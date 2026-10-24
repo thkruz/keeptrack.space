@@ -4,6 +4,8 @@
     "clickToPlay": "Clic para reproducir",
     "clickToPause": "Clic para pausar",
     "clickToResume": "Clic para reanudar",
-    "endOfScenario": "No se puede reproducir: El tiempo de simulación está al final del escenario."
+    "endOfScenario": "No se puede reproducir: El tiempo de simulación está al final del escenario.",
+    "clickToRewind": "Clic para retroceder",
+    "clickToFastForward": "Clic para avanzar rápido"
   }
 }

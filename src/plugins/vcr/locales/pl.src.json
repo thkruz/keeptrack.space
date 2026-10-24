@@ -4,6 +4,8 @@
     "clickToPlay": "Kliknij, aby odtwarzać",
     "clickToPause": "Kliknij, aby wstrzymać",
     "clickToResume": "Kliknij, aby wznowić",
-    "endOfScenario": "Nie można odtwarzać: Czas symulacji osiągnął koniec scenariusza."
+    "endOfScenario": "Nie można odtwarzać: Czas symulacji osiągnął koniec scenariusza.",
+    "clickToRewind": "Kliknij, aby przewinąć do tyłu",
+    "clickToFastForward": "Kliknij, aby przewinąć do przodu"
   }
 }

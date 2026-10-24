@@ -55,13 +55,13 @@ export class VcrPlugin extends KeepTrackPlugin {
         vcrEl.id = 'vcr-container';
         vcrEl.className = 'vcr-container';
         vcrEl.innerHTML = html`
-              <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Rewind">
+              <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" kt-tooltip="${t7e('VcrPlugin.clickToRewind')}">
                 <img class="top-menu-icons__blue-img" src="${rewindPng}">
               </div>
-              <div id="vcr-play-pause-btn" class="vcr-btn top-menu-icons bmenu-item-selected" kt-tooltip="Click to Pause">
+              <div id="vcr-play-pause-btn" class="vcr-btn top-menu-icons bmenu-item-selected" kt-tooltip="${t7e('VcrPlugin.clickToPause')}">
                 <img class="top-menu-icons__blue-img" src="${pausePng}">
               </div>
-              <div id="vcr-fast-forward-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Fast Forward">
+              <div id="vcr-fast-forward-btn" class="vcr-btn top-menu-icons" kt-tooltip="${t7e('VcrPlugin.clickToFastForward')}">
                 <img class="top-menu-icons__blue-img" src="${fastForwardPng}">
               </div>
           `;

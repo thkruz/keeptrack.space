@@ -4,6 +4,8 @@
     "clickToPlay": "Klicken zum Abspielen",
     "clickToPause": "Klicken zum Pausieren",
     "clickToResume": "Klicken zum Fortsetzen",
-    "endOfScenario": "Wiedergabe nicht möglich: Die Simulationszeit befindet sich am Ende des Szenarios."
+    "endOfScenario": "Wiedergabe nicht möglich: Die Simulationszeit befindet sich am Ende des Szenarios.",
+    "clickToRewind": "Klicken zum Zurückspulen",
+    "clickToFastForward": "Klicken zum Vorspulen"
   }
 }

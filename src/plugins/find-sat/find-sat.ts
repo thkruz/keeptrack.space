@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
 
-import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
+import { countryCodeList, countryNameList, getCountryDisplayName } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -516,9 +516,13 @@ export class FindSatPlugin extends KeepTrackPlugin {
       });
     FindSatPlugin.addSelectFilter_('fbl-bus-filter', 'fbl-bus');
 
-    countryNameList.forEach((countryName: string) => {
-      getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${countryCodeList[countryName]}">${countryName}</option>`);
-    });
+    // Values stay the catalog codes; only the option text follows the UI language.
+    countryNameList
+      .map((countryName: string) => ({ code: countryCodeList[countryName], label: getCountryDisplayName(countryName) }))
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .forEach(({ code, label }) => {
+        getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${code}">${label}</option>`);
+      });
 
     FindSatPlugin.wireAllOptionExclusivity_('fbl-type', '0');
     FindSatPlugin.wireAllOptionExclusivity_('fbl-country', 'All');

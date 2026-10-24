@@ -15,20 +15,23 @@ import { DecayedPredicate, getOperationalStatus, OperationalStatus } from './fin
 /** One exported spreadsheet row. */
 export type FindSatExportRow = Record<string, unknown>;
 
-/** Localized coarse status bucket label (Active / Inactive / Unknown). */
-export const operationalStatusLabel = (status: OperationalStatus): string => {
+/** Spreadsheet values stay English for machine parsing, whatever the UI language. */
+const EXPORT_LNG = { lng: 'en' };
+
+/** Coarse status bucket label (Active / Inactive / Unknown), localized unless `opts` pins a language. */
+export const operationalStatusLabel = (status: OperationalStatus, opts?: Record<string, unknown>): string => {
   switch (status) {
     case 'active':
-      return t7e('plugins.FindSatPlugin.labels.statusActive' as Parameters<typeof t7e>[0]);
+      return t7e('plugins.FindSatPlugin.labels.statusActive' as Parameters<typeof t7e>[0], opts);
     case 'inactive':
-      return t7e('plugins.FindSatPlugin.labels.statusInactive' as Parameters<typeof t7e>[0]);
+      return t7e('plugins.FindSatPlugin.labels.statusInactive' as Parameters<typeof t7e>[0], opts);
     default:
-      return t7e('plugins.FindSatPlugin.labels.statusUnknown' as Parameters<typeof t7e>[0]);
+      return t7e('plugins.FindSatPlugin.labels.statusUnknown' as Parameters<typeof t7e>[0], opts);
   }
 };
 
-/** Localized "Decayed" label for the detailed status column. */
-const decayedLabel = (): string => t7e('plugins.FindSatPlugin.labels.statusDecayed' as Parameters<typeof t7e>[0]);
+/** English "Decayed" label for the detailed status column. */
+const decayedLabel = (): string => t7e('plugins.FindSatPlugin.labels.statusDecayed' as Parameters<typeof t7e>[0], EXPORT_LNG);
 
 /**
  * The detailed status text the satellite info box shows on its "Status" row.
@@ -47,21 +50,21 @@ const payloadStatusDetail = (sat: Satellite, isDecayed?: DecayedPredicate): stri
 
   switch (sat.status) {
     case PayloadStatus.OPERATIONAL:
-      return t7e('SatInfoBoxObject.Status.operational');
+      return t7e('SatInfoBoxObject.Status.operational', EXPORT_LNG);
     case PayloadStatus.NONOPERATIONAL:
-      return t7e('SatInfoBoxObject.Status.nonOperational');
+      return t7e('SatInfoBoxObject.Status.nonOperational', EXPORT_LNG);
     case PayloadStatus.PARTIALLY_OPERATIONAL:
-      return t7e('SatInfoBoxObject.Status.partiallyOperational');
+      return t7e('SatInfoBoxObject.Status.partiallyOperational', EXPORT_LNG);
     case PayloadStatus.EXTENDED_MISSION:
-      return t7e('SatInfoBoxObject.Status.extendedMission');
+      return t7e('SatInfoBoxObject.Status.extendedMission', EXPORT_LNG);
     case PayloadStatus.BACKUP_STANDBY:
-      return t7e('SatInfoBoxObject.Status.backupStandby');
+      return t7e('SatInfoBoxObject.Status.backupStandby', EXPORT_LNG);
     case PayloadStatus.SPARE:
-      return t7e('SatInfoBoxObject.Status.spare');
+      return t7e('SatInfoBoxObject.Status.spare', EXPORT_LNG);
     case PayloadStatus.DECAYED:
       return decayedLabel();
     default:
-      return t7e('SatInfoBoxObject.Status.unknown');
+      return t7e('SatInfoBoxObject.Status.unknown', EXPORT_LNG);
   }
 };
 
@@ -86,7 +89,7 @@ export const buildFindSatExportRows = (objs: BaseObject[], isDecayed?: DecayedPr
       raan: sat.rightAscension,
       apogee: sat.apogee,
       perigee: sat.perigee,
-      operationalStatus: operationalStatusLabel(getOperationalStatus(sat, isDecayed)),
+      operationalStatus: operationalStatusLabel(getOperationalStatus(sat, isDecayed), EXPORT_LNG),
       status: payloadStatusDetail(sat, isDecayed),
       country: sat.country,
       site: sat.launchSite,

@@ -74,10 +74,15 @@
         "invalidPeriod": "Nieprawidłowy okres. Musi mieć format NN.NNNN do NNNN.NNNN (np. 90.0000, 9999.9999) z łącznie 8 cyframi.",
         "invalidSource": "Nieprawidłowe źródło. Nie może być puste.",
         "invalidName": "Nieprawidłowa nazwa. Nie może być pusta.",
-        "slotOccupied": "Nadpisywanie istniejącego satelity {name} w slocie {scc}.",
         "noFreeSlots": "Brak wolnych slotów analitycznych (90000-99999 są zajęte).",
         "noSatSelected": "Najpierw wybierz satelitę do sklonowania.",
-        "tleChecksumMismatch": "Suma kontrolna wiersza {line} TLE wynosi {actual}, a powinna wynosić {expected}. Może to wskazywać na literówkę. Kontynuowanie mimo to."
+        "tleChecksumMismatch": "Suma kontrolna wiersza {line} TLE wynosi {actual}, a powinna wynosić {expected}. Może to wskazywać na literówkę. Kontynuowanie mimo to.",
+        "periodToMeanMotionFailed": "Błąd przeliczania okresu na ruch średni",
+        "meanMotionToPeriodFailed": "Błąd przeliczania ruchu średniego na okres: {error}",
+        "satrecFailed": "Błąd tworzenia rekordu satelity!",
+        "cruncherFailed": "Komunikat do Sat Cruncher nie powiódł się",
+        "orbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się",
+        "createFailed": "Nie udało się utworzyć satelity: {error}"
       },
       "successMsgs": {
         "satCreated": "Satelita {name} ({scc}) utworzony pomyślnie",

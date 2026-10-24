@@ -74,10 +74,15 @@
         "invalidPeriod": "Ungültige Periode. Muss im Format NN.NNNN bis NNNN.NNNN sein (z.B. 90.0000, 9999.9999) mit insgesamt 8 Ziffern.",
         "invalidSource": "Ungültige Quelle. Darf nicht leer sein.",
         "invalidName": "Ungültiger Name. Darf nicht leer sein.",
-        "slotOccupied": "Vorhandener Satellit {name} in Slot {scc} wird überschrieben.",
         "noFreeSlots": "Keine freien Analyst-Slots mehr (90000-99999 sind alle belegt).",
         "noSatSelected": "Wählen Sie zuerst einen Satelliten zum Klonen aus.",
-        "tleChecksumMismatch": "Die Prüfsumme von TLE-Zeile {line} ist {actual}, sollte aber {expected} sein. Dies kann auf einen Tippfehler hinweisen. Es wird trotzdem fortgefahren."
+        "tleChecksumMismatch": "Die Prüfsumme von TLE-Zeile {line} ist {actual}, sollte aber {expected} sein. Dies kann auf einen Tippfehler hinweisen. Es wird trotzdem fortgefahren.",
+        "periodToMeanMotionFailed": "Fehler beim Umrechnen der Periode in die mittlere Bewegung",
+        "meanMotionToPeriodFailed": "Fehler beim Umrechnen der mittleren Bewegung in die Periode: {error}",
+        "satrecFailed": "Fehler beim Erstellen des Satellitendatensatzes!",
+        "cruncherFailed": "Nachricht an den Sat Cruncher fehlgeschlagen",
+        "orbitBufferFailed": "Ändern der Orbit-Pufferdaten fehlgeschlagen",
+        "createFailed": "Satellit konnte nicht erstellt werden: {error}"
       },
       "successMsgs": {
         "satCreated": "Satellit {name} ({scc}) erfolgreich erstellt",

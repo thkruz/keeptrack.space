@@ -74,10 +74,15 @@
         "invalidPeriod": "周期无效。格式必须为 NN.NNNN 到 NNNN.NNNN（例如 90.0000、9999.9999），共 8 位数字。",
         "invalidSource": "来源无效。不能为空。",
         "invalidName": "名称无效。不能为空。",
-        "slotOccupied": "正在覆盖槽位 {scc} 中的现有卫星 {name}。",
         "noFreeSlots": "没有可用的分析槽位（90000-99999 已全部占用）。",
         "noSatSelected": "请先选择要克隆的卫星。",
-        "tleChecksumMismatch": "TLE 第 {line} 行的校验和为 {actual}，应为 {expected}。这可能表示存在输入错误。仍将继续。"
+        "tleChecksumMismatch": "TLE 第 {line} 行的校验和为 {actual}，应为 {expected}。这可能表示存在输入错误。仍将继续。",
+        "periodToMeanMotionFailed": "将周期转换为平均运动时出错",
+        "meanMotionToPeriodFailed": "将平均运动转换为周期时出错：{error}",
+        "satrecFailed": "创建卫星记录时出错！",
+        "cruncherFailed": "Sat Cruncher 消息发送失败",
+        "orbitBufferFailed": "更改轨道缓冲区数据失败",
+        "createFailed": "无法创建卫星：{error}"
       },
       "successMsgs": {
         "satCreated": "卫星 {name}（{scc}）创建成功",

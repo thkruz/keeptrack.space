@@ -1,5 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
-import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
+import { countryCodeList, countryNameList, getCountryDisplayName } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -256,15 +256,21 @@ export class CreateSat extends KeepTrackPlugin {
     // Submit button for Basic tab
     getEl('createSat-basic-submit')!.addEventListener('click', this.createSatBasicSubmit_.bind(this));
 
-    countryNameList.forEach((countryName: string) => {
-      let countryCode = countryCodeList[countryName];
+    // Values stay the catalog codes; only the option text follows the UI language.
+    countryNameList
+      .map((countryName: string) => {
+        let countryCode = countryCodeList[countryName];
 
-      if (typeof countryCode === 'string' && countryCode.includes('|')) {
-        countryCode = countryCode.split('|')[0];
-      }
+        if (typeof countryCode === 'string' && countryCode.includes('|')) {
+          countryCode = countryCode.split('|')[0];
+        }
 
-      getEl(`${CreateSat.elementPrefix}-country`)!.insertAdjacentHTML('beforeend', `<option value="${countryCode}">${countryName}</option>`);
-    });
+        return { countryCode, label: getCountryDisplayName(countryName) };
+      })
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .forEach(({ countryCode, label }) => {
+        getEl(`${CreateSat.elementPrefix}-country`)!.insertAdjacentHTML('beforeend', `<option value="${countryCode}">${label}</option>`);
+      });
 
     // Presets, clone, sun-sync, live preview, and inline validation
     this.wireAdvancedTools_();
@@ -504,7 +510,7 @@ export class CreateSat extends KeepTrackPlugin {
         // A programmatic value change fires no event; tell the derived readouts (they listen for input).
         getEl(`${CreateSat.elementPrefix}-meanmo`)?.dispatchEvent(new Event('input'));
       } catch (error) {
-        errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting period to mean motion');
+        errorManagerInstance.error(error as Error, 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.periodToMeanMotionFailed' as T7eKey));
       }
     });
 
@@ -528,7 +534,7 @@ export class CreateSat extends KeepTrackPlugin {
          */
         meanmoInput.value = parseFloat(meanmo).toFixed(5).padStart(8, '0');
       } catch (error) {
-        errorManagerInstance.warn(`Error converting mean motion to period: ${error}`);
+        errorManagerInstance.warn(t7e('plugins.CreateSat.errorMsgs.meanMotionToPeriodFailed' as T7eKey).replace('{error}', String(error)));
       }
     });
   }
@@ -933,7 +939,7 @@ export class CreateSat extends KeepTrackPlugin {
       try {
         satrec = Sgp4.createSatrec(tle1, tle2);
       } catch (e) {
-        errorManagerInstance.error(e as Error, 'create-sat.ts', 'Error creating satellite record!');
+        errorManagerInstance.error(e as Error, 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.satrecFailed' as T7eKey));
 
         return;
       }
@@ -978,14 +984,14 @@ export class CreateSat extends KeepTrackPlugin {
       try {
         catalogManagerInstance.satCruncherThread.sendSatEdit(satId, tle1, tle2, true);
       } catch (e) {
-        errorManagerInstance.error(e as Error, 'create-sat.ts', 'Sat Cruncher message failed');
+        errorManagerInstance.error(e as Error, 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.cruncherFailed' as T7eKey));
       }
 
       // Update orbit buffer
       try {
         orbitManagerInstance.changeOrbitBufferData(satId, tle1, tle2);
       } catch (e) {
-        errorManagerInstance.error(e as Error, 'create-sat.ts', 'Changing orbit buffer data failed');
+        errorManagerInstance.error(e as Error, 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.orbitBufferFailed' as T7eKey));
       }
 
       // Seed the render buffers so the immediate search below does not read
@@ -1012,7 +1018,7 @@ export class CreateSat extends KeepTrackPlugin {
         true
       );
     } catch (error) {
-      errorManagerInstance.warn(`Failed to create satellite: ${error}`);
+      errorManagerInstance.warn(t7e('plugins.CreateSat.errorMsgs.createFailed' as T7eKey).replace('{error}', String(error)));
     }
   }
 
@@ -1045,7 +1051,7 @@ export class CreateSat extends KeepTrackPlugin {
       saveAs(blob, `${scc}.tle`);
       ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.successMsgs.tleExported' as T7eKey), ToastMsgType.normal, true);
     } catch (error) {
-      errorManagerInstance.error(error as Error, 'create-sat.ts', 'Failed to export TLE');
+      errorManagerInstance.error(error as Error, 'create-sat.ts', t7e('plugins.CreateSat.errorMsgs.exportFailed' as T7eKey));
       ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.exportFailed' as T7eKey), ToastMsgType.error, true);
     }
   }

@@ -74,10 +74,15 @@
         "invalidPeriod": "Período no válido. Debe tener el formato NN.NNNN a NNNN.NNNN (ej., 90.0000, 9999.9999) con 8 dígitos en total.",
         "invalidSource": "Fuente no válida. No debe estar vacía.",
         "invalidName": "Nombre no válido. No debe estar vacío.",
-        "slotOccupied": "Sobrescribiendo el satélite existente {name} en la ranura {scc}.",
         "noFreeSlots": "No quedan ranuras de analista libres (90000-99999 están todas en uso).",
         "noSatSelected": "Seleccione primero un satélite para clonar.",
-        "tleChecksumMismatch": "La suma de verificación de la línea {line} del TLE es {actual}, pero debería ser {expected}. Esto puede indicar un error tipográfico. Se continúa de todos modos."
+        "tleChecksumMismatch": "La suma de verificación de la línea {line} del TLE es {actual}, pero debería ser {expected}. Esto puede indicar un error tipográfico. Se continúa de todos modos.",
+        "periodToMeanMotionFailed": "Error al convertir el período en movimiento medio",
+        "meanMotionToPeriodFailed": "Error al convertir el movimiento medio en período: {error}",
+        "satrecFailed": "¡Error al crear el registro del satélite!",
+        "cruncherFailed": "Falló el mensaje al Sat Cruncher",
+        "orbitBufferFailed": "Falló el cambio de los datos del búfer de órbita",
+        "createFailed": "No se pudo crear el satélite: {error}"
       },
       "successMsgs": {
         "satCreated": "Satélite {name} ({scc}) creado exitosamente",

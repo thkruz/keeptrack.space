@@ -74,10 +74,15 @@
         "invalidPeriod": "無効な周期です。NN.NNNN〜NNNN.NNNN形式（例：90.0000、9999.9999）で合計8桁の数字を入力してください。",
         "invalidSource": "無効なソースです。空にすることはできません。",
         "invalidName": "無効な名前です。空にすることはできません。",
-        "slotOccupied": "スロット {scc} の既存衛星 {name} を上書きします。",
         "noFreeSlots": "空きのアナリストスロットがありません（90000～99999 はすべて使用中です）。",
         "noSatSelected": "先に複製する衛星を選択してください。",
-        "tleChecksumMismatch": "TLEの{line}行目のチェックサムは{actual}ですが、正しくは{expected}です。入力ミスの可能性があります。処理はそのまま続行します。"
+        "tleChecksumMismatch": "TLEの{line}行目のチェックサムは{actual}ですが、正しくは{expected}です。入力ミスの可能性があります。処理はそのまま続行します。",
+        "periodToMeanMotionFailed": "周期から平均運動への変換でエラーが発生しました",
+        "meanMotionToPeriodFailed": "平均運動から周期への変換でエラーが発生しました: {error}",
+        "satrecFailed": "衛星レコードの作成でエラーが発生しました!",
+        "cruncherFailed": "Sat Cruncherへのメッセージ送信に失敗しました",
+        "orbitBufferFailed": "軌道バッファデータの変更に失敗しました",
+        "createFailed": "衛星を作成できませんでした: {error}"
       },
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",

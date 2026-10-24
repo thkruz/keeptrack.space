@@ -1,4 +1,4 @@
-import { countryFlagIconMap } from '@app/app/data/catalogs/countries';
+import { countryFlagIconMap, getCountryDisplayName } from '@app/app/data/catalogs/countries';
 import { GroupType } from '@app/app/data/object-group';
 import { SearchResult, SearchResultType } from '@app/app/ui/search-manager';
 import { StringExtractor } from '@app/app/ui/string-extractor';
@@ -99,7 +99,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
   }
 
   getCommandPaletteCommands(): ICommandPaletteCommand[] {
-    const category = 'Countries';
+    const category = t7e('plugins.CountriesMenu.bottomIconLabel');
     const catalogManager = ServiceLocator.getCatalogManager();
     const countryCodeList = [] as string[];
 
@@ -124,6 +124,7 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
     });
 
     return Object.entries(countryGroups)
+      .map(([englishName, codes]): [string, string[]] => [getCountryDisplayName(englishName), codes])
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([country, codes]) => {
         const dataGroup = codes.join('|');
@@ -226,22 +227,26 @@ export class CountriesMenu extends KeepTrackPlugin implements ICommandPaletteCap
     // Create a single full-width v13 action row per country, with all codes
     // merged by '|'. The flag + name live in the .kt-action-label so the count
     // chip rides next to the chevron.
-    const mergedList = Object.entries(countryGroups).reduce((acc, [country, codes]) => {
-      const dataGroup = codes.join('|');
-      const flagCode = countryFlagIconMap[codes[0]] ?? 'unknown';
-      const flagClass = `fi fi-${flagCode.toLowerCase()}`;
-      const satCount = codes.reduce((sum, code) => sum + (countByCode[code] ?? 0), 0);
+    // Groups key on the English name; rows show and sort by the UI-language label.
+    const mergedList = Object.entries(countryGroups)
+      .map(([englishName, codes]): [string, string[]] => [getCountryDisplayName(englishName), codes])
+      .sort(([a], [b]) => a.localeCompare(b))
+      .reduce((acc, [country, codes]) => {
+        const dataGroup = codes.join('|');
+        const flagCode = countryFlagIconMap[codes[0]] ?? 'unknown';
+        const flagClass = `fi fi-${flagCode.toLowerCase()}`;
+        const satCount = codes.reduce((sum, code) => sum + (countByCode[code] ?? 0), 0);
 
-      return (
-        `${acc}<button type="button" class="kt-action waves-effect country-option" data-group="${dataGroup}">` +
-        '<span class="kt-action-label">' +
-        `<span class="${flagClass} country-flag"></span>` +
-        `<span class="country-name">${country}</span>` +
-        '</span>' +
-        `<span class="country-count">${satCount.toLocaleString()}</span>` +
-        '</button>'
-      );
-    }, '');
+        return (
+          `${acc}<button type="button" class="kt-action waves-effect country-option" data-group="${dataGroup}">` +
+          '<span class="kt-action-label">' +
+          `<span class="${flagClass} country-flag"></span>` +
+          `<span class="country-name">${country}</span>` +
+          '</span>' +
+          `<span class="country-count">${satCount.toLocaleString()}</span>` +
+          '</button>'
+        );
+      }, '');
 
     return mergedList;
   }

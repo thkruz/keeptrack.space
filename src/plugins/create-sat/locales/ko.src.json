@@ -74,10 +74,15 @@
         "invalidPeriod": "잘못된 주기입니다. NN.NNNN에서 NNNN.NNNN 형식이어야 합니다 (예: 90.0000, 9999.9999), 총 8자리.",
         "invalidSource": "잘못된 소스입니다. 비워둘 수 없습니다.",
         "invalidName": "잘못된 이름입니다. 비워둘 수 없습니다.",
-        "slotOccupied": "슬롯 {scc}의 기존 위성 {name}을(를) 덮어씁니다.",
         "noFreeSlots": "사용 가능한 분석 슬롯이 없습니다(90000-99999가 모두 사용 중입니다).",
         "noSatSelected": "먼저 복제할 위성을 선택하세요.",
-        "tleChecksumMismatch": "TLE {line}행의 체크섬이 {actual}이지만 {expected}이어야 합니다. 오타일 수 있습니다. 그대로 계속 진행합니다."
+        "tleChecksumMismatch": "TLE {line}행의 체크섬이 {actual}이지만 {expected}이어야 합니다. 오타일 수 있습니다. 그대로 계속 진행합니다.",
+        "periodToMeanMotionFailed": "주기를 평균 운동으로 변환하는 중 오류가 발생했습니다",
+        "meanMotionToPeriodFailed": "평균 운동을 주기로 변환하는 중 오류가 발생했습니다: {error}",
+        "satrecFailed": "위성 레코드를 만드는 중 오류가 발생했습니다!",
+        "cruncherFailed": "Sat Cruncher 메시지 전송에 실패했습니다",
+        "orbitBufferFailed": "궤도 버퍼 데이터 변경에 실패했습니다",
+        "createFailed": "위성을 만들지 못했습니다: {error}"
       },
       "successMsgs": {
         "satCreated": "위성 {name} ({scc})이(가) 성공적으로 생성되었습니다",

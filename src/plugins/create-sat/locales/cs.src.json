@@ -74,10 +74,15 @@
         "invalidPeriod": "Neplatná perioda. Musí být ve formátu NN.NNNN až NNNN.NNNN (např. 90.0000, 9999.9999) s celkem 8 číslicemi.",
         "invalidSource": "Neplatný zdroj. Nesmí být prázdný.",
         "invalidName": "Neplatný název. Nesmí být prázdný.",
-        "slotOccupied": "Přepisuje se stávající satelit {name} ve slotu {scc}.",
         "noFreeSlots": "Nezbývají žádné volné analytické sloty (90000-99999 jsou všechny obsazené).",
         "noSatSelected": "Nejprve vyberte satelit ke klonování.",
-        "tleChecksumMismatch": "Kontrolní součet řádku {line} TLE je {actual}, ale měl by být {expected}. Může jít o překlep. Pokračuje se i přesto."
+        "tleChecksumMismatch": "Kontrolní součet řádku {line} TLE je {actual}, ale měl by být {expected}. Může jít o překlep. Pokračuje se i přesto.",
+        "periodToMeanMotionFailed": "Chyba při převodu periody na střední pohyb",
+        "meanMotionToPeriodFailed": "Chyba při převodu středního pohybu na periodu: {error}",
+        "satrecFailed": "Chyba při vytváření záznamu družice!",
+        "cruncherFailed": "Zpráva pro Sat Cruncher selhala",
+        "orbitBufferFailed": "Změna dat vyrovnávací paměti oběžné dráhy selhala",
+        "createFailed": "Družici se nepodařilo vytvořit: {error}"
       },
       "successMsgs": {
         "satCreated": "Satelit {name} ({scc}) byl úspěšně vytvořen",

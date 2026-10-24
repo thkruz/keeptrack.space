@@ -74,10 +74,15 @@
         "invalidPeriod": "Invalid period. Must be in the format NN.NNNN to NNNN.NNNN (e.g., 90.0000, 9999.9999) with 8 digits total.",
         "invalidSource": "Invalid source. Must not be empty.",
         "invalidName": "Invalid name. Must not be empty.",
-        "slotOccupied": "Overwriting existing satellite {name} in slot {scc}.",
         "noFreeSlots": "No free analyst slots remain (90000-99999 are all in use).",
         "noSatSelected": "Select a satellite to clone first.",
-        "tleChecksumMismatch": "TLE line {line} checksum is {actual} but should be {expected}. This may indicate a typo. Continuing anyway."
+        "tleChecksumMismatch": "TLE line {line} checksum is {actual} but should be {expected}. This may indicate a typo. Continuing anyway.",
+        "periodToMeanMotionFailed": "Error converting period to mean motion",
+        "meanMotionToPeriodFailed": "Error converting mean motion to period: {error}",
+        "satrecFailed": "Error creating satellite record!",
+        "cruncherFailed": "Sat Cruncher message failed",
+        "orbitBufferFailed": "Changing orbit buffer data failed",
+        "createFailed": "Failed to create satellite: {error}"
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",

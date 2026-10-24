@@ -1,10 +1,17 @@
-import { CUSTOM_SENSOR_DEFAULT_NAME, formatCustomSensorLocation, isCustomSensor, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
+import {
+  CUSTOM_SENSOR_DEFAULT_NAME,
+  formatCustomSensorLocation,
+  isCustomSensor,
+  isDefaultCustomSensorName,
+  resolveCustomSensorName,
+} from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorManager } from '@app/app/sensors/sensorManager';
 import { KeepTrack } from '@app/keeptrack';
 import { buildCustomSensorParams, CustomSensorFormValues } from '@app/plugins/sensor/custom-sensor-core';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
+import i18next from 'i18next';
 import { vi } from 'vitest';
 
 const DENVER: CustomSensorFormValues = {
@@ -92,6 +99,16 @@ describe('custom sensor display name', () => {
     expect(isCustomSensor({ objName: 'Custom Sensor-legacy', name: 'Old name' })).toBe(true);
     expect(isCustomSensor({ objName: 'Custom Sensor', name: 'Custom Sensor' })).toBe(true);
     expect(isCustomSensor(null)).toBe(false);
+  });
+
+  it('recognises the default name in any UI language, not just the current one', () => {
+    const germanDefault = i18next.t('sensorMath.customSensorDefaultName', { lng: 'de' });
+    const japaneseDefault = i18next.t('sensorMath.customSensorDefaultName', { lng: 'ja' });
+
+    expect(germanDefault).not.toBe(CUSTOM_SENSOR_DEFAULT_NAME);
+    expect(isDefaultCustomSensorName(germanDefault)).toBe(true);
+    expect(isCustomSensor({ name: japaneseDefault })).toBe(true);
+    expect(isCustomSensor({ name: 'Denver imaging' })).toBe(false);
   });
 
   it('formats the location line', () => {

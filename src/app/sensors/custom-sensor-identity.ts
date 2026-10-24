@@ -1,3 +1,6 @@
+import { t7e } from '@app/locales/keys';
+import i18next from 'i18next';
+
 /**
  * Custom sensor identity helpers.
  *
@@ -28,7 +31,30 @@ export function isCustomSensor(sensor: CustomSensorLike | null | undefined): boo
     return true;
   }
 
-  return !!sensor.objName?.startsWith(CUSTOM_SENSOR_OBJNAME_PREFIX) || sensor.name === CUSTOM_SENSOR_DEFAULT_NAME;
+  return !!sensor.objName?.startsWith(CUSTOM_SENSOR_OBJNAME_PREFIX) || isDefaultCustomSensorName(sensor.name);
+}
+
+/**
+ * True when `name` is the default custom-sensor name in English or in any loaded UI
+ * language. The displayed default is localized (`sensorMath.customSensorDefaultName`),
+ * so identity must never depend on the current language's wording alone.
+ */
+export function isDefaultCustomSensorName(name: string | null | undefined): boolean {
+  if (!name) {
+    return false;
+  }
+  if (name === CUSTOM_SENSOR_DEFAULT_NAME) {
+    return true;
+  }
+
+  const languages = Object.keys(i18next.options?.resources ?? {});
+
+  return languages.some((lng) => i18next.t('sensorMath.customSensorDefaultName', { lng }) === name);
+}
+
+/** The localized default custom-sensor name for display. */
+export function getCustomSensorDefaultDisplayName(): string {
+  return t7e('sensorMath.customSensorDefaultName');
 }
 
 /** The typed name, trimmed, or the default when it is empty. */
@@ -41,7 +67,7 @@ export function resolveCustomSensorName(typedName: string | null | undefined): s
 /** Location line for a custom sensor, e.g. `39.739°N, 104.990°W`. */
 export function formatCustomSensorLocation(lat: number, lon: number): string {
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    return 'Custom location';
+    return t7e('sensorMath.customLocation');
   }
   const latStr = `${Math.abs(lat).toFixed(3)}°${lat >= 0 ? 'N' : 'S'}`;
   const lonStr = `${Math.abs(lon).toFixed(3)}°${lon >= 0 ? 'E' : 'W'}`;

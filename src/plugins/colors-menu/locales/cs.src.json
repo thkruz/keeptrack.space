@@ -13,6 +13,13 @@
         "tip1": "Legenda se aktualizuje spolu se schématem; pokud si nejste jisti, co barva znamená, legenda je rozhodující.",
         "tip2": "Některá schémata jsou datově náročná (například prostorová hustota) a jejich první výpočet chvíli trvá.",
         "shortcutToggle": "Přepnout nabídku Barevná schémata"
+      },
+      "commandPalette": {
+        "category": "Barvy",
+        "setScheme": "Nastavit barevné schéma: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Barevné schéma nenalezeno: {name}"
       }
     }
   }

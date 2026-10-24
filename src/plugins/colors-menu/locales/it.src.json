@@ -13,6 +13,13 @@
         "tip1": "La legenda si aggiorna con lo schema; se non sei sicuro del significato di un colore, la legenda è il riferimento.",
         "tip2": "Alcuni schemi richiedono molti dati (come la densità spaziale) e impiegano un momento per essere calcolati alla prima selezione.",
         "shortcutToggle": "Attiva/disattiva il menu Schemi di Colore"
+      },
+      "commandPalette": {
+        "category": "Colori",
+        "setScheme": "Imposta schema colori: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Schema colori non trovato: {name}"
       }
     }
   }

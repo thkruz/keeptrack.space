@@ -13,6 +13,13 @@
         "tip1": "La légende se met à jour avec le schéma ; en cas de doute sur la signification d'une couleur, la légende fait foi.",
         "tip2": "Certains schémas sont gourmands en données (comme la densité spatiale) et demandent un instant de calcul à la première sélection.",
         "shortcutToggle": "Basculer le menu Schémas de Couleurs"
+      },
+      "commandPalette": {
+        "category": "Couleurs",
+        "setScheme": "Définir le schéma de couleurs : {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Schéma de couleurs introuvable : {name}"
       }
     }
   }

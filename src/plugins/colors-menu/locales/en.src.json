@@ -13,6 +13,13 @@
         "tip1": "The legend updates with the scheme; if you are unsure what a color means, the legend is the authority.",
         "tip2": "Some schemes are data heavy (like spatial density) and take a moment to compute the first time they are selected.",
         "shortcutToggle": "Toggle the Color Schemes menu"
+      },
+      "commandPalette": {
+        "category": "Colors",
+        "setScheme": "Set Color Scheme: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Color scheme not found: {name}"
       }
     }
   }

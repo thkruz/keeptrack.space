@@ -13,6 +13,13 @@
         "tip1": "Die Legende wird mit dem Schema aktualisiert; wenn Sie unsicher sind, was eine Farbe bedeutet, ist die Legende maßgeblich.",
         "tip2": "Einige Schemata sind datenintensiv (wie die räumliche Dichte) und brauchen beim ersten Auswählen einen Moment zur Berechnung.",
         "shortcutToggle": "Menü Farbschemata umschalten"
+      },
+      "commandPalette": {
+        "category": "Farben",
+        "setScheme": "Farbschema festlegen: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Farbschema nicht gefunden: {name}"
       }
     }
   }

@@ -13,6 +13,13 @@
         "tip1": "图例会随方案更新；如果不确定某种颜色的含义，请以图例为准。",
         "tip2": "部分方案（如空间密度）数据量较大，首次选择时需要片刻计算。",
         "shortcutToggle": "切换配色方案菜单"
+      },
+      "commandPalette": {
+        "category": "颜色",
+        "setScheme": "设置配色方案：{name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "未找到配色方案：{name}"
       }
     }
   }

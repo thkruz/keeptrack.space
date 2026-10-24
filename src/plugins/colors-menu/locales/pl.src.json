@@ -13,6 +13,13 @@
         "tip1": "Legenda aktualizuje się wraz ze schematem; jeśli nie wiesz, co oznacza dany kolor, legenda jest rozstrzygająca.",
         "tip2": "Niektóre schematy są wymagające obliczeniowo (np. gęstość przestrzenna) i przy pierwszym wyborze ich obliczenie chwilę trwa.",
         "shortcutToggle": "Przełącz menu Schematy kolorów"
+      },
+      "commandPalette": {
+        "category": "Kolory",
+        "setScheme": "Ustaw schemat kolorów: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Nie znaleziono schematu kolorów: {name}"
       }
     }
   }

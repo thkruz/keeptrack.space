@@ -13,6 +13,13 @@
         "tip1": "La leyenda se actualiza con el esquema; si no está seguro de qué significa un color, la leyenda es la referencia.",
         "tip2": "Algunos esquemas requieren muchos datos (como la densidad espacial) y tardan un momento en calcularse la primera vez que se seleccionan.",
         "shortcutToggle": "Alternar el menú Esquemas de Color"
+      },
+      "commandPalette": {
+        "category": "Colores",
+        "setScheme": "Establecer esquema de color: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Esquema de color no encontrado: {name}"
       }
     }
   }

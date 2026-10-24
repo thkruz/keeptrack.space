@@ -13,6 +13,13 @@
         "tip1": "범례는 구성표에 따라 갱신됩니다. 색의 의미가 확실하지 않으면 범례를 기준으로 삼으세요.",
         "tip2": "일부 구성표(예: 공간 밀도)는 데이터 처리량이 많아 처음 선택할 때 계산에 잠시 시간이 걸립니다.",
         "shortcutToggle": "색상 구성표 메뉴 전환"
+      },
+      "commandPalette": {
+        "category": "색상",
+        "setScheme": "색 구성표 설정: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "색 구성표를 찾을 수 없습니다: {name}"
       }
     }
   }

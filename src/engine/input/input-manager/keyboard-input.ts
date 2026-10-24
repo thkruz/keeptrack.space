@@ -1,16 +1,85 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { isNativeKeyboardTarget } from '@app/engine/input/input-manager/keyboard-native-target';
 import { KeyEvent } from '../input-manager';
 
 export class KeyboardInput {
   keyStates = new Map<string, boolean>();
   keyUpEvents = <KeyEvent[]>[];
 
+  private readonly appModifierOwners_ = new Set<string>();
+  private readonly nativeKeyOwners_ = new Set<string>();
+
+  private resetKeyStates_ = (): void => {
+    this.keyStates.clear();
+    this.appModifierOwners_.clear();
+    this.nativeKeyOwners_.clear();
+  };
+
+  // Observe ownership before a target can stop propagation or remove itself.
+  // This observer never cancels events or interferes with modal/help capture handlers.
+  private observeNativeKeyDown_ = (event: KeyboardEvent): void => {
+    const identity = event.code || event.key;
+
+    if (event.repeat && this.nativeKeyOwners_.has(identity)) {
+      return;
+    }
+    this.nativeKeyOwners_.delete(identity);
+    if (event.key === 'Tab' || ((event.key === 'Enter' || event.key === ' ') && isNativeKeyboardTarget(event.target))) {
+      this.nativeKeyOwners_.add(identity);
+      this.keyStates.set(event.key, false);
+    }
+  };
+
+  private routeKeyEvent_(event: KeyboardEvent, isDown: boolean): void {
+    const identity = event.code || event.key;
+    const owned = this.nativeKeyOwners_.has(identity);
+
+    if (!isDown) {
+      this.nativeKeyOwners_.delete(identity);
+    }
+    if (owned || event.key === 'Tab' || ((event.key === 'Enter' || event.key === ' ') && isNativeKeyboardTarget(event.target))) {
+      this.keyStates.set(event.key, false);
+      return;
+    }
+    const blocked = (event.target instanceof Element && event.target.classList.contains('keyboard-priority')) || ServiceLocator.getUiManager().isCurrentlyTyping;
+
+    if (blocked) {
+      if (!isDown) {
+        this.keyStates.set(event.key, false);
+        if (this.appModifierOwners_.delete(event.key)) {
+          if (event.key === 'Shift') {
+            // Typing owns held letter keys now; never synthesize fresh application downs.
+            for (let i = 65; i <= 90; i++) {
+              this.keyStates.set(String.fromCharCode(i), false);
+              this.keyStates.set(String.fromCharCode(i).toLowerCase(), false);
+            }
+          }
+          EventBus.getInstance().emit(
+            EventBusEvent.KeyUp,
+            event.key,
+            event.code,
+            false,
+            this.keyStates.get('Shift') ?? false,
+            this.keyStates.get('Control') ?? false,
+            event.altKey
+          );
+        }
+      }
+      return;
+    }
+    if (isDown) {
+      this.keyDownHandler_(event);
+    } else {
+      this.keyUpHandler_(event);
+    }
+  }
+
   init() {
     if (!settingsManager.isEmbedMode) {
-      window.addEventListener('blur', this.keyStates.clear.bind(this.keyStates));
-      window.addEventListener('focus', this.keyStates.clear.bind(this.keyStates));
+      window.addEventListener('blur', this.resetKeyStates_);
+      window.addEventListener('focus', this.resetKeyStates_);
     }
 
     if (!settingsManager.disableUI) {
@@ -31,14 +100,14 @@ export class KeyboardInput {
           if (!event.data || typeof event.data !== 'object') {
             return;
           }
-          if (ServiceLocator.getUiManager().isCurrentlyTyping) {
+          if (!event.data.event || typeof event.data.event.key !== 'string') {
             return;
           }
-
           if (event.data.type === 'keydown') {
-            this.keyDownHandler_(event.data.event as KeyboardEvent);
+            this.observeNativeKeyDown_(event.data.event as KeyboardEvent);
+            this.routeKeyEvent_(event.data.event as KeyboardEvent, true);
           } else if (event.data.type === 'keyup') {
-            this.keyUpHandler_(event.data.event as KeyboardEvent);
+            this.routeKeyEvent_(event.data.event as KeyboardEvent, false);
           }
         });
         /**
@@ -68,27 +137,10 @@ export class KeyboardInput {
          */
       }
 
-      // Listen for keyboard events on the current window
-      window.addEventListener('keydown', (e: Event) => {
-        // If event.target's class contains "keyboard-priority", ignore it
-        if (e.target instanceof Element && e.target.classList.contains('keyboard-priority')) {
-          return;
-        }
-        if (ServiceLocator.getUiManager().isCurrentlyTyping) {
-          return;
-        }
-        this.keyDownHandler_(<KeyboardEvent>e);
-      });
-      window.addEventListener('keyup', (e: Event) => {
-        // If event.target's class contains "keyboard-priority", ignore it
-        if (e.target instanceof Element && e.target.classList.contains('keyboard-priority')) {
-          return;
-        }
-        if (ServiceLocator.getUiManager().isCurrentlyTyping) {
-          return;
-        }
-        this.keyUpHandler_(<KeyboardEvent>e);
-      });
+      // Non-cancelling capture preserves ownership even if the target removes itself.
+      window.addEventListener('keydown', this.observeNativeKeyDown_, true);
+      window.addEventListener('keydown', (event: KeyboardEvent) => this.routeKeyEvent_(event, true));
+      window.addEventListener('keyup', (event: KeyboardEvent) => this.routeKeyEvent_(event, false));
     }
   }
 
@@ -108,6 +160,7 @@ export class KeyboardInput {
     const isAltPressed = evt.altKey;
 
     this.keyStates.set(key, false);
+    this.appModifierOwners_.delete(key);
 
     if (settingsManager.isDisableKeyboard) {
       return;
@@ -119,7 +172,7 @@ export class KeyboardInput {
      * when Shift is pressed
      */
     if (!/^f\d{1,2}$/iu.test(key) && !evt.shiftKey) {
-      evt.preventDefault();
+      evt.preventDefault?.();
     }
 
     EventBus.getInstance().emit(EventBusEvent.KeyUp, key, code, false, isShiftPressed, isCtrlPressed, isAltPressed);
@@ -160,9 +213,12 @@ export class KeyboardInput {
      * when Shift is pressed
      */
     if (!/^f\d{1,2}$/iu.test(key) && !evt.shiftKey) {
-      evt.preventDefault();
+      evt.preventDefault?.();
     }
 
+    if (['Shift', 'Control', 'Alt', 'Meta'].includes(key)) {
+      this.appModifierOwners_.add(key);
+    }
     EventBus.getInstance().emit(EventBusEvent.KeyDown, key, code, isRepeat, isShiftPressed, isCtrlPressed, isAltPressed);
 
     if (key === 'Shift') {

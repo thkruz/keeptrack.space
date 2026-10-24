@@ -4,6 +4,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { isKeyboardFocusableTarget } from '@app/engine/input/input-manager/keyboard-native-target';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { shake } from '@app/engine/utils/shake';
@@ -629,10 +630,17 @@ export class PluginDrawer {
           return;
         }
 
-        // Don't toggle if user is typing in an input/textarea
-        const activeEl = document.activeElement;
-
-        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || (activeEl as HTMLElement).isContentEditable)) {
+        // The drawer shortcut is plain forward Tab on the scene. Controls keep
+        // browser focus traversal, and another keyboard scope retains ownership.
+        if (
+          evt.defaultPrevented ||
+          evt.shiftKey ||
+          evt.ctrlKey ||
+          evt.altKey ||
+          evt.metaKey ||
+          isKeyboardFocusableTarget(evt.target) ||
+          isKeyboardFocusableTarget(document.activeElement)
+        ) {
           return;
         }
 

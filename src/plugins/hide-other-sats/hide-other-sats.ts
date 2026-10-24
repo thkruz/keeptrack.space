@@ -5,6 +5,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
 import disabledVisiblePng from '@public/img/icons/disabled-visible.png';
 
@@ -31,7 +32,7 @@ export class HideOtherSatellitesPlugin extends KeepTrackPlugin {
     return [
       {
         id: 'HideOtherSatellitesPlugin.toggle',
-        label: 'Toggle Hide Other Satellites',
+        label: t7e('plugins.HideOtherSatellitesPlugin.commandPalette.toggle'),
         category: 'Display',
         callback: () => this.bottomMenuClicked(),
       },

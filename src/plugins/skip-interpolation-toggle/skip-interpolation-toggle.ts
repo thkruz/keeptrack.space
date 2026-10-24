@@ -3,6 +3,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import toasterPng from '@public/img/icons/toaster.png';
 
@@ -29,7 +30,7 @@ export class SkipInterpolationToggle extends KeepTrackPlugin {
     return [
       {
         id: 'SkipInterpolationToggle.toggle',
-        label: 'Toggle Skip TLE Interpolation',
+        label: t7e('plugins.SkipInterpolationToggle.commandPalette.toggle'),
         category: 'Display',
         callback: () => this.bottomMenuClicked(),
       },

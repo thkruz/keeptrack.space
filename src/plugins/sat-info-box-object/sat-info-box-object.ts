@@ -189,7 +189,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.Configuration.tooltip')}">${t7e('SatInfoBoxObject.Configuration.label')}
           </div>
-          <div class="sat-info-value" id="${EL.CONFIGURATION}">NO DATA</div>
+          <div class="sat-info-value" id="${EL.CONFIGURATION}">${t7e('SatInfoBoxObject.noData' as Parameters<typeof t7e>[0])}</div>
         </div>`
             : ''
         }
@@ -197,7 +197,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.RCS.tooltip')}">${t7e('SatInfoBoxObject.RCS.label')}
           </div>
-          <div class="sat-info-value" id="${EL.RCS}">NO DATA</div>
+          <div class="sat-info-value" id="${EL.RCS}">${t7e('SatInfoBoxObject.noData' as Parameters<typeof t7e>[0])}</div>
         </div>
         ${
           settingsManager.plugins.SatInfoBoxObject?.isShowStdMag !== false
@@ -206,7 +206,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.StdMag.tooltip')}">${t7e('SatInfoBoxObject.StdMag.label')}
           </div>
-          <div class="sat-info-value" id="${EL.STDMAG}">NO DATA</div>
+          <div class="sat-info-value" id="${EL.STDMAG}">${t7e('SatInfoBoxObject.noData' as Parameters<typeof t7e>[0])}</div>
         </div>`
             : ''
         }
@@ -217,7 +217,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.AppMag.tooltip')}">${t7e('SatInfoBoxObject.AppMag.label')}
           </div>
-          <div class="sat-info-value" id="${EL.APPMAG}">NO DATA</div>
+          <div class="sat-info-value" id="${EL.APPMAG}">${t7e('SatInfoBoxObject.noData' as Parameters<typeof t7e>[0])}</div>
         </div>`
             : ''
         }
@@ -230,7 +230,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     return html`
         <div id="${SECTIONS.SECONDARY}">
           <div class="sat-info-section-header">
-            Secondary Satellite
+            ${t7e('SatInfoBoxObject.Secondary.title' as Parameters<typeof t7e>[0])}
             <span id="${SECTIONS.SECONDARY}-collapse" class="section-collapse material-icons">expand_less</span>
           </div>
           <div class="sat-info-row sat-sec-convention-row">
@@ -238,29 +238,29 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key"
-              kt-tooltip="Linear Distance from Secondary Satellite">
-              Linear
+              kt-tooltip="${t7e('SatInfoBoxObject.Secondary.linearTooltip' as Parameters<typeof t7e>[0])}">
+              ${t7e('SatInfoBoxObject.Secondary.linear' as Parameters<typeof t7e>[0])}
             </div>
             <div class="sat-info-value" id="${EL.DIST}">xxxx km</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key"
-              kt-tooltip="Radial Distance">
-              Radial
+              kt-tooltip="${t7e('SatInfoBoxObject.Secondary.radialTooltip' as Parameters<typeof t7e>[0])}">
+              ${t7e('SatInfoBoxObject.Secondary.radial' as Parameters<typeof t7e>[0])}
             </div>
             <div class="sat-info-value" id="${EL.RAD}">XX deg</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key"
-              kt-tooltip="In-Track Distance from Secondary Satellite">
-              In-Track
+              kt-tooltip="${t7e('SatInfoBoxObject.Secondary.inTrackTooltip' as Parameters<typeof t7e>[0])}">
+              ${t7e('SatInfoBoxObject.Secondary.inTrack' as Parameters<typeof t7e>[0])}
             </div>
             <div class="sat-info-value" id="${EL.INTRACK}">XX deg</div>
           </div>
           <div class="sat-info-row">
             <div class="sat-info-key"
-              kt-tooltip="Cross-Track Distance from Secondary Satellite">
-              Cross-Track
+              kt-tooltip="${t7e('SatInfoBoxObject.Secondary.crossTrackTooltip' as Parameters<typeof t7e>[0])}">
+              ${t7e('SatInfoBoxObject.Secondary.crossTrack' as Parameters<typeof t7e>[0])}
             </div>
             <div class="sat-info-value" id="${EL.CROSSTRACK}">xxxx km</div>
           </div>

@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = secundario menos primario, en el marco RIC del primario."
-    }
+      "ricConvention": "RIC = secundario menos primario, en el marco RIC del primario.",
+      "title": "Satélite secundario",
+      "linear": "Lineal",
+      "linearTooltip": "Distancia lineal al satélite secundario",
+      "radial": "Radial",
+      "radialTooltip": "Distancia radial",
+      "inTrack": "A lo largo de la trayectoria",
+      "inTrackTooltip": "Distancia a lo largo de la trayectoria al satélite secundario",
+      "crossTrack": "Transversal",
+      "crossTrackTooltip": "Distancia transversal al satélite secundario"
+    },
+    "noData": "SIN DATOS"
   }
 }

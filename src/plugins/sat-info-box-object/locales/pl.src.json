@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = obiekt wtórny minus główny, w układzie RIC obiektu głównego."
-    }
+      "ricConvention": "RIC = obiekt wtórny minus główny, w układzie RIC obiektu głównego.",
+      "title": "Satelita dodatkowy",
+      "linear": "Liniowa",
+      "linearTooltip": "Odległość liniowa od satelity dodatkowego",
+      "radial": "Radialna",
+      "radialTooltip": "Odległość radialna",
+      "inTrack": "Wzdłuż toru",
+      "inTrackTooltip": "Odległość wzdłuż toru od satelity dodatkowego",
+      "crossTrack": "Poprzecznie do toru",
+      "crossTrackTooltip": "Odległość poprzeczna od satelity dodatkowego"
+    },
+    "noData": "BRAK DANYCH"
   }
 }

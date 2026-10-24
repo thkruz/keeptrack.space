@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = 보조 객체 빼기 주 객체, 주 객체의 RIC 좌표계 기준."
-    }
+      "ricConvention": "RIC = 보조 객체 빼기 주 객체, 주 객체의 RIC 좌표계 기준.",
+      "title": "보조 위성",
+      "linear": "직선",
+      "linearTooltip": "보조 위성까지의 직선 거리",
+      "radial": "방사 방향",
+      "radialTooltip": "방사 방향 거리",
+      "inTrack": "궤도 방향",
+      "inTrackTooltip": "보조 위성까지의 궤도 방향 거리",
+      "crossTrack": "궤도 수직 방향",
+      "crossTrackTooltip": "보조 위성까지의 궤도 수직 방향 거리"
+    },
+    "noData": "데이터 없음"
   }
 }

@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = 次目标减主目标，位于主目标的 RIC 坐标系中。"
-    }
+      "ricConvention": "RIC = 次目标减主目标，位于主目标的 RIC 坐标系中。",
+      "title": "次要卫星",
+      "linear": "直线",
+      "linearTooltip": "与次要卫星的直线距离",
+      "radial": "径向",
+      "radialTooltip": "径向距离",
+      "inTrack": "沿迹",
+      "inTrackTooltip": "与次要卫星的沿迹距离",
+      "crossTrack": "横迹",
+      "crossTrackTooltip": "与次要卫星的横迹距离"
+    },
+    "noData": "无数据"
   }
 }

@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = secondary minus primary, in the primary's RIC frame."
-    }
+      "ricConvention": "RIC = secondary minus primary, in the primary's RIC frame.",
+      "title": "Secondary Satellite",
+      "linear": "Linear",
+      "linearTooltip": "Linear Distance from Secondary Satellite",
+      "radial": "Radial",
+      "radialTooltip": "Radial Distance",
+      "inTrack": "In-Track",
+      "inTrackTooltip": "In-Track Distance from Secondary Satellite",
+      "crossTrack": "Cross-Track",
+      "crossTrackTooltip": "Cross-Track Distance from Secondary Satellite"
+    },
+    "noData": "NO DATA"
   }
 }

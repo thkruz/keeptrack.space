@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = Sekundärobjekt minus Primärobjekt, im RIC-System des Primärobjekts."
-    }
+      "ricConvention": "RIC = Sekundärobjekt minus Primärobjekt, im RIC-System des Primärobjekts.",
+      "title": "Sekundärsatellit",
+      "linear": "Linear",
+      "linearTooltip": "Lineare Entfernung zum Sekundärsatelliten",
+      "radial": "Radial",
+      "radialTooltip": "Radialer Abstand",
+      "inTrack": "In Bahnrichtung",
+      "inTrackTooltip": "Abstand in Bahnrichtung zum Sekundärsatelliten",
+      "crossTrack": "Quer zur Bahn",
+      "crossTrackTooltip": "Abstand quer zur Bahn zum Sekundärsatelliten"
+    },
+    "noData": "KEINE DATEN"
   }
 }

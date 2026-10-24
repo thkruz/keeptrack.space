@@ -2,6 +2,20 @@
   "SatInfoBoxManeuver": {
     "noEventDetected": "イベント未検出",
     "orbitOutOfFamily": "軌道逸脱",
-    "stabilityChange": "安定性変化"
+    "stabilityChange": "安定性変化",
+    "eventStart": "開始: {time}",
+    "eventEnd": "終了: {time}",
+    "notAvailable": "該当なし",
+    "tooltipTime": "時刻: {time}",
+    "tooltipValue": "値: {value}",
+    "charts": {
+      "epochUtc": "元期 (UTC)",
+      "raan": "昇交点赤経 (°)",
+      "inclination": "軌道傾斜角 (°)",
+      "smaAltitude": "軌道長半径高度 (km)",
+      "eccentricity": "離心率",
+      "eccentricityAxis": "離心率 (無次元)",
+      "meanMotion": "平均運動 (周回/日)"
+    }
   }
 }

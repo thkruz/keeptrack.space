@@ -2,6 +2,20 @@
   "SatInfoBoxManeuver": {
     "noEventDetected": "Aucun événement détecté",
     "orbitOutOfFamily": "Orbite hors famille",
-    "stabilityChange": "Changement de stabilité"
+    "stabilityChange": "Changement de stabilité",
+    "eventStart": "Début : {time}",
+    "eventEnd": "Fin : {time}",
+    "notAvailable": "N/D",
+    "tooltipTime": "Heure : {time}",
+    "tooltipValue": "Valeur : {value}",
+    "charts": {
+      "epochUtc": "Époque (UTC)",
+      "raan": "RAAN (°)",
+      "inclination": "Inclinaison (°)",
+      "smaAltitude": "Altitude du demi-grand axe (km)",
+      "eccentricity": "Excentricité",
+      "eccentricityAxis": "Excentricité (sans dimension)",
+      "meanMotion": "Mouvement moyen (rév/jour)"
+    }
   }
 }

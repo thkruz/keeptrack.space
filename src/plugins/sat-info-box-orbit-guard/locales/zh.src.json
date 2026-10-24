@@ -2,6 +2,20 @@
   "SatInfoBoxManeuver": {
     "noEventDetected": "未检测到事件",
     "orbitOutOfFamily": "轨道偏离族群",
-    "stabilityChange": "稳定性变化"
+    "stabilityChange": "稳定性变化",
+    "eventStart": "开始: {time}",
+    "eventEnd": "结束: {time}",
+    "notAvailable": "不适用",
+    "tooltipTime": "时间: {time}",
+    "tooltipValue": "数值: {value}",
+    "charts": {
+      "epochUtc": "历元 (UTC)",
+      "raan": "升交点赤经 (°)",
+      "inclination": "轨道倾角 (°)",
+      "smaAltitude": "半长轴高度 (km)",
+      "eccentricity": "偏心率",
+      "eccentricityAxis": "偏心率 (无量纲)",
+      "meanMotion": "平均运动 (圈/天)"
+    }
   }
 }

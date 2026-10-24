@@ -207,13 +207,13 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
 
       startLine.style.fontSize = '12px';
       startLine.style.opacity = '0.9';
-      startLine.textContent = `Start: ${det.event_start_timestamp ?? '-'}`;
+      startLine.textContent = t7e('SatInfoBoxManeuver.eventStart' as Parameters<typeof t7e>[0]).replace('{time}', det.event_start_timestamp ?? '-');
 
       const endLine = document.createElement('div');
 
       endLine.style.fontSize = '12px';
       endLine.style.opacity = '0.9';
-      endLine.textContent = `End: ${det.event_end_timestamp ?? '-'}`;
+      endLine.textContent = t7e('SatInfoBoxManeuver.eventEnd' as Parameters<typeof t7e>[0]).replace('{time}', det.event_end_timestamp ?? '-');
 
       header.appendChild(eventLine);
       header.appendChild(startLine);
@@ -420,21 +420,21 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
               if (typeof v === 'number' && isFinite(v)) {
                 valueStr = v.toPrecision(6); // full precision on hover
               } else {
-                valueStr = 'N/A';
+                valueStr = t7e('SatInfoBoxManeuver.notAvailable' as Parameters<typeof t7e>[0]);
               }
 
               return `
               <div>
                 <b>${pt.seriesName ?? title}</b><br/>
-                Time: ${new Date(t).toLocaleString()}<br/>
-                Value: ${valueStr}
+                ${t7e('SatInfoBoxManeuver.tooltipTime' as Parameters<typeof t7e>[0]).replace('{time}', new Date(t).toLocaleString())}<br/>
+                ${t7e('SatInfoBoxManeuver.tooltipValue' as Parameters<typeof t7e>[0]).replace('{value}', valueStr)}
               </div>
             `;
             },
           },
           xAxis: {
             type: 'time',
-            name: 'Epoch (UTC)',
+            name: t7e('SatInfoBoxManeuver.charts.epochUtc' as Parameters<typeof t7e>[0]),
             nameLocation: 'middle',
             nameGap: isFs ? 40 : 28,
             axisLabel: { color: '#fff', fontSize: axisTickFont },
@@ -492,12 +492,47 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
     const elsetData = data.find((item) => !item.name.includes('EO Data'));
 
     if (elsetData?.value?.length) {
-      createChart('raan-chart', 'RAAN (°)', 'RAAN (°)', this.elsetDataColumns.raan, elsetData.value, 'line');
-      createChart('inclination-chart', 'Inclination (°)', 'Inclination (°)', this.elsetDataColumns.inclination, elsetData.value, 'line');
+      createChart(
+        'raan-chart',
+        t7e('SatInfoBoxManeuver.charts.raan' as Parameters<typeof t7e>[0]),
+        t7e('SatInfoBoxManeuver.charts.raan' as Parameters<typeof t7e>[0]),
+        this.elsetDataColumns.raan,
+        elsetData.value,
+        'line'
+      );
+      createChart(
+        'inclination-chart',
+        t7e('SatInfoBoxManeuver.charts.inclination' as Parameters<typeof t7e>[0]),
+        t7e('SatInfoBoxManeuver.charts.inclination' as Parameters<typeof t7e>[0]),
+        this.elsetDataColumns.inclination,
+        elsetData.value,
+        'line'
+      );
       // createChart('semiMajorAxis-chart', 'Semi-Major Axis (km)', 'Semi-Major Axis (km)', this.elsetDataColumns.semiMajorAxis, elsetData.value, 'line');
-      createChart('semiMajorAxisAlt-chart', 'Semi-Major Axis Altitude (km)', 'Semi-Major Axis Altitude (km)', this.elsetDataColumns.semiMajorAxisAlt, elsetData.value, 'line');
-      createChart('eccentricity-chart', 'Eccentricity', 'Eccentricity (dimensionless)', this.elsetDataColumns.eccentricity, elsetData.value, 'line');
-      createChart('meanMotion-chart', 'Mean Motion (rev/day)', 'Mean Motion (rev/day)', this.elsetDataColumns.meanMotion, elsetData.value, 'line');
+      createChart(
+        'semiMajorAxisAlt-chart',
+        t7e('SatInfoBoxManeuver.charts.smaAltitude' as Parameters<typeof t7e>[0]),
+        t7e('SatInfoBoxManeuver.charts.smaAltitude' as Parameters<typeof t7e>[0]),
+        this.elsetDataColumns.semiMajorAxisAlt,
+        elsetData.value,
+        'line'
+      );
+      createChart(
+        'eccentricity-chart',
+        t7e('SatInfoBoxManeuver.charts.eccentricity' as Parameters<typeof t7e>[0]),
+        t7e('SatInfoBoxManeuver.charts.eccentricityAxis' as Parameters<typeof t7e>[0]),
+        this.elsetDataColumns.eccentricity,
+        elsetData.value,
+        'line'
+      );
+      createChart(
+        'meanMotion-chart',
+        t7e('SatInfoBoxManeuver.charts.meanMotion' as Parameters<typeof t7e>[0]),
+        t7e('SatInfoBoxManeuver.charts.meanMotion' as Parameters<typeof t7e>[0]),
+        this.elsetDataColumns.meanMotion,
+        elsetData.value,
+        'line'
+      );
     }
 
     // EO charts

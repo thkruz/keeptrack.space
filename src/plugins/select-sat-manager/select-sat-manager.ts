@@ -294,7 +294,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
   private selectSensorObject_(sensor: DetailedSensor) {
     // All sensors should have a sensorId
     if (!sensor.isSensor()) {
-      errorManagerInstance.log(`SelectSatManager.selectSensorObject_: SensorObject does not have a sensorId: ${sensor}`);
+      errorManagerInstance.log(t7e('plugins.SelectSatManager.errorMsgs.sensorWithoutId').replace('{sensor}', String(sensor)));
 
       return;
     }
@@ -500,10 +500,10 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       if (computed && computed[0] && computed[1] && computed[2]) {
         radii = computed;
       } else {
-        errorManagerInstance.log(`${logContext}: Invalid covariance matrix`);
+        errorManagerInstance.log(t7e('plugins.SelectSatManager.errorMsgs.invalidCovariance').replace('{context}', logContext));
       }
     } catch {
-      errorManagerInstance.log(`${logContext}: Failed to compute covariance from TLE`);
+      errorManagerInstance.log(t7e('plugins.SelectSatManager.errorMsgs.covarianceFromTleFailed').replace('{context}', logContext));
     }
 
     return radii;
@@ -695,7 +695,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       if (this.secondarySatObj instanceof MissileObject) {
         this.secondarySatObj = null;
 
-        errorManagerInstance.warn('Selecting a missile as the secondary object is not supported!');
+        errorManagerInstance.warn(t7e('plugins.SelectSatManager.errorMsgs.missileSecondaryUnsupported'));
 
         return;
       }

@@ -5,12 +5,18 @@
   },
   "plugins": {
     "SelectSatManager": {
-      "sectionLabel": "Satellite Selection",
+      "sectionLabel": "Výběr satelitu",
       "settings": {
         "focusOnSatWhenSelected": {
-          "label": "Focus on Satellite When Selected",
-          "helpText": "Zoom in on the satellite when selected."
+          "label": "Zaměřit satelit při výběru",
+          "helpText": "Při výběru satelit přiblížit."
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "Výběr rakety jako sekundárního objektu není podporován!",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_: SensorObject nemá sensorId: {sensor}",
+        "invalidCovariance": "{context}: Neplatná kovarianční matice",
+        "covarianceFromTleFailed": "{context}: Nepodařilo se vypočítat kovarianci z TLE"
       }
     }
   }

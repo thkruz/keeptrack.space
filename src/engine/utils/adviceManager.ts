@@ -18,6 +18,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
 import { KeepTrack } from '@app/keeptrack';
@@ -42,16 +43,52 @@ export class AdviceManager {
   /** Element that had focus when the help opened, so closing hands focus back to it. */
   private returnFocusEl_: HTMLElement | null = null;
   private isEscapeBound_ = false;
-  private readonly onOuterClick_ = (): void => this.closeAdvice();
+  private readonly onOuterClick_ = (event: MouseEvent): void => {
+    if (event.target === this.helpOuterDOM) {
+      this.closeAdvice();
+    }
+  };
+  private readonly onFocusIn_ = (event: FocusEvent): void => {
+    if (this.isAdviceOpen && !this.helpOuterDOM.contains(event.target as Node)) {
+      this.focusableElements_()[0]?.focus();
+    }
+  };
+  private readonly onKeyUp_ = (event: KeyboardEvent): void => {
+    if (this.isAdviceOpen) {
+      event.stopImmediatePropagation();
+    }
+  };
   private readonly onKeyDown_ = (event: KeyboardEvent): void => {
-    if (event.key !== 'Escape' || !this.isAdviceOpen) {
+    if (!this.isAdviceOpen) {
       return;
     }
-    // The help overlay sits on top of everything, so Escape closes it before any menu underneath.
-    event.preventDefault();
+    // Capture both keyboard phases before the app's camera/time/drawer listeners.
+    // Native link activation and scrolling retain their browser defaults.
     event.stopImmediatePropagation();
-    this.closeAdvice();
+    if (event.key === 'Escape' || (event.key === 'F1' && event.shiftKey)) {
+      event.preventDefault();
+      this.closeAdvice();
+
+      return;
+    }
+    if (event.key === 'Tab') {
+      const focusable = this.focusableElements_();
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      const active = document.activeElement;
+
+      if (!first || !this.helpOuterDOM.contains(active) || (!event.shiftKey && active === last) || (event.shiftKey && active === first)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first)?.focus();
+      }
+    }
   };
+
+  private focusableElements_(): HTMLElement[] {
+    return Array.from(this.helpOuterDOM.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])')).filter(
+      (element) => element.tabIndex >= 0 && !(element as HTMLButtonElement).disabled && !element.closest('[hidden], [inert]') && getComputedStyle(element).display !== 'none'
+    );
+  }
 
   public clearAdvice(): void {
     this.helpHeaderDOM?.classList.remove('help-header-sel');
@@ -130,8 +167,7 @@ export class AdviceManager {
   public off() {
     PersistenceManager.getInstance().saveItem(StorageKey.IS_ADVICE_ENABLED, 'false');
     this.isAdviceEnabled = false;
-    this.isAdviceOpen = false;
-    this.helpOuterDOM.style.display = 'none';
+    this.closeAdvice();
     this.tutIconDOM.classList.remove('bmenu-item-selected');
   }
 
@@ -146,6 +182,8 @@ export class AdviceManager {
       return;
     }
 
+    const wasOpen = this.isAdviceOpen;
+
     this.isAdviceOpen = true;
 
     this.clearAdvice();
@@ -157,19 +195,39 @@ export class AdviceManager {
 
     const active = document.activeElement;
 
-    this.returnFocusEl_ = active instanceof HTMLElement && !this.helpOuterDOM.contains(active) ? active : null;
+    if (!wasOpen) {
+      this.returnFocusEl_ = active instanceof HTMLElement && !this.helpOuterDOM.contains(active) ? active : null;
+    }
 
     this.helpOuterDOM.style.display = 'block';
     this.helpHeaderDOM.innerHTML = header;
     this.helpTextDOM.innerHTML = text;
+    this.helpOuterDOM.setAttribute('role', 'dialog');
+    this.helpOuterDOM.setAttribute('aria-modal', 'true');
+    this.helpOuterDOM.setAttribute('aria-labelledby', 'help-header');
+    let close = this.helpOuterDOM.querySelector<HTMLButtonElement>('#help-close');
+
+    if (!close) {
+      close = document.createElement('button');
+      close.id = 'help-close';
+      close.type = 'button';
+      close.textContent = '×';
+      close.addEventListener('click', () => this.closeAdvice());
+      (this.helpTextDOM.closest('#help-screen') ?? this.helpOuterDOM).prepend(close);
+    }
+    close.setAttribute('aria-label', t7e('plugins.OnboardingPlugin.hub.close'));
+    ServiceLocator.getInputManager()?.keyboard?.keyStates.clear();
     // Same function reference every time, so repeated opens never stack listeners.
     this.helpOuterDOM.addEventListener('click', this.onOuterClick_);
 
     if (!this.isEscapeBound_) {
       // Capture phase: Escape must reach the help before menus or the camera keys below it.
-      document.addEventListener('keydown', this.onKeyDown_, true);
+      window.addEventListener('keydown', this.onKeyDown_, true);
+      window.addEventListener('keyup', this.onKeyUp_, true);
+      window.addEventListener('focusin', this.onFocusIn_, true);
       this.isEscapeBound_ = true;
     }
+    close.focus();
   }
 
   /** Hides the help overlay (click, Escape or Shift+F1) and returns focus to the page. */

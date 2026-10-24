@@ -4,7 +4,7 @@
     "overview": "Non è aperto alcun menu o vista, quindi questa è la guida generale di KeepTrack. Ogni menu e ogni vista ha la propria guida.",
     "howToUse": "Apri il pannello laterale e scegli uno strumento per aprirne il menu, oppure passa a una vista come la mappa piana o la vista polare. Poi premi Shift+F1 per vedere la guida di quel menu o di quella vista. Fai clic su un oggetto del globo per selezionarlo e vederne i dettagli.",
     "tip1": "I livelli che attivi (ad esempio gli ellissoidi di covarianza) non hanno un menu proprio, quindi Shift+F1 continua a mostrare questa guida generale finché sono attivi solo livelli.",
-    "tip2": "Fai clic in un punto qualsiasi di questo pannello per chiuderlo.",
+    "tip2": "Usa Chiudi, premi Esc oppure fai clic fuori da questo pannello per chiuderlo.",
     "shortcutClose": "Chiudi la guida"
   }
 }

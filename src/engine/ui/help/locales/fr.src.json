@@ -4,7 +4,7 @@
     "overview": "Aucun menu ni aucune vue n'est ouvert : voici l'aide générale de KeepTrack. Chaque menu et chaque vue possède sa propre aide.",
     "howToUse": "Ouvrez le tiroir et choisissez un outil pour ouvrir son menu, ou passez à une vue comme la carte plane ou la vue polaire. Appuyez ensuite sur Shift+F1 pour afficher l'aide de ce menu ou de cette vue. Cliquez sur un objet du globe pour le sélectionner et voir ses détails.",
     "tip1": "Les calques que vous activez (par exemple les ellipsoïdes de covariance) n'ont pas de menu propre : tant que seuls des calques sont actifs, Shift+F1 affiche cette aide générale.",
-    "tip2": "Cliquez n'importe où sur ce panneau pour le fermer.",
+    "tip2": "Utilisez Fermer, appuyez sur Échap ou cliquez à l’extérieur de ce panneau pour le fermer.",
     "shortcutClose": "Fermer l'aide"
   }
 }

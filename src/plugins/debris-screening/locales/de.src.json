@@ -5,6 +5,7 @@
       "title": "Trümmer-Screening",
       "resultsTitle": "Screening-Ergebnisse",
       "resultsCount": "{count} Konjunktionen gefunden",
+      "notScreened": "Noch nicht geprüft",
       "exportCsv": "CSV exportieren",
       "riskLevels": {
         "critical": "Kritisch",

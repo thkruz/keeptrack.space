@@ -5,6 +5,7 @@
       "title": "Скрининг мусора",
       "resultsTitle": "Результаты скрининга",
       "resultsCount": "Найдено {count} сближений",
+      "notScreened": "Ещё не проверено",
       "exportCsv": "Экспорт CSV",
       "riskLevels": {
         "critical": "Критический",

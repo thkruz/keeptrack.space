@@ -5,6 +5,7 @@
       "title": "Скринінг сміття",
       "resultsTitle": "Результати скринінгу",
       "resultsCount": "Знайдено {count} зближень",
+      "notScreened": "Ще не перевірено",
       "exportCsv": "Експорт CSV",
       "riskLevels": {
         "critical": "Критичний",

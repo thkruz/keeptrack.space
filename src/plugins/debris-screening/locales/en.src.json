@@ -5,6 +5,7 @@
       "title": "Debris Screening",
       "resultsTitle": "Screening Results",
       "resultsCount": "{count} conjunctions found",
+      "notScreened": "Not screened yet",
       "exportCsv": "Export CSV",
       "sections": {
         "parameters": "Parameters",

@@ -41,6 +41,7 @@ describe('DebrisScreening results table', () => {
     renderRows_: (rows: DsResultRow[], countText?: string) => void;
     registerSecondary_: (sat: Satellite) => string;
     beginScreeningRun_: (primary: Satellite) => void;
+    isParentRowShown_: boolean;
   };
   const internals = () => plugin as unknown as Internals;
   const bodyRows = () => Array.from(getEl('ds-results-body')!.querySelectorAll('tr'));
@@ -225,6 +226,8 @@ describe('DebrisScreening results table', () => {
     internals().registerSecondary_(parent);
     internals().registerSecondary_(named);
     internals().rows_ = [row('39084', 4.88e-4), row('38479', 1e-6)];
+    // The CSV follows the table: the parent row is exported only while it is shown.
+    internals().isParentRowShown_ = true;
     URL.createObjectURL = vi.fn((blob: Blob) => {
       exported = blob;
 
@@ -243,6 +246,15 @@ describe('DebrisScreening results table', () => {
     expect(first).toContain(',4.271000,');
     expect(second.startsWith('38479,COSMOS 2251 DEB,1993-036PX,')).toBe(true);
     expect(second).toContain(',6.267000,-4.129000,-1.151000,');
+
+    internals().isParentRowShown_ = false;
+    plugin.onDownload();
+    const hiddenCsv = await (exported as unknown as Blob).text();
+
+    const hiddenLines = hiddenCsv.split('\n');
+
+    expect(hiddenLines).toHaveLength(2);
+    expect(hiddenLines[1].startsWith('38479,')).toBe(true);
   });
 
   it('states the RIC sign convention and the Pc inputs in the results header and help', () => {

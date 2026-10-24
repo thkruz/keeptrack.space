@@ -5,6 +5,7 @@
       "title": "デブリスクリーニング",
       "resultsTitle": "スクリーニング結果",
       "resultsCount": "{count}件のコンジャンクションが見つかりました",
+      "notScreened": "未スクリーニング",
       "exportCsv": "CSVエクスポート",
       "riskLevels": {
         "critical": "重大",

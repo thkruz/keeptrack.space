@@ -5,6 +5,7 @@
       "title": "잔해물 스크리닝",
       "resultsTitle": "스크리닝 결과",
       "resultsCount": "{count}개의 접근이 발견됨",
+      "notScreened": "아직 검사하지 않음",
       "exportCsv": "CSV 내보내기",
       "riskLevels": {
         "critical": "위험",

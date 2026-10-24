@@ -5,6 +5,7 @@
       "title": "Screening detriti",
       "resultsTitle": "Risultati dello screening",
       "resultsCount": "{count} congiunzioni trovate",
+      "notScreened": "Non ancora analizzato",
       "exportCsv": "Esporta CSV",
       "riskLevels": {
         "critical": "Critico",

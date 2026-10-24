@@ -5,6 +5,7 @@
       "title": "Screening trosek",
       "resultsTitle": "Výsledky screeningu",
       "resultsCount": "Nalezeno {count} konjunkcí",
+      "notScreened": "Zatím neprověřeno",
       "exportCsv": "Exportovat CSV",
       "riskLevels": {
         "critical": "Kritická",

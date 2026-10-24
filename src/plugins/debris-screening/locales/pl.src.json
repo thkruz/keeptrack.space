@@ -5,6 +5,7 @@
       "title": "Przegląd odłamków",
       "resultsTitle": "Wyniki przeglądu",
       "resultsCount": "Znaleziono {count} zbliżeń",
+      "notScreened": "Jeszcze nie sprawdzono",
       "exportCsv": "Eksportuj CSV",
       "riskLevels": {
         "critical": "Krytyczny",

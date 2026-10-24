@@ -5,6 +5,7 @@
       "title": "Détection de Débris",
       "resultsTitle": "Résultats de l'Analyse",
       "resultsCount": "{count} conjonctions trouvées",
+      "notScreened": "Pas encore analysé",
       "exportCsv": "Exporter CSV",
       "riskLevels": {
         "critical": "Critique",

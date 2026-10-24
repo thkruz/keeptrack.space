@@ -5,6 +5,7 @@
       "title": "Detección de Escombros",
       "resultsTitle": "Resultados del Análisis",
       "resultsCount": "{count} conjunciones encontradas",
+      "notScreened": "Aún no analizado",
       "exportCsv": "Exportar CSV",
       "riskLevels": {
         "critical": "Crítico",

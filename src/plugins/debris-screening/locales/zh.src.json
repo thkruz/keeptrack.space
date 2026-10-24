@@ -5,6 +5,7 @@
       "title": "碎片筛查",
       "resultsTitle": "筛查结果",
       "resultsCount": "发现 {count} 个交会事件",
+      "notScreened": "尚未筛查",
       "exportCsv": "导出CSV",
       "riskLevels": {
         "critical": "严重",

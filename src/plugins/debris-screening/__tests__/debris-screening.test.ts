@@ -231,7 +231,7 @@ describe('DebrisScreening_follows_selection', () => {
     expect((getEl('ds-scc') as HTMLInputElement).value).toBe('43013');
     expect((plugin as unknown as Internals).rows_).toHaveLength(0);
     expect(getEl('ds-results-body')!.querySelectorAll('tr')).toHaveLength(0);
-    expect(getEl('ds-results-count')!.textContent).toBe('0 conjunctions found');
+    expect(getEl('ds-results-count')!.textContent).toBe('Not screened yet');
   });
 
   it('keeps results when the same satellite is re-selected', () => {

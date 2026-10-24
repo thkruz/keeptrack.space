@@ -317,7 +317,7 @@ export class DebrisScreening extends KeepTrackPlugin {
         <section class="kt-section">
           <div class="kt-section-label">${l('sections.results')}</div>
           <div class="ds-header-row">
-            <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('resultsCount').replace('{count}', '0')}</span>
+            <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('notScreened')}</span>
             <label id="${this.formPrefix_}-parent-toggle" class="ds-parent-toggle" style="display: none;">
               <input id="${this.formPrefix_}-show-parent" type="checkbox" class="filled-in" />
               <span id="${this.formPrefix_}-show-parent-label">${l('showParentRows').replace('{count}', '0')}</span>
@@ -540,7 +540,8 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   protected onTargetChanged_(): void {
     this.rows_ = [];
-    this.renderRows_(this.rows_);
+    // Nothing has run for the new target yet, so do not claim an empty result.
+    this.renderRows_(this.rows_, l('notScreened'));
   }
 
   /**
@@ -846,26 +847,28 @@ export class DebrisScreening extends KeepTrackPlugin {
       'Risk Level',
       'Note',
     ];
-    // Every row is exported, including a hidden parent row (tagged in the Note column).
-    const rows = this.rows_.map((row) => {
-      const pc = row.probabilityOfCollision ?? undefined;
+    // Export what the table shows: a hidden parent row stays out so the CSV matches the count.
+    const rows = this.rows_
+      .filter((row) => this.isParentRowShown_ || !this.isParentRow_(row))
+      .map((row) => {
+        const pc = row.probabilityOfCollision ?? undefined;
 
-      return [
-        csvField(row.secondaryId),
-        csvField(this.secondaryName_(row.secondaryId)),
-        csvField(this.secondaryCospar_(row.secondaryId)),
-        this.formatTcaMs_(row.tcaMs),
-        row.missDistance.toFixed(6),
-        // Signed RIC (secondary minus primary, primary RIC frame), the CCSDS / CDM convention.
-        row.radialDistance.toFixed(6),
-        row.intrackDistance.toFixed(6),
-        row.crosstrackDistance.toFixed(6),
-        row.relativeVelocity.toFixed(6),
-        this.formatPc_(pc),
-        this.getRiskLevel_(pc).label,
-        this.isParentRow_(row) ? csvField(l('parentTag')) : '',
-      ].join(',');
-    });
+        return [
+          csvField(row.secondaryId),
+          csvField(this.secondaryName_(row.secondaryId)),
+          csvField(this.secondaryCospar_(row.secondaryId)),
+          this.formatTcaMs_(row.tcaMs),
+          row.missDistance.toFixed(6),
+          // Signed RIC (secondary minus primary, primary RIC frame), the CCSDS / CDM convention.
+          row.radialDistance.toFixed(6),
+          row.intrackDistance.toFixed(6),
+          row.crosstrackDistance.toFixed(6),
+          row.relativeVelocity.toFixed(6),
+          this.formatPc_(pc),
+          this.getRiskLevel_(pc).label,
+          this.isParentRow_(row) ? csvField(l('parentTag')) : '',
+        ].join(',');
+      });
 
     const csv = [headers.join(','), ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });

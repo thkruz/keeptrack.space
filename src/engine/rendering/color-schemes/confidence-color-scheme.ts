@@ -1,9 +1,11 @@
 /* eslint-disable complexity */
+
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -78,20 +80,22 @@ export class ConfidenceColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-confidence">
     <li>
       <div class="Square-Box layers-confidenceLow-box"></div>
-      3 or Lower
+      ${legendLabel('confidenceLow')}
     </li>
     <li>
       <div class="Square-Box layers-confidenceMed-box"></div>
-      Between 3 and 7
+      ${legendLabel('confidenceMid')}
     </li>
     <li>
       <div class="Square-Box layers-confidenceHi-box"></div>
-      7 or Higher
+      ${legendLabel('confidenceHigh')}
     </li>
   </ul>
   `.trim();
+  }
 }

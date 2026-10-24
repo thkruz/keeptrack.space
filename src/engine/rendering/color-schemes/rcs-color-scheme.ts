@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { buildCatalogRcsStats, CatalogRcsStats, EMPTY_CATALOG_RCS_STATS, estimateRcs } from '@app/app/analysis/rcs-estimator';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -6,6 +7,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 /**
  * Colors satellites by radar cross section (m²). Uses the rcs-estimator
@@ -217,40 +219,42 @@ export class RcsColorScheme extends ColorScheme {
     return thresholds.length;
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-rcs">
     <li>
       <div class="Square-Box layers-rcsXXXSmall-box"></div>
-      Tiniest
+      ${legendLabel('tiniest')}
     </li>
     <li>
       <div class="Square-Box layers-rcsXXSmall-box"></div>
-      Very Small
+      ${legendLabel('verySmall')}
     </li>
     <li>
       <div class="Square-Box layers-rcsXSmall-box"></div>
-      Small
+      ${legendLabel('rcsSmall')}
     </li>
     <li>
       <div class="Square-Box layers-rcsSmall-box"></div>
-      Below Average
+      ${legendLabel('belowAverage')}
     </li>
     <li>
       <div class="Square-Box layers-rcsMed-box"></div>
-      Above Average
+      ${legendLabel('aboveAverage')}
     </li>
     <li>
       <div class="Square-Box layers-rcsLarge-box"></div>
-      Large
+      ${legendLabel('rcsLarge')}
     </li>
     <li>
       <div class="Square-Box layers-rcsXLarge-box"></div>
-      Largest
+      ${legendLabel('largest')}
     </li>
     <li>
       <div class="Square-Box layers-rcsUnknown-box"></div>
-      No Data
+      ${legendLabel('noData')}
     </li>
   </ul>
   `.trim();
+  }
 }

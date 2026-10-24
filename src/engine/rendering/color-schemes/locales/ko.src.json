@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "신뢰도" },
-    "CountryColorScheme": { "label": "국가" },
-    "GpAgeColorScheme": { "label": "GP 경과시간" },
-    "MissionColorScheme": { "label": "임무" },
-    "ObjectTypeColorScheme": { "label": "객체 유형" },
-    "OrbitalPlaneDensityColorScheme": { "label": "궤도면 밀도" },
-    "RcsColorScheme": { "label": "레이더 단면적" },
-    "ReentryRiskColorScheme": { "label": "재진입 위험" },
-    "SmallSatColorScheme": { "label": "소형 위성" },
-    "SourceColorScheme": { "label": "데이터 출처" },
-    "SpatialDensityColorScheme": { "label": "공간 밀도" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "일조 상태" },
-    "VelocityColorScheme": { "label": "속도" },
-    "VisualMagnitudeColorScheme": { "label": "표준 등급" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "신뢰도"
+    },
+    "CountryColorScheme": {
+      "label": "국가"
+    },
+    "GpAgeColorScheme": {
+      "label": "GP 경과시간"
+    },
+    "MissionColorScheme": {
+      "label": "임무"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "객체 유형"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "궤도면 밀도"
+    },
+    "RcsColorScheme": {
+      "label": "레이더 단면적"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "재진입 위험"
+    },
+    "SmallSatColorScheme": {
+      "label": "소형 위성"
+    },
+    "SourceColorScheme": {
+      "label": "데이터 출처"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "공간 밀도"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "일조 상태"
+    },
+    "VelocityColorScheme": {
+      "label": "속도"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "표준 등급"
+    },
+    "legend": {
+      "activePayload": "활성 탑재체",
+      "inactivePayload": "비활성 탑재체",
+      "rocketBody": "로켓 동체",
+      "debris": "잔해",
+      "unknown": "알 수 없음",
+      "inFieldOfView": "시야 내",
+      "sensor": "센서",
+      "launchSite": "발사장",
+      "confidenceLow": "3 이하",
+      "confidenceMid": "3에서 7 사이",
+      "confidenceHigh": "7 이상",
+      "other": "기타",
+      "gpAgeLt05": "0.5일 미만",
+      "gpAge05to1": "0.5일에서 1일 사이",
+      "gpAge1to15": "1일에서 1.5일 사이",
+      "gpAge15to2": "1.5일에서 2일 사이",
+      "gpAge2to25": "2일에서 2.5일 사이",
+      "gpAge25to3": "2.5일에서 3일 사이",
+      "gpAgeGt3": "3일 초과",
+      "military": "군사",
+      "communications": "통신",
+      "technology": "기술",
+      "earthObservation": "지구 관측",
+      "science": "과학",
+      "astronomy": "천문학",
+      "navigation": "항법",
+      "payload": "탑재체",
+      "specialSats": "특수 위성",
+      "satelliteInView": "시야 내 위성",
+      "missile": "미사일",
+      "missileInView": "시야 내 미사일",
+      "highOrbitDensity": "궤도 밀도 높음",
+      "medOrbitDensity": "궤도 밀도 중간",
+      "lowOrbitDensity": "궤도 밀도 낮음",
+      "otherDebris": "기타 잔해",
+      "tiniest": "가장 작음",
+      "verySmall": "매우 작음",
+      "rcsSmall": "작음",
+      "belowAverage": "평균 미만",
+      "aboveAverage": "평균 이상",
+      "rcsLarge": "큼",
+      "largest": "가장 큼",
+      "noData": "데이터 없음",
+      "reentryInfo": "재진입 위험 예측은 위치 유지, 대기 항력, 태양 주기, 위성의 질량 대 면적비 등 여러 요인에 따라 달라집니다. 이는 근지점과 평균 항력 영향을 기반으로 한 대략적인 추정입니다.",
+      "reentryImminent": "임박 (수일 이내)",
+      "reentryDays": "수일",
+      "reentryWeeks": "수주",
+      "reentryMonths": "수개월",
+      "noRisk": "위험 없음",
+      "smallSatellite": "소형 위성",
+      "sourceCelestrakSup": "Celestrak 보충",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "OEM 가져오기",
+      "otherOrbitDensity": "기타 궤도 밀도",
+      "operationalStarlink": "운용 중인 Starlink",
+      "otherStarlink": "기타 Starlink",
+      "notStarlink": "Starlink 아님",
+      "inUmbral": "본영 내",
+      "inPenumbral": "반영 내",
+      "inSunlight": "햇빛 속",
+      "satelliteInFov": "시야 내 위성",
+      "velocity7": "속도 ~7 km/s",
+      "velocity4": "속도 ~4 km/s",
+      "velocity1": "속도 ~1 km/s",
+      "brightest": "가장 밝음",
+      "veryBright": "매우 밝음",
+      "bright": "밝음",
+      "magMedium": "중간",
+      "dim": "어두움",
+      "veryDim": "매우 어두움",
+      "faintest": "가장 어두움",
+      "visMagLessThan35": "실시 등급 3.5 미만",
+      "visMagBetween35And47": "실시 등급 3.5에서 4.7 사이",
+      "visMagGreaterThan47": "실시 등급 4.7 초과",
+      "apogeeBelow2000": "원지점 < 2000 km",
+      "perigeeAbove35000": "근지점 > 35000 km"
+    }
   }
 }

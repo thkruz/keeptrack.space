@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { DensityBin } from '@app/app/data/catalog-manager';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -6,6 +7,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   spatialDensityLow: rgbaArray;
@@ -149,24 +151,26 @@ export class SpatialDensityColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-spatialDensityHi">
     <li>
       <div class="Square-Box layers-spatialDensityHi-box"></div>
-      High Orbit Density
+      ${legendLabel('highOrbitDensity')}
     </li>
     <li>
       <div class="Square-Box layers-spatialDensityMed-box"></div>
-      Med Orbit Density
+      ${legendLabel('medOrbitDensity')}
     </li>
     <li>
       <div class="Square-Box layers-spatialDensityLow-box"></div>
-      Low Orbit Density
+      ${legendLabel('lowOrbitDensity')}
     </li>
     <li>
       <div class="Square-Box layers-spatialDensityOther-box"></div>
-      Other Orbit Density
+      ${legendLabel('otherOrbitDensity')}
     </li>
   </ul>
   `.trim();
+  }
 }

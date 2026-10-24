@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "信頼度" },
-    "CountryColorScheme": { "label": "国" },
-    "GpAgeColorScheme": { "label": "GP経過時間" },
-    "MissionColorScheme": { "label": "ミッション" },
-    "ObjectTypeColorScheme": { "label": "物体タイプ" },
-    "OrbitalPlaneDensityColorScheme": { "label": "軌道面密度" },
-    "RcsColorScheme": { "label": "レーダー断面積" },
-    "ReentryRiskColorScheme": { "label": "再突入リスク" },
-    "SmallSatColorScheme": { "label": "小型衛星" },
-    "SourceColorScheme": { "label": "データソース" },
-    "SpatialDensityColorScheme": { "label": "空間密度" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "日照状況" },
-    "VelocityColorScheme": { "label": "速度" },
-    "VisualMagnitudeColorScheme": { "label": "標準等級" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "信頼度"
+    },
+    "CountryColorScheme": {
+      "label": "国"
+    },
+    "GpAgeColorScheme": {
+      "label": "GP経過時間"
+    },
+    "MissionColorScheme": {
+      "label": "ミッション"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "物体タイプ"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "軌道面密度"
+    },
+    "RcsColorScheme": {
+      "label": "レーダー断面積"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "再突入リスク"
+    },
+    "SmallSatColorScheme": {
+      "label": "小型衛星"
+    },
+    "SourceColorScheme": {
+      "label": "データソース"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "空間密度"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "日照状況"
+    },
+    "VelocityColorScheme": {
+      "label": "速度"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "標準等級"
+    },
+    "legend": {
+      "activePayload": "運用中のペイロード",
+      "inactivePayload": "運用終了のペイロード",
+      "rocketBody": "ロケット機体",
+      "debris": "デブリ",
+      "unknown": "不明",
+      "inFieldOfView": "視野内",
+      "sensor": "センサー",
+      "launchSite": "発射場",
+      "confidenceLow": "3 以下",
+      "confidenceMid": "3 から 7",
+      "confidenceHigh": "7 以上",
+      "other": "その他",
+      "gpAgeLt05": "0.5 日未満",
+      "gpAge05to1": "0.5 から 1 日",
+      "gpAge1to15": "1 から 1.5 日",
+      "gpAge15to2": "1.5 から 2 日",
+      "gpAge2to25": "2 から 2.5 日",
+      "gpAge25to3": "2.5 から 3 日",
+      "gpAgeGt3": "3 日超",
+      "military": "軍事",
+      "communications": "通信",
+      "technology": "技術",
+      "earthObservation": "地球観測",
+      "science": "科学",
+      "astronomy": "天文学",
+      "navigation": "航法",
+      "payload": "ペイロード",
+      "specialSats": "特別な衛星",
+      "satelliteInView": "視界内の衛星",
+      "missile": "ミサイル",
+      "missileInView": "視界内のミサイル",
+      "highOrbitDensity": "軌道密度: 高",
+      "medOrbitDensity": "軌道密度: 中",
+      "lowOrbitDensity": "軌道密度: 低",
+      "otherDebris": "その他のデブリ",
+      "tiniest": "極小",
+      "verySmall": "非常に小さい",
+      "rcsSmall": "小",
+      "belowAverage": "平均以下",
+      "aboveAverage": "平均以上",
+      "rcsLarge": "大",
+      "largest": "最大",
+      "noData": "データなし",
+      "reentryInfo": "再突入リスクの予測は、軌道保持、大気抵抗、太陽活動周期、衛星の質量面積比など多くの要因に左右されます。これは近地点と平均的な抵抗の影響に基づく大まかな近似です。",
+      "reentryImminent": "差し迫っている (数日以内)",
+      "reentryDays": "数日",
+      "reentryWeeks": "数週間",
+      "reentryMonths": "数か月",
+      "noRisk": "リスクなし",
+      "smallSatellite": "小型衛星",
+      "sourceCelestrakSup": "Celestrak 補足",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "OEM インポート",
+      "otherOrbitDensity": "その他の軌道密度",
+      "operationalStarlink": "運用中の Starlink",
+      "otherStarlink": "その他の Starlink",
+      "notStarlink": "Starlink 以外",
+      "inUmbral": "本影内",
+      "inPenumbral": "半影内",
+      "inSunlight": "日照中",
+      "satelliteInFov": "視野内の衛星",
+      "velocity7": "速度 ~7 km/s",
+      "velocity4": "速度 ~4 km/s",
+      "velocity1": "速度 ~1 km/s",
+      "brightest": "最も明るい",
+      "veryBright": "非常に明るい",
+      "bright": "明るい",
+      "magMedium": "中程度",
+      "dim": "暗い",
+      "veryDim": "非常に暗い",
+      "faintest": "最も暗い",
+      "visMagLessThan35": "実視等級 3.5 未満",
+      "visMagBetween35And47": "実視等級 3.5 から 4.7",
+      "visMagGreaterThan47": "実視等級 4.7 超",
+      "apogeeBelow2000": "遠地点 < 2000 km",
+      "perigeeAbove35000": "近地点 > 35000 km"
+    }
   }
 }

@@ -1,9 +1,11 @@
 /* eslint-disable complexity */
+
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -87,32 +89,33 @@ export class ReentryRiskColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <div class="layers-info-message" style="text-align: center; color: #666; font-size: 0.95em; border-radius: 6px; padding: 10px; margin-bottom: 12px;">
-    Reentry risk prediction depends on many factors, including station keeping, atmospheric drag, solar cycles, and the satellite's mass-to-area ratio.
-    This is a rough approximation based on perigee and average drag impact.
+    ${legendLabel('reentryInfo')}
   </div>
   <ul id="layers-list-rcs">
     <li>
       <div class="Square-Box layers-reentryRiskVeryHigh-box"></div>
-      Imminent (within days)
+      ${legendLabel('reentryImminent')}
     </li>
     <li>
       <div class="Square-Box layers-reentryRiskHigh-box"></div>
-      Days
+      ${legendLabel('reentryDays')}
     </li>
     <li>
       <div class="Square-Box layers-reentryRiskMedium-box"></div>
-      Weeks
+      ${legendLabel('reentryWeeks')}
     </li>
     <li>
       <div class="Square-Box layers-reentryRiskLow-box"></div>
-      Months
+      ${legendLabel('reentryMonths')}
     </li>
     <li>
       <div class="Square-Box layers-reentryRiskVeryLow-box"></div>
-      No Risk
+      ${legendLabel('noRisk')}
     </li>
   </ul>
   `.trim();
+  }
 }

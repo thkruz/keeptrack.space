@@ -7,6 +7,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { hideEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface CelestrakColorSchemeColorMap extends ColorSchemeColorMap {
   celestrakDefaultRocketBody: rgbaArray;
@@ -153,40 +154,42 @@ export class CelestrakColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-celestrakDefault-sensor">
   <li>
       <div class="Square-Box layers-celestrakDefaultActivePayload-box"></div>
-      Active Payload
+      ${legendLabel('activePayload')}
     </li>
     <li>
       <div class="Square-Box layers-celestrakDefaultInactivePayload-box"></div>
-      Inactive Payload
+      ${legendLabel('inactivePayload')}
     </li>
     <li>
       <div class="Square-Box layers-celestrakDefaultRocketBody-box"></div>
-      Rocket Body
+      ${legendLabel('rocketBody')}
     </li>
     <li>
       <div class="Square-Box layers-celestrakDefaultDebris-box"></div>
-      Debris
+      ${legendLabel('debris')}
     </li>
     <li>
       <div class="Square-Box layers-celestrakDefaultUnknown-box"></div>
-      Unknown
+      ${legendLabel('unknown')}
     </li>
     <li>
       <div class="Square-Box layers-celestrakDefaultFov-box"></div>
-      In Field of View
+      ${legendLabel('inFieldOfView')}
     </li>
     <li>
       <div class="Square-Box layers-celestrakDefaultSensor-box"></div>
-      Sensor
+      ${legendLabel('sensor')}
     </li>
     <li>
       <div class="Square-Box layers-facility-box"></div>
-      Launch Site
+      ${legendLabel('launchSite')}
     </li>
   </ul>
   `.trim();
+  }
 }

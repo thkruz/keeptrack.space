@@ -1,10 +1,12 @@
 /* eslint-disable complexity */
+
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export class VelocityColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.VelocityColorScheme.label' as Parameters<typeof t7e>[0]);
@@ -97,20 +99,22 @@ export class VelocityColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-velocity">
     <li>
       <div class="Square-Box layers-velocityFast-box"></div>
-      ~7 km/s Velocity
+      ${legendLabel('velocity7')}
     </li>
     <li>
       <div class="Square-Box layers-velocityMed-box"></div>
-      ~4 km/s Velocity
+      ${legendLabel('velocity4')}
     </li>
     <li>
       <div class="Square-Box layers-velocitySlow-box"></div>
-      ~1 km/s Velocity
+      ${legendLabel('velocity1')}
     </li>
   </ul>
   `.trim();
+  }
 }

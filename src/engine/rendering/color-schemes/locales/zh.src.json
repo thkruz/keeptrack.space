@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "置信度" },
-    "CountryColorScheme": { "label": "国家" },
-    "GpAgeColorScheme": { "label": "GP 时效" },
-    "MissionColorScheme": { "label": "任务" },
-    "ObjectTypeColorScheme": { "label": "目标类型" },
-    "OrbitalPlaneDensityColorScheme": { "label": "轨道面密度" },
-    "RcsColorScheme": { "label": "雷达截面积" },
-    "ReentryRiskColorScheme": { "label": "再入风险" },
-    "SmallSatColorScheme": { "label": "小型卫星" },
-    "SourceColorScheme": { "label": "数据来源" },
-    "SpatialDensityColorScheme": { "label": "空间密度" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "日照状态" },
-    "VelocityColorScheme": { "label": "速度" },
-    "VisualMagnitudeColorScheme": { "label": "标准星等" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "置信度"
+    },
+    "CountryColorScheme": {
+      "label": "国家"
+    },
+    "GpAgeColorScheme": {
+      "label": "GP 时效"
+    },
+    "MissionColorScheme": {
+      "label": "任务"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "目标类型"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "轨道面密度"
+    },
+    "RcsColorScheme": {
+      "label": "雷达截面积"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "再入风险"
+    },
+    "SmallSatColorScheme": {
+      "label": "小型卫星"
+    },
+    "SourceColorScheme": {
+      "label": "数据来源"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "空间密度"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "日照状态"
+    },
+    "VelocityColorScheme": {
+      "label": "速度"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "标准星等"
+    },
+    "legend": {
+      "activePayload": "在役载荷",
+      "inactivePayload": "退役载荷",
+      "rocketBody": "火箭箭体",
+      "debris": "碎片",
+      "unknown": "未知",
+      "inFieldOfView": "在视场内",
+      "sensor": "传感器",
+      "launchSite": "发射场",
+      "confidenceLow": "3 及以下",
+      "confidenceMid": "3 到 7 之间",
+      "confidenceHigh": "7 及以上",
+      "other": "其他",
+      "gpAgeLt05": "少于 0.5 天",
+      "gpAge05to1": "0.5 到 1 天之间",
+      "gpAge1to15": "1 到 1.5 天之间",
+      "gpAge15to2": "1.5 到 2 天之间",
+      "gpAge2to25": "2 到 2.5 天之间",
+      "gpAge25to3": "2.5 到 3 天之间",
+      "gpAgeGt3": "超过 3 天",
+      "military": "军事",
+      "communications": "通信",
+      "technology": "技术",
+      "earthObservation": "对地观测",
+      "science": "科学",
+      "astronomy": "天文",
+      "navigation": "导航",
+      "payload": "载荷",
+      "specialSats": "特殊卫星",
+      "satelliteInView": "可见卫星",
+      "missile": "导弹",
+      "missileInView": "可见导弹",
+      "highOrbitDensity": "轨道密度高",
+      "medOrbitDensity": "轨道密度中",
+      "lowOrbitDensity": "轨道密度低",
+      "otherDebris": "其他碎片",
+      "tiniest": "极小",
+      "verySmall": "很小",
+      "rcsSmall": "小",
+      "belowAverage": "低于平均",
+      "aboveAverage": "高于平均",
+      "rcsLarge": "大",
+      "largest": "最大",
+      "noData": "无数据",
+      "reentryInfo": "再入风险预测取决于许多因素，包括位置保持、大气阻力、太阳周期以及卫星的面质比。这是基于近地点和平均阻力影响的粗略估算。",
+      "reentryImminent": "迫近（数天内）",
+      "reentryDays": "数天",
+      "reentryWeeks": "数周",
+      "reentryMonths": "数月",
+      "noRisk": "无风险",
+      "smallSatellite": "小卫星",
+      "sourceCelestrakSup": "Celestrak 补充",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "OEM 导入",
+      "otherOrbitDensity": "其他轨道密度",
+      "operationalStarlink": "在役 Starlink",
+      "otherStarlink": "其他 Starlink",
+      "notStarlink": "非 Starlink",
+      "inUmbral": "在本影中",
+      "inPenumbral": "在半影中",
+      "inSunlight": "在日照中",
+      "satelliteInFov": "视场内卫星",
+      "velocity7": "速度 ~7 km/s",
+      "velocity4": "速度 ~4 km/s",
+      "velocity1": "速度 ~1 km/s",
+      "brightest": "最亮",
+      "veryBright": "很亮",
+      "bright": "亮",
+      "magMedium": "中等",
+      "dim": "暗",
+      "veryDim": "很暗",
+      "faintest": "最暗",
+      "visMagLessThan35": "目视星等小于 3.5",
+      "visMagBetween35And47": "目视星等介于 3.5 与 4.7 之间",
+      "visMagGreaterThan47": "目视星等大于 4.7",
+      "apogeeBelow2000": "远地点 < 2000 km",
+      "perigeeAbove35000": "近地点 > 35000 km"
+    }
   }
 }

@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
@@ -6,6 +7,7 @@ import { BaseObject, Days, getDayOfYear, Satellite, Star } from '@ootk/src/main'
 import { getCatalogReferenceDate } from '../../utils/catalog-reference-time';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface GpAgeColorSchemeColorMap extends ColorSchemeColorMap {
   age1: rgbaArray;
@@ -184,36 +186,38 @@ export class GpAgeColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-ageOfElset">
     <li>
       <div class="Square-Box layers-age1-box"></div>
-      Less Than 0.5 Days
+      ${legendLabel('gpAgeLt05')}
     </li>
     <li>
       <div class="Square-Box layers-age2-box"></div>
-      Between 0.5 and 1 Days
+      ${legendLabel('gpAge05to1')}
     </li>
     <li>
       <div class="Square-Box layers-age3-box"></div>
-      Between 1 and 1.5 Days
+      ${legendLabel('gpAge1to15')}
     </li>
     <li>
       <div class="Square-Box layers-age4-box"></div>
-      Between 1.5 and 2 Days
+      ${legendLabel('gpAge15to2')}
     </li>
     <li>
       <div class="Square-Box layers-age5-box"></div>
-      Between 2 and 2.5 Days
+      ${legendLabel('gpAge2to25')}
     </li>
     <li>
       <div class="Square-Box layers-age6-box"></div>
-      Between 2.5 and 3 Days
+      ${legendLabel('gpAge25to3')}
     </li>
     <li>
       <div class="Square-Box layers-age7-box"></div>
-      More Than 3 Days
+      ${legendLabel('gpAgeGt3')}
     </li>
   </ul>
   `.trim();
+  }
 }

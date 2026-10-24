@@ -5,6 +5,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 /**
  * Colors satellites by *intrinsic* standard magnitude — sensor-independent,
@@ -211,40 +212,42 @@ export class VisualMagnitudeColorScheme extends ColorScheme {
     return thresholds.length;
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-vmag">
     <li>
       <div class="Square-Box layers-vmagBright-box"></div>
-      Brightest
+      ${legendLabel('brightest')}
     </li>
     <li>
       <div class="Square-Box layers-vmagBright2-box"></div>
-      Very Bright
+      ${legendLabel('veryBright')}
     </li>
     <li>
       <div class="Square-Box layers-vmagMed1-box"></div>
-      Bright
+      ${legendLabel('bright')}
     </li>
     <li>
       <div class="Square-Box layers-vmagMed2-box"></div>
-      Medium
+      ${legendLabel('magMedium')}
     </li>
     <li>
       <div class="Square-Box layers-vmagDim1-box"></div>
-      Dim
+      ${legendLabel('dim')}
     </li>
     <li>
       <div class="Square-Box layers-vmagDim2-box"></div>
-      Very Dim
+      ${legendLabel('veryDim')}
     </li>
     <li>
       <div class="Square-Box layers-vmagFaint-box"></div>
-      Faintest
+      ${legendLabel('faintest')}
     </li>
     <li>
       <div class="Square-Box layers-vmagUnknown-box"></div>
-      No Data
+      ${legendLabel('noData')}
     </li>
   </ul>
   `.trim();
+  }
 }

@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "Достовірність" },
-    "CountryColorScheme": { "label": "Країна" },
-    "GpAgeColorScheme": { "label": "Вік GP" },
-    "MissionColorScheme": { "label": "Місія" },
-    "ObjectTypeColorScheme": { "label": "Тип об'єкта" },
-    "OrbitalPlaneDensityColorScheme": { "label": "Щільність орбітальної площини" },
-    "RcsColorScheme": { "label": "Ефективна площа розсіювання" },
-    "ReentryRiskColorScheme": { "label": "Ризик повторного входу" },
-    "SmallSatColorScheme": { "label": "Малі супутники" },
-    "SourceColorScheme": { "label": "Джерело даних" },
-    "SpatialDensityColorScheme": { "label": "Просторова щільність" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "Стан освітленості" },
-    "VelocityColorScheme": { "label": "Швидкість" },
-    "VisualMagnitudeColorScheme": { "label": "Стандартна зоряна величина" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "Достовірність"
+    },
+    "CountryColorScheme": {
+      "label": "Країна"
+    },
+    "GpAgeColorScheme": {
+      "label": "Вік GP"
+    },
+    "MissionColorScheme": {
+      "label": "Місія"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "Тип об'єкта"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "Щільність орбітальної площини"
+    },
+    "RcsColorScheme": {
+      "label": "Ефективна площа розсіювання"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "Ризик повторного входу"
+    },
+    "SmallSatColorScheme": {
+      "label": "Малі супутники"
+    },
+    "SourceColorScheme": {
+      "label": "Джерело даних"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "Просторова щільність"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "Стан освітленості"
+    },
+    "VelocityColorScheme": {
+      "label": "Швидкість"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "Стандартна зоряна величина"
+    },
+    "legend": {
+      "activePayload": "Активне корисне навантаження",
+      "inactivePayload": "Неактивне корисне навантаження",
+      "rocketBody": "Ступінь ракети",
+      "debris": "Уламки",
+      "unknown": "Невідомо",
+      "inFieldOfView": "У полі зору",
+      "sensor": "Датчик",
+      "launchSite": "Стартовий майданчик",
+      "confidenceLow": "3 або нижче",
+      "confidenceMid": "Від 3 до 7",
+      "confidenceHigh": "7 або вище",
+      "other": "Інші",
+      "gpAgeLt05": "Менше 0,5 доби",
+      "gpAge05to1": "Від 0,5 до 1 доби",
+      "gpAge1to15": "Від 1 до 1,5 доби",
+      "gpAge15to2": "Від 1,5 до 2 діб",
+      "gpAge2to25": "Від 2 до 2,5 доби",
+      "gpAge25to3": "Від 2,5 до 3 діб",
+      "gpAgeGt3": "Понад 3 доби",
+      "military": "Військові",
+      "communications": "Зв'язок",
+      "technology": "Технології",
+      "earthObservation": "Спостереження Землі",
+      "science": "Наука",
+      "astronomy": "Астрономія",
+      "navigation": "Навігація",
+      "payload": "Корисне навантаження",
+      "specialSats": "Особливі супутники",
+      "satelliteInView": "Супутник у зоні видимості",
+      "missile": "Ракета",
+      "missileInView": "Ракета в зоні видимості",
+      "highOrbitDensity": "Висока орбітальна щільність",
+      "medOrbitDensity": "Середня орбітальна щільність",
+      "lowOrbitDensity": "Низька орбітальна щільність",
+      "otherDebris": "Інші уламки",
+      "tiniest": "Найдрібніші",
+      "verySmall": "Дуже малі",
+      "rcsSmall": "Малі",
+      "belowAverage": "Нижче середнього",
+      "aboveAverage": "Вище середнього",
+      "rcsLarge": "Великі",
+      "largest": "Найбільші",
+      "noData": "Немає даних",
+      "reentryInfo": "Прогноз ризику входу в атмосферу залежить від багатьох чинників, зокрема утримання на орбіті, атмосферного опору, сонячних циклів і відношення маси супутника до площі. Це груба оцінка на основі перигею та середнього впливу опору.",
+      "reentryImminent": "Неминучий (протягом днів)",
+      "reentryDays": "Дні",
+      "reentryWeeks": "Тижні",
+      "reentryMonths": "Місяці",
+      "noRisk": "Немає ризику",
+      "smallSatellite": "Малий супутник",
+      "sourceCelestrakSup": "Celestrak дод.",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "Імпорт OEM",
+      "otherOrbitDensity": "Інша орбітальна щільність",
+      "operationalStarlink": "Робочі Starlink",
+      "otherStarlink": "Інші Starlink",
+      "notStarlink": "Не Starlink",
+      "inUmbral": "У тіні",
+      "inPenumbral": "У півтіні",
+      "inSunlight": "На сонці",
+      "satelliteInFov": "Супутник у полі зору",
+      "velocity7": "Швидкість ~7 км/с",
+      "velocity4": "Швидкість ~4 км/с",
+      "velocity1": "Швидкість ~1 км/с",
+      "brightest": "Найяскравіші",
+      "veryBright": "Дуже яскраві",
+      "bright": "Яскраві",
+      "magMedium": "Середні",
+      "dim": "Тьмяні",
+      "veryDim": "Дуже тьмяні",
+      "faintest": "Найтьмяніші",
+      "visMagLessThan35": "Видима зоряна величина менше 3,5",
+      "visMagBetween35And47": "Видима зоряна величина від 3,5 до 4,7",
+      "visMagGreaterThan47": "Видима зоряна величина понад 4,7",
+      "apogeeBelow2000": "Апогей < 2000 км",
+      "perigeeAbove35000": "Перигей > 35000 км"
+    }
   }
 }

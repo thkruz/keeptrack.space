@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
@@ -7,6 +8,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export class StarlinkColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.StarlinkColorScheme.label' as Parameters<typeof t7e>[0]);
@@ -128,20 +130,22 @@ export class StarlinkColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-starlink">
     <li>
       <div class="Square-Box layers-starlinkOperational-box"></div>
-      Operational Starlink
+      ${legendLabel('operationalStarlink')}
     </li>
     <li>
       <div class="Square-Box layers-starlinkOther-box"></div>
-      Other Starlink
+      ${legendLabel('otherStarlink')}
     </li>
     <li>
       <div class="Square-Box layers-starlinkNot-box"></div>
-      Not Starlink
+      ${legendLabel('notStarlink')}
     </li>
   </ul>
   `.trim();
+  }
 }

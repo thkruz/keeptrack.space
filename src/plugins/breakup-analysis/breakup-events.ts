@@ -5,9 +5,10 @@
  *
  * breakup-events.ts is the curated catalog of major historical on-orbit breakup
  * events surfaced by the Breakup Analysis plugin. It is kept as a standalone,
- * DOM-free and locale-free data module: the proper nouns (names, causes, orbit
- * types, descriptions) are English source data, while the Breakup Analysis
- * plugin localizes the field *labels* around them.
+ * DOM-free and locale-free data module: the names, causes, orbit types and
+ * descriptions here are the English source data. The Breakup Analysis plugin
+ * shows them in the UI language through `plugins.BreakupAnalysis.events.<id>.*`
+ * keys (see localizeBreakupEvent), so keep those keys in sync with this file.
  *
  * Figures (tracked-debris estimates, altitudes) are drawn from public
  * NASA Orbital Debris Quarterly News / 18 SDS catalog reporting and are
@@ -27,7 +28,10 @@ export interface BreakupEvent {
   breakupDate: string;
   /** ISO date (YYYY-MM-DD) of the parent's launch. */
   launchDate: string;
+  /** English country name (kept for data/CSV use). */
   country: string;
+  /** ISO 3166-1 alpha-2 code, used to show the country name in the UI language. */
+  countryCode: string;
   orbitType: string;
   altitudeKm: number;
   cause: string;
@@ -45,6 +49,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2007-01-11',
     launchDate: '1999-05-10',
     country: 'China',
+    countryCode: 'CN',
     orbitType: 'LEO Sun-Synchronous',
     altitudeKm: 865,
     cause: 'Intentional ASAT Test',
@@ -60,6 +65,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2009-02-10',
     launchDate: '1993-06-16',
     country: 'Russia',
+    countryCode: 'RU',
     orbitType: 'LEO',
     altitudeKm: 790,
     cause: 'Accidental Collision',
@@ -75,6 +81,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2009-02-10',
     launchDate: '1997-09-14',
     country: 'USA',
+    countryCode: 'US',
     orbitType: 'LEO',
     altitudeKm: 790,
     cause: 'Accidental Collision',
@@ -90,6 +97,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2021-11-15',
     launchDate: '1982-09-16',
     country: 'Russia',
+    countryCode: 'RU',
     orbitType: 'LEO',
     altitudeKm: 480,
     cause: 'Intentional ASAT Test',
@@ -105,6 +113,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2019-03-27',
     launchDate: '2019-01-24',
     country: 'India',
+    countryCode: 'IN',
     orbitType: 'LEO',
     altitudeKm: 282,
     cause: 'Intentional ASAT Test',
@@ -121,6 +130,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2007-02-19',
     launchDate: '2006-02-28',
     country: 'Russia',
+    countryCode: 'RU',
     orbitType: 'GTO',
     altitudeKm: 500,
     cause: 'Accidental Explosion',
@@ -136,6 +146,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2022-11-12',
     launchDate: '2022-11-11',
     country: 'China',
+    countryCode: 'CN',
     orbitType: 'LEO Sun-Synchronous',
     altitudeKm: 800,
     cause: 'Accidental Explosion',
@@ -152,6 +163,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2015-11-25',
     launchDate: '2000-09-21',
     country: 'USA',
+    countryCode: 'US',
     orbitType: 'LEO Sun-Synchronous',
     altitudeKm: 860,
     cause: 'Battery / Thermal Failure',
@@ -168,6 +180,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2015-02-03',
     launchDate: '1995-03-24',
     country: 'USA',
+    countryCode: 'US',
     orbitType: 'LEO Sun-Synchronous',
     altitudeKm: 840,
     cause: 'Battery Explosion',
@@ -184,6 +197,7 @@ export const BREAKUP_EVENTS: BreakupEvent[] = [
     breakupDate: '2008-02-21',
     launchDate: '2006-12-14',
     country: 'USA',
+    countryCode: 'US',
     orbitType: 'LEO',
     altitudeKm: 247,
     cause: 'Intentional Shootdown',

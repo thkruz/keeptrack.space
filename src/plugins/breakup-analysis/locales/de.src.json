@@ -72,6 +72,68 @@
       "errorMsgs": {
         "parentNotFound": "Das Ursprungsobjekt befindet sich nicht im aktuellen Katalog.",
         "noDataToExport": "Keine verfolgten Fragmente zum Exportieren vorhanden."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Fengyun-1C ASAT-Test",
+          "cause": "Absichtlicher ASAT-Test",
+          "orbitType": "LEO sonnensynchron",
+          "description": "Chinesischer Antisatelliten-Raketentest, der den Wettersatelliten Fengyun-1C zerstörte und die größte jemals erfasste Trümmerwolke erzeugte."
+        },
+        "cosmos2251": {
+          "name": "Kollision Cosmos 2251 / Iridium 33",
+          "cause": "Unbeabsichtigte Kollision",
+          "orbitType": "LEO",
+          "description": "Erste unbeabsichtigte Hochgeschwindigkeitskollision zweier intakter Satelliten. Cosmos 2251 kollidierte mit dem aktiven Kommunikationssatelliten Iridium 33."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (aus Kollision)",
+          "cause": "Unbeabsichtigte Kollision",
+          "orbitType": "LEO",
+          "description": "Trümmerfeld des aktiven Satelliten Iridium 33 nach der Kollision mit dem ausgedienten Cosmos 2251."
+        },
+        "cosmos1408": {
+          "name": "Cosmos 1408 ASAT-Test",
+          "cause": "Absichtlicher ASAT-Test",
+          "orbitType": "LEO",
+          "description": "Russischer Direktaufstiegs-ASAT-Test, der den ausgedienten ELINT-Satelliten Cosmos 1408 zerstörte und Trümmer erzeugte, die die ISS-Besatzung gefährdeten."
+        },
+        "microsatr": {
+          "name": "Microsat-R ASAT-Test (Mission Shakti)",
+          "cause": "Absichtlicher ASAT-Test",
+          "orbitType": "LEO",
+          "description": "Indischer Direktaufstiegs-ASAT-Test (Mission Shakti) gegen den Satelliten Microsat-R. Die niedrige Abfanghöhe begrenzte die Menge langlebiger Trümmer, doch einige Fragmente wurden über die Höhe der ISS geschleudert."
+        },
+        "breezem": {
+          "name": "Explosion der Oberstufe Briz-M",
+          "cause": "Unbeabsichtigte Explosion",
+          "orbitType": "GTO",
+          "description": "Die Oberstufe Briz-M explodierte nach der gescheiterten Mission Arabsat-4A, wahrscheinlich durch Resttreibstoff. Es entstanden Trümmer über einen weiten Höhenbereich."
+        },
+        "cz6a": {
+          "name": "Zerfall der Oberstufe CZ-6A",
+          "cause": "Unbeabsichtigte Explosion",
+          "orbitType": "LEO sonnensynchron",
+          "description": "Eine zweite Stufe der chinesischen Langer Marsch 6A zerbrach kurz nach dem Aussetzen von Yunhai-3 und verteilte Hunderte Fragmente in stark genutzten sonnensynchronen Höhen."
+        },
+        "noaa16": {
+          "name": "Zerfall von NOAA-16",
+          "cause": "Batterie- / Thermalausfall",
+          "orbitType": "LEO sonnensynchron",
+          "description": "Der stillgelegte Wettersatellit NOAA-16 zerbrach im Orbit, vermutlich durch einen Batterie- oder Thermalausfall, und fügte einer überfüllten polaren Höhe langlebige Trümmer hinzu."
+        },
+        "dmspf13": {
+          "name": "Zerfall von DMSP-F13",
+          "cause": "Batterieexplosion",
+          "orbitType": "LEO sonnensynchron",
+          "description": "Ein Raumfahrzeug des US Defense Meteorological Satellite Program barst nach Überladung und Überhitzung der Batterie, ein Fehlerbild, das später bei mehreren DMSP- und NOAA-Satelliten derselben Bauart nachgewiesen wurde."
+        },
+        "usa193": {
+          "name": "Abschuss von USA-193",
+          "cause": "Absichtlicher Abschuss",
+          "orbitType": "LEO",
+          "description": "Eine SM-3-Rakete der US Navy zerstörte den defekten NRO-Satelliten USA-193 (NROL-21). Durch den Zerfall in geringer Höhe traten die meisten Trümmer innerhalb weniger Wochen wieder ein."
+        }
       }
     }
   }

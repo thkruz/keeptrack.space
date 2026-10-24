@@ -72,6 +72,68 @@
       "errorMsgs": {
         "parentNotFound": "L'objet parent n'est pas dans le catalogue actuel.",
         "noDataToExport": "Aucun fragment suivi à exporter."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Essai ASAT Fengyun-1C",
+          "cause": "Essai ASAT intentionnel",
+          "orbitType": "LEO héliosynchrone",
+          "description": "Essai chinois de missile antisatellite qui a détruit le satellite météorologique Fengyun-1C, créant le plus grand nuage de débris suivi de l'histoire."
+        },
+        "cosmos2251": {
+          "name": "Collision Cosmos 2251 / Iridium 33",
+          "cause": "Collision accidentelle",
+          "orbitType": "LEO",
+          "description": "Première collision accidentelle à hypervitesse entre deux satellites intacts. Cosmos 2251 a percuté le satellite de communication opérationnel Iridium 33."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (issu de la collision)",
+          "cause": "Collision accidentelle",
+          "orbitType": "LEO",
+          "description": "Champ de débris du satellite opérationnel Iridium 33 après sa collision avec Cosmos 2251, hors service."
+        },
+        "cosmos1408": {
+          "name": "Essai ASAT Cosmos 1408",
+          "cause": "Essai ASAT intentionnel",
+          "orbitType": "LEO",
+          "description": "Essai ASAT russe à ascension directe qui a détruit le satellite ELINT hors service Cosmos 1408, générant des débris qui ont menacé l'équipage de l'ISS."
+        },
+        "microsatr": {
+          "name": "Essai ASAT Microsat-R (Mission Shakti)",
+          "cause": "Essai ASAT intentionnel",
+          "orbitType": "LEO",
+          "description": "Essai ASAT indien à ascension directe (Mission Shakti) contre le satellite Microsat-R. La faible altitude d'interception a limité la population de débris durables, bien que certains fragments aient été projetés au-dessus de l'ISS."
+        },
+        "breezem": {
+          "name": "Explosion de l'étage supérieur Briz-M",
+          "cause": "Explosion accidentelle",
+          "orbitType": "GTO",
+          "description": "L'étage supérieur Briz-M a explosé après l'échec de la mission Arabsat-4A, probablement à cause d'ergols résiduels. Il a créé des débris sur une large plage d'altitudes."
+        },
+        "cz6a": {
+          "name": "Fragmentation de l'étage supérieur CZ-6A",
+          "cause": "Explosion accidentelle",
+          "orbitType": "LEO héliosynchrone",
+          "description": "Un deuxième étage chinois Longue Marche 6A s'est fragmenté peu après avoir déployé Yunhai-3, dispersant des centaines de fragments dans des altitudes héliosynchrones très fréquentées."
+        },
+        "noaa16": {
+          "name": "Fragmentation de NOAA-16",
+          "cause": "Défaillance batterie / thermique",
+          "orbitType": "LEO héliosynchrone",
+          "description": "Le satellite météorologique désaffecté NOAA-16 s'est fragmenté en orbite, à la suite d'une défaillance de batterie ou thermique, ajoutant des débris durables à une altitude polaire encombrée."
+        },
+        "dmspf13": {
+          "name": "Fragmentation de DMSP-F13",
+          "cause": "Explosion de batterie",
+          "orbitType": "LEO héliosynchrone",
+          "description": "Un engin du Defense Meteorological Satellite Program américain s'est rompu après une surcharge et une surchauffe de sa batterie, un mode de défaillance retrouvé ensuite sur plusieurs satellites DMSP et NOAA de même conception."
+        },
+        "usa193": {
+          "name": "Destruction de USA-193",
+          "cause": "Destruction intentionnelle",
+          "orbitType": "LEO",
+          "description": "Un missile SM-3 de l'US Navy a détruit le satellite défaillant du NRO USA-193 (NROL-21). La fragmentation à basse altitude a fait rentrer la plupart des débris en quelques semaines."
+        }
       }
     }
   }

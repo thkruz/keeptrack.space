@@ -72,6 +72,68 @@
       "errorMsgs": {
         "parentNotFound": "親オブジェクトは現在のカタログに存在しません。",
         "noDataToExport": "エクスポートする追跡中の破片がありません。"
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Fengyun-1C ASAT実験",
+          "cause": "意図的なASAT実験",
+          "orbitType": "LEO 太陽同期",
+          "description": "中国の対衛星ミサイル実験で気象衛星Fengyun-1Cが破壊され、史上最大の追跡デブリ雲が生じました。"
+        },
+        "cosmos2251": {
+          "name": "Cosmos 2251 / Iridium 33 衝突",
+          "cause": "偶発的な衝突",
+          "orbitType": "LEO",
+          "description": "無傷の衛星同士による初の偶発的な超高速衝突。Cosmos 2251が運用中の通信衛星Iridium 33に衝突しました。"
+        },
+        "iridium33": {
+          "name": "Iridium 33 (衝突由来)",
+          "cause": "偶発的な衝突",
+          "orbitType": "LEO",
+          "description": "運用停止済みのCosmos 2251との衝突後に生じた、運用中の衛星Iridium 33のデブリ群。"
+        },
+        "cosmos1408": {
+          "name": "Cosmos 1408 ASAT実験",
+          "cause": "意図的なASAT実験",
+          "orbitType": "LEO",
+          "description": "ロシアの直接上昇型ASAT実験で運用停止済みのELINT衛星Cosmos 1408が破壊され、ISS乗組員を脅かすデブリが発生しました。"
+        },
+        "microsatr": {
+          "name": "Microsat-R ASAT実験 (Mission Shakti)",
+          "cause": "意図的なASAT実験",
+          "orbitType": "LEO",
+          "description": "インドによるMicrosat-R衛星への直接上昇型ASAT実験 (Mission Shakti)。迎撃高度が低かったため長寿命デブリは限られましたが、一部の破片はISSより高く打ち上げられました。"
+        },
+        "breezem": {
+          "name": "Briz-M上段の爆発",
+          "cause": "偶発的な爆発",
+          "orbitType": "GTO",
+          "description": "Arabsat-4Aミッション失敗後、残留推進剤が原因とみられる爆発をBriz-M上段が起こし、広い高度範囲にデブリを生じました。"
+        },
+        "cz6a": {
+          "name": "CZ-6A上段の破砕",
+          "cause": "偶発的な爆発",
+          "orbitType": "LEO 太陽同期",
+          "description": "中国の長征6A第2段がYunhai-3の分離直後に破砕し、利用の多い太陽同期高度に数百個の破片を撒き散らしました。"
+        },
+        "noaa16": {
+          "name": "NOAA-16の破砕",
+          "cause": "バッテリー / 熱系統の故障",
+          "orbitType": "LEO 太陽同期",
+          "description": "運用終了した気象衛星NOAA-16が軌道上で破砕しました。原因はバッテリーまたは熱系統の故障とされ、混雑した極軌道高度に長寿命デブリを加えました。"
+        },
+        "dmspf13": {
+          "name": "DMSP-F13の破砕",
+          "cause": "バッテリー爆発",
+          "orbitType": "LEO 太陽同期",
+          "description": "米国防気象衛星計画 (DMSP) の衛星がバッテリーの過充電と過熱の後に破裂しました。この故障モードは後に同設計の複数のDMSPおよびNOAA衛星で確認されました。"
+        },
+        "usa193": {
+          "name": "USA-193の撃墜",
+          "cause": "意図的な撃墜",
+          "orbitType": "LEO",
+          "description": "米海軍のSM-3ミサイルが故障したNRO衛星USA-193 (NROL-21) を破壊しました。低高度での破砕のため、大半のデブリは数週間以内に再突入しました。"
+        }
       }
     }
   }

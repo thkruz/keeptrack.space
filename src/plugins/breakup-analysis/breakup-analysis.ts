@@ -14,6 +14,7 @@ import { Satellite } from '@ootk/src/main';
 import scatterPlotPng from '@public/img/icons/scatter-plot.png';
 import type { EChartsCoreOption } from 'echarts';
 import * as echarts from 'echarts';
+import i18next from 'i18next';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { buildCsvRows, buildGabbardData, calcYearsBetween, FragmentSortKey, GabbardData, SortDir, sortFragments, summarizeEvent } from './breakup-analysis-core';
 import { BreakupLabels, buildEventInfoCard, buildEventListTable, buildFragmentTable, buildStatsCard, FRAGMENT_DEFAULT_MAX_ROWS } from './breakup-analysis-table';
@@ -24,6 +25,40 @@ import { buildGabbardOption } from './breakup-gabbard-chart';
 export type { BreakupEvent };
 // Re-export so existing importers keep a single entry point.
 export { BREAKUP_EVENTS };
+
+/**
+ * A copy of a curated event with its display text (name, cause, orbit type,
+ * description, country) in the UI language. The id, dates and figures are
+ * untouched, so lookups and CSV export keep using the English source event.
+ */
+export const localizeBreakupEvent = (event: BreakupEvent): BreakupEvent => {
+  const text = (field: 'name' | 'cause' | 'orbitType' | 'description', fallback: string): string => {
+    const key = `plugins.BreakupAnalysis.events.${event.id}.${field}`;
+    const value = t7e(key as Parameters<typeof t7e>[0]);
+
+    return value && value !== key ? value : fallback;
+  };
+
+  const lang = i18next.language || 'en';
+  let country = event.country;
+
+  if (!lang.startsWith('en')) {
+    try {
+      country = new Intl.DisplayNames([lang], { type: 'region' }).of(event.countryCode) ?? event.country;
+    } catch {
+      // Engines without Intl.DisplayNames keep the English name.
+    }
+  }
+
+  return {
+    ...event,
+    name: text('name', event.name),
+    cause: text('cause', event.cause),
+    orbitType: text('orbitType', event.orbitType),
+    description: text('description', event.description),
+    country,
+  };
+};
 
 export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'BreakupAnalysis';
@@ -233,7 +268,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
             ${this.buildEventListPrefixHtml_()}
             <section class="kt-section">
               <div class="kt-section-label">${s('events')}</div>
-              <div class="ba-table-scroll">${buildEventListTable(BREAKUP_EVENTS, labels)}</div>
+              <div class="ba-table-scroll">${buildEventListTable(BREAKUP_EVENTS.map(localizeBreakupEvent), labels)}</div>
             </section>
           </div>
           <div id="breakup-analysis-detail" style="display:none;">
@@ -411,7 +446,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
 
     const yearsToBreakup = calcYearsBetween(event.launchDate, event.breakupDate);
 
-    infoEl.innerHTML = buildEventInfoCard(event, yearsToBreakup, labels);
+    infoEl.innerHTML = buildEventInfoCard(localizeBreakupEvent(event), yearsToBreakup, labels);
   }
 
   private renderStats_(event: BreakupEvent, labels: BreakupLabels): void {

@@ -72,6 +72,68 @@
       "errorMsgs": {
         "parentNotFound": "母体对象不在当前目录中。",
         "noDataToExport": "没有可导出的已跟踪碎片。"
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "风云一号C反卫星试验",
+          "cause": "蓄意反卫星试验",
+          "orbitType": "LEO 太阳同步",
+          "description": "中国反卫星导弹试验摧毁了风云一号C气象卫星，产生了有史以来最大的被跟踪碎片云。"
+        },
+        "cosmos2251": {
+          "name": "Cosmos 2251 / Iridium 33 碰撞",
+          "cause": "意外碰撞",
+          "orbitType": "LEO",
+          "description": "首次两颗完整卫星之间的意外超高速碰撞。Cosmos 2251 与在轨运行的通信卫星 Iridium 33 相撞。"
+        },
+        "iridium33": {
+          "name": "Iridium 33 (碰撞产生)",
+          "cause": "意外碰撞",
+          "orbitType": "LEO",
+          "description": "在轨运行的 Iridium 33 卫星与失效的 Cosmos 2251 碰撞后形成的碎片场。"
+        },
+        "cosmos1408": {
+          "name": "Cosmos 1408 反卫星试验",
+          "cause": "蓄意反卫星试验",
+          "orbitType": "LEO",
+          "description": "俄罗斯直接上升式反卫星试验摧毁了失效的电子情报卫星 Cosmos 1408，产生的碎片威胁到国际空间站乘员。"
+        },
+        "microsatr": {
+          "name": "Microsat-R 反卫星试验 (Mission Shakti)",
+          "cause": "蓄意反卫星试验",
+          "orbitType": "LEO",
+          "description": "印度针对 Microsat-R 卫星进行的直接上升式反卫星试验 (Mission Shakti)。较低的拦截高度限制了长寿命碎片的数量，但仍有部分碎片被抛至国际空间站上方。"
+        },
+        "breezem": {
+          "name": "Briz-M 上面级爆炸",
+          "cause": "意外爆炸",
+          "orbitType": "GTO",
+          "description": "Briz-M 上面级在 Arabsat-4A 任务失败后发生爆炸，可能由残余推进剂引起，在很宽的高度范围内产生了碎片。"
+        },
+        "cz6a": {
+          "name": "长征六号甲上面级解体",
+          "cause": "意外爆炸",
+          "orbitType": "LEO 太阳同步",
+          "description": "中国长征六号甲第二级在部署云海三号后不久解体，将数百块碎片散布到使用频繁的太阳同步轨道高度。"
+        },
+        "noaa16": {
+          "name": "NOAA-16 解体",
+          "cause": "电池 / 热控故障",
+          "orbitType": "LEO 太阳同步",
+          "description": "已退役的 NOAA-16 气象卫星在轨解体，原因被认为是电池或热控故障，为拥挤的极轨高度增添了长寿命碎片。"
+        },
+        "dmspf13": {
+          "name": "DMSP-F13 解体",
+          "cause": "电池爆炸",
+          "orbitType": "LEO 太阳同步",
+          "description": "美国国防气象卫星计划 (DMSP) 的一颗航天器在电池过充和过热后破裂，这一故障模式后来在多颗同型号的 DMSP 和 NOAA 卫星上被发现。"
+        },
+        "usa193": {
+          "name": "USA-193 击落",
+          "cause": "蓄意击落",
+          "orbitType": "LEO",
+          "description": "美国海军 SM-3 导弹摧毁了故障的 NRO 卫星 USA-193 (NROL-21)。由于在低空解体，大部分碎片在几周内再入大气层。"
+        }
       }
     }
   }

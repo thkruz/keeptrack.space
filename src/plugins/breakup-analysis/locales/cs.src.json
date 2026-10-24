@@ -72,6 +72,68 @@
       "errorMsgs": {
         "parentNotFound": "Mateřský objekt není v aktuálním katalogu.",
         "noDataToExport": "Žádné sledované úlomky k exportu."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Test ASAT na Fengyun-1C",
+          "cause": "Úmyslný test ASAT",
+          "orbitType": "LEO, synchronní se Sluncem",
+          "description": "Čínský test protidružicové střely, který zničil meteorologickou družici Fengyun-1C a vytvořil největší sledovaný oblak trosek v historii."
+        },
+        "cosmos2251": {
+          "name": "Srážka Cosmos 2251 / Iridium 33",
+          "cause": "Nehodová srážka",
+          "orbitType": "LEO",
+          "description": "První nehodová hyperrychlostní srážka dvou neporušených družic. Cosmos 2251 se srazil s provozovanou komunikační družicí Iridium 33."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (ze srážky)",
+          "cause": "Nehodová srážka",
+          "orbitType": "LEO",
+          "description": "Pole trosek z provozované družice Iridium 33 po srážce s nefunkčním Cosmos 2251."
+        },
+        "cosmos1408": {
+          "name": "Test ASAT na Cosmos 1408",
+          "cause": "Úmyslný test ASAT",
+          "orbitType": "LEO",
+          "description": "Ruský test ASAT s přímým výstupem, který zničil nefunkční družici ELINT Cosmos 1408 a vytvořil trosky ohrožující posádku ISS."
+        },
+        "microsatr": {
+          "name": "Test ASAT na Microsat-R (mise Shakti)",
+          "cause": "Úmyslný test ASAT",
+          "orbitType": "LEO",
+          "description": "Indický test ASAT s přímým výstupem (mise Shakti) proti družici Microsat-R. Nízká výška zásahu omezila množství dlouhověkých trosek, některé fragmenty se však dostaly nad ISS."
+        },
+        "breezem": {
+          "name": "Výbuch horního stupně Briz-M",
+          "cause": "Nehodový výbuch",
+          "orbitType": "GTO",
+          "description": "Horní stupeň Briz-M explodoval po neúspěšné misi Arabsat-4A, pravděpodobně kvůli zbytkovému palivu. Vytvořil trosky v širokém rozsahu výšek."
+        },
+        "cz6a": {
+          "name": "Rozpad horního stupně CZ-6A",
+          "cause": "Nehodový výbuch",
+          "orbitType": "LEO, synchronní se Sluncem",
+          "description": "Druhý stupeň čínské rakety Dlouhý pochod 6A se rozpadl krátce po vypuštění Yunhai-3 a rozptýlil stovky fragmentů do hojně využívaných výšek synchronních se Sluncem."
+        },
+        "noaa16": {
+          "name": "Rozpad NOAA-16",
+          "cause": "Porucha baterie / tepelná porucha",
+          "orbitType": "LEO, synchronní se Sluncem",
+          "description": "Vyřazená meteorologická družice NOAA-16 se na oběžné dráze rozpadla, údajně kvůli poruše baterie nebo tepelné poruše, a přidala dlouhověké trosky do přeplněné polární výšky."
+        },
+        "dmspf13": {
+          "name": "Rozpad DMSP-F13",
+          "cause": "Výbuch baterie",
+          "orbitType": "LEO, synchronní se Sluncem",
+          "description": "Družice amerického programu Defense Meteorological Satellite Program se roztrhla po přebití a přehřátí baterie. Tento způsob selhání byl později zjištěn u několika družic DMSP a NOAA stejné konstrukce."
+        },
+        "usa193": {
+          "name": "Sestřelení USA-193",
+          "cause": "Úmyslné sestřelení",
+          "orbitType": "LEO",
+          "description": "Střela SM-3 amerického námořnictva zničila nefunkční družici NRO USA-193 (NROL-21). Díky rozpadu v nízké výšce většina trosek vstoupila do atmosféry během několika týdnů."
+        }
       }
     }
   }

@@ -9,6 +9,11 @@
         "take4k": "Cattura schermo (4K)",
         "takeHd": "Cattura schermo (HD)",
         "take8k": "Cattura schermo (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Impossibile caricare l'immagine del logo principale.",
+        "secondaryLogoFailed": "Impossibile caricare l'immagine del logo secondario.",
+        "noCanvasContext": "Impossibile ottenere il contesto 2D per il canvas temporaneo. Impossibile creare lo screenshot."
       }
     }
   }

@@ -9,6 +9,11 @@
         "take4k": "スクリーンショット (4K)",
         "takeHd": "スクリーンショット (HD)",
         "take8k": "スクリーンショット (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "メインロゴ画像の読み込みに失敗しました。",
+        "secondaryLogoFailed": "サブロゴ画像の読み込みに失敗しました。",
+        "noCanvasContext": "一時キャンバスの2Dコンテキストを取得できませんでした。スクリーンショットを作成できません。"
       }
     }
   }

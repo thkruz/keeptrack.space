@@ -9,6 +9,11 @@
         "take4k": "Snímek obrazovky (4K)",
         "takeHd": "Snímek obrazovky (HD)",
         "take8k": "Snímek obrazovky (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Nepodařilo se načíst obrázek hlavního loga.",
+        "secondaryLogoFailed": "Nepodařilo se načíst obrázek vedlejšího loga.",
+        "noCanvasContext": "Nepodařilo se získat 2D kontext dočasného plátna. Snímek obrazovky nelze vytvořit."
       }
     }
   }

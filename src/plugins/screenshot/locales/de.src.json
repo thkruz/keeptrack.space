@@ -9,6 +9,11 @@
         "take4k": "Screenshot aufnehmen (4K)",
         "takeHd": "Screenshot aufnehmen (HD)",
         "take8k": "Screenshot aufnehmen (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Das primäre Logobild konnte nicht geladen werden.",
+        "secondaryLogoFailed": "Das sekundäre Logobild konnte nicht geladen werden.",
+        "noCanvasContext": "2D-Kontext für die temporäre Zeichenfläche nicht verfügbar. Screenshot kann nicht erstellt werden."
       }
     }
   }

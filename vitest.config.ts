@@ -113,7 +113,12 @@ export default defineConfig({
     },
     include: ['**/?(*.)+(test).?(m)[jt]s?(x)'],
     exclude: [
+      // Retained private QA workspaces junction the source tree; never rediscover tests there.
+      'docs-local/**',
       'node_modules/**',
+      '**/node_modules/**',
+      // Private MCP harness tests use node:test and run separately.
+      'src/plugins-pro/scripts/browser-agent/*.test.js',
       'offline/**',
       'dist/**',
       'src/admin/**',

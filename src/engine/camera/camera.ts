@@ -1755,8 +1755,8 @@ export class Camera {
       this.state.fpsPitch = <Degrees>-10;
     }
 
-    // Wrap azimuth 0-360
-    if (this.state.fpsYaw > 360) {
+    // Wrap azimuth into [0, 360)
+    if (this.state.fpsYaw >= 360) {
       this.state.fpsYaw = <Degrees>(this.state.fpsYaw - 360);
     }
     if (this.state.fpsYaw < 0) {

@@ -1,7 +1,10 @@
 {
   "plugins": {
     "NightToggle": {
-      "bottomIconLabel": "야간 토글"
+      "bottomIconLabel": "야간 토글",
+      "commandPalette": {
+        "toggle": "야간 모드 전환"
+      }
     }
   }
 }

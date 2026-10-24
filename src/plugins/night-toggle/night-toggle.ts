@@ -3,6 +3,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IKeyboardShortcut, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import dayNightPng from '@public/img/icons/day-night.png';
 
 export class NightToggle extends KeepTrackPlugin {
@@ -38,7 +39,7 @@ export class NightToggle extends KeepTrackPlugin {
     return [
       {
         id: 'NightToggle.toggle',
-        label: 'Toggle Night Mode',
+        label: t7e('plugins.NightToggle.commandPalette.toggle'),
         category: 'Display',
         shortcutHint: 'N',
         callback: () => this.bottomMenuClicked(),

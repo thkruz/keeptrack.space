@@ -1,7 +1,10 @@
 {
   "plugins": {
     "NightToggle": {
-      "bottomIconLabel": "Нічний режим"
+      "bottomIconLabel": "Нічний режим",
+      "commandPalette": {
+        "toggle": "Перемкнути нічний режим"
+      }
     }
   }
 }

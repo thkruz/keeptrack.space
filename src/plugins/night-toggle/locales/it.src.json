@@ -1,7 +1,10 @@
 {
   "plugins": {
     "NightToggle": {
-      "bottomIconLabel": "Attiva/Disattiva Notte"
+      "bottomIconLabel": "Attiva/Disattiva Notte",
+      "commandPalette": {
+        "toggle": "Attiva/disattiva modalità notte"
+      }
     }
   }
 }

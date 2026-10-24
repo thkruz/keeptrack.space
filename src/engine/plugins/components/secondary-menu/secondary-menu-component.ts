@@ -27,6 +27,7 @@ import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { slideInRight, slideOutLeft } from '@app/engine/utils/slide';
+import { t7e } from '@app/locales/keys';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
 import { ISecondaryMenuConfig } from '../../core/plugin-capabilities';
 import { SideMenuComponent } from '../side-menu/side-menu-component';
@@ -191,7 +192,7 @@ export class SecondaryMenuComponent {
               <button id="${this.elementName}-close-btn"
                 class="center-align btn btn-ui waves-effect waves-light icon-btn"
                 type="button">
-                <img src="${leftPanelClosePng}" alt="Close" class="icon-btn-img" />
+                <img src="${leftPanelClosePng}" alt="${t7e('Common.close')}" class="icon-btn-img" />
               </button>
             </div>
           </div>

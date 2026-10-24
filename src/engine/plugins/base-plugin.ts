@@ -617,7 +617,10 @@ export abstract class KeepTrackPlugin {
       // A lone shortcut on a plugin with a bottom icon is, by convention, its
       // menu toggle; give it a description so guides never fall back to the id.
       if (shortcuts.length === 1 && !shortcuts[0].description && this.bottomIconLabel) {
-        shortcuts[0].description = t7e('keyboard.toggleMenu' as TranslationKey, { name: this.bottomIconLabel });
+        // addHtml() localizes bottomIconLabel later, so read the translated label directly here.
+        const name = this.t7eIfFound_(`plugins.${this.id}.bottomIconLabel`) ?? this.bottomIconLabel;
+
+        shortcuts[0].description = t7e('keyboard.toggleMenu' as TranslationKey, { name });
       }
 
       this.keyboardComponent_ = new KeyboardComponent(
@@ -754,7 +757,7 @@ export abstract class KeepTrackPlugin {
                 <button id="${this.sideMenuElementName}-secondary-close-btn"
                   class="center-align btn btn-ui waves-effect waves-light icon-btn"
                   type="button">
-                  <img src="${leftPanelClosePng}" alt="Close" class="icon-btn-img" />
+                  <img src="${leftPanelClosePng}" alt="${t7e('Common.close' as TranslationKey)}" class="icon-btn-img" />
                 </button>
               </div>
             </div>
@@ -913,7 +916,7 @@ export abstract class KeepTrackPlugin {
       <button id="${this.sideMenuElementName}-download-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
         type="button">
-        <img src="${this.downloadIconSrc}" alt="Download" class="icon-btn-img" />
+        <img src="${this.downloadIconSrc}" alt="${t7e('Common.download' as TranslationKey)}" class="icon-btn-img" />
       </button>
     `
       : '';
@@ -924,14 +927,14 @@ export abstract class KeepTrackPlugin {
       <button id="${this.sideMenuElementName}-secondary-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
         type="button">
-        <img src="${secondaryIconSrc}" alt="Settings" class="icon-btn-img" />
+        <img src="${secondaryIconSrc}" alt="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" class="icon-btn-img" />
       </button>`
       : '';
     const closeIconHtml = html`
       <button id="${this.sideMenuElementName}-close-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
         type="button">
-        <img src="${leftPanelClosePng}" alt="Close" class="icon-btn-img" />
+        <img src="${leftPanelClosePng}" alt="${t7e('Common.close' as TranslationKey)}" class="icon-btn-img" />
       </button>`;
 
     return html`

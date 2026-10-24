@@ -4,6 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IKeyboardShortcut, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import cloudPng from '@public/img/icons/cloud.png';
 
 export class CloudsToggle extends KeepTrackPlugin {
@@ -48,7 +49,7 @@ export class CloudsToggle extends KeepTrackPlugin {
     return [
       {
         id: 'CloudsToggle.toggle',
-        label: 'Toggle Clouds Layer',
+        label: t7e('plugins.CloudsToggle.commandPalette.toggle'),
         category: 'Display',
         shortcutHint: 'c',
         callback: () => this.bottomMenuClicked(),

@@ -57,6 +57,7 @@ import {
   generateScreeningCompareReport,
 } from './conjunction-report-core';
 import { buildDownloadPayload, buildPreviewText, ReportFormat } from './report-formatter';
+import { doc } from './report-i18n';
 import {
   addWindowEdgePasses,
   generateAerReport,
@@ -220,7 +221,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
    */
   static registerReport(report: ReportGenerator): void {
     if (ReportsPlugin.reportRegistry_.has(report.id)) {
-      errorManagerInstance.warn(`Report with id "${report.id}" is already registered. Overwriting.`);
+      errorManagerInstance.warn(l('errorMsgs.reportOverwrite').replace('{id}', () => report.id));
     }
     ReportsPlugin.reportRegistry_.set(report.id, report);
   }
@@ -1004,7 +1005,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const activeSensor = sensor ?? this.getSelectedSensorQuiet_();
 
     if (!activeSensor) {
-      return { sensorName: null, passWindows: null, notes: ['No sensor selected; select a sensor to list pass windows.'] };
+      return { sensorName: null, passWindows: null, notes: [doc('notes.noSensor')] };
     }
 
     const opts: ReportOptions = { startTime: new Date(epoch.getTime() - halfWidthSec * 1000), windowSec: 2 * halfWidthSec, stepSec: 30 };

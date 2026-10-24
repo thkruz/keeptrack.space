@@ -81,13 +81,270 @@
       "errorMsgs": {
         "notSupportedForObject": "Tento report není pro vybraný objekt k dispozici.",
         "generationFailed": "Generování zprávy selhalo",
-        "parentNotFound": "Rodičovský objekt {scc} není v katalogu"
+        "parentNotFound": "Rodičovský objekt {scc} není v katalogu",
+        "reportOverwrite": "Zpráva s ID „{id}“ je již registrována. Bude přepsána."
       },
       "reasons": {
         "selectSecondary": "Nejprve vyberte sekundární objekt",
         "selectAnalyst": "Vyberte analytický satelit vytvořený nástrojem Manévr",
         "needTwoRuns": "Nejprve spusťte Debris Screening alespoň dvakrát",
         "screeningRunsMissing": "Porovnání screeningu není k dispozici: spusťte Debris Screening pro {parent} a pro {analyst} ve stejném okně a poté tuto zprávu vygenerujte znovu."
+      },
+      "doc": {
+        "header": {
+          "date": "Datum",
+          "satellite": "Satelit",
+          "noradId": "NORAD ID",
+          "altId": "Alternativní ID",
+          "intlDes": "Mezinárodní označení",
+          "none": "Žádné",
+          "sensor": "Senzor",
+          "type": "Typ",
+          "latitude": "Zeměpisná šířka",
+          "longitude": "Zeměpisná délka",
+          "altitude": "Výška",
+          "minAz": "Min. azimut",
+          "maxAz": "Max. azimut",
+          "minEl": "Min. elevace",
+          "maxEl": "Max. elevace",
+          "minRng": "Min. vzdálenost",
+          "maxRng": "Max. vzdálenost",
+          "windowLine": "Období zprávy: {start} až {end} UTC, krok: {step} s",
+          "generatedWallClock": "Vytvořeno (skutečný čas)",
+          "appVersion": "Verze KeepTrack",
+          "ricConvention": "Konvence RIC"
+        },
+        "titles": {
+          "aer": "Zpráva azimut, elevace, vzdálenost",
+          "lla": "Zpráva šířka, délka, výška",
+          "eci": "Zpráva inerciální geocentrická (TEME)",
+          "coes": "Zpráva klasických orbitálních elementů",
+          "visibility": "Zpráva okének viditelnosti",
+          "sunEclipse": "Zpráva slunce/zatmění",
+          "conjunction": "Zpráva o konjunkci",
+          "maneuver": "Zpráva o manévru",
+          "screeningCompare": "Zpráva o porovnání screeningů"
+        },
+        "cols": {
+          "timeUtc": "Čas (UTC)",
+          "pass": "Přelet",
+          "azimuthDeg": "Azimut(°)",
+          "elevationDeg": "Elevace(°)",
+          "rangeKm": "Vzdálenost(km)",
+          "latitudeDeg": "Šířka(°)",
+          "longitudeDeg": "Délka(°)",
+          "altitudeKm": "Výška(km)",
+          "posX": "Poloha X(km)",
+          "posY": "Poloha Y(km)",
+          "posZ": "Poloha Z(km)",
+          "velX": "Rychlost X(km/s)",
+          "velY": "Rychlost Y(km/s)",
+          "velZ": "Rychlost Z(km/s)",
+          "element": "Element",
+          "value": "Hodnota",
+          "passNum": "Přelet č.",
+          "riseTime": "Východ (UTC)",
+          "setTime": "Západ (UTC)",
+          "durationMin": "Doba trvání (min)",
+          "maxElDeg": "Max. elevace(°)",
+          "maxElTime": "Čas max. elevace (UTC)",
+          "note": "Poznámka",
+          "sunIlluminated": "Osvětleno sluncem",
+          "eclipseType": "Typ zatmění",
+          "sunAngleDeg": "Úhel slunce(°)",
+          "offsetSec": "Posun (s)",
+          "rangeKmSpaced": "Vzdálenost (km)",
+          "radialKm": "Radiální (km)",
+          "intrackKm": "Podél dráhy (km)",
+          "crosstrackKm": "Napříč dráhou (km)",
+          "relSpeed": "Rel. rychlost (km/s)"
+        },
+        "empty": {
+          "noPasses": "Nenalezeny žádné přelety!",
+          "noPassesWindow": "V období zprávy nenalezeny žádné přelety!",
+          "noApproach": "V okně hledání nebylo nalezeno žádné největší přiblížení.",
+          "noScreeningEvents": "V žádném z běhů nejsou události screeningu."
+        },
+        "passEdge": {
+          "continuous": "nepřetržitě",
+          "start": "viditelný na začátku",
+          "end": "viditelný na konci"
+        },
+        "illumination": {
+          "sun": "Ano",
+          "penumbral": "Částečně",
+          "umbral": "Ne",
+          "unknown": "Neznámé"
+        },
+        "eclipse": {
+          "sun": "Žádné",
+          "penumbral": "Polostín",
+          "umbral": "Plný stín",
+          "unknown": "Neznámé"
+        },
+        "coes": {
+          "note": "Poznámka: oskulační elementy (J2000) v epoše stavu, odvozené z propagovaného stavového vektoru.\nLiší se od středních elementů TLE použitých pro apogeum/perigeum v katalogu.",
+          "elementSet": "Sada elementů",
+          "osculatingJ2000": "Oskulační (J2000)",
+          "tleEpoch": "Epocha TLE (UTC)",
+          "stateEpoch": "Epocha stavu (oskulační, UTC)",
+          "apogee": "Apogeum",
+          "perigee": "Perigeum",
+          "inclination": "Sklon",
+          "rightAscension": "Rektascenze",
+          "argOfPerigee": "Argument perigea",
+          "trueAnomaly": "Pravá anomálie",
+          "eccentricity": "Excentricita",
+          "period": "Perioda",
+          "semiMajorAxis": "Velká poloosa",
+          "meanMotion": "Střední pohyb"
+        },
+        "objects": {
+          "field": "Pole",
+          "name": "Název",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "Epocha TLE (UTC)",
+          "gpAge": "Stáří GP",
+          "sigma": "1-sigma R / I / C (km, vlastní soustava RIC, v epoše TLE)",
+          "derivedFrom": "Odvozeno od",
+          "days": "{days} dní"
+        },
+        "roles": {
+          "primary": "Primární",
+          "secondary": "Sekundární",
+          "parent": "Původní",
+          "analyst": "Analytický"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "Míjivá vzdálenost",
+          "radial": "Radiální (R)",
+          "intrack": "Podél dráhy (I)",
+          "crosstrack": "Napříč dráhou (C)",
+          "relSpeed": "Relativní rychlost",
+          "risk": "Úroveň rizika",
+          "searchWindow": "Okno hledání (UTC)",
+          "searchWindowValue": "{start} až {end} (+/- {hours} h)"
+        },
+        "risk": {
+          "critical": "kritické",
+          "high": "vysoké",
+          "medium": "střední",
+          "low": "nízké",
+          "unknown": "neznámé"
+        },
+        "common": {
+          "value": "Hodnota",
+          "quantity": "Veličina",
+          "item": "Položka"
+        },
+        "pcInputs": {
+          "input": "Vstup Pc",
+          "method": "Metoda",
+          "primaryHbr": "Poloměr tuhého tělesa primárního objektu",
+          "secondaryHbr": "Poloměr tuhého tělesa sekundárního objektu",
+          "combinedHbr": "Kombinovaný poloměr tuhého tělesa",
+          "covarianceSource": "Zdroj kovariance",
+          "confidence": "Úroveň spolehlivosti (k)",
+          "sigmaCaps": "Limity 1-sigma R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: 2D Pc v rovině setkání, kombinovaná kovariance v soustavě RIC primárního objektu",
+          "covarianceSourceValue": "Syntetická kovariance odvozená z TLE (ootk cappedScreeningCovarianceFromTle), nikoli kovariance operátora; stejně jako ve screeningu trosek"
+        },
+        "passes": {
+          "object": "Objekt",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "Max. el. (stupně)"
+        },
+        "diff": {
+          "status": "Stav",
+          "secondary": "Sekundární",
+          "name": "Název",
+          "preTca": "TCA před (UTC)",
+          "preMiss": "Vzdálenost před (km)",
+          "prePc": "Pc před",
+          "postTca": "TCA po (UTC)",
+          "postMiss": "Vzdálenost po (km)",
+          "postPc": "Pc po",
+          "missChange": "Změna vzdálenosti (km)",
+          "noId": "(bez ID)"
+        },
+        "status": {
+          "introduced": "Nová",
+          "removed": "Odstraněná",
+          "unchanged": "Beze změny",
+          "appeared": "Objevila se (pod prahem)",
+          "dropped": "Zmizela (pod prahem)"
+        },
+        "summary": {
+          "range": "{start} až {end}",
+          "preRunPrimary": "Primární objekt běhu před",
+          "preRunWindow": "Okno běhu před (UTC)",
+          "postRunPrimary": "Primární objekt běhu po",
+          "postRunWindow": "Okno běhu po (UTC)",
+          "concernThreshold": "Práh závažnosti",
+          "concernThresholdValue": "{level} a vyšší",
+          "excluded": "Vyloučené sekundární objekty",
+          "appearedDropped": "Objevené / zmizelé (pod prahem)"
+        },
+        "sections": {
+          "objects": "Objekty",
+          "closestApproach": "Největší přiblížení",
+          "pcInputs": "Vstupy pravděpodobnosti srážky",
+          "sensorPasses": "Přelety nad senzorem ({sensor})",
+          "relativeGeometry": "Relativní geometrie (TCA +/- 5 min, 10 s)",
+          "burnsTotal": "Zážehy (celkem {dv} m/s)",
+          "burns": "Zážehy",
+          "meanElements": "Střední elementy, před a po",
+          "closeApproachTo": "Přiblížení k {name} ({id}), před a po",
+          "diffSummary": "Souhrn porovnání screeningu",
+          "diffManeuver": "Porovnání screeningu (původní před, analytický po)",
+          "diffCompare": "Porovnání screeningu (starší a novější běh)"
+        },
+        "elements": {
+          "header": "Střední element (TLE)",
+          "pre": "Před (původní, v epoše po)",
+          "post": "Po (analytický)",
+          "change": "Změna",
+          "epoch": "Epocha (UTC)",
+          "inclinationDeg": "Sklon (stupně)",
+          "raanDeg": "RAAN (stupně)",
+          "eccentricity": "Excentricita",
+          "argPerigeeDeg": "Arg. perigea (stupně)",
+          "meanAnomalyDeg": "Střední anomálie (stupně)",
+          "meanMotionRevPerDay": "Střední pohyb (oběhy/den)",
+          "periodMin": "Perioda (min)",
+          "apogeeKm": "Apogeum (km)",
+          "perigeeKm": "Perigeum (km)",
+          "semiMajorAxisKm": "Velká poloosa (km)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "Epocha (UTC)",
+          "frame": "Soustava",
+          "dvInput": "Zadané delta-V (m/s)",
+          "magnitude": "Velikost (m/s)",
+          "source": "Zdroj",
+          "label": "Označení",
+          "parameters": "Parametry zážehu",
+          "unavailable": "Parametry zážehu nejsou k dispozici"
+        },
+        "compare": {
+          "pre": "Před (původní)",
+          "post": "Po (analytický)",
+          "notFound": "Nenalezeno",
+          "miss": "Míjivá vzdálenost (km)",
+          "ric": "R / I / C (km)",
+          "relSpeed": "Relativní rychlost (km/s)"
+        },
+        "notes": {
+          "noEncounter": "V okně hledání není žádné největší přiblížení; rozšiřte okno nebo posuňte čas simulace blíže k události.",
+          "windowMismatchManeuver": "Screeningy před a po pokrývají různá okna; události blízko okrajů mohou být klasifikovány chybně.",
+          "windowMismatchCompare": "Oba screeningy pokrývají různá okna; události blízko okrajů mohou být klasifikovány chybně.",
+          "noScreeningRuns": "Nejsou k dispozici žádné běhy screeningu.",
+          "noSensor": "Není vybrán žádný senzor; vyberte senzor pro zobrazení oken přeletů."
+        }
       }
     }
   }

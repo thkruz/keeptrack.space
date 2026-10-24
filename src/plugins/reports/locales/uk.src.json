@@ -81,13 +81,270 @@
       "errorMsgs": {
         "notSupportedForObject": "Цей звіт недоступний для вибраного обʼєкта.",
         "generationFailed": "Не вдалося створити звіт",
-        "parentNotFound": "Батьківського об'єкта {scc} немає в каталозі"
+        "parentNotFound": "Батьківського об'єкта {scc} немає в каталозі",
+        "reportOverwrite": "Звіт з ідентифікатором «{id}» уже зареєстровано. Його буде перезаписано."
       },
       "reasons": {
         "selectSecondary": "Спочатку виберіть вторинний об'єкт",
         "selectAnalyst": "Виберіть аналітичний супутник, створений інструментом маневрів",
         "needTwoRuns": "Спочатку запустіть Debris Screening щонайменше двічі",
         "screeningRunsMissing": "Порівняння скринінгу недоступне: запустіть Debris Screening для {parent} і для {analyst} на тому самому вікні, потім створіть цей звіт знову."
+      },
+      "doc": {
+        "header": {
+          "date": "Дата",
+          "satellite": "Супутник",
+          "noradId": "NORAD ID",
+          "altId": "Альтернативний ID",
+          "intlDes": "Міжнародне позначення",
+          "none": "Немає",
+          "sensor": "Датчик",
+          "type": "Тип",
+          "latitude": "Широта",
+          "longitude": "Довгота",
+          "altitude": "Висота",
+          "minAz": "Мін. азимут",
+          "maxAz": "Макс. азимут",
+          "minEl": "Мін. кут місця",
+          "maxEl": "Макс. кут місця",
+          "minRng": "Мін. дальність",
+          "maxRng": "Макс. дальність",
+          "windowLine": "Період звіту: з {start} по {end} UTC, крок: {step} с",
+          "generatedWallClock": "Створено (реальний час)",
+          "appVersion": "Версія KeepTrack",
+          "ricConvention": "Угода RIC"
+        },
+        "titles": {
+          "aer": "Звіт: азимут, кут місця, дальність",
+          "lla": "Звіт: широта, довгота, висота",
+          "eci": "Звіт: геоцентрична інерціальна СК (TEME)",
+          "coes": "Звіт: класичні елементи орбіти",
+          "visibility": "Звіт: вікна видимості",
+          "sunEclipse": "Звіт: сонце/затемнення",
+          "conjunction": "Звіт про зближення",
+          "maneuver": "Звіт про маневр",
+          "screeningCompare": "Звіт про порівняння скринінгів"
+        },
+        "cols": {
+          "timeUtc": "Час (UTC)",
+          "pass": "Проліт",
+          "azimuthDeg": "Азимут(°)",
+          "elevationDeg": "Кут місця(°)",
+          "rangeKm": "Дальність(км)",
+          "latitudeDeg": "Широта(°)",
+          "longitudeDeg": "Довгота(°)",
+          "altitudeKm": "Висота(км)",
+          "posX": "Положення X(км)",
+          "posY": "Положення Y(км)",
+          "posZ": "Положення Z(км)",
+          "velX": "Швидкість X(км/с)",
+          "velY": "Швидкість Y(км/с)",
+          "velZ": "Швидкість Z(км/с)",
+          "element": "Елемент",
+          "value": "Значення",
+          "passNum": "Проліт №",
+          "riseTime": "Схід (UTC)",
+          "setTime": "Захід (UTC)",
+          "durationMin": "Тривалість (хв)",
+          "maxElDeg": "Макс. кут місця(°)",
+          "maxElTime": "Час макс. кута місця (UTC)",
+          "note": "Примітка",
+          "sunIlluminated": "Освітлений сонцем",
+          "eclipseType": "Тип затемнення",
+          "sunAngleDeg": "Кут сонця(°)",
+          "offsetSec": "Зміщення (с)",
+          "rangeKmSpaced": "Дальність (км)",
+          "radialKm": "Радіальна (км)",
+          "intrackKm": "Уздовж орбіти (км)",
+          "crosstrackKm": "Поперек орбіти (км)",
+          "relSpeed": "Відн. швидкість (км/с)"
+        },
+        "empty": {
+          "noPasses": "Прольотів не знайдено!",
+          "noPassesWindow": "У періоді звіту прольотів не знайдено!",
+          "noApproach": "У вікні пошуку не знайдено точки найбільшого зближення.",
+          "noScreeningEvents": "У жодному з прогонів немає подій скринінгу."
+        },
+        "passEdge": {
+          "continuous": "безперервно",
+          "start": "видимий на початку",
+          "end": "видимий наприкінці"
+        },
+        "illumination": {
+          "sun": "Так",
+          "penumbral": "Частково",
+          "umbral": "Ні",
+          "unknown": "Невідомо"
+        },
+        "eclipse": {
+          "sun": "Немає",
+          "penumbral": "Півтінь",
+          "umbral": "Тінь",
+          "unknown": "Невідомо"
+        },
+        "coes": {
+          "note": "Примітка: оскулюючі елементи (J2000) на епоху стану, отримані з поширеного вектора стану.\nВони відрізняються від середніх елементів TLE, що використовуються для апогею/перигею в каталозі.",
+          "elementSet": "Набір елементів",
+          "osculatingJ2000": "Оскулюючі (J2000)",
+          "tleEpoch": "Епоха TLE (UTC)",
+          "stateEpoch": "Епоха стану (оскулююча, UTC)",
+          "apogee": "Апогей",
+          "perigee": "Перигей",
+          "inclination": "Нахил",
+          "rightAscension": "Пряме піднесення",
+          "argOfPerigee": "Аргумент перигею",
+          "trueAnomaly": "Істинна аномалія",
+          "eccentricity": "Ексцентриситет",
+          "period": "Період",
+          "semiMajorAxis": "Велика піввісь",
+          "meanMotion": "Середній рух"
+        },
+        "objects": {
+          "field": "Поле",
+          "name": "Назва",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "Епоха TLE (UTC)",
+          "gpAge": "Вік GP",
+          "sigma": "1-сигма R / I / C (км, власна СК RIC, на епоху TLE)",
+          "derivedFrom": "Отримано з",
+          "days": "Днів: {days}"
+        },
+        "roles": {
+          "primary": "Основний",
+          "secondary": "Вторинний",
+          "parent": "Вихідний",
+          "analyst": "Аналітичний"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "Відстань прольоту",
+          "radial": "Радіальна (R)",
+          "intrack": "Уздовж орбіти (I)",
+          "crosstrack": "Поперек орбіти (C)",
+          "relSpeed": "Відносна швидкість",
+          "risk": "Рівень ризику",
+          "searchWindow": "Вікно пошуку (UTC)",
+          "searchWindowValue": "з {start} по {end} (+/- {hours} год)"
+        },
+        "risk": {
+          "critical": "критичний",
+          "high": "високий",
+          "medium": "середній",
+          "low": "низький",
+          "unknown": "невідомий"
+        },
+        "common": {
+          "value": "Значення",
+          "quantity": "Величина",
+          "item": "Пункт"
+        },
+        "pcInputs": {
+          "input": "Вхідні дані Pc",
+          "method": "Метод",
+          "primaryHbr": "Радіус твердого тіла основного об'єкта",
+          "secondaryHbr": "Радіус твердого тіла вторинного об'єкта",
+          "combinedHbr": "Сумарний радіус твердого тіла",
+          "covarianceSource": "Джерело коваріації",
+          "confidence": "Рівень довіри (k)",
+          "sigmaCaps": "Обмеження 1-сигма R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: двовимірна Pc у площині зустрічі, сумарна коваріація в СК RIC основного об'єкта",
+          "covarianceSourceValue": "Синтетична коваріація на основі TLE (ootk cappedScreeningCovarianceFromTle), а не коваріація оператора; як у скринінгу сміття"
+        },
+        "passes": {
+          "object": "Об'єкт",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "Макс. кут місця (град.)"
+        },
+        "diff": {
+          "status": "Статус",
+          "secondary": "Вторинний",
+          "name": "Назва",
+          "preTca": "TCA до (UTC)",
+          "preMiss": "Відстань до (км)",
+          "prePc": "Pc до",
+          "postTca": "TCA після (UTC)",
+          "postMiss": "Відстань після (км)",
+          "postPc": "Pc після",
+          "missChange": "Зміна відстані (км)",
+          "noId": "(без ID)"
+        },
+        "status": {
+          "introduced": "Нове",
+          "removed": "Усунуто",
+          "unchanged": "Без змін",
+          "appeared": "З'явилося (нижче порогу)",
+          "dropped": "Зникло (нижче порогу)"
+        },
+        "summary": {
+          "range": "з {start} по {end}",
+          "preRunPrimary": "Основний об'єкт прогону до",
+          "preRunWindow": "Вікно прогону до (UTC)",
+          "postRunPrimary": "Основний об'єкт прогону після",
+          "postRunWindow": "Вікно прогону після (UTC)",
+          "concernThreshold": "Поріг значущості",
+          "concernThresholdValue": "{level} і вище",
+          "excluded": "Виключені вторинні об'єкти",
+          "appearedDropped": "З'явилося / зникло (нижче порогу)"
+        },
+        "sections": {
+          "objects": "Об'єкти",
+          "closestApproach": "Найбільше зближення",
+          "pcInputs": "Вхідні дані ймовірності зіткнення",
+          "sensorPasses": "Прольоти над датчиком ({sensor})",
+          "relativeGeometry": "Відносна геометрія (TCA +/- 5 хв, 10 с)",
+          "burnsTotal": "Імпульси (усього {dv} м/с)",
+          "burns": "Імпульси",
+          "meanElements": "Середні елементи, до і після",
+          "closeApproachTo": "Зближення з {name} ({id}), до і після",
+          "diffSummary": "Підсумок порівняння скринінгу",
+          "diffManeuver": "Порівняння скринінгу (вихідний до, аналітичний після)",
+          "diffCompare": "Порівняння скринінгу (раніший і новіший прогін)"
+        },
+        "elements": {
+          "header": "Середній елемент (TLE)",
+          "pre": "До (вихідний, на епоху після)",
+          "post": "Після (аналітичний)",
+          "change": "Зміна",
+          "epoch": "Епоха (UTC)",
+          "inclinationDeg": "Нахил (град.)",
+          "raanDeg": "RAAN (град.)",
+          "eccentricity": "Ексцентриситет",
+          "argPerigeeDeg": "Аргумент перигею (град.)",
+          "meanAnomalyDeg": "Середня аномалія (град.)",
+          "meanMotionRevPerDay": "Середній рух (об./добу)",
+          "periodMin": "Період (хв)",
+          "apogeeKm": "Апогей (км)",
+          "perigeeKm": "Перигей (км)",
+          "semiMajorAxisKm": "Велика піввісь (км)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "Епоха (UTC)",
+          "frame": "Система відліку",
+          "dvInput": "Задане delta-V (м/с)",
+          "magnitude": "Величина (м/с)",
+          "source": "Джерело",
+          "label": "Мітка",
+          "parameters": "Параметри імпульсу",
+          "unavailable": "Параметри імпульсу недоступні"
+        },
+        "compare": {
+          "pre": "До (вихідний)",
+          "post": "Після (аналітичний)",
+          "notFound": "Не знайдено",
+          "miss": "Відстань прольоту (км)",
+          "ric": "R / I / C (км)",
+          "relSpeed": "Відносна швидкість (км/с)"
+        },
+        "notes": {
+          "noEncounter": "У вікні пошуку немає точки найбільшого зближення; розширте вікно або наблизьте час моделювання до події.",
+          "windowMismatchManeuver": "Скринінги до і після охоплюють різні вікна; події біля меж вікна можуть бути класифіковані неправильно.",
+          "windowMismatchCompare": "Два скринінги охоплюють різні вікна; події біля меж вікна можуть бути класифіковані неправильно.",
+          "noScreeningRuns": "Немає доступних прогонів скринінгу.",
+          "noSensor": "Датчик не вибрано; виберіть датчик, щоб отримати список вікон прольоту."
+        }
       }
     }
   }

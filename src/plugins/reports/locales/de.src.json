@@ -81,13 +81,270 @@
       "errorMsgs": {
         "notSupportedForObject": "Dieser Bericht ist für das ausgewählte Objekt nicht verfügbar.",
         "generationFailed": "Berichterstellung fehlgeschlagen",
-        "parentNotFound": "Elternobjekt {scc} ist nicht im Katalog"
+        "parentNotFound": "Elternobjekt {scc} ist nicht im Katalog",
+        "reportOverwrite": "Ein Bericht mit der ID „{id}“ ist bereits registriert. Er wird überschrieben."
       },
       "reasons": {
         "selectSecondary": "Wählen Sie zuerst ein Sekundärobjekt aus",
         "selectAnalyst": "Wählen Sie einen mit dem Manöver-Werkzeug erstellten Analystensatelliten aus",
         "needTwoRuns": "Führen Sie zuerst mindestens zweimal ein Debris Screening aus",
         "screeningRunsMissing": "Screening-Vergleich nicht verfügbar: Führen Sie Debris Screening für {parent} und für {analyst} über dasselbe Zeitfenster aus und erstellen Sie diesen Bericht erneut."
+      },
+      "doc": {
+        "header": {
+          "date": "Datum",
+          "satellite": "Satellit",
+          "noradId": "NORAD-ID",
+          "altId": "Alternative ID",
+          "intlDes": "Internationale Kennung",
+          "none": "Keine",
+          "sensor": "Sensor",
+          "type": "Typ",
+          "latitude": "Breitengrad",
+          "longitude": "Längengrad",
+          "altitude": "Höhe",
+          "minAz": "Min. Azimut",
+          "maxAz": "Max. Azimut",
+          "minEl": "Min. Elevation",
+          "maxEl": "Max. Elevation",
+          "minRng": "Min. Entfernung",
+          "maxRng": "Max. Entfernung",
+          "windowLine": "Berichtszeitraum: {start} bis {end} UTC, Schritt: {step} s",
+          "generatedWallClock": "Erstellt (Echtzeit)",
+          "appVersion": "KeepTrack-Version",
+          "ricConvention": "RIC-Konvention"
+        },
+        "titles": {
+          "aer": "Bericht Azimut, Elevation, Entfernung",
+          "lla": "Bericht Breite, Länge, Höhe",
+          "eci": "Bericht erdzentriert inertial (TEME)",
+          "coes": "Bericht klassische Bahnelemente",
+          "visibility": "Bericht Sichtbarkeitsfenster",
+          "sunEclipse": "Bericht Sonne/Finsternis",
+          "conjunction": "Konjunktionsbericht",
+          "maneuver": "Manöverbericht",
+          "screeningCompare": "Screening-Vergleichsbericht"
+        },
+        "cols": {
+          "timeUtc": "Zeit (UTC)",
+          "pass": "Überflug",
+          "azimuthDeg": "Azimut(°)",
+          "elevationDeg": "Elevation(°)",
+          "rangeKm": "Entfernung(km)",
+          "latitudeDeg": "Breitengrad(°)",
+          "longitudeDeg": "Längengrad(°)",
+          "altitudeKm": "Höhe(km)",
+          "posX": "Position X(km)",
+          "posY": "Position Y(km)",
+          "posZ": "Position Z(km)",
+          "velX": "Geschwindigkeit X(km/s)",
+          "velY": "Geschwindigkeit Y(km/s)",
+          "velZ": "Geschwindigkeit Z(km/s)",
+          "element": "Element",
+          "value": "Wert",
+          "passNum": "Überflug Nr.",
+          "riseTime": "Aufgang (UTC)",
+          "setTime": "Untergang (UTC)",
+          "durationMin": "Dauer (min)",
+          "maxElDeg": "Max. Elevation(°)",
+          "maxElTime": "Zeit max. Elevation (UTC)",
+          "note": "Hinweis",
+          "sunIlluminated": "Sonnenbeschienen",
+          "eclipseType": "Finsternistyp",
+          "sunAngleDeg": "Sonnenwinkel(°)",
+          "offsetSec": "Versatz (s)",
+          "rangeKmSpaced": "Entfernung (km)",
+          "radialKm": "Radial (km)",
+          "intrackKm": "Entlang der Bahn (km)",
+          "crosstrackKm": "Quer zur Bahn (km)",
+          "relSpeed": "Rel. Geschw. (km/s)"
+        },
+        "empty": {
+          "noPasses": "Keine Überflüge gefunden!",
+          "noPassesWindow": "Keine Überflüge im Berichtszeitraum gefunden!",
+          "noApproach": "Keine größte Annäherung im Suchfenster gefunden.",
+          "noScreeningEvents": "Keine Screening-Ereignisse in beiden Läufen."
+        },
+        "passEdge": {
+          "continuous": "durchgehend",
+          "start": "zu Beginn sichtbar",
+          "end": "am Ende sichtbar"
+        },
+        "illumination": {
+          "sun": "Ja",
+          "penumbral": "Teilweise",
+          "umbral": "Nein",
+          "unknown": "Unbekannt"
+        },
+        "eclipse": {
+          "sun": "Keine",
+          "penumbral": "Halbschatten",
+          "umbral": "Kernschatten",
+          "unknown": "Unbekannt"
+        },
+        "coes": {
+          "note": "Hinweis: oskulierende Elemente (J2000) zur Zustandsepoche, abgeleitet aus dem propagierten Zustandsvektor.\nSie weichen von den mittleren TLE-Elementen ab, die für Apogäum/Perigäum im Katalog verwendet werden.",
+          "elementSet": "Elementsatz",
+          "osculatingJ2000": "Oskulierend (J2000)",
+          "tleEpoch": "TLE-Epoche (UTC)",
+          "stateEpoch": "Zustandsepoche (oskulierend, UTC)",
+          "apogee": "Apogäum",
+          "perigee": "Perigäum",
+          "inclination": "Inklination",
+          "rightAscension": "Rektaszension",
+          "argOfPerigee": "Argument des Perigäums",
+          "trueAnomaly": "Wahre Anomalie",
+          "eccentricity": "Exzentrizität",
+          "period": "Umlaufzeit",
+          "semiMajorAxis": "Große Halbachse",
+          "meanMotion": "Mittlere Bewegung"
+        },
+        "objects": {
+          "field": "Feld",
+          "name": "Name",
+          "noradId": "NORAD-ID",
+          "cosparId": "COSPAR-ID",
+          "tleEpoch": "TLE-Epoche (UTC)",
+          "gpAge": "GP-Alter",
+          "sigma": "1-Sigma R / I / C (km, eigenes RIC-System, zur TLE-Epoche)",
+          "derivedFrom": "Abgeleitet von",
+          "days": "{days} Tage"
+        },
+        "roles": {
+          "primary": "Primärobjekt",
+          "secondary": "Sekundärobjekt",
+          "parent": "Ursprungsobjekt",
+          "analyst": "Analyseobjekt"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "Vorbeiflugdistanz",
+          "radial": "Radial (R)",
+          "intrack": "Entlang der Bahn (I)",
+          "crosstrack": "Quer zur Bahn (C)",
+          "relSpeed": "Relativgeschwindigkeit",
+          "risk": "Risikostufe",
+          "searchWindow": "Suchfenster (UTC)",
+          "searchWindowValue": "{start} bis {end} (+/- {hours} h)"
+        },
+        "risk": {
+          "critical": "kritisch",
+          "high": "hoch",
+          "medium": "mittel",
+          "low": "niedrig",
+          "unknown": "unbekannt"
+        },
+        "common": {
+          "value": "Wert",
+          "quantity": "Größe",
+          "item": "Eintrag"
+        },
+        "pcInputs": {
+          "input": "Pc-Eingabe",
+          "method": "Methode",
+          "primaryHbr": "Hartkörperradius Primärobjekt",
+          "secondaryHbr": "Hartkörperradius Sekundärobjekt",
+          "combinedHbr": "Kombinierter Hartkörperradius",
+          "covarianceSource": "Kovarianzquelle",
+          "confidence": "Konfidenzniveau (k)",
+          "sigmaCaps": "1-Sigma-Obergrenzen R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: 2D-Pc in der Begegnungsebene, kombinierte Kovarianz im RIC-System des Primärobjekts",
+          "covarianceSourceValue": "Synthetische, aus TLE abgeleitete Kovarianz (ootk cappedScreeningCovarianceFromTle), keine Betreiberkovarianz; wie beim Debris Screening"
+        },
+        "passes": {
+          "object": "Objekt",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "Max. El. (Grad)"
+        },
+        "diff": {
+          "status": "Status",
+          "secondary": "Sekundärobjekt",
+          "name": "Name",
+          "preTca": "TCA vorher (UTC)",
+          "preMiss": "Distanz vorher (km)",
+          "prePc": "Pc vorher",
+          "postTca": "TCA nachher (UTC)",
+          "postMiss": "Distanz nachher (km)",
+          "postPc": "Pc nachher",
+          "missChange": "Distanzänderung (km)",
+          "noId": "(keine ID)"
+        },
+        "status": {
+          "introduced": "Neu",
+          "removed": "Entfallen",
+          "unchanged": "Unverändert",
+          "appeared": "Aufgetreten (unter Schwelle)",
+          "dropped": "Weggefallen (unter Schwelle)"
+        },
+        "summary": {
+          "range": "{start} bis {end}",
+          "preRunPrimary": "Primärobjekt Lauf vorher",
+          "preRunWindow": "Zeitraum Lauf vorher (UTC)",
+          "postRunPrimary": "Primärobjekt Lauf nachher",
+          "postRunWindow": "Zeitraum Lauf nachher (UTC)",
+          "concernThreshold": "Relevanzschwelle",
+          "concernThresholdValue": "{level} und höher",
+          "excluded": "Ausgeschlossene Sekundärobjekte",
+          "appearedDropped": "Aufgetreten / Weggefallen (unter Schwelle)"
+        },
+        "sections": {
+          "objects": "Objekte",
+          "closestApproach": "Größte Annäherung",
+          "pcInputs": "Eingaben zur Kollisionswahrscheinlichkeit",
+          "sensorPasses": "Sensorüberflüge ({sensor})",
+          "relativeGeometry": "Relative Geometrie (TCA +/- 5 min, 10 s)",
+          "burnsTotal": "Triebwerkszündungen (gesamt {dv} m/s)",
+          "burns": "Triebwerkszündungen",
+          "meanElements": "Mittlere Elemente, vorher und nachher",
+          "closeApproachTo": "Annäherung an {name} ({id}), vorher und nachher",
+          "diffSummary": "Zusammenfassung Screening-Vergleich",
+          "diffManeuver": "Screening-Vergleich (Ursprung vorher, Analyse nachher)",
+          "diffCompare": "Screening-Vergleich (älterer gegen neueren Lauf)"
+        },
+        "elements": {
+          "header": "Mittleres Element (TLE)",
+          "pre": "Vorher (Ursprung, zur Epoche nachher)",
+          "post": "Nachher (Analyse)",
+          "change": "Änderung",
+          "epoch": "Epoche (UTC)",
+          "inclinationDeg": "Inklination (Grad)",
+          "raanDeg": "RAAN (Grad)",
+          "eccentricity": "Exzentrizität",
+          "argPerigeeDeg": "Arg. des Perigäums (Grad)",
+          "meanAnomalyDeg": "Mittlere Anomalie (Grad)",
+          "meanMotionRevPerDay": "Mittlere Bewegung (Uml./Tag)",
+          "periodMin": "Umlaufzeit (min)",
+          "apogeeKm": "Apogäum (km)",
+          "perigeeKm": "Perigäum (km)",
+          "semiMajorAxisKm": "Große Halbachse (km)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "Epoche (UTC)",
+          "frame": "Bezugssystem",
+          "dvInput": "Delta-V-Eingabe (m/s)",
+          "magnitude": "Betrag (m/s)",
+          "source": "Quelle",
+          "label": "Bezeichnung",
+          "parameters": "Zündungsparameter",
+          "unavailable": "Zündungsparameter nicht verfügbar"
+        },
+        "compare": {
+          "pre": "Vorher (Ursprung)",
+          "post": "Nachher (Analyse)",
+          "notFound": "Nicht gefunden",
+          "miss": "Vorbeiflugdistanz (km)",
+          "ric": "R / I / C (km)",
+          "relSpeed": "Relativgeschwindigkeit (km/s)"
+        },
+        "notes": {
+          "noEncounter": "Keine größte Annäherung im Suchfenster; vergrößern Sie das Fenster oder rücken Sie die Simulationszeit näher an das Ereignis.",
+          "windowMismatchManeuver": "Die Screening-Läufe vorher und nachher decken unterschiedliche Zeiträume ab; Ereignisse nahe den Fenstergrenzen können falsch eingestuft sein.",
+          "windowMismatchCompare": "Die beiden Screening-Läufe decken unterschiedliche Zeiträume ab; Ereignisse nahe den Fenstergrenzen können falsch eingestuft sein.",
+          "noScreeningRuns": "Keine Screening-Läufe verfügbar.",
+          "noSensor": "Kein Sensor ausgewählt; wählen Sie einen Sensor, um Überflugfenster aufzulisten."
+        }
       }
     }
   }

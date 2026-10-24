@@ -81,13 +81,270 @@
       "errorMsgs": {
         "notSupportedForObject": "Этот отчёт недоступен для выбранного объекта.",
         "generationFailed": "Не удалось создать отчёт",
-        "parentNotFound": "Родительского объекта {scc} нет в каталоге"
+        "parentNotFound": "Родительского объекта {scc} нет в каталоге",
+        "reportOverwrite": "Отчёт с идентификатором «{id}» уже зарегистрирован. Он будет перезаписан."
       },
       "reasons": {
         "selectSecondary": "Сначала выберите вторичный объект",
         "selectAnalyst": "Выберите аналитический спутник, созданный инструментом манёвров",
         "needTwoRuns": "Сначала запустите Debris Screening не менее двух раз",
         "screeningRunsMissing": "Сравнение скрининга недоступно: запустите Debris Screening для {parent} и для {analyst} на одном и том же окне, затем снова создайте этот отчёт."
+      },
+      "doc": {
+        "header": {
+          "date": "Дата",
+          "satellite": "Спутник",
+          "noradId": "NORAD ID",
+          "altId": "Альтернативный ID",
+          "intlDes": "Международное обозначение",
+          "none": "Нет",
+          "sensor": "Датчик",
+          "type": "Тип",
+          "latitude": "Широта",
+          "longitude": "Долгота",
+          "altitude": "Высота",
+          "minAz": "Мин. азимут",
+          "maxAz": "Макс. азимут",
+          "minEl": "Мин. угол места",
+          "maxEl": "Макс. угол места",
+          "minRng": "Мин. дальность",
+          "maxRng": "Макс. дальность",
+          "windowLine": "Период отчёта: с {start} по {end} UTC, шаг: {step} с",
+          "generatedWallClock": "Создан (реальное время)",
+          "appVersion": "Версия KeepTrack",
+          "ricConvention": "Соглашение RIC"
+        },
+        "titles": {
+          "aer": "Отчёт: азимут, угол места, дальность",
+          "lla": "Отчёт: широта, долгота, высота",
+          "eci": "Отчёт: геоцентрическая инерциальная СК (TEME)",
+          "coes": "Отчёт: классические элементы орбиты",
+          "visibility": "Отчёт: окна видимости",
+          "sunEclipse": "Отчёт: солнце/затмение",
+          "conjunction": "Отчёт о сближении",
+          "maneuver": "Отчёт о манёвре",
+          "screeningCompare": "Отчёт о сравнении скринингов"
+        },
+        "cols": {
+          "timeUtc": "Время (UTC)",
+          "pass": "Пролёт",
+          "azimuthDeg": "Азимут(°)",
+          "elevationDeg": "Угол места(°)",
+          "rangeKm": "Дальность(км)",
+          "latitudeDeg": "Широта(°)",
+          "longitudeDeg": "Долгота(°)",
+          "altitudeKm": "Высота(км)",
+          "posX": "Положение X(км)",
+          "posY": "Положение Y(км)",
+          "posZ": "Положение Z(км)",
+          "velX": "Скорость X(км/с)",
+          "velY": "Скорость Y(км/с)",
+          "velZ": "Скорость Z(км/с)",
+          "element": "Элемент",
+          "value": "Значение",
+          "passNum": "Пролёт №",
+          "riseTime": "Восход (UTC)",
+          "setTime": "Заход (UTC)",
+          "durationMin": "Длительность (мин)",
+          "maxElDeg": "Макс. угол места(°)",
+          "maxElTime": "Время макс. угла места (UTC)",
+          "note": "Примечание",
+          "sunIlluminated": "Освещён солнцем",
+          "eclipseType": "Тип затмения",
+          "sunAngleDeg": "Угол солнца(°)",
+          "offsetSec": "Смещение (с)",
+          "rangeKmSpaced": "Дальность (км)",
+          "radialKm": "Радиальная (км)",
+          "intrackKm": "Вдоль орбиты (км)",
+          "crosstrackKm": "Поперёк орбиты (км)",
+          "relSpeed": "Отн. скорость (км/с)"
+        },
+        "empty": {
+          "noPasses": "Пролёты не найдены!",
+          "noPassesWindow": "В периоде отчёта пролёты не найдены!",
+          "noApproach": "В окне поиска не найдено точки наибольшего сближения.",
+          "noScreeningEvents": "Ни в одном из прогонов нет событий скрининга."
+        },
+        "passEdge": {
+          "continuous": "непрерывно",
+          "start": "виден в начале",
+          "end": "виден в конце"
+        },
+        "illumination": {
+          "sun": "Да",
+          "penumbral": "Частично",
+          "umbral": "Нет",
+          "unknown": "Неизвестно"
+        },
+        "eclipse": {
+          "sun": "Нет",
+          "penumbral": "Полутень",
+          "umbral": "Тень",
+          "unknown": "Неизвестно"
+        },
+        "coes": {
+          "note": "Примечание: оскулирующие элементы (J2000) на эпоху состояния, полученные из распространённого вектора состояния.\nОни отличаются от средних элементов TLE, используемых для апогея/перигея в каталоге.",
+          "elementSet": "Набор элементов",
+          "osculatingJ2000": "Оскулирующие (J2000)",
+          "tleEpoch": "Эпоха TLE (UTC)",
+          "stateEpoch": "Эпоха состояния (оскулирующая, UTC)",
+          "apogee": "Апогей",
+          "perigee": "Перигей",
+          "inclination": "Наклонение",
+          "rightAscension": "Прямое восхождение",
+          "argOfPerigee": "Аргумент перигея",
+          "trueAnomaly": "Истинная аномалия",
+          "eccentricity": "Эксцентриситет",
+          "period": "Период",
+          "semiMajorAxis": "Большая полуось",
+          "meanMotion": "Среднее движение"
+        },
+        "objects": {
+          "field": "Поле",
+          "name": "Название",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "Эпоха TLE (UTC)",
+          "gpAge": "Возраст GP",
+          "sigma": "1-сигма R / I / C (км, собственная СК RIC, на эпоху TLE)",
+          "derivedFrom": "Получен из",
+          "days": "Дней: {days}"
+        },
+        "roles": {
+          "primary": "Основной",
+          "secondary": "Вторичный",
+          "parent": "Исходный",
+          "analyst": "Аналитический"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "Расстояние пролёта",
+          "radial": "Радиальная (R)",
+          "intrack": "Вдоль орбиты (I)",
+          "crosstrack": "Поперёк орбиты (C)",
+          "relSpeed": "Относительная скорость",
+          "risk": "Уровень риска",
+          "searchWindow": "Окно поиска (UTC)",
+          "searchWindowValue": "с {start} по {end} (+/- {hours} ч)"
+        },
+        "risk": {
+          "critical": "критический",
+          "high": "высокий",
+          "medium": "средний",
+          "low": "низкий",
+          "unknown": "неизвестен"
+        },
+        "common": {
+          "value": "Значение",
+          "quantity": "Величина",
+          "item": "Пункт"
+        },
+        "pcInputs": {
+          "input": "Входные данные Pc",
+          "method": "Метод",
+          "primaryHbr": "Радиус твёрдого тела основного объекта",
+          "secondaryHbr": "Радиус твёрдого тела вторичного объекта",
+          "combinedHbr": "Суммарный радиус твёрдого тела",
+          "covarianceSource": "Источник ковариации",
+          "confidence": "Уровень доверия (k)",
+          "sigmaCaps": "Ограничения 1-сигма R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: двумерная Pc в плоскости встречи, суммарная ковариация в СК RIC основного объекта",
+          "covarianceSourceValue": "Синтетическая ковариация на основе TLE (ootk cappedScreeningCovarianceFromTle), а не ковариация оператора; как в скрининге мусора"
+        },
+        "passes": {
+          "object": "Объект",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "Макс. угол места (град.)"
+        },
+        "diff": {
+          "status": "Статус",
+          "secondary": "Вторичный",
+          "name": "Название",
+          "preTca": "TCA до (UTC)",
+          "preMiss": "Расстояние до (км)",
+          "prePc": "Pc до",
+          "postTca": "TCA после (UTC)",
+          "postMiss": "Расстояние после (км)",
+          "postPc": "Pc после",
+          "missChange": "Изменение расстояния (км)",
+          "noId": "(без ID)"
+        },
+        "status": {
+          "introduced": "Новое",
+          "removed": "Устранено",
+          "unchanged": "Без изменений",
+          "appeared": "Появилось (ниже порога)",
+          "dropped": "Исчезло (ниже порога)"
+        },
+        "summary": {
+          "range": "с {start} по {end}",
+          "preRunPrimary": "Основной объект прогона до",
+          "preRunWindow": "Окно прогона до (UTC)",
+          "postRunPrimary": "Основной объект прогона после",
+          "postRunWindow": "Окно прогона после (UTC)",
+          "concernThreshold": "Порог значимости",
+          "concernThresholdValue": "{level} и выше",
+          "excluded": "Исключённые вторичные объекты",
+          "appearedDropped": "Появилось / исчезло (ниже порога)"
+        },
+        "sections": {
+          "objects": "Объекты",
+          "closestApproach": "Наибольшее сближение",
+          "pcInputs": "Входные данные вероятности столкновения",
+          "sensorPasses": "Пролёты над датчиком ({sensor})",
+          "relativeGeometry": "Относительная геометрия (TCA +/- 5 мин, 10 с)",
+          "burnsTotal": "Импульсы (всего {dv} м/с)",
+          "burns": "Импульсы",
+          "meanElements": "Средние элементы, до и после",
+          "closeApproachTo": "Сближение с {name} ({id}), до и после",
+          "diffSummary": "Сводка сравнения скрининга",
+          "diffManeuver": "Сравнение скрининга (исходный до, аналитический после)",
+          "diffCompare": "Сравнение скрининга (более ранний и более новый прогон)"
+        },
+        "elements": {
+          "header": "Средний элемент (TLE)",
+          "pre": "До (исходный, на эпоху после)",
+          "post": "После (аналитический)",
+          "change": "Изменение",
+          "epoch": "Эпоха (UTC)",
+          "inclinationDeg": "Наклонение (град.)",
+          "raanDeg": "RAAN (град.)",
+          "eccentricity": "Эксцентриситет",
+          "argPerigeeDeg": "Аргумент перигея (град.)",
+          "meanAnomalyDeg": "Средняя аномалия (град.)",
+          "meanMotionRevPerDay": "Среднее движение (об./сут)",
+          "periodMin": "Период (мин)",
+          "apogeeKm": "Апогей (км)",
+          "perigeeKm": "Перигей (км)",
+          "semiMajorAxisKm": "Большая полуось (км)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "Эпоха (UTC)",
+          "frame": "Система отсчёта",
+          "dvInput": "Заданное delta-V (м/с)",
+          "magnitude": "Величина (м/с)",
+          "source": "Источник",
+          "label": "Метка",
+          "parameters": "Параметры импульса",
+          "unavailable": "Параметры импульса недоступны"
+        },
+        "compare": {
+          "pre": "До (исходный)",
+          "post": "После (аналитический)",
+          "notFound": "Не найдено",
+          "miss": "Расстояние пролёта (км)",
+          "ric": "R / I / C (км)",
+          "relSpeed": "Относительная скорость (км/с)"
+        },
+        "notes": {
+          "noEncounter": "В окне поиска нет точки наибольшего сближения; расширьте окно или приблизьте время моделирования к событию.",
+          "windowMismatchManeuver": "Скрининги до и после охватывают разные окна; события у границ окна могут быть классифицированы неверно.",
+          "windowMismatchCompare": "Два скрининга охватывают разные окна; события у границ окна могут быть классифицированы неверно.",
+          "noScreeningRuns": "Нет доступных прогонов скрининга.",
+          "noSensor": "Датчик не выбран; выберите датчик, чтобы получить список окон пролёта."
+        }
       }
     }
   }

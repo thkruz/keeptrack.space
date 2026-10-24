@@ -20,6 +20,7 @@ describe('CreateSat', () => {
       sccNum2Id: vi.fn().mockReturnValue(12345),
       getObject: vi.fn().mockReturnValue({
         isSatellite: () => true,
+        country: 'ANALSAT',
       }),
       objectCache: [],
       satCruncherThread: {
@@ -116,6 +117,7 @@ describe('CreateSat', () => {
       sccNum2Id: vi.fn().mockReturnValue(12345),
       getObject: vi.fn().mockReturnValue({
         isSatellite: () => true,
+        country: 'ANALSAT',
       }),
       objectCache: [],
       satCruncherThread: {

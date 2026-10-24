@@ -103,6 +103,13 @@
         "gto": "地球同步转移（GTO）",
         "molniya": "闪电轨道",
         "polar": "极地（600 公里）"
+      },
+      "confirm": {
+        "title": "替换卫星？",
+        "message": "替换分析员编号 {scc} 的 {name}？",
+        "replace": "替换",
+        "cancel": "取消",
+        "changed": "卫星或表单已更改。请检查后重新提交。"
       }
     }
   }

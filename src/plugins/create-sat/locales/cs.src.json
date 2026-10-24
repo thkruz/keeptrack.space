@@ -103,6 +103,13 @@
         "gto": "Přechodová ke GEO (GTO)",
         "molniya": "Molnija",
         "polar": "Polární (600 km)"
+      },
+      "confirm": {
+        "title": "Nahradit družici?",
+        "message": "Nahradit {name} s analytickým ID {scc}?",
+        "replace": "Nahradit",
+        "cancel": "Zrušit",
+        "changed": "Družice nebo formulář se změnily. Zkontrolujte je a odešlete znovu."
       }
     }
   }

@@ -103,6 +103,13 @@
         "gto": "Transferencia a GEO (GTO)",
         "molniya": "Molniya",
         "polar": "Polar (600 km)"
+      },
+      "confirm": {
+        "title": "¿Reemplazar satélite?",
+        "message": "¿Reemplazar {name} con ID de analista {scc}?",
+        "replace": "Reemplazar",
+        "cancel": "Cancelar",
+        "changed": "El satélite o el formulario cambió. Revísalo y envíalo de nuevo."
       }
     }
   }

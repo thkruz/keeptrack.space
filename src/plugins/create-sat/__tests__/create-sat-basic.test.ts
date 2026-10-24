@@ -39,6 +39,30 @@ describe('CreateSat basic tab', () => {
     expect(meanMotion).toBeGreaterThan(0);
   });
 
+  it('refreshes Advanced derived values for repeated Basic orbits and preserves them on invalid recovery', () => {
+    vi.spyOn(C, 'createSatSubmit_').mockImplementation(() => undefined);
+    for (const [apogee, perigee] of [
+      [400, 400],
+      [800, 800],
+      [1200, 400],
+    ]) {
+      setBasic('51.6', String(apogee), String(perigee));
+      p().createSatBasicSubmit_();
+      expect(parseFloat((getEl('createSat-calc-apogee') as HTMLInputElement).value)).toBeCloseTo(apogee, 0);
+      expect(parseFloat((getEl('createSat-calc-perigee') as HTMLInputElement).value)).toBeCloseTo(perigee, 0);
+      const meanMotion = parseFloat((getEl('createSat-meanmo') as HTMLInputElement).value);
+      const ecc = parseFloat((getEl('createSat-ecen') as HTMLInputElement).value) / 1e7;
+      const derived = CreateSat.calculateDerivedParams(meanMotion, ecc);
+
+      expect(parseFloat((getEl('createSat-calc-sma') as HTMLInputElement).value)).toBeCloseTo(derived.semimajorAxis, 0);
+    }
+    const before = (getEl('createSat-calc-apogee') as HTMLInputElement).value;
+
+    setBasic('200', '800', '800');
+    p().createSatBasicSubmit_();
+    expect((getEl('createSat-calc-apogee') as HTMLInputElement).value).toBe(before);
+  });
+
   it('populateBasicTabDefaults_ fills the basic-tab inputs with defaults', () => {
     p().populateBasicTabDefaults_();
 
@@ -46,14 +70,15 @@ describe('CreateSat basic tab', () => {
     expect((getEl('createSat-basic-perigee') as HTMLInputElement).value).toBe('400');
   });
 
-  it('createSatBasicSubmit_ toasts on non-numeric input', () => {
+  it('createSatBasicSubmit_ shows inline feedback on non-numeric input', () => {
     const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
     const submitSpy = vi.spyOn(C, 'createSatSubmit_').mockImplementation(() => undefined);
 
     setBasic('abc', '400', '400');
     p().createSatBasicSubmit_();
 
-    expect(toastSpy).toHaveBeenCalled();
+    expect(getEl('createSat-basic-error')?.textContent).toBeTruthy();
+    expect(toastSpy).not.toHaveBeenCalled();
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
@@ -64,7 +89,8 @@ describe('CreateSat basic tab', () => {
     setBasic('51.6', '400', '50');
     p().createSatBasicSubmit_();
 
-    expect(toastSpy).toHaveBeenCalled();
+    expect(getEl('createSat-basic-error')?.textContent).toBeTruthy();
+    expect(toastSpy).not.toHaveBeenCalled();
     expect(submitSpy).not.toHaveBeenCalled();
   });
 
@@ -97,5 +123,25 @@ describe('CreateSat basic tab', () => {
     expect((getEl('createSat-scc') as HTMLInputElement).value).toBe('90000');
     expect((getEl('createSat-inc') as HTMLInputElement).value).toContain('51.6');
     expect(submitSpy).toHaveBeenCalled();
+  });
+  it('clears only Basic validation feedback after corrected creation and preserves unrelated notifications', () => {
+    const submit = vi.spyOn(C, 'createSatSubmit_').mockImplementation(() => undefined);
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+    document.body.insertAdjacentHTML('beforeend', '<div id="unrelated-toast">Unrelated notification</div>');
+    setBasic('181', '800', '400');
+    p().createSatBasicSubmit_();
+    const error = getEl('createSat-basic-error', true);
+    expect(error?.textContent).toContain('Inclination');
+    expect(error?.getAttribute('role')).toBe('alert');
+    expect(getEl('createSat-basic-inc')?.getAttribute('aria-invalid')).toBe('true');
+    expect(submit).not.toHaveBeenCalled();
+    setBasic('51.6', '800', '400');
+    p().createSatBasicSubmit_();
+    expect(submit).toHaveBeenCalledTimes(1);
+    expect(error?.textContent).toBe('');
+    expect(error?.hidden).toBe(true);
+    expect(getEl('createSat-basic-inc')?.getAttribute('aria-invalid')).toBe('false');
+    expect(getEl('unrelated-toast')?.textContent).toBe('Unrelated notification');
+    expect(toast).not.toHaveBeenCalled();
   });
 });

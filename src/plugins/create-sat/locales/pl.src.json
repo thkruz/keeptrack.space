@@ -103,6 +103,13 @@
         "gto": "Transferowa do GEO (GTO)",
         "molniya": "Molniya",
         "polar": "Polarna (600 km)"
+      },
+      "confirm": {
+        "title": "Zastąpić satelitę?",
+        "message": "Zastąpić {name} o identyfikatorze analityka {scc}?",
+        "replace": "Zastąp",
+        "cancel": "Anuluj",
+        "changed": "Satelita lub formularz uległ zmianie. Sprawdź i wyślij ponownie."
       }
     }
   }

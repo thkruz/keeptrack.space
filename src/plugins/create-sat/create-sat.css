@@ -46,3 +46,20 @@
 #createSat-menu .input-field textarea:focus-visible {
   outline: none;
 }
+
+#createSat-basic-error {
+  margin: 8px 6px;
+  color: var(--color-error, #ffb4ab);
+  line-height: 1.4;
+}
+#createSat-basic-error[hidden] {
+  display: none;
+}
+
+/* Calculated orbit values remain readable without becoming editable. */
+#createSat-menu #createSat-calc-apogee:disabled,
+#createSat-menu #createSat-calc-perigee:disabled,
+#createSat-menu #createSat-calc-sma:disabled,
+#createSat-menu #createSat-calc-velocity:disabled {
+  color: #c4c4c4;
+}

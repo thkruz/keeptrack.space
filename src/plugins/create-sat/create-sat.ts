@@ -1,13 +1,16 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { countryCodeList, countryNameList } from '@app/app/data/catalogs/countries';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IBottomIconConfig, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { ModalConfirm } from '@app/engine/ui/modal-confirm';
 import { buildSideMenuTabsHtml, initSideMenuTabs, SideMenuTabDef, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { FormatTle, KilometersPerSecond, Satellite, SatelliteParams, SatelliteRecord, Sgp4, TemeVec3, Tle } from '@ootk/src/main';
@@ -16,7 +19,7 @@ import { saveAs } from 'file-saver';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
-import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc } from './create-sat-actions';
+import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc, writeAdvancedFields } from './create-sat-actions';
 import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
@@ -386,6 +389,7 @@ export class CreateSat extends KeepTrackPlugin {
    * Populate Basic tab with default values
    */
   private populateBasicTabDefaults_(): void {
+    this.setBasicError_();
     (getEl(`${CreateSat.elementPrefix}-basic-scc`) as HTMLInputElement).value = '90000';
     (getEl(`${CreateSat.elementPrefix}-basic-name`) as HTMLInputElement).value = 'New Satellite';
     (getEl(`${CreateSat.elementPrefix}-basic-inc`) as HTMLInputElement).value = '51.6';
@@ -396,7 +400,24 @@ export class CreateSat extends KeepTrackPlugin {
   /**
    * Create satellite from Basic tab inputs
    */
+  private setBasicError_(message = '', invalidFields: HTMLInputElement[] = []): void {
+    const error = getEl(`${CreateSat.elementPrefix}-basic-error`, true);
+
+    if (error) {
+      error.textContent = message;
+      error.hidden = message.length === 0;
+    }
+    for (const suffix of ['inc', 'apogee', 'perigee']) {
+      const input = getEl(`${CreateSat.elementPrefix}-basic-${suffix}`, true) as HTMLInputElement | null;
+
+      if (input) {
+        input.setAttribute('aria-invalid', String(invalidFields.includes(input)));
+      }
+    }
+  }
+
   private createSatBasicSubmit_(): void {
+    this.setBasicError_();
     const sccEl = getEl(`${CreateSat.elementPrefix}-basic-scc`) as HTMLInputElement;
     const nameEl = getEl(`${CreateSat.elementPrefix}-basic-name`) as HTMLInputElement;
     const incEl = getEl(`${CreateSat.elementPrefix}-basic-inc`) as HTMLInputElement;
@@ -407,30 +428,34 @@ export class CreateSat extends KeepTrackPlugin {
     const perigee = parseFloat(perigeeEl.value);
     const inc = parseFloat(incEl.value);
 
-    const uiManager = ServiceLocator.getUiManager();
     const e = (key: string) => t7e(`plugins.CreateSat.errorMsgs.${key}` as T7eKey);
 
+    // Basic errors belong to this form so corrected submissions can clear them
+    // without dismissing unrelated application notifications.
     // Validate Basic tab inputs
-    if (isNaN(apogee) || isNaN(perigee) || isNaN(inc)) {
-      uiManager.toast(e('invalidNumericValues'), ToastMsgType.error, true);
+    if (!Number.isFinite(apogee) || !Number.isFinite(perigee) || !Number.isFinite(inc)) {
+      this.setBasicError_(
+        e('invalidNumericValues'),
+        [apogeeEl, perigeeEl, incEl].filter((input) => !Number.isFinite(parseFloat(input.value)))
+      );
 
       return;
     }
 
     if (perigee < 100) {
-      uiManager.toast(e('perigeeTooLow'), ToastMsgType.caution, true);
+      this.setBasicError_(e('perigeeTooLow'), [perigeeEl]);
 
       return;
     }
 
     if (apogee < perigee) {
-      uiManager.toast(e('apogeeMustBeGtePerigee'), ToastMsgType.error, true);
+      this.setBasicError_(e('apogeeMustBeGtePerigee'), [apogeeEl, perigeeEl]);
 
       return;
     }
 
     if (inc < 0 || inc > 180) {
-      uiManager.toast(e('inclinationRange'), ToastMsgType.error, true);
+      this.setBasicError_(e('inclinationRange'), [incEl]);
 
       return;
     }
@@ -441,13 +466,14 @@ export class CreateSat extends KeepTrackPlugin {
     // Calculate period from mean motion
     const period = 1440 / meanMotion;
 
-    // Populate Advanced tab fields with calculated values
-    (getEl(`${CreateSat.elementPrefix}-scc`) as HTMLInputElement).value = sccEl.value.trim().padStart(5, '0');
-    (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value = nameEl.value || 'New Satellite';
-    (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value = inc.toFixed(4).padStart(8, '0');
-    (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value = (eccentricity * 1e7).toFixed(0).padStart(7, '0');
-    (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = meanMotion.toFixed(5).padStart(8, '0');
-    (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = period.toFixed(4).padStart(8, '0');
+    writeAdvancedFields(CreateSat.elementPrefix, {
+      scc: sccEl.value.trim().padStart(5, '0'),
+      name: nameEl.value || 'New Satellite',
+      inc: inc.toFixed(4).padStart(8, '0'),
+      ecen: (eccentricity * 1e7).toFixed(0).padStart(7, '0'),
+      meanmo: meanMotion.toFixed(5).padStart(8, '0'),
+      per: period.toFixed(4).padStart(8, '0'),
+    });
 
     // Use existing submit logic
     CreateSat.createSatSubmit_();
@@ -475,6 +501,8 @@ export class CreateSat extends KeepTrackPlugin {
          * more than 5 decimal places
          */
         perInput.value = parseFloat(per).toFixed(4).padStart(8, '0');
+        // A programmatic value change fires no event; tell the derived readouts (they listen for input).
+        getEl(`${CreateSat.elementPrefix}-meanmo`)?.dispatchEvent(new Event('input'));
       } catch (error) {
         errorManagerInstance.error(error as Error, 'create-sat.ts', 'Error converting period to mean motion');
       }
@@ -783,7 +811,7 @@ export class CreateSat extends KeepTrackPlugin {
   /**
    * Create and submit a new satellite
    */
-  protected static createSatSubmit_(): void {
+  protected static createSatSubmit_(confirmedObject?: unknown): void {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
@@ -816,17 +844,48 @@ export class CreateSat extends KeepTrackPlugin {
 
       const sat = obj as Satellite;
 
-      // Warn before overwriting a slot that already holds a real satellite. A
-      // free analyst slot still carries the 'ANALSAT' country; anything else
-      // means we are replacing a previously created (or catalog) object.
-      if (sat.country && sat.country !== 'ANALSAT') {
-        ServiceLocator.getUiManager().toast(
-          t7e('plugins.CreateSat.errorMsgs.slotOccupied' as T7eKey)
-            .replace('{name}', sat.name ?? '')
-            .replace('{scc}', inputParams.scc),
-          ToastMsgType.caution,
-          true
+      if ((sat.active || sat.country !== 'ANALSAT') && confirmedObject !== sat) {
+        const oldTle1 = sat.tle1;
+        const oldTle2 = sat.tle2;
+        const oldIdentity = JSON.stringify([sat.name, sat.country, sat.active]);
+        const formSnapshot = JSON.stringify(inputParams);
+        const intlSnapshot = (getEl(`${CreateSat.elementPrefix}-intl`, true) as HTMLInputElement | null)?.value;
+        let used = false;
+
+        ModalConfirm.getInstance().open(
+          () => {
+            if (used) {
+              return;
+            }
+            used = true;
+            const current = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
+            const unchanged =
+              current === sat &&
+              sat.tle1 === oldTle1 &&
+              sat.tle2 === oldTle2 &&
+              JSON.stringify([sat.name, sat.country, sat.active]) === oldIdentity &&
+              JSON.stringify(CreateSat.getTleInputs_()) === formSnapshot &&
+              (getEl(`${CreateSat.elementPrefix}-intl`, true) as HTMLInputElement | null)?.value === intlSnapshot;
+
+            if (!unchanged) {
+              ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.confirm.changed' as T7eKey), ToastMsgType.caution);
+
+              return;
+            }
+            CreateSat.createSatSubmit_(sat);
+          },
+          {
+            title: t7e('plugins.CreateSat.confirm.title' as T7eKey),
+            message: t7e('plugins.CreateSat.confirm.message' as T7eKey)
+              .replace('{name}', escapeHtml(sat.name ?? ''))
+              .replace('{scc}', escapeHtml(inputParams.scc)),
+            confirmText: t7e('plugins.CreateSat.confirm.replace' as T7eKey),
+            cancelText: t7e('plugins.CreateSat.confirm.cancel' as T7eKey),
+            isDestructive: true,
+          }
         );
+
+        return;
       }
 
       const country = inputParams.country;
@@ -910,6 +969,8 @@ export class CreateSat extends KeepTrackPlugin {
         },
       });
 
+      writeAdvancedFields(CreateSat.elementPrefix, {});
+
       // Add to catalog
       catalogManagerInstance.objectCache[satId] = newSat;
 
@@ -930,6 +991,14 @@ export class CreateSat extends KeepTrackPlugin {
       // Seed the render buffers so the immediate search below does not read
       // the placeholder 0,0,0 position as "Decayed"
       catalogManagerInstance.seedDotPosition(satId);
+
+      // Replacing the selected object puts a new instance in the same slot; re-select it so the
+      // object panel shows the new satellite instead of the replaced one.
+      const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+      if (selectSatManager?.selectedSat === satId) {
+        selectSatManager.selectSat(satId);
+      }
 
       // Search for the new satellite
       ServiceLocator.getUiManager().doSearch(inputParams.scc);

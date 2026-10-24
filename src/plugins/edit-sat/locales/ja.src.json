@@ -57,7 +57,8 @@
         "satelliteNotFound": "衛星 {sccNum} が見つかりません！",
         "failedToPropagate": "衛星の伝播に失敗しました。別のパラメータを試すか、正しいと確信している場合はこの問題を報告してください。",
         "cannotCalculateDirection": "衛星の方向を計算できません。後でもう一度お試しください。",
-        "notRealSatellite": "実在の衛星ではありません"
+        "notRealSatellite": "実在の衛星ではありません",
+        "satrecFailed": "衛星レコードの作成でエラーが発生しました!"
       }
     }
   }

@@ -570,7 +570,7 @@ export class EditSat extends KeepTrackPlugin {
 
       reader.readAsText(eventTarget.files![0]);
     } catch (e) {
-      errorManagerInstance.error(e, 'edit-sat.ts', 'Error reading file!');
+      errorManagerInstance.error(e, 'edit-sat.ts', t7e('plugins.EditSat.errorMsgs.errorReadingFile' as T7eKey));
     }
   }
 

@@ -57,7 +57,8 @@
         "satelliteNotFound": "Satelit {sccNum} nebyl nalezen!",
         "failedToPropagate": "Nepodařilo se propagovat satelit. Zkuste jiné parametry, nebo pokud jste si jisti, že jsou správné, nahlaste tento problém.",
         "cannotCalculateDirection": "Nelze vypočítat směr satelitu. Zkuste to znovu později.",
-        "notRealSatellite": "Není skutečný satelit"
+        "notRealSatellite": "Není skutečný satelit",
+        "satrecFailed": "Chyba při vytváření záznamu družice!"
       }
     }
   }

@@ -57,7 +57,8 @@
         "satelliteNotFound": "Satellite {sccNum} introuvable !",
         "failedToPropagate": "Échec de la propagation du satellite. Essayez des paramètres différents ou, si vous êtes sûr qu'ils sont corrects, signalez ce problème.",
         "cannotCalculateDirection": "Impossible de calculer la direction du satellite. Réessayez plus tard.",
-        "notRealSatellite": "Pas un vrai satellite"
+        "notRealSatellite": "Pas un vrai satellite",
+        "satrecFailed": "Erreur lors de la création de l'enregistrement du satellite !"
       }
     }
   }

@@ -57,7 +57,8 @@
         "satelliteNotFound": "未找到卫星 {sccNum}！",
         "failedToPropagate": "卫星传播失败。请尝试不同的参数，或者如果您确信参数正确，请报告此问题。",
         "cannotCalculateDirection": "无法计算卫星方向。请稍后再试。",
-        "notRealSatellite": "不是真实卫星"
+        "notRealSatellite": "不是真实卫星",
+        "satrecFailed": "创建卫星记录时出错！"
       }
     }
   }

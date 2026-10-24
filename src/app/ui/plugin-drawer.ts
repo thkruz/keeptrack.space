@@ -185,7 +185,7 @@ export class PluginDrawer {
     btn.id = 'drawer-hamburger';
     btn.className = 'drawer-hamburger';
     btn.setAttribute('role', 'button');
-    btn.setAttribute('aria-label', 'Open plugin menu');
+    btn.setAttribute('aria-label', t7e('pluginDrawer.openPluginMenu' as TranslationKey));
     btn.innerHTML = ['<span class="drawer-hamburger-bar"></span>', '<span class="drawer-hamburger-bar"></span>', '<span class="drawer-hamburger-bar"></span>'].join('');
 
     const logoEl = settingsManager.navBarLogoUrl ? document.createElement('a') : document.createElement('div');
@@ -236,8 +236,8 @@ export class PluginDrawer {
     const launcherHtml = hasLauncher
       ? [
           '    <div class="drawer-app-launcher" id="drawer-app-launcher" role="button" tabindex="0"',
-          '      aria-label="Open app launcher" kt-tooltip="App Launcher (Shift+Z)">',
-          `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="App Launcher" />`,
+          `      aria-label="${t7e('pluginDrawer.openAppLauncher' as TranslationKey)}" kt-tooltip="${t7e('pluginDrawer.appLauncherTooltip' as TranslationKey)}">`,
+          `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="${t7e('pluginDrawer.appLauncher' as TranslationKey)}" />`,
           '    </div>',
         ].join('')
       : '';
@@ -248,8 +248,8 @@ export class PluginDrawer {
     const searchHtml = hasCommandPalette
       ? [
           '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
-          `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
-          '      <span class="drawer-search-label">Search…</span>',
+          `      <img class="drawer-search-icon" src=${searchPng} alt="${t7e('pluginDrawer.search' as TranslationKey)}" />`,
+          `      <span class="drawer-search-label">${t7e('pluginDrawer.searchEllipsis' as TranslationKey)}</span>`,
           '      <span class="drawer-search-shortcut">Ctrl+⇧+K</span>',
           '    </div>',
         ].join('')
@@ -275,9 +275,9 @@ export class PluginDrawer {
       // from under the cursor (and leave the rail toggle in its place).
       '<div id="drawer-status-footer" class="drawer-status-footer-container"></div>',
       '<div id="drawer-user-account" class="drawer-user-account"></div>',
-      '<div id="drawer-rail-toggle" class="drawer-rail-toggle" role="button" aria-label="Toggle rail mode">',
+      `<div id="drawer-rail-toggle" class="drawer-rail-toggle" role="button" aria-label="${t7e('pluginDrawer.toggleRailMode' as TranslationKey)}">`,
       `  <img class="drawer-rail-toggle-icon" src="${leftPanelClosePng}" alt="" />`,
-      '  <span class="drawer-rail-toggle-label">Collapse</span>',
+      `  <span class="drawer-rail-toggle-label">${t7e('pluginDrawer.collapse' as TranslationKey)}</span>`,
       '  <span class="drawer-rail-toggle-shortcut">Tab</span>',
       '</div>',
     ].join('');
@@ -981,7 +981,7 @@ export class PluginDrawer {
       icon.src = isRail ? leftPanelOpenPng : leftPanelClosePng;
     }
     if (label) {
-      label.textContent = isRail ? 'Expand' : 'Collapse';
+      label.textContent = isRail ? t7e('pluginDrawer.expand' as TranslationKey) : t7e('pluginDrawer.collapse' as TranslationKey);
     }
   }
 }

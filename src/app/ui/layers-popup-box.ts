@@ -2,11 +2,12 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, showEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { LayersManager } from './layers-manager';
 
 export class LayersPopupBox extends DraggableBox {
   constructor() {
-    super('layers-popup-box', { title: 'Layers', width: '325px' });
+    super('layers-popup-box', { title: t7e('layersManager.layers'), width: '325px' });
   }
 
   protected getBoxContentHtml(): string {

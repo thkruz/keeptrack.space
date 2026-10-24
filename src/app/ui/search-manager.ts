@@ -111,7 +111,7 @@ export class SearchManager {
       order: 5,
       class: 'top-menu-icons__blue-img',
       icon: searchPng,
-      tooltip: 'Search',
+      tooltip: t7e('pluginDrawer.search' as TranslationKey),
     });
   }
 
@@ -477,7 +477,7 @@ export class SearchManager {
     if (idList.length === 0) {
       // lastSearch is the term list, so test the typed string's length instead.
       if (searchString_.length > settingsManager.minimumSearchCharacters) {
-        uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
+        uiManagerInstance.toast(t7e('searchManager.noResults' as TranslationKey), ToastMsgType.serious, false);
       }
       this.hideResults();
     }
@@ -646,22 +646,22 @@ export class SearchManager {
           }
           break;
         case SearchResultType.STAR:
-          html += 'Star';
+          html += t7e('searchManager.typeStar' as TranslationKey);
           break;
         case SearchResultType.SENSOR:
-          html += (obj as unknown as DetailedSensor).country ?? 'Sensor';
+          html += (obj as unknown as DetailedSensor).country ?? t7e('searchManager.typeSensor' as TranslationKey);
           break;
         case SearchResultType.LAUNCH_SITE:
-          html += (obj as unknown as LaunchSite).country ?? 'Launch Site';
+          html += (obj as unknown as LaunchSite).country ?? t7e('searchManager.typeLaunchSite' as TranslationKey);
           break;
         case SearchResultType.PLANET:
-          html += 'Planet';
+          html += t7e('searchManager.typePlanet' as TranslationKey);
           break;
         default:
           if (obj instanceof MissileObject) {
             html += obj.desc;
           } else if (obj instanceof Star) {
-            html += 'Star';
+            html += t7e('searchManager.typeStar' as TranslationKey);
           } else if (obj instanceof OemSatellite) {
             html += (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
           } else {
@@ -672,7 +672,7 @@ export class SearchManager {
 
       html += '</div>';
       if (isDecayed) {
-        html += '<div class="search-result-decayed-badge">Decayed</div>';
+        html += `<div class="search-result-decayed-badge">${t7e('searchManager.decayed' as TranslationKey)}</div>`;
       }
       html += '</div>';
 

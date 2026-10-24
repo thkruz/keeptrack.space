@@ -10,6 +10,7 @@ import {
   EarthTextureStyle,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
@@ -84,10 +85,7 @@ export class MobileManager {
             settingsManager.isShowPrimaryLogo = false;
             settingsManager.isShowSecondaryLogo = false;
           } else if (!settingsManager.isMobileModeEnabled) {
-            ServiceLocator.getUiManager().toast(
-              'Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
-              ToastMsgType.normal
-            );
+            ServiceLocator.getUiManager().toast(t7e('toasts.mobileFullVersionUnavailable'), ToastMsgType.normal);
           }
 
           Object.assign(settingsManager, {

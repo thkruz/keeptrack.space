@@ -183,7 +183,7 @@ export abstract class SplashScreen {
    * shown, to avoid jargon on the splash).
    */
   static showBootFailure(stalled: string) {
-    errorManagerInstance.warn(`[KeepTrack] Boot recovery UI shown (stalled workers: ${stalled}).`);
+    errorManagerInstance.warn(t7e('errorMsgs.Boot.recoveryShown' as TranslationKey).replace('{workers}', stalled));
     SplashScreen.loadStr(t7e('loadingScreen.loadFailed' as TranslationKey));
 
     const container = getEl('logo-inner-container');

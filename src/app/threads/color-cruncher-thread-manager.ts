@@ -11,6 +11,7 @@ import { ColorWorkerMsgType, ColorWorkerOutMsg, FilterState, SettingsFlags } fro
 import { WebWorkerThreadManager } from '@app/engine/threads/web-worker-thread';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { FrameProfiler } from '@app/engine/utils/frame-profiler';
+import { t7e } from '@app/locales/keys';
 
 export class ColorCruncherThreadManager extends WebWorkerThreadManager {
   readonly WEB_WORKER_CODE: string = 'js/colorCruncher.js';
@@ -120,7 +121,7 @@ export class ColorCruncherThreadManager extends WebWorkerThreadManager {
         transfer
       );
     } catch (error) {
-      errorManagerInstance.warn(`ColorCruncher dynamic update dropped: ${error instanceof Error ? error.message : String(error)}`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.colorCruncherUpdateDropped').replace('{error}', error instanceof Error ? error.message : String(error)));
     }
   }
 

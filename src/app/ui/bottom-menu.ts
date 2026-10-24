@@ -6,6 +6,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import addSatellitePng from '@public/img/icons/add-satellite.png';
 import barChart4BarsPng from '@public/img/icons/bar-chart-4-bars.png';
 import buildCirclePng from '@public/img/icons/build-circle.png';
@@ -51,80 +52,80 @@ export class BottomMenu {
         <div id="bottom-icons-filter">
           <div id="${BottomMenu.catalogMenuId}" class="bmenu-filter-item bmenu-item-selected">
             <div class="bmenu-filter-item-inner">
-              <img alt="Catalog" src="" delayedsrc="${databaseSearchPng}" />
+              <img alt="${t7e('pluginDrawer.modeCatalog' as TranslationKey)}" src="" delayedsrc="${databaseSearchPng}" />
             </div>
-            <span class="bmenu-filter-title">Catalog</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeCatalog' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.sensorsMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Sensors" src="" delayedsrc="${radarPng}" />
+              <img alt="${t7e('pluginDrawer.modeSensors' as TranslationKey)}" src="" delayedsrc="${radarPng}" />
             </div>
-            <span class="bmenu-filter-title">Sensors</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeSensors' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.eventsMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Events" src="" delayedsrc="${eventNotePng}" />
+              <img alt="${t7e('pluginDrawer.modeEvents' as TranslationKey)}" src="" delayedsrc="${eventNotePng}" />
             </div>
-            <span class="bmenu-filter-title">Events</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeEvents' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.createMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Create" src="" delayedsrc="${addSatellitePng}" />
+              <img alt="${t7e('pluginDrawer.modeCreate' as TranslationKey)}" src="" delayedsrc="${addSatellitePng}" />
             </div>
-            <span class="bmenu-filter-title">Create</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeCreate' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.analysisMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Analysis" src="" delayedsrc="${barChart4BarsPng}" />
+              <img alt="${t7e('pluginDrawer.modeAnalysis' as TranslationKey)}" src="" delayedsrc="${barChart4BarsPng}" />
             </div>
-            <span class="bmenu-filter-title">Analysis</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeAnalysis' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.conjunctionsMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Conjunctions" src="" delayedsrc="${targetPng}" />
+              <img alt="${t7e('pluginDrawer.modeConjunctions' as TranslationKey)}" src="" delayedsrc="${targetPng}" />
             </div>
-            <span class="bmenu-filter-title">Conjunctions</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeConjunctions' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.displayMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Display" src="" delayedsrc="${displaySettingsPng}" />
+              <img alt="${t7e('pluginDrawer.modeDisplay' as TranslationKey)}" src="" delayedsrc="${displaySettingsPng}" />
             </div>
-            <span class="bmenu-filter-title">Display</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeDisplay' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.toolsMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Tools" src="" delayedsrc="${buildCirclePng}" />
+              <img alt="${t7e('pluginDrawer.modeTools' as TranslationKey)}" src="" delayedsrc="${buildCirclePng}" />
             </div>
-            <span class="bmenu-filter-title">Tools</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeTools' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.settingsMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Settings" src="" delayedsrc="${settingsPng}" />
+              <img alt="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" src="" delayedsrc="${settingsPng}" />
             </div>
-            <span class="bmenu-filter-title">Settings</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeSettings' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.experimentalMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="Experimental" src="" delayedsrc="${sciencePng}" />
+              <img alt="${t7e('pluginDrawer.modeExperimental' as TranslationKey)}" src="" delayedsrc="${sciencePng}" />
             </div>
-            <span class="bmenu-filter-title">Experimental</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeExperimental' as TranslationKey)}</span>
           </div>
           <div id="${BottomMenu.allMenuId}" class="bmenu-filter-item">
             <div class="bmenu-filter-item-inner">
-              <img alt="All Plugins" src="" delayedsrc="${developerModePng}" />
+              <img alt="${t7e('pluginDrawer.modeAll' as TranslationKey)}" src="" delayedsrc="${developerModePng}" />
             </div>
-            <span class="bmenu-filter-title">All Plugins</span>
+            <span class="bmenu-filter-title">${t7e('pluginDrawer.modeAll' as TranslationKey)}</span>
           </div>
         </div>
         <div id="bottom-icons"></div>
         <div id="${BottomMenu.utilityPanelId}">
-          <div class="utility-section-header">Camera Modes</div>
+          <div class="utility-section-header">${t7e('pluginDrawer.groupCameraModes' as TranslationKey)}</div>
           <div id="${BottomMenu.utilityCameraContainerId}" class="utility-section-icons"></div>
           <hr class="utility-section-divider" />
-          <div class="utility-section-header">Layer Toggles</div>
+          <div class="utility-section-header">${t7e('pluginDrawer.groupLayerToggles' as TranslationKey)}</div>
           <div id="${BottomMenu.utilityLayerContainerId}" class="utility-section-icons"></div>
           <hr class="utility-section-divider" />
-          <div class="utility-section-header">Settings</div>
+          <div class="utility-section-header">${t7e('pluginDrawer.modeSettings' as TranslationKey)}</div>
           <div id="${BottomMenu.utilitySettingsContainerId}" class="utility-section-icons"></div>
         </div>
       </div>
@@ -212,7 +213,7 @@ export class BottomMenu {
         el.classList.remove('bmenu-item-selected');
       });
     } else {
-      errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
+      errorManagerInstance.warn(t7e('errorMsgs.BottomMenu.filterButtonsMissing' as TranslationKey));
     }
   }
 
@@ -269,7 +270,7 @@ export class BottomMenu {
 
       EventBus.getInstance().emit(EventBusEvent.bottomMenuModeChange);
     } else {
-      errorManagerInstance.warn('Failed to find all bottom menu filter buttons');
+      errorManagerInstance.warn(t7e('errorMsgs.BottomMenu.filterButtonsMissing' as TranslationKey));
     }
 
     const wheel = (dom: EventTarget, deltaY: number) => {

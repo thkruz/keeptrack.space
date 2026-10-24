@@ -7,6 +7,7 @@ import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-mana
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
+import { t7e } from '@app/locales/keys';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import layersPng from '@public/img/icons/layers.png';
 import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
@@ -25,7 +26,11 @@ export class LayersManager {
     '.layers-satGEO-box',
   ];
 
-  static menuOptions = {
+  /**
+   * Legend HTML per layer. Values may be builder functions so labels translate on
+   * use (after localization init) rather than when this module is parsed.
+   */
+  static menuOptions: Record<string, string | (() => string)> = {
     near: nearDiv,
     deep: deepDiv,
     planetarium: planetariumDiv,
@@ -38,11 +43,11 @@ export class LayersManager {
   layersPopupBox: LayersPopupBox = new LayersPopupBox();
 
   static {
-    const addonLayers = {};
+    const addonLayers: Record<string, () => string> = {};
     const addonLayersClassList = [] as string[];
 
     for (const ColorSchemeClass of addonColorSchemes) {
-      addonLayers[ColorSchemeClass.id] = ColorSchemeClass.layersHtml;
+      addonLayers[ColorSchemeClass.id] = () => ColorSchemeClass.layersHtml;
 
       for (const flag in ColorSchemeClass.uniqueObjectTypeFlags) {
         if (flag) {
@@ -114,7 +119,7 @@ export class LayersManager {
       order: 2,
       classInner: 'top-menu-icons__blue-img',
       icon: layersPng,
-      tooltip: 'Toggle Layers',
+      tooltip: t7e('layersManager.toggleLayers'),
     });
 
     eventBus.on(EventBusEvent.uiManagerFinal, () => {
@@ -178,7 +183,8 @@ export class LayersManager {
     }
 
     // TODO there should be a setting that determines the defaults (Celestrak Rebase)
-    const selectedOption = LayersManager.menuOptions[menu] ?? ObjectTypeColorScheme.layersHtml;
+    const option = LayersManager.menuOptions[menu];
+    const selectedOption = typeof option === 'function' ? option() : (option ?? ObjectTypeColorScheme.layersHtml);
 
     layersHoverDom.innerHTML = selectedOption;
     if (menu === 'clear') {

@@ -20,6 +20,7 @@
  */
 
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 
 /**
  * Registers every satellite mesh pack this build ships, before anything can resolve a model.
@@ -48,7 +49,7 @@ export async function registerMeshPacks(): Promise<void> {
 
       pack.registerHeroMeshes();
     } catch (error) {
-      errorManagerInstance.warn(`Hero spacecraft meshes unavailable, falling back to the generic models: ${error}`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.heroMeshesUnavailable').replace('{error}', String(error)));
     }
 
     // Separate try/catch from the heroes above: the two packs are independent content, and one
@@ -58,7 +59,7 @@ export async function registerMeshPacks(): Promise<void> {
 
       pack.registerVariantMeshes();
     } catch (error) {
-      errorManagerInstance.warn(`Procedural mesh variants unavailable, falling back to the free archetypes: ${error}`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.meshVariantsUnavailable').replace('{error}', String(error)));
     }
   }
 }

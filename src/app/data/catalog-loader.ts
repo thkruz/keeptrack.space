@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+
 import { DetailedSensor, DetailedSensorParams } from '@app/app/sensors/DetailedSensor';
 import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -7,6 +8,7 @@ import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodi
 import { allPlanetMoons } from '@app/engine/rendering/draw-manager/celestial-bodies/planet-moon-systems';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
+import { t7e } from '@app/locales/keys';
 import { CruncherSat } from '@app/webworker/positionCruncher';
 import {
   BaseObject,
@@ -234,7 +236,7 @@ export class CatalogLoader {
               })
             )
             .catch((error) => {
-              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog', t7e('errorMsgs.CatalogLoader.catalogLoadError'));
             });
         } else {
           // Load the external TLEs only
@@ -255,7 +257,7 @@ export class CatalogLoader {
             })
           )
           .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog', t7e('errorMsgs.CatalogLoader.catalogLoadError'));
           });
       } else if (settingsManager.offlineMode) {
         await fetch(`${settingsManager.installDirectory}tle/tle.json`)
@@ -290,7 +292,7 @@ export class CatalogLoader {
           )
           .catch(async (error) => {
             if (error.message === 'Failed to fetch') {
-              errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
+              errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.usingOfflineCatalog'));
               await fetch(`${settingsManager.installDirectory}tle/tle.json`)
                 .then((response) => response.json())
                 .then((data) =>
@@ -303,12 +305,12 @@ export class CatalogLoader {
                   })
                 );
             } else {
-              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog', t7e('errorMsgs.CatalogLoader.catalogLoadError'));
             }
           });
       }
     } catch {
-      errorManagerInstance.warn('Failed to load TLE catalog(s)!');
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.catalogsLoadFailed'));
     }
   }
 
@@ -1121,7 +1123,7 @@ export class CatalogLoader {
             } else if (content[1].startsWith('1 ')) {
               CatalogLoader.parseAscii3LE_(content, externalCatalog);
             } else {
-              errorManagerInstance.warn('External TLEs are not in the correct format');
+              errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.externalTlesBadFormat'));
             }
 
             CatalogLoader.sortByScc_(externalCatalog);
@@ -1129,14 +1131,14 @@ export class CatalogLoader {
             return externalCatalog;
           });
         }
-        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
+        errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.externalTlesLoadError').replace('{url}', settingsManager.dataSources.externalTLEs));
         errorManagerInstance.info('Reverting to internal TLEs');
         settingsManager.dataSources.externalTLEs = '';
 
         return [];
       })
       .catch(() => {
-        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
+        errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.externalTlesLoadError').replace('{url}', settingsManager.dataSources.externalTLEs));
         errorManagerInstance.info('Reverting to internal TLEs');
         settingsManager.dataSources.externalTLEs = '';
 
@@ -1151,7 +1153,7 @@ export class CatalogLoader {
    */
   private static async getExtraCatalog_(settingsManager: SettingsManager): Promise<ExtraSat[]> {
     return (await fetch(`${settingsManager.installDirectory}tle/extra.json`)).json().catch(() => {
-      errorManagerInstance.warn('Error loading extra.json');
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.fileLoadError').replace('{file}', 'extra.json'));
     });
   }
 
@@ -1178,7 +1180,7 @@ export class CatalogLoader {
         throw new Error('Error loading vimpel.json');
       })
       .catch(async () => {
-        errorManagerInstance.warn('Failed to download latest vimpel.json ! Using offline vimpel.json which may be out of date!');
+        errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.usingOfflineVimpel'));
 
         const vimpelJson = (await fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
           .then((response) => {
@@ -1188,7 +1190,7 @@ export class CatalogLoader {
             throw new Error('Error loading fallback vimpel.json');
           })
           .catch(() => {
-            errorManagerInstance.warn('Error loading fallback vimpel.json');
+            errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.fileLoadError').replace('{file}', 'vimpel.json'));
 
             return [];
           })) as JsSat[];
@@ -1540,7 +1542,7 @@ export class CatalogLoader {
 
       tempSatData[i] = satellite;
     } catch {
-      errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.satProcessFailed').replace('{name}', element.ON).replace('{scc}', String(element.SCC)));
     }
   }
 
@@ -1619,7 +1621,7 @@ export class CatalogLoader {
 
       tempSatData.push(satellite);
     } catch {
-      errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.satProcessFailed').replace('{name}', element.ON).replace('{scc}', String(element.SCC)));
     }
   }
 

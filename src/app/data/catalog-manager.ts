@@ -34,6 +34,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import {
   BaseObject,
   CatalogSource,
@@ -186,7 +187,7 @@ export class CatalogManager {
     if (this.objectCache[sat.id]?.isSatellite()) {
       (this.objectCache[sat.id] as Satellite).satrec = satrec;
     } else {
-      errorManagerInstance.warn('calcSatrec: satId not found in satData');
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogManager.satIdNotFound'));
     }
 
     return satrec;
@@ -618,7 +619,7 @@ export class CatalogManager {
     try {
       satrec = Sgp4.createSatrec(tle1, tle2);
     } catch (e) {
-      errorManagerInstance.error(e, 'catalog-manager.ts', 'Error creating satellite record!');
+      errorManagerInstance.error(e, 'catalog-manager.ts', t7e('errorMsgs.CatalogManager.satrecError'));
 
       return null;
     }
@@ -654,7 +655,7 @@ export class CatalogManager {
     }
     errorManagerInstance.debug(tle1);
     errorManagerInstance.debug(tle2);
-    errorManagerInstance.warn('New Analyst Satellite is Invalid!');
+    errorManagerInstance.warn(t7e('errorMsgs.CatalogManager.analystSatInvalid'));
 
     return null;
   }

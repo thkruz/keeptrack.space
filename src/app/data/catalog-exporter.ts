@@ -1,5 +1,6 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, Tle } from '@ootk/src/main';
 import { saveAs } from 'file-saver';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
@@ -17,11 +18,7 @@ function warnIfExtendedInTleTextExport_(sats: Satellite[]): void {
   const extendedCount = sats.filter((sat) => Tle.classifySatNum(sat.sccNum) === 'extended').length;
 
   if (extendedCount > 0) {
-    errorManagerInstance.warn(
-      `${extendedCount} extended (7+ digit) sccNum satellite(s) in this export — ` +
-        'TLE-format cols 3-7 only fit 5 chars, so re-importing this file will ' +
-        'lose the canonical id. Use CSV/OMM export to preserve extended IDs.'
-    );
+    errorManagerInstance.warn(t7e('errorMsgs.CatalogExporter.extendedIdsInTle').replace('{count}', String(extendedCount)));
   }
 }
 
@@ -59,7 +56,7 @@ export class CatalogExporter {
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as Satellite).tle1) as Satellite[];
 
       if (satOnlyData.length === 0) {
-        errorManagerInstance.info('No TLE data to export');
+        errorManagerInstance.info(t7e('errorMsgs.CatalogExporter.noTleData'));
 
         return;
       }
@@ -131,7 +128,7 @@ export class CatalogExporter {
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as Satellite).tle1) as Satellite[];
 
       if (satOnlyData.length === 0) {
-        errorManagerInstance.info('No TLE data to export');
+        errorManagerInstance.info(t7e('errorMsgs.CatalogExporter.noTleData'));
 
         return;
       }
@@ -179,7 +176,7 @@ export class CatalogExporter {
       const satOnlyData = objData.filter((obj: BaseObject) => obj.isSatellite() && (obj as Satellite).tle1) as Satellite[];
 
       if (satOnlyData.length === 0) {
-        errorManagerInstance.info('No TLE data to export');
+        errorManagerInstance.info(t7e('errorMsgs.CatalogExporter.noTleData'));
 
         return;
       }

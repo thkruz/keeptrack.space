@@ -369,7 +369,7 @@ export class UiManager {
     }
 
     // Make an alert
-    this.toast(`Color Scheme Changed to ${newScheme.label}`, ToastMsgType.normal, false);
+    this.toast(t7e('toasts.colorSchemeChanged' as TranslationKey).replace('{scheme}', newScheme.label), ToastMsgType.normal, false);
   }
 
   doSearch(searchString: string, isPreventDropDown?: boolean) {

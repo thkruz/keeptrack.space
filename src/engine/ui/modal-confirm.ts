@@ -73,6 +73,10 @@ export class ModalConfirm extends DraggableModal {
     this.initializeEventListeners();
   }
 
+  protected override getInitialFocusElement_(): HTMLElement | null {
+    return this.getElement('cancel-action-btn');
+  }
+
   private initializeEventListeners(): void {
     const confirmButton = this.getElement('confirm-action-btn') as HTMLButtonElement;
     const cancelButton = this.getElement('cancel-action-btn') as HTMLButtonElement;

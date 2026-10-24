@@ -10,6 +10,8 @@ interface InputModalOptions {
   defaultValue?: string;
   submitText?: string;
   cancelText?: string;
+  /** Return an inline error to keep the prompt open, or null to submit. */
+  validate?: (value: string) => string | null;
 }
 
 export class ModalInput extends DraggableModal {
@@ -50,6 +52,7 @@ export class ModalInput extends DraggableModal {
             placeholder="${placeholder}"
             value="${defaultValue}"
           />
+          <div id="modal-input-error" role="alert" hidden></div>
         </div>
 
         <div class="confirm-modal__actions">
@@ -92,6 +95,7 @@ export class ModalInput extends DraggableModal {
     }
 
     if (inputField) {
+      inputField.addEventListener('input', () => this.showValidationError_(null));
       inputField.addEventListener('keydown', (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
           e.preventDefault();
@@ -124,6 +128,15 @@ export class ModalInput extends DraggableModal {
     const inputField = this.getElement_('modal-input-field') as HTMLInputElement;
     const value = inputField?.value ?? '';
 
+    const error = this.options_.validate?.(value) ?? null;
+
+    this.showValidationError_(error);
+    if (error) {
+      inputField?.focus();
+
+      return;
+    }
+
     ServiceLocator.getSoundManager()?.play(SoundNames.BUTTON_CLICK);
 
     if (this.onSubmit_) {
@@ -131,6 +144,23 @@ export class ModalInput extends DraggableModal {
     }
 
     this.close();
+  }
+
+  private showValidationError_(message: string | null): void {
+    const input = this.getElement_('modal-input-field');
+    const error = this.getElement_('modal-input-error');
+
+    if (error) {
+      error.textContent = message ?? '';
+      error.hidden = !message;
+    }
+    if (message) {
+      input?.setAttribute('aria-invalid', 'true');
+      input?.setAttribute('aria-describedby', 'modal-input-error');
+    } else {
+      input?.removeAttribute('aria-invalid');
+      input?.removeAttribute('aria-describedby');
+    }
   }
 
   private getElement_(id: string): HTMLElement | null {

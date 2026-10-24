@@ -78,6 +78,37 @@ describe('ModalInput', () => {
     expect(onSubmit).toHaveBeenCalledWith('enter value');
   });
 
+  it('keeps an invalid prompt open, announces the error and allows correction', () => {
+    const onSubmit = vi.fn();
+
+    modal.prompt(onSubmit, { validate: (value) => (value.trim() ? null : 'Enter a name.') });
+    const input = query<HTMLInputElement>('#modal-input-field');
+
+    input.value = '   ';
+    query<HTMLButtonElement>('#modal-input-submit-btn').click();
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(boxEl(modal).style.display).not.toBe('none');
+    expect(input.getAttribute('aria-invalid')).toBe('true');
+    expect(query('#modal-input-error').textContent).toBe('Enter a name.');
+    expect(input.getAttribute('aria-describedby')).toBe('modal-input-error');
+    input.value = 'Recovered';
+    input.dispatchEvent(new Event('input'));
+    expect(input.hasAttribute('aria-invalid')).toBe(false);
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+    expect(onSubmit).toHaveBeenCalledExactlyOnceWith('Recovered');
+    expect(boxEl(modal).style.display).toBe('none');
+  });
+
+  it('does not validate or submit when an invalid prompt is cancelled', () => {
+    const onSubmit = vi.fn();
+    const validate = vi.fn(() => 'Invalid');
+
+    modal.prompt(onSubmit, { validate });
+    query<HTMLButtonElement>('#modal-input-cancel-btn').click();
+    expect(validate).not.toHaveBeenCalled();
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it('closes without submitting when cancel is clicked', () => {
     const onSubmit = vi.fn();
 

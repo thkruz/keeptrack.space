@@ -41,6 +41,57 @@ const makeOem = (commentLines: string[] = []): ParsedOem => {
   };
 };
 
+describe('OEM interpolation degree contract', () => {
+  it('uses degree plus one position samples and returns the analytic cubic derivative', () => {
+    const oem = makeOem();
+    const start = oem.dataBlocks[0].ephemeris[0].epoch.posix;
+
+    oem.dataBlocks[0].metadata.INTERPOLATION_DEGREE = 3;
+    oem.dataBlocks[0].ephemeris = Array.from({ length: 21 }, (_, index) => {
+      const t = index * 10;
+
+      return new J2000(
+        new EpochUTC((start + t) as Seconds),
+        new Vector3D((7000 + 7 * t + 1e-5 * t ** 3) as Kilometers, 0 as Kilometers, 0 as Kilometers),
+        new Vector3D((7 + 3e-5 * t ** 2) as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond)
+      );
+    });
+    const sat = new OemSatellite(oem);
+
+    for (const t of [0, 5, 10, 45, 105, 195, 200]) {
+      const result = sat.lagrangeInterpolator!.interpolate(new EpochUTC((start + t) as Seconds))!;
+
+      expect(result.position.x).toBeCloseTo(7000 + 7 * t + 1e-5 * t ** 3, 8);
+      expect(result.velocity.x).toBeCloseTo(7 + 3e-5 * t ** 2, 8);
+    }
+    expect(oem.dataBlocks[0].metadata.INTERPOLATION_DEGREE).toBe(3);
+  });
+
+  it('limits the sample count to a short ephemeris at both endpoints', () => {
+    const oem = makeOem();
+    const start = oem.dataBlocks[0].ephemeris[0].epoch.posix;
+
+    oem.dataBlocks[0].metadata.INTERPOLATION_DEGREE = 9;
+    oem.dataBlocks[0].ephemeris = Array.from(
+      { length: 6 },
+      (_, index) =>
+        new J2000(
+          new EpochUTC((start + index) as Seconds),
+          new Vector3D((7000 + index ** 5) as Kilometers, 0 as Kilometers, 0 as Kilometers),
+          new Vector3D((5 * index ** 4) as KilometersPerSecond, 0 as KilometersPerSecond, 0 as KilometersPerSecond)
+        )
+    );
+    const sat = new OemSatellite(oem);
+
+    for (const t of [0, 2.5, 5]) {
+      const result = sat.lagrangeInterpolator!.interpolate(new EpochUTC((start + t) as Seconds))!;
+
+      expect(result.position.x).toBeCloseTo(7000 + t ** 5, 8);
+      expect(result.velocity.x).toBeCloseTo(5 * t ** 4, 8);
+    }
+  });
+});
+
 describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
   it('extracts a legacy 5-digit NORAD_ID and marks the satellite as PAYLOAD', () => {
     const sat = new OemSatellite(makeOem(['NORAD_ID = 25544']));

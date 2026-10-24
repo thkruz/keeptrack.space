@@ -257,10 +257,13 @@ export class OemSatellite extends SpaceObject {
     }
 
     this.OemDataBlocks = oem.dataBlocks;
-    this.lagrangeInterpolator = LagrangeInterpolator.fromEphemeris(
-      this.OemDataBlocks.flatMap((block) => block.ephemeris),
-      this.OemDataBlocks[0].metadata.INTERPOLATION_DEGREE
-    );
+    const ephemeris = this.OemDataBlocks.flatMap((block) => block.ephemeris);
+    const degree = this.OemDataBlocks[0].metadata.INTERPOLATION_DEGREE;
+    // OEM/STK metadata describes polynomial degree; ootk's constructor takes
+    // a sample count. Degree n needs n+1 samples, capped by available data.
+    const sampleCount = typeof degree === 'number' && Number.isInteger(degree) && degree >= 0 ? degree + 1 : 10;
+
+    this.lagrangeInterpolator = LagrangeInterpolator.fromEphemeris(ephemeris, Math.min(ephemeris.length, sampleCount));
     this.source = 'OEM File';
     this.header = oem.header;
 

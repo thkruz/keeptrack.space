@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Utiliser ce capteur"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Impossible de déplacer la caméra vers le capteur : {error}",
+        "sensorNotInCatalog": "Le capteur {sensor} listé dans les groupes de capteurs est introuvable dans le catalogue des capteurs !",
+        "groupRenderFailed": "Impossible d'afficher le groupe de capteurs."
       }
     }
   }

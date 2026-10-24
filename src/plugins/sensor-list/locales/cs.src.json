@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Použít tento senzor"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Kameru se nepodařilo přesunout na senzor: {error}",
+        "sensorNotInCatalog": "Senzor {sensor} uvedený ve skupinách senzorů nebyl nalezen v katalogu senzorů!",
+        "groupRenderFailed": "Skupinu senzorů se nepodařilo zobrazit."
       }
     }
   }

@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Użyj tego czujnika"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Nie udało się przenieść kamery do czujnika: {error}",
+        "sensorNotInCatalog": "Czujnik {sensor} z grup czujników nie został znaleziony w katalogu czujników!",
+        "groupRenderFailed": "Nie udało się wyświetlić grupy czujników."
       }
     }
   }

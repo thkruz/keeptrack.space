@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "使用此传感器"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "无法将相机移动到传感器: {error}",
+        "sensorNotInCatalog": "传感器组中列出的传感器 {sensor} 未在传感器目录中找到!",
+        "groupRenderFailed": "无法显示传感器组。"
       }
     }
   }

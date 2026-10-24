@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Usa questo sensore"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Impossibile spostare la telecamera sul sensore: {error}",
+        "sensorNotInCatalog": "Il sensore {sensor} elencato nei gruppi di sensori non è stato trovato nel catalogo dei sensori!",
+        "groupRenderFailed": "Impossibile visualizzare il gruppo di sensori."
       }
     }
   }

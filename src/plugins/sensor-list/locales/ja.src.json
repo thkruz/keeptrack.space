@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "このセンサーを使用"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "カメラをセンサーへ移動できませんでした: {error}",
+        "sensorNotInCatalog": "センサーグループに含まれるセンサー {sensor} がセンサーカタログに見つかりません!",
+        "groupRenderFailed": "センサーグループを表示できませんでした。"
       }
     }
   }

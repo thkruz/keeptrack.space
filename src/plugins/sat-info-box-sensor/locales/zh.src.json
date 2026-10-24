@@ -44,7 +44,11 @@
         "reasonMaxEl": "仰角 {{value}} 超过最大值 {{limit}}",
         "reasonMask": "仰角 {{value}} 低于地平线遮罩 {{limit}}",
         "reasonAzimuth": "方位角 {{value}} 超出 {{min}} 至 {{max}} 范围",
-        "reasonCone": "位于传感器视轴锥体之外"
+        "reasonCone": "位于传感器视轴锥体之外",
+        "unknown": "未知",
+        "notApplicable": "不适用",
+        "notApplicableOem": "不适用 (OEM)",
+        "notInOrbitToast": "卫星 {sccNum} 不在轨道上!<br>模拟时间为 {simTime}。<br>请确认您使用的是正确的 TLE。"
       }
     }
   }

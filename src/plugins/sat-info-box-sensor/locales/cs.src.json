@@ -44,7 +44,11 @@
         "reasonMaxEl": "Elevace {{value}} nad max. {{limit}}",
         "reasonMask": "Elevace {{value}} pod maskou horizontu {{limit}}",
         "reasonAzimuth": "Azimut {{value}} mimo {{min}} až {{max}}",
-        "reasonCone": "Mimo kužel osy senzoru"
+        "reasonCone": "Mimo kužel osy senzoru",
+        "unknown": "Neznámé",
+        "notApplicable": "Není k dispozici",
+        "notApplicableOem": "Není k dispozici (OEM)",
+        "notInOrbitToast": "Družice {sccNum} není na oběžné dráze!<br>Čas simulace je {simTime}.<br>Ověřte, že máte správné TLE."
       }
     }
   }

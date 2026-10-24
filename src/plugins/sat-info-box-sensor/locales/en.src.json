@@ -44,7 +44,11 @@
         "reasonMaxEl": "Elevation {{value}} above max {{limit}}",
         "reasonMask": "Elevation {{value}} below horizon mask {{limit}}",
         "reasonAzimuth": "Azimuth {{value}} outside {{min}} to {{max}}",
-        "reasonCone": "Outside the sensor boresight cone"
+        "reasonCone": "Outside the sensor boresight cone",
+        "unknown": "Unknown",
+        "notApplicable": "N/A",
+        "notApplicableOem": "N/A (OEM)",
+        "notInOrbitToast": "Satellite {sccNum} is not in orbit!<br>Sim time is {simTime}.<br>Be sure to check you have the right TLE."
       }
     }
   }

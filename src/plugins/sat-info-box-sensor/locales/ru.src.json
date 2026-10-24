@@ -44,7 +44,11 @@
         "reasonMaxEl": "Угол места {{value}} больше макс. {{limit}}",
         "reasonMask": "Угол места {{value}} ниже маски горизонта {{limit}}",
         "reasonAzimuth": "Азимут {{value}} вне диапазона {{min}}–{{max}}",
-        "reasonCone": "Вне конуса визирования датчика"
+        "reasonCone": "Вне конуса визирования датчика",
+        "unknown": "Неизвестно",
+        "notApplicable": "Н/Д",
+        "notApplicableOem": "Н/Д (OEM)",
+        "notInOrbitToast": "Спутник {sccNum} не на орбите!<br>Время симуляции: {simTime}.<br>Убедитесь, что используете правильный TLE."
       }
     }
   }

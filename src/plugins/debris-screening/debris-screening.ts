@@ -37,6 +37,8 @@ interface RiskLevel {
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0]);
+/** English variant for CSV values, which stay English for machine parsing. */
+const lEn = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0], { lng: 'en' });
 
 /** Quote a CSV field when it contains a delimiter, quote, or newline. */
 const csvField = (value: string): string => (/[",\n]/u.test(value) ? `"${value.replace(/"/gu, '""')}"` : value);
@@ -865,8 +867,8 @@ export class DebrisScreening extends KeepTrackPlugin {
           row.crosstrackDistance.toFixed(6),
           row.relativeVelocity.toFixed(6),
           this.formatPc_(pc),
-          this.getRiskLevel_(pc).label,
-          this.isParentRow_(row) ? csvField(l('parentTag')) : '',
+          this.getRiskLevel_(pc, true).label,
+          this.isParentRow_(row) ? csvField(lEn('parentTag')) : '',
         ].join(',');
       });
 
@@ -1032,22 +1034,24 @@ export class DebrisScreening extends KeepTrackPlugin {
     return tr;
   }
 
-  protected getRiskLevel_(pc?: number): RiskLevel {
+  protected getRiskLevel_(pc?: number, isExport = false): RiskLevel {
+    const tr = isExport ? lEn : l;
+
     if (typeof pc !== 'number') {
-      return { label: l('riskLevels.unknown'), className: 'risk-unknown' };
+      return { label: tr('riskLevels.unknown'), className: 'risk-unknown' };
     }
 
     if (pc > 1e-4) {
-      return { label: l('riskLevels.critical'), className: 'risk-critical' };
+      return { label: tr('riskLevels.critical'), className: 'risk-critical' };
     }
     if (pc > 1e-6) {
-      return { label: l('riskLevels.high'), className: 'risk-high' };
+      return { label: tr('riskLevels.high'), className: 'risk-high' };
     }
     if (pc > 1e-8) {
-      return { label: l('riskLevels.medium'), className: 'risk-medium' };
+      return { label: tr('riskLevels.medium'), className: 'risk-medium' };
     }
 
-    return { label: l('riskLevels.low'), className: 'risk-low' };
+    return { label: tr('riskLevels.low'), className: 'risk-low' };
   }
 
   protected formatTcaMs_(tcaMs: number): string {

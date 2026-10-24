@@ -106,19 +106,19 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       commands.push(
         {
           id: 'CatalogBrowserPlugin.load.default',
-          label: `Load Catalog: ${t7e('plugins.CatalogBrowserPlugin.entries.defaultCatalog' as T7eKey)}`,
+          label: t7e('plugins.CatalogBrowserPlugin.commands.loadCatalog' as T7eKey).replace('{name}', t7e('plugins.CatalogBrowserPlugin.entries.defaultCatalog' as T7eKey)),
           category,
           callback: () => this.loadKeepTrackCatalog_('DEFAULT'),
         },
         {
           id: 'CatalogBrowserPlugin.load.celestrak-only',
-          label: `Load Catalog: ${t7e('plugins.CatalogBrowserPlugin.entries.celestrakOnly' as T7eKey)}`,
+          label: t7e('plugins.CatalogBrowserPlugin.commands.loadCatalog' as T7eKey).replace('{name}', t7e('plugins.CatalogBrowserPlugin.entries.celestrakOnly' as T7eKey)),
           category,
           callback: () => this.loadKeepTrackCatalog_('CELESTRAK_ONLY'),
         },
         {
           id: 'CatalogBrowserPlugin.load.vimpel-only',
-          label: `Load Catalog: ${t7e('plugins.CatalogBrowserPlugin.entries.vimpelOnly' as T7eKey)}`,
+          label: t7e('plugins.CatalogBrowserPlugin.commands.loadCatalog' as T7eKey).replace('{name}', t7e('plugins.CatalogBrowserPlugin.entries.vimpelOnly' as T7eKey)),
           category,
           callback: () => this.loadKeepTrackCatalog_('VIMPEL_ONLY'),
         }
@@ -131,7 +131,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
 
         commands.push({
           id: `CatalogBrowserPlugin.load.${entry.id}`,
-          label: `Load Catalog: ${label}`,
+          label: t7e('plugins.CatalogBrowserPlugin.commands.loadCatalog' as T7eKey).replace('{name}', label),
           category,
           callback: () => this.fetchAndLoadCatalog_(entry.queryParam),
         });
@@ -239,7 +239,8 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
 
       uiManager.toast(t7e(`plugins.CatalogBrowserPlugin.toasts.${toastSuffix}` as T7eKey), ToastMsgType.normal);
     } catch (error) {
-      errorManagerInstance.error(error, 'CatalogBrowserPlugin');
+      // The localized toast below replaces the raw (English) error message.
+      errorManagerInstance.error(error, 'CatalogBrowserPlugin', undefined, { skipToast: true });
       uiManager.toast(t7e('plugins.CatalogBrowserPlugin.errorMsgs.DefaultFailed' as T7eKey), ToastMsgType.critical);
     } finally {
       this.isLoading_ = false;

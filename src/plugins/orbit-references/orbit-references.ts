@@ -6,6 +6,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { BaseObject, FormatTle, Satellite, Tle } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
@@ -48,7 +49,7 @@ export class OrbitReferences extends KeepTrackPlugin {
           'beforeend',
           html`
                 <div id="orbit-references-link" class="link sat-infobox-links menu-selectable" data-position="top" data-delay="50"
-                      data-tooltip="Create Analyst Satellites in Orbit">Generate Orbit Reference Satellites...</div>
+                      data-tooltip="${t7e('plugins.OrbitReferences.tooltip')}">${t7e('plugins.OrbitReferences.linkText')}</div>
               `
         );
         getEl('orbit-references-link')!.addEventListener('click', this.orbitReferencesLinkClick.bind(this));

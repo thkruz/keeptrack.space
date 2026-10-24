@@ -622,3 +622,39 @@ describe('Reentries_class', () => {
     });
   });
 });
+
+describe('Reentry Analysis source identity', () => {
+  beforeEach(() => setupStandardEnvironment());
+
+  it('routes blank-NORAD rows to their original internal object without blank search', () => {
+    const plugin = new Reentries();
+    const table = document.createElement('table');
+    const sourceObjects = [71, 72].map((id) => ({
+      id,
+      sccNum: '',
+      name: `Source ${id}`,
+      type: SpaceObjectType.DEBRIS,
+      perigee: 90,
+      apogee: 200,
+      inclination: 45,
+      rcs: 1,
+    }));
+    const catalog = ServiceLocator.getCatalogManager();
+    const getSat = vi.spyOn(catalog, 'getSat').mockImplementation((id) => sourceObjects.find((sat) => sat.id === id) as any);
+    const reverseLookup = vi.spyOn(catalog, 'sccNum2Sat');
+    const search = vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockClear();
+
+    for (const source of sourceObjects) {
+      Reentries['createReentryRow_'](table, source as any);
+    }
+    expect([...table.rows].map((row) => row.dataset.objectId)).toEqual(['71', '72']);
+    expect(table.rows[0].cells[0].textContent).toBe('Unknown');
+    for (const row of table.rows) {
+      plugin['reentryEventClicked_'](Number(row.dataset.objectId));
+      expect(plugin['selectSatIdOnCruncher_']).toBe(Number(row.dataset.objectId));
+    }
+    expect(getSat).toHaveBeenLastCalledWith(72);
+    expect(reverseLookup).not.toHaveBeenCalled();
+    expect(search).not.toHaveBeenCalled();
+  });
+});

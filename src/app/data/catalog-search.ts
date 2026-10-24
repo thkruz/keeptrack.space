@@ -151,12 +151,16 @@ export class CatalogSearch {
    * @returns An array of SCC numbers of the top 100 objects with the lowest perigee values.
    */
   static findReentry(satData: Satellite[], numReturns = 100): string[] {
+    return this.findReentryObjects(satData, numReturns).map((sat) => sat.sccNum);
+  }
+
+  /** Ranked source objects; external identifiers need not exist or be unique. */
+  static findReentryObjects(satData: Satellite[], numReturns = 100): Satellite[] {
     return satData
       .filter((sat) => sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS)
       .filter((sat) => sat.perigee > 0)
       .sort((a, b) => a.perigee - b.perigee)
-      .slice(0, numReturns)
-      .map((sat) => sat.sccNum);
+      .slice(0, numReturns);
   }
 
   /**

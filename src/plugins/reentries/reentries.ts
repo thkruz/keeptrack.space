@@ -271,10 +271,10 @@ export class Reentries extends KeepTrackPlugin {
       // Reentry Analysis row click handler
       if (el?.classList.contains('reentry-object')) {
         showLoading(() => {
-          const sccNum = el.dataset?.scc ?? null;
+          const objectId = el.dataset?.objectId;
 
-          if (sccNum !== null) {
-            this.reentryEventClicked_(sccNum);
+          if (typeof objectId === 'string' && objectId !== '') {
+            this.reentryEventClicked_(Number(objectId));
           }
         });
       }
@@ -718,9 +718,7 @@ export class Reentries extends KeepTrackPlugin {
     setTimeout(() => {
       try {
         const objectCache = ServiceLocator.getCatalogManager().objectCache;
-        const sccNums = CatalogSearch.findReentry(<Satellite[]>objectCache, 200);
-
-        this.reentryList_ = sccNums.map((scc) => ServiceLocator.getCatalogManager().sccNum2Sat(scc)).filter((sat): sat is Satellite => sat !== null);
+        this.reentryList_ = CatalogSearch.findReentryObjects(<Satellite[]>objectCache, 200);
 
         this.createReentryTable_();
       } catch {
@@ -763,7 +761,7 @@ export class Reentries extends KeepTrackPlugin {
     const tr = tbl.insertRow();
 
     tr.setAttribute('class', 'reentry-object link');
-    tr.dataset.scc = sat.sccNum;
+    tr.dataset.objectId = String(sat.id);
 
     let hasReentered = sat.perigee < 120;
 
@@ -803,7 +801,7 @@ export class Reentries extends KeepTrackPlugin {
 
     const meanAltStr = hasReentered ? l('reentered') : ((sat.apogee + sat.perigee) / 2).toFixed(1);
 
-    Reentries.createCell_(tr, sat.sccNum);
+    Reentries.createCell_(tr, sat.sccNum || unknown);
     Reentries.createCell_(tr, sat.name || unknown);
     Reentries.createCell_(tr, typeStr);
     Reentries.createCell_(tr, sat.perigee.toFixed(1));
@@ -813,8 +811,8 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, rcsStr);
   }
 
-  protected reentryEventClicked_(sccNum: string) {
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(sccNum);
+  protected reentryEventClicked_(objectId: number) {
+    const sat = ServiceLocator.getCatalogManager().getSat(objectId);
 
     if (!sat) {
       ServiceLocator.getUiManager().toast(t7e('plugins.Reentries.errorMsgs.satelliteDecayed' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
@@ -822,7 +820,11 @@ export class Reentries extends KeepTrackPlugin {
       return;
     }
 
-    ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
+    // Search labels are ambiguous for non-NORAD sources. Selection uses the
+    // internal catalog identity retained by the row, including blank NORADs.
+    if (sat.sccNum) {
+      ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
+    }
 
     this.selectSatIdOnCruncher_ = sat.id;
   }

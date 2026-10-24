@@ -8,9 +8,9 @@
         "satellite": "Satellite",
         "tvchannel": "Chaîne TV",
         "beam": "Faisceau",
-        "freq": "Fréquence",
+        "freq": "Fréquence (MHz)",
         "system": "Système",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Vidéo",
         "lang": "Langue",
         "encryption": "Chiffrement"
@@ -41,7 +41,8 @@
         "statusLoading": "Chargement des chaînes…",
         "statusEmpty": "Aucune donnée de chaîne disponible",
         "statusNoMatch": "Aucune chaîne ne correspond au filtre",
-        "statusError": "Impossible de charger les données de chaîne"
+        "statusError": "Impossible de charger les données de chaîne",
+        "retry": "Réessayer"
       },
       "attribution": "Données de chaînes issues de l'API KeepTrack (listes publiques)."
     }

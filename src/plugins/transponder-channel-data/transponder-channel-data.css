@@ -117,3 +117,7 @@
   text-align: center;
   color: var(--color-dark-text-muted);
 }
+
+#TransponderChannelData-menu #TransponderChannelData-retry[hidden] {
+  display: none;
+}

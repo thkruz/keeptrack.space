@@ -8,9 +8,9 @@
         "satellite": "Satélite",
         "tvchannel": "Canal de TV",
         "beam": "Haz",
-        "freq": "Frecuencia",
+        "freq": "Frecuencia (MHz)",
         "system": "Sistema",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Vídeo",
         "lang": "Idioma",
         "encryption": "Cifrado"
@@ -41,7 +41,8 @@
         "statusLoading": "Cargando canales…",
         "statusEmpty": "No hay datos de canales disponibles",
         "statusNoMatch": "Ningún canal coincide con el filtro",
-        "statusError": "No se pudieron cargar los datos de canales"
+        "statusError": "No se pudieron cargar los datos de canales",
+        "retry": "Reintentar"
       },
       "attribution": "Datos de canales de la API de KeepTrack (listados públicos)."
     }

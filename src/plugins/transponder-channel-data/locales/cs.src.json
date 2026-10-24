@@ -8,9 +8,9 @@
         "satellite": "Satelit",
         "tvchannel": "TV kanál",
         "beam": "Paprsek",
-        "freq": "Frekvence",
+        "freq": "Frekvence (MHz)",
         "system": "Systém",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Video",
         "lang": "Jazyk",
         "encryption": "Šifrování"
@@ -41,7 +41,8 @@
         "statusLoading": "Načítání kanálů…",
         "statusEmpty": "Nejsou k dispozici žádná data o kanálech",
         "statusNoMatch": "Žádný kanál neodpovídá filtru",
-        "statusError": "Nelze načíst data o kanálech"
+        "statusError": "Nelze načíst data o kanálech",
+        "retry": "Zkusit znovu"
       },
       "attribution": "Data kanálů z rozhraní KeepTrack API (veřejné seznamy)."
     }

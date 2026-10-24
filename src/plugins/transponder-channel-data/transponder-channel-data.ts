@@ -43,6 +43,8 @@ export class TransponderChannelData extends KeepTrackPlugin {
   };
 
   private lastLoadedSat_ = -1;
+  private requestGeneration_ = 0;
+  private requestController_: AbortController | null = null;
   /** Full deduped result set for the current satellite (pre-filter/sort). */
   private rawData_: ChannelInfo[] = [];
   /** The rows currently displayed (filtered + sorted) — what export emits. */
@@ -79,6 +81,25 @@ export class TransponderChannelData extends KeepTrackPlugin {
     }
 
     this.loadChannelData_();
+  }
+
+  onBottomIconDeselect(): void {
+    this.invalidateRequest_();
+  }
+
+  private invalidateRequest_(): void {
+    this.requestGeneration_++;
+    this.requestController_?.abort();
+    this.requestController_ = null;
+    this.lastLoadedSat_ = -1;
+    this.rawData_ = [];
+    this.dataCache_ = [];
+    this.setExportEnabled_(false);
+    const table = getEl('TransponderChannelData-table', true);
+
+    if (table) {
+      table.innerHTML = '';
+    }
   }
 
   // Bridge for legacy event system (per CLAUDE.md)
@@ -127,7 +148,8 @@ export class TransponderChannelData extends KeepTrackPlugin {
       </section>
       <section class="kt-section">
         <div class="kt-section-label">${l('channels')}</div>
-        <div id="TransponderChannelData-status" class="tcd-status"></div>
+        <div id="TransponderChannelData-status" class="tcd-status" role="status"></div>
+        <button id="TransponderChannelData-retry" class="kt-action" type="button" hidden>${l('retry')}</button>
         <div class="tcd-table-wrap">
           <table id="TransponderChannelData-table" class="tcd-table"></table>
         </div>
@@ -198,6 +220,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       if (!obj || obj.id === -1 || !obj.isSatellite() || !this.satsWithChannels_.includes((obj as Satellite).sccNum)) {
+        this.invalidateRequest_();
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
         }
@@ -224,6 +247,7 @@ export class TransponderChannelData extends KeepTrackPlugin {
       this.renderTable_();
     });
 
+    getEl('TransponderChannelData-retry', true)?.addEventListener('click', () => this.loadChannelData_());
     getEl('TransponderChannelData-export-xlsx', true)?.addEventListener('click', () => this.exportData_('xlsx'));
     getEl('TransponderChannelData-export-csv', true)?.addEventListener('click', () => this.exportData_('csv'));
 
@@ -256,12 +280,19 @@ export class TransponderChannelData extends KeepTrackPlugin {
     const selectedObj = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
 
     if (!selectedObj?.isSatellite()) {
+      this.invalidateRequest_();
       errorManagerInstance.warn(t7e('plugins.TransponderChannelData.errorMsgs.NotSatellite' as Parameters<typeof t7e>[0]));
 
       return;
     }
 
     const selectedSat = selectedObj as Satellite;
+
+    this.invalidateRequest_();
+    const generation = this.requestGeneration_;
+    const controller = new AbortController();
+
+    this.requestController_ = controller;
 
     // Reset view state for the newly selected satellite.
     this.rawData_ = [];
@@ -278,7 +309,13 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     this.showStatus_('loading');
 
-    const data = await this.fetchChannels_(selectedSat);
+    const data = await this.fetchChannels_(selectedSat, controller.signal);
+    const current = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
+
+    if (generation !== this.requestGeneration_ || controller.signal.aborted || current !== selectedObj) {
+      return;
+    }
+    this.requestController_ = null;
 
     if (data === null) {
       // Fetch failed for both name and altName.
@@ -302,23 +339,23 @@ export class TransponderChannelData extends KeepTrackPlugin {
    * Fetches the channel list for a satellite, trying the primary name then the
    * alternate name. Returns the raw array, or `null` if every attempt failed.
    */
-  private async fetchChannels_(sat: Satellite): Promise<ChannelInfo[] | null> {
-    const primary = await this.fetchChannelsForName_(sat.name);
+  private async fetchChannels_(sat: Satellite, signal?: AbortSignal): Promise<ChannelInfo[] | null> {
+    const primary = await this.fetchChannelsForName_(sat.name, signal);
 
     if (primary !== null) {
       return primary;
     }
 
-    if (sat.altName && sat.altName !== sat.name) {
-      return this.fetchChannelsForName_(sat.altName);
+    if (!signal?.aborted && sat.altName && sat.altName !== sat.name) {
+      return this.fetchChannelsForName_(sat.altName, signal);
     }
 
     return null;
   }
 
-  private async fetchChannelsForName_(name: string): Promise<ChannelInfo[] | null> {
+  private async fetchChannelsForName_(name: string, signal?: AbortSignal): Promise<ChannelInfo[] | null> {
     try {
-      const resp = await apiFetch(`https://api.keeptrack.space/v4/channels/${encodeURIComponent(name)}`);
+      const resp = await apiFetch(`https://api.keeptrack.space/v4/channels/${encodeURIComponent(name)}`, { signal });
 
       if (!resp.ok) {
         throw new Error(`HTTP ${resp.status}`);
@@ -331,6 +368,9 @@ export class TransponderChannelData extends KeepTrackPlugin {
   }
 
   private renderTable_(): void {
+    if (this.requestController_) {
+      return;
+    }
     const filtered = filterChannels(this.rawData_, this.filterQuery_);
     const rows = this.sortKey_ ? sortChannels(filtered, this.sortKey_, this.sortDir_) : filtered;
 
@@ -407,6 +447,12 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     statusEl.textContent = t7e(`plugins.TransponderChannelData.labels.${keyByKind[kind]}` as Parameters<typeof t7e>[0]);
     statusEl.style.display = 'block';
+    this.setExportEnabled_(false);
+    const retry = getEl('TransponderChannelData-retry', true);
+
+    if (retry) {
+      retry.hidden = kind !== 'error';
+    }
 
     if (tbl) {
       tbl.innerHTML = '';
@@ -418,6 +464,22 @@ export class TransponderChannelData extends KeepTrackPlugin {
 
     if (statusEl) {
       statusEl.style.display = 'none';
+      const retry = getEl('TransponderChannelData-retry', true);
+
+      if (retry) {
+        retry.hidden = true;
+      }
+      this.setExportEnabled_(this.dataCache_.length > 0);
+    }
+  }
+
+  private setExportEnabled_(enabled: boolean): void {
+    for (const id of ['TransponderChannelData-export-csv', 'TransponderChannelData-export-xlsx']) {
+      const button = getEl(id, true) as HTMLButtonElement | null;
+
+      if (button) {
+        button.disabled = !enabled;
+      }
     }
   }
 

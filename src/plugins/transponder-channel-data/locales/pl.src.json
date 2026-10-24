@@ -8,9 +8,9 @@
         "satellite": "Satelita",
         "tvchannel": "Kanał TV",
         "beam": "Wiązka",
-        "freq": "Częstotliwość",
+        "freq": "Częstotliwość (MHz)",
         "system": "System",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Wideo",
         "lang": "Język",
         "encryption": "Szyfrowanie"
@@ -41,7 +41,8 @@
         "statusLoading": "Ładowanie kanałów…",
         "statusEmpty": "Brak dostępnych danych o kanałach",
         "statusNoMatch": "Żaden kanał nie pasuje do filtra",
-        "statusError": "Nie można załadować danych o kanałach"
+        "statusError": "Nie można załadować danych o kanałach",
+        "retry": "Ponów"
       },
       "attribution": "Dane kanałów z API KeepTrack (publiczne wykazy)."
     }

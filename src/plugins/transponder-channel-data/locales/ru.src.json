@@ -8,9 +8,9 @@
         "satellite": "Спутник",
         "tvchannel": "ТВ-канал",
         "beam": "Луч",
-        "freq": "Частота",
+        "freq": "Частота (MHz)",
         "system": "Система",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Видео",
         "lang": "Язык",
         "encryption": "Шифрование"
@@ -41,7 +41,8 @@
         "statusLoading": "Загрузка каналов…",
         "statusEmpty": "Данные о каналах недоступны",
         "statusNoMatch": "Нет каналов, соответствующих фильтру",
-        "statusError": "Не удалось загрузить данные о каналах"
+        "statusError": "Не удалось загрузить данные о каналах",
+        "retry": "Повторить"
       },
       "attribution": "Данные о каналах из API KeepTrack (публичные списки)."
     }

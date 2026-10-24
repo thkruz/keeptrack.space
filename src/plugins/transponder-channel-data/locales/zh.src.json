@@ -8,9 +8,9 @@
         "satellite": "卫星",
         "tvchannel": "电视频道",
         "beam": "波束",
-        "freq": "频率",
+        "freq": "频率 (MHz)",
         "system": "系统",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "视频",
         "lang": "语言",
         "encryption": "加密"
@@ -41,7 +41,8 @@
         "statusLoading": "正在加载频道…",
         "statusEmpty": "无可用频道数据",
         "statusNoMatch": "没有符合筛选条件的频道",
-        "statusError": "无法加载频道数据"
+        "statusError": "无法加载频道数据",
+        "retry": "重试"
       },
       "attribution": "频道数据来自 KeepTrack API（公开列表）。"
     }

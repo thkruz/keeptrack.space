@@ -8,9 +8,9 @@
         "satellite": "衛星",
         "tvchannel": "TVチャンネル",
         "beam": "ビーム",
-        "freq": "周波数",
+        "freq": "周波数 (MHz)",
         "system": "システム",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "ビデオ",
         "lang": "言語",
         "encryption": "暗号化"
@@ -41,7 +41,8 @@
         "statusLoading": "チャンネルを読み込み中…",
         "statusEmpty": "チャンネルデータがありません",
         "statusNoMatch": "フィルターに一致するチャンネルがありません",
-        "statusError": "チャンネルデータを読み込めませんでした"
+        "statusError": "チャンネルデータを読み込めませんでした",
+        "retry": "再試行"
       },
       "attribution": "チャンネルデータはKeepTrack API（公開リスト）から取得しています。"
     }

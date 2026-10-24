@@ -8,9 +8,9 @@
         "satellite": "Satellite",
         "tvchannel": "Canale TV",
         "beam": "Fascio",
-        "freq": "Frequenza",
+        "freq": "Frequenza (MHz)",
         "system": "Sistema",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Video",
         "lang": "Lingua",
         "encryption": "Crittografia"
@@ -41,7 +41,8 @@
         "statusLoading": "Caricamento canali…",
         "statusEmpty": "Nessun dato sui canali disponibile",
         "statusNoMatch": "Nessun canale corrisponde al filtro",
-        "statusError": "Impossibile caricare i dati dei canali"
+        "statusError": "Impossibile caricare i dati dei canali",
+        "retry": "Riprova"
       },
       "attribution": "Dati dei canali dall'API KeepTrack (elenchi pubblici)."
     }

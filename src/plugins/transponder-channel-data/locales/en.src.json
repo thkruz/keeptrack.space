@@ -8,9 +8,9 @@
         "satellite": "Satellite",
         "tvchannel": "TV Channel",
         "beam": "Beam",
-        "freq": "Frequency",
+        "freq": "Frequency (MHz)",
         "system": "System",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Video",
         "lang": "Language",
         "encryption": "Encryption"
@@ -41,7 +41,8 @@
         "statusLoading": "Loading channels…",
         "statusEmpty": "No channel data available",
         "statusNoMatch": "No channels match the filter",
-        "statusError": "Could not load channel data"
+        "statusError": "Could not load channel data",
+        "retry": "Retry"
       },
       "attribution": "Channel data from the KeepTrack API (public listings)."
     }

@@ -8,9 +8,9 @@
         "satellite": "Satellit",
         "tvchannel": "TV-Kanal",
         "beam": "Ausleuchtzone",
-        "freq": "Frequenz",
+        "freq": "Frequenz (MHz)",
         "system": "System",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Video",
         "lang": "Sprache",
         "encryption": "Verschlüsselung"
@@ -41,7 +41,8 @@
         "statusLoading": "Kanäle werden geladen…",
         "statusEmpty": "Keine Kanaldaten verfügbar",
         "statusNoMatch": "Keine Kanäle entsprechen dem Filter",
-        "statusError": "Kanaldaten konnten nicht geladen werden"
+        "statusError": "Kanaldaten konnten nicht geladen werden",
+        "retry": "Erneut versuchen"
       },
       "attribution": "Kanaldaten von der KeepTrack-API (öffentliche Listen)."
     }

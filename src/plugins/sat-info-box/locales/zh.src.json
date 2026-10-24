@@ -34,6 +34,9 @@
     "copy": {
       "copied": "已复制到剪贴板",
       "tooltip": "点击复制"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "卫星信息面板未完成加载，因此无法更新其详细信息。"
     }
   }
 }

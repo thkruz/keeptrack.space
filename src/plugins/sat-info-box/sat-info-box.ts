@@ -311,7 +311,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             ? html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.AltName.tooltip')}">${t7e('satInfoBox.AltName.label')}</div>
-          <div class="sat-info-value" id="${EL.ALT_NAME}">Alt Name</div>
+          <div class="sat-info-value" id="${EL.ALT_NAME}">${t7e('satInfoBox.AltName.label')}</div>
         </div>`
             : ''
         }
@@ -325,7 +325,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Confidence.tooltip')}">${t7e('satInfoBox.Confidence.label')}</div>
-          <div class="sat-info-value" id="${EL.CONFIDENCE}">High</div>
+          <div class="sat-info-value" id="${EL.CONFIDENCE}">${t7e('satInfoBox.Confidence.high' as Parameters<typeof t7e>[0])}</div>
         </div>
       </div>
     `;
@@ -394,7 +394,8 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (!this.isHtmlReady_) {
       if (retries >= SatInfoBox.MAX_HTML_READY_RETRIES_) {
-        errorManagerInstance.warn('SatInfoBox HTML never became ready; giving up on header update');
+        console.warn('SatInfoBox HTML never became ready; giving up on header update');
+        errorManagerInstance.warn(t7e('satInfoBox.errorMsgs.htmlNotReady'));
 
         return;
       }
@@ -540,7 +541,8 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (!this.isHtmlReady_) {
       if (retries >= SatInfoBox.MAX_HTML_READY_RETRIES_) {
-        errorManagerInstance.warn('SatInfoBox HTML never became ready; giving up on select update');
+        console.warn('SatInfoBox HTML never became ready; giving up on select update');
+        errorManagerInstance.warn(t7e('satInfoBox.errorMsgs.htmlNotReady'));
 
         return;
       }

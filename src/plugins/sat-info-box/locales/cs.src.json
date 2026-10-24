@@ -34,6 +34,9 @@
     "copy": {
       "copied": "Zkopírováno do schránky",
       "tooltip": "Kliknutím zkopírujete"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "Panel s informacemi o satelitu se nenačetl celý, takže jeho údaje nebylo možné aktualizovat."
     }
   }
 }

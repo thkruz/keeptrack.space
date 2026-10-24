@@ -606,7 +606,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
     const name = `breakup-${event?.id ?? 'fragments'}`;
 
-    saveCsv(buildCsvRows(this.debrisResults_), name);
+    saveCsv(buildCsvRows(this.debrisResults_, event), name);
   }
 
   protected updateShowAllButton_(): void {

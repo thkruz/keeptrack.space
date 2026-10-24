@@ -109,6 +109,12 @@ describe('breakup-analysis-core', () => {
   });
 
   describe('buildCsvRows', () => {
+    it('preserves source COSPAR and UTC epoch while marking unavailable provenance', () => {
+      const rows = buildCsvRows([fakeSat({ intlDes: '1999-025D', epochYear: 26, epochDay: 1.5 }), fakeSat({ intlDes: '', epochYear: NaN, epochDay: NaN })]);
+
+      expect(rows[0]).toMatchObject({ cospar: '1999-025D', tleEpochUtc: '2026-01-01T12:00:00.000Z', provenance: 'loaded catalog elements; launch-prefix membership' });
+      expect(rows[1]).toMatchObject({ cospar: '', tleEpochUtc: '', historicalParentNoradId: '', historicalBreakupDate: '' });
+    });
     it('produces flat numeric rows', () => {
       const rows = buildCsvRows([fakeSat({ sccNum: '12345', perigee: 800.456, eccentricity: 0.00512 })]);
 

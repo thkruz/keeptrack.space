@@ -175,11 +175,27 @@ export const buildGabbardData = (sats: Satellite[]): GabbardData => {
   return { apogee, perigee };
 };
 
+/** UTC TLE epoch from the source snapshot; an unavailable epoch remains explicit. */
+export const tleEpochIso = (epochYear: number, epochDay: number): string => {
+  if (!Number.isFinite(epochYear) || !Number.isFinite(epochDay) || epochDay <= 0) {
+    return '';
+  }
+  const year = epochYear < 57 ? 2000 + epochYear : 1900 + epochYear;
+
+  return new Date(Math.round(Date.UTC(year, 0, 1) + (epochDay - 1) * 86_400_000)).toISOString();
+};
+
 /** Plain rows for {@link saveCsv} (column order preserved by Papa.unparse). */
-export const buildCsvRows = (sats: Satellite[]): Array<Record<string, string | number>> =>
+export const buildCsvRows = (sats: Satellite[], event?: BreakupEvent): Array<Record<string, string | number>> =>
   sats.map((sat) => ({
     noradId: sat.sccNum,
     name: sat.name,
+    cospar: sat.intlDes ?? '',
+    tleEpochUtc: tleEpochIso(sat.epochYear, sat.epochDay),
+    provenance: 'loaded catalog elements; launch-prefix membership',
+    curatedEventId: event?.id ?? '',
+    historicalParentNoradId: event?.parentNoradId ?? '',
+    historicalBreakupDate: event?.breakupDate ?? '',
     type: sat.getTypeString(),
     perigeeKm: Number(sat.perigee.toFixed(1)),
     apogeeKm: Number(sat.apogee.toFixed(1)),

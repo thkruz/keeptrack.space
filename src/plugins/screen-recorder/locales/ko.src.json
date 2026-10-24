@@ -4,6 +4,9 @@
     "compatibilityError": "녹화 호환성 오류!",
     "requesting": "화면 공유 요청 중…",
     "recording": "녹화 중",
-    "stopping": "녹화 마무리 중…"
+    "stopping": "녹화 마무리 중…",
+    "toggleCommand": "화면 녹화 전환",
+    "compatibilityErrorDetail": "녹화 호환성 오류: {error}",
+    "streamError": "오류: {error}"
   }
 }

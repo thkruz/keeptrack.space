@@ -4,6 +4,9 @@
     "compatibilityError": "Помилка сумісності із записом!",
     "requesting": "Запит на показ екрана…",
     "recording": "Запис",
-    "stopping": "Завершення запису…"
+    "stopping": "Завершення запису…",
+    "toggleCommand": "Перемкнути запис екрана",
+    "compatibilityErrorDetail": "Помилка сумісності запису: {error}",
+    "streamError": "Помилка: {error}"
   }
 }

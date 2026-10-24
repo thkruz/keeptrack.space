@@ -4,6 +4,9 @@
     "compatibilityError": "Kompatibilitätsfehler bei der Aufnahme!",
     "requesting": "Bildschirmfreigabe wird angefordert…",
     "recording": "Aufnahme",
-    "stopping": "Aufnahme wird abgeschlossen…"
+    "stopping": "Aufnahme wird abgeschlossen…",
+    "toggleCommand": "Bildschirmaufnahme umschalten",
+    "compatibilityErrorDetail": "Kompatibilitätsfehler bei der Aufnahme: {error}",
+    "streamError": "Fehler: {error}"
   }
 }

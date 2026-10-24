@@ -45,7 +45,7 @@ export class StreamManager {
   }
 
   static handleError(error: Error): void {
-    errorManagerInstance.warn(`Error: ${error.message}`);
+    errorManagerInstance.warn(t7e('ScreenRecorder.streamError').replace('{error}', error.message));
   }
 
   getStream(displayMediaOptions: MediaRecorderOptions = { video: { cursor: 'never' }, audio: false }): Promise<MediaStream> | false {

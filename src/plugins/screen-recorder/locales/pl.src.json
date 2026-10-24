@@ -4,6 +4,9 @@
     "compatibilityError": "Błąd kompatybilności z nagrywaniem!",
     "requesting": "Oczekiwanie na udostępnienie ekranu…",
     "recording": "Nagrywanie",
-    "stopping": "Finalizowanie nagrania…"
+    "stopping": "Finalizowanie nagrania…",
+    "toggleCommand": "Przełącz nagrywanie ekranu",
+    "compatibilityErrorDetail": "Błąd zgodności nagrywania: {error}",
+    "streamError": "Błąd: {error}"
   }
 }

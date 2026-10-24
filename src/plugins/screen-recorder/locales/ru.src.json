@@ -4,6 +4,9 @@
     "compatibilityError": "Ошибка совместимости при записи!",
     "requesting": "Запрос демонстрации экрана…",
     "recording": "Запись",
-    "stopping": "Завершение записи…"
+    "stopping": "Завершение записи…",
+    "toggleCommand": "Переключить запись экрана",
+    "compatibilityErrorDetail": "Ошибка совместимости записи: {error}",
+    "streamError": "Ошибка: {error}"
   }
 }

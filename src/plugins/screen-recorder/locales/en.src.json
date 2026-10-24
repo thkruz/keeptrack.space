@@ -4,6 +4,9 @@
     "compatibilityError": "Compatibility Error with Recording!",
     "requesting": "Requesting screen sharing…",
     "recording": "Recording",
-    "stopping": "Finalizing recording…"
+    "stopping": "Finalizing recording…",
+    "toggleCommand": "Toggle Screen Recording",
+    "compatibilityErrorDetail": "Compatibility Error with Recording: {error}",
+    "streamError": "Error: {error}"
   }
 }

@@ -4,6 +4,9 @@
     "compatibilityError": "Errore di compatibilità con la registrazione!",
     "requesting": "Richiesta di condivisione schermo…",
     "recording": "Registrazione",
-    "stopping": "Finalizzazione della registrazione…"
+    "stopping": "Finalizzazione della registrazione…",
+    "toggleCommand": "Attiva/disattiva registrazione schermo",
+    "compatibilityErrorDetail": "Errore di compatibilità con la registrazione: {error}",
+    "streamError": "Errore: {error}"
   }
 }

@@ -28,7 +28,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'screen-recorder-bottom-icon',
-      label: 'Record',
+      label: t7e('plugins.ScreenRecorder.bottomIconLabel'),
       image: videocamPng,
       menuMode: [MenuMode.TOOLS, MenuMode.ALL],
     };
@@ -38,7 +38,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
     return [
       {
         id: 'ScreenRecorder.toggle',
-        label: 'Toggle Screen Recording',
+        label: t7e('ScreenRecorder.toggleCommand'),
         category: 'Export',
         callback: () => this.bottomMenuClicked(),
       },
@@ -89,7 +89,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
           this.onStateChange_.bind(this)
         );
       } catch (e) {
-        errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
+        errorManagerInstance.warn(t7e('ScreenRecorder.compatibilityErrorDetail').replace('{error}', String(e)));
         this.isCompatibilityIssue_ = true;
         this.setBottomIconToDisabled();
       }

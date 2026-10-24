@@ -4,6 +4,9 @@
     "compatibilityError": "Chyba kompatibility s nahráváním!",
     "requesting": "Žádost o sdílení obrazovky…",
     "recording": "Nahrávání",
-    "stopping": "Dokončování záznamu…"
+    "stopping": "Dokončování záznamu…",
+    "toggleCommand": "Přepnout nahrávání obrazovky",
+    "compatibilityErrorDetail": "Chyba kompatibility při nahrávání: {error}",
+    "streamError": "Chyba: {error}"
   }
 }

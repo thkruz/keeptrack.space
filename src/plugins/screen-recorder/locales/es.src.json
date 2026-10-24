@@ -4,6 +4,9 @@
     "compatibilityError": "¡Error de compatibilidad con la grabación!",
     "requesting": "Solicitando compartir pantalla…",
     "recording": "Grabando",
-    "stopping": "Finalizando grabación…"
+    "stopping": "Finalizando grabación…",
+    "toggleCommand": "Activar/desactivar grabación de pantalla",
+    "compatibilityErrorDetail": "Error de compatibilidad con la grabación: {error}",
+    "streamError": "Error: {error}"
   }
 }

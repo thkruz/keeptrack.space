@@ -76,9 +76,24 @@ describe('SplashScreen_class', () => {
       KeyboardShortcutRegistry.register('OrbitManager', [{ key: 'L', description: 'Toggle orbit lines', callback: () => undefined }]);
       vi.spyOn(Math, 'random').mockReturnValue(0.999999);
 
-      expect(getEl('loading-hint-text')?.textContent).toBe('');
+      expect(getEl('loading-hint-text')?.textContent?.trim().length).toBeGreaterThan(0);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
       expect(getEl('loading-hint-text')?.textContent).toBe('Press L: Toggle orbit lines');
+    });
+
+    it('starts with a nonempty hint and a hidden disabled start button', () => {
+      const start = getEl('start-app-btn') as HTMLButtonElement;
+
+      expect(getEl('loading-hint-text')?.textContent?.trim().length).toBeGreaterThan(0);
+      expect(start.disabled).toBe(true);
+      expect(start.style.display).toBe('none');
+      const previousAutoStart = settingsManager.isAutoStart;
+
+      settingsManager.isAutoStart = false;
+      SplashScreen.hideSplashScreen();
+      expect(start.disabled).toBe(false);
+      expect(start.style.display).not.toBe('none');
+      settingsManager.isAutoStart = previousAutoStart;
     });
   });
 

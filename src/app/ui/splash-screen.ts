@@ -59,12 +59,13 @@ export abstract class SplashScreen {
           <div style="height:36px; min-height:36px; max-height:36px; position: relative;">
             <button
             id="start-app-btn"
+            disabled style="display: none;"
             class="btn btn-large btn-ui waves-effect waves-light">
               ${t7e('loadingScreen.startButton')}
             </button>
           </div>
         </div>
-        <div id="loading-hint">${t7e('loadingScreen.hint' as TranslationKey)} <span id="loading-hint-text"></span></div>
+        <div id="loading-hint">${t7e('loadingScreen.hint' as TranslationKey)} <span id="loading-hint-text">${SplashScreen.showHint()}</span></div>
         <div id="version-text">v${__VERSION__}-${__COMMIT_HASH__}</div>
         <div id="copyright-notice">
         ${settingsManager.isMobileModeEnabled ? t7e('copyright.noticeMobile') : t7e('copyright.notice')}
@@ -129,6 +130,11 @@ export abstract class SplashScreen {
     getEl('loader-text')!.innerText = '';
 
     if (!settingsManager.isAutoStart) {
+      const startButton = getEl('start-app-btn') as HTMLButtonElement | null;
+
+      if (startButton) {
+        startButton.disabled = false;
+      }
       showEl('start-app-btn');
     } else {
       SplashScreen.handleStartAppButton();

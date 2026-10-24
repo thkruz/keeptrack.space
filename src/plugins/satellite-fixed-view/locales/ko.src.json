@@ -1,7 +1,10 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "위성 고정 보기"
+      "bottomIconLabel": "위성 고정 보기",
+      "commandPalette": {
+        "activate": "위성 고정 보기로 전환"
+      }
     }
   }
 }

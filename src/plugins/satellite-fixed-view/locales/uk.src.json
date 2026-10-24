@@ -1,7 +1,10 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "Фіксований вид супутника"
+      "bottomIconLabel": "Фіксований вид супутника",
+      "commandPalette": {
+        "activate": "Перейти до вигляду, прив'язаного до супутника"
+      }
     }
   }
 }

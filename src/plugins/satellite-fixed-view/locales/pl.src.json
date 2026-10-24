@@ -1,7 +1,10 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "Widok stały satelity"
+      "bottomIconLabel": "Widok stały satelity",
+      "commandPalette": {
+        "activate": "Przełącz na widok związany z satelitą"
+      }
     }
   }
 }

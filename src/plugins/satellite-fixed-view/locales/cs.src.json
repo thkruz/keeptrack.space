@@ -1,7 +1,10 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "Fixní pohled na satelit"
+      "bottomIconLabel": "Fixní pohled na satelit",
+      "commandPalette": {
+        "activate": "Přepnout na pohled pevný vůči satelitu"
+      }
     }
   }
 }

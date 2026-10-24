@@ -49,7 +49,7 @@ export class SatelliteFixedView extends KeepTrackPlugin {
     return [
       {
         id: 'SatelliteFixedView.activate',
-        label: 'Switch to Satellite-Fixed View',
+        label: t7e('plugins.SatelliteFixedView.commandPalette.activate'),
         category: 'View',
         callback: () => this.bottomMenuClicked(),
       },

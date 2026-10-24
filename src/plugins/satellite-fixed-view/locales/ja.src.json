@@ -1,7 +1,10 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "衛星固定ビュー"
+      "bottomIconLabel": "衛星固定ビュー",
+      "commandPalette": {
+        "activate": "衛星固定ビューに切り替え"
+      }
     }
   }
 }

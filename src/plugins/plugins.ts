@@ -1,6 +1,7 @@
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { isThisNode } from '@app/engine/utils/isThisNode';
+import { type TranslationKey, t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../engine/plugins/base-plugin';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { getEl } from '../engine/utils/get-el';
@@ -16,6 +17,9 @@ interface ResolvedPlugin {
 /** Where users can learn more about KeepTrack Pro. Matches the URL the README references. */
 const LEARN_MORE_URL = 'https://keeptrack.space';
 
+/** Plugin load-failure toasts live in the Plugin Manager's locale namespace. */
+const loaderMsg_ = (key: string): string => t7e(`plugins.PluginManagerPlugin.loader.${key}` as TranslationKey);
+
 export class PluginManager {
   /**
    * Download a plugin module without initializing it.
@@ -27,12 +31,14 @@ export class PluginManager {
         return { mod: await descriptor.proImport(), usedPro: true };
       } catch (e) {
         // Fall through to OSS below; this block only explains what happened.
-        // TODO: localize
-        const consequence = descriptor.ossImport ? 'Loading the standard version instead.' : 'This feature will be unavailable this session.';
+        const consequence = descriptor.ossImport ? loaderMsg_('consequenceFallback') : loaderMsg_('consequenceUnavailable');
 
         errorManagerInstance.warn(
-          `The Pro version of the "${descriptor.configKey}" plugin failed to load (${(e as Error).message}). ${consequence} ` +
-            `This build includes KeepTrack Pro, so the src/plugins-pro files may be missing, out of date, or unreachable. Learn more at ${LEARN_MORE_URL}.`
+          loaderMsg_('proFailed')
+            .replace('{plugin}', () => descriptor.configKey)
+            .replace('{error}', () => (e as Error).message)
+            .replace('{consequence}', () => consequence)
+            .replace('{url}', () => LEARN_MORE_URL)
         );
       }
     }
@@ -68,7 +74,7 @@ export class PluginManager {
       return;
     }
 
-    // TODO: localize
+    // Console output stays English by design (developer diagnostics, not a toast).
     // eslint-disable-next-line no-console
     console.info(
       `KeepTrack: ${skippedProFeatures.length} ${skippedProFeatures.length === 1 ? 'plugin is' : 'plugins are'} part of KeepTrack Pro and not included in this open-source build: ` +
@@ -119,10 +125,10 @@ export class PluginManager {
       const resolvedModules = await Promise.all(
         enabledDescriptors.map((descriptor) =>
           PluginManager.resolveModule_(descriptor).catch((e) => {
-            // TODO: localize
             errorManagerInstance.warn(
-              `The "${descriptor.configKey}" plugin failed to download (${(e as Error).message}) and will be unavailable this session. ` +
-                'This is usually a network interruption; reloading the page will retry it.'
+              loaderMsg_('downloadFailed')
+                .replace('{plugin}', () => descriptor.configKey)
+                .replace('{error}', () => (e as Error).message)
             );
 
             return null;
@@ -143,8 +149,11 @@ export class PluginManager {
         try {
           PluginManager.initPlugin_(enabledDescriptors[i], resolved);
         } catch (e) {
-          // TODO: localize
-          errorManagerInstance.warn(`The "${enabledDescriptors[i].configKey}" plugin failed to initialize (${(e as Error).message}) and will be unavailable this session.`);
+          errorManagerInstance.warn(
+            loaderMsg_('initFailed')
+              .replace('{plugin}', () => enabledDescriptors[i].configKey)
+              .replace('{error}', () => (e as Error).message)
+          );
         }
       }
 
@@ -161,8 +170,7 @@ export class PluginManager {
         KeepTrackPlugin.hideUnusedMenuModes();
       });
     } catch (e) {
-      // TODO: localize
-      errorManagerInstance.info(`Plugin loading stopped early (${(e as Error).message}). Some features may be missing; reloading the page will retry.`);
+      errorManagerInstance.info(loaderMsg_('stoppedEarly').replace('{error}', () => (e as Error).message));
     }
   }
 

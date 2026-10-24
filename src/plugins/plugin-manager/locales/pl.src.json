@@ -1,73 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "Wtyczki",
+      "title": "Menedżer wtyczek",
+      "helpBody": "Włączaj i wyłączaj wbudowane wtyczki oraz przeglądaj zainstalowane wtyczki innych firm.",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "Otwórz menedżer wtyczek"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "Zainstalowane",
+        "browse": "Przeglądaj",
+        "develop": "Tworzenie"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "Wczytywanie dostępnych wtyczek…",
+        "empty": "W rejestrze nie ma jeszcze żadnych wtyczek.",
+        "error": "Nie udało się wczytać rejestru wtyczek.",
+        "install": "Zainstaluj",
+        "installing": "Instalowanie…",
+        "installed": "Zainstalowano. Trwa ponowne budowanie; aplikacja wkrótce się przeładuje.",
+        "installedBtn": "Zainstalowano",
+        "installFailed": "Instalacja nie powiodła się. Szczegóły znajdziesz w terminalu.",
+        "copyCommand": "Kopiuj polecenie instalacji",
+        "byAuthor": "autor: {author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "Czym jest wtyczka?",
+        "intro": "KeepTrack składa się z dziesiątek niezależnych wtyczek, a Ty możesz napisać własne. Wtyczka to mały pakiet, który dodaje ikonę w panelu, menu, nakładkę lub narzędzie. Wtyczki tworzy się i instaluje za pomocą CLI wtyczek z kopii repozytorium KeepTrack.",
+        "createHeading": "1. Utwórz",
+        "create": "Utwórz szkielet nowej wtyczki (interaktywnie: pyta o nazwę, rodzaj i opis).",
+        "previewHeading": "2. Podgląd",
+        "preview": "Uruchom aplikację tylko z Twoją wtyczką i przeładowaniem na żywo podczas edycji.",
+        "rulesHeading": "Dwie zasady",
+        "rule1": "Plik wejściowy musi eksportować klasę zgodną z className w keeptrack-plugin.json.",
+        "rule2": "Pole readonly id tej klasy musi być równe jej configKey.",
+        "docsLink": "Otwórz przewodnik tworzenia wtyczek"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "Oczekujące zmiany: {count}",
+        "button": "Wczytaj ponownie"
       },
       "labels": {
         "noMatches": "Brak pasujących wtyczek. Spróbuj nazwy lub identyfikatora.",
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
-        "gitUrl": "Git URL",
-        "source": "Source"
+        "search": "Szukaj wtyczek",
+        "builtInSection": "Wbudowane wtyczki",
+        "externalSection": "Zewnętrzne wtyczki",
+        "externalEmpty": "Brak zainstalowanych wtyczek zewnętrznych. Dodaj wtyczkę za pomocą CLI wtyczek.",
+        "installSection": "Instalacja wtyczki",
+        "installHint": "Instalacja wtyczki wymaga ponownego zbudowania KeepTrack. Skopiuj to polecenie i uruchom je w swojej kopii repozytorium KeepTrack.",
+        "gitUrl": "Adres URL Git",
+        "source": "Źródło",
+        "copy": "Kopiuj",
+        "alwaysEnabled": "Zawsze włączone"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "Zgodna",
+        "incompatible": "Sprawdź wersję"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "Kopiuj polecenie instalacji"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "Polecenie instalacji skopiowano do schowka!",
+        "commandCopied": "Polecenie skopiowano do schowka!"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "Menedżer wtyczek pozwala włączać i wyłączać wbudowane wtyczki KeepTrack oraz sprawdzać, które wtyczki innych firm są zainstalowane. Wtyczki wczytują się przy starcie aplikacji, więc zmiany działają po ponownym wczytaniu.",
+        "togglesHeading": "Włączanie i wyłączanie",
+        "toggles": "Przełącz przełącznik, aby włączyć lub wyłączyć wtyczkę, a następnie kliknij Wczytaj ponownie, aby zastosować zmiany. Zawsze włączone wtyczki infrastruktury są zablokowane i nie można ich wyłączyć.",
+        "externalHeading": "Zewnętrzne wtyczki",
+        "external": "Wtyczki innych firm zainstalowane przez CLI wtyczek pojawiają się we własnej sekcji z wersją, plakietką zgodności i linkiem do źródła. Aby zainstalować nową, skopiuj polecenie z sekcji Instalacja i uruchom je w swojej kopii repozytorium KeepTrack."
+      },
+      "searchAliases": {
+        "multiView": "Wiele widoków,Multiwidok"
+      },
+      "loader": {
+        "proFailed": "Nie udało się wczytać wersji Pro wtyczki „{plugin}” ({error}). {consequence} Ta kompilacja zawiera KeepTrack Pro, więc pliki src/plugins-pro mogą być brakujące, nieaktualne lub niedostępne. Więcej informacji na {url}.",
+        "consequenceFallback": "Zamiast niej wczytywana jest wersja standardowa.",
+        "consequenceUnavailable": "Ta funkcja będzie niedostępna w tej sesji.",
+        "downloadFailed": "Nie udało się pobrać wtyczki „{plugin}” ({error}) i będzie ona niedostępna w tej sesji. Zwykle jest to przerwa w połączeniu sieciowym; ponowne wczytanie strony spróbuje ponownie.",
+        "initFailed": "Nie udało się zainicjować wtyczki „{plugin}” ({error}) i będzie ona niedostępna w tej sesji.",
+        "stoppedEarly": "Wczytywanie wtyczek zatrzymało się przedwcześnie ({error}). Niektórych funkcji może brakować; ponowne wczytanie strony spróbuje ponownie."
       }
     }
   }

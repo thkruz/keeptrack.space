@@ -1,73 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "플러그인",
+      "title": "플러그인 관리자",
+      "helpBody": "내장 플러그인을 켜거나 끄고 설치된 타사 플러그인을 확인합니다.",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "플러그인 관리자 열기"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "설치됨",
+        "browse": "찾아보기",
+        "develop": "개발"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "사용 가능한 플러그인을 불러오는 중…",
+        "empty": "레지스트리에 아직 등록된 플러그인이 없습니다.",
+        "error": "플러그인 레지스트리를 불러오지 못했습니다.",
+        "install": "설치",
+        "installing": "설치 중…",
+        "installed": "설치되었습니다. 다시 빌드하는 중이며 곧 앱이 새로 고쳐집니다.",
+        "installedBtn": "설치됨",
+        "installFailed": "설치에 실패했습니다. 자세한 내용은 터미널을 확인하세요.",
+        "copyCommand": "설치 명령 복사",
+        "byAuthor": "제작자: {author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "플러그인이란?",
+        "intro": "KeepTrack은 수십 개의 독립 플러그인으로 이루어져 있으며 직접 플러그인을 작성할 수도 있습니다. 플러그인은 서랍 아이콘, 메뉴, 오버레이 또는 도구를 추가하는 작은 패키지입니다. 플러그인은 KeepTrack 체크아웃에서 플러그인 CLI로 개발하고 설치합니다.",
+        "createHeading": "1. 만들기",
+        "create": "새 플러그인의 기본 구조를 만듭니다(대화형: 이름, 종류, 설명을 묻습니다).",
+        "previewHeading": "2. 미리 보기",
+        "preview": "내 플러그인만 활성화한 상태로 앱을 실행하고, 편집할 때마다 실시간으로 다시 불러옵니다.",
+        "rulesHeading": "두 가지 규칙",
+        "rule1": "진입 파일은 keeptrack-plugin.json의 className과 일치하는 클래스를 내보내야 합니다.",
+        "rule2": "해당 클래스의 readonly id는 configKey와 같아야 합니다.",
+        "docsLink": "플러그인 개발 가이드 열기"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "대기 중인 변경: {count}",
+        "button": "다시 불러오기"
       },
       "labels": {
         "noMatches": "일치하는 플러그인이 없습니다. 이름이나 ID로 검색하세요.",
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
+        "search": "플러그인 검색",
+        "builtInSection": "내장 플러그인",
+        "externalSection": "외부 플러그인",
+        "externalEmpty": "설치된 외부 플러그인이 없습니다. 플러그인 CLI로 추가하세요.",
+        "installSection": "플러그인 설치",
+        "installHint": "플러그인을 설치하려면 KeepTrack을 다시 빌드해야 합니다. 이 명령을 복사해 KeepTrack 체크아웃에서 실행하세요.",
         "gitUrl": "Git URL",
-        "source": "Source"
+        "source": "소스",
+        "copy": "복사",
+        "alwaysEnabled": "항상 사용"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "호환됨",
+        "incompatible": "버전 확인"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "설치 명령 복사"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "설치 명령을 클립보드에 복사했습니다!",
+        "commandCopied": "명령을 클립보드에 복사했습니다!"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "플러그인 관리자에서는 KeepTrack의 내장 플러그인을 켜거나 끄고, 설치된 타사 플러그인을 확인할 수 있습니다. 플러그인은 앱 시작 시 로드되므로 변경 사항은 다시 불러온 후에 적용됩니다.",
+        "togglesHeading": "활성화 및 비활성화",
+        "toggles": "스위치를 전환해 플러그인을 켜거나 끈 다음 다시 불러오기를 클릭해 적용하세요. 항상 켜져 있는 인프라 플러그인은 잠겨 있어 끌 수 없습니다.",
+        "externalHeading": "외부 플러그인",
+        "external": "플러그인 CLI로 설치한 타사 플러그인은 버전, 호환성 배지, 소스 링크와 함께 별도 섹션에 표시됩니다. 새 플러그인을 설치하려면 설치 섹션의 명령을 복사해 KeepTrack 체크아웃에서 실행하세요."
+      },
+      "searchAliases": {
+        "multiView": "멀티뷰,다중 보기"
+      },
+      "loader": {
+        "proFailed": "'{plugin}' 플러그인의 Pro 버전을 불러오지 못했습니다 ({error}). {consequence} 이 빌드에는 KeepTrack Pro가 포함되어 있으므로 src/plugins-pro 파일이 없거나 오래되었거나 접근할 수 없을 수 있습니다. 자세한 내용은 {url}에서 확인하세요.",
+        "consequenceFallback": "대신 표준 버전을 불러옵니다.",
+        "consequenceUnavailable": "이 기능은 이번 세션에서 사용할 수 없습니다.",
+        "downloadFailed": "'{plugin}' 플러그인을 다운로드하지 못했습니다 ({error}). 이번 세션에서는 사용할 수 없습니다. 보통 네트워크 연결이 끊긴 경우이며, 페이지를 새로 고치면 다시 시도합니다.",
+        "initFailed": "'{plugin}' 플러그인을 초기화하지 못했습니다 ({error}). 이번 세션에서는 사용할 수 없습니다.",
+        "stoppedEarly": "플러그인 로딩이 중간에 중단되었습니다 ({error}). 일부 기능이 없을 수 있으며, 페이지를 새로 고치면 다시 시도합니다."
       }
     }
   }

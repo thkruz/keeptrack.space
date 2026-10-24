@@ -1,73 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "プラグイン",
+      "title": "プラグインマネージャー",
+      "helpBody": "組み込みプラグインの有効化と無効化、およびインストール済みのサードパーティ製プラグインの確認を行います。",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "プラグインマネージャーを開く"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "インストール済み",
+        "browse": "参照",
+        "develop": "開発"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "利用可能なプラグインを読み込み中…",
+        "empty": "レジストリにはまだプラグインが登録されていません。",
+        "error": "プラグインレジストリを読み込めませんでした。",
+        "install": "インストール",
+        "installing": "インストール中…",
+        "installed": "インストールしました。再ビルド中です。まもなくアプリが再読み込みされます。",
+        "installedBtn": "インストール済み",
+        "installFailed": "インストールに失敗しました。詳細はターミナルを確認してください。",
+        "copyCommand": "インストールコマンドをコピー",
+        "byAuthor": "作成者: {author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "プラグインとは?",
+        "intro": "KeepTrack は数十個の独立したプラグインで構成されており、独自のプラグインを作成することもできます。プラグインは、ドロワーのアイコン、メニュー、オーバーレイ、ツールを追加する小さなパッケージです。プラグインは KeepTrack のチェックアウトからプラグイン CLI を使って開発、インストールします。",
+        "createHeading": "1. 作成",
+        "create": "新しいプラグインのひな形を作成します (対話形式で名前、種類、説明を尋ねます)。",
+        "previewHeading": "2. プレビュー",
+        "preview": "自分のプラグインだけを有効にしてアプリを起動し、編集に合わせてライブリロードします。",
+        "rulesHeading": "2つのルール",
+        "rule1": "エントリファイルは keeptrack-plugin.json の className と一致するクラスをエクスポートする必要があります。",
+        "rule2": "そのクラスの readonly id は configKey と一致する必要があります。",
+        "docsLink": "プラグイン開発ガイドを開く"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "保留中の変更: {count}",
+        "button": "再読み込み"
       },
       "labels": {
         "noMatches": "一致するプラグインがありません。名前またはIDで検索してください。",
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
+        "search": "プラグインを検索",
+        "builtInSection": "組み込みプラグイン",
+        "externalSection": "外部プラグイン",
+        "externalEmpty": "外部プラグインはインストールされていません。プラグイン CLI で追加してください。",
+        "installSection": "プラグインのインストール",
+        "installHint": "プラグインをインストールするには KeepTrack の再ビルドが必要です。このコマンドをコピーして、KeepTrack のチェックアウトで実行してください。",
         "gitUrl": "Git URL",
-        "source": "Source"
+        "source": "ソース",
+        "copy": "コピー",
+        "alwaysEnabled": "常に有効"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "互換性あり",
+        "incompatible": "バージョンを確認"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "インストールコマンドをコピー"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "インストールコマンドをクリップボードにコピーしました!",
+        "commandCopied": "コマンドをクリップボードにコピーしました!"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "プラグインマネージャーでは、KeepTrack の組み込みプラグインのオンとオフを切り替え、インストール済みのサードパーティ製プラグインを確認できます。プラグインはアプリの起動時に読み込まれるため、変更は再読み込み後に反映されます。",
+        "togglesHeading": "有効化と無効化",
+        "toggles": "スイッチを切り替えてプラグインを有効または無効にし、「再読み込み」をクリックして適用します。常に有効なインフラ系プラグインはロックされており、無効にできません。",
+        "externalHeading": "外部プラグイン",
+        "external": "プラグイン CLI でインストールしたサードパーティ製プラグインは、バージョン、互換性バッジ、ソースへのリンクとともに専用のセクションに表示されます。新しくインストールするには、「インストール」セクションのコマンドをコピーして KeepTrack のチェックアウトで実行してください。"
+      },
+      "searchAliases": {
+        "multiView": "マルチビュー,複数ビュー"
+      },
+      "loader": {
+        "proFailed": "プラグイン「{plugin}」のPro版を読み込めませんでした ({error})。{consequence} このビルドにはKeepTrack Proが含まれているため、src/plugins-pro のファイルが存在しない、古い、またはアクセスできない可能性があります。詳しくは {url} をご覧ください。",
+        "consequenceFallback": "代わりに標準版を読み込みます。",
+        "consequenceUnavailable": "この機能は今回のセッションでは利用できません。",
+        "downloadFailed": "プラグイン「{plugin}」をダウンロードできませんでした ({error})。今回のセッションでは利用できません。通常はネットワークの一時的な切断が原因です。ページを再読み込みすると再試行します。",
+        "initFailed": "プラグイン「{plugin}」を初期化できませんでした ({error})。今回のセッションでは利用できません。",
+        "stoppedEarly": "プラグインの読み込みが途中で停止しました ({error})。一部の機能が利用できない可能性があります。ページを再読み込みすると再試行します。"
       }
     }
   }

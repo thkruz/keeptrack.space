@@ -1,73 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "插件",
+      "title": "插件管理器",
+      "helpBody": "启用或禁用内置插件，并查看已安装的第三方插件。",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "打开插件管理器"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "已安装",
+        "browse": "浏览",
+        "develop": "开发"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "正在加载可用插件…",
+        "empty": "注册表中尚未列出任何插件。",
+        "error": "无法加载插件注册表。",
+        "install": "安装",
+        "installing": "正在安装…",
+        "installed": "已安装。正在重新构建，应用即将重新加载。",
+        "installedBtn": "已安装",
+        "installFailed": "安装失败。详情请查看终端。",
+        "copyCommand": "复制安装命令",
+        "byAuthor": "作者：{author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "什么是插件？",
+        "intro": "KeepTrack 由数十个独立插件构成，你也可以编写自己的插件。插件是一个小型软件包，可添加抽屉图标、菜单、叠加层或工具。插件通过 KeepTrack 代码检出中的插件 CLI 进行开发和安装。",
+        "createHeading": "1. 创建",
+        "create": "生成新插件的脚手架（交互式：会询问名称、类型和描述）。",
+        "previewHeading": "2. 预览",
+        "preview": "仅启用你的插件来启动应用，并在编辑时实时重新加载。",
+        "rulesHeading": "两条规则",
+        "rule1": "入口文件必须导出与 keeptrack-plugin.json 中 className 相符的类。",
+        "rule2": "该类的 readonly id 必须等于其 configKey。",
+        "docsLink": "打开插件开发指南"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "待应用的更改：{count}",
+        "button": "重新加载"
       },
       "labels": {
         "noMatches": "没有匹配的插件。请尝试插件名称或 ID。",
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
+        "search": "搜索插件",
+        "builtInSection": "内置插件",
+        "externalSection": "外部插件",
+        "externalEmpty": "未安装外部插件。请使用插件 CLI 添加。",
+        "installSection": "安装插件",
+        "installHint": "安装插件需要重新构建 KeepTrack。复制此命令并在你的 KeepTrack 代码检出中运行。",
         "gitUrl": "Git URL",
-        "source": "Source"
+        "source": "源代码",
+        "copy": "复制",
+        "alwaysEnabled": "始终启用"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "兼容",
+        "incompatible": "请检查版本"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "复制安装命令"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "安装命令已复制到剪贴板！",
+        "commandCopied": "命令已复制到剪贴板！"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "插件管理器可让你开启或关闭 KeepTrack 的内置插件，并查看已安装了哪些第三方插件。由于插件在应用启动时加载，更改将在重新加载后生效。",
+        "togglesHeading": "启用与禁用",
+        "toggles": "拨动开关以启用或禁用插件，然后点击“重新加载”以应用。始终开启的基础插件已锁定，无法禁用。",
+        "externalHeading": "外部插件",
+        "external": "通过插件 CLI 安装的第三方插件会显示在单独的分区中，附带版本、兼容性徽章和源代码链接。要安装新插件，请复制“安装”分区中的命令，并在你的 KeepTrack 代码检出中运行。"
+      },
+      "searchAliases": {
+        "multiView": "多视图,多窗口"
+      },
+      "loader": {
+        "proFailed": "插件“{plugin}”的 Pro 版本加载失败（{error}）。{consequence} 此构建包含 KeepTrack Pro，因此 src/plugins-pro 文件可能缺失、过期或无法访问。了解更多：{url}。",
+        "consequenceFallback": "将改为加载标准版本。",
+        "consequenceUnavailable": "此功能在本次会话中不可用。",
+        "downloadFailed": "插件“{plugin}”下载失败（{error}），本次会话中将不可用。这通常是网络中断导致的，重新加载页面将会重试。",
+        "initFailed": "插件“{plugin}”初始化失败（{error}），本次会话中将不可用。",
+        "stoppedEarly": "插件加载提前停止（{error}）。部分功能可能缺失，重新加载页面将会重试。"
       }
     }
   }

@@ -238,7 +238,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     return html`
       <div class="pm-command">
         <code class="pm-command-text">${command}</code>
-        <button type="button" class="pm-copy-btn waves-effect" data-copy="${command}" kt-tooltip="Copy">&#128203;</button>
+        <button type="button" class="pm-copy-btn waves-effect" data-copy="${command}" kt-tooltip="${l('labels.copy')}">&#128203;</button>
       </div>
     `;
   }
@@ -246,7 +246,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
   private buildToggleRow_(r: BuiltinRow): string {
     const checked = this.isEnabled_(r.configKey) ? 'checked' : '';
     const disabled = r.alwaysEnabled ? 'disabled' : '';
-    const lockIcon = r.alwaysEnabled ? '<span class="pm-lock" title="Always enabled">&#128274;</span>' : '';
+    const lockIcon = r.alwaysEnabled ? `<span class="pm-lock" title="${l('labels.alwaysEnabled')}">&#128274;</span>` : '';
 
     return html`
       <div class="pm-row" data-plugin-name="${r.label.toLowerCase()} ${r.configKey.toLowerCase()} ${pluginSearchAliases(r.configKey).join(' ')}">
@@ -417,7 +417,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     return `
       <div class="pm-card kt-section">
         <div class="pm-card-title">${esc(p.displayName || p.name)}</div>
-        ${p.author ? `<div class="pm-card-author">${l('browse.by')} ${esc(p.author)}</div>` : ''}
+        ${p.author ? `<div class="pm-card-author">${l('browse.byAuthor').replace('{author}', () => esc(p.author ?? ''))}</div>` : ''}
         <p class="pm-card-desc">${esc(p.description ?? '')}</p>
         <div class="pm-card-tags">${tags}<span class="pm-card-engine">${esc(p.engine ?? '')}</span></div>
         ${button}

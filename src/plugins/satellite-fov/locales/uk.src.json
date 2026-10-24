@@ -18,7 +18,8 @@
         "activeS2sCones": "Активні конуси супутник-супутник",
         "fovDegrees": "Поле зору (градуси)",
         "opacity": "Непрозорість",
-        "targetCatalogNumber": "Каталожний номер цілі"
+        "targetCatalogNumber": "Каталожний номер цілі",
+        "targetCatalogPlaceholder": "напр. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Поле зору сенсора",

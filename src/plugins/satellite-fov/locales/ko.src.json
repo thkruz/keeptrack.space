@@ -18,7 +18,8 @@
         "activeS2sCones": "활성 위성 간 원뿔",
         "fovDegrees": "시야각 (도)",
         "opacity": "불투명도",
-        "targetCatalogNumber": "대상 카탈로그 번호"
+        "targetCatalogNumber": "대상 카탈로그 번호",
+        "targetCatalogPlaceholder": "예: 25544"
       },
       "tooltips": {
         "fovOfSensor": "센서의 시야각",

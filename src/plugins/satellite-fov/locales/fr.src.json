@@ -18,7 +18,8 @@
         "activeS2sCones": "Cônes Sat à Sat actifs",
         "fovDegrees": "Champ de vision (degrés)",
         "opacity": "Opacité",
-        "targetCatalogNumber": "Numéro de catalogue de la cible"
+        "targetCatalogNumber": "Numéro de catalogue de la cible",
+        "targetCatalogPlaceholder": "ex. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Champ de vision du capteur",

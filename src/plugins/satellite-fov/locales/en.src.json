@@ -18,7 +18,8 @@
         "activeS2sCones": "Active Sat-to-Sat Cones",
         "fovDegrees": "Field of View (Degrees)",
         "opacity": "Opacity",
-        "targetCatalogNumber": "Target Catalog Number"
+        "targetCatalogNumber": "Target Catalog Number",
+        "targetCatalogPlaceholder": "e.g. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Field of View of the Sensor",

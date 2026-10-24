@@ -217,7 +217,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       <div class="kt-section-label">${l('labels.targetSatellite')}</div>
       <div class="kt-field-row">
         <div class="input-field col s12">
-          <input id="sat-fov-s2s-target-scc" type="text" placeholder="e.g. 25544"
+          <input id="sat-fov-s2s-target-scc" type="text" placeholder="${l('labels.targetCatalogPlaceholder')}"
             style="text-align: center;"
           />
           <label for="sat-fov-s2s-target-scc" class="active">${l('labels.targetCatalogNumber')}</label>

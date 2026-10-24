@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "궤도 미리보기",
-    "unknown": "알 수 없음"
+    "unknown": "알 수 없음",
+    "close": "닫기",
+    "download": "다운로드",
+    "downloadNamed": "{name} 다운로드",
+    "loading": "불러오는 중…"
   },
   "help": {
     "overview": "개요",
@@ -60,9 +64,9 @@
       "oss": "오픈 소스",
       "celestrak": "CelesTrak",
       "embed": "임베드",
-      "offline": "Offline",
+      "offline": "오프라인",
       "epfl": "EPFL",
-      "companion": "Companion",
+      "companion": "컴패니언",
       "solar-system": "태양계"
     }
   },
@@ -88,12 +92,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "센서 UI 스타일 업데이트 중 오류 발생."
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "하단 메뉴 필터 버튼을 모두 찾지 못했습니다"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset가 유한하지 않은 값을 받았습니다: {value}",
+      "invalidDate": "synchronize()가 잘못된 날짜를 생성했습니다 - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "위성 카탈로그를 불러오는 중 오류가 발생했습니다.",
+      "usingOfflineCatalog": "최신 카탈로그를 다운로드하지 못했습니다! 오래되었을 수 있는 오프라인 카탈로그를 사용합니다!",
+      "catalogsLoadFailed": "TLE 카탈로그를 불러오지 못했습니다!",
+      "externalTlesBadFormat": "외부 TLE 형식이 올바르지 않습니다",
+      "externalTlesLoadError": "{url}에서 외부 TLE를 불러오는 중 오류가 발생했습니다",
+      "fileLoadError": "{file}을(를) 불러오는 중 오류가 발생했습니다",
+      "usingOfflineVimpel": "최신 vimpel.json을 다운로드하지 못했습니다! 오래되었을 수 있는 오프라인 vimpel.json을 사용합니다!",
+      "satProcessFailed": "위성을 처리하지 못했습니다: {name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "이 내보내기에 확장 sccNum(7자리 이상) 위성이 {count}개 있습니다. TLE 형식의 3-7열은 5자만 들어가므로 이 파일을 다시 가져오면 정식 ID가 손실됩니다. 확장 ID를 유지하려면 CSV/OMM 내보내기를 사용하세요.",
+      "noTleData": "내보낼 TLE 데이터가 없습니다"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec: satData에서 satId를 찾을 수 없습니다",
+      "satrecError": "위성 레코드를 생성하는 중 오류가 발생했습니다!",
+      "analystSatInvalid": "새 분석가 위성이 유효하지 않습니다!"
+    },
+    "apiKeyRequired": "API 키가 필요합니다. keeptrack.space에서 무료 키를 받아 settings/data-settings.ts에 추가하세요",
+    "audioLoadFailed": "오디오를 불러오지 못했습니다: {key}",
+    "rmbMenuMissingElements": "오른쪽 클릭 메뉴 요소가 없습니다: {ids}",
+    "sgp4BackendFailed": "{backend} 전파기 백엔드를 활성화하지 못했습니다. TypeScript SGP4로 대체합니다. {error}",
+    "Pwa": {
+      "registrationFailed": "서비스 워커 등록에 실패했습니다:"
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "상세 우주선 메시를 사용할 수 없어 일반 모델로 대체합니다: {error}",
+      "meshVariantsUnavailable": "절차적 메시 변형을 사용할 수 없어 무료 기본 모델로 대체합니다: {error}",
+      "colorCruncherUpdateDropped": "ColorCruncher 동적 업데이트가 삭제되었습니다: {error}",
+      "hoverPickDisabled": "위성 호버 선택이 비활성화되었습니다: 이 브라우저는 WebGL readPixels를 지원하지 않습니다 ({error}). 클릭 선택은 계속 작동합니다.",
+      "earthInitFailed": "지구를 초기화하는 중 오류가 발생했습니다: {error}",
+      "textureLoadFailed": "텍스처를 불러오지 못했습니다: {url}",
+      "solarSystemPackUnavailable": "태양계 팩을 사용할 수 없어 기본 천체로 대체합니다: {error}",
+      "uniformNotFound": "프로그램 {program}에서 uniform {uniform}을(를) 찾을 수 없습니다",
+      "contextLost": "WebGL 컨텍스트가 손실되었습니다",
+      "contextLostRefresh": "WebGL 컨텍스트가 손실되었습니다. 복구하려면 페이지를 새로 고치세요.",
+      "contextRestored": "WebGL 컨텍스트가 복원되었습니다",
+      "pickingResizeFailed": "resizeCanvas 중 선택용 프레임버퍼 크기 조정에 실패했습니다. 컨텍스트가 복원될 때까지 연기합니다. {error}",
+      "godraysResizeFailed": "resizeCanvas 중 갓레이 크기 조정에 실패했습니다. 다음 크기 조정 시 다시 시도합니다. {error}",
+      "bodyInitError": "{name}을(를) 초기화하는 중 오류가 발생했습니다",
+      "bodyTextureError": "{name}의 텍스처를 업데이트하는 중 오류가 발생했습니다",
+      "atmosphereInitError": "{name} 대기를 초기화하는 중 오류가 발생했습니다",
+      "atmosphereTextureError": "{name} 대기 텍스처를 불러오는 중 오류가 발생했습니다 (시도 {attempt})",
+      "shaderInitFailed": "셰이더를 초기화할 수 없습니다",
+      "meshModelUndefined": "메시 모델이 정의되지 않았습니다. 속성 포인터를 적용할 수 없습니다.",
+      "shaderAttributeMissing": "셰이더에서 셰이더 속성 \"{attr}\"을(를) 찾을 수 없습니다. 셰이더 코드에서 선언되지 않았거나 사용되지 않습니까?",
+      "meshesLoadFailed": "3D 모델을 불러오지 못했습니다!",
+      "flagAtlasLoadFailed": "국기 아틀라스를 불러오지 못했습니다",
+      "politicalMapLoadFailed": "정치 지도 데이터를 불러오지 못했습니다"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] 부팅 복구 화면을 표시했습니다 (멈춘 워커: {workers}).",
+      "line": "줄: {line}",
+      "optionalWorkersStalled": "[KeepTrack] 선택적 워커가 {seconds}초 내에 시작되지 않아 이들 없이 부팅합니다: {workers}. 영향을 받는 기능(예: 궤도선)은 이번 세션에서 비활성화됩니다.",
+      "essentialWorkersStalled": "[KeepTrack] 필수 웹 워커가 {seconds}초 후에도 초기화되지 않았습니다. 멈춘 워커: {workers}.",
+      "selfHealReload": "[KeepTrack] 워커가 멈췄습니다. 자동 복구를 위해 새 워커 캐시로 한 번 다시 불러옵니다."
+    },
+    "Persistence": {
+      "versionMismatch": "버전 불일치: {saved} < {current}",
+      "clearingStorage": "로컬 저장소를 지우는 중...",
+      "subscriberError": "저장소 구독자에서 오류가 발생했습니다:",
+      "storageError": "LocalStorageProvider 오류:",
+      "enhancedInitFailed": "고급 영속성을 초기화하지 못했습니다: {error}",
+      "corruptSetting": "손상된 저장 설정 \"{key}\"을(를) 건너뜁니다: {error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "루트 컨테이너를 찾을 수 없습니다!",
+      "containerNotFound": "Colorbox 컨테이너를 찾을 수 없습니다!",
+      "loadFailed": "불러오지 못했습니다: {url}",
+      "imageLoadFailed": "이미지를 불러오지 못했습니다: {url}"
+    },
+    "SaveVariable": {
+      "variable": "변수를 저장하는 중 오류가 발생했습니다!",
+      "csv": "CSV를 저장하는 중 오류가 발생했습니다!",
+      "xlsx": "XLSX를 저장하는 중 오류가 발생했습니다!",
+      "clipboard": "클립보드에 복사하는 중 오류가 발생했습니다!"
+    },
+    "Fatal": {
+      "technicalDetail": "기술 세부 정보",
+      "recommendations": "권장 사항",
+      "canvasMissingTitle": "캔버스 요소 없음",
+      "canvasMissingDescription": "KeepTrack이 그리기 영역을 찾지 못했습니다. 보통 브라우저 확장 프로그램, 회사 방화벽 또는 콘텐츠 보안 정책이 페이지에서 요소를 제거하고 있다는 뜻입니다.",
+      "webgl2Title": "WebGL 2를 사용할 수 없음",
+      "webgl2Description": "KeepTrack은 3D 장면을 렌더링하려면 WebGL 2가 필요합니다. 브라우저나 기기가 이를 지원하지 않거나 비활성화되어 있습니다.",
+      "recDisableExtensions": "브라우저 확장 프로그램(광고 차단기, 개인정보 보호 도구)을 끄고 새로 고치세요.",
+      "recManagedNetwork": "관리되는 네트워크를 사용 중입니까? 네트워크 또는 시스템 관리자에게 이 사이트를 허용해 달라고 요청하세요.",
+      "recDifferentBrowser": "다른 브라우저를 사용해 보세요(Chrome, Edge 또는 Firefox 권장).",
+      "recUpdateBrowser": "브라우저를 최신 버전으로 업데이트하세요.",
+      "recHardwareAcceleration": "브라우저 설정에서 하드웨어 가속을 켜세요.",
+      "recGraphicsDrivers": "그래픽 드라이버를 업데이트하세요.",
+      "recManagedDevice": "관리되는 기기를 사용 중입니까? 시스템 관리자에게 문의하세요."
     }
   },
   "hoverManager": {
     "launched": "발사됨",
     "launchedPlanned": "발사 예정",
-    "launchedUnknown": "발사: 알 수 없음"
+    "launchedUnknown": "발사: 알 수 없음",
+    "orbitPeriodDays": "공전 주기: 지구일 기준 {days}일",
+    "orbitPeriodYears": "공전 주기: 지구년 기준 {years}년",
+    "distanceFromParent": "{parent}까지의 거리: {km} km",
+    "distanceFromSun": "태양까지의 거리: {au} AU ({mkm}백만 km)",
+    "unknownLaunchSite": "알 수 없는 발사장",
+    "unknownSite": "알 수 없는 장소",
+    "unknownCountry": "알 수 없는 국가",
+    "external": "외부",
+    "position": "위치:",
+    "velocity": "속도:"
   },
   "darkClouds": {
     "in": "내",
@@ -153,22 +267,117 @@
     "groupLayerToggles": "레이어 토글",
     "groupSettingsToggles": "설정 토글",
     "groupDevTools": "개발 도구",
-    "groupAbout": "정보"
+    "groupAbout": "정보",
+    "modeAll": "모든 플러그인",
+    "openPluginMenu": "플러그인 메뉴 열기",
+    "openAppLauncher": "앱 런처 열기",
+    "appLauncherTooltip": "앱 런처 (Shift+Z)",
+    "appLauncher": "앱 런처",
+    "search": "검색",
+    "searchEllipsis": "검색…",
+    "toggleRailMode": "레일 모드 전환",
+    "collapse": "접기",
+    "expand": "펼치기",
+    "phoneLink": "휴대폰 연결",
+    "phoneLinkSignIn": "휴대폰을 연결하려면 로그인하세요",
+    "connected": "연결됨",
+    "offline": "오프라인"
   },
   "rightClickMenu": {
     "pauseClock": "시계 일시정지",
     "resetCamera": "카메라 초기화",
     "clearLines": "선 지우기",
-    "clearScreen": "화면 지우기"
+    "clearScreen": "화면 지우기",
+    "startClock": "시계 시작"
   },
   "urlManager": {
     "satNotFound": "위성 \"{val}\"을(를) 찾을 수 없습니다!",
     "intldesNotFound": "국제 식별 부호 \"{val}\"을(를) 찾을 수 없습니다!",
-    "deepSpaceNoEphemeris": "{name}은(는) 심우주 물체입니다. 해당 궤도력은 아직 KeepTrack에서 제공되지 않습니다."
+    "deepSpaceNoEphemeris": "{name}은(는) 심우주 물체입니다. 해당 궤도력은 아직 KeepTrack에서 제공되지 않습니다.",
+    "searchFoundNothing": "\"{val}\" 검색 결과가 없습니다!",
+    "missileLaunched": "미사일이 발사되었습니다!",
+    "dateNotIso": "날짜 값 \"{val}\"은(는) 올바른 ISO 8601 날짜 문자열이 아닙니다!",
+    "dateNotUnix": "날짜 값 \"{val}\"은(는) 올바른 Unix 타임스탬프가 아닙니다!",
+    "rateNotFloat": "전파 속도 \"{val}\"은(는) 유효한 실수가 아닙니다!",
+    "zoomNotFloat": "확대/축소 값 \"{val}\"은(는) 유효한 실수가 아닙니다!",
+    "zoomOutOfBounds": "확대/축소 값 \"{val}\"이(가) 범위를 벗어났습니다!",
+    "pitchYawNotFloat": "피치 또는 요 값이 유효한 실수가 아닙니다!",
+    "pitchOutOfBounds": "피치 값이 범위를 벗어났습니다!",
+    "yawOutOfBounds": "요 값이 범위를 벗어났습니다!",
+    "latLonNotFloat": "위도 또는 경도 값이 유효한 실수가 아닙니다!",
+    "latLonOutOfBounds": "위도 또는 경도 값이 범위를 벗어났습니다!",
+    "unknownSunParam": "알 수 없는 태양 매개변수: {val}",
+    "unknownRegime": "알 수 없는 궤도 영역 필터: {val}",
+    "invalidSearchLimit": "잘못된 검색 한도: {val}"
   },
   "searchManager": {
     "resultCountOne": "결과 1개",
     "resultCount": "결과 {count}개",
-    "resultCountLimited": "{total}개 중 {shown}개 표시"
+    "resultCountLimited": "{total}개 중 {shown}개 표시",
+    "noResults": "검색 결과가 없습니다",
+    "decayed": "소멸됨",
+    "typeStar": "항성",
+    "typeSensor": "센서",
+    "typeLaunchSite": "발사장",
+    "typePlanet": "행성"
+  },
+  "sensorMath": {
+    "withinOneBeam": "단일 빔 내",
+    "range": "거리: {km} km",
+    "relativeVelocity": "상대 속도: {kms} km/s",
+    "noPassesInDays": "{days}일 내 통과 없음",
+    "customLocation": "사용자 지정 위치",
+    "customSensorDefaultName": "사용자 지정 센서"
+  },
+  "toasts": {
+    "orbitTailsOnly": "궤도 꼬리만 표시",
+    "orbitsOff": "궤도 끄기",
+    "orbitsOn": "궤도 켜기",
+    "orbitsInEcf": "궤도를 ECF로 표시",
+    "orbitsInEci": "궤도를 ECI로 표시",
+    "cameraEarthCentered": "지구 중심 카메라 모드",
+    "cameraFixedLvlh": "위성 고정 카메라 모드 (LVLH)",
+    "cameraFixedEci": "위성 고정 카메라 모드 (ECI)",
+    "cameraFree": "자유 카메라 모드",
+    "cameraPlanetarium": "플라네타리움 카메라 모드",
+    "cameraSatFirstPerson": "위성 1인칭 카메라 모드",
+    "cameraAstronomy": "천문 카메라 모드",
+    "cameraFlatMap": "평면 지도 카메라 모드",
+    "propagationSpeed": "전파 속도: {rate}x",
+    "timeSetToRealTime": "시간을 실시간으로 설정했습니다",
+    "noValidFov": "그릴 수 있는 유효한 시야가 없습니다! 여러 심우주 센서를 동시에 그릴 수 없습니다.",
+    "colorSchemeChanged": "색 구성표를 {scheme}(으)로 변경했습니다",
+    "mobileFullVersionUnavailable": "KeepTrack 정식 버전은 모바일 기기에서 사용할 수 없습니다. 정식 버전을 사용하려면 데스크톱 브라우저를 이용하세요.",
+    "objectInsideEarth": "객체가 지구 내부에 있습니다!",
+    "propagationRate": "전파 속도: {rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "레이어 전환",
+    "layers": "레이어"
+  },
+  "modalConfirm": {
+    "confirmAction": "작업 확인",
+    "defaultTitle": "확실합니까?",
+    "defaultMessage": "이 작업을 정말 진행하시겠습니까?",
+    "yes": "예",
+    "no": "아니요",
+    "cancel": "취소",
+    "logoutTitle": "로그아웃 확인",
+    "logoutMessage": "로그아웃하시겠습니까? 계정에 액세스하려면 다시 로그인해야 합니다.",
+    "logout": "로그아웃",
+    "deleteTitle": "삭제 확인",
+    "deleteNamedMessage": "\"{name}\"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "deleteMessage": "이 항목을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "delete": "삭제",
+    "clearTitle": "지우기 확인",
+    "clearTypedMessage": "{dataType}을(를) 모두 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "clearMessage": "모든 데이터를 지우시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+    "clear": "지우기",
+    "input": "입력",
+    "ok": "확인",
+    "removeItem": "{label} 제거"
+  },
+  "colorbox": {
+    "openInNewTab": "새 탭에서 열기"
   }
 }

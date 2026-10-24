@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "Попередній перегляд орбіти",
-    "unknown": "Невідомо"
+    "unknown": "Невідомо",
+    "close": "Закрити",
+    "download": "Завантажити",
+    "downloadNamed": "Завантажити {name}",
+    "loading": "Завантаження…"
   },
   "help": {
     "overview": "Огляд",
@@ -60,9 +64,9 @@
       "oss": "Відкрите ПЗ",
       "celestrak": "CelesTrak",
       "embed": "Вбудований",
-      "offline": "Offline",
+      "offline": "Офлайн",
       "epfl": "EPFL",
-      "companion": "Companion",
+      "companion": "Компаньйон",
       "solar-system": "Сонячна система"
     }
   },
@@ -88,12 +92,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "Помилка оновлення стилів інтерфейсу сенсора."
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "Не вдалося знайти всі кнопки фільтрів нижнього меню"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset отримав нескінченне або нечислове значення: {value}",
+      "invalidDate": "synchronize() повернув недійсну дату - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "Помилка завантаження каталогу супутників.",
+      "usingOfflineCatalog": "Не вдалося завантажити найновіший каталог! Використовується офлайн-каталог, який може бути застарілим!",
+      "catalogsLoadFailed": "Не вдалося завантажити каталог(и) TLE!",
+      "externalTlesBadFormat": "Зовнішні TLE мають неправильний формат",
+      "externalTlesLoadError": "Помилка завантаження зовнішніх TLE з {url}",
+      "fileLoadError": "Помилка завантаження {file}",
+      "usingOfflineVimpel": "Не вдалося завантажити найновіший vimpel.json! Використовується офлайн-версія vimpel.json, яка може бути застарілою!",
+      "satProcessFailed": "Не вдалося обробити супутник: {name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "У цьому експорті супутників із розширеним sccNum (7+ цифр): {count}. Стовпці 3-7 формату TLE вміщують лише 5 символів, тому під час повторного імпорту цього файлу канонічний ID буде втрачено. Щоб зберегти розширені ID, використовуйте експорт CSV/OMM.",
+      "noTleData": "Немає даних TLE для експорту"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec: satId не знайдено в satData",
+      "satrecError": "Помилка створення запису супутника!",
+      "analystSatInvalid": "Новий супутник аналітика недійсний!"
+    },
+    "apiKeyRequired": "Потрібен ключ API. Отримайте безкоштовний ключ на keeptrack.space і додайте його до settings/data-settings.ts",
+    "audioLoadFailed": "Не вдалося завантажити звук: {key}",
+    "rmbMenuMissingElements": "Відсутні елементи контекстного меню: {ids}",
+    "sgp4BackendFailed": "Не вдалося активувати пропагатор {backend}; використовується SGP4 на TypeScript. {error}",
+    "Pwa": {
+      "registrationFailed": "Не вдалося зареєструвати service worker:"
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "Деталізовані моделі космічних апаратів недоступні, використовуються загальні моделі: {error}",
+      "meshVariantsUnavailable": "Процедурні варіанти моделей недоступні, використовуються безкоштовні базові моделі: {error}",
+      "colorCruncherUpdateDropped": "Динамічне оновлення ColorCruncher відкинуто: {error}",
+      "hoverPickDisabled": "Вибір супутників наведенням вимкнено: браузер не підтримує WebGL readPixels ({error}). Вибір клацанням і далі працює.",
+      "earthInitFailed": "Помилка ініціалізації Землі: {error}",
+      "textureLoadFailed": "Не вдалося завантажити текстуру: {url}",
+      "solarSystemPackUnavailable": "Пакет Сонячної системи недоступний, використовуються вбудовані тіла: {error}",
+      "uniformNotFound": "Uniform {uniform} не знайдено в програмі {program}",
+      "contextLost": "Контекст WebGL втрачено",
+      "contextLostRefresh": "Контекст WebGL втрачено. Оновіть сторінку, щоб відновити його.",
+      "contextRestored": "Контекст WebGL відновлено",
+      "pickingResizeFailed": "Не вдалося змінити розмір буфера кадру вибору в resizeCanvas; відкладено до відновлення контексту. {error}",
+      "godraysResizeFailed": "Не вдалося змінити розмір ефекту godrays у resizeCanvas; повтор під час наступної зміни розміру. {error}",
+      "bodyInitError": "Помилка ініціалізації: {name}",
+      "bodyTextureError": "Помилка оновлення текстури: {name}",
+      "atmosphereInitError": "Помилка ініціалізації атмосфери: {name}",
+      "atmosphereTextureError": "Помилка завантаження текстури атмосфери: {name} (спроба {attempt})",
+      "shaderInitFailed": "Не вдалося ініціалізувати шейдери",
+      "meshModelUndefined": "Модель сітки не визначено. Неможливо застосувати вказівники атрибутів.",
+      "shaderAttributeMissing": "Атрибут «{attr}» не знайдено в шейдері. Можливо, його не оголошено або не використано в коді шейдера?",
+      "meshesLoadFailed": "Не вдалося завантажити 3D-моделі!",
+      "flagAtlasLoadFailed": "Не вдалося завантажити атлас прапорів",
+      "politicalMapLoadFailed": "Не вдалося завантажити дані політичної карти"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] Показано екран відновлення завантаження (завислі воркери: {workers}).",
+      "line": "Рядок: {line}",
+      "optionalWorkersStalled": "[KeepTrack] Додаткові воркери не запустилися за {seconds} с; запуск без них: {workers}. Пов'язані функції (наприклад, лінії орбіт) вимкнено в цьому сеансі.",
+      "essentialWorkersStalled": "[KeepTrack] Основні веб-воркери не ініціалізувалися за {seconds} с. Завислі воркери: {workers}.",
+      "selfHealReload": "[KeepTrack] Воркери зависли; виконується одноразове перезавантаження зі свіжим кешем воркерів для самовідновлення."
+    },
+    "Persistence": {
+      "versionMismatch": "Невідповідність версій: {saved} < {current}",
+      "clearingStorage": "Очищення локального сховища...",
+      "subscriberError": "Помилка в підписнику сховища:",
+      "storageError": "Помилка LocalStorageProvider:",
+      "enhancedInitFailed": "Не вдалося ініціалізувати розширене збереження: {error}",
+      "corruptSetting": "Пропуск пошкодженого збереженого налаштування «{key}»: {error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "Кореневий контейнер не знайдено!",
+      "containerNotFound": "Контейнер Colorbox не знайдено!",
+      "loadFailed": "Не вдалося завантажити: {url}",
+      "imageLoadFailed": "Не вдалося завантажити зображення: {url}"
+    },
+    "SaveVariable": {
+      "variable": "Помилка збереження змінної!",
+      "csv": "Помилка збереження CSV!",
+      "xlsx": "Помилка збереження XLSX!",
+      "clipboard": "Помилка копіювання в буфер обміну!"
+    },
+    "Fatal": {
+      "technicalDetail": "Технічні подробиці",
+      "recommendations": "Рекомендації",
+      "canvasMissingTitle": "Відсутній елемент canvas",
+      "canvasMissingDescription": "KeepTrack не вдалося знайти поверхню для малювання. Зазвичай це означає, що розширення браузера, корпоративний брандмауер або політика безпеки вмісту видаляють елементи зі сторінки.",
+      "webgl2Title": "WebGL 2 недоступний",
+      "webgl2Description": "Для відображення 3D-сцени KeepTrack потрібен WebGL 2. Ваш браузер або пристрій його не підтримує, або його вимкнено.",
+      "recDisableExtensions": "Вимкніть розширення браузера (блокувальники реклами, засоби конфіденційності) і перезавантажте сторінку.",
+      "recManagedNetwork": "Використовуєте керовану мережу? Попросіть мережевого або системного адміністратора дозволити цей сайт.",
+      "recDifferentBrowser": "Спробуйте інший браузер (рекомендовано Chrome, Edge або Firefox).",
+      "recUpdateBrowser": "Оновіть браузер до останньої версії.",
+      "recHardwareAcceleration": "Увімкніть апаратне прискорення в налаштуваннях браузера.",
+      "recGraphicsDrivers": "Оновіть графічні драйвери.",
+      "recManagedDevice": "Використовуєте керований пристрій? Зверніться до системного адміністратора."
     }
   },
   "hoverManager": {
     "launched": "Запущено",
     "launchedPlanned": "Запуск: Запланований",
-    "launchedUnknown": "Запуск: Невідомо"
+    "launchedUnknown": "Запуск: Невідомо",
+    "orbitPeriodDays": "Орбітальний період: {days} земних діб",
+    "orbitPeriodYears": "Орбітальний період: {years} земних років",
+    "distanceFromParent": "Відстань від {parent}: {km} км",
+    "distanceFromSun": "Відстань від Сонця: {au} а.о. ({mkm} млн км)",
+    "unknownLaunchSite": "Невідомий стартовий майданчик",
+    "unknownSite": "Невідоме місце",
+    "unknownCountry": "Невідома країна",
+    "external": "Зовнішній",
+    "position": "Положення:",
+    "velocity": "Швидкість:"
   },
   "darkClouds": {
     "in": "В",
@@ -158,22 +272,117 @@
     "groupLayerToggles": "Перемикачі шарів",
     "groupSettingsToggles": "Перемикачі налаштувань",
     "groupDevTools": "Інструменти розробки",
-    "groupAbout": "Про програму"
+    "groupAbout": "Про програму",
+    "modeAll": "Усі плагіни",
+    "openPluginMenu": "Відкрити меню плагінів",
+    "openAppLauncher": "Відкрити панель запуску застосунків",
+    "appLauncherTooltip": "Панель запуску застосунків (Shift+Z)",
+    "appLauncher": "Панель запуску застосунків",
+    "search": "Пошук",
+    "searchEllipsis": "Пошук…",
+    "toggleRailMode": "Перемкнути компактний режим",
+    "collapse": "Згорнути",
+    "expand": "Розгорнути",
+    "phoneLink": "Зв'язок із телефоном",
+    "phoneLinkSignIn": "Увійдіть, щоб під'єднати телефон",
+    "connected": "Під'єднано",
+    "offline": "Офлайн"
   },
   "rightClickMenu": {
     "pauseClock": "Призупинити годинник",
     "resetCamera": "Скинути камеру",
     "clearLines": "Очистити лінії",
-    "clearScreen": "Очистити екран"
+    "clearScreen": "Очистити екран",
+    "startClock": "Запустити годинник"
   },
   "urlManager": {
     "satNotFound": "Супутник \"{val}\" не знайдено!",
     "intldesNotFound": "Міжнародне позначення \"{val}\" не знайдено!",
-    "deepSpaceNoEphemeris": "{name} перебуває в далекому космосі. Його ефемериди поки що недоступні в KeepTrack."
+    "deepSpaceNoEphemeris": "{name} перебуває в далекому космосі. Його ефемериди поки що недоступні в KeepTrack.",
+    "searchFoundNothing": "Пошук «{val}» нічого не знайшов!",
+    "missileLaunched": "Ракету запущено!",
+    "dateNotIso": "Значення дати «{val}» не є коректним рядком дати ISO 8601!",
+    "dateNotUnix": "Значення дати «{val}» не є коректною міткою часу Unix!",
+    "rateNotFloat": "Швидкість пропагації «{val}» не є допустимим числом!",
+    "zoomNotFloat": "Значення масштабу «{val}» не є допустимим числом!",
+    "zoomOutOfBounds": "Значення масштабу «{val}» поза допустимим діапазоном!",
+    "pitchYawNotFloat": "Значення тангажу або рискання не є допустимим числом!",
+    "pitchOutOfBounds": "Значення тангажу поза допустимим діапазоном!",
+    "yawOutOfBounds": "Значення рискання поза допустимим діапазоном!",
+    "latLonNotFloat": "Значення широти або довготи не є допустимим числом!",
+    "latLonOutOfBounds": "Значення широти або довготи поза допустимим діапазоном!",
+    "unknownSunParam": "Невідомий параметр сонця: {val}",
+    "unknownRegime": "Невідомий фільтр орбітального режиму: {val}",
+    "invalidSearchLimit": "Недійсний ліміт пошуку: {val}"
   },
   "searchManager": {
     "resultCountOne": "1 результат",
     "resultCount": "Результатів: {count}",
-    "resultCountLimited": "Показано {shown} з {total} результатів"
+    "resultCountLimited": "Показано {shown} з {total} результатів",
+    "noResults": "Нічого не знайдено",
+    "decayed": "Зійшов з орбіти",
+    "typeStar": "Зоря",
+    "typeSensor": "Датчик",
+    "typeLaunchSite": "Стартовий майданчик",
+    "typePlanet": "Планета"
+  },
+  "sensorMath": {
+    "withinOneBeam": "У межах одного променя",
+    "range": "Дальність: {km} км",
+    "relativeVelocity": "Відносна швидкість: {kms} км/с",
+    "noPassesInDays": "Немає прольотів за {days} доб",
+    "customLocation": "Власне розташування",
+    "customSensorDefaultName": "Власний датчик"
+  },
+  "toasts": {
+    "orbitTailsOnly": "Лише хвости орбіт",
+    "orbitsOff": "Орбіти вимкнено",
+    "orbitsOn": "Орбіти увімкнено",
+    "orbitsInEcf": "Орбіти відображаються в ECF",
+    "orbitsInEci": "Орбіти відображаються в ECI",
+    "cameraEarthCentered": "Режим камери з центром на Землі",
+    "cameraFixedLvlh": "Режим камери, прив'язаної до супутника (LVLH)",
+    "cameraFixedEci": "Режим камери, прив'язаної до супутника (ECI)",
+    "cameraFree": "Режим вільної камери",
+    "cameraPlanetarium": "Режим камери «Планетарій»",
+    "cameraSatFirstPerson": "Режим камери від першої особи супутника",
+    "cameraAstronomy": "Астрономічний режим камери",
+    "cameraFlatMap": "Режим камери «Пласка карта»",
+    "propagationSpeed": "Швидкість пропагації: {rate}x",
+    "timeSetToRealTime": "Встановлено реальний час",
+    "noValidFov": "Немає дійсного поля зору для відображення! Не можна відображати кілька датчиків далекого космосу одночасно.",
+    "colorSchemeChanged": "Колірну схему змінено на {scheme}",
+    "mobileFullVersionUnavailable": "Повна версія KeepTrack недоступна на мобільних пристроях. Скористайтеся браузером на комп'ютері, щоб відкрити повну версію.",
+    "objectInsideEarth": "Об'єкт знаходиться всередині Землі!",
+    "propagationRate": "Швидкість пропагації: {rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "Перемкнути шари",
+    "layers": "Шари"
+  },
+  "modalConfirm": {
+    "confirmAction": "Підтвердьте дію",
+    "defaultTitle": "Ви впевнені?",
+    "defaultMessage": "Ви дійсно хочете виконати цю дію?",
+    "yes": "Так",
+    "no": "Ні",
+    "cancel": "Скасувати",
+    "logoutTitle": "Підтвердьте вихід",
+    "logoutMessage": "Ви впевнені, що хочете вийти? Щоб отримати доступ до облікового запису, потрібно буде знову увійти.",
+    "logout": "Вийти",
+    "deleteTitle": "Підтвердьте видалення",
+    "deleteNamedMessage": "Ви впевнені, що хочете видалити «{name}»? Цю дію неможливо скасувати.",
+    "deleteMessage": "Ви впевнені, що хочете видалити цей елемент? Цю дію неможливо скасувати.",
+    "delete": "Видалити",
+    "clearTitle": "Підтвердьте очищення",
+    "clearTypedMessage": "Ви впевнені, що хочете очистити все: {dataType}? Цю дію неможливо скасувати.",
+    "clearMessage": "Ви впевнені, що хочете очистити всі дані? Цю дію неможливо скасувати.",
+    "clear": "Очистити",
+    "input": "Введення",
+    "ok": "ОК",
+    "removeItem": "Вилучити {label}"
+  },
+  "colorbox": {
+    "openInNewTab": "Відкрити в новій вкладці"
   }
 }

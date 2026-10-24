@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "Orbit Preview",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "close": "Close",
+    "download": "Download",
+    "downloadNamed": "Download {name}",
+    "loading": "Loading…"
   },
   "help": {
     "overview": "Overview",
@@ -88,12 +92,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "Error updating sensor UI styling."
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "Failed to find all bottom menu filter buttons"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset received non-finite value: {value}",
+      "invalidDate": "synchronize() produced Invalid Date - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "Error loading the satellite catalog.",
+      "usingOfflineCatalog": "Failed to download latest catalog! Using offline catalog which may be out of date!",
+      "catalogsLoadFailed": "Failed to load TLE catalog(s)!",
+      "externalTlesBadFormat": "External TLEs are not in the correct format",
+      "externalTlesLoadError": "Error loading external TLEs from {url}",
+      "fileLoadError": "Error loading {file}",
+      "usingOfflineVimpel": "Failed to download latest vimpel.json ! Using offline vimpel.json which may be out of date!",
+      "satProcessFailed": "Failed to process satellite: {name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "{count} extended (7+ digit) sccNum satellite(s) in this export. TLE-format cols 3-7 only fit 5 chars, so re-importing this file will lose the canonical id. Use CSV/OMM export to preserve extended IDs.",
+      "noTleData": "No TLE data to export"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec: satId not found in satData",
+      "satrecError": "Error creating satellite record!",
+      "analystSatInvalid": "New Analyst Satellite is Invalid!"
+    },
+    "apiKeyRequired": "API key required. Get a free key at keeptrack.space and add it to settings/data-settings.ts",
+    "audioLoadFailed": "Failed to load audio: {key}",
+    "rmbMenuMissingElements": "Missing elements for RMB menu: {ids}",
+    "sgp4BackendFailed": "Failed to activate the {backend} propagator backend; falling back to the TypeScript SGP4. {error}",
+    "Pwa": {
+      "registrationFailed": "Service worker registration failed:"
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "Hero spacecraft meshes unavailable, falling back to the generic models: {error}",
+      "meshVariantsUnavailable": "Procedural mesh variants unavailable, falling back to the free archetypes: {error}",
+      "colorCruncherUpdateDropped": "ColorCruncher dynamic update dropped: {error}",
+      "hoverPickDisabled": "Satellite hover-pick disabled: WebGL readPixels not supported in this browser ({error}). Click-to-select still works.",
+      "earthInitFailed": "Error initializing the Earth: {error}",
+      "textureLoadFailed": "Failed to load texture: {url}",
+      "solarSystemPackUnavailable": "Solar System Pack unavailable, falling back to the built-in bodies: {error}",
+      "uniformNotFound": "Uniform {uniform} not found in program {program}",
+      "contextLost": "WebGL Context Lost",
+      "contextLostRefresh": "WebGL context lost. Refresh the page to recover.",
+      "contextRestored": "WebGL Context Restored",
+      "pickingResizeFailed": "Picking framebuffer resize failed during resizeCanvas; deferring until context restore. {error}",
+      "godraysResizeFailed": "Godrays resize failed during resizeCanvas; retrying on next resize. {error}",
+      "bodyInitError": "Error initializing {name}",
+      "bodyTextureError": "Error updating texture for {name}",
+      "atmosphereInitError": "Error initializing {name} atmosphere",
+      "atmosphereTextureError": "Error loading {name} atmosphere texture (attempt {attempt})",
+      "shaderInitFailed": "Could not initialise shaders",
+      "meshModelUndefined": "Mesh model is not defined. Cannot apply attribute pointers.",
+      "shaderAttributeMissing": "Shader attribute \"{attr}\" not found in shader. Is it undeclared or unused in the shader code?",
+      "meshesLoadFailed": "Meshes failed to load!",
+      "flagAtlasLoadFailed": "Failed to load the flag atlas",
+      "politicalMapLoadFailed": "Failed to load political map data"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] Boot recovery UI shown (stalled workers: {workers}).",
+      "line": "Line: {line}",
+      "optionalWorkersStalled": "[KeepTrack] Optional worker(s) failed to start within {seconds}s; booting without them: {workers}. The affected features (e.g. orbit lines) are disabled for this session.",
+      "essentialWorkersStalled": "[KeepTrack] Essential web workers failed to initialize after {seconds}s. Stalled workers: {workers}.",
+      "selfHealReload": "[KeepTrack] Workers stalled; reloading once with a fresh worker cache to self-heal."
+    },
+    "Persistence": {
+      "versionMismatch": "Version mismatch: {saved} < {current}",
+      "clearingStorage": "Clearing local storage...",
+      "subscriberError": "Error in storage subscriber:",
+      "storageError": "LocalStorageProvider error:",
+      "enhancedInitFailed": "Failed to initialize enhanced persistence: {error}",
+      "corruptSetting": "Skipping corrupt saved setting \"{key}\": {error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "Container root not found!",
+      "containerNotFound": "Colorbox container not found!",
+      "loadFailed": "Failed to load: {url}",
+      "imageLoadFailed": "Failed to load image: {url}"
+    },
+    "SaveVariable": {
+      "variable": "Error in saving variable!",
+      "csv": "Error in saving csv!",
+      "xlsx": "Error saving xlsx!",
+      "clipboard": "Error copying to clipboard!"
+    },
+    "Fatal": {
+      "technicalDetail": "Technical Detail",
+      "recommendations": "Recommendations",
+      "canvasMissingTitle": "Canvas Element Missing",
+      "canvasMissingDescription": "KeepTrack could not find its drawing surface. This usually means a browser extension, corporate firewall, or content-security policy is stripping elements from the page.",
+      "webgl2Title": "WebGL 2 Not Available",
+      "webgl2Description": "KeepTrack requires WebGL 2 to render the 3D scene. Your browser or device does not support it, or it has been disabled.",
+      "recDisableExtensions": "Disable browser extensions (ad-blockers, privacy tools) and reload.",
+      "recManagedNetwork": "On a managed network? Contact your LAN Office or System Administrator to whitelist this site.",
+      "recDifferentBrowser": "Try a different browser (Chrome, Edge, or Firefox recommended).",
+      "recUpdateBrowser": "Update your browser to the latest version.",
+      "recHardwareAcceleration": "Enable hardware acceleration in your browser settings.",
+      "recGraphicsDrivers": "Update your graphics drivers.",
+      "recManagedDevice": "On a managed device? Contact your System Administrator."
     }
   },
   "hoverManager": {
     "launched": "Launched",
     "launchedPlanned": "Launched: Planned",
-    "launchedUnknown": "Launched: Unknown"
+    "launchedUnknown": "Launched: Unknown",
+    "orbitPeriodDays": "Orbit Period: {days} Earth Days",
+    "orbitPeriodYears": "Orbit Period: {years} Earth Years",
+    "distanceFromParent": "Distance from {parent}: {km} km",
+    "distanceFromSun": "Distance from Sun: {au} AU ({mkm} million km)",
+    "unknownLaunchSite": "Unknown Launch Site",
+    "unknownSite": "Unknown Site",
+    "unknownCountry": "Unknown Country",
+    "external": "External",
+    "position": "Position:",
+    "velocity": "Velocity:"
   },
   "darkClouds": {
     "in": "In",
@@ -148,22 +262,117 @@
     "groupLayerToggles": "Layer Toggles",
     "groupSettingsToggles": "Settings Toggles",
     "groupDevTools": "Development Tools",
-    "groupAbout": "About"
+    "groupAbout": "About",
+    "modeAll": "All Plugins",
+    "openPluginMenu": "Open plugin menu",
+    "openAppLauncher": "Open app launcher",
+    "appLauncherTooltip": "App Launcher (Shift+Z)",
+    "appLauncher": "App Launcher",
+    "search": "Search",
+    "searchEllipsis": "Search…",
+    "toggleRailMode": "Toggle rail mode",
+    "collapse": "Collapse",
+    "expand": "Expand",
+    "phoneLink": "Phone Link",
+    "phoneLinkSignIn": "Sign in to link your phone",
+    "connected": "Connected",
+    "offline": "Offline"
   },
   "rightClickMenu": {
     "pauseClock": "Pause Clock",
     "resetCamera": "Reset Camera",
     "clearLines": "Clear Lines",
-    "clearScreen": "Clear Screen"
+    "clearScreen": "Clear Screen",
+    "startClock": "Start Clock"
   },
   "urlManager": {
     "satNotFound": "Satellite \"{val}\" was not found!",
     "intldesNotFound": "International Designator \"{val}\" was not found!",
-    "deepSpaceNoEphemeris": "{name} is a deep-space object. Its ephemeris is not available in KeepTrack yet."
+    "deepSpaceNoEphemeris": "{name} is a deep-space object. Its ephemeris is not available in KeepTrack yet.",
+    "searchFoundNothing": "Search for \"{val}\" found nothing!",
+    "missileLaunched": "Missile launched!",
+    "dateNotIso": "Date value of \"{val}\" is not a proper ISO 8601 date string!",
+    "dateNotUnix": "Date value of \"{val}\" is not a proper unix timestamp!",
+    "rateNotFloat": "Propagation rate of \"{val}\" is not a valid float!",
+    "zoomNotFloat": "Zoom value of \"{val}\" is not a valid float!",
+    "zoomOutOfBounds": "Zoom value of \"{val}\" is out of bounds!",
+    "pitchYawNotFloat": "Pitch or Yaw value is not a valid float!",
+    "pitchOutOfBounds": "Pitch value is out of bounds!",
+    "yawOutOfBounds": "Yaw value is out of bounds!",
+    "latLonNotFloat": "Latitude or Longitude value is not a valid float!",
+    "latLonOutOfBounds": "Latitude or Longitude value is out of bounds!",
+    "unknownSunParam": "Unknown sun parameter: {val}",
+    "unknownRegime": "Unknown regime filter: {val}",
+    "invalidSearchLimit": "Invalid search limit: {val}"
   },
   "searchManager": {
     "resultCountOne": "1 result",
     "resultCount": "{count} results",
-    "resultCountLimited": "Showing {shown} of {total} results"
+    "resultCountLimited": "Showing {shown} of {total} results",
+    "noResults": "No Results Found",
+    "decayed": "Decayed",
+    "typeStar": "Star",
+    "typeSensor": "Sensor",
+    "typeLaunchSite": "Launch Site",
+    "typePlanet": "Planet"
+  },
+  "sensorMath": {
+    "withinOneBeam": "Within One Beam",
+    "range": "Range: {km} km",
+    "relativeVelocity": "Relative velocity: {kms} km/s",
+    "noPassesInDays": "No Passes in {days} Days",
+    "customLocation": "Custom location",
+    "customSensorDefaultName": "Custom Sensor"
+  },
+  "toasts": {
+    "orbitTailsOnly": "Orbit Tails Only",
+    "orbitsOff": "Orbits Off",
+    "orbitsOn": "Orbits On",
+    "orbitsInEcf": "Orbits displayed in ECF",
+    "orbitsInEci": "Orbits displayed in ECI",
+    "cameraEarthCentered": "Earth Centered Camera Mode",
+    "cameraFixedLvlh": "Fixed to Satellite (LVLH) Camera Mode",
+    "cameraFixedEci": "Fixed to Satellite (ECI) Camera Mode",
+    "cameraFree": "Free Camera Mode",
+    "cameraPlanetarium": "Planetarium Camera Mode",
+    "cameraSatFirstPerson": "Satellite First Person Camera Mode",
+    "cameraAstronomy": "Astronomy Camera Mode",
+    "cameraFlatMap": "Flat Map Camera Mode",
+    "propagationSpeed": "Propagation Speed: {rate}x",
+    "timeSetToRealTime": "Time Set to Real Time",
+    "noValidFov": "No valid FOV to draw! We can't draw multiple Deep Space sensors at once.",
+    "colorSchemeChanged": "Color Scheme Changed to {scheme}",
+    "mobileFullVersionUnavailable": "Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.",
+    "objectInsideEarth": "Object is inside the earth!",
+    "propagationRate": "Propagation Rate: {rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "Toggle Layers",
+    "layers": "Layers"
+  },
+  "modalConfirm": {
+    "confirmAction": "Confirm Action",
+    "defaultTitle": "Are you sure?",
+    "defaultMessage": "Do you really want to proceed with this action?",
+    "yes": "Yes",
+    "no": "No",
+    "cancel": "Cancel",
+    "logoutTitle": "Confirm Logout",
+    "logoutMessage": "Are you sure you want to logout? You will need to sign in again to access your account.",
+    "logout": "Logout",
+    "deleteTitle": "Confirm Delete",
+    "deleteNamedMessage": "Are you sure you want to delete \"{name}\"? This action cannot be undone.",
+    "deleteMessage": "Are you sure you want to delete this item? This action cannot be undone.",
+    "delete": "Delete",
+    "clearTitle": "Confirm Clear",
+    "clearTypedMessage": "Are you sure you want to clear all {dataType}? This action cannot be undone.",
+    "clearMessage": "Are you sure you want to clear all data? This action cannot be undone.",
+    "clear": "Clear",
+    "input": "Input",
+    "ok": "OK",
+    "removeItem": "Remove {label}"
+  },
+  "colorbox": {
+    "openInNewTab": "Open in new tab"
   }
 }

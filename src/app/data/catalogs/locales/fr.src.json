@@ -283,5 +283,59 @@
     "ZA": "Afrique du Sud",
     "ZR": "Zaïre",
     "ZW": "Zimbabwe"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Capteurs du Space Surveillance Network",
+      "topLink": "Tous les capteurs du Space Surveillance Network"
+    },
+    "mw": {
+      "header": "Capteurs d'alerte antimissile américains",
+      "topLink": "Tous les capteurs d'alerte antimissile"
+    },
+    "md": {
+      "header": "Capteurs de la Missile Defense Agency américaine",
+      "topLink": "Tous les capteurs de défense antimissile"
+    },
+    "OWL-Net": {
+      "header": "Capteurs OWL-Net",
+      "topLink": "Tous les capteurs OWL-Net"
+    },
+    "leolabs": {
+      "header": "Capteurs LeoLabs",
+      "topLink": "Tous les capteurs LeoLabs"
+    },
+    "esoc": {
+      "header": "Capteurs du Centre européen d'opérations spatiales",
+      "topLink": "Tous les capteurs de l'ESOC"
+    },
+    "rus": {
+      "header": "Capteurs russes",
+      "topLink": "Tous les capteurs russes"
+    },
+    "prc": {
+      "header": "Capteurs chinois",
+      "topLink": "Tous les capteurs chinois"
+    },
+    "other": {
+      "header": "Autres capteurs",
+      "topLink": "Autres capteurs"
+    },
+    "dsn": {
+      "header": "Réseau d'espace lointain de la NASA",
+      "topLink": "Tous les complexes du réseau d'espace lointain"
+    },
+    "scn": {
+      "header": "Réseau de contrôle des satellites (AFSCN)",
+      "topLink": "Toutes les stations de poursuite distantes"
+    },
+    "estrack": {
+      "header": "Réseau de poursuite de l'ESA (ESTRACK)",
+      "topLink": "Toutes les stations ESTRACK"
+    },
+    "galileo": {
+      "header": "Segment sol de Galileo",
+      "topLink": "Toutes les stations sol de Galileo"
+    }
   }
 }

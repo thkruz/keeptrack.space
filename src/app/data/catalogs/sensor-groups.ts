@@ -1,6 +1,7 @@
 import { apiFetch } from '@app/app/data/api-fetch';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
+import i18next from 'i18next';
 import { GROUND_STATION_GROUP_LIST } from './sensors/ground-stations';
 
 export interface SensorGroup {
@@ -182,3 +183,22 @@ export const sensorGroups: SensorGroup[] = [
    * },
    */
 ];
+
+/**
+ * Localized heading for a sensor group, for display only. `group.header` stays the
+ * English value (it is also used as an id, e.g. for sensor-marker lines), so callers
+ * must keep passing `group.header` anywhere it identifies the group.
+ * Falls back to the group's own text for groups without a locale entry (API-only groups).
+ */
+export const getSensorGroupHeader = (group: Pick<SensorGroup, 'name' | 'header'>): string => {
+  const key = `sensorGroups.${group.name}.header`;
+
+  return i18next.exists(key) ? t7e(key as Parameters<typeof t7e>[0]) : group.header;
+};
+
+/** Localized "All ... Sensors" link text for a sensor group, for display only. */
+export const getSensorGroupTopLinkName = (group: Pick<SensorGroup, 'name' | 'topLink'>): string => {
+  const key = `sensorGroups.${group.name}.topLink`;
+
+  return i18next.exists(key) ? t7e(key as Parameters<typeof t7e>[0]) : group.topLink.name;
+};

@@ -54,6 +54,12 @@ export class OemSlotAllocator {
   static free(oemSat: OemSatellite): void {
     const catalogManager = ServiceLocator.getCatalogManager();
     const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+    const occupant = catalogManager.objectCache[oemSat.id];
+
+    // A delayed unload must not free a different spacecraft that reused this slot.
+    if (occupant instanceof OemSatellite && occupant !== oemSat) {
+      return;
+    }
 
     // Deselect BEFORE swapping the cache entry to prevent the mesh manager from
     // accessing a null/replaced object.

@@ -7,7 +7,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, RADIUS_OF_EARTH, Satellite } from '@ootk/src/main';
 import * as echarts from 'echarts';
@@ -21,6 +21,7 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
   dependencies_: string[] = [SatInfoBox.name];
 
   private isManeuverSectionCollapsed_ = false;
+  private selectionRevision_ = 0;
 
   private readonly historicalDataAPIEndpoint = 'http://192.34.81.138:8501/orbitguard/historical_data';
   private readonly bearerToken = 'Bearer guruspace5172x2';
@@ -49,7 +50,11 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
   addJs(): void {
     super.addJs();
 
-    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateManeuverData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
+      if (SatInfoBox.isCurrentSelection(obj)) {
+        this.updateManeuverData_(obj);
+      }
+    });
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
   }
 
@@ -506,6 +511,12 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
   }
 
   private updateManeuverData_(obj?: BaseObject) {
+    const revision = ++this.selectionRevision_;
+    const data = getEl(EL.DATA, true);
+
+    if (data) {
+      data.replaceChildren();
+    }
     if (!(obj instanceof Satellite)) {
       hideEl(`${SECTIONS.MANEUVER}`);
 
@@ -513,8 +524,6 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
     }
 
     const sccNum = obj.sccNum;
-
-    setInnerHtml(EL.DATA, '');
 
     // If data is cached, use it and exit early
     if (this.maneuverDataCache_.has(sccNum)) {
@@ -529,10 +538,14 @@ export class SatInfoBoxOrbitGuard extends KeepTrackPlugin {
     this.fetchHistoricalPlotData_(sccNum)
       .then((plotData) => {
         this.maneuverDataCache_.set(sccNum, plotData);
-        this.processHistoricalData_(plotData);
+        if (revision === this.selectionRevision_) {
+          this.processHistoricalData_(plotData);
+        }
       })
       .catch(() => {
-        hideEl(`${SECTIONS.MANEUVER}`);
+        if (revision === this.selectionRevision_) {
+          hideEl(`${SECTIONS.MANEUVER}`);
+        }
       });
   }
 

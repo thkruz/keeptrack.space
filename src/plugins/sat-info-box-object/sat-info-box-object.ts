@@ -14,7 +14,7 @@ import type { ISettingsContribution, ISettingsMultiContributor } from '@app/engi
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, requestIdleWrite, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
@@ -92,9 +92,17 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateObjectData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
+      if (SatInfoBox.isCurrentSelection(obj)) {
+        this.updateObjectData_(obj);
+      }
+    });
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, this.updateSecondaryVisibility_.bind(this));
-    EventBus.getInstance().on(EventBusEvent.updateSelectBox, this.refreshApparentMag_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.updateSelectBox, (obj: BaseObject) => {
+      if (SatInfoBox.isCurrentSelection(obj)) {
+        this.refreshApparentMag_(obj);
+      }
+    });
   }
 
   /**
@@ -311,7 +319,8 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
       }
     }
 
-    requestIdleWrite(this.updateRcsData_.bind(this, sat));
+    // RCS belongs to this selection snapshot; an idle callback may outlive it.
+    this.updateRcsData_(sat);
   }
 
   private updateStdMag_(sat: Satellite) {

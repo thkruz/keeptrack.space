@@ -2,6 +2,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import * as stdMagEstimator from '@app/app/analysis/std-mag-estimator';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath } from '@app/app/sensors/sensor-math';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -29,6 +30,10 @@ const setupSensorAndSat_ = () => {
 };
 
 const frame_ = () => {
+  const selection = PluginRegistry.getPlugin(SelectSatManager)!;
+
+  selection.selectedSat = defaultSat.id;
+  selection.primarySatObj = defaultSat;
   EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
 };
 

@@ -2,6 +2,7 @@ import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxOrbitGuard } from '@app/plugins/sat-info-box-orbit-guard/sat-info-box-orbit-guard';
 import { EL, SECTIONS } from '@app/plugins/sat-info-box-orbit-guard/sat-info-box-orbit-guard-html';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Satellite } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
@@ -57,6 +58,62 @@ describe('SatInfoBoxOrbitGuard behavior', () => {
 
     await vi.waitFor(() => expect(processSpy).toHaveBeenCalled());
     expect(p().maneuverDataCache_.get(defaultSat.sccNum)).toBe(data);
+  });
+
+  it('ignores historical success after deselection while still allowing cache population', async () => {
+    let resolve: (data: unknown) => void = () => undefined;
+    const data = [{ name: 'Elset', value: [1] }];
+
+    vi.spyOn(p(), 'fetchHistoricalPlotData_').mockReturnValue(
+      new Promise((done) => {
+        resolve = done;
+      })
+    );
+    const process = vi.spyOn(p(), 'processHistoricalData_');
+
+    p().updateManeuverData_(defaultSat);
+    p().updateManeuverData_(undefined);
+    resolve(data);
+    await Promise.resolve();
+    expect(process).not.toHaveBeenCalled();
+    expect(p().maneuverDataCache_.get(defaultSat.sccNum)).toBe(data);
+    expect(document.getElementById(SECTIONS.MANEUVER)!.style.display).toBe('none');
+  });
+
+  it('ignores stale success and error after selecting a newer identity', async () => {
+    let resolveOld: (data: unknown) => void = () => undefined;
+    let rejectOld: (error: Error) => void = () => undefined;
+    const old = new Satellite({ ...defaultSat, id: 1, sccNum: '25545' });
+    const latestData = [{ name: 'Elset current', value: [2] }];
+    const oldData = [{ name: 'Elset old', value: [1] }];
+    const fetch = vi.spyOn(p(), 'fetchHistoricalPlotData_');
+
+    fetch.mockReturnValueOnce(
+      new Promise((done) => {
+        resolveOld = done;
+      })
+    );
+    p().updateManeuverData_(old);
+    p().maneuverDataCache_.set(defaultSat.sccNum, latestData);
+    p().updateManeuverData_(defaultSat);
+    const process = vi.spyOn(p(), 'processHistoricalData_');
+
+    resolveOld(oldData);
+    await Promise.resolve();
+    expect(process).not.toHaveBeenCalled();
+    expect(document.getElementById(SECTIONS.MANEUVER)!.style.display).not.toBe('none');
+    p().maneuverDataCache_.delete(old.sccNum);
+    fetch.mockReturnValueOnce(
+      new Promise((_done, reject) => {
+        rejectOld = reject;
+      })
+    );
+    p().updateManeuverData_(old);
+    p().updateManeuverData_(defaultSat);
+    rejectOld(new Error('late request failure'));
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(document.getElementById(SECTIONS.MANEUVER)!.style.display).not.toBe('none');
   });
 
   it('processHistoricalData_ hides the section when there is no data', () => {

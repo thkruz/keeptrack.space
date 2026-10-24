@@ -89,8 +89,16 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
-    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateSensorInfo_.bind(this));
-    EventBus.getInstance().on(EventBusEvent.updateSelectBox, this.updateSelectBox_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
+      if (SatInfoBox.isCurrentSelection(obj)) {
+        this.updateSensorInfo_(obj);
+      }
+    });
+    EventBus.getInstance().on(EventBusEvent.updateSelectBox, (obj: BaseObject) => {
+      if (SatInfoBox.isCurrentSelection(obj)) {
+        this.updateSelectBox_(obj);
+      }
+    });
     EventBus.getInstance().on(EventBusEvent.setSensor, this.updateSensorVisibility_.bind(this));
     EventBus.getInstance().on(EventBusEvent.resetSensor, this.updateSensorVisibility_.bind(this));
   }

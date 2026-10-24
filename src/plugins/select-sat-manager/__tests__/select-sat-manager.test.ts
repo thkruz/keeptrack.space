@@ -116,6 +116,16 @@ describe('SelectSatManager_class', () => {
     expect(selectSatManager.selectedSat).toBe(-1);
   });
 
+  it('clears primary identity when the requested object is inactive', () => {
+    selectSatManager.selectSat(0);
+    const inactive = ServiceLocator.getCatalogManager().objectCache[1];
+
+    inactive.active = false;
+    selectSatManager.selectSat(1);
+    expect(selectSatManager.selectedSat).toBe(-1);
+    expect(selectSatManager.primarySatObj.id).toBe(-1);
+  });
+
   it('should switch primary and secondary satellites', () => {
     selectSatManager.selectSat(0);
     selectSatManager.setSecondarySat(1);
@@ -308,6 +318,7 @@ describe('SelectSatManager_class', () => {
     selectSatManager.setSecondarySat(1);
 
     expect(selectSatManager.selectedSat).toBe(-1);
+    expect(selectSatManager.primarySatObj.id).toBe(-1);
   });
 
   it('should clear the secondary orbit when the secondary is cleared', () => {

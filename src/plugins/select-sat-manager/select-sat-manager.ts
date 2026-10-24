@@ -274,7 +274,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       }
     }
 
-    const spaceObj = obj as Satellite | MissileObject;
+    const spaceObj = obj?.active ? (obj as Satellite | MissileObject) : undefined;
 
     // Set the primary sat
     this.primarySatObj = spaceObj ?? this.noSatObj_;
@@ -312,7 +312,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       EventBus.getInstance().emit(EventBusEvent.sensorDotSelected, sensor);
     }
 
-    this.setSelectedSat_(-1);
+    this.selectSatReset_();
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, undefined, undefined);
     getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
@@ -426,6 +427,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     }
 
     this.setSelectedSat_(-1);
+    this.primarySatObj = this.noSatObj_;
+    this.primarySatCovMatrix = null;
   }
 
   private selectSatObject_(sat: Satellite | MissileObject) {
@@ -719,9 +722,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       ServiceLocator.getOrbitManager().clearSelectOrbit(true);
     }
 
-    if (this.secondarySat === this.selectedSat) {
-      this.selectedSat = -1;
-      this.setSelectedSat_(-1);
+    if (this.secondarySat === this.selectedSat && this.selectedSat !== -1) {
+      this.selectSat(-1);
       ServiceLocator.getOrbitManager().clearSelectOrbit(false);
     }
 

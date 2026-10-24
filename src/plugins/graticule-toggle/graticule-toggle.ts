@@ -2,6 +2,7 @@ import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IKeyboardShortcut, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import backgroundGridImage from '@public/img/icons/background-grid-small.png';
 
 export class GraticuleToggle extends KeepTrackPlugin {
@@ -35,7 +36,7 @@ export class GraticuleToggle extends KeepTrackPlugin {
     return [
       {
         id: 'GraticuleToggle.toggle',
-        label: 'Toggle Graticule (Grid Lines)',
+        label: t7e('plugins.GraticuleToggle.commandPalette.toggle'),
         category: 'Display',
         shortcutHint: 'G',
         callback: () => this.bottomMenuClicked(),

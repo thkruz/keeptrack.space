@@ -48,7 +48,9 @@
         "year": "Rok",
         "goTo": "Přejít na (UTC)",
         "goToTooltip": "Zadejte datum a čas UTC (YYYY-MM-DD HH:MM:SS) a stiskněte Enter. Sekundy a čas jsou volitelné.",
-        "goToInvalid": "Neplatné datum. Použijte formát UTC YYYY-MM-DD HH:MM:SS."
+        "goToInvalid": "Neplatné datum. Použijte formát UTC YYYY-MM-DD HH:MM:SS.",
+        "containerNotFound": "Kontejner s ID {id} nebyl nalezen",
+        "timeInvalid": "Neplatný formát času! Očekává se HH:MM:SS, HH:MM:SS.s nebo HHMMSS"
       }
     }
   }

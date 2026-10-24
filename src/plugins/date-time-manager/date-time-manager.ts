@@ -165,7 +165,7 @@ export class DateTimeManager extends KeepTrackPlugin {
         <div id="nav-top-center">
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">
-            <div id="datetime-text" class="waves-effect waves-light">Placeholder Text</div>
+            <div id="datetime-text" class="waves-effect waves-light"></div>
             <div id="datetime-input">
               <form id="datetime-input-form">
                 <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />

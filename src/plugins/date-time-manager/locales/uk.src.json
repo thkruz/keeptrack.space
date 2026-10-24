@@ -48,7 +48,9 @@
         "year": "Рік",
         "goTo": "Перейти (UTC)",
         "goToTooltip": "Введіть дату й час UTC (YYYY-MM-DD HH:MM:SS) та натисніть Enter. Секунди й час необов'язкові.",
-        "goToInvalid": "Неправильна дата. Використовуйте формат UTC YYYY-MM-DD HH:MM:SS."
+        "goToInvalid": "Неправильна дата. Використовуйте формат UTC YYYY-MM-DD HH:MM:SS.",
+        "containerNotFound": "Контейнер з ID {id} не знайдено",
+        "timeInvalid": "Неправильний формат часу! Очікується HH:MM:SS, HH:MM:SS.s або HHMMSS"
       }
     }
   }

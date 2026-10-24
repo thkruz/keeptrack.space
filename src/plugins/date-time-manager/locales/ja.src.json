@@ -48,7 +48,9 @@
         "year": "年",
         "goTo": "移動 (UTC)",
         "goToTooltip": "UTC の日付と時刻 (YYYY-MM-DD HH:MM:SS) を入力して Enter を押します。秒と時刻は省略できます。",
-        "goToInvalid": "無効な日付です。UTC 形式 YYYY-MM-DD HH:MM:SS を使用してください。"
+        "goToInvalid": "無効な日付です。UTC 形式 YYYY-MM-DD HH:MM:SS を使用してください。",
+        "containerNotFound": "ID {id} のコンテナが見つかりません",
+        "timeInvalid": "時刻の形式が無効です。HH:MM:SS、HH:MM:SS.s、または HHMMSS で入力してください"
       }
     }
   }

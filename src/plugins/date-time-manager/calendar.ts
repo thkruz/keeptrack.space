@@ -41,7 +41,7 @@ export class Calendar {
     const container = document.getElementById(this.containerId);
 
     if (!container) {
-      errorManagerInstance.warn(`Container with ID ${this.containerId} not found`);
+      errorManagerInstance.warn(dt('calendar.containerNotFound').replace('{id}', this.containerId));
 
       return;
     }
@@ -739,7 +739,7 @@ export class Calendar {
     const match = /^(?<h>\d{2}):?(?<m>\d{2}):?(?<s>\d{2})(?:\.(?<f>\d{1,3}))?$/u.exec(timeInput.value.trim());
 
     if (!match?.groups) {
-      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS, HH:MM:SS.s or HHMMSS');
+      errorManagerInstance.warn(dt('calendar.timeInvalid'));
 
       return;
     }

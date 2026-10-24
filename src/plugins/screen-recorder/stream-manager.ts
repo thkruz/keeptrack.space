@@ -1,12 +1,13 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 
 export interface MediaRecorderOptions {
   audio: boolean;
-  video: {
-    cursor: string;
-  };
+  video: { cursor: string };
 }
+
+export type RecordingState = 'idle' | 'requesting' | 'recording' | 'stopping';
 
 export class StreamManager {
   static readonly RECORDING_START_DELAY_MS = 500;
@@ -17,176 +18,224 @@ export class StreamManager {
   static readonly BIT_RATE_2_MBPS = 2000000;
   static readonly BIT_RATE_1_MBPS = 1000000;
 
-  private mediaRecorder_ = null as MediaRecorder | null;
-  private recordedBlobs = [] as Blob[];
-  private supportedType: string | undefined;
-  private readonly videoBitsPerSec_ = null as number | null;
+  private mediaRecorder_: MediaRecorder | null = null;
+  private recordedBlobs_: Blob[] = [];
+  private supportedType_: string | undefined;
   private startDelayTimer_: ReturnType<typeof setTimeout> | null = null;
+  private stream_: MediaStream | null = null;
+  private state_: RecordingState = 'idle';
+  private requestId_ = 0;
+  private canSave_ = false;
+  private trackEnded_: (() => void) | null = null;
 
-  public isVideoRecording = false;
-  private stream_: MediaStream;
-  private readonly onError_: () => void;
-  private readonly onMinorError_: () => void;
-  private readonly onStop_: () => void;
+  constructor(
+    private readonly videoBitsPerSec_: number,
+    private readonly onStop_: () => void,
+    private readonly onMinorError_: () => void,
+    private readonly onError_: () => void,
+    private readonly onStateChange_: (state: RecordingState) => void = () => undefined
+  ) {}
 
-  constructor(videoBitsPerSec: number, onStop: () => void, onMinorError: () => void, onError: () => void) {
-    this.videoBitsPerSec_ = videoBitsPerSec;
-    this.onStop_ = onStop;
-    this.onMinorError_ = onMinorError;
-    this.onError_ = onError;
+  get state(): RecordingState {
+    return this.state_;
+  }
+
+  get isVideoRecording(): boolean {
+    return this.state_ === 'recording';
   }
 
   static handleError(error: Error): void {
-    if (error.message.includes('Permission denied')) {
-      errorManagerInstance.warn('Permission denied! Did you click "Share"?');
-    } else {
-      errorManagerInstance.warn(`Error:${error}`);
-    }
+    errorManagerInstance.warn(`Error: ${error.message}`);
   }
 
-  getStream(displayMediaOptions?: MediaRecorderOptions) {
-    displayMediaOptions ??= {
-      video: {
-        cursor: 'never',
-      },
-      audio: false,
-    };
-
-    if (window.isSecureContext || settingsManager.offlineMode) {
-      const enhancedNavigator = navigator as Navigator & { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream> } & {
-        mediaDevices: { getDisplayMedia: (options: MediaRecorderOptions) => Promise<MediaStream> };
-      };
-
-      if ('getDisplayMedia' in navigator) {
-        return enhancedNavigator.getDisplayMedia(displayMediaOptions).catch((err: Error) => {
-          StreamManager.handleError(err);
-
-          return null;
-        });
-      } else if ('getDisplayMedia' in navigator.mediaDevices) {
-        return enhancedNavigator.mediaDevices.getDisplayMedia(displayMediaOptions).catch((err) => {
-          StreamManager.handleError(err);
-
-          return null;
-        });
-      }
-      errorManagerInstance.warn('Compatibility Error with Recording');
+  getStream(displayMediaOptions: MediaRecorderOptions = { video: { cursor: 'never' }, audio: false }): Promise<MediaStream> | false {
+    if (!window.isSecureContext && !settingsManager.offlineMode) {
       this.onError_();
 
       return false;
     }
-    errorManagerInstance.warn('Recording requires a secure context (HTTPS or localhost)');
+    const legacyNavigator = navigator as Navigator & { getDisplayMedia?: (options: MediaRecorderOptions) => Promise<MediaStream> };
+
+    if (legacyNavigator.getDisplayMedia) {
+      return legacyNavigator.getDisplayMedia(displayMediaOptions);
+    }
+    if (navigator.mediaDevices?.getDisplayMedia) {
+      return navigator.mediaDevices.getDisplayMedia(displayMediaOptions as DisplayMediaStreamOptions);
+    }
     this.onError_();
 
     return false;
   }
 
-  handleDataAvailable(event: BlobEvent): void {
-    if (event.data && event.data.size > 0) {
-      this.recordedBlobs.push(event.data);
+  start(): void {
+    if (this.state_ !== 'idle') {
+      return;
+    }
+    const requestId = ++this.requestId_;
+
+    this.canSave_ = false;
+    this.recordedBlobs_ = [];
+    this.supportedType_ = undefined;
+    this.setState_('requesting');
+    try {
+      const streamPromise = this.getStream();
+
+      if (!streamPromise) {
+        this.setState_('idle');
+
+        return;
+      }
+      streamPromise
+        .then((stream) => {
+          // Cancelled share pickers release eventual grants without touching newer recordings.
+          if (requestId !== this.requestId_ || this.state_ !== 'requesting') {
+            stream.getTracks().forEach((track) => {
+              track.stop();
+            });
+
+            return;
+          }
+          this.stream_ = stream;
+          this.trackEnded_ = () => this.stop();
+          stream.getTracks().forEach((track) => {
+            track.addEventListener('ended', this.trackEnded_!);
+          });
+          this.startDelayTimer_ = setTimeout(() => this.beginRecording_(requestId), StreamManager.RECORDING_START_DELAY_MS);
+        })
+        .catch((error: Error) => {
+          if (requestId === this.requestId_) {
+            this.fail_(error);
+          }
+        });
+    } catch (error) {
+      this.fail_(error as Error);
     }
   }
 
   stop(): void {
-    if (this.startDelayTimer_) {
-      clearTimeout(this.startDelayTimer_);
-      this.startDelayTimer_ = null;
-    }
-
-    if (!this.mediaRecorder_) {
-      this.isVideoRecording = false;
-      this.onStop_();
-
-      return; // No recorder to stop
-    }
-    if (this.isVideoRecording === false) {
+    if (this.state_ === 'idle' || this.state_ === 'stopping') {
       return;
-    } // Already stopped
+    }
+    if (this.state_ === 'requesting') {
+      ++this.requestId_;
+      this.releaseTracks_();
+      this.setState_('idle');
+      this.onMinorError_();
 
-    errorManagerInstance.debug('Recorder stopped.');
-
-    // Stop all streaming
-    this.stream_.getTracks().forEach((track) => {
-      track.stop();
-    });
-
-    this.mediaRecorder_.stop();
-    this.isVideoRecording = false;
-
-    this.onStop_();
+      return;
+    }
+    this.setState_('stopping');
+    try {
+      // The final dataavailable event precedes stop. Keep tracks alive until then.
+      this.mediaRecorder_!.stop();
+    } catch (error) {
+      this.fail_(error as Error);
+    }
   }
 
   save(fileName: string): void {
-    if (!this.mediaRecorder_) {
-      return; // No recorder to save
+    if (!this.canSave_ || this.state_ !== 'idle') {
+      return;
     }
-
-    const name = fileName;
-    const blob = new Blob(this.recordedBlobs, { type: this.supportedType });
+    this.canSave_ = false;
+    const blob = new Blob(this.recordedBlobs_, { type: this.supportedType_ });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const anchor = document.createElement('a');
 
-    a.style.display = 'none';
-    a.href = url;
-    a.download = name;
-    KeepTrack.getInstance().containerRoot.appendChild(a);
-    a.click();
+    anchor.style.display = 'none';
+    anchor.href = url;
+    anchor.download = fileName;
+    KeepTrack.getInstance().containerRoot.appendChild(anchor);
+    anchor.click();
     setTimeout(() => {
-      KeepTrack.getInstance().containerRoot.removeChild(a);
+      anchor.remove();
       window.URL.revokeObjectURL(url);
     }, 100);
   }
 
-  start(): void {
-    const streamPromise = this.getStream();
-
-    if (streamPromise === false) {
+  private beginRecording_(requestId: number): void {
+    this.startDelayTimer_ = null;
+    if (requestId !== this.requestId_ || !this.stream_) {
       return;
     }
+    try {
+      const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
 
-    streamPromise
-      .then((steam) => {
-        if (!steam) {
+      this.supportedType_ = types.find((type) => window.MediaRecorder.isTypeSupported(type));
+      const recorder = new window.MediaRecorder(this.stream_, {
+        ...(this.supportedType_ ? { mimeType: this.supportedType_ } : {}),
+        videoBitsPerSecond: this.videoBitsPerSec_ || StreamManager.BIT_RATE_30_MBPS,
+      });
+
+      this.mediaRecorder_ = recorder;
+      recorder.ondataavailable = (event) => {
+        if (requestId === this.requestId_ && event.data?.size > 0) {
+          this.recordedBlobs_.push(event.data);
+        }
+      };
+      recorder.onstop = () => {
+        if (requestId !== this.requestId_ || this.state_ === 'idle') {
           return;
         }
-        this.isVideoRecording = true;
-        this.stream_ = steam;
-        const types = ['video/webm', 'video/webm,codecs=vp9', 'video/vp8', 'video/webm;codecs=vp8', 'video/webm;codecs=daala', 'video/webm;codecs=h264', 'video/mpeg'];
-
-        for (const i in types) {
-          if (window.MediaRecorder.isTypeSupported(types[i])) {
-            this.supportedType = types[i];
-            break;
-          }
+        ++this.requestId_;
+        this.canSave_ = this.recordedBlobs_.length > 0;
+        this.releaseTracks_();
+        this.mediaRecorder_ = null;
+        this.setState_('idle');
+        if (this.canSave_) {
+          this.onStop_();
+        } else {
+          this.onMinorError_();
         }
-        if (this.supportedType === null) {
-          errorManagerInstance.debug('No supported type found for MediaRecorder');
+      };
+      recorder.onerror = () => {
+        if (requestId === this.requestId_) {
+          this.fail_(new Error(t7e('ScreenRecorder.compatibilityError')));
         }
-        const options = {
-          mimeType: this.supportedType,
-          videoBitsPerSecond: this.videoBitsPerSec_ || StreamManager.BIT_RATE_30_MBPS,
-        };
+      };
+      recorder.start(100);
+      this.setState_('recording');
+    } catch (error) {
+      this.fail_(error as Error);
+    }
+  }
 
-        // Delay recording start so the browser's share-picker dialog has time to dismiss
-        this.startDelayTimer_ = setTimeout(() => {
-          this.startDelayTimer_ = null;
-          this.recordedBlobs = [];
-          try {
-            this.mediaRecorder_ = new window.MediaRecorder(this.stream_, options);
-          } catch {
-            this.onMinorError_();
-            this.isVideoRecording = false;
+  private fail_(error: Error): void {
+    ++this.requestId_;
+    const recorder = this.mediaRecorder_;
 
-            return;
-          }
+    this.mediaRecorder_ = null;
+    if (recorder && recorder.state !== 'inactive') {
+      try {
+        recorder.stop();
+      } catch {
+        // Release capture even when the browser recorder has already failed.
+      }
+    }
+    this.canSave_ = false;
+    this.releaseTracks_();
+    this.setState_('idle');
+    StreamManager.handleError(error);
+    this.onMinorError_();
+  }
 
-          this.mediaRecorder_.onstop = this.stop.bind(this);
-          this.mediaRecorder_.ondataavailable = this.handleDataAvailable.bind(this);
-          this.mediaRecorder_.start(100); // collect 100ms of data blobs
-        }, StreamManager.RECORDING_START_DELAY_MS);
-      })
-      .catch(() => {
-        // Do nothing, errors are handled in getStream
-      });
+  private releaseTracks_(): void {
+    if (this.startDelayTimer_) {
+      clearTimeout(this.startDelayTimer_);
+      this.startDelayTimer_ = null;
+    }
+    this.stream_?.getTracks().forEach((track) => {
+      if (this.trackEnded_) {
+        track.removeEventListener('ended', this.trackEnded_);
+      }
+      track.stop();
+    });
+    this.stream_ = null;
+    this.trackEnded_ = null;
+  }
+
+  private setState_(state: RecordingState): void {
+    this.state_ = state;
+    this.onStateChange_(state);
   }
 }

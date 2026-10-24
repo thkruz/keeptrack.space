@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "¡Grabación no disponible debido a problemas de compatibilidad!",
-    "compatibilityError": "¡Error de compatibilidad con la grabación!"
+    "compatibilityError": "¡Error de compatibilidad con la grabación!",
+    "requesting": "Solicitando compartir pantalla…",
+    "recording": "Grabando",
+    "stopping": "Finalizando grabación…"
   }
 }

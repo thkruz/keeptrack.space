@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "互換性の問題により録画が利用できません！",
-    "compatibilityError": "録画の互換性エラー！"
+    "compatibilityError": "録画の互換性エラー！",
+    "requesting": "画面共有をリクエスト中…",
+    "recording": "録画中",
+    "stopping": "録画を完了中…"
   }
 }

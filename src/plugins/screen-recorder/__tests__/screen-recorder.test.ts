@@ -23,7 +23,7 @@ describe('ScreenRecorder_class', () => {
   test('ScreenRecorder_stop_video', () => {
     websiteInit(screenRecorderPlugin);
 
-    screenRecorderPlugin['streamManagerInstance_'].isVideoRecording = true;
+    screenRecorderPlugin['streamManagerInstance_']['state_'] = 'recording';
     screenRecorderPlugin['streamManagerInstance_']['mediaRecorder_'] = {
       stop: () => {
         // Do nothing
@@ -59,7 +59,7 @@ describe('ScreenRecorder_class', () => {
 
     screenRecorderPlugin['onStop_']();
 
-    expect(screenRecorderPlugin['streamManagerInstance_'].save).toHaveBeenCalledWith(ScreenRecorder.FILE_NAME);
+    expect(screenRecorderPlugin['streamManagerInstance_'].save).toHaveBeenCalledWith(expect.stringMatching(/^keeptrack-.*\.webm$/u));
     expect(screenRecorderPlugin.setBottomIconToUnselected).toHaveBeenCalled();
   });
 
@@ -110,6 +110,27 @@ describe('ScreenRecorder_class', () => {
 
     expect(recorder).toBe(screenRecorderPlugin['streamManagerInstance_']);
   });
+
+  test('shows requesting, recording duration and stopping status, then clears it on idle', () => {
+    vi.useFakeTimers();
+    websiteInit(screenRecorderPlugin);
+    screenRecorderPlugin['onStateChange_']('requesting');
+    const status = document.getElementById('screen-recorder-status')!;
+
+    expect(status.hidden).toBe(false);
+    expect(status.getAttribute('role')).toBe('status');
+    screenRecorderPlugin['onStateChange_']('recording');
+    expect(status.textContent).toContain('00:00');
+    vi.advanceTimersByTime(61000);
+    expect(status.textContent).toContain('01:01');
+    screenRecorderPlugin['onStateChange_']('stopping');
+    expect(status.textContent).not.toContain('01:01');
+    screenRecorderPlugin['onStateChange_']('idle');
+    expect(status.hidden).toBe(true);
+    expect(status.textContent).toBe('');
+    expect(vi.getTimerCount()).toBe(0);
+    vi.useRealTimers();
+  });
 });
 
 /* eslint-disable dot-notation */
@@ -130,7 +151,7 @@ describe('ScreenRecorder_class', () => {
   test('ScreenRecorder_stop_video', () => {
     websiteInit(screenRecorderPlugin);
 
-    screenRecorderPlugin['streamManagerInstance_'].isVideoRecording = true;
+    screenRecorderPlugin['streamManagerInstance_']['state_'] = 'recording';
     screenRecorderPlugin['streamManagerInstance_']['mediaRecorder_'] = {
       stop: () => {
         // Do nothing

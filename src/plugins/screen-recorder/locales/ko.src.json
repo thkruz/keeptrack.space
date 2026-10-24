@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "호환성 문제로 인해 녹화를 사용할 수 없습니다!",
-    "compatibilityError": "녹화 호환성 오류!"
+    "compatibilityError": "녹화 호환성 오류!",
+    "requesting": "화면 공유 요청 중…",
+    "recording": "녹화 중",
+    "stopping": "녹화 마무리 중…"
   }
 }

@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Nahrávání nedostupné kvůli problémům s kompatibilitou!",
-    "compatibilityError": "Chyba kompatibility s nahráváním!"
+    "compatibilityError": "Chyba kompatibility s nahráváním!",
+    "requesting": "Žádost o sdílení obrazovky…",
+    "recording": "Nahrávání",
+    "stopping": "Dokončování záznamu…"
   }
 }

@@ -6,7 +6,8 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 import videocamPng from '@public/img/icons/videocam.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { StreamManager } from './stream-manager';
+import { RecordingState, StreamManager } from './stream-manager';
+import './screen-recorder.css';
 
 export class ScreenRecorder extends KeepTrackPlugin {
   readonly id = 'ScreenRecorder';
@@ -20,6 +21,9 @@ export class ScreenRecorder extends KeepTrackPlugin {
 
   private isCompatibilityIssue_ = false;
   private streamManagerInstance_: StreamManager;
+  private statusElement_: HTMLElement | null = null;
+  private durationTimer_: ReturnType<typeof setInterval> | null = null;
+  private startedAt_ = 0;
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
@@ -49,19 +53,18 @@ export class ScreenRecorder extends KeepTrackPlugin {
       return;
     }
 
-    if (this.streamManagerInstance_.isVideoRecording) {
+    if (!this.streamManagerInstance_) {
+      return;
+    }
+    if (this.streamManagerInstance_.state !== 'idle') {
       this.streamManagerInstance_.stop();
     } else {
       try {
-        this.setBottomIconToSelected();
         this.streamManagerInstance_.start();
-        this.streamManagerInstance_.isVideoRecording = true;
       } catch {
         errorManagerInstance.warn(t7e('ScreenRecorder.compatibilityError'));
-        this.streamManagerInstance_.isVideoRecording = false;
-        this.setBottomIconToDisabled();
+        this.setBottomIconToUnselected();
         this.shakeBottomIcon();
-        this.isCompatibilityIssue_ = true;
       }
     }
   }
@@ -78,7 +81,13 @@ export class ScreenRecorder extends KeepTrackPlugin {
       }
 
       try {
-        this.streamManagerInstance_ = new StreamManager(settingsManager.videoBitsPerSecond, this.onStop_.bind(this), this.onMinorError_.bind(this), this.onError_.bind(this));
+        this.streamManagerInstance_ = new StreamManager(
+          settingsManager.videoBitsPerSecond,
+          this.onStop_.bind(this),
+          this.onMinorError_.bind(this),
+          this.onError_.bind(this),
+          this.onStateChange_.bind(this)
+        );
       } catch (e) {
         errorManagerInstance.warn(`Compatibility Error with Recording: ${e}`);
         this.isCompatibilityIssue_ = true;
@@ -94,7 +103,6 @@ export class ScreenRecorder extends KeepTrackPlugin {
   private onError_(): void {
     this.setBottomIconToDisabled();
     this.isIconDisabled = true;
-    this.streamManagerInstance_.isVideoRecording = false;
     this.shakeBottomIcon();
     this.isCompatibilityIssue_ = true;
   }
@@ -104,7 +112,64 @@ export class ScreenRecorder extends KeepTrackPlugin {
   }
 
   private onStop_(): void {
-    this.streamManagerInstance_.save(ScreenRecorder.FILE_NAME);
+    const timestamp = new Date().toISOString().replace(/[:.]/gu, '-');
+
+    this.streamManagerInstance_.save(`keeptrack-${timestamp}.webm`);
     this.setBottomIconToUnselected();
+  }
+
+  private onStateChange_(state: RecordingState): void {
+    if (this.durationTimer_) {
+      clearInterval(this.durationTimer_);
+      this.durationTimer_ = null;
+    }
+    if (state === 'recording') {
+      this.setBottomIconToSelected();
+      this.startedAt_ = Date.now();
+      this.durationTimer_ = setInterval(() => this.updateStatus_(state), 1000);
+    } else {
+      this.setBottomIconToUnselected();
+    }
+    document.getElementById(this.bottomIconElementName)?.setAttribute('data-recording-state', state);
+    this.updateStatus_(state);
+  }
+
+  private updateStatus_(state: RecordingState): void {
+    if (!this.statusElement_?.isConnected) {
+      this.statusElement_ = document.getElementById('screen-recorder-status') ?? document.createElement('div');
+      this.statusElement_.id = 'screen-recorder-status';
+      this.statusElement_.setAttribute('role', 'status');
+      this.statusElement_.setAttribute('aria-live', 'polite');
+      document.getElementById('keeptrack-root')?.appendChild(this.statusElement_);
+    }
+    this.statusElement_.hidden = state === 'idle';
+    if (state === 'idle') {
+      this.statusElement_.textContent = '';
+      this.statusElement_.dataset.state = state;
+
+      return;
+    }
+    const elapsed = Math.floor((Date.now() - this.startedAt_) / 1000);
+    const duration = `${Math.floor(elapsed / 60)
+      .toString()
+      .padStart(2, '0')}:${(elapsed % 60).toString().padStart(2, '0')}`;
+    const label = t7e(`ScreenRecorder.${state}` as Parameters<typeof t7e>[0]);
+
+    if (this.statusElement_.dataset.state !== state) {
+      this.statusElement_.dataset.state = state;
+      this.statusElement_.textContent = label;
+      if (state === 'recording') {
+        const timer = document.createElement('span');
+
+        timer.setAttribute('role', 'timer');
+        timer.setAttribute('aria-live', 'off');
+        this.statusElement_.append(timer);
+      }
+    }
+    const timer = this.statusElement_.querySelector('[role="timer"]');
+
+    if (timer) {
+      timer.textContent = ` ${duration}`;
+    }
   }
 }

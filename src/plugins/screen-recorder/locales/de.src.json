@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Aufnahme aufgrund von Kompatibilitätsproblemen nicht verfügbar!",
-    "compatibilityError": "Kompatibilitätsfehler bei der Aufnahme!"
+    "compatibilityError": "Kompatibilitätsfehler bei der Aufnahme!",
+    "requesting": "Bildschirmfreigabe wird angefordert…",
+    "recording": "Aufnahme",
+    "stopping": "Aufnahme wird abgeschlossen…"
   }
 }

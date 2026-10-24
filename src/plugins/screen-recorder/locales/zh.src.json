@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "由于兼容性问题，录制不可用！",
-    "compatibilityError": "录制兼容性错误！"
+    "compatibilityError": "录制兼容性错误！",
+    "requesting": "正在请求屏幕共享…",
+    "recording": "正在录制",
+    "stopping": "正在完成录制…"
   }
 }

@@ -1,6 +1,9 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Запис недоступний через проблеми сумісності!",
-    "compatibilityError": "Помилка сумісності із записом!"
+    "compatibilityError": "Помилка сумісності із записом!",
+    "requesting": "Запит на показ екрана…",
+    "recording": "Запис",
+    "stopping": "Завершення запису…"
   }
 }

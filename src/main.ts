@@ -40,6 +40,11 @@ keepTrackInstance.init(window.settingsOverride);
 // Expose to window for debugging
 window.keepTrack = keepTrackInstance;
 
+// window.__ktQaState(): read-only state snapshot for automated playtesters (Pro builds only)
+if (__IS_PRO__) {
+  import(/* @vite-ignore */ '@plugins-pro/qa-state/qa-state').then((m) => m.installQaState());
+}
+
 // Initialize the website
 KeepTrack.initCss().then(() => {
   keepTrackInstance.run();

@@ -28,6 +28,13 @@
         "nightLights": "Lumières nocturnes",
         "inView": "Visible",
         "outOfView": "Hors de vue"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Impossible de charger l'image du logo principal.",
+        "secondaryLogoFailed": "Impossible de charger l'image du logo secondaire.",
+        "earthDrawAfterLoadFailed": "Impossible de dessiner l'image de la Terre sur le canevas après chargement : {error}",
+        "earthLoadFailed": "L'image de la Terre n'a pas pu être chargée pour la carte stéréographique.",
+        "earthDrawFailed": "Impossible de dessiner l'image de la Terre sur le canevas : {error}"
       }
     }
   }

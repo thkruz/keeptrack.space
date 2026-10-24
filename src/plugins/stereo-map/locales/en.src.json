@@ -28,6 +28,13 @@
         "nightLights": "Night Lights",
         "inView": "In view",
         "outOfView": "Out of view"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Failed to load primary logo image.",
+        "secondaryLogoFailed": "Failed to load secondary logo image.",
+        "earthDrawAfterLoadFailed": "Failed to draw earth image on canvas after load: {error}",
+        "earthLoadFailed": "Earth image failed to load for stereo map.",
+        "earthDrawFailed": "Failed to draw earth image on canvas: {error}"
       }
     }
   }

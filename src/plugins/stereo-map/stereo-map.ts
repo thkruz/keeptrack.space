@@ -81,10 +81,10 @@ export class StereoMap extends KeepTrackPlugin {
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
 
     this.logo_.src = `${settingsManager.installDirectory}img/logo-primary.png`;
-    this.logo_.onerror = () => errorManagerInstance.warn('Failed to load primary logo image.');
+    this.logo_.onerror = () => errorManagerInstance.warn(t7e('plugins.StereoMap.errorMsgs.primaryLogoFailed' as Parameters<typeof t7e>[0]));
     if (settingsManager.isShowSecondaryLogo) {
       this.secondaryLogo_.src = `${settingsManager.installDirectory}img/logo-secondary.png`;
-      this.secondaryLogo_.onerror = () => errorManagerInstance.warn('Failed to load secondary logo image.');
+      this.secondaryLogo_.onerror = () => errorManagerInstance.warn(t7e('plugins.StereoMap.errorMsgs.secondaryLogoFailed' as Parameters<typeof t7e>[0]));
     }
   }
 
@@ -144,7 +144,7 @@ export class StereoMap extends KeepTrackPlugin {
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: 'map-menu',
-      title: t7e('plugins.StereoMap.title' as Parameters<typeof t7e>[0]) ?? 'Stereographic Map Menu',
+      title: t7e('plugins.StereoMap.title' as Parameters<typeof t7e>[0]),
       html: this.buildSideMenuHtml_(),
     };
   }
@@ -777,17 +777,17 @@ export class StereoMap extends KeepTrackPlugin {
         try {
           ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
         } catch (e) {
-          errorManagerInstance.warn(`Failed to draw earth image on canvas after load: ${(e as Error).message}`);
+          errorManagerInstance.warn(t7e('plugins.StereoMap.errorMsgs.earthDrawAfterLoadFailed' as Parameters<typeof t7e>[0]).replace('{error}', (e as Error).message));
         }
       };
       this.earthImg_.onerror = () => {
-        errorManagerInstance.warn('Earth image failed to load for stereo map.');
+        errorManagerInstance.warn(t7e('plugins.StereoMap.errorMsgs.earthLoadFailed' as Parameters<typeof t7e>[0]));
       };
     } else if (this.earthImg_.complete && this.earthImg_.naturalWidth !== 0) {
       try {
         ctx?.drawImage(this.earthImg_, 0, 0, settingsManager.mapWidth, settingsManager.mapHeight);
       } catch (e) {
-        errorManagerInstance.warn(`Failed to draw earth image on canvas: ${(e as Error).message}`);
+        errorManagerInstance.warn(t7e('plugins.StereoMap.errorMsgs.earthDrawFailed' as Parameters<typeof t7e>[0]).replace('{error}', (e as Error).message));
       }
     }
   }

@@ -28,6 +28,13 @@
         "nightLights": "Światła nocne",
         "inView": "W polu widzenia",
         "outOfView": "Poza polem widzenia"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Nie udało się wczytać głównego logo.",
+        "secondaryLogoFailed": "Nie udało się wczytać dodatkowego logo.",
+        "earthDrawAfterLoadFailed": "Po wczytaniu nie udało się narysować obrazu Ziemi na płótnie: {error}",
+        "earthLoadFailed": "Nie udało się wczytać obrazu Ziemi dla mapy stereograficznej.",
+        "earthDrawFailed": "Nie udało się narysować obrazu Ziemi na płótnie: {error}"
       }
     }
   }

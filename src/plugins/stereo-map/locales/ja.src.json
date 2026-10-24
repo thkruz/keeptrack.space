@@ -28,6 +28,13 @@
         "nightLights": "夜間光",
         "inView": "視野内",
         "outOfView": "視野外"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "メインのロゴ画像を読み込めませんでした。",
+        "secondaryLogoFailed": "サブのロゴ画像を読み込めませんでした。",
+        "earthDrawAfterLoadFailed": "読み込み後に地球画像をキャンバスに描画できませんでした: {error}",
+        "earthLoadFailed": "ステレオ投影マップ用の地球画像を読み込めませんでした。",
+        "earthDrawFailed": "地球画像をキャンバスに描画できませんでした: {error}"
       }
     }
   }

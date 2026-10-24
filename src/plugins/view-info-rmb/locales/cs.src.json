@@ -11,8 +11,10 @@
       "errorMsgs": {
         "launchSiteNotFound": "Startovací místo nenalezeno!",
         "noRelatedSats": "Žádné související satelity nenalezeny!",
-        "sensorNotFound": "Senzor nenalezen! Nejprve vyberte senzor."
-      }
+        "sensorNotFound": "Senzor nenalezen! Nejprve vyberte senzor.",
+        "latLonUndefined": "latLon není definováno!"
+      },
+      "latLonToast": "Šířka: {lat}<br>Délka: {lon}"
     }
   }
 }

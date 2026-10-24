@@ -64,12 +64,12 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin implements IContextMenuCa
           const dragPosition = ServiceLocator.getInputManager().mouse.dragPosition;
 
           if (latLon === undefined || Number.isNaN(latLon.lat) || Number.isNaN(latLon.lon)) {
-            errorManagerInstance.debug('latLon undefined!');
+            errorManagerInstance.debug(this.t_('errorMsgs.latLonUndefined'));
             const gmst = ServiceLocator.getTimeManager().gmst;
 
             latLon = eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, gmst);
           }
-          ServiceLocator.getUiManager().toast(`Lat: ${latLon.lat.toFixed(3)}<br>Lon: ${latLon.lon.toFixed(3)}`, ToastMsgType.normal, true);
+          ServiceLocator.getUiManager().toast(this.t_('latLonToast').replace('{lat}', latLon.lat.toFixed(3)).replace('{lon}', latLon.lon.toFixed(3)), ToastMsgType.normal, true);
         }
         break;
       case 'view-sensor-info-rmb':

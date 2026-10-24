@@ -11,8 +11,10 @@
       "errorMsgs": {
         "launchSiteNotFound": "Стартовий майданчик не знайдено!",
         "noRelatedSats": "Пов'язані супутники не знайдені!",
-        "sensorNotFound": "Датчик не знайдено! Спочатку виберіть датчик."
-      }
+        "sensorNotFound": "Датчик не знайдено! Спочатку виберіть датчик.",
+        "latLonUndefined": "latLon не визначено!"
+      },
+      "latLonToast": "Шир.: {lat}<br>Довг.: {lon}"
     }
   }
 }

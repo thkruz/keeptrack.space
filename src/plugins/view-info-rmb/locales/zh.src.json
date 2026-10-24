@@ -11,8 +11,10 @@
       "errorMsgs": {
         "launchSiteNotFound": "未找到发射场！",
         "noRelatedSats": "未找到相关卫星！",
-        "sensorNotFound": "未找到传感器！请先选择一个传感器。"
-      }
+        "sensorNotFound": "未找到传感器！请先选择一个传感器。",
+        "latLonUndefined": "latLon 未定义！"
+      },
+      "latLonToast": "纬度：{lat}<br>经度：{lon}"
     }
   }
 }

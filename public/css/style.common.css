@@ -2796,11 +2796,18 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   margin-right: 1rem;
 }
 
-.side-menu-title-text {
+.side-menu-title-left,
+.side-menu-title-right {
   flex: 0 0 auto;
+}
+
+.side-menu-title-text {
+  flex: 1 1 auto;
+  min-width: 0;
   margin-left: 1rem;
   text-align: center;
-  width: 300px;
+  width: auto;
+  overflow-wrap: anywhere;
 }
 
 
@@ -4008,6 +4015,16 @@ input:focus {
   right: 15px;
   top: 5px;
   font-size: 2em;
+  background: var(--color-dark-background);
+  color: white;
+  border: 0;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+#help-close:focus-visible {
+  outline: 2px solid var(--color-dark-text-accent);
+  outline-offset: 2px;
 }
 
 #help-close:hover {
@@ -4032,7 +4049,7 @@ input:focus {
   width: 100%;
   height: 100%;
   position: fixed;
-  z-index: 99;
+  z-index: 20000;
 }
 
 #help-screen {
@@ -4339,7 +4356,9 @@ input:focus {
   position: absolute;
   left: 1rem;
   top: 1rem;
-  width: 100%;
+  /* width: 100% plus the left offset ran past the viewport (clipped at 1366 px). */
+  width: auto;
+  max-width: calc(100% - 4rem);
   text-align: left;
   font-size: 14px;
   color: white;

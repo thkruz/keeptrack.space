@@ -35,6 +35,7 @@ export function editSatActionButton(id: string, label: string, opts: { submit?: 
 export function buildEditSatMenuHtml(): string {
   return html`
     <form id="editSat-menu-form">
+      <div id="es-modified" class="kt-note start-hidden" role="status">${l('modifiedData')}</div>
       <div id="${P}-error" class="kt-note start-hidden menu-selectable">
         <span id="${P}-error-msg">${l('error')}</span>
       </div>
@@ -72,41 +73,42 @@ export function buildEditSatMenuHtml(): string {
         <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="AAA.AAAA" id="${P}-inc" type="text" maxlength="8" />
-            <label for="${P}-inc" class="active">${l('inclination')}</label>
+            <label for="${P}-inc" class="active">${l('inclination')} (°)</label>
           </div>
           <div class="input-field col s6">
             <input placeholder="AAA.AAAA" id="${P}-rasc" type="text" maxlength="8" />
-            <label for="${P}-rasc" class="active">${l('rightAscension')}</label>
+            <label for="${P}-rasc" class="active">${l('rightAscension')} (°)</label>
           </div>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="AAAAAAA" id="${P}-ecen" type="text" maxlength="7" />
+            <input placeholder="AAAAAAA" id="${P}-ecen" type="text" maxlength="7" aria-describedby="es-eccentricity-hint" />
             <label for="${P}-ecen" class="active">${l('eccentricity')}</label>
           </div>
           <div class="input-field col s6">
             <input placeholder="AA.AAAAAAAA" id="${P}-argPe" type="text" maxlength="8" />
-            <label for="${P}-argPe" class="active">${l('argOfPerigee')}</label>
+            <label for="${P}-argPe" class="active">${l('argOfPerigee')} (°)</label>
           </div>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s6">
             <input placeholder="AAA.AAAA" id="${P}-meana" type="text" maxlength="8" />
-            <label for="${P}-meana" class="active">${l('meanAnomaly')}</label>
+            <label for="${P}-meana" class="active">${l('meanAnomaly')} (°)</label>
           </div>
           <div class="input-field col s6">
             <input placeholder="AA.AAAAA" id="${P}-meanmo" type="text" maxlength="11" />
-            <label for="${P}-meanmo" class="active">${l('meanMotion')}</label>
+            <label for="${P}-meanmo" class="active">${l('meanMotion')} (rev/day)</label>
           </div>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s12">
             <input placeholder="" id="${P}-per" type="text" maxlength="11" />
-            <label for="${P}-per" class="active">${l('period')}</label>
+            <label for="${P}-per" class="active">${l('period')} (min)</label>
           </div>
         </div>
       </section>
 
+      <p id="es-eccentricity-hint" class="kt-note">${t7e('plugins.EditSat.help.tip2' as T7eKey)}</p>
       <section class="kt-section" id="${P}-derived">
         <div class="kt-section-label">${s('calculated')}</div>
         <div class="kt-field-row">

@@ -23,6 +23,7 @@
         "actions": "Дії"
       },
       "labels": {
+        "modifiedData": "Орбіту змінено в цьому сеансі",
         "apogeeKm": "Апогей (км)",
         "perigeeKm": "Перигей (км)",
         "periodMin": "Період (хв)",

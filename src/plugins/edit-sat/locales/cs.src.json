@@ -23,6 +23,7 @@
         "actions": "Akce"
       },
       "labels": {
+        "modifiedData": "Dráha změněna v této relaci",
         "apogeeKm": "Apogeum (km)",
         "perigeeKm": "Perigeum (km)",
         "periodMin": "Perioda (min)",

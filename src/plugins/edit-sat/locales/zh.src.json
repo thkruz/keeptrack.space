@@ -23,6 +23,7 @@
         "actions": "操作"
       },
       "labels": {
+        "modifiedData": "本次会话中已修改轨道",
         "apogeeKm": "远地点 (km)",
         "perigeeKm": "近地点 (km)",
         "periodMin": "周期 (分钟)",

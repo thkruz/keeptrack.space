@@ -23,6 +23,7 @@
         "actions": "작업"
       },
       "labels": {
+        "modifiedData": "이 세션에서 궤도 수정됨",
         "apogeeKm": "원지점 (km)",
         "perigeeKm": "근지점 (km)",
         "periodMin": "주기 (분)",

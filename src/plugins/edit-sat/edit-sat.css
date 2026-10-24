@@ -51,3 +51,11 @@
   color: var(--color-light-text, #fff);
   background-color: var(--color-error, #b00020);
 }
+
+/* Informative identity and calculated values remain readable and non-editable. */
+#editSat-menu #es-scc:disabled,
+#editSat-menu #es-calc-apogee:disabled,
+#editSat-menu #es-calc-perigee:disabled,
+#editSat-menu #es-calc-period:disabled {
+  color: #c4c4c4;
+}

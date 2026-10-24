@@ -23,6 +23,7 @@
         "actions": "Aktionen"
       },
       "labels": {
+        "modifiedData": "Umlaufbahn in dieser Sitzung geändert",
         "apogeeKm": "Apogäum (km)",
         "perigeeKm": "Perigäum (km)",
         "periodMin": "Periode (min)",

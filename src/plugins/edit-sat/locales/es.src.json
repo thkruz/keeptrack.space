@@ -23,6 +23,7 @@
         "actions": "Acciones"
       },
       "labels": {
+        "modifiedData": "Órbita modificada en esta sesión",
         "apogeeKm": "Apogeo (km)",
         "perigeeKm": "Perigeo (km)",
         "periodMin": "Período (min)",

@@ -23,6 +23,7 @@
         "actions": "Akcje"
       },
       "labels": {
+        "modifiedData": "Orbita zmieniona w tej sesji",
         "apogeeKm": "Apogeum (km)",
         "perigeeKm": "Perygeum (km)",
         "periodMin": "Okres (min)",

@@ -23,6 +23,7 @@
         "actions": "操作"
       },
       "labels": {
+        "modifiedData": "このセッションで軌道を変更済み",
         "apogeeKm": "遠地点 (km)",
         "perigeeKm": "近地点 (km)",
         "periodMin": "周期 (分)",

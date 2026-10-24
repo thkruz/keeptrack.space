@@ -75,7 +75,8 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
       if (isSatelliteView && !this.isMenuButtonActive && !this.isIconDisabled) {
         this.setBottomIconToSelected();
       } else if (!isSatelliteView && this.isMenuButtonActive) {
-        this.setBottomIconToUnselected();
+        // Icon sync only: the camera changed elsewhere, so leave the user's open menu alone.
+        this.setBottomIconToUnselected(false);
       }
     });
   }

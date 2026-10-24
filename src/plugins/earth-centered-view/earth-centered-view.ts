@@ -53,7 +53,8 @@ export class EarthCenteredView extends KeepTrackPlugin {
       if (isFixedToEarth && !this.isMenuButtonActive) {
         this.setBottomIconToSelected();
       } else if (!isFixedToEarth && this.isMenuButtonActive) {
-        this.setBottomIconToUnselected();
+        // Icon sync only: the camera changed elsewhere, so leave the user's open menu alone.
+        this.setBottomIconToUnselected(false);
       }
     });
   }

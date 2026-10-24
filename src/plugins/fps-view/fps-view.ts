@@ -51,7 +51,8 @@ export class FpsView extends KeepTrackPlugin {
       if (isFps && !this.isMenuButtonActive) {
         this.setBottomIconToSelected();
       } else if (!isFps && this.isMenuButtonActive) {
-        this.setBottomIconToUnselected();
+        // Icon sync only: the camera changed elsewhere, so leave the user's open menu alone.
+        this.setBottomIconToUnselected(false);
       }
     });
   }

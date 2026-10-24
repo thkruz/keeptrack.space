@@ -1,5 +1,6 @@
 import type { GraphicsQualityLevel } from '@app/engine/plugins/core/plugin-capabilities';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import type { SettingsManager } from './settings';
@@ -357,7 +358,11 @@ export const applyPersistedSetting = (sm: SettingsManager, key: StorageKey, raw:
       entry.deserializeMissing?.(sm);
     }
   } catch (err) {
-    errorManagerInstance.warn(`Skipping corrupt saved setting "${key}": ${err instanceof Error ? err.message : String(err)}`);
+    errorManagerInstance.warn(
+      t7e('errorMsgs.Persistence.corruptSetting')
+        .replace('{key}', key)
+        .replace('{error}', err instanceof Error ? err.message : String(err))
+    );
   }
 
   return true;

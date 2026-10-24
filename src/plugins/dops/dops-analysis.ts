@@ -59,6 +59,7 @@ export interface DopCsvRow {
   gdop: string;
   tdop: string;
   visibleSats: number;
+  solutionStatus: string;
 }
 
 /** Maps a DOP list into flat rows suitable for CSV export. */
@@ -71,5 +72,6 @@ export function dopsToCsvRows(dopsList: DopList): DopCsvRow[] {
     gdop: entry.dops.gdop,
     tdop: entry.dops.tdop,
     visibleSats: entry.visibleSats,
+    solutionStatus: Number.isFinite(Number(entry.dops.hdop)) ? 'available' : 'unavailable',
   }));
 }

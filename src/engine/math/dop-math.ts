@@ -62,11 +62,11 @@ export abstract class DopMath {
    * @returns An object containing the calculated DOP values.
    */
   public static calculateDops(azElList: AzEl<Degrees>[]): DopValues {
-    const dops: DopValues = { pdop: '50.00', hdop: '50.00', gdop: '50.00', vdop: '50.00', tdop: '50.00' };
+    const dops: DopValues = { pdop: 'N/A', hdop: 'N/A', gdop: 'N/A', vdop: 'N/A', tdop: 'N/A' };
 
     const nsat = azElList.length;
 
-    if (nsat < 4) {
+    if (nsat < 4 || azElList.some(({ az, el }) => !Number.isFinite(az) || !Number.isFinite(el) || el < -90 || el > 90)) {
       return dops;
     }
 
@@ -79,6 +79,12 @@ export abstract class DopMath {
 
       numeric.setBlock(A, [n - 1, 0], [n - 1, 3], [B]);
     }
+    // Satellite count alone does not establish an invertible position/clock geometry.
+    const singularValues = numeric.svd(A).S;
+
+    if (Math.min(...singularValues) <= Math.max(...singularValues) * 1e-10) {
+      return dops;
+    }
     const Q = <number[][]>numeric.dot(numeric.transpose(A), A);
     const Qinv = numeric.inv(Q);
     const pdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2]);
@@ -86,6 +92,10 @@ export abstract class DopMath {
     const gdop = Math.sqrt(Qinv[0][0] + Qinv[1][1] + Qinv[2][2] + Qinv[3][3]);
     const vdop = Math.sqrt(Qinv[2][2]);
     const tdop = Math.sqrt(Qinv[3][3]);
+
+    if (![pdop, hdop, gdop, vdop, tdop].every(Number.isFinite)) {
+      return dops;
+    }
 
     dops.pdop = (Math.round(pdop * 100) / 100).toFixed(2);
     dops.hdop = (Math.round(hdop * 100) / 100).toFixed(2);

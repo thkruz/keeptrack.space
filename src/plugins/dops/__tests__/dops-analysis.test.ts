@@ -72,7 +72,12 @@ describe('dopsToCsvRows', () => {
       gdop: '2.50',
       tdop: '0.80',
       visibleSats: 8,
+      solutionStatus: 'available',
     });
+  });
+
+  it('exports unavailable geometry explicitly', () => {
+    expect(dopsToCsvRows([entry('N/A', 0)])[0]).toMatchObject({ hdop: 'N/A', solutionStatus: 'unavailable' });
   });
 
   it('returns an empty array for an empty list', () => {

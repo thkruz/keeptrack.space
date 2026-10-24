@@ -124,28 +124,28 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
 
   private validateScenario_(scenario: ScenarioData): boolean {
     if (scenario.startTime && scenario.endTime && scenario.startTime >= scenario.endTime) {
-      errorManagerInstance.warn('Scenario start time must be before end time.');
+      errorManagerInstance.warn(t7e('plugins.ScenarioManagementMenu.errorMsgs.startAfterEnd'));
 
       return false;
     }
 
     // Must be valid dates or null
     if ((scenario.startTime && isNaN(scenario.startTime.getTime())) || (scenario.endTime && isNaN(scenario.endTime.getTime()))) {
-      errorManagerInstance.warn('Scenario start time and end time must be valid dates.');
+      errorManagerInstance.warn(t7e('plugins.ScenarioManagementMenu.errorMsgs.invalidDates'));
 
       return false;
     }
 
     // if start or end then there must be both
     if ((scenario.startTime && !scenario.endTime) || (!scenario.startTime && scenario.endTime)) {
-      errorManagerInstance.warn('Both scenario start time and end time must be set.');
+      errorManagerInstance.warn(t7e('plugins.ScenarioManagementMenu.errorMsgs.bothBoundsRequired'));
 
       return false;
     }
 
     // Name must be less than 30 characters
     if (scenario.name.length > 30) {
-      errorManagerInstance.warn('Scenario name must be less than 30 characters.');
+      errorManagerInstance.warn(t7e('plugins.ScenarioManagementMenu.errorMsgs.nameTooLong'));
 
       return false;
     }

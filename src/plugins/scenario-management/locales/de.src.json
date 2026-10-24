@@ -39,7 +39,11 @@
         "endDateInvalid": "Das Enddatum ist ungültig.",
         "savingScenario": "Fehler beim Speichern des Szenarios!",
         "loadingScenarioFile": "Fehler beim Laden der Szenariodatei!",
-        "decompressingScenarioFile": "Fehler beim Entpacken der Szenariodatei!"
+        "decompressingScenarioFile": "Fehler beim Entpacken der Szenariodatei!",
+        "startAfterEnd": "Die Startzeit des Szenarios muss vor der Endzeit liegen.",
+        "invalidDates": "Start- und Endzeit des Szenarios müssen gültige Daten sein.",
+        "bothBoundsRequired": "Start- und Endzeit des Szenarios müssen beide gesetzt sein.",
+        "nameTooLong": "Der Szenarioname muss kürzer als 30 Zeichen sein."
       },
       "defaults": {
         "scenarioName": "Mein Szenario",

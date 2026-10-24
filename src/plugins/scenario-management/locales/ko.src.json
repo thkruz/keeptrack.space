@@ -39,7 +39,11 @@
         "endDateInvalid": "종료 날짜가 잘못되었습니다.",
         "savingScenario": "시나리오 저장 중 오류가 발생했습니다!",
         "loadingScenarioFile": "시나리오 파일을 불러오는 중 오류가 발생했습니다!",
-        "decompressingScenarioFile": "시나리오 파일 압축 해제 중 오류가 발생했습니다!"
+        "decompressingScenarioFile": "시나리오 파일 압축 해제 중 오류가 발생했습니다!",
+        "startAfterEnd": "시나리오 시작 시간은 종료 시간보다 앞서야 합니다.",
+        "invalidDates": "시나리오 시작 시간과 종료 시간은 유효한 날짜여야 합니다.",
+        "bothBoundsRequired": "시나리오 시작 시간과 종료 시간을 모두 설정해야 합니다.",
+        "nameTooLong": "시나리오 이름은 30자 미만이어야 합니다."
       },
       "defaults": {
         "scenarioName": "내 시나리오",

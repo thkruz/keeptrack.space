@@ -39,7 +39,11 @@
         "endDateInvalid": "结束日期无效。",
         "savingScenario": "保存情景时出错！",
         "loadingScenarioFile": "加载情景文件时出错！",
-        "decompressingScenarioFile": "解压情景文件时出错！"
+        "decompressingScenarioFile": "解压情景文件时出错！",
+        "startAfterEnd": "场景开始时间必须早于结束时间。",
+        "invalidDates": "场景开始时间和结束时间必须是有效日期。",
+        "bothBoundsRequired": "必须同时设置场景开始时间和结束时间。",
+        "nameTooLong": "场景名称必须少于 30 个字符。"
       },
       "defaults": {
         "scenarioName": "我的情景",

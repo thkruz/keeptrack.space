@@ -21,6 +21,11 @@
         "copied": "リンクをクリップボードにコピーしました！",
         "copyFailed": "リンクをクリップボードにコピーできませんでした。"
       }
+    },
+    "ShareMenu": {
+      "errorMsgs": {
+        "nativeShareFailed": "ネイティブ共有に失敗しました: {error}"
+      }
     }
   }
 }

@@ -21,6 +21,11 @@
         "copied": "링크를 클립보드에 복사했습니다!",
         "copyFailed": "링크를 클립보드에 복사하지 못했습니다."
       }
+    },
+    "ShareMenu": {
+      "errorMsgs": {
+        "nativeShareFailed": "기본 공유 실패: {error}"
+      }
     }
   }
 }

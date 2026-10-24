@@ -21,6 +21,11 @@
         "copied": "Link copiato negli appunti!",
         "copyFailed": "Impossibile copiare il link negli appunti."
       }
+    },
+    "ShareMenu": {
+      "errorMsgs": {
+        "nativeShareFailed": "Condivisione nativa non riuscita: {error}"
+      }
     }
   }
 }

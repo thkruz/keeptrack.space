@@ -208,7 +208,7 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
       .catch((err: Error) => {
         // AbortError is the user dismissing the share sheet — not a real failure.
         if (err?.name !== 'AbortError') {
-          errorManagerInstance.debug(`Native share failed: ${err?.message ?? err}`);
+          errorManagerInstance.debug(l('errorMsgs.nativeShareFailed').replace('{error}', String(err?.message ?? err)));
         }
       });
   }

@@ -5,6 +5,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IKeyboardShortcut, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import videocamPng from '@public/img/icons/videocam.png';
 
 export class FpsView extends KeepTrackPlugin {
@@ -34,7 +35,7 @@ export class FpsView extends KeepTrackPlugin {
     return [
       {
         id: 'FpsView.activate',
-        label: 'Switch to FPS View',
+        label: t7e('plugins.FpsView.commandPalette.switch'),
         category: 'View',
         callback: () => this.bottomMenuClicked(),
       },

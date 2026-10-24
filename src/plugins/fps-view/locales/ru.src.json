@@ -1,7 +1,10 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "Вид от первого лица"
+      "bottomIconLabel": "Вид от первого лица",
+      "commandPalette": {
+        "switch": "Переключиться на вид от первого лица"
+      }
     }
   }
 }

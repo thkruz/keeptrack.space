@@ -1,7 +1,10 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "FPS pohled"
+      "bottomIconLabel": "FPS pohled",
+      "commandPalette": {
+        "switch": "Přepnout na pohled FPS"
+      }
     }
   }
 }

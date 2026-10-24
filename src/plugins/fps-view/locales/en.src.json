@@ -1,7 +1,10 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "FPS View"
+      "bottomIconLabel": "FPS View",
+      "commandPalette": {
+        "switch": "Switch to FPS View"
+      }
     }
   }
 }

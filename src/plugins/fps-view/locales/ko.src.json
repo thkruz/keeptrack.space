@@ -1,7 +1,10 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "FPS 보기"
+      "bottomIconLabel": "FPS 보기",
+      "commandPalette": {
+        "switch": "FPS 보기로 전환"
+      }
     }
   }
 }

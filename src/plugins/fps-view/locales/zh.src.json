@@ -1,7 +1,10 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "第一人称视图"
+      "bottomIconLabel": "第一人称视图",
+      "commandPalette": {
+        "switch": "切换到第一人称视图"
+      }
     }
   }
 }

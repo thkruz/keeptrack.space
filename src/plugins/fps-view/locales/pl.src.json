@@ -1,7 +1,10 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "Widok pierwszoosobowy"
+      "bottomIconLabel": "Widok pierwszoosobowy",
+      "commandPalette": {
+        "switch": "Przełącz na widok FPS"
+      }
     }
   }
 }

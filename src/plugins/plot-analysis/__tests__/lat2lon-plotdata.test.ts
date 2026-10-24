@@ -40,9 +40,9 @@ describe('Lat2LonPlots.getPlotData', () => {
 
     const data = Lat2LonPlots.getPlotData();
 
-    expect(data.USA).toHaveLength(1);
-    expect(data.USA[0].value).toEqual([100, 5]);
-    expect(data.USA[0].name).toBe('GEOSAT');
+    expect(data['United States']).toHaveLength(1);
+    expect(data['United States'][0].value).toEqual([100, 5]);
+    expect(data['United States'][0].name).toBe('GEOSAT');
   });
 
   it('excludes non-payloads and non-GEO objects', () => {

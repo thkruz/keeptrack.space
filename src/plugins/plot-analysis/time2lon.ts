@@ -443,9 +443,10 @@ export class Time2LonPlots extends KeepTrackPlugin {
     for (const { sat } of matched) {
       countryCounts[sat.country] = (countryCounts[sat.country] || 0) + 1;
     }
-    const topCountries = buildTopCountries(countryCounts, getCountryMapList() as Record<string, string>, Time2LonPlots.topCountryCount_);
+    const otherLabel = t7e('plugins.Time2LonPlots.chart.other' as T7eKey);
+    const topCountries = buildTopCountries(countryCounts, getCountryMapList() as Record<string, string>, Time2LonPlots.topCountryCount_, otherLabel);
 
-    return matched.map(({ index, sat }) => ({ index, sat, country: topCountries.get(sat.country) ?? 'Other' }));
+    return matched.map(({ index, sat }) => ({ index, sat, country: topCountries.get(sat.country) ?? otherLabel }));
   }
 
   /**
@@ -500,7 +501,7 @@ export class Time2LonPlots extends KeepTrackPlugin {
    * 'Other'. Thin wrapper over the core helper that supplies the country map.
    */
   static buildTopCountries_(countryCounts: Record<string, number>): Map<string, string> {
-    return buildTopCountries(countryCounts, getCountryMapList() as Record<string, string>, Time2LonPlots.topCountryCount_);
+    return buildTopCountries(countryCounts, getCountryMapList() as Record<string, string>, Time2LonPlots.topCountryCount_, t7e('plugins.Time2LonPlots.chart.other' as T7eKey));
   }
 
   // =========================================================================

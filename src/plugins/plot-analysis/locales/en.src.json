@@ -13,6 +13,20 @@
         "howToUse": "<ol><li>Open the <strong>Inc vs Alt Plot</strong> from the drawer (Analysis mode).</li><li>The plot computes automatically; hover points for satellite names and click a point to select that satellite.</li><li>Use the legend to hide or show constellations and countries.</li></ol>",
         "tip1": "Click a legend entry to toggle a whole group; isolating one constellation makes its shell structure obvious.",
         "tip2": "The plot samples the catalog at the current time; reopen the menu to refresh after catalog changes."
+      },
+      "chart": {
+        "title": "Inclination vs Altitude Scatter Plot",
+        "xAxis": "Altitude (km)",
+        "yAxis": "Inclination (°)",
+        "zAxis": "Period (min)",
+        "constellation": "Constellation",
+        "country": "Country",
+        "altitude": "Altitude",
+        "inclination": "Inclination",
+        "period": "Period",
+        "eccentricity": "Eccentricity",
+        "unknown": "Unknown",
+        "other": "Other"
       }
     },
     "Inc2LonPlots": {
@@ -29,6 +43,17 @@
         "tip1": "A vertical stack of points at one longitude is a cluster of co-located satellites sharing a slot.",
         "tip2": "Satellites above roughly 7 degrees inclination are usually in graveyard or inclined storage; the active belt hugs zero.",
         "shortcutToggle": "Toggle the Inc vs Lon plot"
+      },
+      "chart": {
+        "loading": "Computing satellite positions...",
+        "title": "GEO Inclination vs Longitude Scatter Plot",
+        "xAxis": "Longitude (°)",
+        "yAxis": "Inclination (°)",
+        "inclination": "Inclination",
+        "longitude": "Longitude",
+        "period": "Period",
+        "periodMinutes": "Period (minutes)",
+        "other": "Other"
       }
     },
     "Time2LonPlots": {
@@ -47,7 +72,8 @@
         "tooltipLongitude": "Longitude",
         "tooltipTime": "Time from now",
         "loading": "Computing orbit data...",
-        "empty": "No objects match the current filters"
+        "empty": "No objects match the current filters",
+        "other": "Other"
       },
       "help": {
         "overview": "The Waterfall plot tracks GEO longitude over time: each line is a satellite's longitude drifting (or holding) across the plotted window. Station kept satellites draw vertical lines; drifters slant; relocations show as sweeping curves.",
@@ -65,6 +91,14 @@
         "overview": "The Latitude vs Longitude plot is a flat snapshot of where satellites sit over the Earth right now, plotted as ground positions. It reads like a map without the map: useful for spotting coverage gaps and the geometry of the GEO belt's figure eight inclination traces.",
         "howToUse": "<ol><li>Open the <strong>Lat vs Lon Plot</strong> from the drawer (Analysis mode).</li><li>The plot renders automatically; hover points for names and click to select a satellite.</li></ol>",
         "tip1": "Inclined GEO satellites trace north-south excursions at a fixed longitude, which appear as vertical spreads in this view."
+      },
+      "chart": {
+        "title": "Latitude vs Longitude Plot",
+        "xAxis": "Longitude (°)",
+        "yAxis": "Latitude (°)",
+        "latitude": "Latitude",
+        "longitude": "Longitude",
+        "other": "Other"
       }
     },
     "EciPlot": {
@@ -74,6 +108,9 @@
         "overview": "The ECI plot draws the selected satellite's orbit as a 3D curve in the Earth Centered Inertial frame: the frame fixed to the stars, where orbits are clean ellipses. If a secondary satellite is selected, both orbits plot together for comparison.",
         "howToUse": "<ol><li>Select a satellite; its drawer icon is disabled until one is selected.</li><li>Open the <strong>ECI Plot</strong> from the drawer (Analysis mode).</li><li>Drag to rotate the 3D plot and scroll to zoom; hover the curve for position values.</li></ol>",
         "tip1": "Select a secondary satellite first (right-click, or the [ and ] keys) to overlay two orbits and compare their geometry."
+      },
+      "chart": {
+        "title": "Earth Centered Inertial (ECI) Plot"
       }
     },
     "EcfPlot": {
@@ -83,6 +120,9 @@
         "overview": "The ECF plot draws the selected satellite's trajectory in the Earth Centered Earth Fixed frame, which rotates with the planet. Geosynchronous satellites collapse to small loops, and repeating ground track orbits close on themselves, making this the frame for studying Earth relative behavior.",
         "howToUse": "<ol><li>Select a satellite; its drawer icon is disabled until one is selected.</li><li>Open the <strong>ECF Plot</strong> from the drawer (Analysis mode).</li><li>Drag to rotate the 3D plot and scroll to zoom; hover the curve for position values.</li></ol>",
         "tip1": "A GEO satellite's tight figure eight in ECF is its daily inclination and eccentricity cycle; the tighter the loop, the better the station keeping."
+      },
+      "chart": {
+        "title": "Earth Centered Fixed (ECF) Plot"
       }
     },
     "RicPlot": {
@@ -121,6 +161,9 @@
         "overview": "The RIC plot shows the relative motion between two satellites in the Radial, In-Track, Cross-Track frame centered on the primary. It is the standard view for rendezvous, formation flying, and close approach analysis: the secondary satellite's offset from the primary is plotted over time.",
         "howToUse": "<ol><li>Select a primary satellite, then a secondary satellite (right-click a satellite, or use the [ and ] keys).</li><li>Open the <strong>RIC Plot</strong> from the drawer (Analysis mode).</li><li>Read the four 2D plots: Radial, In-Track, Cross-Track, and total Range over time. Drag the slider or scroll to zoom the time axis.</li></ol>",
         "tip1": "Both a primary and a secondary satellite must be selected or the plot has nothing to compare; pick objects in similar orbits for a readable scale."
+      },
+      "errorMsgs": {
+        "missingSatData": "Missing satellite data for RIC plot"
       }
     }
   }

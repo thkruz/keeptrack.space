@@ -10,6 +10,7 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
+import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './lat2lon.css';
@@ -99,7 +100,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     this.chart.setOption({
       animation: false,
       title: {
-        text: 'Latitude vs Longitude Plot',
+        text: t7e('plugins.Lat2LonPlots.chart.title'),
         textStyle: {
           fontSize: 16,
           color: '#fff',
@@ -122,19 +123,19 @@ export class Lat2LonPlots extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
                 <div style="font-weight: bold;"> ${point.name}</div>
               </div>
-              <div><bold>Latitude:</bold> ${point.value[1].toFixed(3)}°</div>
-              <div><bold>Longitude:</bold> ${point.value[0].toFixed(3)}°</div>
+              <div><bold>${t7e('plugins.Lat2LonPlots.chart.latitude')}:</bold> ${point.value[1].toFixed(3)}°</div>
+              <div><bold>${t7e('plugins.Lat2LonPlots.chart.longitude')}:</bold> ${point.value[0].toFixed(3)}°</div>
             </div>
           `;
         },
       },
       xAxis: {
-        name: 'Longitude (°)',
+        name: t7e('plugins.Lat2LonPlots.chart.xAxis'),
         type: 'value',
         position: 'bottom',
       },
       yAxis: {
-        name: 'Latitude (°)',
+        name: t7e('plugins.Lat2LonPlots.chart.yAxis'),
         type: 'value',
         position: 'left',
       },
@@ -182,9 +183,24 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     });
   }
 
+  /** Localized country name for an ISO 3166 region code, falling back to English when Intl lacks it. */
+  private static regionNameResolver_(): (isoCode: string, fallback: string) => string {
+    let displayNames: Intl.DisplayNames | null = null;
+
+    try {
+      displayNames = new Intl.DisplayNames([i18next.language || 'en'], { type: 'region' });
+    } catch {
+      displayNames = null;
+    }
+
+    return (isoCode, fallback) => displayNames?.of(isoCode) ?? fallback;
+  }
+
   static getPlotData(): Record<string, SatPoint[]> {
     const catalogManager = ServiceLocator.getCatalogManager();
     const countryData: Record<string, SatPoint[]> = {};
+    const regionName = Lat2LonPlots.regionNameResolver_();
+    const otherLabel = t7e('plugins.Lat2LonPlots.chart.other');
 
     catalogManager.objectCache.forEach((obj) => {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
@@ -219,26 +235,26 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
       switch (sat.country) {
         case 'US':
-          country = 'USA';
+          country = regionName('US', 'USA');
           break;
         case 'F':
-          country = 'France';
+          country = regionName('FR', 'France');
           break;
         case 'RU':
         case 'USSR':
-          country = 'Russia';
+          country = regionName('RU', 'Russia');
           break;
         case 'CN':
-          country = 'China';
+          country = regionName('CN', 'China');
           break;
         case 'IN':
-          country = 'India';
+          country = regionName('IN', 'India');
           break;
         case 'J':
-          country = 'Japan';
+          country = regionName('JP', 'Japan');
           break;
         default:
-          country = 'Other';
+          country = otherLabel;
           break;
       }
 

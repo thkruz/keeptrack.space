@@ -280,7 +280,7 @@ export class RicPlot extends KeepTrackPlugin {
     const satS = this.selectSatManager_.secondarySatObj;
 
     if (!satP || !satS) {
-      errorManagerInstance.warn('Missing satellite data for RIC plot');
+      errorManagerInstance.warn(t7e('plugins.RicPlot.errorMsgs.missingSatData'));
 
       return [];
     }

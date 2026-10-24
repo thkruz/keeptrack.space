@@ -288,7 +288,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     this.chart.setOption(
       {
         title: {
-          text: 'Inclination vs Altitude Scatter Plot',
+          text: t7e('plugins.Inc2AltPlots.chart.title'),
           textStyle: {
             fontSize: 16,
             color: '#fff',
@@ -323,29 +323,29 @@ export class Inc2AltPlots extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
                 <span style="font-weight: bold;">${d.name}</span>
               </div>
-              <div><b>Constellation:</b> ${d.constellation}</div>
-              <div><b>Country:</b> ${d.country || 'Unknown'}</div>
-              <div><b>Altitude:</b> ${d.value[0].toFixed(0)} km</div>
-              <div><b>Inclination:</b> ${d.value[1].toFixed(2)}°</div>
-              <div><b>Period:</b> ${d.value[2].toFixed(1)} min</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.constellation')}:</b> ${d.constellation === 'Other' ? t7e('plugins.Inc2AltPlots.chart.other') : d.constellation}</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.country')}:</b> ${d.country || t7e('plugins.Inc2AltPlots.chart.unknown')}</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.altitude')}:</b> ${d.value[0].toFixed(0)} km</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.inclination')}:</b> ${d.value[1].toFixed(2)}°</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.period')}:</b> ${d.value[2].toFixed(1)} min</div>
               <div><b>RAAN:</b> ${d.raan?.toFixed(1) ?? 'N/A'}°</div>
-              <div><b>Eccentricity:</b> ${d.ecc?.toFixed(5) ?? 'N/A'}</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.eccentricity')}:</b> ${d.ecc?.toFixed(5) ?? 'N/A'}</div>
             </div>
           `;
           },
         },
         xAxis: {
-          name: 'Altitude (km)',
+          name: t7e('plugins.Inc2AltPlots.chart.xAxis'),
           type: 'value',
           position: 'bottom',
         },
         yAxis: {
-          name: 'Inclination (°)',
+          name: t7e('plugins.Inc2AltPlots.chart.yAxis'),
           type: 'value',
           position: 'left',
         },
         zAxis: {
-          name: 'Period (min)',
+          name: t7e('plugins.Inc2AltPlots.chart.zAxis'),
           type: 'value',
         },
         dataZoom: [
@@ -521,7 +521,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       { name: 'Globalstar', value: constellations.Globalstar },
       { name: 'Planet', value: constellations.Planet },
       { name: 'Spire', value: constellations.Spire },
-      { name: 'Other', value: constellations.Other },
+      { name: t7e('plugins.Inc2AltPlots.chart.other'), value: constellations.Other },
     ];
   }
 

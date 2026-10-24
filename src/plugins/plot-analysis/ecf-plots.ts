@@ -97,7 +97,7 @@ export class EcfPlot extends KeepTrackPlugin {
     // Setup Chart
     this.chart.setOption({
       title: {
-        text: 'Earth Centered Fixed (ECF) Plot',
+        text: t7e('plugins.EcfPlot.chart.title'),
         textStyle: {
           fontSize: 16,
           color: '#fff',

@@ -114,7 +114,7 @@ export class EciPlot extends KeepTrackPlugin {
     // Setup Chart
     this.chart.setOption({
       title: {
-        text: 'Earth Centered Inertial (ECI) Plot',
+        text: t7e('plugins.EciPlot.chart.title'),
         textStyle: {
           fontSize: 16,
           color: '#fff',

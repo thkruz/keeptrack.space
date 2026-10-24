@@ -13,6 +13,20 @@
         "howToUse": "<ol><li>Aprite il <strong>Grafico Inc vs Alt</strong> dal pannello (modalità Analisi).</li><li>Il grafico si calcola automaticamente; passate il cursore sui punti per vedere i nomi dei satelliti e fate clic su un punto per selezionare quel satellite.</li><li>Usate la legenda per nascondere o mostrare costellazioni e paesi.</li></ol>",
         "tip1": "Fate clic su una voce della legenda per attivare o disattivare un intero gruppo; isolare una costellazione rende evidente la struttura dei suoi gusci.",
         "tip2": "Il grafico campiona il catalogo all'istante corrente; riaprite il menu per aggiornarlo dopo modifiche al catalogo."
+      },
+      "chart": {
+        "title": "Grafico a dispersione inclinazione/altitudine",
+        "xAxis": "Altitudine (km)",
+        "yAxis": "Inclinazione (°)",
+        "zAxis": "Periodo (min)",
+        "constellation": "Costellazione",
+        "country": "Paese",
+        "altitude": "Altitudine",
+        "inclination": "Inclinazione",
+        "period": "Periodo",
+        "eccentricity": "Eccentricità",
+        "unknown": "Sconosciuto",
+        "other": "Altri"
       }
     },
     "Inc2LonPlots": {
@@ -29,6 +43,17 @@
         "tip1": "Una pila verticale di punti a una stessa longitudine è un gruppo di satelliti co-locati che condividono una posizione.",
         "tip2": "I satelliti sopra circa 7 gradi di inclinazione sono di solito in orbita cimitero o in parcheggio inclinato; la fascia attiva resta vicino allo zero.",
         "shortcutToggle": "Attiva/disattiva il grafico Inc vs Lon"
+      },
+      "chart": {
+        "loading": "Calcolo delle posizioni dei satelliti...",
+        "title": "Grafico a dispersione GEO inclinazione/longitudine",
+        "xAxis": "Longitudine (°)",
+        "yAxis": "Inclinazione (°)",
+        "inclination": "Inclinazione",
+        "longitude": "Longitudine",
+        "period": "Periodo",
+        "periodMinutes": "Periodo (minuti)",
+        "other": "Altri"
       }
     },
     "Time2LonPlots": {
@@ -47,7 +72,8 @@
         "tooltipLongitude": "Longitudine",
         "tooltipTime": "Tempo da adesso",
         "loading": "Calcolo dei dati orbitali...",
-        "empty": "Nessun oggetto corrisponde ai filtri attuali"
+        "empty": "Nessun oggetto corrisponde ai filtri attuali",
+        "other": "Altri"
       },
       "help": {
         "overview": "Il grafico a cascata segue la longitudine GEO nel tempo: ogni linea è la longitudine di un satellite che deriva (o si mantiene) nella finestra tracciata. I satelliti con mantenimento di posizione disegnano linee verticali; quelli in deriva si inclinano; le ricollocazioni appaiono come curve ampie.",
@@ -65,6 +91,14 @@
         "overview": "Il grafico Latitudine vs Longitudine è un'istantanea piatta di dove si trovano i satelliti sopra la Terra in questo momento, tracciati come posizioni al suolo. Si legge come una mappa senza la mappa: utile per individuare vuoti di copertura e la geometria delle tracce a forma di otto dei satelliti inclinati della fascia GEO.",
         "howToUse": "<ol><li>Aprite il <strong>Grafico Lat vs Lon</strong> dal pannello (modalità Analisi).</li><li>Il grafico viene disegnato automaticamente; passate il cursore sui punti per vedere i nomi e fate clic per selezionare un satellite.</li></ol>",
         "tip1": "I satelliti GEO inclinati descrivono escursioni nord-sud a longitudine fissa, che in questa vista appaiono come dispersioni verticali."
+      },
+      "chart": {
+        "title": "Grafico latitudine/longitudine",
+        "xAxis": "Longitudine (°)",
+        "yAxis": "Latitudine (°)",
+        "latitude": "Latitudine",
+        "longitude": "Longitudine",
+        "other": "Altri"
       }
     },
     "EciPlot": {
@@ -74,6 +108,9 @@
         "overview": "Il grafico ECI disegna l'orbita del satellite selezionato come curva 3D nel riferimento inerziale centrato sulla Terra (ECI): il riferimento fisso rispetto alle stelle, dove le orbite sono ellissi pulite. Se è selezionato un satellite secondario, entrambe le orbite vengono tracciate insieme per il confronto.",
         "howToUse": "<ol><li>Selezionate un satellite; l'icona del plugin nel pannello è disabilitata finché non ne è selezionato uno.</li><li>Aprite il <strong>Grafico ECI</strong> dal pannello (modalità Analisi).</li><li>Trascinate per ruotare il grafico 3D e scorrete per ingrandire; passate il cursore sulla curva per vedere i valori di posizione.</li></ol>",
         "tip1": "Selezionate prima un satellite secondario (clic destro, oppure i tasti [ e ]) per sovrapporre due orbite e confrontarne la geometria."
+      },
+      "chart": {
+        "title": "Grafico ECI (centrato sulla Terra, inerziale)"
       }
     },
     "EcfPlot": {
@@ -83,6 +120,9 @@
         "overview": "Il grafico ECF disegna la traiettoria del satellite selezionato nel riferimento terrestre fisso centrato sulla Terra (ECF), che ruota con il pianeta. I satelliti geosincroni si riducono a piccoli anelli, e le orbite con traccia al suolo ripetitiva si richiudono su se stesse, rendendolo il riferimento ideale per studiare il comportamento relativo alla Terra.",
         "howToUse": "<ol><li>Selezionate un satellite; l'icona del plugin nel pannello è disabilitata finché non ne è selezionato uno.</li><li>Aprite il <strong>Grafico ECF</strong> dal pannello (modalità Analisi).</li><li>Trascinate per ruotare il grafico 3D e scorrete per ingrandire; passate il cursore sulla curva per vedere i valori di posizione.</li></ol>",
         "tip1": "La stretta figura a otto di un satellite GEO in ECF è il suo ciclo giornaliero di inclinazione ed eccentricità; più stretto è l'anello, migliore è il mantenimento di posizione."
+      },
+      "chart": {
+        "title": "Grafico ECF (centrato sulla Terra, fisso)"
       }
     },
     "RicPlot": {
@@ -121,6 +161,9 @@
         "overview": "Il grafico RIC mostra il moto relativo tra due satelliti nel riferimento radiale, lungo traccia e fuori traccia (RIC), centrato sul satellite primario. È la vista standard per rendezvous, volo in formazione e analisi degli avvicinamenti ravvicinati: il percorso del satellite secondario è disegnato come visto dal primario.",
         "howToUse": "<ol><li>Selezionate un satellite primario, poi un satellite secondario (clic destro su un satellite, oppure i tasti [ e ]).</li><li>Aprite il <strong>Grafico RIC</strong> dal pannello (modalità Analisi).</li><li>Leggi i quattro grafici 2D: radiale, lungo l'orbita, trasversale all'orbita e distanza totale nel tempo. Trascina il cursore o scorri per ingrandire l'asse temporale.</li></ol>",
         "tip1": "Devono essere selezionati sia un satellite primario sia uno secondario, altrimenti il grafico non ha nulla da confrontare; scegliete oggetti su orbite simili per una scala leggibile."
+      },
+      "errorMsgs": {
+        "missingSatData": "Dati del satellite mancanti per il grafico RIC"
       }
     }
   }

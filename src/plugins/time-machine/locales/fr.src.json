@@ -4,10 +4,14 @@
       "bottomIconLabel": "Machine à remonter le temps",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "Désactiver les notifications de la Machine à remonter le temps",
+          "helpText": "La Machine à remonter le temps n'affichera plus de notifications."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Basculer la machine à remonter le temps"
+      },
+      "yearToast": "Machine à remonter le temps : année {year} !"
     }
   }
 }

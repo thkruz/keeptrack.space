@@ -37,7 +37,7 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
     return [
       {
         id: 'TimeMachine.toggle',
-        label: 'Toggle Time Machine',
+        label: t7e('plugins.TimeMachine.commandPalette.toggle'),
         category: 'Playback',
         callback: () => this.bottomMenuClicked(),
       },
@@ -119,12 +119,12 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
 
     if (!settingsManager.isDisableTimeMachineToasts) {
       if (year >= 57 && year < 100) {
-        const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
+        const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || t7e('plugins.TimeMachine.yearToast').replace('{year}', `19${year}`));
 
         ServiceLocator.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       } else {
         const yearStr = year < 10 ? `0${year}` : `${year}`;
-        const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`);
+        const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || t7e('plugins.TimeMachine.yearToast').replace('{year}', `20${yearStr}`));
 
         ServiceLocator.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       }

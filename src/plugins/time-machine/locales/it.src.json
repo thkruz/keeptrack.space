@@ -4,10 +4,14 @@
       "bottomIconLabel": "Macchina del Tempo",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "Disattiva le notifiche della Macchina del tempo",
+          "helpText": "La Macchina del tempo non mostrerà più notifiche a comparsa."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Attiva/disattiva macchina del tempo"
+      },
+      "yearToast": "Macchina del tempo nell'anno {year}!"
     }
   }
 }

@@ -4,10 +4,14 @@
       "bottomIconLabel": "时间机器",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "关闭时间机器提示",
+          "helpText": "时间机器将不再显示提示消息。"
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "切换时光机"
+      },
+      "yearToast": "时光机：{year}年！"
     }
   }
 }

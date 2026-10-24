@@ -4,10 +4,14 @@
       "bottomIconLabel": "Wehikuł czasu",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "Wyłącz powiadomienia Wehikułu czasu",
+          "helpText": "Wehikuł czasu przestanie wyświetlać wyskakujące powiadomienia."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Przełącz wehikuł czasu"
+      },
+      "yearToast": "Wehikuł czasu w roku {year}!"
     }
   }
 }

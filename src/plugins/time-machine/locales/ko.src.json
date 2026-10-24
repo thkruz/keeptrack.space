@@ -4,10 +4,14 @@
       "bottomIconLabel": "타임머신",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "타임머신 알림 끄기",
+          "helpText": "타임머신이 알림 메시지를 표시하지 않습니다."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "타임머신 전환"
+      },
+      "yearToast": "타임머신: {year}년!"
     }
   }
 }

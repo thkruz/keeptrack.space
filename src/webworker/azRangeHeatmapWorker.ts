@@ -3,11 +3,11 @@
  *
  * Propagates a pre-filtered satellite catalog across a requested time window,
  * checks each position against a configurable ±marginDeg elevation band at the observer, and
- * accumulates an azimuth × range hit count matrix.
+ * accumulates an azimuth × range satellite-seconds matrix.
  *
  * Every ~5 % of time steps a PARTIAL snapshot is posted so the UI can render a
  * live running average while the job is still in progress. The final RESULT
- * message carries the completed average (cumulative counts ÷ total steps).
+ * message carries average satellites present (satellite-seconds ÷ window seconds).
  *
  * ECI → ECEF → RAE follows the same transform chain as fovPredictionWorker.
  */
@@ -34,7 +34,7 @@ interface SatRecord {
   sccNum: string;
 }
 
-let cancelled = false;
+let generation = 0;
 
 /**
  * Converts a millisecond timestamp into its Julian date and GMST angle.
@@ -48,11 +48,12 @@ function timeToJdayGmst(timeMs: number): { j: number; gmst: number } {
   return { j, gmst: Sgp4.gstime(j) };
 }
 
-/** Deep-copy the bins array and normalise by elapsed hours to get passes/hr. */
-function snapshotBinsPerHour(bins: number[][], stepsProcessed: number, stepSec: number): number[][] {
-  const elapsedHours = (stepsProcessed * stepSec) / 3600;
-
-  return bins.map((row) => row.map((v) => (elapsedHours > 0 ? v / elapsedHours : 0)));
+/** Average satellites present: integrate left-endpoint counts over [start, end).
+ * The last interval is clipped to the requested end; partials divide by elapsed
+ * sampled time. Bin edges are lower-inclusive, upper-exclusive (max range included).
+ */
+function snapshotOccupancy(bins: number[][], elapsedSec: number): number[][] {
+  return bins.map((row) => row.map((value) => (elapsedSec > 0 ? value / elapsedSec : 0)));
 }
 
 // Route unhandled promise rejections (e.g. from the async onmessage handler) to
@@ -75,7 +76,7 @@ self.onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg
   }
 
   if (msg.typ === AzRangeMsgType.CANCEL) {
-    cancelled = true;
+    generation++;
 
     return;
   }
@@ -84,7 +85,7 @@ self.onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg
     return;
   }
 
-  cancelled = false;
+  const runGeneration = ++generation;
 
   try {
     const {
@@ -123,32 +124,27 @@ self.onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg
       alt: sensorAlt as Kilometers,
     };
 
+    if (!Number.isFinite(durationSec) || !Number.isFinite(stepSec) || durationSec <= 0 || stepSec <= 0) {
+      throw new Error('Duration and step must be finite and positive');
+    }
     const numSteps = Math.ceil(durationSec / stepSec);
     const stepMs = stepSec * 1000;
 
-    // Raw cumulative counts; never divided in place — snapshot() does that.
+    // Cumulative satellite-seconds; never normalized in place.
     const bins: number[][] = Array.from({ length: numAzBins }, () => new Array(numRngBins).fill(0));
     // Per-bin sets of catalog numbers — populated on every hit, flushed to RESULT only.
     const binSatSets: Set<string>[][] = Array.from({ length: numAzBins }, () => Array.from({ length: numRngBins }, () => new Set<string>()));
-
-    // Cooldown: each (satellite, bin) pair may be counted at most once per cooldown
-    // window. This prevents the same satellite accumulating counts every timestep
-    // while it lingers in a bin (e.g. at its inclination turning point) or from
-    // notional debris objects in nearly-identical orbits inflating the same bin.
-    // 30 min = half a typical LEO period, so each real orbital pass still counts once.
-    const cooldownSteps = Math.max(1, Math.floor((30 * 60) / stepSec));
-    // sccNum → (binKey → step at which it was last counted)
-    const lastCountedStep = new Map<string, Map<number, number>>();
 
     // Emit a PARTIAL every ~5 % of steps (minimum every 10 steps to avoid
     // flooding the main thread on very short jobs).
     const partialInterval = Math.max(10, Math.floor(numSteps / 20));
 
     for (let step = 0; step < numSteps; step++) {
-      if (cancelled) {
+      if (generation !== runGeneration) {
         return;
       }
 
+      const intervalSec = Math.min(stepSec, durationSec - step * stepSec);
       const timeMs = startTimeMs + step * stepMs;
       const { j, gmst } = timeToJdayGmst(timeMs);
 
@@ -183,21 +179,13 @@ self.onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg
           continue;
         }
 
-        const azBin = Math.min(numAzBins - 1, Math.floor((rae.az / 360) * numAzBins));
-        const rngBin = Math.min(numRngBins - 1, Math.floor((rae.rng / sensorMaxRng) * numRngBins));
-        const binKey = azBin * numRngBins + rngBin;
-
-        let satCooldowns = lastCountedStep.get(sccNum);
-        const lastStep = satCooldowns?.get(binKey) ?? -Infinity;
-
-        if (step - lastStep > cooldownSteps) {
-          bins[azBin][rngBin]++;
-          if (!satCooldowns) {
-            satCooldowns = new Map<number, number>();
-            lastCountedStep.set(sccNum, satCooldowns);
-          }
-          satCooldowns.set(binKey, step);
+        if (![rae.az, rae.el, rae.rng].every(Number.isFinite) || rae.rng < 0) {
+          continue;
         }
+        const az = ((rae.az % 360) + 360) % 360;
+        const azBin = Math.min(numAzBins - 1, Math.floor((az / 360) * numAzBins));
+        const rngBin = Math.min(numRngBins - 1, Math.floor((rae.rng / sensorMaxRng) * numRngBins));
+        bins[azBin][rngBin] += intervalSec;
         binSatSets[azBin][rngBin].add(sccNum);
       }
 
@@ -207,7 +195,7 @@ self.onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg
         postMessage({
           typ: AzRangeOutMsgType.PARTIAL,
           runId,
-          bins: snapshotBinsPerHour(bins, stepsProcessed, stepSec),
+          bins: snapshotOccupancy(bins, Math.min(stepsProcessed * stepSec, durationSec)),
           numAzBins,
           numRngBins,
           maxRng: sensorMaxRng,
@@ -220,12 +208,15 @@ self.onmessage = async function onmessage(event: MessageEvent<AzRangeWorkerInMsg
       }
     }
 
-    // Final result — bins already divided by numSteps in the last PARTIAL, but
-    // RESULT signals completion so the plugin can switch out of computing state.
+    if (generation !== runGeneration) {
+      return;
+    }
+
+    // RESULT normalizes a fresh snapshot over the complete requested window.
     postMessage({
       typ: AzRangeOutMsgType.RESULT,
       runId,
-      bins: snapshotBinsPerHour(bins, numSteps, stepSec),
+      bins: snapshotOccupancy(bins, durationSec),
       numAzBins,
       numRngBins,
       maxRng: sensorMaxRng,

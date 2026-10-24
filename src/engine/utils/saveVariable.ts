@@ -23,6 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { t7e } from '@app/locales/keys';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import { errorManagerInstance } from './errorManager';
@@ -44,7 +45,7 @@ export const saveVariable = <T>(variable: T, filename?: string): void => {
     }
     saveAs(blob, filename);
   } catch (e) {
-    errorManagerInstance.error(e, 'saveVariable', 'Error in saving variable!');
+    errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.variable'));
   }
 };
 
@@ -84,7 +85,7 @@ export const saveCsv = <T extends Record<string, unknown>>(items: Array<T>, name
     saveAs(blob, `${name}.csv`);
   } catch (e) {
     if (!isThisNode()) {
-      errorManagerInstance.error(e, 'saveVariable', 'Error in saving csv!');
+      errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.csv'));
     }
   }
 };
@@ -106,7 +107,7 @@ export const saveXlsx = async <T extends Record<string, unknown>>(items: Array<T
     XLSX.writeFile(wb, `${name}.xlsx`);
   } catch (e) {
     if (!isThisNode()) {
-      errorManagerInstance.error(e, 'saveVariable', 'Error saving xlsx!');
+      errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.xlsx'));
     }
   }
 };
@@ -124,7 +125,7 @@ export type ExportFormat = 'csv' | 'xlsx';
  */
 export const saveTable = <T extends Record<string, unknown>>(items: Array<T>, name: string, format: ExportFormat = 'csv'): void => {
   if (format === 'xlsx') {
-    saveXlsx(items, name).catch((e) => errorManagerInstance.error(e, 'saveTable', 'Error saving xlsx!'));
+    saveXlsx(items, name).catch((e) => errorManagerInstance.error(e, 'saveTable', t7e('errorMsgs.SaveVariable.xlsx')));
 
     return;
   }
@@ -142,7 +143,7 @@ export const copyTsvToClipboard = async <T extends Record<string, unknown>>(item
     await navigator.clipboard.writeText(tsv);
   } catch (e) {
     if (!isThisNode()) {
-      errorManagerInstance.error(e, 'saveVariable', 'Error copying to clipboard!');
+      errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.clipboard'));
     }
   }
 };

@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { Sgp4, Sgp4Wasm, Sgp4WasmBase, Sgp4XpWasm } from '@ootk/src/main';
 import { errorManagerInstance } from './errorManager';
@@ -86,7 +87,7 @@ export const activateConfiguredPropagatorBackend = async (): Promise<boolean> =>
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
 
-    errorManagerInstance.warn(`Failed to activate the ${backend} propagator backend; falling back to the TypeScript SGP4. ${message}`);
+    errorManagerInstance.warn(t7e('errorMsgs.sgp4BackendFailed').replace('{backend}', backend).replace('{error}', message));
 
     return false;
   }

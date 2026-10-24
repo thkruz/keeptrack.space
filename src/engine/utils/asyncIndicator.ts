@@ -1,3 +1,4 @@
+import { t7e } from '@app/locales/keys';
 import './asyncIndicator.css';
 
 /**
@@ -46,7 +47,7 @@ const ensureElement_ = (label: string): HTMLElement => {
  *
  * @param label Optional aria-label describing the action (defaults to "Loading…").
  */
-export const showAsyncIndicator = (label = 'Loading…'): void => {
+export const showAsyncIndicator = (label = t7e('Common.loading')): void => {
   activeCount_++;
   ensureElement_(label).classList.add(ACTIVE_CLASS);
 };

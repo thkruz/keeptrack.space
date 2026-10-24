@@ -517,7 +517,7 @@ export abstract class UrlManager {
 
       uiManagerInstance.doSearch(searchString);
       if (settingsManager.lastSearchResults.length === 0) {
-        uiManagerInstance.toast(`Search for "${searchString}" found nothing!`, ToastMsgType.caution, true);
+        uiManagerInstance.toast(t7e('urlManager.searchFoundNothing').replace('{val}', searchString), ToastMsgType.caution, true);
         uiManagerInstance.searchManager.hideResults();
       }
       onDone?.();
@@ -731,7 +731,7 @@ export abstract class UrlManager {
     (<HTMLSelectElement>getEl('ms-target')).value = subVal[2].toString();
     (<HTMLButtonElement>getEl('missile')).click();
 
-    ServiceLocator.getUiManager().toast('Missile launched!', ToastMsgType.normal, false);
+    ServiceLocator.getUiManager().toast(t7e('urlManager.missileLaunched'), ToastMsgType.normal, false);
   }
 
   private static handleDateParam_(val: string) {
@@ -742,7 +742,7 @@ export abstract class UrlManager {
       const date = new Date(val);
 
       if (isNaN(date.getTime())) {
-        errorManagerInstance.warn(`Date value of "${val}" is not a proper ISO 8601 date string!`);
+        errorManagerInstance.warn(t7e('urlManager.dateNotIso').replace('{val}', val));
 
         return;
       }
@@ -750,12 +750,12 @@ export abstract class UrlManager {
       settingsManager.simulationTime = date;
     } else {
       if (val.length !== 13) {
-        errorManagerInstance.warn(`Date value of "${val}" is not a proper unix timestamp!`);
+        errorManagerInstance.warn(t7e('urlManager.dateNotUnix').replace('{val}', val));
 
         return;
       }
       if (isNaN(parseInt(val))) {
-        errorManagerInstance.warn(`Date value of "${val}" is not a proper unix timestamp!`);
+        errorManagerInstance.warn(t7e('urlManager.dateNotUnix').replace('{val}', val));
 
         return;
       }
@@ -769,7 +769,7 @@ export abstract class UrlManager {
     let rate = parseFloat(val);
 
     if (isNaN(rate)) {
-      errorManagerInstance.warn(`Propagation rate of "${rate}" is not a valid float!`);
+      errorManagerInstance.warn(t7e('urlManager.rateNotFloat').replace('{val}', String(rate)));
 
       return;
     }
@@ -788,13 +788,13 @@ export abstract class UrlManager {
     const camDistBufferValue = parseFloat(camDistBuffer);
 
     if (isNaN(zoom)) {
-      ServiceLocator.getUiManager().toast(`Zoom value of "${val}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.zoomNotFloat').replace('{val}', val), ToastMsgType.caution, true);
 
       return;
     }
 
     if (zoom < 0.06 || zoom > 1) {
-      ServiceLocator.getUiManager().toast(`Zoom value of "${val}" is out of bounds!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.zoomOutOfBounds').replace('{val}', val), ToastMsgType.caution, true);
 
       return;
     }
@@ -812,17 +812,17 @@ export abstract class UrlManager {
     const yawNum = parseFloat(kv.yaw);
 
     if (isNaN(pitchNum) || isNaN(yawNum)) {
-      ServiceLocator.getUiManager().toast('Pitch or Yaw value is not a valid float!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.pitchYawNotFloat'), ToastMsgType.caution, true);
 
       return;
     }
     if (pitchNum < -90 || pitchNum > 90) {
-      ServiceLocator.getUiManager().toast('Pitch value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.pitchOutOfBounds'), ToastMsgType.caution, true);
 
       return;
     }
     if (yawNum < -360 || yawNum > 360) {
-      ServiceLocator.getUiManager().toast('Yaw value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.yawOutOfBounds'), ToastMsgType.caution, true);
 
       return;
     }
@@ -844,19 +844,19 @@ export abstract class UrlManager {
     const zoomNum = parseFloat(zoom);
 
     if (isNaN(zoomNum)) {
-      ServiceLocator.getUiManager().toast(`Zoom value of "${zoom}" is not a valid float!`, ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.zoomNotFloat').replace('{val}', zoom), ToastMsgType.caution, true);
 
       return;
     }
 
     if (isNaN(latNum) || isNaN(lonNum)) {
-      ServiceLocator.getUiManager().toast('Latitude or Longitude value is not a valid float!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.latLonNotFloat'), ToastMsgType.caution, true);
 
       return;
     }
 
     if (latNum < -90 || latNum > 90 || lonNum < -360 || lonNum > 360) {
-      ServiceLocator.getUiManager().toast('Latitude or Longitude value is out of bounds!', ToastMsgType.caution, true);
+      ServiceLocator.getUiManager().toast(t7e('urlManager.latLonOutOfBounds'), ToastMsgType.caution, true);
 
       return;
     }
@@ -948,7 +948,7 @@ export abstract class UrlManager {
     const samples = val === 'potato' ? GodraySamples.OFF : parseGodraySamplesParam(val);
 
     if (samples === null) {
-      errorManagerInstance.warn(`Unknown sun parameter: ${val}`);
+      errorManagerInstance.warn(t7e('urlManager.unknownSunParam').replace('{val}', val));
 
       return;
     }
@@ -974,7 +974,7 @@ export abstract class UrlManager {
       if (UrlManager.VALID_REGIMES_.includes(r)) {
         valid.push(r);
       } else {
-        errorManagerInstance.warn(`Unknown regime filter: ${r}`);
+        errorManagerInstance.warn(t7e('urlManager.unknownRegime').replace('{val}', r));
       }
     }
 

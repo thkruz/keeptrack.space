@@ -1,5 +1,7 @@
 // biome-ignore-all lint/suspicious/useAwait: StorageProvider contract returns Promises; async keeps sync throws (quota/privacy-mode localStorage, error hooks) surfacing as rejections for .catch() callers
+
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { StorageKey } from '../storage-key';
 import type { StorageProvider, StorageProviderConfig } from '../storage-provider';
 
@@ -128,13 +130,13 @@ export class LocalStorageProvider implements StorageProvider {
       try {
         callback(key, value);
       } catch (error) {
-        errorManagerInstance.warn('Error in storage subscriber:', error);
+        errorManagerInstance.warn(t7e('errorMsgs.Persistence.subscriberError'), error);
       }
     });
   }
 
   private handleError_(error: Error): void {
-    errorManagerInstance.warn('LocalStorageProvider error:', error);
+    errorManagerInstance.warn(t7e('errorMsgs.Persistence.storageError'), error);
     if (this.config_.onError) {
       this.config_.onError(error);
     }

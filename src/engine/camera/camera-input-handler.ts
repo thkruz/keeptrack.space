@@ -218,29 +218,29 @@ export class CameraInputHandler {
 
     switch (this.camera.cameraType) {
       case CameraType.FIXED_TO_EARTH:
-        uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraEarthCentered' as TranslationKey), ToastMsgType.standby);
         this.camera.state.zoomTarget = 0.5;
         break;
       case CameraType.FIXED_TO_SAT_LVLH:
-        uiManagerInstance.toast('Fixed to Satellite (LVLH) Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFixedLvlh' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.FIXED_TO_SAT_ECI:
-        uiManagerInstance.toast('Fixed to Satellite (ECI) Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFixedEci' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.FPS:
-        uiManagerInstance.toast('Free Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFree' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.PLANETARIUM:
-        uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraPlanetarium' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.SATELLITE_FIRST_PERSON:
-        uiManagerInstance.toast('Satellite First Person Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraSatFirstPerson' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.ASTRONOMY:
-        uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraAstronomy' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.FLAT_MAP:
-        uiManagerInstance.toast('Flat Map Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFlatMap' as TranslationKey), ToastMsgType.standby);
         break;
       default:
         errorManagerInstance.log(`Invalid Camera Type: ${this.camera.cameraType}`);

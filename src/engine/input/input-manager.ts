@@ -562,7 +562,7 @@ export class InputManager {
       this.hasWarnedPickingDisabled_ = true;
       const msg = e instanceof Error ? e.message : String(e);
 
-      errorManagerInstance.warn(`Satellite hover-pick disabled: WebGL readPixels not supported in this browser (${msg}). Click-to-select still works.`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.hoverPickDisabled').replace('{error}', msg));
     }
   }
 

@@ -25,6 +25,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SolarBody, ToastMsgType } from '@app/engine/core/interfaces';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from '@app/engine/utils/constants';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import {
   DEG2RAD,
@@ -1057,7 +1058,7 @@ export class Camera {
     }
 
     if (sat.position.x === 0 && sat.position.y === 0 && sat.position.z === 0) {
-      ServiceLocator.getUiManager().toast('Object is inside the earth!', ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast(t7e('toasts.objectInsideEarth'), ToastMsgType.critical);
       const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
       if (selectSatManagerInstance) {

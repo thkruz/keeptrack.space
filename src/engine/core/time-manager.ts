@@ -113,9 +113,9 @@ export class TimeManager {
 
     if (toggleTimeDOM) {
       if (ServiceLocator.getTimeManager().propRate === 0) {
-        toggleTimeDOM.childNodes[0].textContent = 'Start Clock';
+        toggleTimeDOM.childNodes[0].textContent = t7e('rightClickMenu.startClock');
       } else {
-        toggleTimeDOM.childNodes[0].textContent = 'Pause Clock';
+        toggleTimeDOM.childNodes[0].textContent = t7e('rightClickMenu.pauseClock');
       }
     }
 
@@ -124,16 +124,16 @@ export class TimeManager {
     if (!settingsManager.isAlwaysHidePropRate && isShowToast) {
       if (this.propRate > 1.01 || this.propRate < 0.99) {
         if (this.propRate < 10) {
-          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
+          uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.standby);
         }
         if (this.propRate >= 10 && this.propRate < 60) {
-          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.caution);
+          uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.caution);
         }
         if (this.propRate >= 60) {
-          uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.serious);
+          uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.serious);
         }
       } else {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
+        uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.normal);
       }
     }
   }
@@ -150,7 +150,7 @@ export class TimeManager {
 
   changeStaticOffset(staticOffset: number) {
     if (!Number.isFinite(staticOffset)) {
-      errorManagerInstance.warn(`changeStaticOffset received non-finite value: ${staticOffset}`);
+      errorManagerInstance.warn(t7e('errorMsgs.TimeManager.nonFiniteOffset').replace('{value}', String(staticOffset)));
 
       return;
     }
@@ -223,7 +223,7 @@ export class TimeManager {
           if (!this.guardTimeChange_()) {
             return;
           }
-          ServiceLocator.getUiManager().toast('Time Set to Real Time', ToastMsgType.normal);
+          ServiceLocator.getUiManager().toast(t7e('toasts.timeSetToRealTime'), ToastMsgType.normal);
           this.changeStaticOffset(0);
         },
       },
@@ -381,16 +381,16 @@ export class TimeManager {
 
     if (this.propRate > 1.01 || this.propRate < 0.99) {
       if (this.propRate < 10) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.standby);
       }
       if (this.propRate >= 10 && this.propRate < 60) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.caution);
+        uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.caution);
       }
       if (this.propRate >= 60) {
-        uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.serious);
+        uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.serious);
       }
     } else {
-      uiManagerInstance.toast(`Propagation Speed: ${this.propRate.toFixed(1)}x`, ToastMsgType.normal);
+      uiManagerInstance.toast(t7e('toasts.propagationSpeed').replace('{rate}', this.propRate.toFixed(1)), ToastMsgType.normal);
     }
   }
 
@@ -405,7 +405,7 @@ export class TimeManager {
     const simDate = new Date(this.dynamicOffsetEpoch + this.staticOffset);
 
     if (isNaN(simDate.getTime())) {
-      errorManagerInstance.warn(`synchronize() produced Invalid Date - epoch=${this.dynamicOffsetEpoch}, offset=${this.staticOffset}`);
+      errorManagerInstance.warn(t7e('errorMsgs.TimeManager.invalidDate').replace('{epoch}', String(this.dynamicOffsetEpoch)).replace('{offset}', String(this.staticOffset)));
 
       return;
     }

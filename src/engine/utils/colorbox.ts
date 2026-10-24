@@ -1,5 +1,6 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { getEl } from './get-el';
 import { hideLoading, showLoading } from './showLoading';
 import { slideInRight, slideOutLeft } from './slide';
@@ -105,7 +106,7 @@ export const createColorbox = () => {
   colorboxDiv.id = 'colorbox-div';
 
   if (!KeepTrack.getInstance().containerRoot) {
-    errorManagerInstance.warn('Container root not found!');
+    errorManagerInstance.warn(t7e('errorMsgs.Colorbox.containerRootNotFound'));
 
     return;
   }
@@ -130,7 +131,8 @@ export const createColorbox = () => {
   const openButton = document.createElement('button');
 
   openButton.id = 'colorbox-open-button';
-  openButton.innerHTML = '<i class="material-icons" alt="Open in new tab">open_in_new</i>';
+  openButton.setAttribute('aria-label', t7e('colorbox.openInNewTab'));
+  openButton.innerHTML = `<i class="material-icons" alt="${t7e('colorbox.openInNewTab')}">open_in_new</i>`;
   openButton.onclick = () => {
     const iframe = <HTMLIFrameElement>getEl('colorbox-iframe');
 
@@ -161,7 +163,7 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
-    errorManagerInstance.warn('Colorbox container not found!');
+    errorManagerInstance.warn(t7e('errorMsgs.Colorbox.containerNotFound'));
 
     return;
   }
@@ -170,7 +172,7 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
   colorboxIframe.style.display = 'block';
   // Catch failures to load
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
-    errorManagerInstance.warn(`Failed to load: ${url}`);
+    errorManagerInstance.warn(t7e('errorMsgs.Colorbox.loadFailed').replace('{url}', url));
     closeColorbox();
     hideLoading();
   };
@@ -189,7 +191,7 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
-    errorManagerInstance.warn('Colorbox container not found!');
+    errorManagerInstance.warn(t7e('errorMsgs.Colorbox.containerNotFound'));
 
     return;
   }
@@ -204,7 +206,7 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   };
   // Catch failures to load images
   colorboxImage.onerror = () => {
-    errorManagerInstance.warn(`Failed to load image: ${url}`);
+    errorManagerInstance.warn(t7e('errorMsgs.Colorbox.imageLoadFailed').replace('{url}', url));
     closeColorbox();
     hideLoading();
   };

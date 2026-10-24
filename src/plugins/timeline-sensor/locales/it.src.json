@@ -28,7 +28,8 @@
         "inFov": "Nel FOV",
         "atNight": "Di notte",
         "clearSkies": "Cielo sereno",
-        "noPasses": "Nessun passaggio"
+        "noPasses": "Nessun passaggio",
+        "missingUiName": "Sensore senza nome"
       },
       "help": {
         "overview": "La Cronologia sensore mostra quando una rete di sensori può vedere il satellite selezionato nelle ore a venire. Ogni riga è un sensore e ogni barra colorata è un passaggio, così puoi confrontare a colpo d'occhio le opportunità di ogni sito e scegliere il sensore migliore per la prossima osservazione.",
@@ -42,6 +43,9 @@
         "tip1": "Il meteo proviene dalle previsioni di copertura nuvolosa Open-Meteo per ogni sito ottico; i radar ignorano completamente le condizioni di meteo, luce solare e oscurità.",
         "tip2": "Fare clic su un passaggio riseleziona il satellite dopo il cambio di sensore e orario, così gli altri menu aperti si aggiornano con la nuova geometria.",
         "tip3": "Intervalli di calcolo più brevi catturano i passaggi rapidi ma richiedono più tempo di calcolo; 30 secondi sono un buon equilibrio per una finestra di 24 ore."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "Elenco dei sensori non trovato"
       }
     }
   }

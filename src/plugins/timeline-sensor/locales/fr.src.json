@@ -28,7 +28,8 @@
         "inFov": "Dans le FOV",
         "atNight": "De nuit",
         "clearSkies": "Ciel dégagé",
-        "noPasses": "Aucun passage"
+        "noPasses": "Aucun passage",
+        "missingUiName": "Capteur sans nom"
       },
       "help": {
         "overview": "La Chronologie Capteur montre quand un réseau de capteurs peut voir le satellite sélectionné au cours des prochaines heures. Chaque ligne est un capteur et chaque barre colorée est un passage, ce qui permet de comparer d'un coup d'œil les opportunités de chaque site et de choisir le meilleur capteur pour la prochaine observation.",
@@ -42,6 +43,9 @@
         "tip1": "La météo provient des prévisions de couverture nuageuse Open-Meteo pour chaque site optique ; les radars ignorent totalement les conditions de météo, d'ensoleillement et d'obscurité.",
         "tip2": "Cliquer sur un passage resélectionne le satellite après le changement de capteur et d'heure, afin que les autres menus ouverts se rafraîchissent avec la nouvelle géométrie.",
         "tip3": "Des intervalles de calcul plus courts détectent les passages brefs mais prennent plus de temps à calculer ; 30 secondes est un bon compromis pour une fenêtre de 24 heures."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "Liste des capteurs introuvable"
       }
     }
   }

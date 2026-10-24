@@ -426,7 +426,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     const sensorListDom = getEl('sensor-timeline-sensor-list');
 
     if (!sensorListDom) {
-      errorManagerInstance.warn('Could not find sensor list dom');
+      errorManagerInstance.warn(t7e('plugins.SensorTimeline.errorMsgs.sensorListMissing'));
 
       return;
     }
@@ -1088,12 +1088,12 @@ export class SensorTimeline extends KeepTrackPlugin {
       if (sensorPass.type === PassTypes.SAT_IN_SUN) {
         this.ctx_.fillText(SensorTimeline.passTypeLabel_(PassTypes.SAT_IN_SUN), this.leftOffset - nameOffset, yPos + 5);
       } else if (sensorPass.type === PassTypes.CAN_OBSERVE) {
-        this.ctx_.fillText(sensorPass.sensor.uiName ?? 'Missing uiName', this.leftOffset - nameOffset, yPos + 5);
+        this.ctx_.fillText(sensorPass.sensor.uiName ?? t7e('plugins.SensorTimeline.msgs.missingUiName'), this.leftOffset - nameOffset, yPos + 5);
       } else {
         this.ctx_.fillText(SensorTimeline.passTypeLabel_(sensorPass.type as PassTypes), this.leftOffset - nameOffset, yPos + 5);
       }
     } else {
-      this.ctx_.fillText(sensorPass.sensor.uiName ?? 'Missing uiName', this.leftOffset - nameOffset, yPos + 5);
+      this.ctx_.fillText(sensorPass.sensor.uiName ?? t7e('plugins.SensorTimeline.msgs.missingUiName'), this.leftOffset - nameOffset, yPos + 5);
     }
 
     sensorPass.passes.forEach((pass) => {

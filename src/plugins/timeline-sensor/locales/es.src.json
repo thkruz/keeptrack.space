@@ -28,7 +28,8 @@
         "inFov": "En FOV",
         "atNight": "De Noche",
         "clearSkies": "Cielo Despejado",
-        "noPasses": "Sin Pases"
+        "noPasses": "Sin Pases",
+        "missingUiName": "Sensor sin nombre"
       },
       "help": {
         "overview": "La Línea de Tiempo del Sensor muestra cuándo una red de sensores puede ver el satélite seleccionado durante las próximas horas. Cada fila es un sensor y cada barra de color es un pase, de modo que puedes comparar las oportunidades de cada sitio de un vistazo y elegir el mejor sensor para la próxima observación.",
@@ -42,6 +43,9 @@
         "tip1": "La meteorología proviene del pronóstico de nubosidad de Open-Meteo para cada sitio óptico; los radares ignoran por completo las condiciones de meteorología, luz solar y oscuridad.",
         "tip2": "Hacer clic en un pase vuelve a seleccionar el satélite después de cambiar el sensor y la hora, de modo que otros menús abiertos se actualizan con la nueva geometría.",
         "tip3": "Los intervalos de cálculo más cortos capturan pases breves pero tardan más en calcularse; 30 segundos es un buen equilibrio para una ventana de 24 horas."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "No se encontró la lista de sensores"
       }
     }
   }

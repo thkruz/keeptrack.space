@@ -2,7 +2,8 @@
   "plugins": {
     "GamepadPlugin": {
       "connected": "ゲームパッドが接続されました",
-      "disconnected": "ゲームパッドが切断されました"
+      "disconnected": "ゲームパッドが切断されました",
+      "notSupported": "このゲームパッドはサポートされていません。追加を希望する場合は、ゲームパッドの機種名を添えてGitHubでissueを作成してください。"
     }
   }
 }

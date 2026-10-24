@@ -2,7 +2,8 @@
   "plugins": {
     "GamepadPlugin": {
       "connected": "Геймпад підключено",
-      "disconnected": "Геймпад від'єднано"
+      "disconnected": "Геймпад від'єднано",
+      "notSupported": "Цей геймпад не підтримується. Відкрийте issue на GitHub із моделлю геймпада, щоб його додали."
     }
   }
 }

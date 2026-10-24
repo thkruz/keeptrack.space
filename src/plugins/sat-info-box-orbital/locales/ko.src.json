@@ -80,6 +80,7 @@
     "meter": "m",
     "kilometer": "km",
     "second": "초",
-    "unknown": "알 수 없음"
+    "unknown": "알 수 없음",
+    "notAvailable": "해당 없음"
   }
 }

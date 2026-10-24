@@ -80,6 +80,7 @@
     "meter": "米",
     "kilometer": "千米",
     "second": "秒",
-    "unknown": "未知"
+    "unknown": "未知",
+    "notAvailable": "不适用"
   }
 }

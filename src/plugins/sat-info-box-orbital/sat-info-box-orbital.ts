@@ -21,6 +21,9 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
 import { screeningSigmasKm } from './screening-sigmas';
 
+/** Localized placeholder for values that cannot be shown. */
+const notAvailableText = (): string => t7e('SatInfoBoxOrbital.notAvailable' as Parameters<typeof t7e>[0]);
+
 // Keep all fields in the current selection's synchronous render transaction.
 const setInnerHtml = (id: string, value: string): void => {
   const element = getEl(id, true);
@@ -139,7 +142,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
 
     // Only objects propagated from a GP element set (TLE) have a GP epoch; OEM, missiles, etc. show N/A
-    setInnerHtml(EL.GP_EPOCH, obj instanceof Satellite ? SatInfoBoxOrbital.formatGpEpoch(obj.tle1) : 'N/A');
+    setInnerHtml(EL.GP_EPOCH, obj instanceof Satellite ? SatInfoBoxOrbital.formatGpEpoch(obj.tle1) : notAvailableText());
 
     this.updateCovariance_(obj);
     this.updateSecondarySatellite_(obj);
@@ -166,7 +169,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (periodDom) {
       if (!Number.isFinite(period) || period <= 0) {
-        periodDom.textContent = 'N/A';
+        periodDom.textContent = notAvailableText();
         periodDom.removeAttribute('kt-tooltip');
 
         return;
@@ -204,7 +207,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
    */
   static formatElsetAge(daysOld: number): string {
     if (!Number.isFinite(daysOld)) {
-      return 'N/A';
+      return notAvailableText();
     }
 
     const absDays = Math.abs(daysOld);
@@ -227,7 +230,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
    */
   static formatGpEpoch(tle1: TleLine1 | undefined | null): string {
     if (typeof tle1 !== 'string' || tle1.length < 32) {
-      return 'N/A';
+      return notAvailableText();
     }
 
     try {
@@ -237,12 +240,12 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       const epochMs = Math.round(Date.UTC(year, 0, 1) + (dayOfYear - 1) * 86400000);
 
       if (!Number.isFinite(epochMs)) {
-        return 'N/A';
+        return notAvailableText();
       }
 
       return `${new Date(epochMs).toISOString().slice(0, 19).replace('T', ' ')} UTC`;
     } catch {
-      return 'N/A';
+      return notAvailableText();
     }
   }
 
@@ -295,8 +298,8 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       if (!centerBody) {
         errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
 
-        satAltitudeElement.textContent = 'N/A';
-        satVelocityElement.textContent = 'N/A';
+        satAltitudeElement.textContent = notAvailableText();
+        satVelocityElement.textContent = notAvailableText();
 
         return false;
       }
@@ -361,7 +364,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (!secondarySatObj || !(obj instanceof Satellite)) {
       ['sat-sec-dist', 'sat-sec-rad', 'sat-sec-intrack', 'sat-sec-crosstrack'].forEach((id) => {
-        setInnerHtml(id, 'N/A');
+        setInnerHtml(id, notAvailableText());
       });
 
       return;
@@ -396,7 +399,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // report unavailable until a body/frame-aware element model is provided.
     if (obj.centerBody !== SolarBody.Earth) {
       [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE].forEach((id) => {
-        setInnerHtml(id, 'N/A');
+        setInnerHtml(id, notAvailableText());
       });
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
       this.updateSectionHeader_(obj);
@@ -406,20 +409,20 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     try {
       const elements = obj.toClassicalElements();
 
-      const finite = (value: number, digits: number, suffix = ''): string => (Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : 'N/A');
+      const finite = (value: number, digits: number, suffix = ''): string => (Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : notAvailableText());
       const isElliptic = elements.eccentricity >= 0 && elements.eccentricity < 1;
 
-      setInnerHtml(EL.APOGEE, isElliptic ? finite(elements.apogee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : 'N/A');
+      setInnerHtml(EL.APOGEE, isElliptic ? finite(elements.apogee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
       // Earth-centered elements of an escape or heliocentric trajectory are not an orbit, so do not show them as one.
-      setInnerHtml(EL.PERIGEE, isElliptic ? finite(elements.perigee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : 'N/A');
+      setInnerHtml(EL.PERIGEE, isElliptic ? finite(elements.perigee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
       setInnerHtml(EL.INCLINATION, finite(elements.inclinationDegrees, 2, '°'));
-      setInnerHtml(EL.ECCENTRICITY, isElliptic ? finite(elements.eccentricity, 3) : 'N/A');
+      setInnerHtml(EL.ECCENTRICITY, isElliptic ? finite(elements.eccentricity, 3) : notAvailableText());
       setInnerHtml(EL.RAAN, finite(elements.rightAscensionDegrees, 2, '°'));
       setInnerHtml(EL.ARG_PE, finite(elements.argPerigeeDegrees, 2, '°'));
 
       this.updatePeriodElement_(isElliptic ? elements.period : NaN);
 
-      setInnerHtml(EL.ELSET_AGE, 'N/A');
+      setInnerHtml(EL.ELSET_AGE, notAvailableText());
 
       this.updateLatLonElements_(obj.position);
     } catch {
@@ -431,9 +434,9 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.ARG_PE, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.PERIOD, t7e('SatInfoBoxOrbital.unknown'));
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
-      setInnerHtml(EL.ELSET_AGE, 'N/A');
-      setInnerHtml(EL.LATITUDE, 'N/A');
-      setInnerHtml(EL.LONGITUDE, 'N/A');
+      setInnerHtml(EL.ELSET_AGE, notAvailableText());
+      setInnerHtml(EL.LATITUDE, notAvailableText());
+      setInnerHtml(EL.LONGITUDE, notAvailableText());
     }
 
     this.updateSectionHeader_(obj);

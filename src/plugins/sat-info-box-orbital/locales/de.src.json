@@ -80,6 +80,7 @@
     "meter": "m",
     "kilometer": "km",
     "second": "s",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "notAvailable": "k. A."
   }
 }

@@ -80,6 +80,7 @@
     "meter": "m",
     "kilometer": "km",
     "second": "s",
-    "unknown": "Neznámý"
+    "unknown": "Neznámý",
+    "notAvailable": "Není k dispozici"
   }
 }

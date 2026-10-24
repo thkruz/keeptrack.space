@@ -80,6 +80,7 @@
     "meter": "м",
     "kilometer": "км",
     "second": "с",
-    "unknown": "Неизвестно"
+    "unknown": "Неизвестно",
+    "notAvailable": "Н/Д"
   }
 }

@@ -295,3 +295,4 @@ src/plugins-pro/data/optical/
 # Playwright MCP output (page snapshots, console logs, test downloads)
 /.playwright-mcp/
 /.codex/config.toml
+/.agents/

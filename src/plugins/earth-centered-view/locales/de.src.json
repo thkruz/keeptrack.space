@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "Erdansicht"
+      "bottomIconLabel": "Erdansicht",
+      "commandPalette": {
+        "switch": "Zur erdzentrierten Ansicht wechseln"
+      }
     }
   }
 }

@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "Vista Terra"
+      "bottomIconLabel": "Vista Terra",
+      "commandPalette": {
+        "switch": "Passa alla vista centrata sulla Terra"
+      }
     }
   }
 }

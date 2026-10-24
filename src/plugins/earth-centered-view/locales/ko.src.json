@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "지구 보기"
+      "bottomIconLabel": "지구 보기",
+      "commandPalette": {
+        "switch": "지구 중심 보기로 전환"
+      }
     }
   }
 }

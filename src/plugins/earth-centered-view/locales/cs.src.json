@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "Geocentrický pohled"
+      "bottomIconLabel": "Geocentrický pohled",
+      "commandPalette": {
+        "switch": "Přepnout na pohled se středem v Zemi"
+      }
     }
   }
 }

@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "地球ビュー"
+      "bottomIconLabel": "地球ビュー",
+      "commandPalette": {
+        "switch": "地球中心ビューに切り替え"
+      }
     }
   }
 }

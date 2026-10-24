@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "Вид Земли"
+      "bottomIconLabel": "Вид Земли",
+      "commandPalette": {
+        "switch": "Переключиться на геоцентрический вид"
+      }
     }
   }
 }

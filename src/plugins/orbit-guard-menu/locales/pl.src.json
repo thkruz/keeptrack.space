@@ -29,6 +29,17 @@
         "howToUse": "<ol><li>Otwórz menu <strong>Strażnik orbity</strong> z panelu (tryb Zdarzenia). Najnowsze zdarzenia ładują się automatycznie.</li><li>Przejrzyj tabelę: komórki podświetlone na czerwono to wykrycia pozytywne (sklasyfikowany manewr, orbita poza rodziną lub zmiana stabilności).</li><li>Kliknij wiersz, aby przelecieć do tego satelity i przeskoczyć zegarem do końca zdarzenia.</li><li>Użyj przycisków <strong>Poprzednia</strong> i <strong>Następna</strong>, aby przeglądać listę, po 20 zdarzeń na stronę.</li></ol>",
         "tip1": "Zdarzenia są deduplikowane dla każdego satelity i sortowane od najnowszych, więc górne wiersze pokazują najświeższą aktywność.",
         "tip2": "Prawdopodobieństwa to pewność modelu, a nie pewnik; wartości środkowe traktuj jako sygnał do ręcznej weryfikacji, a nie jako wniosek."
+      },
+      "errorMsgs": {
+        "satDecayed": "Wygląda na to, że satelita uległ deorbitacji!",
+        "noData": "Nie znaleziono danych OrbitGuard!",
+        "fetchError": "Błąd pobierania danych OrbitGuard: {error}",
+        "processingError": "Błąd przetwarzania danych o manewrach!"
+      },
+      "values": {
+        "none": "Brak",
+        "true": "Tak",
+        "false": "Nie"
       }
     }
   }

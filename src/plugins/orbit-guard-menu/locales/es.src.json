@@ -29,6 +29,17 @@
         "howToUse": "<ol><li>Abre <strong>OrbitGuard</strong> desde el panel de complementos (modo Eventos). Los últimos eventos se cargan automáticamente.</li><li>Revisa la tabla: las celdas resaltadas en rojo son detecciones positivas (una maniobra clasificada, una órbita fuera de familia o un cambio de estabilidad).</li><li>Haz clic en una fila para volar a ese satélite y saltar el reloj al final del evento.</li><li>Usa <strong>Anterior</strong> y <strong>Siguiente</strong> para recorrer la lista, 20 eventos por página.</li></ol>",
         "tip1": "Los eventos se deduplican por satélite y se ordenan del más reciente al más antiguo, así que las filas superiores muestran la actividad más reciente.",
         "tip2": "Las probabilidades son la confianza del modelo, no una certeza; toma los valores intermedios como una señal para revisar manualmente, no como una conclusión."
+      },
+      "errorMsgs": {
+        "satDecayed": "¡Parece que el satélite ha reentrado!",
+        "noData": "¡No se encontraron datos de OrbitGuard!",
+        "fetchError": "Error al obtener los datos de OrbitGuard: {error}",
+        "processingError": "¡Error al procesar los datos de maniobras!"
+      },
+      "values": {
+        "none": "Ninguna",
+        "true": "Sí",
+        "false": "No"
       }
     }
   }

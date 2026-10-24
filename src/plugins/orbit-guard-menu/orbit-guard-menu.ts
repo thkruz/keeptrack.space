@@ -116,7 +116,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.orbitGuardEvents[row].satNo);
 
     if (!sat) {
-      ServiceLocator.getUiManager().toast('Satellite appears to have decayed!', ToastMsgType.caution);
+      ServiceLocator.getUiManager().toast(l('errorMsgs.satDecayed'), ToastMsgType.caution);
 
       return;
     }
@@ -152,11 +152,11 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
           this.setManeuverList_(maneuverList);
           this.createTable_();
           if (this.orbitGuardEvents.length === 0) {
-            errorManagerInstance.warn('No OrbitGuard data found!');
+            errorManagerInstance.warn(l('errorMsgs.noData'));
           }
         })
         .catch((error) => {
-          errorManagerInstance.warn(`Error fetching OrbitGuard data: ${error.message}`);
+          errorManagerInstance.warn(l('errorMsgs.fetchError').replace('{error}', error.message));
         });
     }
   }
@@ -212,7 +212,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       this.createHeaders_(tbl);
       this.createBody_(tbl);
     } catch {
-      errorManagerInstance.warn('Error processing maneuver data!');
+      errorManagerInstance.warn(l('errorMsgs.processingError'));
     }
   }
 
@@ -289,10 +289,10 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       this.orbitGuardEvents[i].satNo,
       formatDateTime(this.orbitGuardEvents[i].event_start_timestamp),
       formatDateTime(this.orbitGuardEvents[i].event_end_timestamp),
-      this.orbitGuardEvents[i].maneuver_class ?? 'None',
+      this.orbitGuardEvents[i].maneuver_class ?? l('values.none'),
       (this.orbitGuardEvents[i].maneuver_probability * 100).toFixed(2),
-      this.orbitGuardEvents[i].oof_detection === 0 ? 'False' : 'True',
-      this.orbitGuardEvents[i].stability_change_detection === 0 ? 'False' : 'True',
+      this.orbitGuardEvents[i].oof_detection === 0 ? l('values.false') : l('values.true'),
+      this.orbitGuardEvents[i].stability_change_detection === 0 ? l('values.false') : l('values.true'),
       (this.orbitGuardEvents[i].stability_change_probability * 100).toFixed(2),
     ];
 

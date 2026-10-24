@@ -29,6 +29,17 @@
         "howToUse": "<ol><li>Otevřete <strong>Strážce orbity</strong> z panelu (režim Události). Nejnovější události se načtou automaticky.</li><li>Projděte tabulku: buňky zvýrazněné červeně jsou pozitivní detekce (klasifikovaný manévr, orbita mimo rodinu nebo změna stability).</li><li>Kliknutím na řádek přeletíte k danému satelitu a posunete čas na konec události.</li><li>Pomocí tlačítek <strong>Předchozí</strong> a <strong>Další</strong> listujete přehledem, 20 událostí na stránku.</li></ol>",
         "tip1": "Události jsou deduplikovány podle satelitu a seřazeny od nejnovějších, takže horní řádky představují nejčerstvější aktivitu.",
         "tip2": "Pravděpodobnosti vyjadřují spolehlivost modelu, nikoli jistotu; střední hodnoty berte jako podnět k ručnímu prověření, ne jako závěr."
+      },
+      "errorMsgs": {
+        "satDecayed": "Zdá se, že satelit již zanikl!",
+        "noData": "Nebyla nalezena žádná data OrbitGuard!",
+        "fetchError": "Chyba při načítání dat OrbitGuard: {error}",
+        "processingError": "Chyba při zpracování dat o manévrech!"
+      },
+      "values": {
+        "none": "Žádná",
+        "true": "Ano",
+        "false": "Ne"
       }
     }
   }

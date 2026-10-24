@@ -41,6 +41,7 @@
         "button": "Reload"
       },
       "labels": {
+        "noMatches": "一致するプラグインがありません。名前またはIDで検索してください。",
         "search": "Search plugins",
         "builtInSection": "Built-in Plugins",
         "externalSection": "External Plugins",

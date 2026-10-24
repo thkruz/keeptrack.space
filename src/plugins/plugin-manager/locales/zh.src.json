@@ -41,6 +41,7 @@
         "button": "Reload"
       },
       "labels": {
+        "noMatches": "没有匹配的插件。请尝试插件名称或 ID。",
         "search": "Search plugins",
         "builtInSection": "Built-in Plugins",
         "externalSection": "External Plugins",

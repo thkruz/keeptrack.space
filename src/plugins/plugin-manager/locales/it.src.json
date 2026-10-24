@@ -41,6 +41,7 @@
         "button": "Reload"
       },
       "labels": {
+        "noMatches": "Nessun plugin corrispondente. Prova un nome o ID.",
         "search": "Search plugins",
         "builtInSection": "Built-in Plugins",
         "externalSection": "External Plugins",

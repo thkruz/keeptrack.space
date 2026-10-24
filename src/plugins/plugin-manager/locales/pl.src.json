@@ -41,6 +41,7 @@
         "button": "Reload"
       },
       "labels": {
+        "noMatches": "Brak pasujących wtyczek. Spróbuj nazwy lub identyfikatora.",
         "search": "Search plugins",
         "builtInSection": "Built-in Plugins",
         "externalSection": "External Plugins",

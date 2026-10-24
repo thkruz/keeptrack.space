@@ -41,6 +41,7 @@
         "button": "Reload"
       },
       "labels": {
+        "noMatches": "Keine Plugins entsprechen dieser Suche. Versuchen Sie einen Plugin-Namen oder eine ID.",
         "search": "Search plugins",
         "builtInSection": "Built-in Plugins",
         "externalSection": "External Plugins",

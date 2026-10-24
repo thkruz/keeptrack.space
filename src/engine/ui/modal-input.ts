@@ -1,4 +1,5 @@
 import { SoundNames } from '@app/engine/audio/sounds';
+import { t7e } from '@app/locales/keys';
 import { ServiceLocator } from '../core/service-locator';
 import { html } from '../utils/development/formatter';
 import { DraggableModal } from './draggable-modal';
@@ -27,7 +28,7 @@ export class ModalInput extends DraggableModal {
     }
 
     super(ModalInput.id, {
-      title: 'Input',
+      title: t7e('modalConfirm.input'),
       width: '400px',
     });
   }
@@ -39,7 +40,7 @@ export class ModalInput extends DraggableModal {
   }
 
   protected getModalContentHtml(): string {
-    const { label = '', placeholder = '', defaultValue = '', submitText = 'OK', cancelText = 'Cancel' } = this.options_;
+    const { label = '', placeholder = '', defaultValue = '', submitText = t7e('modalConfirm.ok'), cancelText = t7e('modalConfirm.cancel') } = this.options_;
 
     return html`
       <div class="input-modal">
@@ -173,12 +174,12 @@ export class ModalInput extends DraggableModal {
   prompt(onSubmit: (value: string) => void, options?: InputModalOptions): void {
     this.onSubmit_ = onSubmit;
     this.options_ = {
-      title: 'Input',
+      title: t7e('modalConfirm.input'),
       label: '',
       placeholder: '',
       defaultValue: '',
-      submitText: 'OK',
-      cancelText: 'Cancel',
+      submitText: t7e('modalConfirm.ok'),
+      cancelText: t7e('modalConfirm.cancel'),
       ...options,
     };
 

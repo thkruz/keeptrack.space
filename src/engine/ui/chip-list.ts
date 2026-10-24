@@ -25,6 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { t7e } from '@app/locales/keys';
 import './chip-list.css';
 
 export interface ChipListItem {
@@ -194,7 +195,7 @@ export class ChipList {
       remove.type = 'button';
       remove.className = 'kt-chip-remove';
       remove.dataset.chipId = item.id;
-      remove.setAttribute('aria-label', `Remove ${item.label}`);
+      remove.setAttribute('aria-label', t7e('modalConfirm.removeItem').replace('{label}', item.label));
       remove.textContent = '×';
       chip.appendChild(remove);
     }

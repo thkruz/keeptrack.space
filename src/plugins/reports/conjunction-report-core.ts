@@ -48,7 +48,8 @@ import {
   type ScreeningDiffEntry,
 } from '@app/engine/conjunction/analysis-state';
 import { findApproachMinima } from '@app/engine/conjunction/conjunction-tca';
-import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, Kilometers, RIC, Satellite, Seconds, StateCovariance } from '@ootk/src/main';
+import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, j2SecularRates, Kilometers, RIC, Satellite, Seconds, StateCovariance } from '@ootk/src/main';
+import { isPlaceholderIntlDes } from '../sat-info-box/placeholder-intl-des';
 import { screeningSigmasKm } from '../sat-info-box-orbital/screening-sigmas';
 import { formatReportTime, ReportData, ReportTable, tleEpochFromLine1 } from './reports-core';
 import { formatPc, riskLevelFromPc } from './screening-diff';
@@ -179,11 +180,45 @@ const ELEMENT_KEYS = [
   'bstar',
 ] as const;
 
+const ANGLE_KEYS = new Set<string>(['raanDeg', 'argPerigeeDeg', 'meanAnomalyDeg']);
+const RAD2DEG = 180 / Math.PI;
+
+const wrap360 = (deg: number): number => ((deg % 360) + 360) % 360;
+/** Signed angle difference in [-180, 180). */
+const wrap180 = (deg: number): number => wrap360(deg + 180) - 180;
+
+/**
+ * Moves TLE mean elements to another epoch using the secular J2 rates (RAAN, argument of perigee,
+ * mean anomaly). Without this the maneuver report compared the parent at its TLE epoch with the
+ * clone at the burn epoch, so the Change column showed hours of orbital motion as a burn effect.
+ */
+export const advanceMeanElements = (el: MeanElements, targetIso: string): MeanElements => {
+  if (!el.epochIso) {
+    return el;
+  }
+  const dtSec = (new Date(targetIso).getTime() - new Date(el.epochIso).getTime()) / 1000;
+  const rates = j2SecularRates(el.semiMajorAxisKm, el.eccentricity, el.inclinationDeg / RAD2DEG);
+
+  if (!Number.isFinite(dtSec) || !Number.isFinite(rates.meanAnomalyDot)) {
+    return el;
+  }
+
+  return {
+    ...el,
+    epochIso: targetIso,
+    raanDeg: wrap360(el.raanDeg + rates.raanDot * dtSec * RAD2DEG),
+    argPerigeeDeg: wrap360(el.argPerigeeDeg + rates.argPerigeeDot * dtSec * RAD2DEG),
+    meanAnomalyDeg: wrap360(el.meanAnomalyDeg + rates.meanAnomalyDot * dtSec * RAD2DEG),
+  };
+};
+
 const meanElementDeltas = (pre: MeanElements, post: MeanElements): ManeuverOption['meanElementDeltas'] => {
   const out: NonNullable<ManeuverOption['meanElementDeltas']> = {};
 
   for (const key of ELEMENT_KEYS) {
-    out[key] = post[key] - pre[key];
+    const delta = post[key] - pre[key];
+
+    out[key] = ANGLE_KEYS.has(key) ? wrap180(delta) : delta;
   }
 
   return out;
@@ -198,7 +233,7 @@ export const buildObjectSummary = (sat: Satellite, role: AnalysisObjectRole, env
     role,
     name: sat.name,
     noradId: sat.sccNum || null,
-    cosparId: sat.intlDes || null,
+    cosparId: sat.intlDes && !isPlaceholderIntlDes(sat) ? sat.intlDes : null,
     tleEpochIso: epoch ? epoch.toISOString() : null,
     gpAgeHours: epoch ? (env.analysisEpoch.getTime() - epoch.getTime()) / MS_PER_HOUR : null,
     ricSigmasKm: ricSigmas(sat),
@@ -590,8 +625,9 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
     state.encounter = postEncounter;
   }
 
-  const pre = parentSummary.meanElements;
   const post = analystSummary.meanElements;
+  // Compare at one epoch: the parent's elements are carried forward to the clone's epoch.
+  const pre = parentSummary.meanElements && post?.epochIso ? advanceMeanElements(parentSummary.meanElements, post.epochIso) : parentSummary.meanElements;
   const burns = input.burns;
 
   state.maneuverOptions = [
@@ -647,7 +683,7 @@ const meanElementsTable = (option: ManeuverOption): ReportTable => {
   const deltas = option.meanElementDeltas;
 
   return {
-    headers: ['Mean Element (TLE)', 'Pre (parent)', 'Post (analyst)', 'Change'],
+    headers: ['Mean Element (TLE)', 'Pre (parent, at Post epoch)', 'Post (analyst)', 'Change'],
     rows: [
       ['Epoch (UTC)', fmtIsoTime(pre?.epochIso ?? null), fmtIsoTime(post?.epochIso ?? null), '-'],
       ...ELEMENT_ROWS.map(([key, label, digits]) => [

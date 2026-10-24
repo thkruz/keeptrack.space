@@ -25,7 +25,9 @@
         "mapStyle": "地図スタイル",
         "standard": "標準",
         "political": "政治地図",
-        "nightLights": "夜間光"
+        "nightLights": "夜間光",
+        "inView": "視野内",
+        "outOfView": "視野外"
       }
     }
   }

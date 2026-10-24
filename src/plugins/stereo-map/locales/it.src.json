@@ -25,7 +25,9 @@
         "mapStyle": "Stile mappa",
         "standard": "Standard",
         "political": "Politica",
-        "nightLights": "Luci notturne"
+        "nightLights": "Luci notturne",
+        "inView": "Visibile",
+        "outOfView": "Fuori vista"
       }
     }
   }

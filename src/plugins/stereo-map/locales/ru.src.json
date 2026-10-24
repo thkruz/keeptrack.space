@@ -25,7 +25,9 @@
         "mapStyle": "Стиль карты",
         "standard": "Стандартный",
         "political": "Политический",
-        "nightLights": "Ночные огни"
+        "nightLights": "Ночные огни",
+        "inView": "В поле зрения",
+        "outOfView": "Вне поля зрения"
       }
     }
   }

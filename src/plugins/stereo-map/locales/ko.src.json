@@ -25,7 +25,9 @@
         "mapStyle": "지도 스타일",
         "standard": "표준",
         "political": "정치 지도",
-        "nightLights": "야간 조명"
+        "nightLights": "야간 조명",
+        "inView": "시야 내",
+        "outOfView": "시야 밖"
       }
     }
   }

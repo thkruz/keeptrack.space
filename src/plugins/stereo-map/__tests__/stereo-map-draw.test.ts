@@ -254,6 +254,77 @@ describe('StereoMap draw chain and interactions', () => {
   });
 
   describe('resize2DMap_', () => {
+    it('resizes an open map when the drawer returns to rail mode', async () => {
+      const existingDrawer = getEl('plugin-drawer', true);
+      const drawer = existingDrawer ?? document.createElement('div');
+      const menu = getEl('map-menu')!;
+
+      if (!existingDrawer) {
+        drawer.id = 'plugin-drawer';
+        document.body.appendChild(drawer);
+      }
+      menu.style.left = '0px';
+      EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+      vi.spyOn(plugin, 'updateMap').mockImplementation(() => undefined);
+
+      try {
+        menu.style.left = '60px';
+        drawer.classList.add('rail-mode');
+
+        await vi.waitFor(() => {
+          expect(60 + p().canvas_.width).toBeLessThanOrEqual(window.innerWidth - 360);
+        });
+        expect(plugin.updateMap).toHaveBeenCalled();
+
+        // A drawer change while closed must not leave the next opening's inset stale.
+        p().isMenuButtonActive = false;
+        menu.style.left = '0px';
+        drawer.classList.remove('rail-mode');
+        await Promise.resolve();
+        p().isMenuButtonActive = true;
+        plugin.onBottomIconClick();
+        expect(p().canvas_.width).toBe(window.innerWidth - 360);
+
+        menu.style.left = '60px';
+        drawer.classList.add('rail-mode');
+        await vi.waitFor(() => {
+          expect(60 + p().canvas_.width).toBeLessThanOrEqual(window.innerWidth - 360);
+        });
+      } finally {
+        p().drawerLayoutObserver_?.disconnect();
+        menu.style.removeProperty('left');
+        if (!existingDrawer) {
+          drawer.remove();
+        }
+      }
+    });
+
+    it.each([
+      [1366, 768],
+      [1093, 614],
+      [911, 512],
+    ])('keeps the map between the drawer rail and info box at %ix%i', (width, height) => {
+      const widthDescriptor = Object.getOwnPropertyDescriptor(window, 'innerWidth')!;
+      const heightDescriptor = Object.getOwnPropertyDescriptor(window, 'innerHeight')!;
+      const menu = getEl('map-menu')!;
+
+      Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: height });
+      menu.style.left = '60px';
+
+      try {
+        p().resize2DMap_();
+
+        expect(Number.parseFloat(menu.style.left) + p().canvas_.width).toBeLessThanOrEqual(width - 360);
+        expect(p().canvas_.height).toBe(Math.floor(p().canvas_.width / 2));
+        expect(settingsManager.mapWidth).toBe(p().canvas_.width);
+      } finally {
+        Object.defineProperty(window, 'innerWidth', widthDescriptor);
+        Object.defineProperty(window, 'innerHeight', heightDescriptor);
+        menu.style.removeProperty('left');
+      }
+    });
+
     it('recomputes map dimensions and redraws the earth layer', () => {
       p().resize2DMap_(true);
 
@@ -312,5 +383,43 @@ describe('StereoMap draw chain and interactions', () => {
 
       expect(updateSpy).not.toHaveBeenCalled();
     });
+  });
+  it('renders target identities and UTC epoch into the exported canvas layer', () => {
+    p().selectSatManager_.primarySatObj = fakeSat({ name: 'PRIMARY', sccNum: '25544' });
+    p().selectSatManager_.secondarySatObj = fakeSat({ id: 5, name: 'SECONDARY', sccNum: '12345' });
+    p().drawTargetLegend_();
+    expect(ctx.fillText).toHaveBeenCalledWith('PRIMARY (25544)', 18, 58, expect.any(Number));
+    expect(ctx.fillText).toHaveBeenCalledWith('SECONDARY (12345)', 18, 98, expect.any(Number));
+    expect(ctx.fillText).toHaveBeenCalledWith(expect.stringContaining('UTC'), 18, 150);
+  });
+
+  it.each([
+    { from: 179, to: -179, firstEdge: 1000, secondEdge: 0 },
+    { from: -179, to: 179, firstEdge: 0, secondEdge: 1000 },
+  ])('splits the frozen $from to $to degree dateline segment at its analytic midpoint', ({ from, to, firstEdge, secondEdge }) => {
+    settingsManager.mapWidth = 1000;
+    // Independent equirectangular oracle: +/-179 are one degree from the edge;
+    // their equal distances put the crossing halfway between y=100 and y=200.
+    const points = [
+      { x: ((from + 180) * 1000) / 360, y: 100, inView: false },
+      { x: ((to + 180) * 1000) / 360, y: 200, inView: false },
+    ];
+    p().strokeGroundTrace_(ctx, points, '#ffff00', '#ff0000', 4);
+    expect(ctx.lineTo).toHaveBeenCalledWith(firstEdge, expect.closeTo(150, 8));
+    expect(ctx.moveTo).toHaveBeenCalledWith(secondEdge, expect.closeTo(150, 8));
+  });
+
+  it('makes trace markers keyboard buttons with identity and exact-time names', () => {
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getSat').mockReturnValue(fakeSat({ name: 'FIXTURE', sccNum: '25544' }) as never);
+    p().drawGroundTrace_();
+    const marker = getEl('map-look1') as HTMLImageElement;
+    expect(marker.getAttribute('role')).toBe('button');
+    expect(marker.tabIndex).toBe(0);
+    expect(marker.alt).toContain('FIXTURE (25544)');
+    expect(marker.alt).toContain(marker.dataset.time);
+    const jump = vi.spyOn(plugin as never, 'mapMenuClick_' as never).mockImplementation(() => undefined);
+    marker.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    marker.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(jump).toHaveBeenCalledTimes(2);
   });
 });

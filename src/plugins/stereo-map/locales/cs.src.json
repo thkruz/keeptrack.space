@@ -25,7 +25,9 @@
         "mapStyle": "Styl mapy",
         "standard": "Standardní",
         "political": "Politická",
-        "nightLights": "Noční světla"
+        "nightLights": "Noční světla",
+        "inView": "V zorném poli",
+        "outOfView": "Mimo zorné pole"
       }
     }
   }

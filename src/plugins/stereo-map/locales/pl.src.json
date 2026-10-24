@@ -25,7 +25,9 @@
         "mapStyle": "Styl mapy",
         "standard": "Standardowy",
         "political": "Polityczny",
-        "nightLights": "Światła nocne"
+        "nightLights": "Światła nocne",
+        "inView": "W polu widzenia",
+        "outOfView": "Poza polem widzenia"
       }
     }
   }

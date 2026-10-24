@@ -97,6 +97,8 @@ export class StereoMap extends KeepTrackPlugin {
   private static readonly SECONDARY_OUT_OF_VIEW_COLOR_ = '#0066ff';
   protected canvas_: HTMLCanvasElement;
   private satCrunchNow_ = 0;
+  private drawerLayoutObserver_?: MutationObserver;
+  private mapLayoutLeft_ = '';
   protected isMapUpdateOverride_ = false;
   protected readonly earthImg_ = new Image();
   private readonly logo_ = new Image();
@@ -128,6 +130,7 @@ export class StereoMap extends KeepTrackPlugin {
 
   onBottomIconClick(): void {
     if (this.isMenuButtonActive) {
+      this.resize2DMap_();
       this.syncMinutesFromOrbits_();
       this.updateMap();
     }
@@ -258,6 +261,7 @@ export class StereoMap extends KeepTrackPlugin {
       this.canvas_ = <HTMLCanvasElement>getEl('map-2d');
 
       this.resize2DMap_();
+      this.observeDrawerLayout_();
 
       window.addEventListener('resize', () => {
         if (!settingsManager.disableUI) {
@@ -276,6 +280,14 @@ export class StereoMap extends KeepTrackPlugin {
         this.mapMenuClick_(evt);
       });
 
+      getEl('map-menu')?.addEventListener('keydown', (evt: KeyboardEvent) => {
+        const target = evt.target as HTMLElement;
+
+        if (target.dataset.time && (evt.key === 'Enter' || evt.key === ' ')) {
+          evt.preventDefault();
+          this.mapMenuClick_(evt);
+        }
+      });
       const settingsForm = getEl('stereo-map-settings-form', true);
 
       settingsForm?.addEventListener('submit', (e: Event) => {
@@ -342,6 +354,7 @@ export class StereoMap extends KeepTrackPlugin {
         this.drawGraticuleLabels_();
       }
       this.addTextToMap_();
+      this.drawTargetLegend_();
     } catch (e) {
       errorManagerInstance.info(e);
     }
@@ -425,6 +438,9 @@ export class StereoMap extends KeepTrackPlugin {
           dotDom.style.left = `${groundTracePoints[i - 1].x - this.halfDotSize_}px`;
           dotDom.style.top = `${groundTracePoints[i - 1].y - this.halfDotSize_}px`;
           dotDom.dataset.time = mapPoints.time;
+          dotDom.alt = `${sat.name} (${sat.sccNum}) — ${mapPoints.time} UTC — ${t7e(`plugins.StereoMap.labels.${mapPoints.overallView ? 'inView' : 'outOfView'}` as Parameters<typeof t7e>[0])}`;
+          dotDom.setAttribute('role', 'button');
+          dotDom.tabIndex = 0;
           dotDom.dataset.inview = mapPoints.overallView ? 'true' : 'false';
           showEl(`map-look${selectableIdx}`);
         }
@@ -535,6 +551,49 @@ export class StereoMap extends KeepTrackPlugin {
     ctx.stroke();
   }
 
+  private drawTargetLegend_(): void {
+    const ctx = this.canvas_.getContext('2d');
+    const selection = this.selectSatManager_;
+    const primary = selection?.primarySatObj;
+
+    if (!ctx || !primary || primary.id < 0) {
+      return;
+    }
+    const secondary = selection.secondarySatObj;
+    const targets = [
+      { sat: primary, visible: StereoMap.PRIMARY_IN_VIEW_COLOR_, hidden: StereoMap.PRIMARY_OUT_OF_VIEW_COLOR_ },
+      ...(secondary && secondary.id >= 0 && secondary.id !== primary.id
+        ? [{ sat: secondary, visible: StereoMap.SECONDARY_IN_VIEW_COLOR_, hidden: StereoMap.SECONDARY_OUT_OF_VIEW_COLOR_ }]
+        : []),
+    ];
+    const visible = t7e('plugins.StereoMap.labels.inView' as Parameters<typeof t7e>[0]);
+    const hidden = t7e('plugins.StereoMap.labels.outOfView' as Parameters<typeof t7e>[0]);
+
+    ctx.save();
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'left';
+    targets.forEach((target, index) => {
+      const y = 58 + index * 40;
+
+      ctx.fillStyle = '#fff';
+      ctx.fillText(`${target.sat.name} (${(target.sat as Satellite).sccNum ?? target.sat.id})`, 18, y, this.canvas_.width - 36);
+      for (const [color, label, x] of [
+        [target.visible, visible, 18],
+        [target.hidden, hidden, 205],
+      ] as const) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(x, y + 14);
+        ctx.lineTo(x + 22, y + 14);
+        ctx.stroke();
+        ctx.fillText(label, x + 30, y + 18);
+      }
+    });
+    ctx.fillText(`${ServiceLocator.getTimeManager().simulationTimeObj.toISOString()} UTC`, 18, 70 + targets.length * 40);
+    ctx.restore();
+  }
+
   private addTextToMap_() {
     const ctx = this.canvas_.getContext('2d');
     const cw = this.canvas_.width;
@@ -601,6 +660,7 @@ export class StereoMap extends KeepTrackPlugin {
       newSensor.id = `map-sensor-${selectableIdx}`;
       newSensor.className = 'map-item map-look start-hidden';
       newSensor.src = radar1;
+      newSensor.alt = sensor.name;
       newSensor.style.left = `${map.x - sensorDom.width / 2}px`;
       newSensor.style.top = `${map.y - sensorDom.height / 2}px`;
       newSensor.style.width = `${sensorDom.width}px`;
@@ -634,6 +694,7 @@ export class StereoMap extends KeepTrackPlugin {
       y: settingsManager.mapHeight - ((lla.lat + 90) / 180) * settingsManager.mapHeight,
     };
 
+    satDom.alt = `${sat.name} (${(sat as Satellite).sccNum ?? sat.id})`;
     satDom.style.left = `${map.x - satDom.width / 2}px`;
     satDom.style.top = `${map.y - satDom.height / 2}px`;
   }
@@ -641,14 +702,38 @@ export class StereoMap extends KeepTrackPlugin {
   private static readonly SAT_INFOBOX_WIDTH_ = 360;
   private static readonly MIN_MAP_DIMENSION_ = 2;
 
+  private observeDrawerLayout_(): void {
+    this.drawerLayoutObserver_?.disconnect();
+    const drawer = getEl('plugin-drawer', true);
+    const menu = getEl('map-menu', true);
+
+    if (!drawer || !menu) {
+      return;
+    }
+    this.drawerLayoutObserver_ = new MutationObserver(() => {
+      if (!drawer.isConnected || !menu.isConnected || !this.isMenuButtonActive) {
+        return;
+      }
+      if (window.getComputedStyle(menu).left === this.mapLayoutLeft_) {
+        return;
+      }
+      this.resize2DMap_();
+      this.updateMap();
+    });
+    this.drawerLayoutObserver_.observe(drawer, { attributes: true, attributeFilter: ['class'] });
+  }
+
   private resize2DMap_(isForceWidescreen?: boolean): void {
     isForceWidescreen ??= false;
     const mapMenuDOM = getEl('map-menu');
 
     if (mapMenuDOM) {
+      this.mapLayoutLeft_ = window.getComputedStyle(mapMenuDOM).left;
       if (isForceWidescreen || window.innerWidth > window.innerHeight) {
-        // If widescreen, leave room for the sat-info-box on the right
-        const availableWidth = Math.max(StereoMap.MIN_MAP_DIMENSION_, window.innerWidth - StereoMap.SAT_INFOBOX_WIDTH_);
+        // Leave room for both the drawer rail and the sat-info-box.
+        const menuLeft = Number.parseFloat(this.mapLayoutLeft_);
+        const leftInset = Number.isFinite(menuLeft) ? Math.max(0, menuLeft) : 0;
+        const availableWidth = Math.max(StereoMap.MIN_MAP_DIMENSION_, window.innerWidth - leftInset - StereoMap.SAT_INFOBOX_WIDTH_);
 
         settingsManager.mapWidth = availableWidth;
         settingsManager.mapHeight = settingsManager.mapWidth / 2;

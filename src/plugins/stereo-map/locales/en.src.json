@@ -25,7 +25,9 @@
         "mapStyle": "Map Style",
         "standard": "Standard",
         "political": "Political",
-        "nightLights": "Night Lights"
+        "nightLights": "Night Lights",
+        "inView": "In view",
+        "outOfView": "Out of view"
       }
     }
   }

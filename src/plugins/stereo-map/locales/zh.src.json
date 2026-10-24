@@ -25,7 +25,9 @@
         "mapStyle": "地图样式",
         "standard": "标准",
         "political": "政区",
-        "nightLights": "夜间灯光"
+        "nightLights": "夜间灯光",
+        "inView": "视野内",
+        "outOfView": "视野外"
       }
     }
   }

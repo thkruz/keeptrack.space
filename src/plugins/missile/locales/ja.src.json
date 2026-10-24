@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} を読み込みました",
         "simLoadFailed": "{sim} の読み込みに失敗しました",
-        "missilesActive": "{n} / {max} 発のミサイルが稼働中"
+        "missilesActive": "{n} / {max} 発のミサイルが稼働中",
+        "massRaidLoaded": "ミサイル大規模攻撃を読み込みました",
+        "missileCreated": "ミサイル RV_{n} を<br>作成しました。",
+        "mirvCreated": "作成された再突入体 (MIRV):<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "目標緯度が無効です！",
         "invalidTargetLongitude": "目標経度が無効です！",
         "invalidLaunchLatitude": "発射緯度が無効です！",
         "invalidLaunchLongitude": "発射経度が無効です！",
-        "invalidWarheads": "弾頭数は1から12までの整数で指定してください。"
+        "invalidWarheads": "弾頭数は1から12までの整数で指定してください。",
+        "maxMissiles": "エラー: ミサイルの最大数に<br>達しました。",
+        "launchLatRange": "エラー: 発射地点の緯度は<br>90度から-90度の範囲で指定してください",
+        "launchLonRange": "エラー: 発射地点の経度は<br>180度から-180度の範囲で指定してください",
+        "targetLatRange": "エラー: 目標の緯度は<br>90度から-90度の範囲で指定してください",
+        "targetLonRange": "エラー: 目標の経度は<br>180度から-180度の範囲で指定してください",
+        "minDistance": "エラー: このミサイルの最小射程は320 kmです。",
+        "maxDistance": "エラー: このミサイルの最大射程は{km} kmです。",
+        "tooClose": "エラー: 選択したミサイルにはこの距離は近すぎます。",
+        "orbitalVelocity": "エラー: ミサイルが軌道速度に達しました<br>(この射程にはモーターが大きすぎます)。",
+        "overshot": "エラー: ミサイルが目標を越えました<br>(この射程にはモーターが大きすぎます)。",
+        "notGuided": "エラー: この射程ではミサイルを<br>目標へ誘導できませんでした。"
       },
       "commands": {
         "open": "ミサイルプラグインを開く",

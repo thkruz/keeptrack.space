@@ -7,6 +7,7 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { t7e } from '@app/locales/keys';
 import { Degrees, Kilometers, Meters, SpaceObjectType } from '@ootk/src/main';
 import { missileManager } from './missile-manager';
 
@@ -842,13 +843,13 @@ export class Missile {
     }
     if (TargetLatitude > 90 || TargetLatitude < -90) {
       missileManager.lastMissileErrorType = ToastMsgType.critical;
-      missileManager.lastMissileError = 'Error: Target Latitude must be<br>between 90 and -90 degrees';
+      missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.targetLatRange');
 
       return false;
     }
     if (TargetLongitude > 180 || TargetLongitude < -180) {
       missileManager.lastMissileErrorType = ToastMsgType.critical;
-      missileManager.lastMissileError = 'Error: Target Longitude must be<br>between 90 and -90 degrees';
+      missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.targetLonRange');
 
       return false;
     }
@@ -1144,14 +1145,14 @@ export class Missile {
 
     if (ArcLength < 320000) {
       missileManager.lastMissileErrorType = ToastMsgType.critical;
-      missileManager.lastMissileError = 'Error: This missile has a minimum distance of 320 km.';
+      missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.minDistance');
 
       return null;
     }
 
     if (ArcLength > MaxMissileRange * 1000) {
       missileManager.lastMissileErrorType = ToastMsgType.critical;
-      missileManager.lastMissileError = `Error: This missile has a maximum distance of ${MaxMissileRange} km.`;
+      missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.maxDistance').replace('{km}', MaxMissileRange.toString());
 
       return null;
     }
@@ -1276,7 +1277,7 @@ export class Missile {
 
     if (minAltitudeTrue === (minAltitude * 3) / 2) {
       missileManager.lastMissileErrorType = ToastMsgType.critical;
-      missileManager.lastMissileError = 'Error: This distance is too close for the selected missile.';
+      missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.tooClose');
 
       return null;
     }

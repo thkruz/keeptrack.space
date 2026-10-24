@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} načteno",
         "simLoadFailed": "Nepodařilo se načíst {sim}",
-        "missilesActive": "{n} / {max} aktivních raket"
+        "missilesActive": "{n} / {max} aktivních raket",
+        "massRaidLoaded": "Hromadný raketový útok byl úspěšně načten",
+        "missileCreated": "Střela RV_{n}<br>byla vytvořena.",
+        "mirvCreated": "Vytvořené návratové hlavice (MIRV):<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Neplatná zeměpisná šířka cíle!",
         "invalidTargetLongitude": "Neplatná zeměpisná délka cíle!",
         "invalidLaunchLatitude": "Neplatná zeměpisná šířka startu!",
         "invalidLaunchLongitude": "Neplatná zeměpisná délka startu!",
-        "invalidWarheads": "Počet hlavic musí být celé číslo od 1 do 12."
+        "invalidWarheads": "Počet hlavic musí být celé číslo od 1 do 12.",
+        "maxMissiles": "Chyba: Bylo dosaženo maximálního<br>počtu střel.",
+        "launchLatRange": "Chyba: Zeměpisná šířka startu musí být<br>mezi 90 a -90 stupni",
+        "launchLonRange": "Chyba: Zeměpisná délka startu musí být<br>mezi 180 a -180 stupni",
+        "targetLatRange": "Chyba: Zeměpisná šířka cíle musí být<br>mezi 90 a -90 stupni",
+        "targetLonRange": "Chyba: Zeměpisná délka cíle musí být<br>mezi 180 a -180 stupni",
+        "minDistance": "Chyba: Tato střela má minimální dolet 320 km.",
+        "maxDistance": "Chyba: Tato střela má maximální dolet {km} km.",
+        "tooClose": "Chyba: Tato vzdálenost je pro zvolenou střelu příliš krátká.",
+        "orbitalVelocity": "Chyba: Střela dosáhla orbitální rychlosti<br>(motor je pro tento dolet příliš silný).",
+        "overshot": "Chyba: Střela přeletěla cíl<br>(motor je pro tento dolet příliš silný).",
+        "notGuided": "Chyba: Střelu nebylo možné navést<br>k cíli na tuto vzdálenost."
       },
       "commands": {
         "open": "Otevřít raketový plugin",

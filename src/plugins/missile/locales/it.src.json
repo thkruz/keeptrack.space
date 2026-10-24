@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} caricato",
         "simLoadFailed": "Impossibile caricare {sim}",
-        "missilesActive": "{n} / {max} missili attivi"
+        "missilesActive": "{n} / {max} missili attivi",
+        "massRaidLoaded": "Attacco missilistico di massa caricato correttamente",
+        "missileCreated": "Il missile RV_{n}<br>è stato creato.",
+        "mirvCreated": "Veicoli di rientro (MIRV) creati:<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Latitudine del bersaglio non valida!",
         "invalidTargetLongitude": "Longitudine del bersaglio non valida!",
         "invalidLaunchLatitude": "Latitudine di lancio non valida!",
         "invalidLaunchLongitude": "Longitudine di lancio non valida!",
-        "invalidWarheads": "Le testate devono essere un numero intero da 1 a 12."
+        "invalidWarheads": "Le testate devono essere un numero intero da 1 a 12.",
+        "maxMissiles": "Errore: è stato raggiunto il numero<br>massimo di missili.",
+        "launchLatRange": "Errore: la latitudine di lancio deve essere<br>compresa tra 90 e -90 gradi",
+        "launchLonRange": "Errore: la longitudine di lancio deve essere<br>compresa tra 180 e -180 gradi",
+        "targetLatRange": "Errore: la latitudine del bersaglio deve essere<br>compresa tra 90 e -90 gradi",
+        "targetLonRange": "Errore: la longitudine del bersaglio deve essere<br>compresa tra 180 e -180 gradi",
+        "minDistance": "Errore: questo missile ha una distanza minima di 320 km.",
+        "maxDistance": "Errore: questo missile ha una distanza massima di {km} km.",
+        "tooClose": "Errore: questa distanza è troppo breve per il missile selezionato.",
+        "orbitalVelocity": "Errore: il missile ha raggiunto la velocità orbitale<br>(motore troppo potente per questa distanza).",
+        "overshot": "Errore: il missile ha superato il bersaglio<br>(motore troppo potente per questa distanza).",
+        "notGuided": "Errore: impossibile guidare il missile<br>sul bersaglio a questa distanza."
       },
       "commands": {
         "open": "Apri il plugin dei missili",

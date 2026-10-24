@@ -4,6 +4,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable complexity */
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { t7e } from '@app/locales/keys';
 import { Degrees, Kilometers } from '@ootk/src/main';
 import { MissileSimulationResult, MissileSpec } from './missile-types';
 
@@ -128,7 +129,7 @@ export class MissileSimulation {
     if (ArcLength < 320_000) {
       return {
         kind: 'error',
-        errorMessage: 'Error: This missile has a minimum distance of 320 km.',
+        errorMessage: t7e('plugins.MissileSimulatorPlugin.errorMsgs.minDistance'),
         errorType: ToastMsgType.critical,
       };
     }
@@ -136,7 +137,7 @@ export class MissileSimulation {
     if (ArcLength > MaxMissileRange * 1000) {
       return {
         kind: 'error',
-        errorMessage: `Error: This missile has a maximum distance of ${MaxMissileRange} km.`,
+        errorMessage: t7e('plugins.MissileSimulatorPlugin.errorMsgs.maxDistance').replace('{km}', MaxMissileRange.toString()),
         errorType: ToastMsgType.critical,
       };
     }
@@ -332,7 +333,7 @@ export class MissileSimulation {
     if (AltitudeList.length >= MissileSimulation.MAX_FLIGHT_STEPS) {
       return {
         kind: 'error',
-        errorMessage: 'Error: The missile reached orbital velocity<br>(motor too large for this range).',
+        errorMessage: t7e('plugins.MissileSimulatorPlugin.errorMsgs.orbitalVelocity'),
         errorType: ToastMsgType.critical,
       };
     }
@@ -348,7 +349,7 @@ export class MissileSimulation {
     if (LatList.length !== AltitudeList.length || LongList.length !== AltitudeList.length) {
       return {
         kind: 'error',
-        errorMessage: 'Error: The missile overshot its target<br>(motor too large for this range).',
+        errorMessage: t7e('plugins.MissileSimulatorPlugin.errorMsgs.overshot'),
         errorType: ToastMsgType.critical,
       };
     }
@@ -364,7 +365,7 @@ export class MissileSimulation {
     if (minAltitudeTrue === (minAltitude * 3) / 2) {
       return {
         kind: 'tooClose',
-        errorMessage: 'Error: This distance is too close for the selected missile.',
+        errorMessage: t7e('plugins.MissileSimulatorPlugin.errorMsgs.tooClose'),
         errorType: ToastMsgType.critical,
       };
     }
@@ -378,7 +379,7 @@ export class MissileSimulation {
     if (impactErrorFraction > 0.1) {
       return {
         kind: 'error',
-        errorMessage: 'Error: The missile could not be guided<br>to its target at this range.',
+        errorMessage: t7e('plugins.MissileSimulatorPlugin.errorMsgs.notGuided'),
         errorType: ToastMsgType.critical,
       };
     }

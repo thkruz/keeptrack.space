@@ -85,7 +85,7 @@
       },
       "errorMsgs": {
         "NoConstellationSelected": "Nebyla vybrána žádná konstelace",
-        "ConstellationEmpty": "Nenalezeny žádné satelity — tato konstelace možná ještě není na oběžné dráze nebo musí být importována"
+        "ConstellationEmpty": "Nenalezeny žádné satelity. Tato konstelace možná ještě není na oběžné dráze nebo musí být importována"
       }
     }
   }

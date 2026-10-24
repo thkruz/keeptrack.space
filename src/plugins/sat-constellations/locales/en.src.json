@@ -85,7 +85,7 @@
       },
       "errorMsgs": {
         "NoConstellationSelected": "No constellation selected",
-        "ConstellationEmpty": "No satellites found — this constellation may not be in orbit yet or needs to be imported"
+        "ConstellationEmpty": "No satellites found. This constellation may not be in orbit yet or needs to be imported"
       }
     }
   }

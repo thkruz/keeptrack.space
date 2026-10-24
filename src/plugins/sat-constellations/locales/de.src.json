@@ -85,7 +85,7 @@
       },
       "errorMsgs": {
         "NoConstellationSelected": "Keine Konstellation ausgewählt",
-        "ConstellationEmpty": "Keine Satelliten gefunden — diese Konstellation ist möglicherweise noch nicht im Orbit oder muss importiert werden"
+        "ConstellationEmpty": "Keine Satelliten gefunden. Diese Konstellation ist möglicherweise noch nicht im Orbit oder muss importiert werden"
       }
     }
   }

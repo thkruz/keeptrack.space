@@ -85,7 +85,7 @@
       },
       "errorMsgs": {
         "NoConstellationSelected": "コンステレーションが選択されていません",
-        "ConstellationEmpty": "衛星が見つかりません — この星座はまだ軌道上にないか、インポートが必要な場合があります"
+        "ConstellationEmpty": "衛星が見つかりません。このコンステレーションはまだ軌道上にないか、インポートが必要な可能性があります"
       }
     }
   }

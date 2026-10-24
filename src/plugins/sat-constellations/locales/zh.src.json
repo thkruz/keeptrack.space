@@ -85,7 +85,7 @@
       },
       "errorMsgs": {
         "NoConstellationSelected": "未选择星座",
-        "ConstellationEmpty": "未找到卫星 — 该星座可能尚未入轨或需要导入"
+        "ConstellationEmpty": "未找到卫星。该星座可能尚未入轨或需要导入"
       }
     }
   }

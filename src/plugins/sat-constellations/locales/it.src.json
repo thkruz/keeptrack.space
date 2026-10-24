@@ -85,7 +85,7 @@
       },
       "errorMsgs": {
         "NoConstellationSelected": "Nessuna costellazione selezionata",
-        "ConstellationEmpty": "Nessun satellite trovato — questa costellazione potrebbe non essere ancora in orbita o deve essere importata"
+        "ConstellationEmpty": "Nessun satellite trovato. Questa costellazione potrebbe non essere ancora in orbita o deve essere importata"
       }
     }
   }

@@ -116,13 +116,13 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       </div>
       <div class="kt-field-row">
         <div class="input-field col s12">
-            <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="How Many Days of Look Angles Should be Calculated" />
+            <input id="look-angles-length" value="2" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('settings.calculationLengthTooltip')}" />
             <label for="look-angles-length" class="active">${l('settings.calculationLength')}</label>
         </div>
       </div>
       <div class="kt-field-row">
         <div class="input-field col s12">
-            <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="Seconds Between Each Line of Look Angles" />
+            <input id="look-angles-interval" value="30" type="text" data-position="bottom" data-delay="50" data-tooltip="${l('settings.intervalTooltip')}" />
             <label for="look-angles-interval" class="active">${l('settings.interval')}</label>
         </div>
       </div>
@@ -136,7 +136,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     }
 
     if (!this.lastlooksArray_) {
-      errorManagerInstance.warn('No look angles available for download!');
+      errorManagerInstance.warn(l('msgs.noLookAnglesToDownload'));
 
       return;
     }

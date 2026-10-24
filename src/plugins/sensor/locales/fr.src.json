@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Nom du capteur",
-        "defaultSensorName": "Capteur personnalisé",
         "latitude": "Latitude",
         "longitude": "Longitude",
         "elevation": "Altitude au-dessus du niveau de la mer (km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Afficher uniquement les heures de lever et de coucher",
         "calculationLength": "Durée du calcul (jours)",
-        "interval": "Intervalle (secondes)"
+        "interval": "Intervalle (secondes)",
+        "calculationLengthTooltip": "Nombre de jours d'angles de visée à calculer",
+        "intervalTooltip": "Secondes entre chaque ligne d'angles de visée"
       },
       "table": {
         "time": "Heure",
@@ -167,7 +168,8 @@
         "set": "Coucher",
         "maxEl": "Élév. max.",
         "unknown": "Inconnu",
-        "inView": "En vue"
+        "inView": "En vue",
+        "noLookAnglesToDownload": "Aucun angle de visée disponible au téléchargement !"
       },
       "maskLimited": "masque",
       "maskLimitedTitle": "Ce bord est fixé par le masque d'horizon du capteur, pas par son élévation minimale",
@@ -201,7 +203,9 @@
         "notVisible": "Le satellite ne sera pas visible pendant les {hours} prochaines heures.",
         "yes": "Oui",
         "no": "Non",
-        "na": "N/D"
+        "na": "N/D",
+        "sensorListMissing": "Liste des capteurs introuvable dans l'interface",
+        "satrecNotFound": "Enregistrement du satellite introuvable"
       },
       "help": {
         "overview": "Les angles multi-sites répondent à une question de réseau : parmi tous mes capteurs, lequel voit le satellite sélectionné, et quand ? Ils calculent les angles de visée sur de nombreux sites à la fois et les entrelacent dans un seul tableau chronologique.",

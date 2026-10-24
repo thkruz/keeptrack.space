@@ -1,4 +1,4 @@
-import { CUSTOM_SENSOR_DEFAULT_NAME, formatCustomSensorLocation, isCustomSensor, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
+import { formatCustomSensorLocation, getCustomSensorDefaultDisplayName, isCustomSensor, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -95,7 +95,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         <div class="kt-section-label">${s('identity')}</div>
         <div class="kt-field-row">
           <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipSensorName')}">
-            <input id="cs-uiName" type="text" value="${l('defaultSensorName')}" />
+            <input id="cs-uiName" type="text" value="${getCustomSensorDefaultDisplayName()}" />
             <label for="cs-uiName" class="active">${l('sensorName')}</label>
           </div>
         </div>
@@ -225,7 +225,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           getEl('cs-telescope')?.click();
         }
         CustomSensorPlugin.setFields_({
-          'cs-uiName': 'Observer',
+          'cs-uiName': CustomSensorPlugin.t_('labels.typeObserver'),
           'cs-lat': mouseInputInstance.latLon.lat.toString(),
           'cs-lon': mouseInputInstance.latLon.lon.toString(),
           'cs-hei': '0',
@@ -250,7 +250,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             getEl('cs-telescope')!.click();
           }
           CustomSensorPlugin.setFields_({
-            'cs-uiName': CUSTOM_SENSOR_DEFAULT_NAME,
+            'cs-uiName': getCustomSensorDefaultDisplayName(),
             'cs-lat': mouseInputInstance.latLon.lat.toString(),
             'cs-lon': mouseInputInstance.latLon.lon.toString(),
             'cs-hei': '0',

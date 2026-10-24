@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Nazwa czujnika",
-        "defaultSensorName": "Własny czujnik",
         "latitude": "Szerokość geograficzna",
         "longitude": "Długość geograficzna",
         "elevation": "Wysokość nad poziomem morza (km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Pokaż tylko czasy wschodu i zachodu",
         "calculationLength": "Długość obliczeń (dni)",
-        "interval": "Interwał (sekundy)"
+        "interval": "Interwał (sekundy)",
+        "calculationLengthTooltip": "Na ile dni obliczyć kąty obserwacji",
+        "intervalTooltip": "Liczba sekund między kolejnymi wierszami kątów obserwacji"
       },
       "table": {
         "time": "Czas",
@@ -167,7 +168,8 @@
         "set": "Zachód",
         "maxEl": "Maks. El.",
         "unknown": "Nieznany",
-        "inView": "W zasięgu"
+        "inView": "W zasięgu",
+        "noLookAnglesToDownload": "Brak kątów obserwacji do pobrania!"
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tę krawędź wyznacza maska horyzontu sensora, a nie jego minimalna elewacja",
@@ -201,7 +203,9 @@
         "notVisible": "Satelita nie będzie widoczny przez najbliższe {hours} godzin.",
         "yes": "Tak",
         "no": "Nie",
-        "na": "nd."
+        "na": "nd.",
+        "sensorListMissing": "Nie znaleziono listy czujników w interfejsie",
+        "satrecNotFound": "Nie znaleziono rekordu satelity"
       },
       "help": {
         "overview": "Wielostanowiskowe kąty obserwacji odpowiadają na pytanie sieciowe: który z moich czujników widzi wybranego satelitę i kiedy? Obliczają kąty obserwacji dla wielu stanowisk naraz i przeplatają je w jedną chronologiczną tabelę.",

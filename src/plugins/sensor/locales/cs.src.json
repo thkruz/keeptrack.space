@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Název senzoru",
-        "defaultSensorName": "Vlastní senzor",
         "latitude": "Zeměpisná šířka",
         "longitude": "Zeměpisná délka",
         "elevation": "Nadmořská výška (km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Zobrazit pouze časy východu a západu",
         "calculationLength": "Délka výpočtu (dny)",
-        "interval": "Interval (sekundy)"
+        "interval": "Interval (sekundy)",
+        "calculationLengthTooltip": "Kolik dní úhlů pohledu se má vypočítat",
+        "intervalTooltip": "Počet sekund mezi jednotlivými řádky úhlů pohledu"
       },
       "table": {
         "time": "Čas",
@@ -167,7 +168,8 @@
         "set": "Západ",
         "maxEl": "Max. El.",
         "unknown": "Neznámé",
-        "inView": "V dohledu"
+        "inView": "V dohledu",
+        "noLookAnglesToDownload": "Nejsou k dispozici žádné úhly pohledu ke stažení!"
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tuto hranu určuje maska horizontu senzoru, ne jeho minimální elevace",
@@ -201,7 +203,9 @@
         "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
         "yes": "Ano",
         "no": "Ne",
-        "na": "N/A"
+        "na": "N/A",
+        "sensorListMissing": "Seznam senzorů nebyl nalezen v rozhraní",
+        "satrecNotFound": "Záznam družice nebyl nalezen"
       },
       "help": {
         "overview": "Úhly pohledu z více míst odpovídají na síťovou otázku: který ze všech mých senzorů vidí vybraný satelit a kdy? Počítají úhly pohledu pro mnoho stanovišť najednou a prokládají je do jediné chronologické tabulky.",

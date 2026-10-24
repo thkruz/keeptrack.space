@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Sensor Name",
-        "defaultSensorName": "Custom Sensor",
         "latitude": "Latitude",
         "longitude": "Longitude",
         "elevation": "Elevation Above Sea Level (Km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Show Only Rise and Set Times",
         "calculationLength": "Calculation Length (Days)",
-        "interval": "Interval (Seconds)"
+        "interval": "Interval (Seconds)",
+        "calculationLengthTooltip": "How Many Days of Look Angles Should be Calculated",
+        "intervalTooltip": "Seconds Between Each Line of Look Angles"
       },
       "table": {
         "time": "Time",
@@ -167,7 +168,8 @@
         "set": "Set",
         "maxEl": "Max El",
         "unknown": "Unknown",
-        "inView": "In View"
+        "inView": "In View",
+        "noLookAnglesToDownload": "No look angles available for download!"
       },
       "maskLimited": "mask",
       "maskLimitedTitle": "This edge is set by the sensor's horizon mask, not its minimum elevation",
@@ -201,7 +203,9 @@
         "notVisible": "Satellite is not visible for the next {hours} hours.",
         "yes": "Yes",
         "no": "No",
-        "na": "N/A"
+        "na": "N/A",
+        "sensorListMissing": "Could not find the sensor list",
+        "satrecNotFound": "Satellite record not found"
       },
       "help": {
         "overview": "Multi-Site Look Angles answers a network question: of all my sensors, which one sees the selected satellite, and when? It computes look angles across many sites at once and interleaves them into a single chronological table.",

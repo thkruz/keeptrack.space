@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Nombre del Sensor",
-        "defaultSensorName": "Sensor Personalizado",
         "latitude": "Latitud",
         "longitude": "Longitud",
         "elevation": "Elevación sobre el Nivel del Mar (Km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Mostrar Solo Tiempos de Salida y Puesta",
         "calculationLength": "Duración del Cálculo (Días)",
-        "interval": "Intervalo (Segundos)"
+        "interval": "Intervalo (Segundos)",
+        "calculationLengthTooltip": "Cuántos días de ángulos de observación se deben calcular",
+        "intervalTooltip": "Segundos entre cada línea de ángulos de observación"
       },
       "table": {
         "time": "Hora",
@@ -167,7 +168,8 @@
         "set": "Puesta",
         "maxEl": "El. máx.",
         "unknown": "Desconocido",
-        "inView": "En vista"
+        "inView": "En vista",
+        "noLookAnglesToDownload": "¡No hay ángulos de observación disponibles para descargar!"
       },
       "maskLimited": "máscara",
       "maskLimitedTitle": "Este borde lo define la máscara de horizonte del sensor, no su elevación mínima",
@@ -201,7 +203,9 @@
         "notVisible": "El satélite no será visible durante las próximas {hours} horas.",
         "yes": "Sí",
         "no": "No",
-        "na": "N/D"
+        "na": "N/D",
+        "sensorListMissing": "No se encontró la lista de sensores en la interfaz",
+        "satrecNotFound": "No se encontró el registro del satélite"
       },
       "help": {
         "overview": "Los Ángulos de Visión Multi-Sitio responden a una pregunta de red: de todos mis sensores, ¿cuál ve el satélite seleccionado y cuándo? Calcula los ángulos de visión en muchos sitios a la vez y los intercala en una única tabla cronológica.",

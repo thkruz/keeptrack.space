@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Nome del sensore",
-        "defaultSensorName": "Sensore personalizzato",
         "latitude": "Latitudine",
         "longitude": "Longitudine",
         "elevation": "Altitudine sul livello del mare (km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Mostra solo gli orari di sorgere e tramonto",
         "calculationLength": "Durata del calcolo (giorni)",
-        "interval": "Intervallo (secondi)"
+        "interval": "Intervallo (secondi)",
+        "calculationLengthTooltip": "Quanti giorni di angoli di vista calcolare",
+        "intervalTooltip": "Secondi tra ogni riga di angoli di vista"
       },
       "table": {
         "time": "Ora",
@@ -167,7 +168,8 @@
         "set": "Tramonto",
         "maxEl": "El. max",
         "unknown": "Sconosciuto",
-        "inView": "In vista"
+        "inView": "In vista",
+        "noLookAnglesToDownload": "Nessun angolo di vista disponibile per il download!"
       },
       "maskLimited": "maschera",
       "maskLimitedTitle": "Questo bordo è fissato dalla maschera d'orizzonte del sensore, non dalla sua elevazione minima",
@@ -201,7 +203,9 @@
         "notVisible": "Il satellite non sarà visibile per le prossime {hours} ore.",
         "yes": "Sì",
         "no": "No",
-        "na": "N/D"
+        "na": "N/D",
+        "sensorListMissing": "Elenco dei sensori non trovato nell'interfaccia",
+        "satrecNotFound": "Record del satellite non trovato"
       },
       "help": {
         "overview": "Gli angoli di osservazione multi-sito rispondono a una domanda di rete: tra tutti i miei sensori, quale vede il satellite selezionato, e quando? Calcolano gli angoli di osservazione su molti siti contemporaneamente e li intrecciano in un'unica tabella cronologica.",

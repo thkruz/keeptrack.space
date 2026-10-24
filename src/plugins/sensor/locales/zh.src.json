@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "传感器名称",
-        "defaultSensorName": "自定义传感器",
         "latitude": "纬度",
         "longitude": "经度",
         "elevation": "海拔高度（公里）",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "仅显示升起和落下时间",
         "calculationLength": "计算时长（天）",
-        "interval": "间隔（秒）"
+        "interval": "间隔（秒）",
+        "calculationLengthTooltip": "要计算多少天的观测角度",
+        "intervalTooltip": "每行观测角度之间的秒数"
       },
       "table": {
         "time": "时间",
@@ -167,7 +168,8 @@
         "set": "落下",
         "maxEl": "最大仰角",
         "unknown": "未知",
-        "inView": "在视野内"
+        "inView": "在视野内",
+        "noLookAnglesToDownload": "没有可下载的观测角度!"
       },
       "maskLimited": "遮罩",
       "maskLimitedTitle": "此边界由传感器的地平线遮罩决定，而非其最小仰角",
@@ -201,7 +203,9 @@
         "notVisible": "未来{hours}小时内卫星不可见。",
         "yes": "是",
         "no": "否",
-        "na": "不适用"
+        "na": "不适用",
+        "sensorListMissing": "未找到传感器列表元素",
+        "satrecNotFound": "未找到卫星记录"
       },
       "help": {
         "overview": "多站观测角回答一个网络层面的问题：在我所有的传感器中，哪一个能看到选定的卫星，何时能看到？它一次性计算多个站点的观测角，并将它们交织成一张按时间排序的表格。",

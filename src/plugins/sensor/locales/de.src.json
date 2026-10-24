@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "Sensorname",
-        "defaultSensorName": "Benutzerdefinierter Sensor",
         "latitude": "Breitengrad",
         "longitude": "Längengrad",
         "elevation": "Höhe über dem Meeresspiegel (km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "Nur Auf- und Untergangszeiten anzeigen",
         "calculationLength": "Berechnungsdauer (Tage)",
-        "interval": "Intervall (Sekunden)"
+        "interval": "Intervall (Sekunden)",
+        "calculationLengthTooltip": "Für wie viele Tage Blickwinkel berechnet werden sollen",
+        "intervalTooltip": "Sekunden zwischen den einzelnen Blickwinkelzeilen"
       },
       "table": {
         "time": "Zeit",
@@ -167,7 +168,8 @@
         "set": "Untergang",
         "maxEl": "Max. El.",
         "unknown": "Unbekannt",
-        "inView": "Im Sichtfeld"
+        "inView": "Im Sichtfeld",
+        "noLookAnglesToDownload": "Keine Blickwinkel zum Herunterladen verfügbar!"
       },
       "maskLimited": "Maske",
       "maskLimitedTitle": "Diese Kante wird durch die Horizontmaske des Sensors bestimmt, nicht durch seine Mindestelevation",
@@ -201,7 +203,9 @@
         "notVisible": "Der Satellit ist in den nächsten {hours} Stunden nicht sichtbar.",
         "yes": "Ja",
         "no": "Nein",
-        "na": "k. A."
+        "na": "k. A.",
+        "sensorListMissing": "Die Sensorliste wurde in der Oberfläche nicht gefunden",
+        "satrecNotFound": "Satellitendatensatz nicht gefunden"
       },
       "help": {
         "overview": "Multi-Standort-Blickwinkel beantwortet eine Netzwerkfrage: Welcher meiner Sensoren sieht den ausgewählten Satelliten, und wann? Es berechnet Blickwinkel über viele Standorte gleichzeitig und verschachtelt sie zu einer einzigen chronologischen Tabelle.",

@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "センサー名",
-        "defaultSensorName": "カスタムセンサー",
         "latitude": "緯度",
         "longitude": "経度",
         "elevation": "海抜高度（km）",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "上昇・下降時刻のみ表示",
         "calculationLength": "計算期間（日）",
-        "interval": "間隔（秒）"
+        "interval": "間隔（秒）",
+        "calculationLengthTooltip": "ルックアングルを計算する日数",
+        "intervalTooltip": "ルックアングルの各行の間隔 (秒)"
       },
       "table": {
         "time": "時刻",
@@ -167,7 +168,8 @@
         "set": "下降",
         "maxEl": "最大仰角",
         "unknown": "不明",
-        "inView": "視野内"
+        "inView": "視野内",
+        "noLookAnglesToDownload": "ダウンロードできるルックアングルがありません!"
       },
       "maskLimited": "マスク",
       "maskLimitedTitle": "この境界はセンサーの最小仰角ではなく地平線マスクで決まります",
@@ -201,7 +203,9 @@
         "notVisible": "今後{hours}時間、衛星は可視になりません。",
         "yes": "はい",
         "no": "いいえ",
-        "na": "該当なし"
+        "na": "該当なし",
+        "sensorListMissing": "センサー一覧の要素が見つかりませんでした",
+        "satrecNotFound": "衛星レコードが見つかりません"
       },
       "help": {
         "overview": "マルチサイト視線角度は、ネットワークに関する問いに答えます。自分のすべてのセンサーのうち、どれが選択した衛星をいつ見るのか？多数のサイトの視線角度を一度に計算し、それらを時系列順の1つのテーブルにまとめます。",

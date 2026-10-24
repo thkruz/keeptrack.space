@@ -63,7 +63,6 @@
       },
       "labels": {
         "sensorName": "센서 이름",
-        "defaultSensorName": "커스텀 센서",
         "latitude": "위도",
         "longitude": "경도",
         "elevation": "해발 고도 (km)",
@@ -149,7 +148,9 @@
       "settings": {
         "showRiseSetOnly": "상승 및 하강 시간만 표시",
         "calculationLength": "계산 기간 (일)",
-        "interval": "간격 (초)"
+        "interval": "간격 (초)",
+        "calculationLengthTooltip": "관측 각도를 계산할 일수",
+        "intervalTooltip": "관측 각도 각 행 사이의 초"
       },
       "table": {
         "time": "시간",
@@ -167,7 +168,8 @@
         "set": "하강",
         "maxEl": "최대 고도각",
         "unknown": "알 수 없음",
-        "inView": "시야 내"
+        "inView": "시야 내",
+        "noLookAnglesToDownload": "다운로드할 관측 각도가 없습니다!"
       },
       "maskLimited": "마스크",
       "maskLimitedTitle": "이 경계는 센서의 최소 고각이 아니라 지평선 마스크로 정해집니다",
@@ -201,7 +203,9 @@
         "notVisible": "위성이 향후 {hours}시간 동안 보이지 않습니다.",
         "yes": "예",
         "no": "아니요",
-        "na": "해당 없음"
+        "na": "해당 없음",
+        "sensorListMissing": "센서 목록 요소를 찾을 수 없습니다",
+        "satrecNotFound": "위성 레코드를 찾을 수 없습니다"
       },
       "help": {
         "overview": "다중 사이트 관측각은 네트워크에 대한 질문에 답합니다: 내 모든 센서 중 어느 것이 선택된 위성을 언제 보는가? 여러 사이트의 관측각을 한 번에 계산하고 이를 하나의 시간순 표로 엮어 보여줍니다.",

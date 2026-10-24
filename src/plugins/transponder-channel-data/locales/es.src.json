@@ -19,7 +19,8 @@
         "NoChannelInfo": "El satélite no tiene información de canal",
         "NotSatellite": "El objeto seleccionado no es un satélite",
         "FetchFailed": "No se pudo obtener la información del canal para {name} y {altName}",
-        "NoData": "No hay datos de canal disponibles"
+        "NoData": "No hay datos de canal disponibles",
+        "SaveXlsxFailed": "¡Error al guardar el archivo xlsx!"
       },
       "help": {
         "overview": "La información de transpondedor y canal muestra lo que un satélite geoestacionario de TV o comunicaciones está transmitiendo realmente: cada canal conocido con su frecuencia, haz, sistema de transmisión y cifrado. Los datos cubren unos cientos de satélites de difusión muy conocidos y se obtienen en vivo al abrir el menú.",
@@ -44,7 +45,8 @@
         "statusError": "No se pudieron cargar los datos de canales",
         "retry": "Reintentar"
       },
-      "attribution": "Datos de canales de la API de KeepTrack (listados públicos)."
+      "attribution": "Datos de canales de la API de KeepTrack (listados públicos).",
+      "searchAliases": "Frecuencias de satélites,Transpondedor,Datos de canales"
     }
   }
 }

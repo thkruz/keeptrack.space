@@ -493,7 +493,9 @@ export class TransponderChannelData extends KeepTrackPlugin {
     if (format === 'csv') {
       saveCsv(rows, 'channel-info');
     } else {
-      saveXlsx(rows, 'channel-info').catch((e) => errorManagerInstance.error(e, 'TransponderChannelData', 'Error saving xlsx!'));
+      saveXlsx(rows, 'channel-info').catch((e) =>
+        errorManagerInstance.error(e, 'TransponderChannelData', t7e('plugins.TransponderChannelData.errorMsgs.SaveXlsxFailed' as Parameters<typeof t7e>[0]))
+      );
     }
   }
 }

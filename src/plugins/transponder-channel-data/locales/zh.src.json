@@ -19,7 +19,8 @@
         "NoChannelInfo": "该卫星没有频道信息",
         "NotSatellite": "所选对象不是卫星",
         "FetchFailed": "无法获取 {name} 和 {altName} 的频道信息",
-        "NoData": "没有可用的频道数据"
+        "NoData": "没有可用的频道数据",
+        "SaveXlsxFailed": "保存 xlsx 文件时出错！"
       },
       "help": {
         "overview": "转发器和频道信息显示地球静止轨道电视或通信卫星实际正在播出的内容：每个已知频道及其频率、波束、传输系统和加密方式。数据涵盖数百颗知名广播卫星，并在打开菜单时实时获取。",
@@ -44,7 +45,8 @@
         "statusError": "无法加载频道数据",
         "retry": "重试"
       },
-      "attribution": "频道数据来自 KeepTrack API（公开列表）。"
+      "attribution": "频道数据来自 KeepTrack API（公开列表）。",
+      "searchAliases": "卫星频率,转发器,频道数据"
     }
   }
 }

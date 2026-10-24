@@ -19,7 +19,8 @@
         "NoChannelInfo": "Satellite does not have channel information",
         "NotSatellite": "Selected object is not a satellite",
         "FetchFailed": "Failed to fetch channel info for {name} and {altName}",
-        "NoData": "No channel data available"
+        "NoData": "No channel data available",
+        "SaveXlsxFailed": "Error saving xlsx!"
       },
       "help": {
         "overview": "Transponder and Channel Info shows what a geostationary TV or communications satellite is actually broadcasting: every known channel with its frequency, beam, transmission system, and encryption. The data covers a few hundred well known broadcast satellites and is fetched live when you open the menu.",
@@ -44,7 +45,8 @@
         "statusError": "Could not load channel data",
         "retry": "Retry"
       },
-      "attribution": "Channel data from the KeepTrack API (public listings)."
+      "attribution": "Channel data from the KeepTrack API (public listings).",
+      "searchAliases": "Satellite Frequencies,Transponder,Channel Data"
     }
   }
 }

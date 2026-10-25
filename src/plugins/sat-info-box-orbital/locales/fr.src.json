@@ -81,6 +81,14 @@
     "kilometer": "km",
     "second": "s",
     "unknown": "Inconnu",
-    "notAvailable": "N/D"
+    "notAvailable": "N/D",
+    "CenterBody": {
+      "label": "Corps central",
+      "tooltip": "Corps à partir duquel les positions de l'éphéméride sont mesurées (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Repère de référence",
+      "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)"
+    }
   }
 }

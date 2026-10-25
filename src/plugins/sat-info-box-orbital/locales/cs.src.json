@@ -81,6 +81,14 @@
     "kilometer": "km",
     "second": "s",
     "unknown": "Neznámý",
-    "notAvailable": "Není k dispozici"
+    "notAvailable": "Není k dispozici",
+    "CenterBody": {
+      "label": "Centrální těleso",
+      "tooltip": "Těleso, od kterého se měří polohy efemeridy (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Vztažná soustava",
+      "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)"
+    }
   }
 }

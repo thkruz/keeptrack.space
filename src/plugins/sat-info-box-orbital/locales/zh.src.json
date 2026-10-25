@@ -81,6 +81,14 @@
     "kilometer": "千米",
     "second": "秒",
     "unknown": "未知",
-    "notAvailable": "不适用"
+    "notAvailable": "不适用",
+    "CenterBody": {
+      "label": "中心天体",
+      "tooltip": "星历位置所参照的天体（OEM CENTER_NAME）"
+    },
+    "RefFrame": {
+      "label": "参考系",
+      "tooltip": "星历的坐标系（OEM REF_FRAME）"
+    }
   }
 }

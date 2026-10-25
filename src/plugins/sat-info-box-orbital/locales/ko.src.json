@@ -81,6 +81,14 @@
     "kilometer": "km",
     "second": "초",
     "unknown": "알 수 없음",
-    "notAvailable": "해당 없음"
+    "notAvailable": "해당 없음",
+    "CenterBody": {
+      "label": "중심 천체",
+      "tooltip": "궤도력 위치의 기준이 되는 천체 (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "기준 좌표계",
+      "tooltip": "궤도력의 좌표계 (OEM REF_FRAME)"
+    }
   }
 }

@@ -112,16 +112,82 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Drop the covariance rows (Radial, In Track, Cross Track Sigma) when the setting is disabled
     const visibleRows = settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance ? rows : rows.filter((row) => !covarianceIds.includes(row.id));
 
-    return visibleRows
-      .map(
-        (row) => html`
+    return (
+      this.createOemFrameRows_() +
+      visibleRows
+        .map(
+          (row) => html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
       `
+        )
+        .join('')
+    );
+  }
+
+  /**
+   * Center body and reference frame rows, shown only for OEM objects (hidden until one is selected). They are not
+   * `sat-only-info` rows: SatInfoBox shows those for every satellite.
+   */
+  private createOemFrameRows_(): string {
+    const rows = [
+      {
+        key: t7e('SatInfoBoxOrbital.CenterBody.label' as Parameters<typeof t7e>[0]),
+        id: EL.CENTER_BODY,
+        tooltip: t7e('SatInfoBoxOrbital.CenterBody.tooltip' as Parameters<typeof t7e>[0]),
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.RefFrame.label' as Parameters<typeof t7e>[0]),
+        id: EL.REF_FRAME,
+        tooltip: t7e('SatInfoBoxOrbital.RefFrame.tooltip' as Parameters<typeof t7e>[0]),
+      },
+    ];
+
+    return rows
+      .map(
+        (row) => html`
+        <div class="sat-info-row sat-oem-only-info" id="${row.id}-row" style="display: none;">
+          <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
+          <div class="sat-info-value" id="${row.id}"></div>
+        </div>
+      `
       )
       .join('');
+  }
+
+  /** Show the OEM header's center body and frame for an OEM object; hide both rows for anything else. */
+  private updateOemFrameRows_(obj: BaseObject): void {
+    const isOem = obj instanceof OemSatellite;
+
+    for (const id of [EL.CENTER_BODY, EL.REF_FRAME]) {
+      const row = getEl(`${id}-row`, true);
+
+      if (row) {
+        row.style.display = isOem ? 'flex' : 'none';
+      }
+    }
+
+    if (!isOem) {
+      return;
+    }
+
+    const { centerName, refFrame } = obj.centerNameAndFrame;
+
+    setInnerHtml(EL.CENTER_BODY, SatInfoBoxOrbital.formatCenterName(centerName) || notAvailableText());
+    setInnerHtml(EL.REF_FRAME, refFrame || notAvailableText());
+  }
+
+  /** OEM CENTER_NAME in title case for display: `EARTH` -> `Earth`, `SOLAR SYSTEM BARYCENTER` -> `Solar System Barycenter`. */
+  static formatCenterName(centerName: string): string {
+    return centerName
+      .trim()
+      .toLowerCase()
+      .split(/\s+/u)
+      .filter((word) => word.length > 0)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 
   private updateOrbitData_(obj: BaseObject): void {
@@ -144,6 +210,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Only objects propagated from a GP element set (TLE) have a GP epoch; OEM, missiles, etc. show N/A
     setInnerHtml(EL.GP_EPOCH, obj instanceof Satellite ? SatInfoBoxOrbital.formatGpEpoch(obj.tle1) : notAvailableText());
 
+    this.updateOemFrameRows_(obj);
     this.updateCovariance_(obj);
     this.updateSecondarySatellite_(obj);
     this.updateAltitudeAndVelocity_(obj);
@@ -411,10 +478,15 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
       const finite = (value: number, digits: number, suffix = ''): string => (Number.isFinite(value) ? `${value.toFixed(digits)}${suffix}` : notAvailableText());
       const isElliptic = elements.eccentricity >= 0 && elements.eccentricity < 1;
+      /*
+       * During a powered ascent the osculating elements are not an orbit yet (at liftoff they read apogee 0 km and
+       * perigee about -6367 km), so apogee and perigee are not shown until insertion.
+       */
+      const isApsisAvailable = isElliptic && !(obj instanceof PhasedOrbitSatellite && obj.isInAscent());
 
-      setInnerHtml(EL.APOGEE, isElliptic ? finite(elements.apogee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
+      setInnerHtml(EL.APOGEE, isApsisAvailable ? finite(elements.apogee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
       // Earth-centered elements of an escape or heliocentric trajectory are not an orbit, so do not show them as one.
-      setInnerHtml(EL.PERIGEE, isElliptic ? finite(elements.perigee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
+      setInnerHtml(EL.PERIGEE, isApsisAvailable ? finite(elements.perigee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
       setInnerHtml(EL.INCLINATION, finite(elements.inclinationDegrees, 2, '°'));
       setInnerHtml(EL.ECCENTRICITY, isElliptic ? finite(elements.eccentricity, 3) : notAvailableText());
       setInnerHtml(EL.RAAN, finite(elements.rightAscensionDegrees, 2, '°'));

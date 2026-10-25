@@ -81,6 +81,14 @@
     "kilometer": "км",
     "second": "с",
     "unknown": "Неизвестно",
-    "notAvailable": "Н/Д"
+    "notAvailable": "Н/Д",
+    "CenterBody": {
+      "label": "Центральное тело",
+      "tooltip": "Тело, относительно которого заданы положения эфемерид (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Система отсчёта",
+      "tooltip": "Система координат эфемерид (OEM REF_FRAME)"
+    }
   }
 }

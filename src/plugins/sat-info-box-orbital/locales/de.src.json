@@ -81,6 +81,14 @@
     "kilometer": "km",
     "second": "s",
     "unknown": "Unbekannt",
-    "notAvailable": "k. A."
+    "notAvailable": "k. A.",
+    "CenterBody": {
+      "label": "Zentralkörper",
+      "tooltip": "Körper, von dem aus die Ephemeridenpositionen gemessen werden (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Bezugssystem",
+      "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)"
+    }
   }
 }

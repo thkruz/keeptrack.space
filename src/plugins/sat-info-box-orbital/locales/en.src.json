@@ -81,6 +81,14 @@
     "kilometer": "km",
     "second": "s",
     "unknown": "Unknown",
-    "notAvailable": "N/A"
+    "notAvailable": "N/A",
+    "CenterBody": {
+      "label": "Center Body",
+      "tooltip": "Body the ephemeris positions are measured from (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Reference Frame",
+      "tooltip": "Coordinate frame of the ephemeris (OEM REF_FRAME)"
+    }
   }
 }

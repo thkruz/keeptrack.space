@@ -114,6 +114,31 @@ textarea.materialize-textarea {
     animation: kt-toast-progress-shrink linear forwards;
 }
 
+/* Optional action button (UiManager toast `action`, e.g. Undo). */
+.toast .kt-toast-action {
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 4px 10px;
+    border: 1px solid var(--kt-toast-accent);
+    border-radius: var(--kt-radius-sm, 4px);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+}
+
+.toast .kt-toast-action:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.toast .kt-toast-action:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
 @keyframes kt-toast-enter {
     from {
         opacity: 0;

@@ -25,7 +25,7 @@
  */
 
 import { SoundNames } from '@app/engine/audio/sounds';
-import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastAction, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EngineEventMap, EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -55,6 +55,8 @@ export class UiManager {
   /** Upper bound for an isLong toast that is not critical or an error. */
   private static readonly LONG_NON_CRITICAL_MAX_MS = MILLISECONDS_PER_SECOND * 20;
   private static readonly TOAST_TEMPLATE_ID = 'kt-toast';
+  /** Minimum time a toast with an action button stays up, so the action can still be reached. */
+  static readonly TOAST_ACTION_MIN_MS = MILLISECONDS_PER_SECOND * 10;
 
   private isFooterVisible_ = true;
   private isInitialized_ = false;
@@ -243,7 +245,36 @@ export class UiManager {
     toastEl.style.pointerEvents = 'auto';
   }
 
-  private makeToast_(toastText: string, type: ToastMsgType, isLong = false) {
+  /**
+   * Adds the action button to a toast. A real <button> keeps it reachable with Tab and
+   * operable with Enter/Space; the click must not bubble to the toast's own
+   * click-to-dismiss handler, and the callback runs at most once.
+   */
+  private static attachToastAction_(toastEl: HTMLElement, toastMsg: Toast, action: ToastAction): void {
+    const button = document.createElement('button');
+    let isDone = false;
+
+    button.type = 'button';
+    button.className = 'kt-toast-action';
+    button.textContent = action.label;
+    button.addEventListener('click', (evt: MouseEvent) => {
+      evt.stopPropagation();
+      if (isDone) {
+        return;
+      }
+      isDone = true;
+      try {
+        action.callback();
+      } catch (error) {
+        errorManagerInstance.debug(`toast action failed: ${String(error)}`);
+      }
+      toastMsg.dismiss();
+    });
+
+    toastEl.insertBefore(button, toastEl.querySelector('.kt-toast-progress'));
+  }
+
+  private makeToast_(toastText: string, type: ToastMsgType, isLong = false, action?: ToastAction) {
     if (settingsManager.isDisableToasts) {
       return null;
     }
@@ -313,6 +344,10 @@ export class UiManager {
     });
 
     toastMsg.timeRemaining = UiManager.toastDuration_(toastText, type, isLong);
+    if (action) {
+      UiManager.attachToastAction_(toastEl, toastMsg, action);
+      toastMsg.timeRemaining = action.durationMs ?? Math.max(toastMsg.timeRemaining, UiManager.TOAST_ACTION_MIN_MS);
+    }
     UiManager.makeToastClickThrough_(toastEl);
 
     // Auto-dismiss progress bar (part of the template)
@@ -600,7 +635,11 @@ export class UiManager {
     });
   }
 
-  toast(toastText: string, type: ToastMsgType, isLong = false) {
+  /**
+   * Shows a toast. `action` adds one button (e.g. Undo) that runs its callback once
+   * and closes the toast; such toasts stay up at least TOAST_ACTION_MIN_MS.
+   */
+  toast(toastText: string, type: ToastMsgType, isLong = false, action?: ToastAction) {
     this.lastToast = toastText;
 
     if (isThisNode()) {
@@ -616,7 +655,7 @@ export class UiManager {
       if (this.activeToastList_.length > 20) {
         return;
       }
-      const toastMsg = this.makeToast_(toastText, type, isLong);
+      const toastMsg = this.makeToast_(toastText, type, isLong, action);
 
       if (toastMsg) {
         this.activeToastList_.push(toastMsg);

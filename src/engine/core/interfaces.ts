@@ -155,6 +155,20 @@ export enum ToastMsgType {
   error = 'error',
 }
 
+/**
+ * Optional action button on a toast (e.g. "Undo"). The toast stays up at least
+ * ToastAction display time, the button is a real focusable <button>, and the
+ * callback runs at most once before the toast closes.
+ */
+export interface ToastAction {
+  /** Visible button text; the caller localizes it. */
+  label: string;
+  /** Runs once when the button is clicked or activated from the keyboard. */
+  callback: () => void;
+  /** Override for how long the toast stays up, in ms (default UiManager.TOAST_ACTION_MIN_MS). */
+  durationMs?: number;
+}
+
 export type GeolocationPosition = {
   coords: {
     latitude: Degrees | number;

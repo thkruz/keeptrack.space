@@ -9,7 +9,7 @@ import type { HoverManager } from './app/ui/hover-manager';
 import type { UiManager } from './app/ui/ui-manager';
 import type { SoundManager } from './engine/audio/sound-manager';
 import type { Camera } from './engine/camera/camera';
-import type { ToastMsgType } from './engine/core/interfaces';
+import type { ToastAction, ToastMsgType } from './engine/core/interfaces';
 import { PluginRegistry } from './engine/core/plugin-registry';
 import type { Scene } from './engine/core/scene';
 import { ServiceLocator } from './engine/core/service-locator';
@@ -48,7 +48,7 @@ export class KeepTrackApi {
   };
 
   // UI related methods
-  toast(toastText: string, type: ToastMsgType, isLong = false) {
+  toast(toastText: string, type: ToastMsgType, isLong = false, action?: ToastAction) {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (!uiManagerInstance) {
@@ -57,7 +57,7 @@ export class KeepTrackApi {
       return;
     }
 
-    uiManagerInstance.toast(toastText, type, isLong);
+    uiManagerInstance.toast(toastText, type, isLong, action);
   }
 
   // Event bus methods

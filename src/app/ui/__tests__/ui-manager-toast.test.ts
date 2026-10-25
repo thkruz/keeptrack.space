@@ -1,4 +1,4 @@
-import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ToastAction, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import type { Toast } from '@materializecss/materialize';
@@ -206,5 +206,72 @@ describe('UiManager toast duration and click-through', () => {
 
     expect(container.style.pointerEvents).toBe('none');
     expect(toastEl.style.pointerEvents).toBe('auto');
+  });
+});
+
+describe('UiManager toast action button', () => {
+  type ActionInternals = {
+    makeToast_: (text: string, type: ToastMsgType, isLong?: boolean, action?: ToastAction) => Toast | null;
+  };
+  let internals: ActionInternals;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    EventBus.getInstance().unregisterAllEvents();
+    vi.spyOn(ServiceLocator, 'getSoundManager').mockReturnValue(null as never);
+    settingsManager.isDisableToasts = false;
+    internals = new UiManager() as unknown as ActionInternals;
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    document.body.innerHTML = '';
+  });
+
+  const actionButton = (toast: Toast): HTMLButtonElement => toast.el.querySelector<HTMLButtonElement>('button.kt-toast-action')!;
+
+  it('renders no button without an action', () => {
+    const toast = internals.makeToast_('plain', ToastMsgType.normal)!;
+
+    expect(actionButton(toast)).toBeNull();
+  });
+
+  it('renders a focusable button with the label and runs the callback once', () => {
+    const callback = vi.fn();
+    const toast = internals.makeToast_('Removed', ToastMsgType.normal, false, { label: 'Undo', callback })!;
+    const dismiss = vi.spyOn(toast, 'dismiss');
+    const button = actionButton(toast);
+
+    expect(button).not.toBeNull();
+    expect(button.type).toBe('button');
+    expect(button.textContent).toBe('Undo');
+
+    button.click();
+    button.click();
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    expect(dismiss).toHaveBeenCalled();
+  });
+
+  it('keeps the action toast up at least TOAST_ACTION_MIN_MS unless a duration is given', () => {
+    const short = internals.makeToast_('Hi', ToastMsgType.normal, false, { label: 'Undo', callback: vi.fn() })!;
+
+    expect(short.timeRemaining).toBe(UiManager.TOAST_ACTION_MIN_MS);
+
+    const custom = internals.makeToast_('Hi', ToastMsgType.normal, false, { label: 'Undo', callback: vi.fn(), durationMs: 3000 })!;
+
+    expect(custom.timeRemaining).toBe(3000);
+  });
+
+  it('does not let a throwing callback escape the click handler', () => {
+    const toast = internals.makeToast_('Removed', ToastMsgType.normal, false, {
+      label: 'Undo',
+      callback: () => {
+        throw new Error('boom');
+      },
+    })!;
+
+    expect(() => actionButton(toast).click()).not.toThrow();
   });
 });

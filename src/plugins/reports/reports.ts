@@ -39,6 +39,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import analysisPng from '@public/img/icons/reports.png';
@@ -1205,7 +1206,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // The window shows the chosen format: text keeps the metadata header and
     // aligned table, CSV/JSON show exactly what the download and copy produce.
     const preview = this.format_ === 'text' ? buildPreviewText(data) : payload.content;
-    const blob = new Blob([payload.content], { type: payload.mime });
+    const blob = payload.ext === 'csv' ? createCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
     const url = URL.createObjectURL(blob);
 
     win.document.open();

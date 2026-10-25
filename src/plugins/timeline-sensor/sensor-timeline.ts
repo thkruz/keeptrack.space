@@ -15,6 +15,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import {
   BaseObject,
@@ -265,7 +266,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     const csvData = this.convertSensorPassesToCSV(sensorData);
 
     // Create a Blob with the CSV data
-    const blob = new Blob([csvData], { type: 'text/csv' });
+    const blob = createCsvBlob(csvData);
 
     // Create a link element
     const link = document.createElement('a');

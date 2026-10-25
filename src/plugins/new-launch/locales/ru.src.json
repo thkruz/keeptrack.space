@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Создать запуск в окне"
       },
       "msgs": {
-        "windowFound": "Старт в {time} для совмещения с целевой плоскостью (ΔRAAN {delta}°)",
+        "windowFound": "Старт в {time} с {site} для совмещения с плоскостью орбиты {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Номинал запуска создан!",
         "timeRelativeToLaunch": "Время теперь отсчитывается от момента запуска."
       },

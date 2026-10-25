@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "在窗口创建发射"
       },
       "msgs": {
-        "windowFound": "在 {time} 发射以匹配目标轨道面（ΔRAAN {delta}°）",
+        "windowFound": "在 {time} 从 {site} 发射以匹配 {target} 的轨道面（ΔRAAN {delta}°）",
         "launchNominalCreated": "发射标称轨道已创建！",
         "timeRelativeToLaunch": "时间现在以发射时间为基准。"
       },

@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "윈도우에서 발사 생성"
       },
       "msgs": {
-        "windowFound": "{time}에 발사하면 목표 궤도면과 일치합니다 (ΔRAAN {delta}°)",
+        "windowFound": "{time}에 {site}에서 발사하면 {target}의 궤도면과 일치합니다 (ΔRAAN {delta}°)",
         "launchNominalCreated": "발사 노미널이 생성되었습니다!",
         "timeRelativeToLaunch": "이제 시간은 발사 시간 기준 상대 시간입니다."
       },

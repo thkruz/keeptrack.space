@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "ウィンドウで打ち上げを作成"
       },
       "msgs": {
-        "windowFound": "{time} に打ち上げると目標軌道面に一致します（ΔRAAN {delta}°）",
+        "windowFound": "{site} から {time} に打ち上げると {target} の軌道面に一致します（ΔRAAN {delta}°）",
         "launchNominalCreated": "打ち上げノミナルを作成しました！",
         "timeRelativeToLaunch": "時間は打ち上げ時刻からの相対時間になりました。"
       },

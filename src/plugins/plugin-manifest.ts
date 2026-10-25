@@ -801,6 +801,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'ObservabilityPlanner',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/observability-planner/observability-planner') : undefined,
+    proClassName: 'ObservabilityPlanner',
+    defaultConfig: { enabled: true, order: 427 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'EclipseSolarAnalysis',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis') : undefined,
     proClassName: 'EclipseSolarAnalysis',

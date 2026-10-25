@@ -455,6 +455,7 @@ export class WebpackManager {
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
       entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
       entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];
+      entry.observabilityWorker = ['./src/plugins-pro/observability-planner/observabilityWorker.ts'];
     }
 
     return ({

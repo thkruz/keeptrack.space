@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "Chyba při vytváření rozpadu!",
         "InvalidStartNum": "Neplatné počáteční číslo satelitu! Výchozí hodnota 90000!",
         "InvalidSlotRange": "Počáteční číslo satelitu je mimo rozsah. Použijte {start} až {end}.",
-        "BreakupGeneratorFailed": "Generátor rozpadu selhal!"
+        "BreakupGeneratorFailed": "Generátor rozpadu selhal!",
+        "NoFreeSlots": "Pro {count} úlomků není dost volných analytických slotů. Sloty obsazené jinými objekty se nikdy nepřepisují; snižte počet nebo odeberte některé analytické objekty."
       },
       "stats": {
         "meanSpeed": "Očekávaná střední rychlost",

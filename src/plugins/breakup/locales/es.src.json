@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "¡Error al crear la ruptura!",
         "InvalidStartNum": "¡Número de inicio de satélite inválido! ¡Restableciendo a 90000!",
         "InvalidSlotRange": "Número inicial de satélite fuera de rango. Use {start} a {end}.",
-        "BreakupGeneratorFailed": "¡El generador de ruptura falló!"
+        "BreakupGeneratorFailed": "¡El generador de ruptura falló!",
+        "NoFreeSlots": "No hay suficientes ranuras de analista libres para {count} fragmentos. Las ranuras ocupadas por otros objetos nunca se sobrescriben; reduzca la cantidad o elimine algunos objetos de analista."
       },
       "stats": {
         "meanSpeed": "Velocidad media esperada",

@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "Błąd tworzenia rozpadu!",
         "InvalidStartNum": "Nieprawidłowy numer początkowy satelity! Ustawiono domyślnie na 90000!",
         "InvalidSlotRange": "Początkowy numer satelity poza zakresem. Użyj od {start} do {end}.",
-        "BreakupGeneratorFailed": "Generator rozpadu nie powiódł się!"
+        "BreakupGeneratorFailed": "Generator rozpadu nie powiódł się!",
+        "NoFreeSlots": "Za mało wolnych slotów analityka dla {count} fragmentów. Sloty zajęte przez inne obiekty nigdy nie są nadpisywane; zmniejsz liczbę lub usuń część obiektów analityka."
       },
       "stats": {
         "meanSpeed": "Oczekiwana prędkość średnia",

@@ -529,6 +529,27 @@ export function isAnalystRangeValid(startNum: number, count: number, analystStar
   return startNum >= analystStart && startNum + count <= analystStart + analystCount;
 }
 
+/**
+ * Pick `count` analyst catalog numbers for the fragments, starting at `startNum` and
+ * walking up to (not including) `blockEnd`. A number the writer may not use (reserved
+ * by another object, or holding an active object another tool made) is skipped and
+ * the pieces shift to the next usable numbers, so a breakup never overwrites another
+ * tool's object. Returns null when the block runs out first.
+ *
+ * @param isWritable - Whether the slot with this 6-digit analyst number may be written.
+ */
+export function selectAnalystSlots(startNum: number, count: number, blockEnd: number, isWritable: (num: number) => boolean): number[] | null {
+  const slots: number[] = [];
+
+  for (let num = startNum; num < blockEnd && slots.length < count; num++) {
+    if (isWritable(num)) {
+      slots.push(num);
+    }
+  }
+
+  return slots.length === count ? slots : null;
+}
+
 // =========================================================================
 // Theoretical ensemble statistics (live menu readout)
 // =========================================================================

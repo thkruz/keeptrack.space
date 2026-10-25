@@ -1,4 +1,5 @@
 import { StringifiedNumber } from '@app/app/analysis/sat-math';
+import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -24,6 +25,8 @@ export class OrbitReferences extends KeepTrackPlugin {
 
   doOnce = false;
   isReferenceSatsActive = false;
+  /** Reference satellites this plugin wrote, by slot id; a later click may reuse a slot that still holds one. */
+  private readonly references_ = new Map<number, Satellite>();
 
   addHtml(): void {
     super.addHtml();
@@ -69,7 +72,7 @@ export class OrbitReferences extends KeepTrackPlugin {
       return;
     }
 
-    let searchStr = (sat.sccNum5 ?? sat.sccNum).padStart(5, '0');
+    let searchStr = `${(sat.sccNum5 ?? sat.sccNum).padStart(5, '0')},`;
 
     // Add the satellites
     const ecen = sat.eccentricity.toString();
@@ -91,22 +94,27 @@ export class OrbitReferences extends KeepTrackPlugin {
     const period = 1440.0 / parseFloat(meanmo);
 
     let j = 0;
+    // Only slots that still hold this plugin's own reference objects count as reusable.
+    const ownIds = new Set([...this.references_].filter(([id, ref]) => catalogManagerInstance.objectCache[id] === ref).map(([id]) => id));
 
-    for (let i = 0; i < 360; i++) {
+    for (let i = 0; i < settingsManager.maxAnalystSats; i++) {
       const meana = j.toFixed(4).padStart(8, '0') as StringifiedNumber;
-      const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
       // Get the next available ID
       const a5 = Tle.convert6DigitToA5((CatalogManager.ANALYST_START_ID + i).toString().padStart(5, '0'));
       const id = catalogManagerInstance.sccNum2Id(a5);
 
-      if (typeof id !== 'number') {
-        // If the ID is not a number, skip this iteration
+      // Skip slots that do not resolve, are reserved by another object (a New Launch trajectory),
+      // or hold an active object another tool made (Create Satellite, a Maneuver clone, breakup
+      // pieces). Only inactive placeholders and this plugin's own earlier references are written.
+      if (typeof id !== 'number' || !AnalystSlotReservations.canWrite(a5, catalogManagerInstance.objectCache[id] as Satellite | undefined, ownIds)) {
         continue;
       }
 
+      const { tle1, tle2 } = FormatTle.createTle({ sat, inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
       const analystSat = catalogManagerInstance.addAnalystSat(tle1, tle2, id, a5);
 
       if (analystSat) {
+        this.references_.set(id, analystSat);
         searchStr += `${analystSat.sccNum.toString()},`;
       }
       j += (360 / period) * 4;

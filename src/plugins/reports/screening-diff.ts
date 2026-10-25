@@ -78,7 +78,12 @@ export interface ScreeningDiffOptions {
 }
 
 const DEFAULT_TCA_TOLERANCE_MS = 15 * 60 * 1000;
-/** Default reach of the moved pairing: about four LEO revolutions. */
+/**
+ * Default reach of the moved pairing: about four LEO revolutions. One value serves every regime on purpose. A small
+ * burn shifts a LEO encounter by minutes to an hour or two (half a period would already miss real shifts), and in
+ * GEO repeat encounters with the same secondary come about 24 h apart, so 6 h cannot merge two distinct ones there.
+ * Pairing is one-to-one and closest-TCA-first, which keeps LEO repeats from cross-pairing.
+ */
 const DEFAULT_MOVED_TOLERANCE_MS = 6 * 60 * 60 * 1000;
 /** Windows that differ by less than this are treated as the same window. */
 const WINDOW_MATCH_TOLERANCE_MS = 5 * 60 * 1000;

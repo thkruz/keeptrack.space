@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "ウォッチリストに追加",
         "removeFromWatchlist": "ウォッチリストから削除"
+      },
+      "infoBox": {
+        "addLabel": "ウォッチリストに追加",
+        "removeLabel": "ウォッチリストから削除"
       }
     },
     "WatchlistOverlay": {

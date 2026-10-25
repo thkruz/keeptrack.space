@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "添加到关注列表",
         "removeFromWatchlist": "从关注列表中移除"
+      },
+      "infoBox": {
+        "addLabel": "添加到关注列表",
+        "removeLabel": "从关注列表中移除"
       }
     },
     "WatchlistOverlay": {

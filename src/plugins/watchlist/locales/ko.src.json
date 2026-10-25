@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "관심 목록에 추가",
         "removeFromWatchlist": "관심 목록에서 제거"
+      },
+      "infoBox": {
+        "addLabel": "관심 목록에 추가",
+        "removeLabel": "관심 목록에서 제거"
       }
     },
     "WatchlistOverlay": {

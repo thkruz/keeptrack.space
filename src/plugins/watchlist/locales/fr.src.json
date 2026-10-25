@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "Ajouter à la liste de suivi",
         "removeFromWatchlist": "Retirer de la liste de suivi"
+      },
+      "infoBox": {
+        "addLabel": "Ajouter à la liste de suivi",
+        "removeLabel": "Retirer de la liste de suivi"
       }
     },
     "WatchlistOverlay": {

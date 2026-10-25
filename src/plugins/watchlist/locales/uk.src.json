@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "Додати до списку спостереження",
         "removeFromWatchlist": "Видалити зі списку спостереження"
+      },
+      "infoBox": {
+        "addLabel": "Додати до списку спостереження",
+        "removeLabel": "Видалити зі списку спостереження"
       }
     },
     "WatchlistOverlay": {

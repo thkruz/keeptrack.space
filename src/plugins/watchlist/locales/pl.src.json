@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "Dodaj do listy obserwowanych",
         "removeFromWatchlist": "Usuń z listy obserwowanych"
+      },
+      "infoBox": {
+        "addLabel": "Dodaj do listy obserwowanych",
+        "removeLabel": "Usuń z listy obserwowanych"
       }
     },
     "WatchlistOverlay": {

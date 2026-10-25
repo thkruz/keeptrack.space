@@ -54,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "Přidat do seznamu sledovaných",
         "removeFromWatchlist": "Odebrat ze seznamu sledovaných"
+      },
+      "infoBox": {
+        "addLabel": "Přidat do seznamu sledovaných",
+        "removeLabel": "Odebrat ze seznamu sledovaných"
       }
     },
     "WatchlistOverlay": {

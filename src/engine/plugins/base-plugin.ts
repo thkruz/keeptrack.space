@@ -330,6 +330,12 @@ export abstract class KeepTrackPlugin {
    * fall back to the MenuMode group.
    */
   drawerGroupKey: string | null = null;
+  /**
+   * Keeps this plugin out of the drawer's Recent group. For one-shot action toggles
+   * (e.g. the screen recorder) whose own row already shows their state, a Recent copy
+   * is only a duplicate entry.
+   */
+  isExcludedFromDrawerRecent = false;
 
   /**
    * The maximum order for the bottom icon.

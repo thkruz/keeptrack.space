@@ -27,6 +27,8 @@ export interface DrawerItemData {
   isLoginRequired?: boolean;
   order: number;
   shortcutHint?: string;
+  /** Kept out of the Recent group (see KeepTrackPlugin.isExcludedFromDrawerRecent). */
+  isExcludedFromRecent?: boolean;
 }
 
 export interface DrawerGroup {
@@ -35,6 +37,23 @@ export interface DrawerGroup {
 }
 
 const MAX_RECENT_PLUGINS_ = 8;
+
+/**
+ * Every plugin row in the drawer content. Rows in a plugin's own group carry
+ * data-plugin-id; the copies in the Recent group carry data-recent-plugin-id so a
+ * `.drawer-item[data-plugin-id="x"]` selector matches exactly one row per plugin.
+ */
+export const ALL_DRAWER_PLUGIN_ITEMS_SELECTOR = '.drawer-item[data-plugin-id], .drawer-item[data-recent-plugin-id]';
+
+/** Selector for every row (own group and Recent) of one plugin. */
+export function drawerItemsForPluginSelector(pluginId: string): string {
+  return `.drawer-item[data-plugin-id="${pluginId}"], .drawer-item[data-recent-plugin-id="${pluginId}"]`;
+}
+
+/** The plugin (bottom-icon element) id behind a drawer row, from either attribute. */
+export function drawerItemPluginId(el: HTMLElement): string | undefined {
+  return el.dataset.pluginId ?? el.dataset.recentPluginId;
+}
 
 // ---- Shared Item Collection ----
 
@@ -196,6 +215,7 @@ export function collectDrawerItems(): CollectedDrawerItems {
         isLoginRequired: plugin.isLoginRequired,
         order,
         shortcutHint: getShortcutHint(plugin.id),
+        isExcludedFromRecent: plugin.isExcludedFromDrawerRecent,
       });
     }
   }
@@ -366,24 +386,26 @@ export function renderBadge(pluginId: string, badges: Map<string, DrawerBadge>):
     return;
   }
 
-  contentEl.querySelectorAll(`.drawer-item[data-plugin-id="${pluginId}"] .drawer-item-badge`).forEach((badgeEl) => {
-    const badge = badges.get(pluginId);
+  contentEl
+    .querySelectorAll(`.drawer-item[data-plugin-id="${pluginId}"] .drawer-item-badge, .drawer-item[data-recent-plugin-id="${pluginId}"] .drawer-item-badge`)
+    .forEach((badgeEl) => {
+      const badge = badges.get(pluginId);
 
-    if (!badge) {
-      badgeEl.className = 'drawer-item-badge';
-      badgeEl.textContent = '';
+      if (!badge) {
+        badgeEl.className = 'drawer-item-badge';
+        badgeEl.textContent = '';
 
-      return;
-    }
+        return;
+      }
 
-    if (badge.type === 'active') {
-      badgeEl.className = 'drawer-item-badge drawer-item-badge--active';
-      badgeEl.textContent = '';
-    } else {
-      badgeEl.className = 'drawer-item-badge drawer-item-badge--count';
-      badgeEl.textContent = String(badge.value ?? '');
-    }
-  });
+      if (badge.type === 'active') {
+        badgeEl.className = 'drawer-item-badge drawer-item-badge--active';
+        badgeEl.textContent = '';
+      } else {
+        badgeEl.className = 'drawer-item-badge drawer-item-badge--count';
+        badgeEl.textContent = String(badge.value ?? '');
+      }
+    });
 }
 
 /** Sync badge state from bottom icon events. */
@@ -535,7 +557,7 @@ export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<str
   for (const pluginId of recentIds) {
     const item = allItems.get(pluginId);
 
-    if (item) {
+    if (item && !item.isExcludedFromRecent) {
       recentItems.push({ ...item, order: recentItems.length });
     }
     if (recentItems.length >= maxItems) {

@@ -16,11 +16,14 @@ import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
+  ALL_DRAWER_PLUGIN_ITEMS_SELECTOR,
   buildRecentGroupFromCache,
   collectDrawerItems,
   type DrawerBadge,
   type DrawerGroup,
   type DrawerItemData,
+  drawerItemPluginId,
+  drawerItemsForPluginSelector,
   loadRecents,
   type RecentEntry,
   recordRecent,
@@ -395,7 +398,7 @@ export class PluginDrawer {
           return;
         }
 
-        const pluginId = itemEl.dataset.pluginId;
+        const pluginId = drawerItemPluginId(itemEl);
         const topMenuId = itemEl.dataset.topMenuId;
 
         // A disabled item should explain itself rather than silently ignore the
@@ -654,7 +657,7 @@ export class PluginDrawer {
     // Sync menu items (both selected and disabled state)
     const contentEl = getEl('drawer-content', true);
 
-    contentEl?.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
+    contentEl?.querySelectorAll(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR).forEach((el) => {
       PluginDrawer.syncItemState_(el as HTMLElement);
     });
 
@@ -692,7 +695,7 @@ export class PluginDrawer {
         syncedIds.add(id);
 
         getEl('drawer-content', true)
-          ?.querySelectorAll(`.drawer-item[data-plugin-id="${id}"]`)
+          ?.querySelectorAll(drawerItemsForPluginSelector(id))
           .forEach((el) => {
             PluginDrawer.syncItemState_(el as HTMLElement);
           });
@@ -706,7 +709,7 @@ export class PluginDrawer {
 
   /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */
   private static syncItemState_(el: HTMLElement): void {
-    const pluginId = el.dataset.pluginId;
+    const pluginId = drawerItemPluginId(el);
     const bottomIcon = pluginId ? getEl(pluginId, true) : null;
     const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
     const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
@@ -726,8 +729,8 @@ export class PluginDrawer {
   private syncDisabledState_(): void {
     const contentEl = getEl('drawer-content', true);
 
-    contentEl?.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
-      const pluginId = (el as HTMLElement).dataset.pluginId;
+    contentEl?.querySelectorAll(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR).forEach((el) => {
+      const pluginId = drawerItemPluginId(el as HTMLElement);
       const bottomIcon = pluginId ? getEl(pluginId, true) : null;
       const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
 
@@ -780,7 +783,12 @@ export class PluginDrawer {
     html += '<div class="drawer-group-items">';
 
     for (const item of group.items) {
-      const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
+      /*
+       * Recent rows repeat a plugin that already has a row in its own group. They carry
+       * data-recent-plugin-id so `.drawer-item[data-plugin-id="x"]` stays one element per plugin.
+       */
+      const pluginAttr = key === 'recent' ? 'data-recent-plugin-id' : 'data-plugin-id';
+      const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `${pluginAttr}="${item.id}"`;
       const disabledClass = item.isDisabled ? ' disabled' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
       const proClass = item.isLoginRequired && !settingsManager.isDisableLoginGate ? ' bmenu-item-pro' : '';
@@ -886,7 +894,7 @@ export class PluginDrawer {
       // The cached item data only knows load-time state, so the rebuilt rows
       // would otherwise show plugins as disabled/inactive even when their
       // bottom icon says otherwise. Re-sync each row and re-apply badges.
-      newGroupEl.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
+      newGroupEl.querySelectorAll(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR).forEach((el) => {
         PluginDrawer.syncItemState_(el as HTMLElement);
       });
       this.badges_.forEach((_badge, pluginId) => {

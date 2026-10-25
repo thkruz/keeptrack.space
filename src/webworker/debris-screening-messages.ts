@@ -27,6 +27,12 @@ export interface DsSatelliteData {
   tle2: string;
   name: string;
   radius: number;
+  /**
+   * TLE lines the covariance is built from when they are not the object's own: an analyst
+   * clone sends its root parent's (uncertainty-source.ts). Omitted, the object's TLE is used.
+   */
+  covarianceTle1?: string;
+  covarianceTle2?: string;
 }
 
 /** A single screening result row; plain numbers only, no class instances. */

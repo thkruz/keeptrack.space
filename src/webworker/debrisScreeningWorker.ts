@@ -19,7 +19,7 @@ import {
   StateCovariance,
   Tle,
 } from '@ootk/src/main';
-import { type DsMsgStartScreening, type DsResultRow, type DsWorkerInMsg, DsWorkerMsgType, DsWorkerOutMsgType } from './debris-screening-messages';
+import { type DsMsgStartScreening, type DsResultRow, type DsSatelliteData, type DsWorkerInMsg, DsWorkerMsgType, DsWorkerOutMsgType } from './debris-screening-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 // ─── Module-level state ─────────────────────────────────────────────────────
@@ -48,6 +48,16 @@ export function secondaryWindow(secondary: DsSecondaryData, startTime: EpochUTC,
   }
 
   return { startTime: EpochUTC.fromDateTime(new Date(startMs)), endTime: EpochUTC.fromDateTime(new Date(endMs)) };
+}
+
+/**
+ * Screening covariance for an object: from its covariance TLE when the caller sent one (an
+ * analyst clone takes its root parent's uncertainty), else from its own TLE.
+ */
+export function screeningCovarianceOf(obj: DsSatelliteData, confidenceLevel: number): StateCovariance {
+  const hasOwnSource = typeof obj.covarianceTle1 === 'string' && typeof obj.covarianceTle2 === 'string';
+
+  return cappedScreeningCovarianceFromTle(hasOwnSource ? obj.covarianceTle1! : obj.tle1, hasOwnSource ? obj.covarianceTle2! : obj.tle2, confidenceLevel);
 }
 
 /** Whether an event's signed RIC components all fall inside the U / V / W box (NaN never does). */
@@ -110,7 +120,7 @@ function assessCandidate_(
     endTime = EpochUTC.fromDateTime(new Date(Math.min(endTime.toDateTime().getTime(), tcaMs + PC_PASS_HALF_WINDOW_MS)));
   }
 
-  const secondaryCovariance = cappedScreeningCovarianceFromTle(secondary.tle1, secondary.tle2, confidenceLevel);
+  const secondaryCovariance = screeningCovarianceOf(secondary, confidenceLevel);
 
   const assessment = new ConjunctionAssessment(
     {
@@ -170,7 +180,7 @@ function handleStartScreening_(msg: DsMsgStartScreening): void {
   try {
     // Reconstruct primary objects
     const primaryTle = new Tle(primary.tle1, primary.tle2);
-    const primaryCovariance = cappedScreeningCovarianceFromTle(primary.tle1, primary.tle2, covarianceConfidenceLevel);
+    const primaryCovariance = screeningCovarianceOf(primary, covarianceConfidenceLevel);
 
     // Reconstruct secondary TLEs for coarse filter
     const secondaryTles: Tle[] = [];

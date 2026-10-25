@@ -1,4 +1,5 @@
 import { jumpToTca } from '@app/engine/conjunction/conjunction-row-actions';
+import { covarianceSourceOf, uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -102,6 +103,12 @@ export class DebrisScreening extends KeepTrackPlugin {
   protected lineageKeys_ = new Set<string>();
   /** Whether rows for the primary's parent object are shown (hidden by default). */
   protected isParentRowShown_ = false;
+  /**
+   * Root catalog object whose uncertainty (covariance, GP age) the current run's primary assumes,
+   * or null when the primary is not an analyst clone. A clone's own TLE is a fit at the burn epoch,
+   * so its covariance would look better than its parent's; it knows no more than its parent.
+   */
+  protected uncertaintyParent_: Satellite | null = null;
   /** Last rows/count passed to renderRows_, so the parent toggle can re-render. */
   private lastRender_: { rows: DsResultRow[]; countText?: string } = { rows: [] };
   /**
@@ -332,6 +339,7 @@ export class DebrisScreening extends KeepTrackPlugin {
           <div class="ds-notes">
             <div id="${this.formPrefix_}-ric-convention" class="kt-note ds-note">${l('ricConvention')}</div>
             <div id="${this.formPrefix_}-pc-inputs" class="kt-note ds-note">${this.pcInputsText_()}</div>
+            <div id="${this.formPrefix_}-uncertainty-note" class="kt-note ds-note" style="display: none;"></div>
           </div>
           <div class="ds-table-container">
             <table id="${this.formPrefix_}-results-table" class="striped highlight">
@@ -543,6 +551,8 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   protected onTargetChanged_(): void {
     this.rows_ = [];
+    this.uncertaintyParent_ = null;
+    this.updateUncertaintyNote_();
     // Nothing has run for the new target yet, so do not claim an empty result.
     this.renderRows_(this.rows_, l('notScreened'));
   }
@@ -579,12 +589,34 @@ export class DebrisScreening extends KeepTrackPlugin {
     this.secondaryIdMap_ = new Map();
     this.lineageKeys_ = this.getLineageSccNums_(primary);
     this.isParentRowShown_ = false;
+    this.uncertaintyParent_ = uncertaintyParentOf(primary);
+    this.updateUncertaintyNote_();
 
     const toggle = getEl(`${this.formPrefix_}-show-parent`, true) as HTMLInputElement | null;
 
     if (toggle) {
       toggle.checked = false;
     }
+  }
+
+  /** "Uncertainty assumed from parent <name> (<norad>)", or '' when the run's primary is not a clone. */
+  protected uncertaintyNoteText_(): string {
+    const parent = this.uncertaintyParent_;
+
+    return parent ? l('uncertaintyAssumedFromParent').replace('{name}', parent.name).replace('{norad}', DebrisScreening.screeningKey(parent)) : '';
+  }
+
+  /** Show the clone note in the results area while the current run's primary is an analyst clone. */
+  protected updateUncertaintyNote_(): void {
+    const noteEl = getEl(`${this.formPrefix_}-uncertainty-note`, true);
+
+    if (!noteEl) {
+      return;
+    }
+    const text = this.uncertaintyNoteText_();
+
+    noteEl.textContent = text;
+    noteEl.style.display = text ? '' : 'none';
   }
 
   /**
@@ -824,9 +856,12 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   protected calculateCovarianceFromSatellite(sat: Satellite) {
+    // An analyst clone uses its root parent's TLE: it knows no more than the object it came from.
+    const source = covarianceSourceOf(sat);
+
     // Caps radii (radial/cross-track/in-track) so a bad TLE can't produce a huge
     // bubble; shared with the screening worker via ootk to avoid logic drift.
-    return cappedScreeningCovarianceFromTle(sat.tle1, sat.tle2, settingsManager.covarianceConfidenceLevel);
+    return cappedScreeningCovarianceFromTle(source.tle1, source.tle2, settingsManager.covarianceConfidenceLevel);
   }
 
   onDownload(): void {

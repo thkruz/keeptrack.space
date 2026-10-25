@@ -72,6 +72,7 @@
       "ricConvention": "Znaménková konvence RIC: sekundární mínus primární, v RIC soustavě primárního objektu (+R radiálně ven, +I ve směru rychlosti primárního objektu, +C = R x I, normála dráhy).",
       "pcInputs": "Vstupy Pc: poloměr tělesa {hbr} m ({primary} m primární + {secondary} m sekundární) pro každou dvojici. Kovariance: odhadnutá z TLE každého objektu (model za sigmami v informačním panelu, {sigma} sigma), ne z CDM.",
       "parentTag": "rodič tohoto analytického satelitu",
+      "uncertaintyAssumedFromParent": "Nejistota převzata od rodiče {name} ({norad})",
       "showParentRows": "Zobrazit řádek rodiče ({count})",
       "notInCatalog": "(není v načteném katalogu)",
       "resultsCapped": "Zobrazeno prvních {limit} z {total} konjunkcí (podle nejvyšší Pc)"

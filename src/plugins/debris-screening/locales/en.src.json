@@ -72,6 +72,7 @@
       "ricConvention": "RIC sign convention: secondary minus primary, in the primary's RIC frame (+R radially outward, +I along the primary's velocity, +C = R x I, the orbit normal).",
       "pcInputs": "Pc inputs: hard-body radius {hbr} m ({primary} m primary + {secondary} m secondary) for every pair. Covariance: estimated from each object's TLE (the model behind the info box sigmas, at {sigma} sigma), not from a CDM.",
       "parentTag": "parent of this analyst satellite",
+      "uncertaintyAssumedFromParent": "Uncertainty assumed from parent {name} ({norad})",
       "showParentRows": "Show parent row ({count})",
       "notInCatalog": "(not in loaded catalog)",
       "resultsCapped": "Showing the top {limit} of {total} conjunctions (highest Pc first)"

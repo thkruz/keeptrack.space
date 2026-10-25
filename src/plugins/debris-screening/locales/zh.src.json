@@ -72,6 +72,7 @@
       "ricConvention": "RIC 符号约定：次目标减主目标，位于主目标的 RIC 坐标系中（+R 沿径向向外，+I 沿主目标速度方向，+C = R x I，即轨道面法向）。",
       "pcInputs": "Pc 输入：每对目标的硬体半径均为 {hbr} m（主目标 {primary} m + 次目标 {secondary} m）。协方差：根据每个目标的 TLE 估算（与信息框中 sigma 相同的模型，{sigma} sigma），而非来自 CDM。",
       "parentTag": "此分析卫星的母体",
+      "uncertaintyAssumedFromParent": "不确定度沿用母体 {name} ({norad})",
       "showParentRows": "显示母体行 ({count})",
       "notInCatalog": "（不在已加载目录中）",
       "resultsCapped": "显示 {total} 次交会中的前 {limit} 次 (按 Pc 从高到低)"

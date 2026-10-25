@@ -72,6 +72,7 @@
       "ricConvention": "Konwencja znaków RIC: obiekt wtórny minus główny, w układzie RIC obiektu głównego (+R radialnie na zewnątrz, +I zgodnie z prędkością obiektu głównego, +C = R x I, normalna do orbity).",
       "pcInputs": "Dane wejściowe Pc: promień bryły {hbr} m ({primary} m główny + {secondary} m wtórny) dla każdej pary. Kowariancja: szacowana z TLE każdego obiektu (model stojący za sigmami w panelu informacji, {sigma} sigma), nie z CDM.",
       "parentTag": "rodzic tego satelity analityka",
+      "uncertaintyAssumedFromParent": "Niepewność przyjęta od rodzica {name} ({norad})",
       "showParentRows": "Pokaż wiersz rodzica ({count})",
       "notInCatalog": "(brak we wczytanym katalogu)",
       "resultsCapped": "Pokazano {limit} pierwszych z {total} koniunkcji (od najwyższego Pc)"

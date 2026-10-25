@@ -72,6 +72,7 @@
       "ricConvention": "RIC 부호 규약: 보조 객체 빼기 주 객체, 주 객체의 RIC 좌표계 기준 (+R은 지구 중심에서 바깥쪽, +I는 주 객체의 속도 방향, +C = R x I는 궤도면 법선).",
       "pcInputs": "Pc 입력: 모든 쌍에 강체 반경 {hbr} m (주 객체 {primary} m + 보조 객체 {secondary} m). 공분산: 각 객체의 TLE로 추정 (정보 상자 시그마와 같은 모델, {sigma} 시그마), CDM 아님.",
       "parentTag": "이 분석 위성의 원본",
+      "uncertaintyAssumedFromParent": "불확실성은 원본 {name} ({norad})의 값을 사용",
       "showParentRows": "원본 행 표시 ({count})",
       "notInCatalog": "(불러온 카탈로그에 없음)",
       "resultsCapped": "{total}건의 접근 중 상위 {limit}건 표시 (Pc 높은 순)"

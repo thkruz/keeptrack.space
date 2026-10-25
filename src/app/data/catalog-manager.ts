@@ -25,6 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { controlSites } from '@app/app/data/catalogs/control-sites';
 import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-sites';
 import { sensors } from '@app/app/data/catalogs/sensors';
@@ -344,8 +345,10 @@ export class CatalogManager {
   /**
    * Finds the next unused analyst satellite slot - an inactive PAYLOAD reserved in
    * the {@link CatalogManager.ANALYST_START_ID} block. Tools that host a generated
-   * nominal satellite (e.g. New Launch) claim one of these slots. Returns null when
-   * every analyst slot in the search window is already active.
+   * nominal satellite (e.g. New Launch) claim one of these slots. Skips slots whose
+   * NORAD id is reserved in {@link AnalystSlotReservations} (held by another object,
+   * such as a New Launch trajectory). Returns null when every analyst slot in the
+   * search window is already active or reserved.
    *
    * @param startOffset - First offset past ANALYST_START_ID to consider.
    * @param endOffset - Exclusive upper offset bound for the search.
@@ -354,7 +357,7 @@ export class CatalogManager {
     for (let offset = startOffset; offset < endOffset; offset++) {
       const sat = this.sccNum2Sat(CatalogManager.ANALYST_START_ID + offset);
 
-      if (sat && !sat.active) {
+      if (sat && !sat.active && !AnalystSlotReservations.isReserved(sat.sccNum)) {
         return sat;
       }
     }

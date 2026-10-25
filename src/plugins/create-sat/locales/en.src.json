@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field} must be between {min} and {max} degrees.",
         "meanMotionRange": "{field} must be greater than 0 and at most {max} revolutions per day.",
         "periodPositive": "{field} must be a positive number of minutes.",
-        "numberRequired": "{field} must be a number."
+        "numberRequired": "{field} must be a number.",
+        "noradIdReserved": "NORAD ID {id} is held by a launch trajectory. Choose another ID or remove the trajectory first."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",

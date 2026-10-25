@@ -11,6 +11,7 @@
  * Both check the semantic value ("51.64" is a valid inclination), not the padded
  * TLE layout the submit writes back.
  */
+import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 
@@ -199,6 +200,11 @@ export function advancedFieldMessage(key: string): string {
   }
 }
 
+/** The slot's NORAD id is held by another object (a New Launch trajectory), so filling it would collide. */
+function reservedSccMessage(scc: string): string {
+  return errMsg('noradIdReserved').replace('{id}', scc.trim());
+}
+
 /** True when a 1-5 digit id falls in the analyst range 90000-99999. */
 function isAnalystScc(raw: string): boolean {
   const value = raw.trim();
@@ -225,6 +231,8 @@ export function validateAdvancedFields(v: TleInputParams): FormFieldError[] {
 
   if (!isAnalystScc(v.scc)) {
     add('scc');
+  } else if (AnalystSlotReservations.isReserved(v.scc)) {
+    add('scc', reservedSccMessage(v.scc));
   }
   if (!['1', '2', '3', '4'].includes(v.type)) {
     add('type', errMsg('invalidType'));
@@ -285,6 +293,8 @@ export function validateBasicFields(v: BasicInputValues): FormFieldError[] {
 
   if (!isAnalystScc(v.scc)) {
     errors.push({ id: 'basic-scc', fields: ['basic-scc'], message: errMsg('invalidNoradId') });
+  } else if (AnalystSlotReservations.isReserved(v.scc)) {
+    errors.push({ id: 'basic-scc', fields: ['basic-scc'], message: reservedSccMessage(v.scc) });
   }
   if (!(inc >= 0 && inc <= 180)) {
     errors.push({ id: 'basic-inc', fields: ['basic-inc'], message: errMsg('inclinationRange') });

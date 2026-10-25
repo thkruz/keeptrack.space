@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field}は{min}度から{max}度の範囲で入力してください。",
         "meanMotionRange": "{field}は0より大きく、1日あたり{max}周回以下にしてください。",
         "periodPositive": "{field}は正の分数で入力してください。",
-        "numberRequired": "{field}は数値で入力してください。"
+        "numberRequired": "{field}は数値で入力してください。",
+        "noradIdReserved": "NORAD ID {id} は打ち上げ軌道で使用中です。別の ID を選ぶか、先にその軌道を削除してください。"
       },
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",

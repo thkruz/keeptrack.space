@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field}必须介于 {min} 和 {max} 度之间。",
         "meanMotionRange": "{field}必须大于 0 且不超过每天 {max} 圈。",
         "periodPositive": "{field}必须是正的分钟数。",
-        "numberRequired": "{field}必须是数字。"
+        "numberRequired": "{field}必须是数字。",
+        "noradIdReserved": "NORAD ID {id} 已被一条发射轨迹占用。请选择其他 ID，或先移除该轨迹。"
       },
       "successMsgs": {
         "satCreated": "卫星 {name}（{scc}）创建成功",

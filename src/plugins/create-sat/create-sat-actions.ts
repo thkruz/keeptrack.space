@@ -4,6 +4,7 @@
  * Advanced-tab form fields by id and is shared across the OSS flows (presets,
  * clone, sun-sync, live preview) and the Pro import flows (TLE / OMM).
  */
+import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { selectSideMenuTab } from '@app/engine/ui/side-menu-tabs';
@@ -34,7 +35,8 @@ export interface AdvancedFieldWrite {
 /**
  * Find the lowest free analyst slot SCC (90000-99999), or null if all are in
  * use. A slot is free while it still holds its untouched template object, which
- * carries the 'ANALSAT' country.
+ * carries the 'ANALSAT' country, and no other object (a New Launch trajectory)
+ * has reserved its NORAD id.
  */
 export function getFreeAnalystScc(): string | null {
   const objData = ServiceLocator.getCatalogManager().objectCache;
@@ -47,7 +49,7 @@ export function getFreeAnalystScc(): string | null {
 
     const sat = obj as Satellite;
 
-    if (sat.country !== 'ANALSAT') {
+    if (sat.country !== 'ANALSAT' || AnalystSlotReservations.isReserved(sat.sccNum)) {
       continue;
     }
 

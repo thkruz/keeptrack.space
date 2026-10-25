@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field}: значення має бути від {min} до {max} градусів.",
         "meanMotionRange": "{field}: значення має бути більшим за 0 і не більше {max} обертів на добу.",
         "periodPositive": "{field}: значення має бути додатним числом хвилин.",
-        "numberRequired": "{field}: значення має бути числом."
+        "numberRequired": "{field}: значення має бути числом.",
+        "noradIdReserved": "NORAD ID {id} зайнятий траєкторією запуску. Виберіть інший ID або спочатку видаліть траєкторію."
       },
       "successMsgs": {
         "satCreated": "Супутник {name} ({scc}) успішно створено",

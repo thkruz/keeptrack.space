@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field} musi mieścić się w zakresie od {min} do {max} stopni.",
         "meanMotionRange": "{field} musi być większy od 0 i wynosić najwyżej {max} obiegów na dobę.",
         "periodPositive": "{field} musi być dodatnią liczbą minut.",
-        "numberRequired": "{field} musi być liczbą."
+        "numberRequired": "{field} musi być liczbą.",
+        "noradIdReserved": "NORAD ID {id} jest zajęty przez trajektorię startu. Wybierz inny identyfikator lub najpierw usuń trajektorię."
       },
       "successMsgs": {
         "satCreated": "Satelita {name} ({scc}) utworzony pomyślnie",

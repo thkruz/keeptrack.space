@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field} muss zwischen {min} und {max} Grad liegen.",
         "meanMotionRange": "{field} muss größer als 0 und höchstens {max} Umläufe pro Tag sein.",
         "periodPositive": "{field} muss eine positive Anzahl von Minuten sein.",
-        "numberRequired": "{field} muss eine Zahl sein."
+        "numberRequired": "{field} muss eine Zahl sein.",
+        "noradIdReserved": "Die NORAD-ID {id} wird von einer Startbahn belegt. Wählen Sie eine andere ID oder entfernen Sie zuerst die Bahn."
       },
       "successMsgs": {
         "satCreated": "Satellit {name} ({scc}) erfolgreich erstellt",

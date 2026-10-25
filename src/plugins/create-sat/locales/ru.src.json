@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field}: значение должно быть от {min} до {max} градусов.",
         "meanMotionRange": "{field}: значение должно быть больше 0 и не более {max} оборотов в сутки.",
         "periodPositive": "{field}: значение должно быть положительным числом минут.",
-        "numberRequired": "{field}: значение должно быть числом."
+        "numberRequired": "{field}: значение должно быть числом.",
+        "noradIdReserved": "NORAD ID {id} занят траекторией запуска. Выберите другой ID или сначала удалите траекторию."
       },
       "successMsgs": {
         "satCreated": "Спутник {name} ({scc}) успешно создан",

@@ -87,7 +87,8 @@
         "rangeErrorDeg": "{field} musí být mezi {min} a {max} stupni.",
         "meanMotionRange": "{field} musí být větší než 0 a nejvýše {max} oběhů za den.",
         "periodPositive": "{field} musí být kladný počet minut.",
-        "numberRequired": "{field} musí být číslo."
+        "numberRequired": "{field} musí být číslo.",
+        "noradIdReserved": "NORAD ID {id} používá trajektorie startu. Zvolte jiné ID nebo nejprve trajektorii odeberte."
       },
       "successMsgs": {
         "satCreated": "Satelit {name} ({scc}) byl úspěšně vytvořen",

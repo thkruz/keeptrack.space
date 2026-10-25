@@ -20,7 +20,7 @@ import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import { runNumOnlySearch, runRegularSearch } from './search-query';
+import { isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -547,7 +547,8 @@ export class SearchManager {
     htmlStr += results.reduce((html, result) => {
       const obj = <Satellite | OemSatellite | MissileObject>satData[result.id];
       const pos = dotsManagerInstance.positionData ? dotsManagerInstance.getCurrentPosition(Number(obj.id)) : null;
-      const isDecayed = pos?.x === 0 && pos?.y === 0 && pos?.z === 0;
+      // OEM objects are placed on the main thread; a (0, 0, 0) slot between a cruncher message and the next frame is not a decay.
+      const isDecayed = !isNeverDecayed(obj) && pos?.x === 0 && pos?.y === 0 && pos?.z === 0;
       const decayedClass = isDecayed ? ' search-result-decayed' : '';
 
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;
@@ -683,7 +684,8 @@ export class SearchManager {
           } else if (obj instanceof Star) {
             html += t7e('searchManager.typeStar' as TranslationKey);
           } else if (obj instanceof OemSatellite) {
-            html += (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
+            // A NORAD id (mission catalog or OEM comment) is shown like any catalog row; otherwise the OEM OBJECT_ID.
+            html += (obj as OemSatellite).sccNum || (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
           } else {
             html += (obj as Satellite).sccNum;
           }

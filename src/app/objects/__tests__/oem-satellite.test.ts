@@ -196,6 +196,33 @@ describe('OemSatellite NORAD_ID extraction from COMMENT lines', () => {
   });
 });
 
+describe('OemSatellite.assignNoradId and centerNameAndFrame', () => {
+  it('gives an OEM without a NORAD_ID comment a catalog number (Deep Space mission identity)', () => {
+    const sat = new OemSatellite(makeOem());
+
+    expect(sat.sccNum).toBe('');
+    expect(sat.assignNoradId('49328')).toBe(true);
+    expect(sat.sccNum).toBe('49328');
+    expect(sat.sccNum5).toBe('49328');
+    expect(sat.sccNum6).toBe('049328');
+    expect(sat.type).toBe(SpaceObjectType.PAYLOAD);
+  });
+
+  it('ignores an invalid id', () => {
+    const sat = new OemSatellite(makeOem());
+
+    expect(sat.assignNoradId('LUCY!')).toBe(false);
+    expect(sat.sccNum).toBe('');
+    expect(sat.type).toBe(SpaceObjectType.NOTIONAL);
+  });
+
+  it('reports the center name and frame of the data block in use', () => {
+    const sat = new OemSatellite(makeOem());
+
+    expect(sat.centerNameAndFrame).toEqual({ centerName: 'EARTH', refFrame: 'EME2000' });
+  });
+});
+
 describe('OemSatellite.applyUserDefinedMetadata_', () => {
   it('maps every USER_DEFINED_ field onto the satellite', () => {
     const sat = new OemSatellite(makeOem());

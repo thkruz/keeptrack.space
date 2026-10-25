@@ -3,6 +3,7 @@ import { SearchableFields } from '@app/settings/core-settings';
 import { settingsManager } from '@app/settings/settings';
 import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { OemSatellite } from '../objects/oem-satellite';
 import { SearchResult, SearchResultType } from './search-manager';
 
 /**
@@ -341,9 +342,15 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
 function getSearchableObjects(onlySatellites = false): BaseObject[] {
   const catalogManagerInstance = ServiceLocator.getCatalogManager();
   const dotsManagerInstance = ServiceLocator.getDotsManager();
+  const oemNoradIds = getOemNoradIds();
 
   return catalogManagerInstance.objectCache
     .filter((obj) => {
+      // A loaded OEM object that carries a catalog NORAD id replaces that catalog row (one row per spacecraft).
+      if (isReplacedByOemObject(obj, oemNoradIds)) {
+        return false;
+      }
+
       // Type allow-list. The numeric path is satellites-only; everything else
       // respects the per-type toggles (satellites, missiles, stars, sensors,
       // launch sites, and planets). Markers and unused OEM placeholder slots
@@ -375,7 +382,7 @@ function getSearchableObjects(onlySatellites = false): BaseObject[] {
       // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
       // objects (stars, sensors, launch sites, planets) hold fixed positions that
       // are not in the dots position buffer, so never treat them as decayed.
-      if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData) {
+      if (!obj.isStatic() && !settingsManager.isShowDecayedInSearch && dotsManagerInstance.positionData && !isNeverDecayed(obj)) {
         const pos = dotsManagerInstance.getCurrentPosition(Number(obj.id));
 
         if (pos?.x === 0 && pos?.y === 0 && pos?.z === 0) {
@@ -393,4 +400,42 @@ function getSearchableObjects(onlySatellites = false): BaseObject[] {
 
       return 0;
     });
+}
+
+/**
+ * NORAD ids carried by the loaded OEM objects (Deep Space missions, OEM Reader files with a NORAD_ID comment,
+ * New Launch trajectories). Usually empty.
+ */
+export function getOemNoradIds(): Set<string> {
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
+  const ids = new Set<string>();
+
+  for (const id of catalogManagerInstance.oemSatelliteIds ?? []) {
+    const obj = catalogManagerInstance.objectCache[id];
+
+    if (obj instanceof OemSatellite && obj.sccNum) {
+      ids.add(obj.sccNum);
+    }
+  }
+
+  return ids;
+}
+
+/** True for a catalog (non-OEM) object whose NORAD id is carried by a loaded OEM object, which wins in search. */
+export function isReplacedByOemObject(obj: BaseObject, oemNoradIds: Set<string>): boolean {
+  if (oemNoradIds.size === 0 || obj instanceof OemSatellite) {
+    return false;
+  }
+
+  const sccNum = (obj as Satellite).sccNum;
+
+  return typeof sccNum === 'string' && sccNum.length > 0 && oemNoradIds.has(sccNum);
+}
+
+/**
+ * OEM objects are positioned on the main thread from their ephemeris; between a position-cruncher message and
+ * the next frame their slot can briefly read (0, 0, 0). That is not a decay, so never treat them as decayed.
+ */
+export function isNeverDecayed(obj: BaseObject): boolean {
+  return obj instanceof OemSatellite;
 }

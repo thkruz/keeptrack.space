@@ -277,39 +277,7 @@ export class OemSatellite extends SpaceObject {
       // as a known payload when it parses as a valid sccNum form.
       const match = comment.match(/NORAD_ID\s*=\s*(?<id>\S+)/u);
 
-      if (match?.groups?.id) {
-        const id = match.groups.id;
-        const kind = Tle.classifySatNum(id);
-
-        if (kind === 'invalid') {
-          continue;
-        }
-
-        // Normalize to the display-canonical numeric form so OemSatellite.sccNum
-        // matches the convention used by Satellite (alpha-5 "T0001" → "270001",
-        // leading zeros stripped). The alpha-5 string is preserved on sccNum5.
-        // Tle.convertA5to6Digit THROWS for extended IDs beyond TLE alpha-5
-        // capacity (a 6-digit value > 339999); guard it the same way
-        // Satellite.assignAlpha5Forms_ does and keep the original as canonical.
-        let normalizedScc = id;
-
-        try {
-          normalizedScc = Tle.convertA5to6Digit(id);
-        } catch {
-          // Extended (e.g. 6-digit > 339999) — leave the numeric form untouched.
-        }
-        this.sccNum = normalizedScc.replace(/^0+(?=\d)/u, '');
-        if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
-          // Fixed-width forms, matching ootk Satellite: 25544 gives sccNum5 "25544" and
-          // sccNum6 "025544"; catalog number 5 gives "00005" and "000005".
-          this.sccNum5 = Tle.convert6DigitToA5(this.sccNum.padStart(5, '0'));
-          this.sccNum6 = this.sccNum.padStart(6, '0');
-        } else {
-          this.sccNum5 = null;
-          this.sccNum6 = null;
-        }
-        // With a real NORAD ID, this is a known payload not a notional object
-        this.type = SpaceObjectType.PAYLOAD;
+      if (match?.groups?.id && this.assignNoradId(match.groups.id)) {
         break;
       }
     }
@@ -323,6 +291,54 @@ export class OemSatellite extends SpaceObject {
       this.removeFullOrbitPath();
       this.removeOrbitHistory();
     });
+  }
+
+  /**
+   * Give this object a NORAD catalog number, from an OEM `COMMENT NORAD_ID = ...` line or from a caller that knows
+   * the spacecraft (the Deep Space mission catalog). Invalid ids are ignored.
+   * @returns true when the id was applied.
+   */
+  assignNoradId(id: string): boolean {
+    const kind = Tle.classifySatNum(id);
+
+    if (kind === 'invalid') {
+      return false;
+    }
+
+    // Normalize to the display-canonical numeric form so OemSatellite.sccNum
+    // matches the convention used by Satellite (alpha-5 "T0001" → "270001",
+    // leading zeros stripped). The alpha-5 string is preserved on sccNum5.
+    // Tle.convertA5to6Digit THROWS for extended IDs beyond TLE alpha-5
+    // capacity (a 6-digit value > 339999); guard it the same way
+    // Satellite.assignAlpha5Forms_ does and keep the original as canonical.
+    let normalizedScc = id;
+
+    try {
+      normalizedScc = Tle.convertA5to6Digit(id);
+    } catch {
+      // Extended (e.g. 6-digit > 339999) — leave the numeric form untouched.
+    }
+    this.sccNum = normalizedScc.replace(/^0+(?=\d)/u, '');
+    if (kind === 'numeric5' || kind === 'alpha5' || kind === 'numeric6') {
+      // Fixed-width forms, matching ootk Satellite: 25544 gives sccNum5 "25544" and
+      // sccNum6 "025544"; catalog number 5 gives "00005" and "000005".
+      this.sccNum5 = Tle.convert6DigitToA5(this.sccNum.padStart(5, '0'));
+      this.sccNum6 = this.sccNum.padStart(6, '0');
+    } else {
+      this.sccNum5 = null;
+      this.sccNum6 = null;
+    }
+    // With a real NORAD ID, this is a known payload not a notional object
+    this.type = SpaceObjectType.PAYLOAD;
+
+    return true;
+  }
+
+  /** The OEM CENTER_NAME and REF_FRAME of the data block in use (for the object panel). */
+  get centerNameAndFrame(): { centerName: string; refFrame: string } {
+    const block = this.OemDataBlocks[this.dataBlockIdx] ?? this.OemDataBlocks[0];
+
+    return { centerName: block?.metadata.CENTER_NAME ?? '', refFrame: block?.metadata.REF_FRAME ?? '' };
   }
 
   private applyUserDefinedMetadata_(ud?: Record<string, string>): void {

@@ -1214,6 +1214,15 @@ export class DotsManager {
       }
     }
 
+    /*
+     * The worker does not propagate OEM objects, so the copy above zeroes their slots until the next frame.
+     * Re-apply them now: a search, hover or pick between this message and the frame read (0, 0, 0) and showed
+     * the mission as "Decayed" (its search row then ignored clicks).
+     */
+    if (mData.satPos || mData.satVel) {
+      this.interpolatePositionsOfOemSatellites();
+    }
+
     if (mData.satInView?.length > 0) {
       if (!this.inViewData || this.inViewData.length !== mData.satInView.length) {
         this.inViewData = new Int8Array(mData.satInView);

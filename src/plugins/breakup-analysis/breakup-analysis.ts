@@ -179,6 +179,9 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
       estimatedTotal: l('labels.estimatedTotal'),
       trackingRatio: l('labels.trackingRatio'),
       typeBreakdown: l('labels.typeBreakdown'),
+      likelyDecayed: l('labels.likelyDecayed'),
+      likelyDecayedNote: l('labels.likelyDecayedNote'),
+      likelyDecayedTag: l('labels.likelyDecayedTag'),
       fragmentDispersion: l('sections.fragmentDispersion'),
       parameter: l('labels.parameter'),
       min: l('labels.min'),
@@ -456,7 +459,18 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
       return;
     }
 
-    statsEl.innerHTML = buildStatsCard(summarizeEvent(event, this.debrisResults_), labels);
+    const referenceMs = this.decayReferenceMs_();
+
+    statsEl.innerHTML = buildStatsCard(summarizeEvent(event, this.debrisResults_, referenceMs), labels, referenceMs);
+  }
+
+  /**
+   * Time the "likely decayed" element-age rule measures from: the simulation
+   * time (the live catalog). The Pro build uses the archive date while a
+   * Historic Catalog snapshot is loaded.
+   */
+  protected decayReferenceMs_(): number {
+    return ServiceLocator.getTimeManager().simulationTimeObj.getTime();
   }
 
   protected renderDispersion_(): void {
@@ -481,6 +495,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
         sortDir: this.sortDir_,
         showAll: this.showAllFragments_,
         maxRows: FRAGMENT_DEFAULT_MAX_ROWS,
+        decayReferenceMs: this.decayReferenceMs_(),
       },
       this.getLabels_()
     );
@@ -641,7 +656,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     const event = BREAKUP_EVENTS.find((e) => e.id === this.selectedEventId_);
     const name = `breakup-${event?.id ?? 'fragments'}`;
 
-    saveCsv(buildCsvRows(this.debrisResults_, event), name);
+    saveCsv(buildCsvRows(this.debrisResults_, event, this.decayReferenceMs_()), name);
   }
 
   protected updateShowAllButton_(): void {

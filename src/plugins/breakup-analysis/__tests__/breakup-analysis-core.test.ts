@@ -5,8 +5,14 @@ import {
   calcFieldStats,
   calcYearsBetween,
   countByType,
+  countLikelyDecayed,
+  isLikelyDecayed,
+  LIKELY_DECAYED_EPOCH_AGE_DAYS,
+  LIKELY_DECAYED_PERIGEE_KM,
   sortFragments,
   summarizeEvent,
+  summarizeFragments,
+  tleEpochMs,
 } from '@app/plugins/breakup-analysis/breakup-analysis-core';
 import { BREAKUP_EVENTS } from '@app/plugins/breakup-analysis/breakup-events';
 import { Satellite, SpaceObjectType } from '@ootk/src/main';
@@ -93,6 +99,60 @@ describe('breakup-analysis-core', () => {
     });
   });
 
+  describe('likely decayed', () => {
+    // Archive date 2026-04-13 (00:00 UTC); TLE epoch day 103 of 2026 is that date.
+    const ARCHIVE_MS = Date.UTC(2026, 3, 13);
+    const DAY_MS = 86_400_000;
+
+    it('uses the ruled thresholds', () => {
+      expect(LIKELY_DECAYED_PERIGEE_KM).toBe(120);
+      expect(LIKELY_DECAYED_EPOCH_AGE_DAYS).toBe(90);
+    });
+
+    it('converts a TLE epoch to Unix ms (and null when unavailable)', () => {
+      expect(tleEpochMs(26, 103)).toBe(ARCHIVE_MS);
+      expect(tleEpochMs(7, 37)).toBe(Date.UTC(2007, 1, 6));
+      expect(tleEpochMs(Number.NaN, 1)).toBeNull();
+      expect(tleEpochMs(26, 0)).toBeNull();
+    });
+
+    it('flags a perigee below 120 km whatever the epoch', () => {
+      expect(isLikelyDecayed(fakeSat({ perigee: 119.9, epochYear: 26, epochDay: 103 }), ARCHIVE_MS)).toBe(true);
+      expect(isLikelyDecayed(fakeSat({ perigee: 120, epochYear: 26, epochDay: 103 }), ARCHIVE_MS)).toBe(false);
+      expect(isLikelyDecayed(fakeSat({ perigee: 100 }), Number.NaN)).toBe(true);
+    });
+
+    it('flags an element set more than 90 days older than the reference', () => {
+      const ninetyDaysBefore = 103 - 90;
+
+      expect(isLikelyDecayed(fakeSat({ epochYear: 26, epochDay: ninetyDaysBefore }), ARCHIVE_MS)).toBe(false);
+      expect(isLikelyDecayed(fakeSat({ epochYear: 26, epochDay: ninetyDaysBefore - 0.01 }), ARCHIVE_MS)).toBe(true);
+      // Planner example: NORAD 29716, epoch 2007-02-06, perigee ~125 km, in the 2026-04-13 archive.
+      expect(isLikelyDecayed(fakeSat({ sccNum: '29716', perigee: 124.6, epochYear: 7, epochDay: 37 }), ARCHIVE_MS)).toBe(true);
+    });
+
+    it('never flags on a newer epoch, a missing epoch or a missing reference', () => {
+      expect(isLikelyDecayed(fakeSat({ epochYear: 26, epochDay: 200 }), ARCHIVE_MS)).toBe(false);
+      expect(isLikelyDecayed(fakeSat({ epochYear: Number.NaN, epochDay: Number.NaN }), ARCHIVE_MS)).toBe(false);
+      expect(isLikelyDecayed(fakeSat({ epochYear: 7, epochDay: 37 }), Number.NaN)).toBe(false);
+      expect(isLikelyDecayed(fakeSat({ perigee: Number.NaN, epochYear: 26, epochDay: 103 }), ARCHIVE_MS)).toBe(false);
+    });
+
+    it('counts flagged members and keeps them in the summary counts', () => {
+      const sats = [fakeSat({ epochYear: 26, epochDay: 102 }), fakeSat({ perigee: 110, epochYear: 26, epochDay: 102 }), fakeSat({ epochYear: 12, epochDay: 215 })];
+      const summary = summarizeFragments(sats, 3, ARCHIVE_MS);
+
+      expect(countLikelyDecayed(sats, ARCHIVE_MS)).toBe(2);
+      expect(summary.likelyDecayed).toBe(2);
+      expect(summary.tracked).toBe(3);
+      expect(summary.trackingRatio).toBe('100.0');
+      expect(summarizeEvent({ ...BREAKUP_EVENTS[0], estimatedDebrisCount: 3 }, sats, ARCHIVE_MS).likelyDecayed).toBe(2);
+      // Without a reference only the perigee rule applies.
+      expect(summarizeFragments(sats).likelyDecayed).toBe(1);
+      expect(countLikelyDecayed(sats, ARCHIVE_MS + 365 * DAY_MS)).toBe(3);
+    });
+  });
+
   describe('buildGabbardData', () => {
     it('emits an apogee and perigee point per finite-period fragment', () => {
       const data = buildGabbardData([fakeSat({ period: 100, apogee: 900, perigee: 800 })]);
@@ -115,6 +175,14 @@ describe('breakup-analysis-core', () => {
       expect(rows[0]).toMatchObject({ cospar: '1999-025D', tleEpochUtc: '2026-01-01T12:00:00.000Z', provenance: 'loaded catalog elements; launch-prefix membership' });
       expect(rows[1]).toMatchObject({ cospar: '', tleEpochUtc: '', historicalParentNoradId: '', historicalBreakupDate: '' });
     });
+    it('ends every row with the likely-decayed flag', () => {
+      const archiveMs = Date.UTC(2026, 3, 13);
+      const rows = buildCsvRows([fakeSat({ epochYear: 26, epochDay: 102 }), fakeSat({ epochYear: 7, epochDay: 37 })], BREAKUP_EVENTS[0], archiveMs);
+
+      expect(Object.keys(rows[0]).at(-1)).toBe('likelyDecayed');
+      expect(rows.map((row) => row.likelyDecayed)).toEqual(['no', 'yes']);
+    });
+
     it('produces flat numeric rows', () => {
       const rows = buildCsvRows([fakeSat({ sccNum: '12345', perigee: 800.456, eccentricity: 0.00512 })]);
 

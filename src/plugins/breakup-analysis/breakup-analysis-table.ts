@@ -14,7 +14,7 @@
 
 import { html } from '@app/engine/utils/development/formatter';
 import { Satellite } from '@ootk/src/main';
-import { EventSummary, FragmentSortKey, SortDir } from './breakup-analysis-core';
+import { EventSummary, FragmentSortKey, isLikelyDecayed, LIKELY_DECAYED_EPOCH_AGE_DAYS, LIKELY_DECAYED_PERIGEE_KM, SortDir } from './breakup-analysis-core';
 import { BreakupEvent } from './breakup-events';
 
 /** Every user-facing string the table builders need, pre-resolved through t7e. */
@@ -43,6 +43,12 @@ export interface BreakupLabels {
   estimatedTotal: string;
   trackingRatio: string;
   typeBreakdown: string;
+  /** Stats label for the likely-decayed count. */
+  likelyDecayed: string;
+  /** Parameterized note under the stats: "{perigee}", "{days}" and "{date}". */
+  likelyDecayedNote: string;
+  /** Short tag on a flagged fragment-table row. */
+  likelyDecayedTag: string;
   fragmentDispersion: string;
   parameter: string;
   min: string;
@@ -187,8 +193,35 @@ export const buildDispersionTable = (summary: EventSummary, labels: BreakupLabel
     : html`<p class="ba-empty-state">${labels.noTrackedDebris}</p>`;
 };
 
-export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): string => {
-  const { tracked, estimated, trackingRatio, counts } = summary;
+/** "YYYY-MM-DD" (UTC) of a reference time, or '' when not finite. */
+const referenceDate_ = (referenceMs: number): string => (Number.isFinite(referenceMs) ? new Date(referenceMs).toISOString().slice(0, 10) : '');
+
+/**
+ * The likely-decayed stat cell value (the count, highlighted when non-zero).
+ * Exported so the Pro live card shows the same cell.
+ */
+export const likelyDecayedValue = (count: number): string => (count > 0 ? html`<span class="ba-decayed-count">${count.toLocaleString()}</span>` : count.toLocaleString());
+
+/**
+ * The note that explains the likely-decayed rule, or '' when nothing is
+ * flagged. `referenceMs` is the archive date or the simulation time.
+ */
+export const likelyDecayedNote = (count: number, referenceMs: number, labels: BreakupLabels): string => {
+  if (count <= 0) {
+    return '';
+  }
+
+  const text = labels.likelyDecayedNote
+    .replace('{perigee}', LIKELY_DECAYED_PERIGEE_KM.toString())
+    .replace('{days}', LIKELY_DECAYED_EPOCH_AGE_DAYS.toString())
+    .replace('{date}', referenceDate_(referenceMs));
+
+  return html`<p class="ba-decayed-note">${text}</p>`;
+};
+
+/** `referenceMs` is the time the likely-decayed note names (the archive date or the simulation time). */
+export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels, referenceMs = Number.NaN): string => {
+  const { tracked, estimated, trackingRatio, counts, likelyDecayed } = summary;
   const typeValue = `${counts.payloads.toString()} / ${counts.rocketBodies.toString()} / ${counts.debris.toString()}`;
   const dispersion = buildDispersionTable(summary, labels);
 
@@ -199,8 +232,10 @@ export const buildStatsCard = (summary: EventSummary, labels: BreakupLabels): st
         ${infoItem(labels.trackedDebris, tracked.toLocaleString())}
         ${infoItem(labels.estimatedTotal, estimated.toLocaleString())}
         ${infoItem(labels.trackingRatio, `${trackingRatio}%`)}
+        ${infoItem(labels.likelyDecayed, likelyDecayedValue(likelyDecayed))}
         ${infoItem(labels.typeBreakdown, typeValue)}
       </div>
+      ${likelyDecayedNote(likelyDecayed, referenceMs, labels)}
       ${dispersion}
     </section>
   `;
@@ -211,6 +246,8 @@ interface FragmentTableOptions {
   sortDir: SortDir;
   showAll: boolean;
   maxRows: number;
+  /** Time the likely-decayed age rule measures from (omitted or NaN: perigee rule only). */
+  decayReferenceMs?: number;
 }
 
 const sortIndicator = (key: FragmentSortKey, opts: FragmentTableOptions): string => {
@@ -237,11 +274,17 @@ export const buildFragmentTable = (sats: Satellite[], opts: FragmentTableOptions
 
   let rows = '';
 
+  const referenceMs = opts.decayReferenceMs ?? Number.NaN;
+
   for (const sat of displayResults) {
+    const isDecayed = isLikelyDecayed(sat, referenceMs);
+    const rowClass = isDecayed ? 'breakup-analysis-debris-row link breakup-likely-decayed' : 'breakup-analysis-debris-row link';
+    const tag = isDecayed ? html` <span class="ba-decayed-tag">${labels.likelyDecayedTag}</span>` : '';
+
     rows += html`
-      <tr class="breakup-analysis-debris-row link" data-scc="${sat.sccNum}">
+      <tr class="${rowClass}" data-scc="${sat.sccNum}">
         <td>${sat.sccNum}</td>
-        <td class="ba-cell-left">${sat.name}</td>
+        <td class="ba-cell-left">${sat.name}${tag}</td>
         <td>${sat.getTypeString()}</td>
         <td>${sat.perigee.toFixed(0)}</td>
         <td>${sat.apogee.toFixed(0)}</td>

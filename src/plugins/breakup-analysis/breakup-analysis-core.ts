@@ -46,6 +46,8 @@ export interface EventSummary {
   altStats: AltitudeStats;
   eccStats: FieldStats;
   incStats: FieldStats;
+  /** Members flagged by {@link isLikelyDecayed} (kept in every count above). */
+  likelyDecayed: number;
 }
 
 /** One [period (min), altitude (km)] tuple for a Gabbard scatter point. */
@@ -128,8 +130,73 @@ export const countByType = (sats: Satellite[]): TypeCounts => {
   return { payloads, rocketBodies, debris };
 };
 
-/** Aggregate every statistic the detail panel needs for one event + its tracked fragments. */
-export const summarizeEvent = (event: BreakupEvent, sats: Satellite[]): EventSummary => summarizeFragments(sats, event.estimatedDebrisCount);
+// =========================================================================
+// Likely-decayed members
+// =========================================================================
+
+/** A member whose perigee is below this altitude (km) is flagged "likely decayed". */
+export const LIKELY_DECAYED_PERIGEE_KM = 120;
+
+/**
+ * A member whose element set epoch is more than this many days older than the
+ * reference time (the archive date, or the simulation time on the live
+ * catalog) is flagged "likely decayed": a catalog that still carries it has
+ * not had a fresh element set for it in that long.
+ */
+export const LIKELY_DECAYED_EPOCH_AGE_DAYS = 90;
+
+const DAY_MS_ = 86_400_000;
+
+/** UTC TLE epoch as Unix ms, or null when the epoch fields are unavailable. */
+export const tleEpochMs = (epochYear: number, epochDay: number): number | null => {
+  if (!Number.isFinite(epochYear) || !Number.isFinite(epochDay) || epochDay <= 0) {
+    return null;
+  }
+  const year = epochYear < 57 ? 2000 + epochYear : 1900 + epochYear;
+
+  return Date.UTC(year, 0, 1) + (epochDay - 1) * DAY_MS_;
+};
+
+/**
+ * True when a member is likely decayed: perigee below
+ * {@link LIKELY_DECAYED_PERIGEE_KM}, or an element set epoch more than
+ * {@link LIKELY_DECAYED_EPOCH_AGE_DAYS} days before `referenceMs`. A missing
+ * perigee or epoch never flags; a non-finite `referenceMs` skips the age rule.
+ * Flagged members are kept in the set; this only labels them.
+ */
+export const isLikelyDecayed = (sat: Satellite, referenceMs: number): boolean => {
+  if (Number.isFinite(sat.perigee) && sat.perigee < LIKELY_DECAYED_PERIGEE_KM) {
+    return true;
+  }
+
+  if (!Number.isFinite(referenceMs)) {
+    return false;
+  }
+
+  const epochMs = tleEpochMs(sat.epochYear, sat.epochDay);
+
+  return epochMs !== null && referenceMs - epochMs > LIKELY_DECAYED_EPOCH_AGE_DAYS * DAY_MS_;
+};
+
+/** Number of members {@link isLikelyDecayed} flags. */
+export const countLikelyDecayed = (sats: readonly Satellite[], referenceMs: number): number => {
+  let count = 0;
+
+  for (const sat of sats) {
+    if (isLikelyDecayed(sat, referenceMs)) {
+      count++;
+    }
+  }
+
+  return count;
+};
+
+/**
+ * Aggregate every statistic the detail panel needs for one event + its tracked
+ * fragments. `referenceMs` is the time the likely-decayed age rule measures
+ * from (NaN applies only the perigee rule).
+ */
+export const summarizeEvent = (event: BreakupEvent, sats: Satellite[], referenceMs = Number.NaN): EventSummary => summarizeFragments(sats, event.estimatedDebrisCount, referenceMs);
 
 /**
  * Aggregate the detail-panel statistics for any fragment set. `estimated` is
@@ -137,7 +204,7 @@ export const summarizeEvent = (event: BreakupEvent, sats: Satellite[]): EventSum
  * {@link summarizeEvent} is this with the curated event's estimate, so a live
  * (uncurated) set gets exactly the same dispersion math.
  */
-export const summarizeFragments = (sats: Satellite[], estimated = 0): EventSummary => {
+export const summarizeFragments = (sats: Satellite[], estimated = 0, referenceMs = Number.NaN): EventSummary => {
   const tracked = sats.length;
 
   return {
@@ -148,6 +215,7 @@ export const summarizeFragments = (sats: Satellite[], estimated = 0): EventSumma
     altStats: calcAltitudeStats(sats),
     eccStats: calcFieldStats(sats, (s) => s.eccentricity),
     incStats: calcFieldStats(sats, (s) => s.inclination),
+    likelyDecayed: countLikelyDecayed(sats, referenceMs),
   };
 };
 
@@ -177,16 +245,19 @@ export const buildGabbardData = (sats: Satellite[]): GabbardData => {
 
 /** UTC TLE epoch from the source snapshot; an unavailable epoch remains explicit. */
 export const tleEpochIso = (epochYear: number, epochDay: number): string => {
-  if (!Number.isFinite(epochYear) || !Number.isFinite(epochDay) || epochDay <= 0) {
-    return '';
-  }
-  const year = epochYear < 57 ? 2000 + epochYear : 1900 + epochYear;
+  const ms = tleEpochMs(epochYear, epochDay);
 
-  return new Date(Math.round(Date.UTC(year, 0, 1) + (epochDay - 1) * 86_400_000)).toISOString();
+  return ms === null ? '' : new Date(Math.round(ms)).toISOString();
 };
 
-/** Plain rows for {@link saveCsv} (column order preserved by Papa.unparse). */
-export const buildCsvRows = (sats: Satellite[], event?: BreakupEvent): Array<Record<string, string | number>> =>
+/** CSV value of the likely-decayed flag (exports stay English for machine parsing). */
+export const likelyDecayedCsvValue = (sat: Satellite, referenceMs: number): string => (isLikelyDecayed(sat, referenceMs) ? 'yes' : 'no');
+
+/**
+ * Plain rows for {@link saveCsv} (column order preserved by Papa.unparse).
+ * `referenceMs` feeds the trailing `likelyDecayed` column (see {@link isLikelyDecayed}).
+ */
+export const buildCsvRows = (sats: Satellite[], event?: BreakupEvent, referenceMs = Number.NaN): Array<Record<string, string | number>> =>
   sats.map((sat) => ({
     noradId: sat.sccNum,
     name: sat.name,
@@ -202,6 +273,7 @@ export const buildCsvRows = (sats: Satellite[], event?: BreakupEvent): Array<Rec
     inclinationDeg: Number(sat.inclination.toFixed(2)),
     eccentricity: Number(sat.eccentricity.toFixed(4)),
     periodMin: Number(sat.period.toFixed(1)),
+    likelyDecayed: likelyDecayedCsvValue(sat, referenceMs),
   }));
 
 const fragmentSortValue = (sat: Satellite, key: FragmentSortKey): number | string => {

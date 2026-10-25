@@ -114,6 +114,41 @@ describe('Calendar', () => {
     expect((document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement).value).toBe('2024-08-15 06:30:00');
   });
 
+  it('after a scenario clamp the Go-to field and calendar show the clamped time, not the typed text', () => {
+    const scenarioPlugin = { scenario: { startTime: new Date('2021-10-16T10:33:08.284Z'), endTime: new Date('2033-04-02T16:33:08.284Z') } };
+    const getPluginSpy = vi
+      .spyOn(PluginRegistry, 'getPlugin')
+      .mockImplementation(((cls: { name?: string }) => (cls?.name === 'ScenarioManagementPlugin' ? scenarioPlugin : null)) as unknown as typeof PluginRegistry.getPlugin);
+
+    cal.setDate(new Date(Date.UTC(2026, 9, 16, 12)));
+    let input = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement;
+
+    input.value = '2034-01-01 00:00:00';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(cal.getSelectedDate()?.toISOString()).toBe('2033-04-02T16:33:08.284Z');
+    expect(c().calendarDate.getUTCFullYear()).toBe(2033);
+    expect((document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement).value).toBe('2033-04-02 16:33:08');
+
+    input = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement;
+    input.value = '2021-10-01 00:00:00';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(cal.getSelectedDate()?.toISOString()).toBe('2021-10-16T10:33:08.284Z');
+
+    // An in-span time is not touched
+    input = document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement;
+    input.value = '2025-01-01 00:00:00';
+    input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(cal.getSelectedDate()?.toISOString()).toBe('2025-01-01T00:00:00.000Z');
+    getPluginSpy.mockRestore();
+  });
+
+  it('clampToScenario leaves the time alone without scenario bounds', () => {
+    expect(Calendar.clampToScenario(1234)).toBe(1234);
+  });
+
   it('the typed Go-to field flags invalid text and leaves the time alone', () => {
     const toast = vi.fn();
 

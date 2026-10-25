@@ -21,6 +21,7 @@ import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager
 import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
 import type { MeshManager } from './engine/rendering/mesh-manager';
+import type { ViewportManager } from './engine/rendering/viewport-manager';
 import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
 import { errorManagerInstance } from './engine/utils/errorManager';
 import { copyTsvToClipboard, saveCsv, saveVariable, saveXlsx } from './engine/utils/saveVariable';
@@ -98,6 +99,8 @@ export class KeepTrackApi {
   getHoverManager: () => HoverManager = ServiceLocator.getHoverManager.bind(ServiceLocator);
   getMainCamera: () => Camera = ServiceLocator.getMainCamera.bind(ServiceLocator);
   getMeshManager: () => MeshManager = ServiceLocator.getMeshManager.bind(ServiceLocator);
+  /** Multi-View pane layout and per-pane cameras; null before the engine registers it. */
+  getViewportManager: () => ViewportManager | null = ServiceLocator.getViewportManager.bind(ServiceLocator);
 
   // Save utilities
   saveCsv = saveCsv;

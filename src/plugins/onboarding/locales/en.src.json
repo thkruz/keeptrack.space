@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Basics tour covered",
         "body": "Want the operator toolkit? Sensors, watchlists, and keyboard-speed workflows. About two more minutes.",
-        "recap1": "Finding and selecting satellites",
-        "recap2": "Reading live orbit data",
-        "recap3": "Controlling simulation time"
+        "doneLabel": "Done",
+        "tryNextLabel": "Try next",
+        "tasks": {
+          "spin": "Spin the globe",
+          "search": "Search for a satellite",
+          "select": "Select a satellite",
+          "time": "Speed up or slow down time"
+        }
       },
       "account": {
         "title": "Save your progress?",

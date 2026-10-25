@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Témata základní prohlídky",
         "body": "Chcete operátorskou výbavu? Senzory, seznamy sledovaných a rychlou práci s klávesnicí. Zhruba dvě minuty navíc.",
-        "recap1": "Hledání a výběr družic",
-        "recap2": "Čtení živých orbitálních dat",
-        "recap3": "Ovládání času simulace"
+        "doneLabel": "Hotovo",
+        "tryNextLabel": "Vyzkoušejte dále",
+        "tasks": {
+          "spin": "Otočte zeměkoulí",
+          "search": "Vyhledejte satelit",
+          "select": "Vyberte satelit",
+          "time": "Zrychlete nebo zpomalte čas"
+        }
       },
       "account": {
         "title": "Uložit váš postup?",

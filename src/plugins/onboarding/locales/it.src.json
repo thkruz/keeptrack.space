@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Argomenti del tour di base",
         "body": "Vuoi il kit dell'operatore? Sensori, watchlist e flussi rapidi da tastiera. Circa altri due minuti.",
-        "recap1": "Trovare e selezionare satelliti",
-        "recap2": "Leggere dati orbitali in tempo reale",
-        "recap3": "Controllare il tempo della simulazione"
+        "doneLabel": "Fatto",
+        "tryNextLabel": "Da provare",
+        "tasks": {
+          "spin": "Ruota il globo",
+          "search": "Cerca un satellite",
+          "select": "Seleziona un satellite",
+          "time": "Accelera o rallenta il tempo"
+        }
       },
       "account": {
         "title": "Salvare i tuoi progressi?",

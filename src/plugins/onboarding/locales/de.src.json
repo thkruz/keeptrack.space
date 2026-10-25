@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Themen der Grundlagen-Tour",
         "body": "Lust auf das Operator-Toolkit? Sensoren, Beobachtungslisten und schnelle Tastatur-Workflows. Etwa zwei weitere Minuten.",
-        "recap1": "Satelliten finden und auswählen",
-        "recap2": "Live-Orbitdaten lesen",
-        "recap3": "Simulationszeit steuern"
+        "doneLabel": "Erledigt",
+        "tryNextLabel": "Als Nächstes ausprobieren",
+        "tasks": {
+          "spin": "Den Globus drehen",
+          "search": "Nach einem Satelliten suchen",
+          "select": "Einen Satelliten auswählen",
+          "time": "Die Zeit beschleunigen oder verlangsamen"
+        }
       },
       "account": {
         "title": "Fortschritt speichern?",

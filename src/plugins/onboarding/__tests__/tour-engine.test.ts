@@ -3,6 +3,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { AdviceManager } from '@app/engine/utils/adviceManager';
 import { TourEngine, type TourStep } from '@app/plugins/onboarding/tour-engine';
+import { BaseObject } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -414,6 +415,41 @@ describe('TourEngine', () => {
     vi.advanceTimersByTime(15_100);
     expect(actionBtn?.classList.contains('start-hidden')).toBe(false);
     expect(actionBtn?.classList.contains('kt-tour-btn-hint-pulse')).toBe(true);
+    engine.stop();
+  });
+
+  it('reports a task the user performed, and flags one done via "Do it for me" as assisted', () => {
+    vi.useFakeTimers();
+
+    const onStepActionDone = vi.fn();
+    const engine = new TourEngine({
+      steps: [
+        coachmark('mine', { advanceOn: { event: EventBusEvent.propRateChanged } }),
+        coachmark('helped', {
+          advanceOn: { event: EventBusEvent.selectSatData },
+          // Production "Do it for me" selects a satellite, which fires the advance event
+          actionButton: { label: 'Do it for me', action: () => EventBus.getInstance().emit(EventBusEvent.selectSatData, new BaseObject({ id: 0, name: 'ISS (ZARYA)' }), 0) },
+        }),
+        coachmark('skipped-with-next'),
+      ],
+      texts: TEXTS,
+      onFinish,
+      onStepActionDone,
+    });
+
+    engine.start();
+    EventBus.getInstance().emit(EventBusEvent.propRateChanged, 2);
+    vi.advanceTimersByTime(400);
+    expect(onStepActionDone).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'mine' }), false);
+    expect(engine.currentStep?.id).toBe('helped');
+
+    (document.querySelector('[data-tour-action="do-it"]') as HTMLElement).click();
+    vi.advanceTimersByTime(400);
+    expect(onStepActionDone).toHaveBeenLastCalledWith(expect.objectContaining({ id: 'helped' }), true);
+    expect(engine.currentStep?.id).toBe('skipped-with-next');
+
+    engine.next();
+    expect(onStepActionDone).toHaveBeenCalledTimes(2);
     engine.stop();
   });
 

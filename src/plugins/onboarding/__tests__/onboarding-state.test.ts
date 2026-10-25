@@ -43,6 +43,41 @@ describe('onboarding-state', () => {
     expect(loaded.updatedAt).toBeGreaterThan(0);
   });
 
+  it('round-trips the basics recap and the deferred account prompt', () => {
+    const state = createDefaultOnboardingState();
+
+    expect(state.basicsDone).toEqual([]);
+    expect(state.accountPrompt).toBe('none');
+    state.basicsDone = ['b1-globe', 'b6-time'];
+    state.accountPrompt = 'later';
+    saveOnboardingState(state);
+
+    const loaded = loadOnboardingState();
+
+    expect(loaded.basicsDone).toEqual(['b1-globe', 'b6-time']);
+    expect(loaded.accountPrompt).toBe('later');
+  });
+
+  it('maps a dev-build "due" account prompt to "later" and junk to "none"', () => {
+    PersistenceManager.getInstance().saveItem(StorageKey.ONBOARDING_STATE, JSON.stringify({ ...createDefaultOnboardingState(), accountPrompt: 'due' }));
+    expect(loadOnboardingState().accountPrompt).toBe('later');
+    PersistenceManager.getInstance().saveItem(StorageKey.ONBOARDING_STATE, JSON.stringify({ ...createDefaultOnboardingState(), accountPrompt: 42 }));
+    expect(loadOnboardingState().accountPrompt).toBe('none');
+  });
+
+  it('defaults the new fields for a v2 blob saved before they existed', () => {
+    const legacy = createDefaultOnboardingState() as Partial<ReturnType<typeof createDefaultOnboardingState>>;
+
+    delete legacy.basicsDone;
+    delete legacy.accountPrompt;
+    PersistenceManager.getInstance().saveItem(StorageKey.ONBOARDING_STATE, JSON.stringify({ ...legacy, status: 'done' }));
+
+    const loaded = loadOnboardingState();
+
+    expect(loaded.basicsDone).toEqual([]);
+    expect(loaded.accountPrompt).toBe('none');
+  });
+
   it('falls back to defaults on a corrupt blob', () => {
     PersistenceManager.getInstance().saveItem(StorageKey.ONBOARDING_STATE, 'not-json{');
     expect(loadOnboardingState().status).toBe('not-started');

@@ -1,5 +1,6 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { getEl } from '@app/engine/utils/get-el';
@@ -127,6 +128,33 @@ export const sideMenuTarget = (pluginIds: string | string[]): HTMLElement | null
 
 export const openDrawer = (): void => {
   ServiceLocator.getUiManager()?.pluginDrawer?.open();
+};
+
+/**
+ * Opens the drawer WITHOUT its full-viewport dimming overlay (end of tour).
+ * The overlay intercepts every pointer event until clicked, which made the
+ * globe and search results look dead right after the tour. Here the canvas
+ * stays live instead: the first press on the globe closes the drawer, as an
+ * overlay click would have. Escape, Tab, the hamburger and a selection close
+ * it as usual.
+ */
+export const openDrawerWithoutOverlay = (): void => {
+  openDrawer();
+  getEl('drawer-overlay', true)?.classList.remove('open');
+
+  const eventBus = EventBus.getInstance();
+  const closeOnCanvasPress = (): void => {
+    eventBus.unregister(EventBusEvent.canvasMouseDown, closeOnCanvasPress);
+    eventBus.unregister(EventBusEvent.touchStart, closeOnCanvasPress);
+
+    // Only close the overlay-free open state; a drawer reopened since (with its overlay) is not ours.
+    if (!getEl('drawer-overlay', true)?.classList.contains('open')) {
+      ServiceLocator.getUiManager()?.pluginDrawer?.close();
+    }
+  };
+
+  eventBus.on(EventBusEvent.canvasMouseDown, closeOnCanvasPress);
+  eventBus.on(EventBusEvent.touchStart, closeOnCanvasPress);
 };
 
 /** Opens the drawer and expands the collapsed group containing the target row. */
@@ -326,7 +354,8 @@ export const buildBasicsSteps = (): TourStep[] => [
     target: () => getEl('search-results', true) ?? getEl('search-holder', true),
     placement: 'bottom',
     isAvailable: isCatalogLoaded,
-    advanceOn: { event: EventBusEvent.selectSatData },
+    // Same rescue delay as every other task step: the user gets a fair try at picking a row first.
+    advanceOn: { event: EventBusEvent.selectSatData, timeoutHintMs: DO_IT_FOR_ME_HINT_MS },
     actionButton: {
       label: l('buttons.doItForMe'),
       action: selectIssForUser,

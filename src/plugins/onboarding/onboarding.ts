@@ -18,6 +18,7 @@ import { keepTrackApi } from '@app/keepTrackApi';
 import { settingsManager } from '@app/settings/settings';
 import checkCirclePng from '@public/img/icons/check-circle.png';
 import type { User } from '@supabase/supabase-js';
+import { buildBasicsRecapHtml } from './basics-recap';
 import { buildMissions, type ChecklistMission, MISSION_POWER_TOUR, sortMissionsForPersona, wireMissionAutoChecks } from './checklist';
 import { GetStartedCard } from './get-started-card';
 import {
@@ -32,7 +33,7 @@ import {
 import { l } from './onboarding-t7e';
 import { areAllAvailableChaptersDone, buildHubStep, POWER_CHAPTERS } from './power-hub';
 import { TourEngine, type TourStep } from './tour-engine';
-import { buildBasicsSteps, openDrawer } from './tour-steps';
+import { buildBasicsSteps, openDrawer, openDrawerWithoutOverlay } from './tour-steps';
 import './onboarding.css';
 
 const AUTO_START_DELAY_MS = 1500;
@@ -44,7 +45,8 @@ const PERSONAS: OnboardingPersona[] = ['explorer', 'student', 'operator', 'devel
  * Two-tier first-run experience: a short Basics tour for everyone (globe,
  * search/select, time, drawer pointer), a bridge card offering the opt-in
  * Power tour (drawer depth, sensors, watchlist, command palette), an optional
- * create-account card (Pro builds only, via the login-gate hook), and a
+ * create-account card (Pro builds only, via the login-gate hook; at tour end
+ * and, after "Maybe later", once more on the next visit), and a
  * persistent Storybook-style "Get started" checklist card pinned at the top
  * of the plugin drawer.
  */
@@ -202,6 +204,13 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       return;
     }
 
+    if (this.state_.status === 'done' && this.state_.accountPrompt === 'later') {
+      // Returning visitor who said "Maybe later" at tour end: one more (last) offer
+      this.afterSplash_(() => this.showAccount_(true));
+
+      return;
+    }
+
     if (this.state_.status === 'done' || this.state_.status === 'skipped') {
       return;
     }
@@ -262,6 +271,8 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     this.state_ = {
       ...createDefaultOnboardingState(),
       persona: this.state_.persona,
+      // A restart never re-schedules an account card that was already due or shown
+      accountPrompt: this.state_.accountPrompt,
       checklist: this.state_.checklist,
       powerChapters: this.state_.powerChapters,
       tiers: {
@@ -360,11 +371,21 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     this.state_.status = 'in-progress';
     this.state_.stage = 'basics';
     this.state_.tiers.basics = 'in-progress';
+    if (!resumeStepId) {
+      this.state_.basicsDone = [];
+    }
     this.saveState_();
 
     this.engine_ = new TourEngine({
       steps: buildBasicsSteps(),
       texts: this.engineTexts_(),
+      onStepActionDone: (step, isAssisted) => {
+        // Only what the user did counts for the recap; "Do it for me" and Next do not.
+        if (!isAssisted && !this.state_.basicsDone.includes(step.id)) {
+          this.state_.basicsDone.push(step.id);
+          this.saveState_();
+        }
+      },
       onStepShown: (step, index, total) => {
         this.state_.stepId = step.id;
         this.saveState_();
@@ -372,7 +393,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       },
       onStepExit: (step, reason) => {
         if (reason === 'action') {
-          this.track_('onboarding_step_completed', { tier: 'basics', stepId: step.id, mode: reason });
+          this.track_('onboarding_step_completed', { tier: 'basics', stepId: step.id, mode: this.state_.basicsDone.includes(step.id) ? reason : 'assisted' });
         } else if (reason === 'next') {
           this.track_('onboarding_step_covered', { tier: 'basics', stepId: step.id, mode: reason });
         }
@@ -415,7 +436,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('bridge.title'),
       body: l('bridge.body'),
-      extraHtml: `<ul class="kt-tour-recap"><li>${l('bridge.recap1')}</li><li>${l('bridge.recap2')}</li><li>${l('bridge.recap3')}</li></ul>`,
+      extraHtml: buildBasicsRecapHtml(this.state_.basicsDone),
       buttons: [
         { id: 'power', label: l('buttons.keepGoing'), isPrimary: isPowerPrimary },
         { id: 'finish', label: l('buttons.finishUp'), isPrimary: !isPowerPrimary },
@@ -442,8 +463,8 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
 
   /**
    * Shows the Power Tour hub card. In the first-run flow (isFirstRun) closing
-   * the hub proceeds to the account stage exactly once, as the linear tour
-   * did; chapters always return here so the loop is hub -> chapter -> hub.
+   * the hub proceeds to the account card (anonymous Pro) and then finishes
+   * the tour; chapters always return here so the loop is hub -> chapter -> hub.
    */
   private openHub_(isFirstRun: boolean): void {
     this.teardownEngine_();
@@ -552,16 +573,52 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     return typeof KeepTrackPlugin.loginGateOpenModal === 'function' && !document.body.classList.contains('user-logged-in');
   }
 
-  private showAccount_(): void {
-    if (!this.isAccountStepAvailable_()) {
-      this.finishTour_(true);
+  /**
+   * The create-account card (anonymous Pro only; OSS has no login gate).
+   * State machine (state.accountPrompt):
+   * - 'none': shown at tour end (finish up / first-run hub close, or a resumed
+   *   run parked on stage 'account'). Closing it finishes the tour.
+   *   "Maybe later" -> 'later'; signing up or in -> 'shown'.
+   * - 'later': shown once more at the start of the next visit (isNextVisit),
+   *   1.5 s after the splash; dropped if the user signed in meanwhile. Any
+   *   outcome -> 'shown'.
+   * - 'shown': never again (a restarted tour skips the card).
+   */
+  private showAccount_(isNextVisit = false): void {
+    const isOfferable = this.isAccountStepAvailable_() && this.state_.accountPrompt === (isNextVisit ? 'later' : 'none');
+
+    if (!isOfferable) {
+      if (!isNextVisit) {
+        this.finishTour_(true);
+      } else if (document.body.classList.contains('user-logged-in')) {
+        // Signed in since the tour: nothing left to offer, drop the prompt for good
+        this.state_.accountPrompt = 'shown';
+        this.saveState_();
+      }
 
       return;
     }
 
-    this.state_.stage = 'account';
-    this.state_.stepId = null;
+    const close = (outcome: 'later' | 'acted'): void => {
+      this.clearAccountLoginCb_();
+      this.teardownEngine_();
+      this.state_.accountPrompt = outcome === 'later' && !isNextVisit ? 'later' : 'shown';
+      this.saveState_();
+
+      if (!isNextVisit) {
+        this.finishTour_(true);
+      }
+    };
+
+    if (isNextVisit) {
+      // Second and last showing: a reload while it is up does not bring it back
+      this.state_.accountPrompt = 'shown';
+    } else {
+      this.state_.stage = 'account';
+      this.state_.stepId = null;
+    }
     this.saveState_();
+    this.track_('onboarding_account_shown', { source: isNextVisit ? 'next-visit' : 'tour-end' });
 
     const isPowerDone = this.state_.tiers.power === 'done';
 
@@ -579,11 +636,9 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     };
 
     this.accountLoginCb_ = () => {
-      this.clearAccountLoginCb_();
       keepTrackApi.toast(l('toasts.accountCreated'), ToastMsgType.normal);
       this.track_('onboarding_account_created');
-      this.teardownEngine_();
-      this.finishTour_(true);
+      close('acted');
     };
     EventBus.getInstance().on(EventBusEvent.userLogin, this.accountLoginCb_);
 
@@ -594,8 +649,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
           this.track_('onboarding_account_cta_clicked');
           KeepTrackPlugin.loginGateOpenModal?.();
         } else {
-          this.clearAccountLoginCb_();
-          this.finishTour_(true);
+          close('later');
         }
       },
       { isKeepOpenOn: ['create'] }
@@ -631,7 +685,8 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     if (isCelebrate) {
       keepTrackApi.toast(l('toasts.finished'), ToastMsgType.normal);
       this.pulseHamburger_();
-      openDrawer();
+      // No dimming overlay: the globe and search stay usable with the drawer open
+      openDrawerWithoutOverlay();
     }
   }
 

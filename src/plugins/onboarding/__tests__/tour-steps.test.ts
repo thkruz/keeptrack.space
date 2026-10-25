@@ -1,8 +1,21 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import type { TourStep } from '@app/plugins/onboarding/tour-engine';
-import { advanceOnIconClick, advanceWhenMenuOpens, buildTeaserStep, gatedStep, isPluginLocked, isPluginUsable, utilityIconTarget } from '@app/plugins/onboarding/tour-steps';
+import {
+  advanceOnIconClick,
+  advanceWhenMenuOpens,
+  buildBasicsSteps,
+  buildTeaserStep,
+  DO_IT_FOR_ME_HINT_MS,
+  gatedStep,
+  isPluginLocked,
+  isPluginUsable,
+  openDrawerWithoutOverlay,
+  utilityIconTarget,
+} from '@app/plugins/onboarding/tour-steps';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -218,6 +231,83 @@ describe('tour-steps helpers', () => {
 
     it('returns the real step (filtered by its own guards) when the plugin is missing', () => {
       expect(gatedStep('MissingPlugin', realStep, TEASER_COPY).id).toBe('real-step');
+    });
+  });
+
+  describe('basics steps', () => {
+    it('the select step reveals "Do it for me" after the shared hint delay, not at once', () => {
+      const select = buildBasicsSteps().find((step) => step.id === 'b4-select');
+
+      expect(select?.actionButton).toBeDefined();
+      expect(select?.advanceOn?.timeoutHintMs).toBe(DO_IT_FOR_ME_HINT_MS);
+    });
+  });
+
+  describe('openDrawerWithoutOverlay', () => {
+    /** Mirrors PluginDrawer.open()/close(): both toggle `open` on the drawer and its overlay. */
+    const mountDrawer = () => {
+      const drawerEl = document.createElement('div');
+      const overlayEl = document.createElement('div');
+
+      drawerEl.className = 'plugin-drawer';
+      overlayEl.id = 'drawer-overlay';
+      overlayEl.className = 'drawer-overlay';
+      document.body.append(drawerEl, overlayEl);
+
+      const pluginDrawer = {
+        open: vi.fn(() => {
+          drawerEl.classList.add('open');
+          overlayEl.classList.add('open');
+        }),
+        close: vi.fn(() => {
+          drawerEl.classList.remove('open');
+          overlayEl.classList.remove('open');
+        }),
+      };
+
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ pluginDrawer } as unknown as ReturnType<typeof ServiceLocator.getUiManager>);
+
+      return { drawerEl, overlayEl, pluginDrawer };
+    };
+
+    afterEach(() => {
+      document.querySelector('.plugin-drawer')?.remove();
+      document.getElementById('drawer-overlay')?.remove();
+    });
+
+    it('opens the drawer but leaves the full-viewport overlay off', () => {
+      const { drawerEl, overlayEl } = mountDrawer();
+
+      openDrawerWithoutOverlay();
+
+      expect(drawerEl.classList.contains('open')).toBe(true);
+      expect(overlayEl.classList.contains('open')).toBe(false);
+    });
+
+    it('closes on the first press on the globe (what an overlay click did), once', () => {
+      const { drawerEl, pluginDrawer } = mountDrawer();
+
+      openDrawerWithoutOverlay();
+      EventBus.getInstance().emit(EventBusEvent.canvasMouseDown, new MouseEvent('mousedown', { button: 0 }));
+
+      expect(drawerEl.classList.contains('open')).toBe(false);
+      expect(pluginDrawer.close).toHaveBeenCalledTimes(1);
+
+      // The listener is gone: a later press with the drawer reopened normally does nothing
+      pluginDrawer.open();
+      EventBus.getInstance().emit(EventBusEvent.canvasMouseDown, new MouseEvent('mousedown', { button: 0 }));
+      expect(pluginDrawer.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not close a drawer that was reopened with its overlay in the meantime', () => {
+      const { pluginDrawer } = mountDrawer();
+
+      openDrawerWithoutOverlay();
+      pluginDrawer.close();
+      pluginDrawer.open();
+      EventBus.getInstance().emit(EventBusEvent.canvasMouseDown, new MouseEvent('mousedown', { button: 0 }));
+
+      expect(pluginDrawer.close).toHaveBeenCalledTimes(1);
     });
   });
 });

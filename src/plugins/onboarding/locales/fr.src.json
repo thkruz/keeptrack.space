@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Sujets du parcours de base",
         "body": "Envie du kit opérateur ? Capteurs, listes de suivi et raccourcis clavier. Environ deux minutes de plus.",
-        "recap1": "Trouver et sélectionner des satellites",
-        "recap2": "Lire les données orbitales en direct",
-        "recap3": "Contrôler le temps de simulation"
+        "doneLabel": "Fait",
+        "tryNextLabel": "À essayer ensuite",
+        "tasks": {
+          "spin": "Faire tourner le globe",
+          "search": "Rechercher un satellite",
+          "select": "Sélectionner un satellite",
+          "time": "Accélérer ou ralentir le temps"
+        }
       },
       "account": {
         "title": "Sauvegarder votre progression ?",

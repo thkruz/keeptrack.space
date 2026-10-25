@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Tematy podstawowej wycieczki",
         "body": "Chcesz zestaw operatora? Sensory, listy obserwowanych i szybka praca z klawiaturą. Około dwóch minut więcej.",
-        "recap1": "Wyszukiwanie i wybieranie satelitów",
-        "recap2": "Odczytywanie bieżących danych orbitalnych",
-        "recap3": "Sterowanie czasem symulacji"
+        "doneLabel": "Zrobione",
+        "tryNextLabel": "Spróbuj dalej",
+        "tasks": {
+          "spin": "Obróć globus",
+          "search": "Wyszukaj satelitę",
+          "select": "Wybierz satelitę",
+          "time": "Przyspiesz lub zwolnij czas"
+        }
       },
       "account": {
         "title": "Zapisać postępy?",

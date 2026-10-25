@@ -65,9 +65,14 @@
       "bridge": {
         "title": "Temas del recorrido básico",
         "body": "¿Quieres el kit del operador? Sensores, listas de seguimiento y flujos rápidos con teclado. Unos dos minutos más.",
-        "recap1": "Buscar y seleccionar satélites",
-        "recap2": "Leer datos orbitales en vivo",
-        "recap3": "Controlar el tiempo de simulación"
+        "doneLabel": "Hecho",
+        "tryNextLabel": "Prueba a continuación",
+        "tasks": {
+          "spin": "Gira el globo",
+          "search": "Busca un satélite",
+          "select": "Selecciona un satélite",
+          "time": "Acelera o ralentiza el tiempo"
+        }
       },
       "account": {
         "title": "¿Guardar tu progreso?",

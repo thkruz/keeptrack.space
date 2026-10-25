@@ -228,6 +228,33 @@
   color: rgba(255, 255, 255, 0.75);
 }
 
+/* ---- Bridge recap: "Done" (checked off) and "Try next" groups ---- */
+.kt-tour-recap-label {
+  margin: 12px 0 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.kt-tour-recap-group .kt-tour-recap {
+  margin-top: 4px;
+}
+
+.kt-tour-recap-done .kt-tour-recap {
+  list-style: none;
+  padding-left: 2px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.kt-tour-recap-check {
+  display: inline-block;
+  width: 18px;
+  color: #7bd88a;
+  font-weight: 700;
+}
+
 /* ---- Mobile: dock the popover to the bottom ---- */
 
 .kt-tour-mobile .kt-tour-popover {

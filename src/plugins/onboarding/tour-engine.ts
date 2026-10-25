@@ -83,6 +83,13 @@ export interface TourEngineOptions {
   /** Fired on every step entry with the position within the filtered run. */
   onStepShown?: (step: TourStep, index: number, total: number) => void;
   onStepExit?: (step: TourStep, reason: StepExitReason) => void;
+  /**
+   * Fired once when a step's advanceOn task really happened (predicate and
+   * verify passed), before any dwell. isAssisted is true when the step's
+   * "Do it for me" button was pressed on this visit to the step, so callers
+   * can tell what the user did from what the tour did for them.
+   */
+  onStepActionDone?: (step: TourStep, isAssisted: boolean) => void;
   /** Fired when a custom (card) button is clicked. */
   onCustomButton?: (stepId: string, buttonId: string) => void;
   onFinish: (reason: TourFinishReason, lastStepId: string | null) => void;
@@ -122,6 +129,8 @@ export class TourEngine {
   /** True while dwelling on a completed task step (shade lifted, done note up). */
   private isDwelling_ = false;
   private isConfirmingSkip_ = false;
+  /** The step whose "Do it for me" button was pressed during its current visit. */
+  private assistedStep_: TourStep | null = null;
   private readonly keydownCb_ = (evt: KeyboardEvent): void => this.onKeyDown_(evt);
   private readonly keyupCb_ = (evt: KeyboardEvent): void => {
     if (this.hasForegroundHelp_()) {
@@ -271,6 +280,7 @@ export class TourEngine {
   private showStep_(index: number): void {
     this.index_ = index;
     this.isConfirmingSkip_ = false;
+    this.assistedStep_ = null;
 
     const step = this.steps_[index];
 
@@ -323,6 +333,8 @@ export class TourEngine {
         if (!this.isActive || this.currentStep !== step || this.isDwelling_) {
           return;
         }
+
+        this.options_.onStepActionDone?.(step, this.assistedStep_ === step);
 
         const dwellMs = step.advanceOn?.dwellMs ?? 0;
 
@@ -549,6 +561,7 @@ export class TourEngine {
             this.toggleSkipConfirm_(false);
             break;
           case 'do-it':
+            this.assistedStep_ = step;
             step.actionButton?.action();
             break;
           default:

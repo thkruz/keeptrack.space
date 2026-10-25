@@ -799,10 +799,28 @@ body.drawer-mode:not(.is-mobile-mode) {
     display: none !important;
   }
 
-  /* Always-open search bar on desktop */
+  /*
+   * Always-open search bar on desktop. 420px is the preferred width, not a
+   * floor: under ~1024 CSS px (125-150% browser zoom on a 1366 screen) the
+   * header cannot fit it, and a fixed 420px pushed the box past the viewport
+   * edge so focusing it scrolled #keeptrack-root sideways. The center group
+   * keeps its content width (flex-basis 0 + min-width max-content, so it still
+   * absorbs spare space and stays centered on wide screens) and the right
+   * group plus the search box are allowed to shrink to whatever is left.
+   */
+  #nav-top-center {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+
+  #nav-top-right {
+    min-width: 0;
+  }
+
   #search-holder {
     display: flex !important;
     width: 420px !important;
+    min-width: 0;
     transition: none !important;
   }
 

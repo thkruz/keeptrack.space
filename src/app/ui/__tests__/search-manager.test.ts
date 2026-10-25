@@ -535,6 +535,15 @@ describe('SearchManager interactions', () => {
     expect(mgr.getCurrentSearch()).toBe('ISS');
   });
 
+  it('mirrors the open results list onto the body so toasts can move off it', () => {
+    // Toast cards covered the first result rows and swallowed their clicks (zoom QA 2026-10-24)
+    mgr.isResultsOpen = true;
+    expect(document.body.classList.contains(SearchManager.RESULTS_OPEN_BODY_CLASS)).toBe(true);
+
+    mgr.isResultsOpen = false;
+    expect(document.body.classList.contains(SearchManager.RESULTS_OPEN_BODY_CLASS)).toBe(false);
+  });
+
   it('getLastResultGroup returns the cached group', () => {
     const group = { foo: 'bar' };
 

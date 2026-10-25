@@ -4213,6 +4213,12 @@ input:focus {
   height: 100%;
   z-index: 0;
   overflow: hidden;
+  /*
+   * clip, not just hidden: a hidden box is still a scroll container, so focusing
+   * or typing into a control that sticks out past the edge scrolled the whole app
+   * sideways and it never scrolled back. Nothing relies on the root scrolling.
+   */
+  overflow: clip;
   touch-action: none;
   -webkit-overflow-scrolling: none;
 
@@ -4328,11 +4334,24 @@ input:focus {
 
 #sensor-selected-container {
   display: none;
-  width: 0px;
+  /*
+   * Narrow headers (under 1024 CSS px, e.g. 150% zoom) used to give this a 0px
+   * box with the text spilling under the VCR buttons. Keep a real box and cap
+   * it; responsive-lg.css lifts the cap when there is room.
+   */
+  width: max-content;
+  max-width: 160px;
+  overflow: hidden;
   cursor: pointer;
-  padding: 0px;
+  padding: 0px 6px;
   transition: none;
   -webkit-transition: none;
+}
+
+#sensor-selected {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #sensor-selected-container:hover,
@@ -4343,6 +4362,25 @@ input:focus {
 #toast-container {
   min-width: 100%;
   top: 75px;
+}
+
+/*
+ * Keep toasts off the open search results (SearchManager toggles the class).
+ * Below 1024px the results list spans the full width under the header, so the
+ * stack drops to the bottom; from 1024px the list docks right at 360px wide
+ * (responsive-lg.css), so the stack moves left of it.
+ */
+body.search-results-open #toast-container {
+  top: auto;
+  bottom: 7%;
+}
+
+@media (min-width: 1024px) {
+  body.search-results-open #toast-container {
+    top: 75px;
+    bottom: auto;
+    right: calc(360px + 16px);
+  }
 }
 
 #version-box {

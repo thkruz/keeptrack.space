@@ -66,8 +66,27 @@ const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
 };
 
 export class SearchManager {
+  /** Body class that lets CSS move the toast stack off the open results list. */
+  static readonly RESULTS_OPEN_BODY_CLASS = 'search-results-open';
+
   isSearchOpen = false;
-  isResultsOpen = false;
+  private isResultsOpen_ = false;
+
+  get isResultsOpen(): boolean {
+    return this.isResultsOpen_;
+  }
+
+  /**
+   * Plugins (Watchlist) set this directly, so the body class is kept in sync
+   * here rather than at each slideIn/slideOut call site. The toast stack sits
+   * top-right, exactly where the results list docks, and its cards covered and
+   * swallowed clicks on the first result rows.
+   */
+  set isResultsOpen(isOpen: boolean) {
+    this.isResultsOpen_ = isOpen;
+    document.body?.classList.toggle(SearchManager.RESULTS_OPEN_BODY_CLASS, isOpen);
+  }
+
   private lastResultGroup_: ObjectGroup<GroupType> | null = null;
   private selectedIndex_ = -1;
 

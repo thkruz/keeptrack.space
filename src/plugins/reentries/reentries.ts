@@ -52,6 +52,96 @@ export interface TipMsg {
   OBJECT_NUMBER: string;
 }
 
+/** True for a real NORAD number; synthetic objects (JSC Vimpel) carry '' or '00000'. */
+export const isRealNorad = (norad?: string | null): boolean => typeof norad === 'string' && norad.trim() !== '' && !/^0+$/u.test(norad.trim());
+
+/**
+ * Parses a Space-Track TIP timestamp ("YYYY-MM-DD HH:MM:SS", UTC with no zone
+ * suffix) into a Date. `new Date()` alone would read that form as local time.
+ * Returns null for a blank or unparseable value.
+ */
+export const parseTipUtc = (value?: string | null): Date | null => {
+  if (typeof value !== 'string' || value.trim() === '') {
+    return null;
+  }
+
+  let iso = value.trim().replace(' ', 'T');
+
+  if (!/(?:Z|[+-]\d{2}:?\d{2})$/iu.test(iso)) {
+    iso += 'Z';
+  }
+
+  const date = new Date(iso);
+
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/** Normalizes a TIP longitude (0 to 360 east) to signed degrees in [-180, 180]. */
+export const normalizeTipLon = (lon: string): number => {
+  const lonDeg = parseFloat(lon);
+
+  return lonDeg > 180 ? lonDeg - 360 : lonDeg;
+};
+
+/** Flight path angle at the predicted decay epoch in degrees (absolute, 2 dp), or null when the elements no longer propagate. */
+export const tipReentryAngleDeg = (sat: Satellite, decayEpoch: Date): number | null => {
+  let nu: number | null | undefined = null;
+
+  try {
+    nu = sat.toClassicalElements(decayEpoch)?.trueAnomaly;
+  } catch {
+    // Expected to fail for some satellites since they are reentries
+  }
+
+  if (typeof nu !== 'number') {
+    return null;
+  }
+
+  const gamma = Math.atan((sat.eccentricity * Math.sin(nu)) / (1 + sat.eccentricity * Math.cos(nu)));
+
+  return Number(Math.abs(gamma * RAD2DEG).toFixed(2));
+};
+
+/** Catalog RCS, or the historical estimate (2 dp) when the catalog has none. */
+export const objectRcs = (sat: Satellite): { value: number | null; isEstimate: boolean } => {
+  if (sat.rcs) {
+    return { value: sat.rcs, isEstimate: false };
+  }
+
+  const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
+
+  return rcsEst ? { value: Number(rcsEst.toFixed(2)), isEstimate: true } : { value: null, isEstimate: false };
+};
+
+/** Dry mass (kg) and the ellipsoid volume estimate (m^3, 2 dp) from detail-API fields, null where unknown. */
+export const objectMassVolume = (sat: Satellite): { dryMassKg: number | null; volumeM3: number | null } => {
+  const toNumber = (value?: string): number => (value ? parseFloat(`${value}`.replace(/[^0-9.]/gu, '')) : NaN);
+  const span = toNumber(sat.span);
+  const length = toNumber(sat.length);
+  const diameter = toNumber(sat.diameter);
+  const dryMass = toNumber(sat.dryMass);
+
+  return {
+    dryMassKg: Number.isFinite(dryMass) ? dryMass : null,
+    volumeM3: Number.isFinite(span) && Number.isFinite(length) && Number.isFinite(diameter) ? Number(((Math.PI / 6) * span * length * diameter).toFixed(2)) : null,
+  };
+};
+
+/** Reentry Analysis rule: perigee under 120 km, or elements that can no longer be propagated. */
+export const hasObjectReentered = (sat: Satellite): boolean => {
+  if (sat.perigee < 120) {
+    return true;
+  }
+
+  try {
+    sat.toClassicalElements(new Date());
+  } catch {
+    return true;
+  }
+
+  return false;
+};
+
 export class Reentries extends KeepTrackPlugin {
   readonly id = 'Reentries';
   dependencies_ = [];
@@ -390,14 +480,26 @@ export class Reentries extends KeepTrackPlugin {
   private setTipList_(tipList: TipMsg[]) {
     this.tipList_ = tipList;
     this.tipList_.sort((a, b) => new Date(b.MSG_EPOCH).getTime() - new Date(a.MSG_EPOCH).getTime());
-    this.tipList_ = this.tipList_.filter((v, i, a) => a.findIndex((t) => t.NORAD_CAT_ID === v.NORAD_CAT_ID) === i);
+    // Keep the newest message per object. A row without a NORAD number has no
+    // object identity to merge on, so it is keyed by its own message ID instead
+    // of collapsing every blank-NORAD row into one.
+    const seen = new Set<string>();
+
+    this.tipList_ = this.tipList_.filter((tip) => {
+      const key = isRealNorad(tip.NORAD_CAT_ID) ? `norad:${tip.NORAD_CAT_ID.trim()}` : `msg:${tip.ID}`;
+
+      if (seen.has(key)) {
+        return false;
+      }
+      seen.add(key);
+
+      return true;
+    });
     this.tipList_.sort((a, b) => new Date(b.DECAY_EPOCH).getTime() - new Date(a.DECAY_EPOCH).getTime());
   }
 
   protected tipEventClicked_(row: number) {
-    // sccNum2Sat accepts the NORAD_CAT_ID string directly; parseInt would drop
-    // alpha-5 IDs.
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[row].NORAD_CAT_ID);
+    const sat = Reentries.tipSat_(this.tipList_[row]);
 
     if (!sat) {
       ServiceLocator.getUiManager().toast(t7e('plugins.Reentries.errorMsgs.satelliteDecayed' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
@@ -524,7 +626,7 @@ export class Reentries extends KeepTrackPlugin {
     tr.setAttribute('class', 'tip-object link');
     tr.dataset.row = i.toString();
 
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(this.tipList_[i].NORAD_CAT_ID);
+    const sat = Reentries.tipSat_(this.tipList_[i]);
     const reentered = t7e('plugins.Reentries.labels.reentered' as Parameters<typeof t7e>[0]);
     const unknown = t7e('Common.unknown');
     let rcs = reentered;
@@ -532,33 +634,21 @@ export class Reentries extends KeepTrackPlugin {
     let gammaDegrees = reentered;
 
     if (sat) {
-      const decayEpochDate = new Date(this.tipList_[i].DECAY_EPOCH);
-      let nu: number | null = null;
+      const decayEpochDate = parseTipUtc(this.tipList_[i].DECAY_EPOCH);
+      const gamma = decayEpochDate ? tipReentryAngleDeg(sat, decayEpochDate) : null;
 
-      try {
-        nu = sat.toClassicalElements(decayEpochDate)?.trueAnomaly;
-      } catch {
-        // Expected to fail for some satellites since they are reentries
-      }
+      gammaDegrees = gamma !== null ? `${gamma.toFixed(2)}\u00B0` : unknown;
 
-      if (nu !== null) {
-        const sinNu = Math.sin(nu);
-        const gamma = Math.atan((sat.eccentricity * sinNu) / (1 + sat.eccentricity * Math.cos(nu)));
+      const rcsValue = objectRcs(sat).value;
 
-        gammaDegrees = `${Math.abs(gamma * RAD2DEG).toFixed(2)}\u00B0`;
-      } else {
-        gammaDegrees = unknown;
-      }
-
-      if (sat?.rcs) {
+      if (sat.rcs) {
         rcs = `${sat.rcs}`;
       } else {
-        const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
-
-        rcs = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
+        rcs = rcsValue !== null ? rcsValue.toFixed(2) : unknown;
       }
 
-      age = sat ? `${sat.ageOfElset(new Date(), 'hours').toFixed(2)}` : unknown;
+      // Age of GP follows the simulation clock (Ted ruling 2026-10-16), so a jump to the decay epoch ages the elset.
+      age = `${sat.ageOfElset(ServiceLocator.getTimeManager().simulationTimeObj, 'hours').toFixed(2)}`;
     }
 
     const massVolume = Reentries.tipMassVolume_(sat);
@@ -576,6 +666,15 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, massVolume.volume);
 
     return tr;
+  }
+
+  /**
+   * Catalog object a TIP row refers to, or null when the row has no real NORAD
+   * number (nothing to look up) or the object is no longer in the catalog.
+   * sccNum2Sat takes the NORAD_CAT_ID string directly; parseInt would drop alpha-5 IDs.
+   */
+  protected static tipSat_(tip: TipMsg, catalogManager = ServiceLocator.getCatalogManager()): Satellite | null {
+    return isRealNorad(tip.NORAD_CAT_ID) ? catalogManager.sccNum2Sat(tip.NORAD_CAT_ID.trim()) : null;
   }
 
   /**
@@ -598,11 +697,8 @@ export class Reentries extends KeepTrackPlugin {
     }
 
     const unknown = t7e('Common.unknown');
-    const toNumber = (value?: string): number => (value ? parseFloat(`${value}`.replace(/[^0-9.]/gu, '')) : NaN);
-    const span = toNumber(sat.span);
-    const length = toNumber(sat.length);
-    const diameter = toNumber(sat.diameter);
-    const volume = Number.isFinite(span) && Number.isFinite(length) && Number.isFinite(diameter) ? `${((Math.PI / 6) * span * length * diameter).toFixed(2)}` : unknown;
+    const { volumeM3 } = objectMassVolume(sat);
+    const volume = volumeM3 !== null ? volumeM3.toFixed(2) : unknown;
     const dryMass = sat.dryMass ? `${sat.dryMass}` : unknown;
 
     return { dryMass, volume };
@@ -619,7 +715,7 @@ export class Reentries extends KeepTrackPlugin {
     const pending: Promise<boolean>[] = [];
 
     for (const tip of this.tipList_) {
-      const sat = catalogManager.sccNum2Sat(tip.NORAD_CAT_ID);
+      const sat = Reentries.tipSat_(tip, catalogManager);
 
       if (!sat || sat.dryMass || this.detailRequested_.has(sat.sccNum)) {
         continue;
@@ -701,7 +797,7 @@ export class Reentries extends KeepTrackPlugin {
         continue;
       }
 
-      const { dryMass, volume } = Reentries.tipMassVolume_(catalogManager.sccNum2Sat(tip.NORAD_CAT_ID));
+      const { dryMass, volume } = Reentries.tipMassVolume_(Reentries.tipSat_(tip, catalogManager));
 
       tr.cells[tr.cells.length - 2].textContent = dryMass;
       tr.cells[tr.cells.length - 1].textContent = volume;
@@ -763,15 +859,7 @@ export class Reentries extends KeepTrackPlugin {
     tr.setAttribute('class', 'reentry-object link');
     tr.dataset.objectId = String(sat.id);
 
-    let hasReentered = sat.perigee < 120;
-
-    if (!hasReentered) {
-      try {
-        sat.toClassicalElements(new Date());
-      } catch {
-        hasReentered = true;
-      }
-    }
+    const hasReentered = hasObjectReentered(sat);
 
     if (hasReentered) {
       tr.classList.add('reentry-critical');
@@ -794,9 +882,9 @@ export class Reentries extends KeepTrackPlugin {
     if (sat.rcs) {
       rcsStr = `${sat.rcs}`;
     } else {
-      const rcsEst = SatMath.estimateRcsUsingHistoricalData(sat);
+      const rcsEst = objectRcs(sat).value;
 
-      rcsStr = rcsEst ? `${rcsEst.toFixed(2)}` : unknown;
+      rcsStr = rcsEst !== null ? rcsEst.toFixed(2) : unknown;
     }
 
     const meanAltStr = hasReentered ? l('reentered') : ((sat.apogee + sat.perigee) / 2).toFixed(1);
@@ -840,13 +928,7 @@ export class Reentries extends KeepTrackPlugin {
 
   /** Parses a TIP longitude string into signed degrees normalized to [-180, 180]. */
   private static parseLon_(lon: string): number {
-    let lonDeg = parseFloat(lon);
-
-    if (lonDeg > 180) {
-      lonDeg -= 360;
-    }
-
-    return lonDeg;
+    return normalizeTipLon(lon);
   }
 
   private lon2degrees_(lon: string): string {

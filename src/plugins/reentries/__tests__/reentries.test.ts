@@ -6,9 +6,9 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { Reentries, TipMsg } from '@app/plugins/reentries/reentries';
+import { isRealNorad, normalizeTipLon, parseTipUtc, Reentries, TipMsg } from '@app/plugins/reentries/reentries';
 import { settingsManager } from '@app/settings/settings';
-import { SpaceObjectType } from '@ootk/src/main';
+import { CatalogSource, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -656,5 +656,73 @@ describe('Reentry Analysis source identity', () => {
     expect(getSat).toHaveBeenLastCalledWith(72);
     expect(reverseLookup).not.toHaveBeenCalled();
     expect(search).not.toHaveBeenCalled();
+  });
+});
+
+describe('Reentries TIP identity helpers', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+  });
+
+  it('parseTipUtc reads Space-Track timestamps as UTC, not local time', () => {
+    expect(parseTipUtc('2026-10-26 21:25:00')?.toISOString()).toBe('2026-10-26T21:25:00.000Z');
+    expect(parseTipUtc('2024-12-15T12:00:00Z')?.toISOString()).toBe('2024-12-15T12:00:00.000Z');
+    expect(parseTipUtc('')).toBeNull();
+    expect(parseTipUtc('not a date')).toBeNull();
+  });
+
+  it('isRealNorad rejects the blank and zero placeholders synthetic objects carry', () => {
+    expect(isRealNorad('25544')).toBe(true);
+    expect(isRealNorad('A0001')).toBe(true);
+    expect(isRealNorad('')).toBe(false);
+    expect(isRealNorad('00000')).toBe(false);
+    expect(isRealNorad(null)).toBe(false);
+  });
+
+  it('normalizeTipLon maps 0-360 east to signed degrees', () => {
+    expect(normalizeTipLon('193.5')).toBeCloseTo(-166.5, 6);
+    expect(normalizeTipLon('45')).toBe(45);
+  });
+
+  it('setTipList_ keeps blank-NORAD rows apart instead of merging them into one', () => {
+    const plugin = new Reentries();
+    const blankA = { ...mockTipData[0], NORAD_CAT_ID: '', OBJECT_NUMBER: '', ID: '901' };
+    const blankB = { ...mockTipData[1], NORAD_CAT_ID: '', OBJECT_NUMBER: '', ID: '902' };
+
+    plugin['setTipList_']([blankA, blankB, ...mockTipData]);
+
+    expect(plugin['tipList_']).toHaveLength(4);
+    expect(plugin['tipList_'].map((tip: TipMsg) => tip.ID).sort()).toEqual(['1', '2', '901', '902']);
+  });
+
+  it('the TIP table GP Age column is measured at the simulation time', () => {
+    const plugin = new Reentries();
+    const sat = new Satellite({
+      id: 12,
+      active: true,
+      sccNum: '25544',
+      intlDes: '1998-067A',
+      name: 'ISS (ZARYA)',
+      type: SpaceObjectType.PAYLOAD,
+      tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991' as TleLine1,
+      tle2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053' as TleLine2,
+      rcs: 99.0524,
+      source: CatalogSource.CELESTRAK,
+    });
+    const simTime = new Date('2026-10-26T21:25:00.000Z');
+
+    ServiceLocator.getTimeManager().simulationTimeObj = simTime;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue(sat);
+    document.body.insertAdjacentHTML('beforeend', '<table id="reentries-tip-table"></table>');
+    plugin['tipList_'] = [{ ...mockTipData[0], DECAY_EPOCH: '2026-10-26 21:25:00' }];
+
+    plugin['createTipTable_']();
+
+    const row = (document.getElementById('reentries-tip-table') as HTMLTableElement).rows[1];
+
+    // Columns: NORAD, Decay Date, Lat, Lon, Window, Next Report, Reentry Angle, RCS, GP Age, ...
+    expect(row.cells[8].textContent).toBe(sat.ageOfElset(simTime, 'hours').toFixed(2));
+    document.getElementById('reentries-tip-table')?.remove();
+    vi.restoreAllMocks();
   });
 });

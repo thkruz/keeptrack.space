@@ -2,7 +2,7 @@
   "plugins": {
     "ProximityOps": {
       "bottomIconLabel": "ランデブー・近接運用",
-      "title": "ランデブー・近接運用（RPO）",
+      "title": "ランデブー・近接運用 (RPO)",
       "titleSecondary": "ランデブー・近接運用リスト",
       "noradId": "NORAD ID",
       "useCurrentSat": "現在の衛星を使用",

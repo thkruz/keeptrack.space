@@ -37,7 +37,7 @@
           "description": "Compara un satélite de analista creado con la herramienta de maniobras con su objeto padre: encendidos, elementos medios antes y después, y los eventos de cribado que la maniobra introduce o elimina"
         },
         "screeningCompare": {
-          "name": "Comparar las dos últimas ejecuciones de cribado",
+          "name": "Comparar los dos últimos cribados",
           "description": "Compara las dos ejecuciones más recientes de Debris Screening: eventos introducidos, eliminados y sin cambios"
         }
       },
@@ -76,7 +76,7 @@
         "tip1": "Los informes cubren varios días de datos; la generación puede tardar unos segundos en los informes basados en pases.",
         "tip2": "Si la ventana del informe no aparece, el culpable habitual es el bloqueador de ventanas emergentes de tu navegador; permite las ventanas emergentes para este sitio.",
         "conjunctionHeading": "Informes de conjunción y maniobra",
-        "conjunction": "<ul><li><strong>Informe de conjunción</strong>: requiere un objeto primario y uno secundario. Busca el máximo acercamiento en la ventana alrededor de la hora actual y muestra TCA, distancia de paso, R/I/C con signo (secundario menos primario, en el sistema del primario), velocidad relativa, Pc con su radio de cuerpo duro y fuente de covarianza, y la geometría relativa desde 5 minutos antes hasta 5 minutos después del TCA.</li><li><strong>Informe de maniobra</strong>: seleccione un satélite de analista creado con la herramienta de maniobras. Muestra los encendidos, los elementos medios antes y después y, cuando Debris Screening se ha ejecutado para el padre y para el satélite de analista, los eventos que la maniobra introduce, elimina o deja sin cambios.</li><li><strong>Comparar las dos últimas ejecuciones de cribado</strong>: compara las dos ejecuciones más recientes de Debris Screening.</li></ul>La salida JSON de estos informes es el estado de análisis completo legible por máquina."
+        "conjunction": "<ul><li><strong>Informe de conjunción</strong>: requiere un objeto primario y uno secundario. Busca el máximo acercamiento en la ventana alrededor de la hora actual y muestra TCA, distancia de paso, R/I/C con signo (secundario menos primario, en el sistema del primario), velocidad relativa, Pc con su radio de cuerpo duro y fuente de covarianza, y la geometría relativa desde 5 minutos antes hasta 5 minutos después del TCA.</li><li><strong>Informe de maniobra</strong>: seleccione un satélite de analista creado con la herramienta de maniobras. Muestra los encendidos, los elementos medios antes y después y, cuando Debris Screening se ha ejecutado para el padre y para el satélite de analista, los eventos que la maniobra introduce, elimina o deja sin cambios.</li><li><strong>Comparar los dos últimos cribados</strong>: compara las dos ejecuciones más recientes de Debris Screening.</li></ul>La salida JSON de estos informes es el estado de análisis completo legible por máquina."
       },
       "errorMsgs": {
         "notSupportedForObject": "Este informe no está disponible para el objeto seleccionado.",

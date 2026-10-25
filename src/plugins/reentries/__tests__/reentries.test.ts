@@ -626,6 +626,25 @@ describe('Reentries_class', () => {
 describe('Reentry Analysis source identity', () => {
   beforeEach(() => setupStandardEnvironment());
 
+  it('labels a catalog-less JSC Vimpel row the same way the sat info box does', () => {
+    const table = document.createElement('table');
+    const vimpelObj = {
+      id: 80,
+      sccNum: '',
+      source: CatalogSource.VIMPEL,
+      name: 'JSC Vimpel 9600',
+      type: SpaceObjectType.DEBRIS,
+      perigee: 150,
+      apogee: 300,
+      inclination: 51,
+      rcs: 1,
+    };
+
+    Reentries['createReentryRow_'](table, vimpelObj as unknown as Satellite);
+
+    expect(table.rows[0].cells[0].textContent).toBe('N/A (JSC Vimpel)');
+  });
+
   it('routes blank-NORAD rows to their original internal object without blank search', () => {
     const plugin = new Reentries();
     const table = document.createElement('table');

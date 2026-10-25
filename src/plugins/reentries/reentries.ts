@@ -1,6 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { apiFetch } from '@app/app/data/api-fetch';
 import { CatalogSearch } from '@app/app/data/catalog-search';
+import { isSyntheticVimpel } from '@app/app/data/synthetic-vimpel';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -1034,7 +1035,10 @@ export class Reentries extends KeepTrackPlugin {
 
     const meanAltStr = hasReentered ? l('reentered') : ((sat.apogee + sat.perigee) / 2).toFixed(1);
 
-    Reentries.createCell_(tr, sat.sccNum || unknown);
+    // Match the sat info box wording for catalog-less JSC Vimpel objects.
+    const noradStr = isSyntheticVimpel(sat) ? t7e('satInfoBox.notAvailableJscVimpel') : sat.sccNum || unknown;
+
+    Reentries.createCell_(tr, noradStr);
     Reentries.createCell_(tr, sat.name || unknown);
     Reentries.createCell_(tr, typeStr);
     Reentries.createCell_(tr, sat.perigee.toFixed(1));

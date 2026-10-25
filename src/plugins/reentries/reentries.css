@@ -13,6 +13,14 @@
   white-space: nowrap;
 }
 
+/* One-line reminder under the corridor controls that a TIP point is not an impact point. */
+.re-corridor-note {
+  margin: 8px 6px 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-dark-text-muted);
+}
+
 /*
  * ===== Narrow-screen layout =====
  * The menu opens at min(1200px, space right of the drawer rail) (see

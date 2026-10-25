@@ -363,6 +363,7 @@ export class Reentries extends KeepTrackPlugin {
             <span class="re-flyto-label">${tb('flyToCorridor')}</span>
           </label>
         </div>
+        <p id="reentries-corridor-note" class="re-corridor-note">${tb('corridorNote')}</p>
       </section>
       <section class="kt-section">
         <div class="kt-section-label">${lbl('results')}</div>
@@ -432,6 +433,11 @@ export class Reentries extends KeepTrackPlugin {
         {
           heading: t7e('plugins.Reentries.help.tabsHeading'),
           content: t7e('plugins.Reentries.help.tabs'),
+        },
+        {
+          // Why a corridor matters when it is not an impact point (Ted's ruling 2026-10-24).
+          heading: t7e('plugins.Reentries.help.corridorHeading'),
+          content: t7e('plugins.Reentries.help.corridor'),
         },
         {
           heading: t7e('help.howToUse'),

@@ -547,6 +547,42 @@ describe('Reentries_class', () => {
       expect(tabs).not.toContain('red means perigee below 120 km');
     });
 
+    it('names the Fetch Data control in How to use, not a download icon', () => {
+      const plugin = new Reentries();
+      const howTo = plugin.getHelpConfig().sections!.find((s) => s.content.includes('Shift+R'))!.content;
+
+      expect(howTo).toContain('<strong>Fetch Data</strong>');
+      expect(howTo).toContain('<strong>Refresh</strong>');
+      expect(howTo).not.toContain('download icon');
+    });
+
+    it('says Fly to corridor still selects the object, matching flyToCorridor_', () => {
+      const tabs = new Reentries().getHelpConfig().sections![1].content;
+
+      expect(tabs).toContain('the object is still selected');
+      expect(tabs).not.toContain('the object is not selected');
+    });
+
+    it('explains why the corridor matters when it is not an impact point', () => {
+      const section = new Reentries().getHelpConfig().sections!.find((s) => s.heading === 'Reading a Reentry Corridor');
+
+      expect(section).toBeDefined();
+      expect(section!.content).toContain('not an impact point');
+      expect(section!.content).toContain('only ground the object can overfly during the window');
+    });
+
+    it('shows the not-an-impact-point line beside the corridor controls', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+
+      const note = document.getElementById('reentries-corridor-note');
+
+      expect(note?.textContent).toContain('not an impact point');
+      // Same Data Actions card as the Fly to corridor switch (and the Pro layer toggle).
+      expect(note?.closest('.kt-section')?.querySelector('#reentries-flyto-corridor')).not.toBeNull();
+    });
+
     it('the shortcut callback toggles the menu', () => {
       const plugin = new Reentries();
 

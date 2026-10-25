@@ -29,7 +29,7 @@
         "apogeeKm": "遠地点 (km)",
         "perigeeKm": "近地点 (km)",
         "smaKm": "軌道長半径 (km)",
-        "velocityKms": "軌道速度 (km/s)",
+        "velocityKms": "元期での速度 (km/s)",
         "sectionIdentity": "識別情報",
         "sectionOrbit": "軌道",
         "sectionEpoch": "元期",
@@ -82,7 +82,12 @@
         "satrecFailed": "衛星レコードの作成でエラーが発生しました!",
         "cruncherFailed": "Sat Cruncherへのメッセージ送信に失敗しました",
         "orbitBufferFailed": "軌道バッファデータの変更に失敗しました",
-        "createFailed": "衛星を作成できませんでした: {error}"
+        "createFailed": "衛星を作成できませんでした: {error}",
+        "rangeError": "{field}は{min}から{max}の範囲で入力してください。",
+        "rangeErrorDeg": "{field}は{min}度から{max}度の範囲で入力してください。",
+        "meanMotionRange": "{field}は0より大きく、1日あたり{max}周回以下にしてください。",
+        "periodPositive": "{field}は正の分数で入力してください。",
+        "numberRequired": "{field}は数値で入力してください。"
       },
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",
@@ -95,7 +100,7 @@
         "tabsHeading": "基本タブと詳細タブ",
         "tabs": "<strong>基本</strong>タブに必要なのはNORAD ID、名前、<strong>軌道傾斜角</strong>、<strong>遠地点高度</strong>、<strong>近地点高度</strong>だけで、残りの軌道は自動的に導出されます。<strong>詳細</strong>タブでは完全な軌道要素セットを設定できます：<strong>物体タイプ</strong>、<strong>国</strong>、元期、<strong>昇交点赤経</strong>、<strong>離心率</strong>、<strong>近地点引数</strong>、<strong>平均近点角</strong>、そして<strong>平均運動</strong>または<strong>周期</strong>（一方を編集するともう一方が再計算されます）。<strong>計算パラメータ</strong>欄には、入力に応じて結果の遠地点、近地点、軌道長半径、軌道速度が表示されます。",
         "howToUse": "<ol><li>ドロワーから<strong>衛星を作成</strong>メニューを開きます。</li><li>90000〜99999の範囲で空いているNORAD IDを選び、衛星に名前を付けます。</li><li><strong>基本</strong>タブで軌道傾斜角、遠地点、近地点を入力するか、<strong>詳細</strong>タブに切り替えて完全な軌道要素セットを入力します。</li><li><strong>衛星を作成</strong>をクリックします。新しい物体が即座に表示され、確認通知に名前と番号が表示されます。</li><li><strong>TLEを保存</strong>を使うと、作成した衛星の軌道要素をファイルとして書き出し、後で再読み込みできます。</li></ol>",
-        "tip1": "すべての入力欄は個別のエラーメッセージで検証されるため、作成に失敗した場合は、どの値を修正すべきかが通知で正確にわかります。",
+        "tip1": "無効なフィールドはすべて「衛星を作成」ボタンの上に一覧表示され、フォーム上でも示されます。各メッセージは、そのフィールドを修正するとすぐに消えます。",
         "tip2": "およそ100 km未満の近地点は、衛星がすぐに落下してしまうため拒否されます。",
         "tip3": "作成した衛星はセッション限りです。別の日にも使いたい場合はTLEをエクスポートしてください。"
       },

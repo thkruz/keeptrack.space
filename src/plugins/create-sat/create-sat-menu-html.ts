@@ -69,7 +69,7 @@ export function buildBasicTabHtml(): string {
             <label for="${P}-basic-perigee" class="active">${l('perigeeAltKm')}</label>
           </div>
         </div>
-        <div id="${P}-basic-error" class="create-sat-basic-error" role="alert" hidden></div>
+        <div id="${P}-basic-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-basic-submit', b('createSatellite'))}
       </section>
     </form>
@@ -218,6 +218,7 @@ export function buildAdvancedTabHtml(): string {
       </section>
 
       <section class="kt-section">
+        <div id="${P}-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-submit', b('createSatellite'))}
         ${createSatActionButton('createSat-save', b('saveTle'))}
       </section>

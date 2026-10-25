@@ -4,7 +4,7 @@ import { ModalConfirm } from '@app/engine/ui/modal-confirm';
 import { getEl } from '@app/engine/utils/get-el';
 import { CreateSat } from '@app/plugins/create-sat/create-sat';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Satellite } from '@ootk/src/main';
+import { Kilometers, Satellite } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
@@ -18,7 +18,7 @@ describe('Create Satellite replacement confirmation', () => {
   const input = (id: string) => getEl(`createSat-${id}`) as HTMLInputElement;
   const submit = () => {
     plugin['createSatBasicSubmit_']();
-    expect(CreateSat['validateInputs_'](CreateSat['getTleInputs_']())).toBeNull();
+    expect(getEl('createSat-basic-error')!.hidden).toBe(true);
   };
   const confirm = () => getEl('confirm-action-btn')!.click();
 
@@ -33,7 +33,7 @@ describe('Create Satellite replacement confirmation', () => {
     catalog.objectCache = [existing];
     vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(0);
     vi.spyOn(catalog, 'getObject').mockImplementation(() => catalog.objectCache[0]);
-    vi.spyOn(SatMath, 'altitudeCheck').mockReturnValue(400);
+    vi.spyOn(SatMath, 'altitudeCheck').mockReturnValue(400 as Kilometers);
     vi.spyOn(catalog, 'seedDotPosition').mockImplementation(() => undefined);
     input('country').value = 'TBD';
     input('basic-scc').value = '90000';
@@ -64,18 +64,20 @@ describe('Create Satellite replacement confirmation', () => {
     expect(ServiceLocator.getCatalogManager().satCruncherThread.sendSatEdit).not.toHaveBeenCalled();
   });
 
-  it('replaces exactly once after confirmation and keeps Advanced/created orbital values consistent', () => {
+  it('replaces exactly once after confirmation with the Basic orbit', () => {
     submit();
     confirm();
     confirm();
     const created = ServiceLocator.getCatalogManager().objectCache[0] as Satellite;
+    const expected = CreateSat.calculateFromAltitudes(400, 400);
 
     expect(created).not.toBe(existing);
     expect(created.name).toBe('Replacement');
     expect(ServiceLocator.getCatalogManager().satCruncherThread.sendSatEdit).toHaveBeenCalledOnce();
-    expect(created.inclination).toBeCloseTo(parseFloat(input('inc').value), 4);
-    expect(created.meanMotion).toBeCloseTo(parseFloat(input('meanmo').value), 5);
-    expect(created.eccentricity).toBeCloseTo(parseFloat(input('ecen').value) / 1e7, 7);
+    expect(created.inclination).toBeCloseTo(51.6, 4);
+    expect(created.meanMotion).toBeCloseTo(expected.meanMotion, 5);
+    expect(created.eccentricity).toBeCloseTo(expected.eccentricity, 7);
+    expect(created.argOfPerigee).toBe(0);
   });
 
   it.each(['object', 'TLE', 'form'])('rejects confirmation when %s changes while open', (kind) => {
@@ -87,7 +89,7 @@ describe('Create Satellite replacement confirmation', () => {
     } else if (kind === 'TLE') {
       existing.tle1 = existing.tle1.replace('25544', '25545') as Satellite['tle1'];
     } else {
-      input('name').value = 'Changed draft';
+      input('basic-name').value = 'Changed draft';
     }
     const before = catalog.objectCache[0];
 

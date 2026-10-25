@@ -148,13 +148,23 @@ export class TimeManager {
     return year % 100 !== 0 || year % 400 === 0;
   }
 
-  changeStaticOffset(staticOffset: number) {
+  /**
+   * Jump the simulation clock to an absolute time. Prefer this over `changeStaticOffset(target - Date.now())`: that
+   * form reads the wall clock twice, so a millisecond tick between the reads leaves a paused clock 1 ms off target.
+   */
+  changeSimulationTime(targetMs: number) {
+    const now = Date.now();
+
+    this.changeStaticOffset(targetMs - now, now);
+  }
+
+  changeStaticOffset(staticOffset: number, now = Date.now()) {
     if (!Number.isFinite(staticOffset)) {
       errorManagerInstance.warn(t7e('errorMsgs.TimeManager.nonFiniteOffset').replace('{value}', String(staticOffset)));
 
       return;
     }
-    this.dynamicOffsetEpoch = Date.now();
+    this.dynamicOffsetEpoch = now;
     this.staticOffset = staticOffset;
     this.calculateSimulationTime();
     this.synchronize();

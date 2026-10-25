@@ -218,6 +218,14 @@ describe('TimeManager simulation-time arithmetic', () => {
 
       expect(tm.calculateSimulationTime().toISOString()).toBe(pin.toISOString());
     });
+
+    it('changeSimulationTime(target)', () => {
+      tm.propRate = 0;
+
+      tm.changeSimulationTime(pin.getTime());
+
+      expect(tm.calculateSimulationTime().toISOString()).toBe(pin.toISOString());
+    });
   });
 
   it('getPropOffset returns 0 when no date is selected', () => {

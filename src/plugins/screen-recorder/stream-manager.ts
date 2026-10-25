@@ -1,6 +1,7 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
+import { injectWebmDuration } from './webm-duration';
 
 export interface MediaRecorderOptions {
   audio: boolean;
@@ -27,6 +28,10 @@ export class StreamManager {
   private requestId_ = 0;
   private canSave_ = false;
   private trackEnded_: (() => void) | null = null;
+  /** Bytes of the first chunk (EBML header + Segment Info), read eagerly so save() can stay synchronous. */
+  private headBytes_: Uint8Array | null = null;
+  private recordStartMs_ = 0;
+  private recordedDurationMs_ = 0;
 
   constructor(
     private readonly videoBitsPerSec_: number,
@@ -75,6 +80,8 @@ export class StreamManager {
 
     this.canSave_ = false;
     this.recordedBlobs_ = [];
+    this.headBytes_ = null;
+    this.recordedDurationMs_ = 0;
     this.supportedType_ = undefined;
     this.setState_('requesting');
     try {
@@ -138,7 +145,7 @@ export class StreamManager {
       return;
     }
     this.canSave_ = false;
-    const blob = new Blob(this.recordedBlobs_, { type: this.supportedType_ });
+    const blob = new Blob(this.blobPartsWithDuration_(), { type: this.supportedType_ });
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement('a');
 
@@ -171,6 +178,9 @@ export class StreamManager {
       recorder.ondataavailable = (event) => {
         if (requestId === this.requestId_ && event.data?.size > 0) {
           this.recordedBlobs_.push(event.data);
+          if (this.recordedBlobs_.length === 1) {
+            this.readHead_(event.data, requestId);
+          }
         }
       };
       recorder.onstop = () => {
@@ -178,6 +188,7 @@ export class StreamManager {
           return;
         }
         ++this.requestId_;
+        this.recordedDurationMs_ = performance.now() - this.recordStartMs_;
         this.canSave_ = this.recordedBlobs_.length > 0;
         this.releaseTracks_();
         this.mediaRecorder_ = null;
@@ -194,10 +205,43 @@ export class StreamManager {
         }
       };
       recorder.start(100);
+      this.recordStartMs_ = performance.now();
       this.setState_('recording');
     } catch (error) {
       this.fail_(error as Error);
     }
+  }
+
+  /** Cache the first chunk's bytes; MediaRecorder writes the whole WebM header into it. */
+  private readHead_(chunk: Blob, requestId: number): void {
+    if (typeof chunk.arrayBuffer !== 'function') {
+      return;
+    }
+    chunk
+      .arrayBuffer()
+      .then((buffer) => {
+        if (requestId === this.requestId_ || (this.canSave_ && this.recordedBlobs_[0] === chunk)) {
+          this.headBytes_ = new Uint8Array(buffer);
+        }
+      })
+      .catch(() => {
+        // Without the head the file is still saved, just without a duration.
+      });
+  }
+
+  /**
+   * MediaRecorder WebM carries no Duration, so players cannot seek. Patch the first chunk when
+   * its bytes are available; otherwise (or when the head is not patchable) save the original parts.
+   */
+  private blobPartsWithDuration_(): BlobPart[] {
+    const head = this.headBytes_;
+
+    if (!head || this.recordedBlobs_.length === 0 || head.length !== this.recordedBlobs_[0].size) {
+      return this.recordedBlobs_;
+    }
+    const patched = injectWebmDuration(head, this.recordedDurationMs_);
+
+    return patched ? [patched as Uint8Array<ArrayBuffer>, ...this.recordedBlobs_.slice(1)] : this.recordedBlobs_;
   }
 
   private fail_(error: Error): void {

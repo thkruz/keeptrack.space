@@ -1,6 +1,7 @@
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 import { StreamManager } from '../stream-manager';
+import { readWebmDurationMs } from '../webm-duration';
 
 describe('recording lifecycle', () => {
   let manager: StreamManager;
@@ -230,5 +231,29 @@ describe('recording lifecycle', () => {
     expect(onMinorError).toHaveBeenCalledOnce();
     expect(track.stop).toHaveBeenCalledOnce();
     expect(manager.state).toBe('idle');
+  });
+  it('writes the recorded duration into the saved WebM so players can seek', async () => {
+    const now = vi.spyOn(performance, 'now').mockReturnValue(1000);
+
+    await startRecording();
+    // Chrome's first chunk: EBML header, unknown-size Segment, Info without Duration.
+    const head = new Uint8Array([
+      0x1a, 0x45, 0xdf, 0xa3, 0x87, 0x42, 0x82, 0x84, 0x77, 0x65, 0x62, 0x6d, 0x18, 0x53, 0x80, 0x67, 0x01, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x15, 0x49, 0xa9, 0x66, 0x87,
+      0x2a, 0xd7, 0xb1, 0x83, 0x0f, 0x42, 0x40,
+    ]);
+    const headChunk = new Blob([head]);
+
+    recorder.ondataavailable?.({ data: headChunk } as BlobEvent);
+    await headChunk.arrayBuffer();
+    await Promise.resolve();
+    data('cluster bytes');
+    now.mockReturnValue(1000 + 14545);
+    manager.stop();
+    finish();
+
+    const saved = new Uint8Array(await (createUrl.mock.calls[0][0] as Blob).arrayBuffer());
+
+    expect(readWebmDurationMs(saved)).toBeCloseTo(14545, 3);
+    expect(new TextDecoder().decode(saved.subarray(saved.length - 'cluster bytes'.length))).toBe('cluster bytes');
   });
 });

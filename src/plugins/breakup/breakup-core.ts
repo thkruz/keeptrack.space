@@ -33,7 +33,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { RvVector, rv2tle, TleLine1, TleLine2 } from '@ootk/src/main';
+import { FormatTle, RvVector, rv2tle, TleLine1, TleLine2 } from '@ootk/src/main';
 
 /** Convert metres-per-second (UI units) to kilometres-per-second (ootk units). */
 export const MS_TO_KMS = 0.001;
@@ -496,9 +496,12 @@ export function buildFragmentTle(epoch: Date, position: Vec3, velocity: Vec3, de
     throw new Error(`SGP4 fit did not converge (${fit.positionErrorKm.toFixed(2)} km residual)`);
   }
 
-  // rv2tle stamps a fixed 5-char SCC ("00001"); replace it with the analyst number.
-  const tle1 = `1 ${a5Num}${fit.tle1.substring(7)}` as TleLine1;
-  const tle2 = `2 ${a5Num}${fit.tle2.substring(7)}` as TleLine2;
+  // rv2tle stamps a fixed 5-char SCC ("00001"); replace it with the analyst number
+  // and recompute each line's checksum, which covers the SCC digits.
+  const tle1Pre = `1 ${a5Num}${fit.tle1.substring(7, 68)}`;
+  const tle2Pre = `2 ${a5Num}${fit.tle2.substring(7, 68)}`;
+  const tle1 = `${tle1Pre}${FormatTle.tleChecksum(tle1Pre)}` as TleLine1;
+  const tle2 = `${tle2Pre}${FormatTle.tleChecksum(tle2Pre)}` as TleLine2;
 
   if (tle1.length !== TLE_LINE_LENGTH) {
     throw new Error(`Invalid tle1: length is not ${TLE_LINE_LENGTH} - "${tle1}"`);

@@ -1,4 +1,4 @@
-import { Satellite, TleLine1, TleLine2 } from '@app/engine/ootk/src/main';
+import { FormatTle, Satellite, TleLine1, TleLine2 } from '@app/engine/ootk/src/main';
 import {
   AxisTriple,
   applyDeltaV,
@@ -469,6 +469,14 @@ describe('breakup-core', () => {
       expect(tle2).toHaveLength(69);
       expect(tle1.substring(2, 7)).toBe('90123');
       expect(tle2.substring(2, 7)).toBe('90123');
+    });
+
+    it('recomputes both checksums after stamping the analyst SCC', () => {
+      const { position, velocity } = stateOf(ISS_TLE1, ISS_TLE2);
+      const { tle1, tle2 } = buildFragmentTle(BREAKUP_DATE, position, velocity, ZERO, '90123');
+
+      expect(Number(tle1[68])).toBe(FormatTle.tleChecksum(tle1));
+      expect(Number(tle2[68])).toBe(FormatTle.tleChecksum(tle2));
     });
 
     // The bug this guards: a fragment built from osculating elements lands ~100+ km

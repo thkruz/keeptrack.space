@@ -6,7 +6,10 @@
     "recording": "Registrazione",
     "stopping": "Finalizzazione della registrazione…",
     "toggleCommand": "Attiva/disattiva registrazione schermo",
-    "compatibilityErrorDetail": "Errore di compatibilità con la registrazione: {error}",
-    "streamError": "Errore: {error}"
+    "saved": "Registrazione salvata",
+    "tooShort": "Registrazione troppo breve, nulla salvato",
+    "cancelled": "Registrazione annullata",
+    "notReadable": "Impossibile acquisire lo schermo. Un'altra app o un'impostazione di sistema potrebbe bloccarlo.",
+    "failed": "Registrazione non riuscita. Riprova."
   }
 }

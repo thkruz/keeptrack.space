@@ -6,7 +6,10 @@
     "recording": "正在录制",
     "stopping": "正在完成录制…",
     "toggleCommand": "切换屏幕录制",
-    "compatibilityErrorDetail": "录制兼容性错误：{error}",
-    "streamError": "错误：{error}"
+    "saved": "录制已保存",
+    "tooShort": "录制时间太短，未保存任何内容",
+    "cancelled": "录制已取消",
+    "notReadable": "无法捕获屏幕。可能有其他应用或系统设置阻止了捕获。",
+    "failed": "录制失败，请重试。"
   }
 }

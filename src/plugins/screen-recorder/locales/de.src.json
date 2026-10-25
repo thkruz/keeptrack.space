@@ -6,7 +6,10 @@
     "recording": "Aufnahme",
     "stopping": "Aufnahme wird abgeschlossen…",
     "toggleCommand": "Bildschirmaufnahme umschalten",
-    "compatibilityErrorDetail": "Kompatibilitätsfehler bei der Aufnahme: {error}",
-    "streamError": "Fehler: {error}"
+    "saved": "Aufnahme gespeichert",
+    "tooShort": "Aufnahme zu kurz, nichts gespeichert",
+    "cancelled": "Aufnahme abgebrochen",
+    "notReadable": "Der Bildschirm konnte nicht aufgenommen werden. Eine andere App oder eine Systemeinstellung blockiert ihn möglicherweise.",
+    "failed": "Aufnahme fehlgeschlagen. Bitte erneut versuchen."
   }
 }

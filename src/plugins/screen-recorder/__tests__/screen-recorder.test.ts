@@ -1,3 +1,5 @@
+import { ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ScreenRecorder } from '@app/plugins/screen-recorder/screen-recorder';
@@ -32,9 +34,7 @@ describe('ScreenRecorder_class', () => {
     screenRecorderPlugin['streamManagerInstance_']['stream_'] = {
       getTracks: () => [],
     } as unknown as MediaStream;
-    screenRecorderPlugin['streamManagerInstance_'].save = () => {
-      // Do nothing
-    };
+    screenRecorderPlugin['streamManagerInstance_'].save = () => false;
 
     expect(() => EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
@@ -160,9 +160,7 @@ describe('ScreenRecorder_class', () => {
     screenRecorderPlugin['streamManagerInstance_']['stream_'] = {
       getTracks: () => [],
     } as unknown as MediaStream;
-    screenRecorderPlugin['streamManagerInstance_'].save = () => {
-      // Do nothing
-    };
+    screenRecorderPlugin['streamManagerInstance_'].save = () => false;
 
     expect(() => EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
   });
@@ -176,5 +174,54 @@ describe('ScreenRecorder_class', () => {
     };
 
     expect(() => EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, screenRecorderPlugin.bottomIconElementName)).not.toThrow();
+  });
+});
+
+describe('ScreenRecorder feedback', () => {
+  let plugin: ScreenRecorder;
+  let toast: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    setupDefaultHtml();
+    Object.defineProperty(window, 'isSecureContext', { value: true, writable: true, configurable: true });
+    plugin = new ScreenRecorder();
+    websiteInit(plugin);
+    toast = vi.fn();
+    vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ toast } as never);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  test('a saved recording shows a "Recording saved" toast', () => {
+    plugin['streamManagerInstance_'].save = vi.fn(() => true);
+    plugin['onStop_']();
+    expect(toast).toHaveBeenCalledWith('Recording saved', ToastMsgType.normal);
+  });
+
+  test('no saved toast when nothing was saved', () => {
+    plugin['streamManagerInstance_'].save = vi.fn(() => false);
+    plugin['onStop_']();
+    expect(toast).not.toHaveBeenCalled();
+  });
+
+  test('each notice shows its localized text, never raw browser text', () => {
+    plugin['onNotice_']('cancelled');
+    plugin['onNotice_']('tooShort');
+    plugin['onNotice_']('notReadable');
+    plugin['onNotice_']('failed');
+    const texts = toast.mock.calls.map(([text]) => text as string);
+
+    expect(texts.slice(0, 2)).toEqual(['Recording cancelled', 'Recording too short, nothing saved']);
+    expect(texts).toHaveLength(4);
+    texts.forEach((text) => {
+      expect(text).not.toMatch(/^Error:/u);
+      expect(text).not.toMatch(/^ScreenRecorder\./u);
+    });
+  });
+
+  test('stays out of the drawer Recent group', () => {
+    expect(plugin.isExcludedFromDrawerRecent).toBe(true);
   });
 });

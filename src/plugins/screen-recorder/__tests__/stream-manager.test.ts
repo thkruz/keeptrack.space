@@ -10,6 +10,7 @@ describe('recording lifecycle', () => {
   let getDisplayMedia: ReturnType<typeof vi.fn>;
   let onStop: ReturnType<typeof vi.fn>;
   let onMinorError: ReturnType<typeof vi.fn>;
+  let onNotice: ReturnType<typeof vi.fn>;
   let createUrl: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -46,7 +47,8 @@ describe('recording lifecycle', () => {
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => undefined);
     onStop = vi.fn(() => manager.save('recording.webm'));
     onMinorError = vi.fn();
-    manager = new StreamManager(1000000, onStop, onMinorError, vi.fn());
+    onNotice = vi.fn();
+    manager = new StreamManager(1000000, onStop, onMinorError, vi.fn(), vi.fn(), onNotice);
   });
 
   afterEach(() => {
@@ -80,6 +82,8 @@ describe('recording lifecycle', () => {
     await vi.advanceTimersByTimeAsync(0);
     expect(manager.state).toBe('idle');
     expect(onMinorError).toHaveBeenCalledOnce();
+    // A cancelled picker (Chromium: NotAllowedError) is a localized "cancelled" notice, never the browser text.
+    expect(onNotice).toHaveBeenCalledExactlyOnceWith('cancelled');
     await startRecording();
     expect(manager.state).toBe('recording');
   });
@@ -229,6 +233,7 @@ describe('recording lifecycle', () => {
     finish();
     expect(onStop).not.toHaveBeenCalled();
     expect(onMinorError).toHaveBeenCalledOnce();
+    expect(onNotice).toHaveBeenCalledExactlyOnceWith('tooShort');
     expect(track.stop).toHaveBeenCalledOnce();
     expect(manager.state).toBe('idle');
   });
@@ -255,5 +260,80 @@ describe('recording lifecycle', () => {
 
     expect(readWebmDurationMs(saved)).toBeCloseTo(14545, 3);
     expect(new TextDecoder().decode(saved.subarray(saved.length - 'cluster bytes'.length))).toBe('cluster bytes');
+  });
+
+  it('reports a cancelled pending request as cancelled', () => {
+    manager.start();
+    manager.stop();
+    expect(manager.state).toBe('idle');
+    expect(onNotice).toHaveBeenCalledExactlyOnceWith('cancelled');
+  });
+
+  it('reports Stop Sharing before any data as too short and saves nothing', async () => {
+    manager.start();
+    await Promise.resolve();
+    // Stream granted, still inside the start delay: the browser ends the share.
+    const ended = track.addEventListener.mock.calls.find(([name]) => name === 'ended')?.[1];
+
+    ended();
+    vi.advanceTimersByTime(StreamManager.RECORDING_START_DELAY_MS);
+    expect(manager.state).toBe('idle');
+    expect(recorder.start).not.toHaveBeenCalled();
+    expect(onStop).not.toHaveBeenCalled();
+    expect(onNotice).toHaveBeenCalledExactlyOnceWith('tooShort');
+  });
+
+  it('reports Stop Sharing after recording without a chunk as too short', async () => {
+    await startRecording();
+    const ended = track.addEventListener.mock.calls.find(([name]) => name === 'ended')?.[1];
+
+    ended();
+    finish();
+    expect(onStop).not.toHaveBeenCalled();
+    expect(createUrl).not.toHaveBeenCalled();
+    expect(onNotice).toHaveBeenCalledExactlyOnceWith('tooShort');
+  });
+
+  it('saves on Stop Sharing with data and reports no failure notice', async () => {
+    await startRecording();
+    data('partial');
+    const ended = track.addEventListener.mock.calls.find(([name]) => name === 'ended')?.[1];
+
+    ended();
+    finish();
+    expect(onStop).toHaveBeenCalledOnce();
+    expect(createUrl).toHaveBeenCalledOnce();
+    expect(onNotice).not.toHaveBeenCalled();
+  });
+
+  it('save returns true once and false when there is nothing left to save', async () => {
+    onStop.mockImplementation(() => undefined);
+    await startRecording();
+    data('frame');
+    manager.stop();
+    finish();
+    expect(manager.save('a.webm')).toBe(true);
+    expect(manager.save('b.webm')).toBe(false);
+  });
+
+  it('reports recorder construction failures as failed and an unreadable surface as notReadable', async () => {
+    vi.mocked(window.MediaRecorder).mockImplementationOnce(function () {
+      throw new Error('codec');
+    });
+    await startRecording();
+    expect(onNotice).toHaveBeenLastCalledWith('failed');
+
+    getDisplayMedia.mockRejectedValueOnce(new DOMException('Could not start video source', 'NotReadableError'));
+    manager.start();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(onNotice).toHaveBeenLastCalledWith('notReadable');
+  });
+
+  it('classifyError maps browser error names to notices', () => {
+    expect(StreamManager.classifyError(new DOMException('Permission denied', 'NotAllowedError'))).toBe('cancelled');
+    expect(StreamManager.classifyError(new DOMException('Aborted', 'AbortError'))).toBe('cancelled');
+    expect(StreamManager.classifyError(new DOMException('Busy', 'NotReadableError'))).toBe('notReadable');
+    expect(StreamManager.classifyError(new Error('anything else'))).toBe('failed');
+    expect(StreamManager.classifyError(null)).toBe('failed');
   });
 });

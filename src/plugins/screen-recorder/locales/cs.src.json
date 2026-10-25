@@ -6,7 +6,10 @@
     "recording": "Nahrávání",
     "stopping": "Dokončování záznamu…",
     "toggleCommand": "Přepnout nahrávání obrazovky",
-    "compatibilityErrorDetail": "Chyba kompatibility při nahrávání: {error}",
-    "streamError": "Chyba: {error}"
+    "saved": "Záznam uložen",
+    "tooShort": "Záznam je příliš krátký, nic nebylo uloženo",
+    "cancelled": "Nahrávání zrušeno",
+    "notReadable": "Obrazovku nelze zachytit. Může ji blokovat jiná aplikace nebo nastavení systému.",
+    "failed": "Nahrávání se nezdařilo. Zkuste to znovu."
   }
 }

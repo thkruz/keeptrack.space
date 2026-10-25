@@ -1,6 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
-import { t7e } from '@app/locales/keys';
 import { injectWebmDuration } from './webm-duration';
 
 export interface MediaRecorderOptions {
@@ -9,6 +8,19 @@ export interface MediaRecorderOptions {
 }
 
 export type RecordingState = 'idle' | 'requesting' | 'recording' | 'stopping';
+
+/**
+ * Outcomes the plugin turns into localized toasts. The manager never shows browser
+ * error text itself; the raw message only reaches the debug log.
+ * - cancelled: the user cancelled the share picker or a pending request
+ * - tooShort: capture ended before any video data was recorded, so nothing was saved
+ * - notReadable: the browser could not read the chosen surface (OS or another app blocked it)
+ * - failed: any other failure
+ */
+export type RecordingNotice = 'cancelled' | 'tooShort' | 'notReadable' | 'failed';
+
+/** Who asked the recording to stop: the user (KeepTrack UI) or the browser (Stop Sharing ended a track). */
+export type StopReason = 'user' | 'ended';
 
 export class StreamManager {
   static readonly RECORDING_START_DELAY_MS = 500;
@@ -38,7 +50,8 @@ export class StreamManager {
     private readonly onStop_: () => void,
     private readonly onMinorError_: () => void,
     private readonly onError_: () => void,
-    private readonly onStateChange_: (state: RecordingState) => void = () => undefined
+    private readonly onStateChange_: (state: RecordingState) => void = () => undefined,
+    private readonly onNotice_: (notice: RecordingNotice) => void = () => undefined
   ) {}
 
   get state(): RecordingState {
@@ -49,8 +62,19 @@ export class StreamManager {
     return this.state_ === 'recording';
   }
 
-  static handleError(error: Error): void {
-    errorManagerInstance.warn(t7e('ScreenRecorder.streamError').replace('{error}', error.message));
+  /** Maps a capture or recorder error to the notice the user sees. */
+  static classifyError(error: unknown): RecordingNotice {
+    const name = (error as { name?: unknown } | null)?.name;
+
+    // Chromium rejects a cancelled picker with NotAllowedError ("Permission denied"); Firefox may use AbortError.
+    if (name === 'NotAllowedError' || name === 'AbortError') {
+      return 'cancelled';
+    }
+    if (name === 'NotReadableError') {
+      return 'notReadable';
+    }
+
+    return 'failed';
   }
 
   getStream(displayMediaOptions: MediaRecorderOptions = { video: { cursor: 'never' }, audio: false }): Promise<MediaStream> | false {
@@ -103,7 +127,7 @@ export class StreamManager {
             return;
           }
           this.stream_ = stream;
-          this.trackEnded_ = () => this.stop();
+          this.trackEnded_ = () => this.stop('ended');
           stream.getTracks().forEach((track) => {
             track.addEventListener('ended', this.trackEnded_!);
           });
@@ -119,7 +143,11 @@ export class StreamManager {
     }
   }
 
-  stop(): void {
+  /**
+   * Stops a pending request or an active recording. A user stop during `requesting`
+   * cancels; a browser Stop Sharing before recording began means nothing was recorded.
+   */
+  stop(reason: StopReason = 'user'): void {
     if (this.state_ === 'idle' || this.state_ === 'stopping') {
       return;
     }
@@ -128,6 +156,7 @@ export class StreamManager {
       this.releaseTracks_();
       this.setState_('idle');
       this.onMinorError_();
+      this.onNotice_(reason === 'ended' ? 'tooShort' : 'cancelled');
 
       return;
     }
@@ -140,9 +169,10 @@ export class StreamManager {
     }
   }
 
-  save(fileName: string): void {
+  /** Downloads the finished recording. Returns false when there is nothing (left) to save. */
+  save(fileName: string): boolean {
     if (!this.canSave_ || this.state_ !== 'idle') {
-      return;
+      return false;
     }
     this.canSave_ = false;
     const blob = new Blob(this.blobPartsWithDuration_(), { type: this.supportedType_ });
@@ -158,6 +188,8 @@ export class StreamManager {
       anchor.remove();
       window.URL.revokeObjectURL(url);
     }, 100);
+
+    return true;
   }
 
   private beginRecording_(requestId: number): void {
@@ -197,11 +229,12 @@ export class StreamManager {
           this.onStop_();
         } else {
           this.onMinorError_();
+          this.onNotice_('tooShort');
         }
       };
       recorder.onerror = () => {
         if (requestId === this.requestId_) {
-          this.fail_(new Error(t7e('ScreenRecorder.compatibilityError')));
+          this.fail_(new Error('MediaRecorder error event'));
         }
       };
       recorder.start(100);
@@ -259,8 +292,10 @@ export class StreamManager {
     this.canSave_ = false;
     this.releaseTracks_();
     this.setState_('idle');
-    StreamManager.handleError(error);
+    // Browser text is English-only and often technical: keep it in the log, show a localized notice.
+    errorManagerInstance.debug(`ScreenRecorder: ${error?.name ?? 'Error'}: ${error?.message ?? String(error)}`);
     this.onMinorError_();
+    this.onNotice_(StreamManager.classifyError(error));
   }
 
   private releaseTracks_(): void {

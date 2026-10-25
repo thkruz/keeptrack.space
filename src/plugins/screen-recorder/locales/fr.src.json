@@ -6,7 +6,10 @@
     "recording": "Enregistrement",
     "stopping": "Finalisation de l’enregistrement…",
     "toggleCommand": "Activer/désactiver l'enregistrement d'écran",
-    "compatibilityErrorDetail": "Erreur de compatibilité avec l'enregistrement : {error}",
-    "streamError": "Erreur : {error}"
+    "saved": "Enregistrement sauvegardé",
+    "tooShort": "Enregistrement trop court, rien n'a été sauvegardé",
+    "cancelled": "Enregistrement annulé",
+    "notReadable": "Impossible de capturer l'écran. Une autre application ou un réglage du système le bloque peut-être.",
+    "failed": "L'enregistrement a échoué. Veuillez réessayer."
   }
 }

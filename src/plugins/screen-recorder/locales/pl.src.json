@@ -6,7 +6,10 @@
     "recording": "Nagrywanie",
     "stopping": "Finalizowanie nagrania…",
     "toggleCommand": "Przełącz nagrywanie ekranu",
-    "compatibilityErrorDetail": "Błąd zgodności nagrywania: {error}",
-    "streamError": "Błąd: {error}"
+    "saved": "Nagranie zapisane",
+    "tooShort": "Nagranie za krótkie, nic nie zapisano",
+    "cancelled": "Nagrywanie anulowane",
+    "notReadable": "Nie można przechwycić ekranu. Może go blokować inna aplikacja lub ustawienie systemu.",
+    "failed": "Nagrywanie nie powiodło się. Spróbuj ponownie."
   }
 }

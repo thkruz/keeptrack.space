@@ -1,4 +1,5 @@
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IBottomIconConfig, ICommandPaletteCommand } from '@app/engine/plugins/core/plugin-capabilities';
@@ -6,13 +7,15 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 import videocamPng from '@public/img/icons/videocam.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { RecordingState, StreamManager } from './stream-manager';
+import { RecordingNotice, RecordingState, StreamManager } from './stream-manager';
 import './screen-recorder.css';
 
 export class ScreenRecorder extends KeepTrackPlugin {
   readonly id = 'ScreenRecorder';
   dependencies_ = [];
   static readonly FILE_NAME = 'keeptrack.webm';
+  /** A one-shot toggle: its Tools row already shows the recording state, so a Recent copy is a duplicate. */
+  override isExcludedFromDrawerRecent = true;
 
   // Bridge to onBottomIconClick until base class wires up component callbacks
   bottomIconCallback = (): void => {
@@ -86,10 +89,12 @@ export class ScreenRecorder extends KeepTrackPlugin {
           this.onStop_.bind(this),
           this.onMinorError_.bind(this),
           this.onError_.bind(this),
-          this.onStateChange_.bind(this)
+          this.onStateChange_.bind(this),
+          this.onNotice_.bind(this)
         );
       } catch (e) {
-        errorManagerInstance.warn(t7e('ScreenRecorder.compatibilityErrorDetail').replace('{error}', String(e)));
+        errorManagerInstance.debug(`ScreenRecorder: ${String(e)}`);
+        errorManagerInstance.warn(t7e('ScreenRecorder.compatibilityError'));
         this.isCompatibilityIssue_ = true;
         this.setBottomIconToDisabled();
       }
@@ -114,8 +119,23 @@ export class ScreenRecorder extends KeepTrackPlugin {
   private onStop_(): void {
     const timestamp = new Date().toISOString().replace(/[:.]/gu, '-');
 
-    this.streamManagerInstance_.save(`keeptrack-${timestamp}.webm`);
+    if (this.streamManagerInstance_.save(`keeptrack-${timestamp}.webm`)) {
+      ServiceLocator.getUiManager()?.toast(t7e('ScreenRecorder.saved'), ToastMsgType.normal);
+    }
     this.setBottomIconToUnselected();
+  }
+
+  /** Localized feedback for every way a recording can end without a saved file. */
+  private onNotice_(notice: RecordingNotice): void {
+    const messages: Record<RecordingNotice, { key: Parameters<typeof t7e>[0]; type: ToastMsgType }> = {
+      cancelled: { key: 'ScreenRecorder.cancelled', type: ToastMsgType.standby },
+      tooShort: { key: 'ScreenRecorder.tooShort', type: ToastMsgType.caution },
+      notReadable: { key: 'ScreenRecorder.notReadable', type: ToastMsgType.caution },
+      failed: { key: 'ScreenRecorder.failed', type: ToastMsgType.caution },
+    };
+    const { key, type } = messages[notice];
+
+    ServiceLocator.getUiManager()?.toast(t7e(key), type);
   }
 
   private onStateChange_(state: RecordingState): void {

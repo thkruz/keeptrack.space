@@ -6,7 +6,10 @@
     "recording": "Grabando",
     "stopping": "Finalizando grabación…",
     "toggleCommand": "Activar/desactivar grabación de pantalla",
-    "compatibilityErrorDetail": "Error de compatibilidad con la grabación: {error}",
-    "streamError": "Error: {error}"
+    "saved": "Grabación guardada",
+    "tooShort": "Grabación demasiado corta, no se guardó nada",
+    "cancelled": "Grabación cancelada",
+    "notReadable": "No se pudo capturar la pantalla. Otra aplicación o un ajuste del sistema puede estar bloqueándola.",
+    "failed": "La grabación falló. Inténtalo de nuevo."
   }
 }

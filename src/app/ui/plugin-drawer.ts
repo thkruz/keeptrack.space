@@ -31,6 +31,7 @@ import {
   renderStatusFooter,
   renderUtilityFooter,
   syncBadgesFromEvents,
+  syncDrawerItemState,
   syncInitialUtilityState,
   syncUtilityFooterState,
   updateConnectivityStatus,
@@ -709,13 +710,7 @@ export class PluginDrawer {
 
   /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */
   private static syncItemState_(el: HTMLElement): void {
-    const pluginId = drawerItemPluginId(el);
-    const bottomIcon = pluginId ? getEl(pluginId, true) : null;
-    const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
-    const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
-
-    el.classList.toggle('active', isSelected);
-    el.classList.toggle('disabled', isDisabled);
+    syncDrawerItemState(el);
   }
 
   private syncUtilityFooterState_(): void {

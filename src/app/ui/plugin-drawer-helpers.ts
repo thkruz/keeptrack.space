@@ -40,19 +40,31 @@ const MAX_RECENT_PLUGINS_ = 8;
 
 /**
  * Every plugin row in the drawer content. Rows in a plugin's own group carry
- * data-plugin-id; the copies in the Recent group carry data-recent-plugin-id so a
+ * data-plugin-id; the copies in the Recent group carry data-recent-plugin-id and the
+ * copies in the Pro Favorites group carry data-favorite-plugin-id, so a
  * `.drawer-item[data-plugin-id="x"]` selector matches exactly one row per plugin.
  */
-export const ALL_DRAWER_PLUGIN_ITEMS_SELECTOR = '.drawer-item[data-plugin-id], .drawer-item[data-recent-plugin-id]';
+export const ALL_DRAWER_PLUGIN_ITEMS_SELECTOR = '.drawer-item[data-plugin-id], .drawer-item[data-recent-plugin-id], .drawer-item[data-favorite-plugin-id]';
 
-/** Selector for every row (own group and Recent) of one plugin. */
+/** Selector for every row (own group, Recent and Favorites) of one plugin. */
 export function drawerItemsForPluginSelector(pluginId: string): string {
-  return `.drawer-item[data-plugin-id="${pluginId}"], .drawer-item[data-recent-plugin-id="${pluginId}"]`;
+  return `.drawer-item[data-plugin-id="${pluginId}"], .drawer-item[data-recent-plugin-id="${pluginId}"], .drawer-item[data-favorite-plugin-id="${pluginId}"]`;
 }
 
-/** The plugin (bottom-icon element) id behind a drawer row, from either attribute. */
+/** The plugin (bottom-icon element) id behind a drawer row, from any of the three attributes. */
 export function drawerItemPluginId(el: HTMLElement): string | undefined {
-  return el.dataset.pluginId ?? el.dataset.recentPluginId;
+  return el.dataset.pluginId ?? el.dataset.recentPluginId ?? el.dataset.favoritePluginId;
+}
+
+/** Mirror the live bottom-icon selected/disabled classes onto a drawer row. */
+export function syncDrawerItemState(el: HTMLElement): void {
+  const pluginId = drawerItemPluginId(el);
+  const bottomIcon = pluginId ? getEl(pluginId, true) : null;
+  const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
+  const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
+
+  el.classList.toggle('active', isSelected);
+  el.classList.toggle('disabled', isDisabled);
 }
 
 // ---- Shared Item Collection ----
@@ -386,26 +398,26 @@ export function renderBadge(pluginId: string, badges: Map<string, DrawerBadge>):
     return;
   }
 
-  contentEl
-    .querySelectorAll(`.drawer-item[data-plugin-id="${pluginId}"] .drawer-item-badge, .drawer-item[data-recent-plugin-id="${pluginId}"] .drawer-item-badge`)
-    .forEach((badgeEl) => {
-      const badge = badges.get(pluginId);
+  const badge = badges.get(pluginId);
 
-      if (!badge) {
-        badgeEl.className = 'drawer-item-badge';
-        badgeEl.textContent = '';
+  contentEl.querySelectorAll(drawerItemsForPluginSelector(pluginId)).forEach((itemEl) => {
+    const badgeEl = itemEl.querySelector('.drawer-item-badge');
 
-        return;
-      }
+    if (!badgeEl) {
+      return;
+    }
 
-      if (badge.type === 'active') {
-        badgeEl.className = 'drawer-item-badge drawer-item-badge--active';
-        badgeEl.textContent = '';
-      } else {
-        badgeEl.className = 'drawer-item-badge drawer-item-badge--count';
-        badgeEl.textContent = String(badge.value ?? '');
-      }
-    });
+    if (!badge) {
+      badgeEl.className = 'drawer-item-badge';
+      badgeEl.textContent = '';
+    } else if (badge.type === 'active') {
+      badgeEl.className = 'drawer-item-badge drawer-item-badge--active';
+      badgeEl.textContent = '';
+    } else {
+      badgeEl.className = 'drawer-item-badge drawer-item-badge--count';
+      badgeEl.textContent = String(badge.value ?? '');
+    }
+  });
 }
 
 /** Sync badge state from bottom icon events. */

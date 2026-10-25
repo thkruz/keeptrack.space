@@ -304,7 +304,7 @@ export class TimeSlider extends KeepTrackPlugin {
 
     const newDate = new Date(newTimeInMs);
 
-    timeManager.changeStaticOffset(newDate.getTime() - Date.now());
+    timeManager.changeSimulationTime(newDate.getTime());
 
     // Notify other components of the time change
     EventBus.getInstance().emit(EventBusEvent.updateDateTime, newDate);

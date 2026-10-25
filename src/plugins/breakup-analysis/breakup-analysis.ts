@@ -626,7 +626,7 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
       return;
     }
 
-    ServiceLocator.getTimeManager().changeStaticOffset(targetMs - Date.now());
+    ServiceLocator.getTimeManager().changeSimulationTime(targetMs);
   }
 
   /** Select the parent object on the globe if it is present in the catalog. */

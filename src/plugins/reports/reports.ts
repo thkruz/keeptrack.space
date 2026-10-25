@@ -27,6 +27,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { BurnSummary, MissionImpact, ScreeningDiff } from '@app/engine/conjunction/analysis-state';
+import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -959,6 +960,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
           env: this.buildAnalysisEnv_(ctx),
           halfWidthSec,
           missionImpact: this.buildMissionImpact_([sat], ctx.generatedAt, halfWidthSec, sensor),
+          // An analyst clone on either side takes its root parent's uncertainty.
+          uncertaintyParents: { primary: uncertaintyParentOf(sat), secondary: uncertaintyParentOf(secondary) },
         });
       },
     });
@@ -1067,6 +1070,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       screeningDiff,
       screeningDiffUnavailableReason: reason,
       missionImpact: this.buildMissionImpact_([parent, sat], ctx.generatedAt, halfWidthSec, sensor),
+      uncertaintyRoot: uncertaintyParentOf(sat) ?? parent,
     });
   }
 
@@ -1091,7 +1095,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
       source: 'debris-screening-runs',
     });
 
-    return generateScreeningCompareReport({ diff, env: this.buildAnalysisEnv_(ctx), objects: { pre, post } });
+    return generateScreeningCompareReport({
+      diff,
+      env: this.buildAnalysisEnv_(ctx),
+      objects: { pre, post },
+      uncertaintyParents: { pre: pre ? uncertaintyParentOf(pre) : null, post: post ? uncertaintyParentOf(post) : null },
+    });
   }
 
   /**

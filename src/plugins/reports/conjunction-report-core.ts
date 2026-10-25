@@ -47,6 +47,7 @@ import {
   type ScreeningDiff,
 } from '@app/engine/conjunction/analysis-state';
 import { findApproachMinima } from '@app/engine/conjunction/conjunction-tca';
+import { analystParentSccNum } from '@app/engine/conjunction/uncertainty-source';
 import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, j2SecularRates, Kilometers, RIC, Satellite, Seconds, StateCovariance } from '@ootk/src/main';
 import { isPlaceholderIntlDes } from '../sat-info-box/placeholder-intl-des';
 import { screeningSigmasKm } from '../sat-info-box-orbital/screening-sigmas';
@@ -95,29 +96,8 @@ export interface AnalysisEnv {
   secondaryHardBodyRadiusKm: number;
 }
 
-/** Analyst lineage fields, read duck-typed (the Maneuver tool writes `derivedFromSccNum`). */
-interface AnalystLineage {
-  derivedFromSccNum?: unknown;
-  parentSccNum?: unknown;
-  derivedFrom?: unknown;
-}
-
-/** NORAD number of the object an analyst satellite was derived from, or null. */
-export const analystParentSccNum = (obj: unknown): string | null => {
-  if (typeof obj !== 'object' || obj === null) {
-    return null;
-  }
-  const lineage = obj as AnalystLineage;
-  const own = (obj as { sccNum?: unknown }).sccNum;
-
-  for (const value of [lineage.derivedFromSccNum, lineage.parentSccNum, lineage.derivedFrom]) {
-    if (typeof value === 'string' && value.length > 0 && value !== own) {
-      return value;
-    }
-  }
-
-  return null;
-};
+/** NORAD number of the object an analyst satellite was derived from (shared with the screening tools). */
+export { analystParentSccNum };
 
 // =============================================================================
 // Building blocks
@@ -303,7 +283,9 @@ export const findEncounter = (
   env: AnalysisEnv,
   halfWidthSec: number,
   /** Object whose screening covariance stands in for the primary's (an analyst clone uses its parent's). */
-  primaryCovarianceSource: Satellite = primary
+  primaryCovarianceSource: Satellite = primary,
+  /** Same for the secondary. */
+  secondaryCovarianceSource: Satellite = secondary
 ): ConjunctionEncounter | null => {
   const startMs = env.analysisEpoch.getTime() - halfWidthSec * 1000;
   const windowMs = 2 * halfWidthSec * 1000;
@@ -322,7 +304,7 @@ export const findEncounter = (
   let pc: number | null = null;
 
   const primaryCov = screeningCovariance(primaryCovarianceSource, env.covarianceConfidenceLevel);
-  const secondaryCov = screeningCovariance(secondary, env.covarianceConfidenceLevel);
+  const secondaryCov = screeningCovariance(secondaryCovarianceSource, env.covarianceConfidenceLevel);
 
   try {
     const assessment = new ConjunctionAssessment(
@@ -567,15 +549,22 @@ export interface ConjunctionReportInput {
   env: AnalysisEnv;
   halfWidthSec?: number;
   missionImpact?: MissionImpact;
+  /**
+   * Root catalog objects whose uncertainty an analyst-clone primary or secondary assumes
+   * (uncertaintyParentOf). Their covariance drives the Pc and their sigmas and GP age the summary.
+   */
+  uncertaintyParents?: { primary?: Satellite | null; secondary?: Satellite | null };
 }
 
 /** Builds the analysis state for a primary/secondary pair. */
 export const buildConjunctionState = (input: ConjunctionReportInput): ConjunctionAnalysisState => {
   const { primary, secondary, env } = input;
+  const primaryParent = input.uncertaintyParents?.primary ?? null;
+  const secondaryParent = input.uncertaintyParents?.secondary ?? null;
   const state = baseState('conjunction', env, input.missionImpact);
-  const encounter = findEncounter(primary, secondary, env, input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC);
+  const encounter = findEncounter(primary, secondary, env, input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC, primaryParent ?? primary, secondaryParent ?? secondary);
 
-  state.objects = [buildObjectSummary(primary, 'primary', env), buildObjectSummary(secondary, 'secondary', env)];
+  state.objects = [buildObjectSummary(primary, 'primary', env, primaryParent), buildObjectSummary(secondary, 'secondary', env, secondaryParent)];
   state.encounter = encounter;
   state.relativeGeometry = encounter ? sampleRelativeGeometry(primary, secondary, encounter.tcaMs) : [];
   if (!encounter) {
@@ -644,6 +633,11 @@ export interface ManeuverReportInput {
   /** Why the screening diff is missing (shown in place of the table). */
   screeningDiffUnavailableReason?: string | null;
   missionImpact?: MissionImpact;
+  /**
+   * Root catalog object of the clone chain (uncertaintyParentOf). Defaults to `parent`; differs
+   * only when `parent` is itself a clone, and then both the parent and the analyst take its uncertainty.
+   */
+  uncertaintyRoot?: Satellite | null;
 }
 
 /** Builds the analysis state for a parent/analyst pair. */
@@ -651,9 +645,11 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
   const { parent, analyst, env } = input;
   const state = baseState('maneuver', env, input.missionImpact);
   const halfWidthSec = input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
-  const parentSummary = buildObjectSummary(parent, 'parent', env);
-  // The clone's uncertainty and GP age are its parent's (see buildObjectSummary).
-  const analystSummary = buildObjectSummary(analyst, 'analyst', env, parent);
+  const root = input.uncertaintyRoot ?? parent;
+  const parentUncertainty = root === parent ? null : root;
+  const parentSummary = buildObjectSummary(parent, 'parent', env, parentUncertainty);
+  // The clone's uncertainty and GP age are its root parent's (see buildObjectSummary).
+  const analystSummary = buildObjectSummary(analyst, 'analyst', env, root);
 
   state.objects = [parentSummary, analystSummary];
 
@@ -662,8 +658,8 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
 
   if (input.secondary) {
     state.objects.push(buildObjectSummary(input.secondary, 'secondary', env));
-    preEncounter = findEncounter(parent, input.secondary, env, halfWidthSec);
-    postEncounter = findEncounter(analyst, input.secondary, env, halfWidthSec, parent);
+    preEncounter = findEncounter(parent, input.secondary, env, halfWidthSec, root);
+    postEncounter = findEncounter(analyst, input.secondary, env, halfWidthSec, root);
     state.encounter = postEncounter;
   }
 
@@ -829,6 +825,11 @@ export interface ScreeningCompareInput {
   env: AnalysisEnv;
   /** Objects screened in the two runs, when they are still in the catalog. */
   objects?: { pre: Satellite | null; post: Satellite | null };
+  /**
+   * Root catalog objects whose uncertainty a clone `pre` / `post` assumes (uncertaintyParentOf).
+   * When omitted, a `post` clone of `pre` still takes `pre`'s uncertainty.
+   */
+  uncertaintyParents?: { pre?: Satellite | null; post?: Satellite | null };
 }
 
 export const buildScreeningCompareState = (input: ScreeningCompareInput): ConjunctionAnalysisState => {
@@ -839,11 +840,12 @@ export const buildScreeningCompareState = (input: ScreeningCompareInput): Conjun
   const post = input.objects?.post ?? null;
 
   if (pre) {
-    state.objects.push(buildObjectSummary(pre, analystParentSccNum(pre) ? 'analyst' : 'primary', input.env));
+    state.objects.push(buildObjectSummary(pre, analystParentSccNum(pre) ? 'analyst' : 'primary', input.env, input.uncertaintyParents?.pre ?? null));
   }
   if (post && post !== pre) {
-    // A clone compared with its own parent takes the parent's uncertainty (see buildObjectSummary).
-    const uncertaintyParent = pre && analystParentSccNum(post) === pre.sccNum ? pre : null;
+    // A clone takes its root parent's uncertainty (see buildObjectSummary).
+    const fallbackParent = pre && analystParentSccNum(post) === pre.sccNum ? pre : null;
+    const uncertaintyParent = input.uncertaintyParents ? (input.uncertaintyParents.post ?? null) : fallbackParent;
 
     state.objects.push(buildObjectSummary(post, analystParentSccNum(post) ? 'analyst' : 'primary', input.env, uncertaintyParent));
   }

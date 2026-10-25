@@ -287,3 +287,48 @@ describe('validateConjunctionAnalysisState', () => {
     expect(validateConjunctionAnalysisState(null)).toEqual(['$: expected object']);
   });
 });
+
+describe('Conjunction and Maneuver Reports: clone uncertainty from the root catalog object', () => {
+  // A clone fitted at a burn 4 h after the analysis epoch (own TLE epoch in the future, BSTAR 0).
+  const clone = new Satellite({
+    name: 'LANDSAT 8 (burn 1)',
+    tle1: withChecksum('1 90000U 13008A   22222.16666667  .00000000  00000-0  00000-0 0  9999') as TleLine1,
+    tle2: withChecksum(L8_TLE2.replace('2 39084', '2 90000')) as TleLine2,
+  });
+  // A second burn on the clone: a clone of a clone.
+  const cloneOfClone = new Satellite({
+    name: 'LANDSAT 8 (burn 2)',
+    tle1: withChecksum('1 90001U 13008A   22222.20833333  .00000000  00000-0  00000-0 0  9999') as TleLine1,
+    tle2: withChecksum(L8_TLE2.replace('2 39084', '2 90001')) as TleLine2,
+  });
+
+  clone.derivedFromSccNum = '39084';
+  cloneOfClone.derivedFromSccNum = '90000';
+
+  it('a clone primary of a Conjunction Report takes the parent covariance, sigmas and GP age', () => {
+    const own = buildConjunctionState({ primary: clone, secondary, env });
+    const assumed = buildConjunctionState({ primary: clone, secondary, env, uncertaintyParents: { primary: landsat8 } });
+    const parentState = buildConjunctionState({ primary: landsat8, secondary, env });
+    const [primarySummary] = assumed.objects;
+
+    expect(primarySummary.ricSigmasKm).toEqual(parentState.objects[0].ricSigmasKm);
+    expect(primarySummary.gpAgeHours).toBeCloseTo(parentState.objects[0].gpAgeHours!, 9);
+    expect(primarySummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(own.objects[0].uncertaintyAssumedFromNoradId).toBeUndefined();
+    // The clone's own TLE would claim a smaller uncertainty; the geometry is the clone's either way.
+    expect(own.objects[0].ricSigmasKm).not.toEqual(primarySummary.ricSigmasKm);
+    expect(assumed.encounter!.tcaMs).toBe(own.encounter!.tcaMs);
+    expect(validateConjunctionAnalysisState(JSON.parse(JSON.stringify(assumed)))).toEqual([]);
+  });
+
+  it('a Maneuver Report on a clone of a clone gives both the parent clone and the analyst the root uncertainty', () => {
+    const state = buildManeuverState({ parent: clone, analyst: cloneOfClone, env, burns: null, screeningDiff: null, uncertaintyRoot: landsat8 });
+    const rootSummary = buildConjunctionState({ primary: landsat8, secondary, env }).objects[0];
+    const [parentSummary, analystSummary] = state.objects;
+
+    expect(parentSummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(analystSummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(analystSummary.ricSigmasKm).toEqual(rootSummary.ricSigmasKm);
+    expect(parentSummary.ricSigmasKm).toEqual(rootSummary.ricSigmasKm);
+  });
+});

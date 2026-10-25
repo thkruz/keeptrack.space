@@ -20,6 +20,7 @@ const makeCtx = () => ({
   fill: vi.fn(),
   arc: vi.fn(),
   fillText: vi.fn(),
+  fillRect: vi.fn(),
   strokeText: vi.fn(),
   measureText: vi.fn(() => ({ width: 10 })),
   save: vi.fn(),
@@ -391,6 +392,83 @@ describe('StereoMap draw chain and interactions', () => {
     expect(ctx.fillText).toHaveBeenCalledWith('PRIMARY (25544)', 18, 58, expect.any(Number));
     expect(ctx.fillText).toHaveBeenCalledWith('SECONDARY (12345)', 18, 98, expect.any(Number));
     expect(ctx.fillText).toHaveBeenCalledWith(expect.stringContaining('UTC'), 18, 150);
+  });
+
+  describe('zoom-dependent layout (125-150% browser zoom narrows the map)', () => {
+    /** Longitude labels drawn on the top edge (textBaseline 'top' at the time of the call). */
+    const topLonLabels = (): { label: string; x: number }[] => {
+      const out: { label: string; x: number }[] = [];
+
+      ctx.fillText.mockImplementation((label: string, x: number) => {
+        if (ctx.textBaseline === 'top') {
+          out.push({ label, x });
+        }
+      });
+      p().drawGraticuleLabels_();
+
+      return out;
+    };
+
+    it('picks the finest label step whose spacing clears the widest label', () => {
+      // 1000px map: 20 deg = 55.6px, enough for a 40px label + 10px gap
+      expect(StereoMap.pickLabelStep(1000 / 360, 40, [20, 40, 60, 120])).toBe(20);
+      // 600px map: 20 deg = 33px, 40 deg = 67px
+      expect(StereoMap.pickLabelStep(600 / 360, 40, [20, 40, 60, 120])).toBe(40);
+      // Nothing fits: fall back to the coarsest step
+      expect(StereoMap.pickLabelStep(100 / 360, 40, [20, 40, 60, 120])).toBe(120);
+    });
+
+    it('keeps 20 deg longitude labels on a wide map', () => {
+      settingsManager.mapWidth = 1200;
+      settingsManager.mapHeight = 600;
+      ctx.measureText.mockImplementation((text: string) => ({ width: text.length * 7 }));
+
+      const labels = topLonLabels();
+
+      expect(labels.map((l) => l.label)).toContain('20°E');
+      expect(labels.map((l) => l.label)).toContain('160°W');
+    });
+
+    it('thins longitude labels on a narrow map so neighbours never overlap', () => {
+      // The 150% zoom case from QA: the map narrows to ~736px and "160°W140°W..." ran together
+      settingsManager.mapWidth = 736;
+      settingsManager.mapHeight = 368;
+      ctx.measureText.mockImplementation((text: string) => ({ width: text.length * 8 }));
+
+      const labels = topLonLabels();
+
+      expect(labels.length).toBeGreaterThan(3);
+      for (let i = 1; i < labels.length; i++) {
+        const prev = labels[i - 1];
+        const cur = labels[i];
+        const clearance = cur.x - prev.x - (cur.label.length * 8) / 2 - (prev.label.length * 8) / 2;
+
+        expect(clearance).toBeGreaterThanOrEqual(8);
+      }
+      expect(labels.map((l) => l.label)).toContain('0°');
+    });
+
+    it('moves the legend off a ground-station icon in the top-left corner', () => {
+      settingsManager.mapWidth = 736;
+      settingsManager.mapHeight = 368;
+      // Socorro, NM: lands right under the default top-left legend on a 736px map
+      vi.spyOn(ServiceLocator, 'getSensorManager').mockReturnValue({
+        isSensorSelected: () => true,
+        currentSensors: [{ lat: 33.817, lon: -106.66 }],
+      } as never);
+      ctx.measureText.mockImplementation((text: string) => ({ width: text.length * 7 }));
+      p().selectSatManager_.primarySatObj = fakeSat({ name: 'PRIMARY', sccNum: '25544' });
+      p().selectSatManager_.secondarySatObj = null;
+
+      p().drawTargetLegend_();
+
+      const nameCall = ctx.fillText.mock.calls.find((call: unknown[]) => call[0] === 'PRIMARY (25544)');
+
+      expect(nameCall).toBeDefined();
+      expect(nameCall![1] !== 18 || nameCall![2] !== 58).toBe(true);
+      // A backing panel keeps the legend readable over the map
+      expect(ctx.fillRect).toHaveBeenCalled();
+    });
   });
 
   it.each([

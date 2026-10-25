@@ -95,6 +95,17 @@ export class StereoMap extends KeepTrackPlugin {
   private static readonly PRIMARY_OUT_OF_VIEW_COLOR_ = '#ff0000';
   private static readonly SECONDARY_IN_VIEW_COLOR_ = '#00ffff';
   private static readonly SECONDARY_OUT_OF_VIEW_COLOR_ = '#0066ff';
+  /** Label steps (deg) that all land on the 20 deg graticule lines, finest first. */
+  private static readonly LON_LABEL_STEPS_ = [20, 40, 60, 120] as const;
+  private static readonly LAT_LABEL_STEPS_ = [20, 40, 60] as const;
+  private static readonly GRATICULE_FONT_PX_ = 12;
+  /** Minimum clear space between neighbouring graticule labels, px. */
+  private static readonly LABEL_GAP_PX_ = 10;
+  /** Half the drawn ground-station icon (40px) plus a little air. */
+  private static readonly SENSOR_ICON_RADIUS_ = 24;
+
+  /** Canvas edge bands taken by graticule labels, so the legend can sit inside them. */
+  private graticuleInset_ = { x: 0, y: 0 };
   protected canvas_: HTMLCanvasElement;
   private satCrunchNow_ = 0;
   private drawerLayoutObserver_?: MutationObserver;
@@ -350,6 +361,7 @@ export class StereoMap extends KeepTrackPlugin {
         this.drawGraticuleLines_();
       }
       this.drawGroundTrace_();
+      this.graticuleInset_ = { x: 0, y: 0 };
       if (this.isGraticuleEnabled_) {
         this.drawGraticuleLabels_();
       }
@@ -568,18 +580,31 @@ export class StereoMap extends KeepTrackPlugin {
     ];
     const visible = t7e('plugins.StereoMap.labels.inView' as Parameters<typeof t7e>[0]);
     const hidden = t7e('plugins.StereoMap.labels.outOfView' as Parameters<typeof t7e>[0]);
+    const names = targets.map((target) => `${target.sat.name} (${(target.sat as Satellite).sccNum ?? target.sat.id})`);
+    const utc = `${ServiceLocator.getTimeManager().simulationTimeObj.toISOString()} UTC`;
 
     ctx.save();
     ctx.font = '14px sans-serif';
     ctx.textAlign = 'left';
+
+    // Content block measured from its text origin: names on rows 40px apart, the
+    // in/out-of-view key 14-18px under each name and the UTC line last.
+    const hiddenKeyX = 187;
+    const contentW = Math.max(...names.map((name) => ctx.measureText(name).width), hiddenKeyX + 30 + ctx.measureText(hidden).width, ctx.measureText(utc).width);
+    const contentH = 12 + targets.length * 40;
+    const { x: originX, y: originY } = this.placeLegend_(contentW, contentH);
+
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+    ctx.fillRect(originX - 8, originY - 18, Math.min(contentW, this.canvas_.width - 36) + 16, contentH + 24);
+
     targets.forEach((target, index) => {
-      const y = 58 + index * 40;
+      const y = originY + index * 40;
 
       ctx.fillStyle = '#fff';
-      ctx.fillText(`${target.sat.name} (${(target.sat as Satellite).sccNum ?? target.sat.id})`, 18, y, this.canvas_.width - 36);
+      ctx.fillText(names[index], originX, y, this.canvas_.width - 36);
       for (const [color, label, x] of [
-        [target.visible, visible, 18],
-        [target.hidden, hidden, 205],
+        [target.visible, visible, originX],
+        [target.hidden, hidden, originX + hiddenKeyX],
       ] as const) {
         ctx.strokeStyle = color;
         ctx.lineWidth = 4;
@@ -590,8 +615,78 @@ export class StereoMap extends KeepTrackPlugin {
         ctx.fillText(label, x + 30, y + 18);
       }
     });
-    ctx.fillText(`${ServiceLocator.getTimeManager().simulationTimeObj.toISOString()} UTC`, 18, 70 + targets.length * 40);
+    ctx.fillText(utc, originX, originY + contentH);
     ctx.restore();
+  }
+
+  /**
+   * Text origin for the legend block. Tries the top-left, top-right and
+   * bottom-left corners (bottom-right holds the logo) inside the graticule
+   * label bands and takes the first one no ground-station or satellite icon
+   * sits under; on narrow maps the top-left legend otherwise covered the
+   * selected sensor.
+   */
+  private placeLegend_(contentW: number, contentH: number): { x: number; y: number } {
+    const w = settingsManager.mapWidth;
+    const h = settingsManager.mapHeight;
+    const inset = this.graticuleInset_;
+    const left = 18 + inset.x;
+    const right = Math.max(left, w - 18 - inset.x - contentW);
+    const top = 58 + inset.y;
+    const bottom = Math.max(top, h - 18 - inset.y - contentH);
+    const candidates = [
+      { x: left, y: top },
+      { x: right, y: top },
+      { x: left, y: bottom },
+    ];
+    const sensorManager = ServiceLocator.getSensorManager();
+    const sensors = sensorManager?.isSensorSelected() ? sensorManager.currentSensors : [];
+    const r = StereoMap.SENSOR_ICON_RADIUS_;
+    // Icons drawn over the map: ground stations, plus the satellite marker itself
+    const icons = sensors.map((sensor) => ({ x: ((sensor.lon + 180) / 360) * w, y: h - ((sensor.lat + 90) / 180) * h }));
+    const satDom = getEl('map-sat', true) as HTMLImageElement | null;
+
+    if (satDom && satDom.style.left !== '' && satDom.style.top !== '') {
+      icons.push({ x: parseFloat(satDom.style.left) + satDom.width / 2, y: parseFloat(satDom.style.top) + satDom.height / 2 });
+    }
+    const hits = (c: { x: number; y: number }): number =>
+      icons.filter((icon) => icon.x + r > c.x - 8 && icon.x - r < c.x + contentW + 8 && icon.y + r > c.y - 18 && icon.y - r < c.y + contentH + 6).length;
+
+    let best = candidates[0];
+    let bestHits = hits(best);
+
+    for (const candidate of candidates.slice(1)) {
+      if (bestHits === 0) {
+        break;
+      }
+      const candidateHits = hits(candidate);
+
+      if (candidateHits < bestHits) {
+        best = candidate;
+        bestHits = candidateHits;
+      }
+    }
+
+    return best;
+  }
+
+  /**
+   * Smallest step whose on-screen spacing clears the widest label plus a gap.
+   * A fixed 20 deg step ran the longitude labels together at 125-150% zoom.
+   */
+  static pickLabelStep(pxPerDeg: number, labelSizePx: number, steps: readonly number[], gapPx = StereoMap.LABEL_GAP_PX_): number {
+    return steps.find((step) => step * pxPerDeg >= labelSizePx + gapPx) ?? steps[steps.length - 1];
+  }
+
+  /** Multiples of `step` strictly inside (-limit, limit), 0 included. */
+  private static labelValues_(step: number, limit: number): number[] {
+    const values: number[] = [];
+
+    for (let v = -Math.floor((limit - 1) / step) * step; v < limit; v += step) {
+      values.push(v);
+    }
+
+    return values;
   }
 
   private addTextToMap_() {
@@ -836,18 +931,31 @@ export class StereoMap extends KeepTrackPlugin {
     const w = settingsManager.mapWidth;
     const h = settingsManager.mapHeight;
     const pad = 4;
+    const fontPx = StereoMap.GRATICULE_FONT_PX_;
 
-    ctx.font = 'bold 12px sans-serif';
+    ctx.font = `bold ${fontPx}px sans-serif`;
     ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
     ctx.lineWidth = 3;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
 
+    const latLabel = (lat: number): string => (lat === 0 ? '0\u00B0' : `${Math.abs(lat)}\u00B0${lat > 0 ? 'N' : 'S'}`);
+    const lonLabel = (lon: number): string => (lon === 0 ? '0\u00B0' : `${Math.abs(lon)}\u00B0${lon > 0 ? 'E' : 'W'}`);
+    // Label steps follow the drawn map size, not a fixed 20 deg: the widest
+    // label ("160\u00B0W") must fit between neighbours with a gap.
+    const lonStep = StereoMap.pickLabelStep(w / 360, ctx.measureText(lonLabel(-160)).width, StereoMap.LON_LABEL_STEPS_);
+    const latStep = StereoMap.pickLabelStep(h / 180, fontPx, StereoMap.LAT_LABEL_STEPS_);
+    const latWidth = Math.max(...StereoMap.labelValues_(latStep, 90).map((lat) => ctx.measureText(latLabel(lat)).width));
+    const latBoxes: { x0: number; x1: number; y0: number; y1: number }[] = [];
+
+    this.graticuleInset_ = { x: pad + latWidth, y: pad + fontPx };
+
     // Latitude labels on left and right edges
     ctx.textBaseline = 'middle';
-    for (let lat = -80; lat <= 80; lat += 20) {
+    for (const lat of StereoMap.labelValues_(latStep, 90)) {
       const y = h - ((lat + 90) / 180) * h;
-      const absLat = Math.abs(lat);
-      const label = lat === 0 ? '0\u00B0' : `${absLat}\u00B0${lat > 0 ? 'N' : 'S'}`;
+      const label = latLabel(lat);
+
+      latBoxes.push({ x0: 0, x1: pad + latWidth, y0: y - fontPx / 2, y1: y + fontPx / 2 }, { x0: w - pad - latWidth, x1: w, y0: y - fontPx / 2, y1: y + fontPx / 2 });
 
       // Left edge
       ctx.textAlign = 'left';
@@ -860,22 +968,35 @@ export class StereoMap extends KeepTrackPlugin {
       ctx.fillText(label, w - pad, y);
     }
 
-    // Longitude labels on top and bottom edges
+    // Longitude labels on top and bottom edges, skipping any that would land on
+    // a latitude label in the corners (short maps put 80\u00B0N inside the top row)
+    const overlapsLat = (x0: number, x1: number, y0: number, y1: number): boolean => latBoxes.some((b) => x0 < b.x1 && x1 > b.x0 && y0 < b.y1 && y1 > b.y0);
+
     ctx.textAlign = 'center';
-    for (let lon = -160; lon <= 160; lon += 20) {
+    for (const lon of StereoMap.labelValues_(lonStep, 180)) {
       const x = ((lon + 180) / 360) * w;
-      const absLon = Math.abs(lon);
-      const label = lon === 0 ? '0\u00B0' : `${absLon}\u00B0${lon > 0 ? 'E' : 'W'}`;
+      const label = lonLabel(lon);
+      const halfW = ctx.measureText(label).width / 2;
+      const isBottomClear = !overlapsLat(x - halfW, x + halfW, h - pad - fontPx, h - pad);
+      const isTopClear = !overlapsLat(x - halfW, x + halfW, pad, pad + fontPx);
+
+      if (!isBottomClear && !isTopClear) {
+        continue;
+      }
 
       // Bottom edge
-      ctx.textBaseline = 'bottom';
-      ctx.strokeText(label, x, h - pad);
-      ctx.fillText(label, x, h - pad);
+      if (isBottomClear) {
+        ctx.textBaseline = 'bottom';
+        ctx.strokeText(label, x, h - pad);
+        ctx.fillText(label, x, h - pad);
+      }
 
       // Top edge
-      ctx.textBaseline = 'top';
-      ctx.strokeText(label, x, pad);
-      ctx.fillText(label, x, pad);
+      if (isTopClear) {
+        ctx.textBaseline = 'top';
+        ctx.strokeText(label, x, pad);
+        ctx.fillText(label, x, pad);
+      }
     }
 
     ctx.textAlign = 'start';

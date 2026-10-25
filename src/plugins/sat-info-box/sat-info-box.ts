@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
+import { isSyntheticVimpel } from '@app/app/data/synthetic-vimpel';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { ToastMsgType } from '@app/engine/core/interfaces';
@@ -226,8 +227,9 @@ export class SatInfoBox extends KeepTrackPlugin {
   private copyIdentifier_(elementId: string): void {
     const value = getEl(elementId, true)?.textContent?.trim() ?? '';
     const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
+    const notAvailableJsc = t7e('satInfoBox.notAvailableJscVimpel' as Parameters<typeof t7e>[0]);
 
-    if (!value || value === notAvailable) {
+    if (!value || value === notAvailable || value === notAvailableJsc) {
       return;
     }
 
@@ -463,12 +465,14 @@ export class SatInfoBox extends KeepTrackPlugin {
     } else {
       const sat = obj as Satellite;
 
-      setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' || isPlaceholderIntlDes(sat) ? notAvailable : sat.intlDes);
-      // Synthetic JSC objects have no NORAD number; real ones served from a
-      // newer Vimpel elset keep theirs.
-      if (sat.source === CatalogSource.VIMPEL && /^0*$/u.test(sat.sccNum ?? '')) {
-        setInnerHtml(EL.OBJNUM, notAvailable);
-        setInnerHtml(EL.INTL_DES, notAvailable);
+      setInnerHtml(EL.INTL_DES, !sat.intlDes || sat.intlDes === 'none' || isPlaceholderIntlDes(sat) ? notAvailable : sat.intlDes);
+      // Synthetic JSC objects have no NORAD number or COSPAR ID; real ones served
+      // from a newer Vimpel elset keep theirs.
+      if (isSyntheticVimpel(sat)) {
+        const notAvailableJsc = t7e('satInfoBox.notAvailableJscVimpel' as Parameters<typeof t7e>[0]);
+
+        setInnerHtml(EL.OBJNUM, notAvailableJsc);
+        setInnerHtml(EL.INTL_DES, notAvailableJsc);
       } else {
         setInnerHtml(EL.OBJNUM, sat.sccNum);
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);

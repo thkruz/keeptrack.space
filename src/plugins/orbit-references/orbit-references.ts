@@ -80,8 +80,9 @@ export class OrbitReferences extends KeepTrackPlugin {
     const epochyr = sat.epochYear.toString();
     const epochday = sat.epochDay.toString();
     // .intlDes is 2000-001A we need 00001A
-    const yy = sat.intlDes.split('-')[0].slice(2);
-    const intl = yy + sat.intlDes.split('-')[1];
+    // Synthetic JSC Vimpel objects carry no designator, so both parts stay blank.
+    const [yearPart = '', launchPart = ''] = (sat.intlDes ?? '').split('-');
+    const intl = yearPart.slice(2) + launchPart;
     // FormatTle.createTle runs scc through Tle.convert6DigitToA5, which throws
     // for extended (7+ digit) IDs. Mirror Satellite.toTle and pass the trailing
     // 5 digits so the TLE stays well-formed; the canonical id stays on sat.sccNum.

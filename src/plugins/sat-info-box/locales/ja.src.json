@@ -30,6 +30,7 @@
       "external": "外部"
     },
     "notAvailable": "該当なし",
+    "notAvailableJscVimpel": "該当なし (JSC Vimpel)",
     "oemFile": "OEMファイル",
     "copy": {
       "copied": "クリップボードにコピーしました",

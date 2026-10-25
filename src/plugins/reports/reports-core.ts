@@ -291,7 +291,7 @@ export const buildReportHeader = (title: string, sat: HeaderSat, sensor: Detaile
     line('satellite', sat.name) +
     line('noradId', sat.sccNum ?? none) +
     line('altId', sat.altId || none) +
-    `${line('intlDes', sat.intlDes ?? none)}\n`;
+    `${line('intlDes', sat.intlDes || none)}\n`;
 
   if (!sensor) {
     return satData;

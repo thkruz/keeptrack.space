@@ -148,6 +148,34 @@ describe('SatInfoBox_header_OBJNUM_sccNumForms', () => {
     }
   });
 
+  it('labels NORAD and COSPAR of a synthetic JSC Vimpel object as unavailable', () => {
+    const sat = new Satellite({
+      id: 0,
+      active: true,
+      sccNum: '',
+      name: 'JSC Vimpel 26100',
+      type: SpaceObjectType.DEBRIS,
+      tle1: TLE1,
+      tle2: TLE2,
+      source: CatalogSource.VIMPEL,
+      altId: '26100',
+    });
+
+    sat.intlDes = '';
+
+    expect(renderObjNum(sat)).toBe('N/A (JSC Vimpel)');
+    expect(getEl(EL.INTL_DES)!.innerHTML).toBe('N/A (JSC Vimpel)');
+  });
+
+  it('keeps the real COSPAR of a cataloged object on a Vimpel elset', () => {
+    const sat = makeSat('25544');
+
+    sat.source = CatalogSource.VIMPEL;
+
+    expect(renderObjNum(sat)).toBe('25544');
+    expect(getEl(EL.INTL_DES)!.innerHTML).toBe('1998-067A');
+  });
+
   it('renders an OemSatellite alpha-5 NORAD_ID as its normalized numeric form', () => {
     const oemSat = makeOemSat('T0001');
 

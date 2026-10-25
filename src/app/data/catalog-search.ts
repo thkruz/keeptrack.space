@@ -23,6 +23,7 @@
 
 import { BaseObject, CatalogSource, Degrees, Minutes, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { SatMath } from '../analysis/sat-math';
+import { isSyntheticVimpel } from './synthetic-vimpel';
 
 /**
  * The CatalogSearch class provides static methods for filtering and searching through an array of satellite data.
@@ -208,6 +209,10 @@ export class CatalogSearch {
    */
   static year(satData: Satellite[], yr: number): Satellite[] {
     return satData.filter((sat) => {
+      // Synthetic JSC Vimpel elsets hold the Vimpel id where the designator year goes.
+      if (isSyntheticVimpel(sat)) {
+        return false;
+      }
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
 
       return Number.parseInt(tleYear) === yr;

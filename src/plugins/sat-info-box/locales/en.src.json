@@ -30,6 +30,7 @@
       "external": "External"
     },
     "notAvailable": "N/A",
+    "notAvailableJscVimpel": "N/A (JSC Vimpel)",
     "oemFile": "OEM File",
     "copy": {
       "copied": "Copied to clipboard",

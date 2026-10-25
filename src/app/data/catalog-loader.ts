@@ -36,6 +36,7 @@ import { CatalogManager } from './catalog-manager';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { orgDataService } from './catalogs/org-data-service';
+import { hasRealSccNum, isSyntheticVimpel } from './synthetic-vimpel';
 
 export interface JsSat {
   TLE1: string;
@@ -1386,7 +1387,8 @@ export class CatalogLoader {
       resp[i].source = CatalogSource.UNKNOWN;
     }
 
-    const intlDes = CatalogLoader.parseIntlDes_(resp[i].tle1);
+    // Synthetic JSC Vimpel rows carry the Vimpel id in the designator field.
+    const intlDes = isSyntheticVimpel(resp[i]) ? '' : CatalogLoader.parseIntlDes_(resp[i].tle1);
 
     resp[i].intlDes = intlDes;
     resp[i].active = true;
@@ -1456,7 +1458,9 @@ export class CatalogLoader {
 
       if (isAddedToCatalog) {
         catalogManagerInstance.sccIndex[key] = tempObjData.length - 1;
-        catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
+        if (resp[i].intlDes) {
+          catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
+        }
       }
     }
 
@@ -1668,7 +1672,9 @@ export class CatalogLoader {
         const key = CatalogLoader.canonicalSccKey(tempSatData[idx].sccNum) ?? tempSatData[idx].sccNum;
 
         catalogManagerInstance.sccIndex[key] = idx;
-        catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
+        if (tempSatData[idx].intlDes) {
+          catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
+        }
       }
     }
 
@@ -1790,6 +1796,8 @@ export class CatalogLoader {
             });
 
             satellite.id = tempObjData.length;
+            // Never indexed into cosparIndex: the designator field holds the Vimpel id.
+            CatalogLoader.clearSyntheticVimpelIntlDes_(satellite);
 
             tempObjData.push(satellite);
           } catch (err) {
@@ -1807,7 +1815,21 @@ export class CatalogLoader {
 
   /** True for a real NORAD number; synthetic JSC Vimpel objects carry '' or '00000'. */
   static hasRealSccNum(sccNum?: string | null): boolean {
-    return typeof sccNum === 'string' && sccNum.length > 0 && !/^0+$/u.test(sccNum);
+    return hasRealSccNum(sccNum);
+  }
+
+  /**
+   * ootk's Satellite reads intlDes from line-1 columns 10-17, but JSC Vimpel writes
+   * its own object number there (55402 reads as "2055-402", 26100 as "2026-100",
+   * which collides with a real designator). A synthetic Vimpel object has no
+   * COSPAR ID, so blank it. Real objects on a Vimpel elset keep theirs.
+   */
+  private static clearSyntheticVimpelIntlDes_<T extends BaseObject>(obj: T): T {
+    if (obj instanceof Satellite && isSyntheticVimpel(obj)) {
+      obj.intlDes = '';
+    }
+
+    return obj;
   }
 
   /**
@@ -1824,7 +1846,7 @@ export class CatalogLoader {
       return satellite;
     }
 
-    return new Satellite(params);
+    return CatalogLoader.clearSyntheticVimpelIntlDes_(new Satellite(params));
   }
 
   /**

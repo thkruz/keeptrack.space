@@ -212,6 +212,11 @@ export class CatalogManager {
    * @returns The corresponding ID if found, otherwise null.
    */
   intlDes2id(intlDes: string): number | null {
+    // Objects without a COSPAR ID (synthetic JSC Vimpel) are never indexed.
+    if (!intlDes) {
+      return null;
+    }
+
     return typeof this.cosparIndex[`${intlDes}`] !== 'undefined' ? this.cosparIndex[`${intlDes}`] : null;
   }
 

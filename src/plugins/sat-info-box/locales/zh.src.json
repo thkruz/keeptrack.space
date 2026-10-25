@@ -30,6 +30,7 @@
       "external": "外部"
     },
     "notAvailable": "不适用",
+    "notAvailableJscVimpel": "不适用 (JSC Vimpel)",
     "oemFile": "OEM文件",
     "copy": {
       "copied": "已复制到剪贴板",

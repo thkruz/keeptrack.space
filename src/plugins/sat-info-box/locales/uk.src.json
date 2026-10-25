@@ -30,6 +30,7 @@
       "external": "Зовнішні"
     },
     "notAvailable": "Н/Д",
+    "notAvailableJscVimpel": "Н/Д (JSC Vimpel)",
     "oemFile": "Файл OEM",
     "copy": {
       "copied": "Скопійовано в буфер обміну",

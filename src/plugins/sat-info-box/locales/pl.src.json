@@ -30,6 +30,7 @@
       "external": "Zewnętrzna"
     },
     "notAvailable": "B/D",
+    "notAvailableJscVimpel": "B/D (JSC Vimpel)",
     "oemFile": "Plik OEM",
     "copy": {
       "copied": "Skopiowano do schowka",

@@ -616,16 +616,17 @@ export class SearchManager {
         case SearchResultType.INTLDES:
           {
             const sat = obj as Satellite;
-            // If the international designator matched
+            // If the international designator matched (synthetic JSC Vimpel objects have none)
+            const intlDes = sat.intlDes ?? '';
 
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += sat.intlDes.substring(0, result.strIndex);
+            html += intlDes.substring(0, result.strIndex);
             html += '<span class="search-hilight">';
-            html += sat.intlDes.substring(result.strIndex, result.strIndex + result.patlen);
+            html += intlDes.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
-            html += sat.intlDes.substring(result.strIndex + result.patlen);
+            html += intlDes.substring(result.strIndex + result.patlen);
           }
           break;
         case SearchResultType.BUS:

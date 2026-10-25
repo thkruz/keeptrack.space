@@ -12,12 +12,13 @@ import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodi
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CatalogSource, KM_PER_AU, LandObject, Satellite, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
+import { KM_PER_AU, LandObject, Satellite, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
 import i18next from 'i18next';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { isSyntheticVimpel } from '../data/synthetic-vimpel';
 import { OemSatellite } from '../objects/oem-satellite';
 import { Planet as PlanetDot } from '../objects/planet';
 import { SensorMath } from '../sensors/sensor-math';
@@ -298,7 +299,8 @@ export class HoverManager {
 
       getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
 
-      if (sat.sccNum) {
+      // Synthetic JSC Vimpel objects carry a placeholder catalog number ("0").
+      if (sat.sccNum && !isSyntheticVimpel(sat)) {
         this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
       } else {
         this.satHoverBoxNode2.textContent = HoverManager.getLaunchYear(sat);
@@ -308,7 +310,7 @@ export class HoverManager {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
       } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);
-      } else if (sat.source !== CatalogSource.VIMPEL && sat.sccNum) {
+      } else if (!isSyntheticVimpel(sat) && sat.sccNum) {
         // Without an sccNum, line 2 already shows the launch line; repeating it read "Launched: Planned" twice.
         this.satHoverBoxNode3.textContent = HoverManager.getLaunchYear(sat);
       } else {
@@ -345,7 +347,8 @@ export class HoverManager {
     if (sat.type === SpaceObjectType.NOTIONAL) {
       return t7e('hoverManager.launchedPlanned');
     }
-    if (sat.source === CatalogSource.VIMPEL) {
+    // Synthetic JSC Vimpel objects have no COSPAR ID; real ones on a Vimpel elset keep theirs.
+    if (isSyntheticVimpel(sat) || !sat.intlDes) {
       return t7e('hoverManager.launchedUnknown');
     }
 

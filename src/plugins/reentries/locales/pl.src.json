@@ -11,7 +11,9 @@
         "fetchData": "Pobierz dane",
         "refresh": "Odśwież",
         "flyToCorridor": "Leć do korytarza",
-        "flyToCorridorTooltip": "Po włączeniu kliknięcie wiersza TIP przenosi kamerę do przewidywanego korytarza wejścia w atmosferę na globie zamiast śledzić obiekt."
+        "flyToCorridorTooltip": "Po włączeniu kliknięcie wiersza TIP przenosi kamerę do przewidywanego korytarza wejścia w atmosferę na globie zamiast śledzić obiekt.",
+        "showAllColumns": "Pokaż wszystkie kolumny",
+        "showAllColumnsTooltip": "Menu jest zbyt wąskie dla wszystkich kolumn, więc część z nich jest ukryta. Włącz tę opcję, aby pokazać wszystkie i przewijać tabelę w poziomie."
       },
       "table": {
         "norad": "NORAD",

@@ -11,7 +11,9 @@
         "fetchData": "Načíst data",
         "refresh": "Obnovit",
         "flyToCorridor": "Letět ke koridoru",
-        "flyToCorridorTooltip": "Když je zapnuto, kliknutí na řádek TIP přeletí kamerou k předpovídanému koridoru návratu na zeměkouli místo sledování objektu."
+        "flyToCorridorTooltip": "Když je zapnuto, kliknutí na řádek TIP přeletí kamerou k předpovídanému koridoru návratu na zeměkouli místo sledování objektu.",
+        "showAllColumns": "Zobrazit všechny sloupce",
+        "showAllColumnsTooltip": "Nabídka je pro všechny sloupce příliš úzká, proto jsou některé skryté. Zapnutím zobrazíte všechny a tabulku můžete posouvat do stran."
       },
       "table": {
         "norad": "NORAD",

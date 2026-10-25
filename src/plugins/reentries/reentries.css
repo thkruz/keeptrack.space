@@ -1,7 +1,7 @@
 /*
  * Reentries (OSS) menu styles. The menu opts into the shared v13 card system
  * (.kt-ui-v13 + kt-section/kt-action); see src/engine/ui/menu-v13.css. Only the
- * results-table chrome and the fly-to-corridor switch live here.
+ * results-table chrome, the narrow-screen layout and the switches live here.
  */
 
 /* Fly-to-corridor switch sits below the data-action rows inside its card. */
@@ -13,19 +13,77 @@
   white-space: nowrap;
 }
 
+/*
+ * ===== Narrow-screen layout =====
+ * The menu opens at min(1200px, space right of the drawer rail) (see
+ * fitMenuToViewport_). The max-width below is the safety net for changes the
+ * resize listener does not see (the rail opening or closing), so the close
+ * button can never be pushed past the viewport edge.
+ */
+@media (min-width: 640px) {
+  /* Below 640px side menus are full width (responsive-sm.css), so no margin there. */
+  #reentries-menu {
+    max-width: calc(100vw - var(--drawer-offset, 0px) - 16px);
+  }
+}
+
+#reentries-menu {
+  /* Width of the pinned NORAD column; the Name pin starts after it. */
+  --re-pin-norad-w: 80px;
+  /* Pro adds a pinned layer-toggle column ahead of NORAD and widens this. */
+  --re-pin-lead: 0px;
+}
+
+/* The Columns switch only matters while the menu is narrow enough to fold. */
+.re-cols-switch {
+  display: none;
+  margin: 0 0 8px;
+}
+
+#reentries-menu.re-cols-narrow .re-cols-switch {
+  display: block;
+}
+
+.re-cols-switch .re-cols-label {
+  white-space: nowrap;
+}
+
+#reentries-menu.re-cols-folded .re-col-low {
+  display: none;
+}
+
+/* Each table scrolls sideways inside its card instead of widening the menu. */
+.re-table-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
 /* ===== Results tables (TIP + analysis) ===== */
 .reentries-table {
   width: 100%;
   margin-top: 4px;
-  border-collapse: collapse;
+  /* separate (not collapse) so pinned cells keep their own bottom border while scrolled */
+  border-collapse: separate;
+  border-spacing: 0;
   line-height: 1.4;
   font-size: 13px;
+}
+
+.reentries-table tr {
+  /* Row tint (hover / risk shading), repeated on the opaque pinned cells. */
+  --re-row-tint: transparent;
+  background-color: var(--re-row-tint);
 }
 
 .reentries-table td {
   text-align: center;
   padding: 5px 4px;
   border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Data cells stay on one line so a narrow menu scrolls instead of stacking digits. */
+.reentries-table tr:not(:first-child) td {
+  white-space: nowrap;
 }
 
 /* Header row */
@@ -39,6 +97,40 @@
   border-bottom: 1px solid var(--color-dark-border);
 }
 
+/*
+ * Pinned identity columns (NORAD, plus Name on Reentry Analysis). The
+ * background is opaque (row tint over the card surface over the menu
+ * background) so scrolled columns pass underneath instead of showing through.
+ */
+.reentries-table td.re-col-pin {
+  position: sticky;
+  z-index: 1;
+  box-sizing: border-box;
+  background:
+    linear-gradient(var(--re-row-tint), var(--re-row-tint)), linear-gradient(rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.035)),
+    var(--color-dark-background);
+}
+
+.reentries-table td.re-col-pin-norad {
+  left: var(--re-pin-lead);
+  width: var(--re-pin-norad-w);
+  min-width: var(--re-pin-norad-w);
+  max-width: var(--re-pin-norad-w);
+}
+
+.reentries-table tr td.re-col-pin-name {
+  left: calc(var(--re-pin-lead) + var(--re-pin-norad-w));
+  min-width: 120px;
+  max-width: 170px;
+  /* Long names wrap inside the pin rather than eating the scroll area. */
+  white-space: normal;
+}
+
+/* Edge shadow marks where the scrolling columns slide under the pins. */
+.reentries-table td.re-col-pin-last {
+  box-shadow: 6px 0 6px -6px rgba(0, 0, 0, 0.7);
+}
+
 /* Clickable event rows */
 .tip-object,
 .reentry-object {
@@ -46,9 +138,9 @@
   transition: background-color 0.15s ease;
 }
 
-.tip-object:hover,
-.reentry-object:hover {
-  background-color: rgba(255, 255, 255, 0.07);
+.reentries-table .tip-object:hover,
+.reentries-table .reentry-object:hover {
+  --re-row-tint: rgba(255, 255, 255, 0.07);
 }
 
 .reentries-attribution {
@@ -60,17 +152,17 @@
 
 /* Risk shading (id selectors win over the generic row hover above) */
 #reentries-analysis-table .reentry-critical {
-  background-color: rgba(211, 47, 47, 0.35);
+  --re-row-tint: rgba(211, 47, 47, 0.35);
 }
 
 #reentries-analysis-table .reentry-critical:hover {
-  background-color: rgba(211, 47, 47, 0.5);
+  --re-row-tint: rgba(211, 47, 47, 0.5);
 }
 
 #reentries-analysis-table .reentry-warning {
-  background-color: rgba(251, 192, 45, 0.25);
+  --re-row-tint: rgba(251, 192, 45, 0.25);
 }
 
 #reentries-analysis-table .reentry-warning:hover {
-  background-color: rgba(251, 192, 45, 0.4);
+  --re-row-tint: rgba(251, 192, 45, 0.4);
 }

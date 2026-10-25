@@ -11,7 +11,9 @@
         "fetchData": "Scarica dati",
         "refresh": "Aggiorna",
         "flyToCorridor": "Vola al corridoio",
-        "flyToCorridorTooltip": "Quando attivato, facendo clic su una riga TIP la telecamera vola verso il corridoio di rientro previsto sul globo invece di seguire l'oggetto."
+        "flyToCorridorTooltip": "Quando attivato, facendo clic su una riga TIP la telecamera vola verso il corridoio di rientro previsto sul globo invece di seguire l'oggetto.",
+        "showAllColumns": "Mostra tutte le colonne",
+        "showAllColumnsTooltip": "Il menu è troppo stretto per tutte le colonne, quindi alcune sono nascoste. Attiva questa opzione per mostrarle tutte e scorrere la tabella in orizzontale."
       },
       "table": {
         "norad": "NORAD",

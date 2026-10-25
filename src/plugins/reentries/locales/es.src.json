@@ -11,7 +11,9 @@
         "fetchData": "Obtener datos",
         "refresh": "Actualizar",
         "flyToCorridor": "Volar al corredor",
-        "flyToCorridorTooltip": "Cuando está activado, al hacer clic en una fila TIP la cámara vuela al corredor de reentrada previsto en el globo en lugar de seguir al objeto."
+        "flyToCorridorTooltip": "Cuando está activado, al hacer clic en una fila TIP la cámara vuela al corredor de reentrada previsto en el globo en lugar de seguir al objeto.",
+        "showAllColumns": "Mostrar todas las columnas",
+        "showAllColumnsTooltip": "El menú es demasiado estrecho para todas las columnas, por lo que algunas están ocultas. Actívalo para mostrarlas todas y desplazar la tabla horizontalmente."
       },
       "table": {
         "norad": "NORAD",

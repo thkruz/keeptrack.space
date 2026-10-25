@@ -11,7 +11,9 @@
         "fetchData": "Daten abrufen",
         "refresh": "Aktualisieren",
         "flyToCorridor": "Zum Korridor fliegen",
-        "flyToCorridorTooltip": "Wenn aktiviert, fliegt ein Klick auf eine TIP-Zeile die Kamera zum vorhergesagten Wiedereintrittskorridor auf dem Globus, anstatt dem Objekt zu folgen."
+        "flyToCorridorTooltip": "Wenn aktiviert, fliegt ein Klick auf eine TIP-Zeile die Kamera zum vorhergesagten Wiedereintrittskorridor auf dem Globus, anstatt dem Objekt zu folgen.",
+        "showAllColumns": "Alle Spalten anzeigen",
+        "showAllColumnsTooltip": "Das Menü ist zu schmal für alle Spalten, daher sind einige ausgeblendet. Aktivieren Sie diese Option, um alle anzuzeigen und die Tabelle seitlich zu scrollen."
       },
       "table": {
         "norad": "NORAD",

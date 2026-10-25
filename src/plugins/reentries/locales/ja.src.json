@@ -11,7 +11,9 @@
         "fetchData": "データを取得",
         "refresh": "更新",
         "flyToCorridor": "回廊へ移動",
-        "flyToCorridorTooltip": "有効にすると、TIP行をクリックするとカメラがオブジェクトを追従する代わりに、地球上の予測再突入回廊へ移動します。"
+        "flyToCorridorTooltip": "有効にすると、TIP行をクリックするとカメラがオブジェクトを追従する代わりに、地球上の予測再突入回廊へ移動します。",
+        "showAllColumns": "すべての列を表示",
+        "showAllColumnsTooltip": "メニューの幅が狭いため、一部の列を非表示にしています。オンにするとすべての列を表示し、表を横にスクロールできます。"
       },
       "table": {
         "norad": "NORAD",

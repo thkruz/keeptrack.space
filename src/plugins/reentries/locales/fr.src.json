@@ -11,7 +11,9 @@
         "fetchData": "Récupérer les données",
         "refresh": "Actualiser",
         "flyToCorridor": "Voler vers le couloir",
-        "flyToCorridorTooltip": "Lorsque cette option est activée, cliquer sur une ligne TIP fait voler la caméra vers le couloir de rentrée prévu sur le globe au lieu de suivre l'objet."
+        "flyToCorridorTooltip": "Lorsque cette option est activée, cliquer sur une ligne TIP fait voler la caméra vers le couloir de rentrée prévu sur le globe au lieu de suivre l'objet.",
+        "showAllColumns": "Afficher toutes les colonnes",
+        "showAllColumnsTooltip": "Le menu est trop étroit pour toutes les colonnes, certaines sont donc masquées. Activez cette option pour toutes les afficher et faire défiler le tableau horizontalement."
       },
       "table": {
         "norad": "NORAD",

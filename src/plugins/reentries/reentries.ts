@@ -22,6 +22,126 @@ import './reentries.css';
 
 const TABS_ID = 'reentries-tabs';
 
+/** Menu width (px) the tables are laid out for when the viewport has room. */
+export const REENTRIES_PREFERRED_WIDTH = 1200;
+/** Widest the user can drag the menu. */
+export const REENTRIES_MAX_WIDTH = 1500;
+/** Narrowest the user can drag the menu; the tables scroll sideways below their natural width. */
+export const REENTRIES_MIN_DRAG_WIDTH = 480;
+/** Gap (px) kept between the menu's right edge and the viewport edge so the close button stays reachable. */
+export const REENTRIES_VIEWPORT_MARGIN = 16;
+/** Below this menu width (px) the low-priority columns fold away unless the user asks for all of them. */
+export const REENTRIES_COMPACT_WIDTH = 1000;
+/** sessionStorage key remembering the "Show all columns" choice for this browser session. */
+export const REENTRIES_SHOW_ALL_COLUMNS_KEY = 'keeptrack-reentries-show-all-columns';
+
+/** One results-table column: its header locale key and how it behaves on a narrow menu. */
+export interface ReentriesColumn {
+  /** `plugins.Reentries.table.<key>` header and the cell's `data-col` value. */
+  key: string;
+  /** Stays in view (position: sticky) while the table scrolls sideways. */
+  isPinned?: boolean;
+  /** Folds away below REENTRIES_COMPACT_WIDTH unless "Show all columns" is on. */
+  isLowPriority?: boolean;
+}
+
+/**
+ * TIP Messages columns in display order. Identity, decay epoch, window, the
+ * predicted location and the reentry angle always show; the report cadence and
+ * the catalog-derived physical columns fold away on a narrow menu.
+ */
+export const TIP_COLUMNS: readonly ReentriesColumn[] = [
+  { key: 'norad', isPinned: true },
+  { key: 'decayDate' },
+  { key: 'latitude' },
+  { key: 'longitude' },
+  { key: 'window' },
+  { key: 'nextReport', isLowPriority: true },
+  { key: 'reentryAngle' },
+  { key: 'rcs', isLowPriority: true },
+  { key: 'gpAge', isLowPriority: true },
+  { key: 'dryMass', isLowPriority: true },
+  { key: 'volume', isLowPriority: true },
+];
+
+/**
+ * Reentry Analysis columns in display order. Identity, type and the altitudes
+ * that drive the risk shading always show; inclination and RCS fold away.
+ */
+export const ANALYSIS_COLUMNS: readonly ReentriesColumn[] = [
+  { key: 'norad', isPinned: true },
+  { key: 'name', isPinned: true },
+  { key: 'type' },
+  { key: 'perigee' },
+  { key: 'apogee' },
+  { key: 'meanAlt' },
+  { key: 'incl', isLowPriority: true },
+  { key: 'rcsSup', isLowPriority: true },
+];
+
+/**
+ * Menu width that fits the viewport: the preferred width (kept inside the drag
+ * limits), capped by the space right of the drawer rail minus a margin, so the
+ * whole menu including its close button is always on screen. On a viewport too
+ * small for even the drag minimum the available space wins.
+ */
+export const clampReentriesMenuWidth = (preferredWidth: number, viewportWidth: number, drawerOffset: number, margin: number = REENTRIES_VIEWPORT_MARGIN): number => {
+  const preferred = Math.min(Math.max(preferredWidth, REENTRIES_MIN_DRAG_WIDTH), REENTRIES_MAX_WIDTH);
+  const available = Math.max(0, viewportWidth - Math.max(0, drawerOffset) - margin);
+
+  return Math.floor(Math.min(preferred, available));
+};
+
+/** True when the low-priority columns should be hidden at this menu width. */
+export const isReentriesMenuCompact = (menuWidth: number): boolean => menuWidth > 0 && menuWidth < REENTRIES_COMPACT_WIDTH;
+
+/** Tags each cell of a table row with its column key and its pin and fold classes. */
+export const applyReentriesColumnClasses = (tr: HTMLTableRowElement, columns: readonly ReentriesColumn[]): void => {
+  let lastPinned = -1;
+
+  columns.forEach((column, i) => {
+    if (column.isPinned) {
+      lastPinned = i;
+    }
+  });
+
+  columns.forEach((column, i) => {
+    const cell = tr.cells[i];
+
+    if (!cell) {
+      return;
+    }
+
+    cell.dataset.col = column.key;
+    if (column.isPinned) {
+      cell.classList.add('re-col-pin', `re-col-pin-${column.key}`);
+      if (i === lastPinned) {
+        cell.classList.add('re-col-pin-last');
+      }
+    }
+    if (column.isLowPriority) {
+      cell.classList.add('re-col-low');
+    }
+  });
+};
+
+const readShowAllColumns = (): boolean => {
+  try {
+    return globalThis.sessionStorage?.getItem(REENTRIES_SHOW_ALL_COLUMNS_KEY) === 'true';
+  } catch {
+    // sessionStorage can throw in locked-down/private contexts; default to folding.
+    return false;
+  }
+};
+
+const writeShowAllColumns = (isShowAll: boolean): void => {
+  try {
+    globalThis.sessionStorage?.setItem(REENTRIES_SHOW_ALL_COLUMNS_KEY, String(isShowAll));
+  } catch {
+    // sessionStorage unavailable; the choice still applies until reload.
+  }
+};
+
 /**
  * Satellite detail API fields the TIP table needs (mass and the dimensions the
  * volume estimate uses), mapped to their Satellite property names. These are
@@ -156,6 +276,14 @@ export class Reentries extends KeepTrackPlugin {
   private isFlyToCorridor_ = false;
   /** NORAD IDs whose mass/size detail has already been requested for the TIP table. */
   private readonly detailRequested_ = new Set<string>();
+  /** "Show all columns" choice; remembered for the browser session. */
+  protected isShowAllColumns_ = readShowAllColumns();
+  /** Width the user wants (the default, or what they last dragged to); the viewport may cap it. */
+  private preferredWidth_ = REENTRIES_PREFERRED_WIDTH;
+  /** Inline width this plugin last applied, so a different value means the user dragged. */
+  private lastAppliedWidth_: number | null = null;
+  /** Last measured (non-zero) menu width, used while the menu is hidden and measures 0. */
+  private lastMenuWidth_ = 0;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -180,6 +308,7 @@ export class Reentries extends KeepTrackPlugin {
 
     this.updateToolbarForLoginState_();
     updateSideMenuTabIndicator(TABS_ID);
+    this.fitMenuToViewport_();
 
     if (this.isLoggedIn_ && this.tipList_.length === 0) {
       this.fetchTipData_();
@@ -200,11 +329,16 @@ export class Reentries extends KeepTrackPlugin {
     };
   }
 
+  /**
+   * Drag limits. The opening width is not the drag minimum: fitMenuToViewport_
+   * sets min(preferred, available) so the menu fits a narrow viewport, and the
+   * user can drag down to REENTRIES_MIN_DRAG_WIDTH (the tables scroll sideways).
+   */
   private getDragOptions_(): IDragOptions {
     return {
       isDraggable: true,
-      minWidth: 1200,
-      maxWidth: 1500,
+      minWidth: REENTRIES_MIN_DRAG_WIDTH,
+      maxWidth: REENTRIES_MAX_WIDTH,
     };
   }
 
@@ -231,7 +365,10 @@ export class Reentries extends KeepTrackPlugin {
       </section>
       <section class="kt-section">
         <div class="kt-section-label">${lbl('results')}</div>
-        <table id="reentries-tip-table" class="reentries-table center-align"></table>
+        ${Reentries.columnsSwitchHtml_('reentries-show-all-cols-tip')}
+        <div class="re-table-scroll">
+          <table id="reentries-tip-table" class="reentries-table center-align"></table>
+        </div>
         <sub class="reentries-attribution">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
       </section>
     `;
@@ -239,7 +376,10 @@ export class Reentries extends KeepTrackPlugin {
     const reentryAnalysisContent = html`
       <section class="kt-section">
         <div class="kt-section-label">${lbl('results')}</div>
-        <table id="reentries-analysis-table" class="reentries-table center-align"></table>
+        ${Reentries.columnsSwitchHtml_('reentries-show-all-cols-analysis')}
+        <div class="re-table-scroll">
+          <table id="reentries-analysis-table" class="reentries-table center-align"></table>
+        </div>
       </section>
     `;
 
@@ -253,6 +393,24 @@ export class Reentries extends KeepTrackPlugin {
         <div id="reentries-content" class="side-menu">
           ${tabsHtml}
         </div>
+      </div>
+    `;
+  }
+
+  /**
+   * "Show all columns" switch for a results card. Both tabs carry one and they
+   * stay in sync; CSS only shows them while the menu is narrow enough to fold.
+   */
+  private static columnsSwitchHtml_(id: string): string {
+    const tb = (key: string) => t7e(`plugins.Reentries.toolbar.${key}` as Parameters<typeof t7e>[0]);
+
+    return html`
+      <div class="switch re-cols-switch" kt-tooltip="${tb('showAllColumnsTooltip')}">
+        <label for="${id}">
+          <input id="${id}" class="re-show-all-cols-input" type="checkbox" />
+          <span class="lever"></span>
+          <span class="re-cols-label">${tb('showAllColumns')}</span>
+        </label>
       </div>
     `;
   }
@@ -341,6 +499,8 @@ export class Reentries extends KeepTrackPlugin {
     getEl('reentries-flyto-corridor', true)?.addEventListener('change', (evt: Event) => {
       this.isFlyToCorridor_ = (<HTMLInputElement>evt.target).checked;
     });
+
+    this.initResponsiveLayout_();
 
     // TIP Messages row click handler
     getEl(this.sideMenuElementName)!.addEventListener('click', (evt: Event) => {
@@ -596,28 +756,21 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createTipHeaders_(tbl: HTMLTableElement) {
-    const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
-    const tr = tbl.insertRow();
-    const names = [
-      th('norad'),
-      th('decayDate'),
-      th('latitude'),
-      th('longitude'),
-      th('window'),
-      th('nextReport'),
-      th('reentryAngle'),
-      th('rcs'),
-      th('gpAge'),
-      th('dryMass'),
-      th('volume'),
-    ];
+    Reentries.createHeaderRow_(tbl, TIP_COLUMNS);
+  }
 
-    for (const name of names) {
+  /** Header row for a results table, tagged with the column pin and fold classes. */
+  private static createHeaderRow_(tbl: HTMLTableElement, columns: readonly ReentriesColumn[]): void {
+    const tr = tbl.insertRow();
+
+    for (const { key } of columns) {
       const column = tr.insertCell();
 
-      column.appendChild(document.createTextNode(name));
-      column.setAttribute('class', 'center');
+      column.appendChild(document.createTextNode(t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0])));
+      column.classList.add('center');
     }
+
+    applyReentriesColumnClasses(tr, columns);
   }
 
   private createTipRow_(tbl: HTMLTableElement, i: number): HTMLTableRowElement {
@@ -664,6 +817,7 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, age);
     Reentries.createCell_(tr, massVolume.dryMass);
     Reentries.createCell_(tr, massVolume.volume);
+    applyReentriesColumnClasses(tr, TIP_COLUMNS);
 
     return tr;
   }
@@ -839,16 +993,7 @@ export class Reentries extends KeepTrackPlugin {
   }
 
   private static createReentryHeaders_(tbl: HTMLTableElement) {
-    const th = (key: string) => t7e(`plugins.Reentries.table.${key}` as Parameters<typeof t7e>[0]);
-    const tr = tbl.insertRow();
-    const names = [th('norad'), th('name'), th('type'), th('perigee'), th('apogee'), th('meanAlt'), th('incl'), th('rcsSup')];
-
-    for (const name of names) {
-      const column = tr.insertCell();
-
-      column.appendChild(document.createTextNode(name));
-      column.setAttribute('class', 'center');
-    }
+    Reentries.createHeaderRow_(tbl, ANALYSIS_COLUMNS);
   }
 
   private static createReentryRow_(tbl: HTMLTableElement, sat: Satellite) {
@@ -897,6 +1042,7 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, meanAltStr);
     Reentries.createCell_(tr, sat.inclination.toFixed(2));
     Reentries.createCell_(tr, rcsStr);
+    applyReentriesColumnClasses(tr, ANALYSIS_COLUMNS);
   }
 
   protected reentryEventClicked_(objectId: number) {
@@ -915,6 +1061,95 @@ export class Reentries extends KeepTrackPlugin {
     }
 
     this.selectSatIdOnCruncher_ = sat.id;
+  }
+
+  // =========================================================================
+  // Narrow-screen layout
+  // =========================================================================
+
+  /** Wires the Columns switches, viewport resize and menu-width tracking. */
+  private initResponsiveLayout_(): void {
+    const menuEl = getEl(this.sideMenuElementName, true);
+
+    for (const input of Array.from(document.querySelectorAll<HTMLInputElement>('.re-show-all-cols-input'))) {
+      input.checked = this.isShowAllColumns_;
+      input.addEventListener('change', () => this.setShowAllColumns_(input.checked));
+    }
+
+    this.fitMenuToViewport_();
+    window.addEventListener('resize', () => this.fitMenuToViewport_());
+
+    // The menu is draggable, so fold on its measured width rather than a viewport media query.
+    if (menuEl && typeof ResizeObserver !== 'undefined') {
+      new ResizeObserver(() => this.updateColumnFold_()).observe(menuEl);
+    }
+  }
+
+  /** Applies the "Show all columns" choice to both tables and remembers it for the session. */
+  protected setShowAllColumns_(isShowAll: boolean): void {
+    this.isShowAllColumns_ = isShowAll;
+    writeShowAllColumns(isShowAll);
+
+    for (const input of Array.from(document.querySelectorAll<HTMLInputElement>('.re-show-all-cols-input'))) {
+      input.checked = isShowAll;
+    }
+
+    this.updateColumnFold_();
+  }
+
+  /**
+   * Sizes the menu to min(preferred, space right of the drawer rail) so it and
+   * its close button fit the viewport. A width the user dragged to becomes the
+   * new preference. Mobile mode forces side menus full-screen, so it is left alone.
+   */
+  protected fitMenuToViewport_(): void {
+    const menuEl = getEl(this.sideMenuElementName, true);
+
+    if (!menuEl || settingsManager.isMobileModeEnabled) {
+      return;
+    }
+
+    const current = parseFloat(menuEl.style.width);
+
+    if (this.lastAppliedWidth_ !== null && Number.isFinite(current) && current !== this.lastAppliedWidth_) {
+      this.preferredWidth_ = current;
+    }
+
+    const drawerOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--drawer-offset')) || 0;
+    const width = clampReentriesMenuWidth(this.preferredWidth_, window.innerWidth, drawerOffset);
+
+    menuEl.style.width = `${width}px`;
+    this.lastAppliedWidth_ = width;
+    this.updateColumnFold_(width);
+  }
+
+  /**
+   * Toggles the fold classes on the menu root: `re-cols-narrow` while the menu
+   * is under REENTRIES_COMPACT_WIDTH (shows the Columns switch) and
+   * `re-cols-folded` while the low-priority columns are hidden. A hidden menu
+   * measures 0, so the last known width is used instead.
+   */
+  protected updateColumnFold_(width?: number): void {
+    const menuEl = getEl(this.sideMenuElementName, true);
+
+    if (!menuEl) {
+      return;
+    }
+
+    let menuWidth = typeof width === 'number' ? width : menuEl.getBoundingClientRect().width;
+
+    if (menuWidth <= 0) {
+      menuWidth = this.lastMenuWidth_;
+    }
+    if (menuWidth <= 0) {
+      return;
+    }
+    this.lastMenuWidth_ = menuWidth;
+
+    const isCompact = isReentriesMenuCompact(menuWidth);
+
+    menuEl.classList.toggle('re-cols-narrow', isCompact);
+    menuEl.classList.toggle('re-cols-folded', isCompact && !this.isShowAllColumns_);
   }
 
   // =========================================================================

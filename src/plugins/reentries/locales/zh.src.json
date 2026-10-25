@@ -11,7 +11,9 @@
         "fetchData": "获取数据",
         "refresh": "刷新",
         "flyToCorridor": "飞向走廊",
-        "flyToCorridorTooltip": "启用后，点击 TIP 行会将相机飞向地球上预测的再入走廊，而不是跟随目标。"
+        "flyToCorridorTooltip": "启用后，点击 TIP 行会将相机飞向地球上预测的再入走廊，而不是跟随目标。",
+        "showAllColumns": "显示所有列",
+        "showAllColumnsTooltip": "菜单宽度不足以显示所有列，因此部分列已隐藏。开启后可显示全部列，并横向滚动表格。"
       },
       "table": {
         "norad": "NORAD",

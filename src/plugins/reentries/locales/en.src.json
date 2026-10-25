@@ -11,7 +11,9 @@
         "fetchData": "Fetch Data",
         "refresh": "Refresh",
         "flyToCorridor": "Fly to corridor",
-        "flyToCorridorTooltip": "When enabled, clicking a TIP row flies the camera to the predicted reentry corridor on the globe instead of following the object."
+        "flyToCorridorTooltip": "When enabled, clicking a TIP row flies the camera to the predicted reentry corridor on the globe instead of following the object.",
+        "showAllColumns": "Show all columns",
+        "showAllColumnsTooltip": "The menu is too narrow for every column, so some are hidden. Turn this on to show them all and scroll the table sideways."
       },
       "table": {
         "norad": "NORAD",

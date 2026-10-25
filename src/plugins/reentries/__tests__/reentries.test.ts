@@ -86,7 +86,7 @@ describe('Reentries_class', () => {
 
       expect(config.elementName).toBe('reentries-menu');
       expect(config.dragOptions?.isDraggable).toBe(true);
-      expect(config.dragOptions?.minWidth).toBe(1200);
+      expect(config.dragOptions?.minWidth).toBe(480);
       expect(config.dragOptions?.maxWidth).toBe(1500);
     });
 
@@ -104,7 +104,7 @@ describe('Reentries_class', () => {
       const dragOptions = plugin['getDragOptions_']();
 
       expect(dragOptions.isDraggable).toBe(true);
-      expect(dragOptions.minWidth).toBe(1200);
+      expect(dragOptions.minWidth).toBe(480);
       expect(dragOptions.maxWidth).toBe(1500);
     });
 

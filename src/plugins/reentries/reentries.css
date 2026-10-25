@@ -72,6 +72,14 @@
 .reentries-table tr {
   /* Row tint (hover / risk shading), repeated on the opaque pinned cells. */
   --re-row-tint: transparent;
+}
+
+/*
+ * Paint the tint with id specificity so the generic side-menu row hover
+ * (.side-menu table tbody tr:hover) cannot replace the risk shading on the
+ * scrolling cells while the pinned cells keep it.
+ */
+#reentries-menu .reentries-table tr {
   background-color: var(--re-row-tint);
 }
 

@@ -208,7 +208,8 @@
           "gpAge": "Âge GP",
           "sigma": "1-sigma R / I / C (km, repère RIC propre, à l'époque TLE)",
           "derivedFrom": "Dérivé de",
-          "days": "{days} jours"
+          "days": "{days} jours",
+          "assumedFromParent": "(repris du parent)"
         },
         "roles": {
           "primary": "Primaire",
@@ -275,7 +276,8 @@
           "removed": "Supprimé",
           "unchanged": "Inchangé",
           "appeared": "Apparu (sous le seuil)",
-          "dropped": "Disparu (sous le seuil)"
+          "dropped": "Disparu (sous le seuil)",
+          "moved": "Déplacé"
         },
         "summary": {
           "range": "{start} à {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "Les criblages avant et après couvrent des fenêtres différentes ; les événements proches des bords peuvent être mal classés.",
           "windowMismatchCompare": "Les deux criblages couvrent des fenêtres différentes ; les événements proches des bords peuvent être mal classés.",
           "noScreeningRuns": "Aucune exécution de criblage disponible.",
-          "noSensor": "Aucun capteur sélectionné ; sélectionnez un capteur pour lister les fenêtres de passage."
+          "noSensor": "Aucun capteur sélectionné ; sélectionnez un capteur pour lister les fenêtres de passage.",
+          "uncertaintyAssumed": "L'incertitude à 1 sigma et l'âge GP de l'objet analyste sont repris de son parent ({parent}), et la Pc du rapprochement utilise la covariance du parent. L'erreur d'exécution de la manœuvre n'est pas modélisée."
         }
       }
     }

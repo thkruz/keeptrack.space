@@ -3,8 +3,8 @@
  *
  * screening-diff.ts compares two conjunction screening runs (typically the
  * parent satellite before a maneuver and the analyst satellite after it) and
- * classifies every event as introduced, removed, unchanged, appeared or
- * dropped. Pure: no DOM, no ServiceLocator.
+ * classifies every event as introduced, removed, unchanged, moved, appeared
+ * or dropped. Pure: no DOM, no ServiceLocator.
  *
  * https://keeptrack.space
  *
@@ -65,6 +65,11 @@ export interface ScreeningDiffOptions {
   concernThreshold?: ScreeningRiskLevel;
   /** Max TCA difference for two rows of the same secondary to be the same event. Default 15 min. */
   tcaMatchToleranceMs?: number;
+  /**
+   * Max TCA difference for two rows of the same secondary, left unpaired by the match tolerance,
+   * to be reported as one `moved` encounter. Default 6 h. 0 turns moved pairing off.
+   */
+  movedToleranceMs?: number;
   /** Secondaries to leave out (the parent, the analyst objects). */
   excludeSecondaryIds?: readonly string[];
   /** Resolves a secondary id to a display name. */
@@ -73,6 +78,8 @@ export interface ScreeningDiffOptions {
 }
 
 const DEFAULT_TCA_TOLERANCE_MS = 15 * 60 * 1000;
+/** Default reach of the moved pairing: about four LEO revolutions. */
+const DEFAULT_MOVED_TOLERANCE_MS = 6 * 60 * 60 * 1000;
 /** Windows that differ by less than this are treated as the same window. */
 const WINDOW_MATCH_TOLERANCE_MS = 5 * 60 * 1000;
 
@@ -124,8 +131,9 @@ const toSummary = (row: ScreeningEventInput, nameOf: (id: string) => string): Sc
 
 /**
  * Pairs pre and post rows of the same secondary whose TCAs are within the
- * tolerance, closest TCA first. A secondary can have several approaches in a
- * multi-day window, so pairing is per event, not per secondary.
+ * tolerance, closest TCA first (each row is used at most once). A secondary can
+ * have several approaches in a multi-day window, so pairing is per event, not
+ * per secondary.
  */
 const pairEvents = (
   pre: readonly ScreeningEventInput[],
@@ -173,7 +181,7 @@ const riskChangeOf = (rankDelta: number): ScreeningDiffEntry['riskChange'] => {
   return rankDelta < 0 ? 'down' : 'same';
 };
 
-const STATUS_ORDER: Record<ScreeningDiffStatus, number> = { introduced: 0, removed: 1, unchanged: 2, appeared: 3, dropped: 4 };
+const STATUS_ORDER: Record<ScreeningDiffStatus, number> = { introduced: 0, removed: 1, moved: 2, unchanged: 3, appeared: 4, dropped: 5 };
 
 const entryTca = (e: ScreeningDiffEntry): number => (e.post ?? e.pre)?.tcaMs ?? 0;
 
@@ -245,6 +253,18 @@ export const pickScreeningRunPair = <T extends ScreeningRunInput>(runs: readonly
  * secondary that was a Low 18 km event before and is a Medium 2 km event
  * after is introduced. Below-threshold presence changes are reported as
  * appeared / dropped so they do not drown the events that matter.
+ *
+ * Pairing rule (two passes, both one-to-one and closest TCA first):
+ * 1. Same event: same secondary id and TCAs within `tcaMatchToleranceMs`
+ *    (default 15 min). The pair is introduced, removed or unchanged by concern.
+ * 2. Moved: rows still unpaired after pass 1 with the same secondary id and
+ *    TCAs within `movedToleranceMs` (default 6 h) are one encounter that the
+ *    maneuver shifted (a phasing burn can move the closest approach to an
+ *    earlier or later pass of the same object). They become ONE `moved` row
+ *    with the old and new TCA, miss and Pc; `riskChange` says whether the risk
+ *    band went up or down. Without this pass the analyst saw "Removed" plus
+ *    "Appeared (below threshold)" for one object and could read "Removed" as
+ *    "gone". Rows of different secondaries never pair.
  */
 export const diffScreeningRuns = (preRun: ScreeningRunInput, postRun: ScreeningRunInput, options: ScreeningDiffOptions = {}): ScreeningDiff => {
   const concernThreshold = options.concernThreshold ?? 'medium';
@@ -256,8 +276,28 @@ export const diffScreeningRuns = (preRun: ScreeningRunInput, postRun: ScreeningR
 
   const pre = preRun.rows.filter(keep);
   const post = postRun.rows.filter(keep);
-  const { pairs, preOnly, postOnly } = pairEvents(pre, post, tcaMatchToleranceMs);
+  const movedToleranceMs = Math.max(options.movedToleranceMs ?? DEFAULT_MOVED_TOLERANCE_MS, tcaMatchToleranceMs);
+  const { pairs, preOnly: preLeft, postOnly: postLeft } = pairEvents(pre, post, tcaMatchToleranceMs);
+  const {
+    pairs: movedPairs,
+    preOnly,
+    postOnly,
+  } = movedToleranceMs > tcaMatchToleranceMs ? pairEvents(preLeft, postLeft, movedToleranceMs) : { pairs: [], preOnly: preLeft, postOnly: postLeft };
   const entries: ScreeningDiffEntry[] = [];
+  const pairedEntry = (a: ScreeningEventInput, b: ScreeningEventInput, status: ScreeningDiffStatus): ScreeningDiffEntry => {
+    const preSummary = toSummary(a, nameOf);
+    const postSummary = toSummary(b, nameOf);
+
+    return {
+      status,
+      secondaryId: a.secondaryId,
+      secondaryName: preSummary.secondaryName,
+      pre: preSummary,
+      post: postSummary,
+      missDeltaKm: b.missDistance - a.missDistance,
+      riskChange: riskChangeOf(RISK_RANK[postSummary.riskLevel] - RISK_RANK[preSummary.riskLevel]),
+    };
+  };
 
   for (const [a, b] of pairs) {
     const preConcern = isConcern(a);
@@ -270,19 +310,11 @@ export const diffScreeningRuns = (preRun: ScreeningRunInput, postRun: ScreeningR
       status = 'introduced';
     }
 
-    const preSummary = toSummary(a, nameOf);
-    const postSummary = toSummary(b, nameOf);
-    const rankDelta = RISK_RANK[postSummary.riskLevel] - RISK_RANK[preSummary.riskLevel];
+    entries.push(pairedEntry(a, b, status));
+  }
 
-    entries.push({
-      status,
-      secondaryId: a.secondaryId,
-      secondaryName: preSummary.secondaryName,
-      pre: preSummary,
-      post: postSummary,
-      missDeltaKm: b.missDistance - a.missDistance,
-      riskChange: riskChangeOf(rankDelta),
-    });
+  for (const [a, b] of movedPairs) {
+    entries.push(pairedEntry(a, b, 'moved'));
   }
 
   for (const a of preOnly) {
@@ -315,7 +347,7 @@ export const diffScreeningRuns = (preRun: ScreeningRunInput, postRun: ScreeningR
 
   entries.sort((x, y) => STATUS_ORDER[x.status] - STATUS_ORDER[y.status] || entryTca(x) - entryTca(y));
 
-  const counts: Record<ScreeningDiffStatus, number> = { introduced: 0, removed: 0, unchanged: 0, appeared: 0, dropped: 0 };
+  const counts: Record<ScreeningDiffStatus, number> = { introduced: 0, removed: 0, unchanged: 0, moved: 0, appeared: 0, dropped: 0 };
 
   for (const e of entries) {
     counts[e.status]++;
@@ -334,6 +366,7 @@ export const diffScreeningRuns = (preRun: ScreeningRunInput, postRun: ScreeningR
     postRun: runInfo(postRun, post.length),
     concernThreshold,
     tcaMatchToleranceMs,
+    movedToleranceMs,
     excludedSecondaryIds: [...excluded],
     isWindowMismatch: !isSameScreeningWindow(preRun, postRun),
     counts,

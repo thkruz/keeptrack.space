@@ -208,7 +208,8 @@
           "gpAge": "GP の経過時間",
           "sigma": "1シグマ R / I / C (km、自身の RIC 座標系、TLE エポック時点)",
           "derivedFrom": "派生元",
-          "days": "{days} 日"
+          "days": "{days} 日",
+          "assumedFromParent": "(親から仮定)"
         },
         "roles": {
           "primary": "主物体",
@@ -275,7 +276,8 @@
           "removed": "解消",
           "unchanged": "変化なし",
           "appeared": "出現 (しきい値未満)",
-          "dropped": "消失 (しきい値未満)"
+          "dropped": "消失 (しきい値未満)",
+          "moved": "移動"
         },
         "summary": {
           "range": "{start} から {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "変更前と変更後のスクリーニングは期間が異なります。期間の端に近いイベントは誤って分類される可能性があります。",
           "windowMismatchCompare": "2つのスクリーニングは期間が異なります。期間の端に近いイベントは誤って分類される可能性があります。",
           "noScreeningRuns": "利用できるスクリーニングの実行がありません。",
-          "noSensor": "センサーが選択されていません。パスウィンドウを表示するにはセンサーを選択してください。"
+          "noSensor": "センサーが選択されていません。パスウィンドウを表示するにはセンサーを選択してください。",
+          "uncertaintyAssumed": "解析オブジェクトの1シグマ不確かさとGP経過時間は親 ({parent}) から仮定しており、最接近のPcも親の共分散を使用します。マヌーバ実行誤差はモデル化していません。"
         }
       }
     }

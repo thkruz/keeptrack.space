@@ -235,3 +235,88 @@ describe('generateScreeningCompareReport', () => {
     expect(text).toContain('Screening Comparison Report');
   });
 });
+
+describe('diffScreeningRuns moved pairing (Ted ruling 2026-10-24)', () => {
+  const T0 = Date.parse('2026-10-24T14:00:00Z');
+  const MIN = 60_000;
+  const row = (secondaryId: string, tcaMs: number, missDistance: number, probabilityOfCollision: number | null) => ({ secondaryId, tcaMs, missDistance, probabilityOfCollision });
+  const runOf = (primaryId: string, rows: ReturnType<typeof row>[]): ScreeningRunInput => ({ primaryId, startTimeMs: T0 - 3600_000, endTimeMs: T0 + 23 * 3600_000, rows });
+
+  it('pairs a Medium encounter that moved one pass later into ONE moved row with old and new TCA and miss', () => {
+    // The maneuver-comparison session: 68698 Medium before, Low 47 min later after the burn.
+    const diff = diffScreeningRuns(runOf('68762', [row('68698', T0, 1.2, 5e-8)]), runOf('90000', [row('68698', T0 + 47 * MIN, 6.4, 1e-10)]));
+
+    expect(diff.entries).toHaveLength(1);
+    const e = diff.entries[0];
+
+    expect(e.status).toBe('moved');
+    expect(e.pre!.tcaMs).toBe(T0);
+    expect(e.post!.tcaMs).toBe(T0 + 47 * MIN);
+    expect(e.pre!.riskLevel).toBe('medium');
+    expect(e.post!.riskLevel).toBe('low');
+    expect(e.riskChange).toBe('down');
+    expect(e.missDeltaKm!).toBeCloseTo(5.2, 9);
+    expect(diff.counts).toEqual({ introduced: 0, removed: 0, unchanged: 0, moved: 1, appeared: 0, dropped: 0 });
+    expect(diff.movedToleranceMs).toBe(6 * 3600_000);
+  });
+
+  it('keeps a TCA shift inside the 15 min match tolerance as the same event (unchanged / removed / introduced)', () => {
+    const diff = diffScreeningRuns(runOf('1', [row('5', T0, 1.2, 5e-8)]), runOf('2', [row('5', T0 + 10 * MIN, 1.0, 6e-8)]));
+
+    expect(diff.entries.map((e) => e.status)).toEqual(['unchanged']);
+  });
+
+  it('never pairs different secondaries', () => {
+    const diff = diffScreeningRuns(runOf('1', [row('5', T0, 1.2, 5e-8)]), runOf('2', [row('6', T0 + 30 * MIN, 1.0, 5e-8)]));
+
+    expect(diff.entries.map((e) => e.status).sort()).toEqual(['introduced', 'removed']);
+  });
+
+  it('leaves rows more than the moved tolerance apart as separate events', () => {
+    const diff = diffScreeningRuns(runOf('1', [row('5', T0, 9, 1e-10)]), runOf('2', [row('5', T0 + 7 * 3600_000, 9, 1e-10)]));
+
+    expect(diff.entries.map((e) => e.status).sort()).toEqual(['appeared', 'dropped']);
+  });
+
+  it('pairs closest TCA first and one-to-one, after the same-event pass', () => {
+    // Pre: 5 at T0 and T0+3h. Post: 5 at T0+5min (same event as T0) and T0+2h (moved from T0+3h).
+    const diff = diffScreeningRuns(
+      runOf('1', [row('5', T0, 2, 1e-7), row('5', T0 + 180 * MIN, 3, 1e-7)]),
+      runOf('2', [row('5', T0 + 5 * MIN, 2, 1e-7), row('5', T0 + 120 * MIN, 4, 1e-7)])
+    );
+    const moved = diff.entries.filter((e) => e.status === 'moved');
+
+    expect(diff.entries).toHaveLength(2);
+    expect(diff.entries.find((e) => e.status === 'unchanged')!.pre!.tcaMs).toBe(T0);
+    expect(moved).toHaveLength(1);
+    expect(moved[0].pre!.tcaMs).toBe(T0 + 180 * MIN);
+    expect(moved[0].post!.tcaMs).toBe(T0 + 120 * MIN);
+  });
+
+  it('movedToleranceMs 0 turns the moved pass off', () => {
+    const diff = diffScreeningRuns(runOf('1', [row('5', T0, 1.2, 5e-8)]), runOf('2', [row('5', T0 + 47 * MIN, 6.4, 1e-10)]), { movedToleranceMs: 0 });
+
+    expect(diff.entries.map((e) => e.status).sort()).toEqual(['appeared', 'removed']);
+  });
+
+  it('prints the moved row in the report table and validates against the schema', () => {
+    const diff = diffScreeningRuns(runOf('68762', [row('68698', T0, 1.2, 5e-8)]), runOf('90000', [row('68698', T0 + 47 * MIN, 6.4, 1e-10)]));
+    const data = generateScreeningCompareReport({
+      diff,
+      env: {
+        analysisEpoch: new Date(T0),
+        wallClock: new Date(T0),
+        appVersion: 'test',
+        covarianceConfidenceLevel: 1,
+        primaryHardBodyRadiusKm: 0.01,
+        secondaryHardBodyRadiusKm: 0.005,
+      },
+    });
+    const csv = buildDownloadPayload(data, 'csv').content;
+    const text = buildDownloadPayload(data, 'text').content;
+
+    expect(csv).toContain('Moved,68698,,2026-10-24 14:00:00,1.200,5.00e-8,2026-10-24 14:47:00,6.400,1.00e-10,+5.200');
+    expect(text).toMatch(/Moved\s+1/u);
+    expect(validateConjunctionAnalysisState(JSON.parse(buildDownloadPayload(data, 'json').content))).toEqual([]);
+  });
+});

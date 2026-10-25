@@ -208,7 +208,8 @@
           "gpAge": "GP 경과 시간",
           "sigma": "1시그마 R / I / C (km, 자체 RIC 좌표계, TLE 에포크 기준)",
           "derivedFrom": "파생 원본",
-          "days": "{days}일"
+          "days": "{days}일",
+          "assumedFromParent": "(부모에서 가정)"
         },
         "roles": {
           "primary": "주 물체",
@@ -275,7 +276,8 @@
           "removed": "해소",
           "unchanged": "변화 없음",
           "appeared": "나타남 (임계값 미만)",
-          "dropped": "사라짐 (임계값 미만)"
+          "dropped": "사라짐 (임계값 미만)",
+          "moved": "이동됨"
         },
         "summary": {
           "range": "{start} ~ {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "이전과 이후 스크리닝 실행의 구간이 다릅니다. 구간 경계 근처의 이벤트는 잘못 분류될 수 있습니다.",
           "windowMismatchCompare": "두 스크리닝 실행의 구간이 다릅니다. 구간 경계 근처의 이벤트는 잘못 분류될 수 있습니다.",
           "noScreeningRuns": "사용 가능한 스크리닝 실행이 없습니다.",
-          "noSensor": "선택된 센서가 없습니다. 통과 구간을 보려면 센서를 선택하세요."
+          "noSensor": "선택된 센서가 없습니다. 통과 구간을 보려면 센서를 선택하세요.",
+          "uncertaintyAssumed": "분석 객체의 1-시그마 불확도와 GP 경과 시간은 부모({parent})에서 가정하며, 근접 접근 Pc도 부모의 공분산을 사용합니다. 기동 실행 오차는 모델링하지 않습니다."
         }
       }
     }

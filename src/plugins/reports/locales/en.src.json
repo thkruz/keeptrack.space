@@ -208,7 +208,8 @@
           "gpAge": "GP Age",
           "sigma": "1-sigma R / I / C (km, own RIC frame, at TLE epoch)",
           "derivedFrom": "Derived From",
-          "days": "{days} days"
+          "days": "{days} days",
+          "assumedFromParent": "(assumed from parent)"
         },
         "roles": {
           "primary": "Primary",
@@ -275,7 +276,8 @@
           "removed": "Removed",
           "unchanged": "Unchanged",
           "appeared": "Appeared (below threshold)",
-          "dropped": "Dropped (below threshold)"
+          "dropped": "Dropped (below threshold)",
+          "moved": "Moved"
         },
         "summary": {
           "range": "{start} to {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "The pre and post screening runs cover different windows; events near the window edges may be classified wrongly.",
           "windowMismatchCompare": "The two screening runs cover different windows; events near the window edges may be classified wrongly.",
           "noScreeningRuns": "No screening runs available.",
-          "noSensor": "No sensor selected; select a sensor to list pass windows."
+          "noSensor": "No sensor selected; select a sensor to list pass windows.",
+          "uncertaintyAssumed": "The analyst object's 1-sigma uncertainty and GP age are assumed from its parent ({parent}), and the close-approach Pc uses the parent's covariance. Burn execution error is not modelled."
         }
       }
     }

@@ -208,7 +208,8 @@
           "gpAge": "GP 时效",
           "sigma": "1-sigma R / I / C（km，自身 RIC 坐标系，TLE 历元时）",
           "derivedFrom": "派生自",
-          "days": "{days} 天"
+          "days": "{days} 天",
+          "assumedFromParent": "(沿用父对象)"
         },
         "roles": {
           "primary": "主目标",
@@ -275,7 +276,8 @@
           "removed": "消除",
           "unchanged": "未变",
           "appeared": "出现（低于阈值）",
-          "dropped": "消失（低于阈值）"
+          "dropped": "消失（低于阈值）",
+          "moved": "已移动"
         },
         "summary": {
           "range": "{start} 至 {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "之前与之后的筛查运行覆盖的窗口不同；靠近窗口边缘的事件可能被错误分类。",
           "windowMismatchCompare": "两次筛查运行覆盖的窗口不同；靠近窗口边缘的事件可能被错误分类。",
           "noScreeningRuns": "没有可用的筛查运行。",
-          "noSensor": "未选择传感器；请选择传感器以列出过境窗口。"
+          "noSensor": "未选择传感器；请选择传感器以列出过境窗口。",
+          "uncertaintyAssumed": "分析对象的 1-sigma 不确定度和 GP 时长沿用其父对象 ({parent})，最接近点的 Pc 也使用父对象的协方差。未对机动执行误差建模。"
         }
       }
     }

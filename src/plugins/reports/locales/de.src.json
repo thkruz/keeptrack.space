@@ -208,7 +208,8 @@
           "gpAge": "GP-Alter",
           "sigma": "1-Sigma R / I / C (km, eigenes RIC-System, zur TLE-Epoche)",
           "derivedFrom": "Abgeleitet von",
-          "days": "{days} Tage"
+          "days": "{days} Tage",
+          "assumedFromParent": "(vom Elternobjekt übernommen)"
         },
         "roles": {
           "primary": "Primärobjekt",
@@ -275,7 +276,8 @@
           "removed": "Entfallen",
           "unchanged": "Unverändert",
           "appeared": "Aufgetreten (unter Schwelle)",
-          "dropped": "Weggefallen (unter Schwelle)"
+          "dropped": "Weggefallen (unter Schwelle)",
+          "moved": "Verschoben"
         },
         "summary": {
           "range": "{start} bis {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "Die Screening-Läufe vorher und nachher decken unterschiedliche Zeiträume ab; Ereignisse nahe den Fenstergrenzen können falsch eingestuft sein.",
           "windowMismatchCompare": "Die beiden Screening-Läufe decken unterschiedliche Zeiträume ab; Ereignisse nahe den Fenstergrenzen können falsch eingestuft sein.",
           "noScreeningRuns": "Keine Screening-Läufe verfügbar.",
-          "noSensor": "Kein Sensor ausgewählt; wählen Sie einen Sensor, um Überflugfenster aufzulisten."
+          "noSensor": "Kein Sensor ausgewählt; wählen Sie einen Sensor, um Überflugfenster aufzulisten.",
+          "uncertaintyAssumed": "Die 1-Sigma-Unsicherheit und das GP-Alter des Analyseobjekts sind von seinem Elternobjekt ({parent}) übernommen, und die Pc der größten Annäherung verwendet dessen Kovarianz. Ausführungsfehler des Manövers werden nicht modelliert."
         }
       }
     }

@@ -237,6 +237,46 @@ describe('Maneuver Report', () => {
   });
 });
 
+describe('Maneuver Report: clone uncertainty assumed from the parent (Ted ruling 2026-10-24)', () => {
+  // A clone fitted at a burn 4 h after the analysis epoch: own TLE epoch in the future, BSTAR 0.
+  const clone = new Satellite({
+    name: 'LANDSAT 8 (burn 1)',
+    tle1: withChecksum('1 90000U 13008A   22222.16666667  .00000000  00000-0  00000-0 0  9999') as TleLine1,
+    tle2: withChecksum(L8_TLE2.replace('2 39084', '2 90000')) as TleLine2,
+  });
+
+  clone.derivedFromSccNum = '39084';
+
+  const state = buildManeuverState({ parent: landsat8, analyst: clone, env, burns: null, screeningDiff: null, secondary });
+  const [parentSummary, cloneSummary] = state.objects;
+
+  it('gives the clone the parent 1-sigma RIC and GP age, flagged as assumed', () => {
+    expect(cloneSummary.ricSigmasKm).toEqual(parentSummary.ricSigmasKm);
+    expect(cloneSummary.gpAgeHours).toBeCloseTo(parentSummary.gpAgeHours!, 9);
+    expect(cloneSummary.gpAgeHours!).toBeGreaterThan(0);
+    expect(cloneSummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(parentSummary.uncertaintyAssumedFromNoradId).toBeUndefined();
+    // The clone keeps its own TLE epoch (the burn time).
+    expect(cloneSummary.tleEpochIso).toBe('2022-08-10T04:00:00.000Z');
+  });
+
+  it('labels the inherited cells "(assumed from parent)" and adds a note', () => {
+    const text = buildDownloadPayload(generateManeuverReport({ parent: landsat8, analyst: clone, env, burns: null, screeningDiff: null }), 'text').content;
+    const lines = text.split('\n');
+    const sigmaLine = lines.find((line) => line.startsWith('1-sigma'))!;
+    const ageLine = lines.find((line) => line.startsWith('GP Age'))!;
+
+    expect(sigmaLine.match(/\(assumed from parent\)/gu)).toHaveLength(1);
+    expect(ageLine.match(/\(assumed from parent\)/gu)).toHaveLength(1);
+    expect(text).toContain('assumed from its parent (39084)');
+  });
+
+  it('computes the post-burn Pc with the parent covariance and still validates', () => {
+    expect(state.maneuverOptions[0].postEncounter).not.toBeNull();
+    expect(validateConjunctionAnalysisState(JSON.parse(JSON.stringify(state)))).toEqual([]);
+  });
+});
+
 describe('validateConjunctionAnalysisState', () => {
   it('reports every violation with its path', () => {
     const errors = validateConjunctionAnalysisState({ schemaVersion: 3, kind: 'nope', objects: 'x' });

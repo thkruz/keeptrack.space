@@ -225,23 +225,38 @@ const meanElementDeltas = (pre: MeanElements, post: MeanElements): ManeuverOptio
   return out;
 };
 
-/** Object summary block (name, ids, TLE epoch, GP age, Pc sigmas, mean elements). */
-export const buildObjectSummary = (sat: Satellite, role: AnalysisObjectRole, env: AnalysisEnv): AnalysisObjectSummary => {
+/**
+ * Object summary block (name, ids, TLE epoch, GP age, Pc sigmas, mean elements).
+ *
+ * `uncertaintyParent`: for an analyst clone, the cataloged object it was derived from. The clone's
+ * TLE is a fit at the burn epoch, so its own GP age is near zero (negative for a future burn) and
+ * its TLE-derived sigmas can be smaller than the parent's, as if the burn had improved our
+ * knowledge of the orbit. The clone knows no more than its parent, so it takes the parent's
+ * 1-sigma RIC and GP age, and `uncertaintyAssumedFromNoradId` says so. Its own TLE epoch is kept.
+ */
+export const buildObjectSummary = (sat: Satellite, role: AnalysisObjectRole, env: AnalysisEnv, uncertaintyParent?: Satellite | null): AnalysisObjectSummary => {
   const epoch = tleEpochFromLine1(sat.tle1);
   const parent = analystParentSccNum(sat);
-
-  return {
+  const source = uncertaintyParent ?? sat;
+  const sourceEpoch = uncertaintyParent ? tleEpochFromLine1(uncertaintyParent.tle1) : epoch;
+  const summary: AnalysisObjectSummary = {
     role,
     name: sat.name,
     noradId: sat.sccNum || null,
     cosparId: sat.intlDes && !isPlaceholderIntlDes(sat) ? sat.intlDes : null,
     tleEpochIso: epoch ? epoch.toISOString() : null,
-    gpAgeHours: epoch ? (env.analysisEpoch.getTime() - epoch.getTime()) / MS_PER_HOUR : null,
-    ricSigmasKm: ricSigmas(sat),
+    gpAgeHours: sourceEpoch ? (env.analysisEpoch.getTime() - sourceEpoch.getTime()) / MS_PER_HOUR : null,
+    ricSigmasKm: ricSigmas(source),
     meanElements: meanElementsOf(sat),
     isAnalystObject: parent !== null,
     derivedFromNoradId: parent,
   };
+
+  if (uncertaintyParent) {
+    summary.uncertaintyAssumedFromNoradId = uncertaintyParent.sccNum || null;
+  }
+
+  return summary;
 };
 
 /** The Pc inputs block, built from the same constants and setting the computation uses. */
@@ -282,7 +297,14 @@ const separationKm = (primary: Satellite, secondary: Satellite, date: Date): num
  * around it for the Pc (the same assessment the Debris Screening tool runs).
  * Returns null when the window holds no interior minimum.
  */
-export const findEncounter = (primary: Satellite, secondary: Satellite, env: AnalysisEnv, halfWidthSec: number): ConjunctionEncounter | null => {
+export const findEncounter = (
+  primary: Satellite,
+  secondary: Satellite,
+  env: AnalysisEnv,
+  halfWidthSec: number,
+  /** Object whose screening covariance stands in for the primary's (an analyst clone uses its parent's). */
+  primaryCovarianceSource: Satellite = primary
+): ConjunctionEncounter | null => {
   const startMs = env.analysisEpoch.getTime() - halfWidthSec * 1000;
   const windowMs = 2 * halfWidthSec * 1000;
   const distFn = (t: number): number => separationKm(primary, secondary, new Date(startMs + t));
@@ -299,7 +321,7 @@ export const findEncounter = (primary: Satellite, secondary: Satellite, env: Ana
   let ricVelocityKmS: RicVector | null = null;
   let pc: number | null = null;
 
-  const primaryCov = screeningCovariance(primary, env.covarianceConfidenceLevel);
+  const primaryCov = screeningCovariance(primaryCovarianceSource, env.covarianceConfidenceLevel);
   const secondaryCov = screeningCovariance(secondary, env.covarianceConfidenceLevel);
 
   try {
@@ -417,6 +439,8 @@ const fmtSigned = (v: number, digits = 3): string => `${v >= 0 ? '+' : ''}${v.to
 const fmtIsoTime = (iso: string | null): string => (iso ? formatReportTime(new Date(iso)) : 'N/A');
 const fmtAge = (hours: number | null): string => (hours === null ? 'N/A' : fillDoc(doc('objects.days'), { days: (hours / 24).toFixed(2) }));
 const fmtSigmas = (s: RicVector | null): string => (s ? `${s.radial.toFixed(3)} / ${s.intrack.toFixed(3)} / ${s.crosstrack.toFixed(3)}` : 'N/A');
+/** Appends "(assumed from parent)" to a cell whose value was taken from the object's parent. */
+const assumedCell = (o: AnalysisObjectSummary, text: string): string => (o.uncertaintyAssumedFromNoradId && text !== 'N/A' ? `${text} ${doc('objects.assumedFromParent')}` : text);
 
 const headerBlock = (title: string, state: ConjunctionAnalysisState): string =>
   `${title}\n${RULE}\n` +
@@ -436,8 +460,8 @@ const objectsTable = (objects: AnalysisObjectSummary[]): ReportTable => {
       [doc('objects.noradId'), ...cell((o) => o.noradId ?? doc('header.none'))],
       [doc('objects.cosparId'), ...cell((o) => o.cosparId ?? doc('header.none'))],
       [doc('objects.tleEpoch'), ...cell((o) => fmtIsoTime(o.tleEpochIso))],
-      [doc('objects.gpAge'), ...cell((o) => fmtAge(o.gpAgeHours))],
-      [doc('objects.sigma'), ...cell((o) => fmtSigmas(o.ricSigmasKm))],
+      [doc('objects.gpAge'), ...cell((o) => assumedCell(o, fmtAge(o.gpAgeHours)))],
+      [doc('objects.sigma'), ...cell((o) => assumedCell(o, fmtSigmas(o.ricSigmasKm)))],
       [doc('objects.derivedFrom'), ...cell((o) => o.derivedFromNoradId ?? '-')],
     ],
   };
@@ -527,6 +551,7 @@ const diffSummaryRows = (diff: ScreeningDiff): string[][] => {
     [doc('summary.excluded'), diff.excludedSecondaryIds.length > 0 ? diff.excludedSecondaryIds.join(', ') : doc('header.none')],
     [doc('status.introduced'), diff.counts.introduced.toString()],
     [doc('status.removed'), diff.counts.removed.toString()],
+    [doc('status.moved'), (diff.counts.moved ?? 0).toString()],
     [doc('status.unchanged'), diff.counts.unchanged.toString()],
     [doc('summary.appearedDropped'), `${diff.counts.appeared} / ${diff.counts.dropped}`],
   ];
@@ -627,7 +652,8 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
   const state = baseState('maneuver', env, input.missionImpact);
   const halfWidthSec = input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
   const parentSummary = buildObjectSummary(parent, 'parent', env);
-  const analystSummary = buildObjectSummary(analyst, 'analyst', env);
+  // The clone's uncertainty and GP age are its parent's (see buildObjectSummary).
+  const analystSummary = buildObjectSummary(analyst, 'analyst', env, parent);
 
   state.objects = [parentSummary, analystSummary];
 
@@ -637,7 +663,7 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
   if (input.secondary) {
     state.objects.push(buildObjectSummary(input.secondary, 'secondary', env));
     preEncounter = findEncounter(parent, input.secondary, env, halfWidthSec);
-    postEncounter = findEncounter(analyst, input.secondary, env, halfWidthSec);
+    postEncounter = findEncounter(analyst, input.secondary, env, halfWidthSec, parent);
     state.encounter = postEncounter;
   }
 
@@ -672,6 +698,7 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
    */
   state.screeningDiff = input.screeningDiff;
 
+  state.notes.push(fillDoc(doc('notes.uncertaintyAssumed'), { parent: parent.sccNum || parent.name }));
   if (input.screeningDiff?.isWindowMismatch) {
     state.notes.push(doc('notes.windowMismatchManeuver'));
   }
@@ -808,11 +835,17 @@ export const buildScreeningCompareState = (input: ScreeningCompareInput): Conjun
   const state = baseState('screening-compare', input.env, undefined);
 
   state.screeningDiff = input.diff;
-  if (input.objects?.pre) {
-    state.objects.push(buildObjectSummary(input.objects.pre, analystParentSccNum(input.objects.pre) ? 'analyst' : 'primary', input.env));
+  const pre = input.objects?.pre ?? null;
+  const post = input.objects?.post ?? null;
+
+  if (pre) {
+    state.objects.push(buildObjectSummary(pre, analystParentSccNum(pre) ? 'analyst' : 'primary', input.env));
   }
-  if (input.objects?.post && input.objects.post !== input.objects.pre) {
-    state.objects.push(buildObjectSummary(input.objects.post, analystParentSccNum(input.objects.post) ? 'analyst' : 'primary', input.env));
+  if (post && post !== pre) {
+    // A clone compared with its own parent takes the parent's uncertainty (see buildObjectSummary).
+    const uncertaintyParent = pre && analystParentSccNum(post) === pre.sccNum ? pre : null;
+
+    state.objects.push(buildObjectSummary(post, analystParentSccNum(post) ? 'analyst' : 'primary', input.env, uncertaintyParent));
   }
   if (input.diff.isWindowMismatch) {
     state.notes.push(doc('notes.windowMismatchCompare'));

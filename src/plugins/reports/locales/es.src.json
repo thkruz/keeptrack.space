@@ -208,7 +208,8 @@
           "gpAge": "Antigüedad GP",
           "sigma": "1-sigma R / I / C (km, marco RIC propio, en la época TLE)",
           "derivedFrom": "Derivado de",
-          "days": "{days} días"
+          "days": "{days} días",
+          "assumedFromParent": "(asumido del padre)"
         },
         "roles": {
           "primary": "Primario",
@@ -275,7 +276,8 @@
           "removed": "Eliminado",
           "unchanged": "Sin cambios",
           "appeared": "Aparecido (bajo el umbral)",
-          "dropped": "Desaparecido (bajo el umbral)"
+          "dropped": "Desaparecido (bajo el umbral)",
+          "moved": "Desplazado"
         },
         "summary": {
           "range": "{start} a {end}",
@@ -343,7 +345,8 @@
           "windowMismatchManeuver": "Los cribados previo y posterior cubren ventanas distintas; los eventos cerca de los bordes pueden clasificarse mal.",
           "windowMismatchCompare": "Los dos cribados cubren ventanas distintas; los eventos cerca de los bordes pueden clasificarse mal.",
           "noScreeningRuns": "No hay ejecuciones de cribado disponibles.",
-          "noSensor": "No hay ningún sensor seleccionado; seleccione un sensor para listar las ventanas de pase."
+          "noSensor": "No hay ningún sensor seleccionado; seleccione un sensor para listar las ventanas de pase.",
+          "uncertaintyAssumed": "La incertidumbre 1-sigma y la antigüedad GP del objeto de analista se asumen de su padre ({parent}), y la Pc del acercamiento usa la covarianza del padre. El error de ejecución de la maniobra no se modela."
         }
       }
     }

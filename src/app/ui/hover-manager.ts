@@ -18,6 +18,7 @@ import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { OemSatellite } from '../objects/oem-satellite';
 import { Planet as PlanetDot } from '../objects/planet';
 import { SensorMath } from '../sensors/sensor-math';
 import { StringExtractor } from './string-extractor';
@@ -307,7 +308,8 @@ export class HoverManager {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
       } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);
-      } else if (sat.source !== CatalogSource.VIMPEL) {
+      } else if (sat.source !== CatalogSource.VIMPEL && sat.sccNum) {
+        // Without an sccNum, line 2 already shows the launch line; repeating it read "Launched: Planned" twice.
         this.satHoverBoxNode3.textContent = HoverManager.getLaunchYear(sat);
       } else {
         this.satHoverBoxNode3.textContent = '';
@@ -333,6 +335,13 @@ export class HoverManager {
   }
 
   private static getLaunchYear(sat: Satellite) {
+    if (sat instanceof OemSatellite) {
+      // OEM objects default to NOTIONAL, but they are flown or flying spacecraft (Lucy launched in 2021),
+      // never "planned". Use a real international designator when the file carries one.
+      const designatorYear = /^(?<year>\d{4})-\d{3}/u.exec(sat.intlDes)?.groups?.year;
+
+      return designatorYear ? HoverManager.launchedText_(designatorYear) : t7e('hoverManager.launchedUnknown');
+    }
     if (sat.type === SpaceObjectType.NOTIONAL) {
       return t7e('hoverManager.launchedPlanned');
     }
@@ -342,21 +351,18 @@ export class HoverManager {
 
     const launchYear = Number.parseInt(sat.intlDes.slice(2, 4));
 
-    if (launchYear < 57) {
-      if (i18next.language === 'zh') {
-        return `${t7e('hoverManager.launched')}20${launchYear.toString().padStart(2, '0')}`;
-      }
-
-      return `${t7e('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
+    if (launchYear >= 0 && launchYear < 57) {
+      return HoverManager.launchedText_(`20${launchYear.toString().padStart(2, '0')}`);
     } else if (launchYear >= 57 && launchYear < 100) {
-      if (i18next.language === 'zh') {
-        return `${t7e('hoverManager.launched')}19${launchYear.toString().padStart(2, '0')}`;
-      }
-
-      return `${t7e('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
+      return HoverManager.launchedText_(`19${launchYear.toString().padStart(2, '0')}`);
     }
 
     return t7e('hoverManager.launchedUnknown');
+  }
+
+  /** "Launched: 2021" (Chinese runs the label into the year with no separator). */
+  private static launchedText_(year: string): string {
+    return i18next.language === 'zh' ? `${t7e('hoverManager.launched')}${year}` : `${t7e('hoverManager.launched')}: ${year}`;
   }
 
   private showEciVel_(sat: Satellite) {

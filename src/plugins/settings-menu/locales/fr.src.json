@@ -52,7 +52,7 @@
         "imgCaption": "Basculez une option pour l'appliquer instantanément ; utilisez le filtre pour trouver rapidement un paramètre.",
         "howToUse": "<ol><li>Ouvrez <strong>Paramètres</strong> depuis le tiroir des extensions.</li><li>Basculez un interrupteur pour l'appliquer instantanément ; survolez une ligne pour afficher une infobulle explicative.</li><li>Utilisez le champ de <strong>filtre</strong> en haut pour trouver rapidement un paramètre par son nom.</li><li><strong>Réinitialiser par défaut</strong> restaure toutes les options, y compris les sections ajoutées par les plugins, aux valeurs d'usine.</li></ol>",
         "tip1": "Les options sous CPU rapide requis, comme l'affichage du prochain passage au survol, effectuent des calculs supplémentaires à chaque image ; laissez-les désactivées sur les machines lentes.",
-        "tip2": "Les sections de plugins en bas proviennent d'autres plugins (Watchlist, Machine à remonter le temps et plus encore) ; le menu s'enrichit donc à mesure que les plugins sont activés."
+        "tip2": "Les sections de plugins en bas proviennent d'autres plugins (Liste de suivi, Machine à remonter le temps et plus encore) ; le menu s'enrichit donc à mesure que les plugins sont activés."
       }
     }
   }

@@ -3,7 +3,7 @@
     "OnboardingPlugin": {
       "bottomIconLabel": "Pierwsze kroki",
       "title": "Pierwsze kroki",
-      "helpBody": "Menu Pierwsze kroki śledzi Twoje pierwsze misje w KeepTracku i pozwala ponownie uruchomić przewodniki. Podstawowa wycieczka obejmuje glob, wyszukiwanie i sterowanie czasem. Wycieczka zaawansowana to centrum krótkich rozdziałów o sensorach, liście obserwacyjnej, czasie, analizie i wizualizacji.",
+      "helpBody": "Menu Pierwsze kroki śledzi Twoje pierwsze misje w KeepTracku i pozwala ponownie uruchomić przewodniki. Podstawowa wycieczka obejmuje glob, wyszukiwanie i sterowanie czasem. Wycieczka zaawansowana to centrum krótkich rozdziałów o sensorach, liście obserwowanych, czasie, analizie i wizualizacji.",
       "stepLabel": "{current} z {total}",
       "buttons": {
         "next": "Dalej",
@@ -64,7 +64,7 @@
       },
       "bridge": {
         "title": "Tematy podstawowej wycieczki",
-        "body": "Chcesz zestaw operatora? Sensory, listy obserwacyjne i szybka praca z klawiaturą. Około dwóch minut więcej.",
+        "body": "Chcesz zestaw operatora? Sensory, listy obserwowanych i szybka praca z klawiaturą. Około dwóch minut więcej.",
         "recap1": "Wyszukiwanie i wybieranie satelitów",
         "recap2": "Odczytywanie bieżących danych orbitalnych",
         "recap3": "Sterowanie czasem symulacji"
@@ -90,7 +90,7 @@
       },
       "checklist": {
         "powerTour": "Ukończ rozdział wycieczki zaawansowanej",
-        "watchlist3": "Dodaj 3 satelity do listy obserwacyjnej",
+        "watchlist3": "Dodaj 3 satelity do listy obserwowanych",
         "selectSensor": "Wybierz sensor i zobacz jego zasięg",
         "lookAngles": "Sprawdź kąty obserwacji przelotu",
         "colorScheme": "Zmień schemat kolorów"
@@ -169,7 +169,7 @@
           }
         },
         "watchlist": {
-          "title": "Lista obserwacyjna i przeloty",
+          "title": "Lista obserwowanych i przeloty",
           "description": "Śledź cele i planuj ich kolejne przeloty",
           "steps": {
             "pickTarget": {
@@ -177,12 +177,12 @@
               "body": "Wyszukaj satelitę, który Cię interesuje, na przykład ISS, i zaznacz go."
             },
             "addToWatchlist": {
-              "title": "Dodaj go do listy obserwacyjnej",
-              "body": "Umieść wybranego satelitę na liście obserwacyjnej, aby KeepTrack pilnował go za Ciebie."
+              "title": "Dodaj go do listy obserwowanych",
+              "body": "Umieść wybranego satelitę na liście obserwowanych, aby KeepTrack pilnował go za Ciebie."
             },
             "overlay": {
               "title": "Nakładka",
-              "body": "Nakładka wypisuje nadchodzące przeloty Twojej listy obserwacyjnej nad bieżącym sensorem i aktualizuje się na żywo."
+              "body": "Nakładka wypisuje nadchodzące przeloty Twojej listy obserwowanych nad bieżącym sensorem i aktualizuje się na żywo."
             },
             "lookAngles": {
               "title": "Kąty najbliższego przelotu",
@@ -300,7 +300,7 @@
         "signInCta": "Zaloguj się za darmo, aby odblokować",
         "bestPass": {
           "title": "Najlepsze przeloty (Pro)",
-          "body": "Szereguje każdy nadchodzący przelot Twojej listy obserwacyjnej nad wybranym sensorem. Zaplanuj noc obserwacji w kilka sekund."
+          "body": "Szereguje każdy nadchodzący przelot Twojej listy obserwowanych nad wybranym sensorem. Zaplanuj noc obserwacji w kilka sekund."
         },
         "dops": {
           "title": "Dokładność GPS (Pro)",

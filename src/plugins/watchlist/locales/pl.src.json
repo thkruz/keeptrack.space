@@ -1,19 +1,19 @@
 {
   "plugins": {
     "WatchlistPlugin": {
-      "bottomIconLabel": "Lista obserwacyjna",
-      "title": "Lista obserwacyjna",
+      "bottomIconLabel": "Lista obserwowanych",
+      "title": "Lista obserwowanych",
       "help": {
-        "overview": "Lista obserwacyjna to Twoja lista priorytetowych satelitów. Jest zapisywana w przeglądarce, więc przetrwa ponowne załadowanie strony. Gdy wybrany jest czujnik, a satelita z listy obserwacyjnej wejdzie w jego pole widzenia, otrzymasz powiadomienie, od czujnika do satelity zostanie narysowana linia, a numer satelity pojawi się na globie.",
-        "imgAlt": "Menu listy obserwacyjnej z kilkoma dodanymi satelitami",
-        "imgCaption": "Lista obserwacyjna z kilkoma satelitami. Kliknij nazwę, aby wybrać satelitę; ikona zakładki go usuwa.",
+        "overview": "Lista obserwowanych to Twoja lista priorytetowych satelitów. Jest zapisywana w przeglądarce, więc przetrwa ponowne załadowanie strony. Gdy wybrany jest czujnik, a satelita z listy obserwowanych wejdzie w jego pole widzenia, otrzymasz powiadomienie, od czujnika do satelity zostanie narysowana linia, a numer satelity pojawi się na globie.",
+        "imgAlt": "Menu listy obserwowanych z kilkoma dodanymi satelitami",
+        "imgCaption": "Lista obserwowanych z kilkoma satelitami. Kliknij nazwę, aby wybrać satelitę; ikona zakładki go usuwa.",
         "managingHeading": "Zarządzanie listą",
         "managing": "<ul><li><strong>Dodaj</strong>: wpisz jeden lub więcej numerów NORAD oddzielonych przecinkami lub spacjami (działają też identyfikatory alpha-5, np. T0001) i kliknij ikonę dodawania lub naciśnij Enter.</li><li><strong>Szybkie dodawanie/usuwanie</strong>: gdy na globie wybrany jest dowolny satelita, kliknij ikonę zakładki obok jego nazwy w polu informacyjnym.</li><li><strong>Wybierz</strong>: kliknij numer lub nazwę satelity na liście, aby do niego przelecieć.</li><li><strong>Zapisz / Wczytaj</strong>: wyeksportuj listę jako plik JSON i wczytaj ją później lub udostępnij.</li><li><strong>Wyczyść</strong>: opróżnia całą listę.</li></ul>",
-        "howToUse": "<ol><li>Otwórz menu z panelu lub naciśnij W.</li><li>Dodaj satelity według numeru NORAD, na przykład 25544 dla ISS.</li><li>Wybierz czujnik w menu Czujniki, aby zacząć otrzymywać powiadomienia o widoczności i linie od czujnika do satelity.</li><li>Otwórz menu dodatkowe (ikona koła zębatego), aby ukryć wszystkie obiekty spoza listy obserwacyjnej lub zmienić, kiedy rysowane są etykiety (Zawsze / Tylko FOV / Wyłączone).</li></ol>",
-        "tip1": "\"Ukryj inne obiekty\" zamienia glob w widok wyłącznie listy obserwacyjnej. To idealne rozwiązanie do śledzenia kilku obiektów bez bałaganu pełnego katalogu.",
-        "tip2": "Menu nakładki (czasy następnych przelotów dla każdego satelity z listy obserwacyjnej) działa dopiero wtedy, gdy lista obserwacyjna zawiera wpisy.",
+        "howToUse": "<ol><li>Otwórz menu z panelu lub naciśnij W.</li><li>Dodaj satelity według numeru NORAD, na przykład 25544 dla ISS.</li><li>Wybierz czujnik w menu Czujniki, aby zacząć otrzymywać powiadomienia o widoczności i linie od czujnika do satelity.</li><li>Otwórz menu dodatkowe (ikona koła zębatego), aby ukryć wszystkie obiekty spoza listy obserwowanych lub zmienić, kiedy rysowane są etykiety (Zawsze / Tylko FOV / Wyłączone).</li></ol>",
+        "tip1": "\"Ukryj inne obiekty\" zamienia glob w widok wyłącznie listy obserwowanych. To idealne rozwiązanie do śledzenia kilku obiektów bez bałaganu pełnego katalogu.",
+        "tip2": "Menu nakładki (czasy następnych przelotów dla każdego satelity z listy obserwowanych) działa dopiero wtedy, gdy lista obserwowanych zawiera wpisy.",
         "tip3": "Duplikaty są automatycznie ignorowane, a nieprawidłowe numery powodują wyświetlenie powiadomienia z nazwą satelity, którego nie znaleziono.",
-        "shortcutToggle": "Przełącz menu listy obserwacyjnej"
+        "shortcutToggle": "Przełącz menu listy obserwowanych"
       },
       "labels": {
         "newSatellites": "Nowe satelity",
@@ -30,7 +30,7 @@
         "labelsHeader": "Etykiety"
       },
       "msgs": {
-        "watchlistLoaded": "Wczytano listę obserwacyjną z {count} satelitami"
+        "watchlistLoaded": "Wczytano listę obserwowanych z {count} satelitami"
       },
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} jest już na liście!",
@@ -43,24 +43,24 @@
       "settings": {
         "satLabelMode": {
           "label": "Tryb etykiet satelitów",
-          "helpText": "Steruje wyświetlaniem etykiet satelitów z listy obserwacyjnej.",
+          "helpText": "Steruje wyświetlaniem etykiet satelitów z listy obserwowanych.",
           "options": {
             "off": "Wyłączone",
             "fovOnly": "Tylko FOV",
-            "all": "Cała lista obserwacyjna"
+            "all": "Cała lista obserwowanych"
           }
         }
       },
       "rmbMenu": {
-        "addToWatchlist": "Dodaj do listy obserwacyjnej",
-        "removeFromWatchlist": "Usuń z listy obserwacyjnej"
+        "addToWatchlist": "Dodaj do listy obserwowanych",
+        "removeFromWatchlist": "Usuń z listy obserwowanych"
       }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Nakładka",
       "title": "Menu nakładki",
-      "helpBody": "<p> Nakładka listy obserwacyjnej pokazuje czas następnego przelotu dla każdego satelity na liście obserwacyjnej. Nakładka jest aktualizowana co 10 sekund. </p> <p> Nakładka jest oznaczona kolorami, aby pokazać czas do następnego przelotu. Kolory są następujące: </p> <ul> <li>Żółty - w polu widzenia</li> <li>Niebieski - czas do następnego przelotu wynosi do 30 minut po bieżącym czasie lub 10 minut przed bieżącym czasem</li> <li>Biały - każdy przyszły przelot niespełniający powyższych wymagań</li> </ul> <p> Kliknięcie satelity na nakładce wycentruje mapę na tym satelicie. </p>",
-      "openOverlayCmd": "Otwórz nakładkę Watchlist",
+      "helpBody": "<p> Nakładka listy obserwowanych pokazuje czas następnego przelotu dla każdego satelity na liście obserwowanych. Nakładka jest aktualizowana co 10 sekund. </p> <p> Nakładka jest oznaczona kolorami, aby pokazać czas do następnego przelotu. Kolory są następujące: </p> <ul> <li>Żółty - w polu widzenia</li> <li>Niebieski - czas do następnego przelotu wynosi do 30 minut po bieżącym czasie lub 10 minut przed bieżącym czasem</li> <li>Biały - każdy przyszły przelot niespełniający powyższych wymagań</li> </ul> <p> Kliknięcie satelity na nakładce wycentruje mapę na tym satelicie. </p>",
+      "openOverlayCmd": "Otwórz nakładkę listy obserwowanych",
       "addSatellitesToast": "Najpierw dodaj satelity do listy!",
       "noPassesMsg": "Brak przelotów w ciągu 60 minut",
       "inFovToast": "Satelita {sccNum} jest w polu widzenia!",

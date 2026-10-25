@@ -109,6 +109,11 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
       const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
 
+      // Targets may drop their tooltip text while registered (e.g. a summary that only needs one when truncated).
+      if (!text) {
+        return;
+      }
+
       // Delay showing tooltip to avoid flicker on fast mouse movement
       this.showTimer_ = setTimeout(() => {
         this.showTimer_ = null;

@@ -1,6 +1,7 @@
 import { SatMath, StringifiedNumber } from '@app/app/analysis/sat-math';
 import { ProximityOpsThreadManager } from '@app/app/threads/proximity-ops-thread-manager';
 import { drawPairLine, jumpToTca, RemovableLine } from '@app/engine/conjunction/conjunction-row-actions';
+import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -25,6 +26,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import {
   buildRpoCsvRow,
+  CovarianceTleLines,
   DEFAULT_REFINE_TOLERANCE_MS,
   DEFAULT_STEP_SECONDS,
   findClosestApproach as findClosestApproachCore,
@@ -85,6 +87,8 @@ export class ProximityOps extends KeepTrackPlugin {
   private sortKey_: RpoSortKey = DEFAULT_SORT_KEY;
   /** Active results-table sort direction. */
   private sortAsc_ = DEFAULT_SORT_ASC;
+  /** Root parents of the analyst clones in the last search, by catalog id: their Pc uses the parent's covariance. */
+  private uncertaintyParents_ = new Map<number, Satellite>();
 
   // Wide enough for the two-line title plus the title-bar icons.
   dragOptions: ClickDragOptions = {
@@ -236,6 +240,7 @@ export class ProximityOps extends KeepTrackPlugin {
       <section class="kt-section">
         <div class="kt-section-label">${t7e('plugins.ProximityOps.titleSecondary')}</div>
         <div id="proximity-ops-count" class="proximity-ops-count"></div>
+        <div id="proximity-ops-uncertainty-note" class="kt-note" style="display: none;"></div>
         <div class="proximity-ops-table-container">
           <table id="proximity-ops-table" class="striped-light"></table>
         </div>
@@ -409,6 +414,7 @@ export class ProximityOps extends KeepTrackPlugin {
       // gatherSearch_ already toasted (e.g. the primary satellite was not found).
       return;
     }
+    this.applyCovarianceSources_(request);
 
     // Single-satellite searches only screen the co-orbital candidates (the list includes the primary).
     this.lastCandidateCount_ = request.mode === 'single' ? Math.max(0, request.sats.length - 1) : null;
@@ -475,6 +481,62 @@ export class ProximityOps extends KeepTrackPlugin {
     };
   }
 
+  /**
+   * An analyst clone (Maneuver tool) knows no more than the object it came from, so its Pc uses its
+   * root parent's TLE-derived covariance. Records the parents for the results note and hands their
+   * TLE lines to the search (worker or synchronous) by catalog id.
+   */
+  private applyCovarianceSources_(request: { sats: Satellite[]; params: RpoSearchParams }): void {
+    const parents = new Map<number, Satellite>();
+    const tles: Record<string, CovarianceTleLines> = {};
+
+    for (const sat of request.sats) {
+      const parent = uncertaintyParentOf(sat);
+
+      if (parent) {
+        parents.set(sat.id, parent);
+        tles[String(sat.id)] = { tle1: parent.tle1, tle2: parent.tle2 };
+      }
+    }
+
+    this.uncertaintyParents_ = parents;
+    if (parents.size > 0) {
+      request.params.covarianceTles = tles;
+    }
+  }
+
+  /** "Uncertainty assumed from parent <name> (<norad>)" for each analyst clone in the reported approaches. */
+  private uncertaintyNoteText_(): string {
+    const parents = new Map<string, Satellite>();
+
+    for (const rpo of this.RPOs) {
+      for (const id of [rpo.sat1Id, rpo.sat2Id]) {
+        const parent = this.uncertaintyParents_.get(id);
+
+        if (parent) {
+          parents.set(parent.sccNum, parent);
+        }
+      }
+    }
+
+    return [...parents.values()]
+      .map((parent) => t7e('plugins.DebrisScreening.uncertaintyAssumedFromParent').replace('{name}', parent.name).replace('{norad}', parent.sccNum))
+      .join(' ');
+  }
+
+  /** Show the clone note under the results count while a reported approach involves an analyst clone. */
+  private updateUncertaintyNote_(): void {
+    const el = getEl('proximity-ops-uncertainty-note', true);
+
+    if (!el) {
+      return;
+    }
+    const text = this.uncertaintyNoteText_();
+
+    el.textContent = text;
+    el.style.display = text ? '' : 'none';
+  }
+
   /** Synchronous search over real catalog satellites (no-worker fallback + unit tests). */
   private runSearch_(request: { mode: RpoSearchMode; sats: Satellite[]; params: RpoSearchParams }): ProximityOpsEvent[] {
     const { mode, sats, params } = request;
@@ -526,6 +588,7 @@ export class ProximityOps extends KeepTrackPlugin {
     this.sortAsc_ = DEFAULT_SORT_ASC;
     this.applySortAndRender_();
     this.updateCount_(this.RPOs.length);
+    this.updateUncertaintyNote_();
 
     if (this.RPOs.length === 0) {
       ServiceLocator.getUiManager().toast(this.emptyResultMessage_(), ToastMsgType.caution, true);

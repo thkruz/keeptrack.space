@@ -103,6 +103,18 @@ export interface RpoSearchParams {
    * is not computed (the column shows "-"); the unit tests omit it.
    */
   confidenceLevel?: CovarianceConfidence;
+  /**
+   * TLE lines the Pc covariance is built from instead of an object's own, keyed by catalog id
+   * (`String(sat.id)`). An analyst clone maps to its root parent's TLE: it knows no more than
+   * the object it came from. Objects without an entry use their own TLE.
+   */
+  covarianceTles?: Record<string, CovarianceTleLines>;
+}
+
+/** A pair of TLE lines a covariance is built from. */
+export interface CovarianceTleLines {
+  tle1: string;
+  tle2: string;
 }
 
 /** Default coarse scan step for the per-pair TCA search. */
@@ -192,11 +204,21 @@ const PC_WINDOW_MS = 5 * 60 * 1000;
  * Covariance is derived from each TLE (the same capped model the debris-screening
  * worker uses), assessed over a tight window bracketing the encounter. Pure ootk
  * math, so it runs in the worker; returns null on any failure or missing TLE.
+ * `covarianceTles` swaps in another TLE for an object's covariance (an analyst
+ * clone uses its root parent's); its own TLE still drives the geometry.
  */
-export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date, confidenceLevel?: CovarianceConfidence): number | null {
+export function computeEventPc(
+  sat1: Satellite,
+  sat2: Satellite,
+  eventDate: Date,
+  confidenceLevel?: CovarianceConfidence,
+  covarianceTles?: Record<string, CovarianceTleLines>
+): number | null {
   if (!confidenceLevel || !sat1.tle1 || !sat1.tle2 || !sat2.tle1 || !sat2.tle2) {
     return null;
   }
+  const cov1 = covarianceTles?.[String(sat1.id)] ?? sat1;
+  const cov2 = covarianceTles?.[String(sat2.id)] ?? sat2;
 
   try {
     const assessment = new ConjunctionAssessment(
@@ -204,13 +226,13 @@ export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date
         tle: new Tle(sat1.tle1, sat1.tle2),
         name: sat1.sccNum,
         radius: 0.01 as Kilometers,
-        covariance: cappedScreeningCovarianceFromTle(sat1.tle1, sat1.tle2, confidenceLevel),
+        covariance: cappedScreeningCovarianceFromTle(cov1.tle1, cov1.tle2, confidenceLevel),
       },
       {
         tle: new Tle(sat2.tle1, sat2.tle2),
         name: sat2.sccNum,
         radius: 0.01 as Kilometers,
-        covariance: cappedScreeningCovarianceFromTle(sat2.tle1, sat2.tle2, confidenceLevel),
+        covariance: cappedScreeningCovarianceFromTle(cov2.tle1, cov2.tle2, confidenceLevel),
       }
     );
 
@@ -236,14 +258,14 @@ export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date
  * Otherwise the first satellite is the primary and is screened against the rest.
  */
 export function findRpoPairs(sats: Satellite[], params: RpoSearchParams, baseDate: Date, isAva: boolean, satPairs?: number[][], onProgress?: RpoProgressFn): ProximityOpsEvent[] {
-  const { maxDis, maxVel, durationSec, stepSeconds, refineToleranceMs, confidenceLevel } = params;
+  const { maxDis, maxVel, durationSec, stepSeconds, refineToleranceMs, confidenceLevel, covarianceTles } = params;
   const RPOs: ProximityOpsEvent[] = [];
   const search = (a: Satellite, b: Satellite) => findClosestApproach(a, b, baseDate, durationSec, stepSeconds, refineToleranceMs);
   // Pc is filled only for events that pass the gate (a bounded set), and only
   // when a confidence level is supplied - so it is off the per-pair hot path.
   const keep = (res: ProximityOpsEvent, primarySat: Satellite, secondarySat: Satellite) => {
     if (res.dist <= maxDis && res.vel <= maxVel) {
-      res.pc = computeEventPc(primarySat, secondarySat, res.date, confidenceLevel);
+      res.pc = computeEventPc(primarySat, secondarySat, res.date, confidenceLevel, covarianceTles);
       RPOs.push(res);
     }
   };

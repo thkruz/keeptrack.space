@@ -42,18 +42,32 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     });
 
     /*
-     * If we didn't draw anything, we should disable the FOV view plugin
-     * and show a toast message to the user.
-     * This is to prevent the user from being confused when they select a sensor
-     * and nothing happens.
+     * If we didn't draw anything, switch off whichever layer (Sensor FOV or Sensor Fence) asked
+     * for the drawing and tell the user why, so they are not left with a selected icon and an
+     * empty globe.
      */
     if (!didWeDrawSomething) {
-      const sensorFovPlugin = PluginRegistry.getPlugin(SensorFov);
+      this.disableUndrawableLayers_();
+    }
+  }
 
-      if (sensorFovPlugin && sensorFovPlugin.isMenuButtonActive) {
-        ServiceLocator.getUiManager().toast(t7e('toasts.noValidFov'), ToastMsgType.caution);
-        sensorFovPlugin.disableFovView();
-      }
+  private disableUndrawableLayers_(): void {
+    const sensorFovPlugin = PluginRegistry.getPlugin(SensorFov);
+    const sensorSurvFencePlugin = PluginRegistry.getPlugin(SensorSurvFence);
+    const isFovOn = Boolean(sensorFovPlugin?.isMenuButtonActive);
+    const isFenceOn = Boolean(sensorSurvFencePlugin?.isMenuButtonActive);
+
+    if (!isFovOn && !isFenceOn) {
+      return;
+    }
+
+    ServiceLocator.getUiManager().toast(t7e('toasts.noValidFov'), ToastMsgType.caution);
+
+    if (isFovOn) {
+      sensorFovPlugin?.disableFovView();
+    }
+    if (isFenceOn) {
+      sensorSurvFencePlugin?.disableSurvView();
     }
   }
 

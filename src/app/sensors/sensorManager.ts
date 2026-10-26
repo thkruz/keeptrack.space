@@ -533,8 +533,11 @@ export class SensorManager {
     try {
       if (sensors?.[0]?.objName) {
         PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
-        PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
-        PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+        /*
+         * Sensor FOV / Sensor Fence stay on across a switch to another sensor: the user asked for
+         * the layer. If the new sensor cannot be drawn, SensorFovMeshFactory.drawAll toasts and
+         * switches the layer off. Reset Sensor (resetSensorSelected) still turns both off.
+         */
         PluginRegistry.getPluginByName('Planetarium')?.setBottomIconToUnselected();
         PluginRegistry.getPluginByName('Astronomy')?.setBottomIconToUnselected();
 

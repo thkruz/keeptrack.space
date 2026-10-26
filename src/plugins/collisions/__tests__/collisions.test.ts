@@ -1,4 +1,5 @@
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -389,6 +390,47 @@ describe('Collisions behavior', () => {
     await flush();
 
     expect(warn).toHaveBeenCalled();
+  });
+
+  it('fetchCollisionData_ re-renders the empty state when the fetch rejects', async () => {
+    global.fetch = vi.fn(() => Promise.reject(new Error('network'))) as Mock;
+    vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+    const hook = vi.spyOn(p(), 'refreshEmptyState_');
+
+    p().isFetching_ = false;
+    p().fetchCollisionData_();
+    await flush();
+
+    expect(hook).toHaveBeenCalled();
+  });
+
+  it('updateToolbarForLoginState_ re-renders the empty state', () => {
+    const hook = vi.spyOn(p(), 'refreshEmptyState_');
+
+    p().updateToolbarForLoginState_();
+
+    expect(hook).toHaveBeenCalled();
+  });
+
+  it('isFetchButtonShown_ follows the Fetch Data button visibility', () => {
+    p().isLoggedIn_ = false;
+    p().collisionList_ = [];
+    p().updateToolbarForLoginState_();
+    expect(p().isFetchButtonShown_()).toBe(true);
+
+    p().isLoggedIn_ = true;
+    p().updateToolbarForLoginState_();
+    expect(p().isFetchButtonShown_()).toBe(false);
+  });
+
+  it('eventClicked_ jumps the clock to exactly 30 s before TOCA', () => {
+    const timeManager = ServiceLocator.getTimeManager();
+    const jump = vi.spyOn(timeManager, 'changeSimulationTime').mockImplementation(() => undefined);
+
+    p().collisionList_ = [{ ...mockCollisionData[0], TOCA: '2026-10-26T18:00:00.000Z' }];
+    p().eventClicked_(0);
+
+    expect(jump).toHaveBeenCalledWith(Date.parse('2026-10-26T17:59:30.000Z'));
   });
 
   it('createTable_ warns when the table element is missing', () => {

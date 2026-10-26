@@ -186,6 +186,7 @@ export class Collisions extends KeepTrackPlugin {
     getEl('Collisions-fetch-btn', true)?.addEventListener('click', () => {
       hideEl('Collisions-fetch-btn');
       showEl('Collisions-refresh-btn', 'flex');
+      this.refreshEmptyState_();
       this.fetchCollisionData_();
     });
 
@@ -234,6 +235,7 @@ export class Collisions extends KeepTrackPlugin {
       })
       .catch(() => {
         errorManagerInstance.warn(t7e('plugins.Collisions.errorMsgs.noCollisionsData'));
+        this.refreshEmptyState_();
       })
       .finally(() => {
         this.isFetching_ = false;
@@ -286,12 +288,30 @@ export class Collisions extends KeepTrackPlugin {
         }
       }
     }
+
+    this.refreshEmptyState_();
+  }
+
+  /**
+   * True while the Fetch Data button is on screen. Empty-state copy keys off this so it never points
+   * at a button the user cannot see (signed in, or after the first fetch, only Refresh is shown).
+   */
+  protected isFetchButtonShown_(): boolean {
+    const fetchBtn = getEl('Collisions-fetch-btn', true);
+
+    return !!fetchBtn && fetchBtn.style.display !== 'none';
+  }
+
+  /**
+   * Hook run whenever the Fetch/Refresh toolbar changes or a fetch fails, so a view with an empty
+   * state can re-render its copy. The OSS table has no empty state, so this is a no-op here.
+   */
+  protected refreshEmptyState_(): void {
+    // Overridden by Pro.
   }
 
   private eventClicked_(row: number) {
-    const now = new Date();
-
-    ServiceLocator.getTimeManager().changeStaticOffset(new Date(this.collisionList_[row].TOCA).getTime() - now.getTime() - 1000 * 30);
+    ServiceLocator.getTimeManager().changeSimulationTime(new Date(this.collisionList_[row].TOCA).getTime() - 1000 * 30);
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     const sat1 = this.collisionList_[row].SAT1.toString().padStart(5, '0');

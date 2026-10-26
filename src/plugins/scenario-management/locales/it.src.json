@@ -43,7 +43,7 @@
         "startAfterEnd": "L'ora di inizio dello scenario deve precedere l'ora di fine.",
         "invalidDates": "Le ore di inizio e fine dello scenario devono essere date valide.",
         "bothBoundsRequired": "Devono essere impostate sia l'ora di inizio sia quella di fine dello scenario.",
-        "nameTooLong": "Il nome dello scenario deve avere meno di 30 caratteri."
+        "nameTooLong": "Il nome dello scenario deve avere al massimo 30 caratteri."
       },
       "defaults": {
         "scenarioName": "Il mio scenario",

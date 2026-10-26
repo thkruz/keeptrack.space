@@ -43,7 +43,7 @@
         "startAfterEnd": "La hora de inicio del escenario debe ser anterior a la hora de fin.",
         "invalidDates": "Las horas de inicio y fin del escenario deben ser fechas válidas.",
         "bothBoundsRequired": "Deben establecerse tanto la hora de inicio como la de fin del escenario.",
-        "nameTooLong": "El nombre del escenario debe tener menos de 30 caracteres."
+        "nameTooLong": "El nombre del escenario debe tener 30 caracteres o menos."
       },
       "defaults": {
         "scenarioName": "Mi escenario",

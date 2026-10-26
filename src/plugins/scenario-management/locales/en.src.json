@@ -43,7 +43,7 @@
         "startAfterEnd": "Scenario start time must be before end time.",
         "invalidDates": "Scenario start time and end time must be valid dates.",
         "bothBoundsRequired": "Both scenario start time and end time must be set.",
-        "nameTooLong": "Scenario name must be less than 30 characters."
+        "nameTooLong": "Scenario name must be 30 characters or fewer."
       },
       "defaults": {
         "scenarioName": "My Scenario",

@@ -37,6 +37,27 @@ describe('scenario-form-utils', () => {
       expect(input.classList.contains('valid')).toBe(false);
     });
 
+    it('rejects a pattern-valid but impossible date and marks the input invalid', () => {
+      const input = makeInput('2026-13-45 99:99:99');
+
+      expect(validateDateInput(input)).toBe(false);
+      expect(input.classList.contains('invalid')).toBe(true);
+      expect(input.classList.contains('valid')).toBe(false);
+    });
+
+    it('rejects days past the end of the month and out-of-range times', () => {
+      expect(validateDateInput(makeInput('2026-02-29 00:00:00'))).toBe(false);
+      expect(validateDateInput(makeInput('2026-04-31 00:00:00'))).toBe(false);
+      expect(validateDateInput(makeInput('2026-10-20 24:00:00'))).toBe(false);
+      expect(validateDateInput(makeInput('2026-10-20 12:60:00'))).toBe(false);
+      expect(validateDateInput(makeInput('2026-00-10 12:00:00'))).toBe(false);
+    });
+
+    it('accepts leap days and the last second of a day', () => {
+      expect(validateDateInput(makeInput('2028-02-29 23:59:59.999'))).toBe(true);
+      expect(validateDateInput(makeInput('2026-12-31 23:59:59'))).toBe(true);
+    });
+
     it('flips classes when a previously-valid input becomes invalid', () => {
       const input = makeInput('2022-01-01 00:00:00');
 

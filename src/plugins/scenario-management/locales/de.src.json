@@ -43,7 +43,7 @@
         "startAfterEnd": "Die Startzeit des Szenarios muss vor der Endzeit liegen.",
         "invalidDates": "Start- und Endzeit des Szenarios müssen gültige Daten sein.",
         "bothBoundsRequired": "Start- und Endzeit des Szenarios müssen beide gesetzt sein.",
-        "nameTooLong": "Der Szenarioname muss kürzer als 30 Zeichen sein."
+        "nameTooLong": "Der Szenarioname darf höchstens 30 Zeichen lang sein."
       },
       "defaults": {
         "scenarioName": "Mein Szenario",

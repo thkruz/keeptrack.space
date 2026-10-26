@@ -435,11 +435,17 @@ export class CatalogLoader {
    * Reloads the entire satellite catalog from raw TLE text content.
    * Resets all rendering subsystems and re-initializes the propagation worker.
    * Supports .tce (2-line), .tle (3-line), and .txt TLE files.
+   *
+   * @param vimpelCatalog Optional JSC Vimpel objects without a NORAD number, added
+   * after the TLE objects through the same Vimpel pipeline as at boot (keyed by
+   * their own Vimpel id). Their TLEs all carry catalog number 00000, so passing
+   * them inside `tceContent` would collapse them onto one slot. Used by the
+   * Scenario Management "Full Satellite Catalog" load.
    */
-  static async reloadCatalog(tceContent: string): Promise<void> {
+  static async reloadCatalog(tceContent: string, vimpelCatalog: JsSat[] = []): Promise<void> {
     const asciiCatalog = CatalogLoader.parseTceContent(tceContent);
 
-    if (asciiCatalog.length === 0) {
+    if (asciiCatalog.length === 0 && vimpelCatalog.length === 0) {
       throw new Error('No valid TLE data found in file');
     }
 
@@ -448,6 +454,7 @@ export class CatalogLoader {
     await CatalogLoader.reloadFromParseArgs_({
       keepTrackTle: [],
       externalCatalog: Promise.resolve(asciiCatalog),
+      ...(vimpelCatalog.length > 0 ? { vimpelCatalog: Promise.resolve(vimpelCatalog) } : {}),
     });
   }
 

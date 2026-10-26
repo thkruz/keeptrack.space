@@ -2,13 +2,35 @@ import { getEl } from '@app/engine/utils/get-el';
 import { ScenarioData } from './scenario-management';
 
 /**
- * Validates a date input field against the format YYYY-MM-DD HH:MM:SS.sss.
- * Toggles valid/invalid CSS classes on the input element.
+ * True when the text is YYYY-MM-DD HH:MM:SS(.sss) AND names a real UTC calendar
+ * date and time (month 1-12, a day that exists in that month, 00-23:00-59:00-59).
+ * A pattern match alone would accept "2026-13-45 99:99:99".
+ */
+export function isValidScenarioDateString(dateStr: string): boolean {
+  const match = /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?$/u.exec(dateStr);
+
+  if (!match) {
+    return false;
+  }
+
+  const [year, month, day, hour, minute, second] = match.slice(1, 7).map(Number);
+
+  if (month < 1 || month > 12 || day < 1 || hour > 23 || minute > 59 || second > 59) {
+    return false;
+  }
+
+  // Day 0 of the next month is the last day of this month (handles leap years).
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+
+  return day <= daysInMonth;
+}
+
+/**
+ * Validates a date input field: format YYYY-MM-DD HH:MM:SS.sss and a real
+ * calendar date. Toggles valid/invalid CSS classes on the input element.
  */
 export function validateDateInput(input: HTMLInputElement): boolean {
-  const dateStr = input.value;
-  const regex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}(?:\.\d{1,3})?$/u;
-  const isValid = regex.test(dateStr);
+  const isValid = isValidScenarioDateString(input.value);
 
   if (!isValid) {
     input.classList.remove('valid');

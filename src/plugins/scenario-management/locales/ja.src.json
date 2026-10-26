@@ -43,7 +43,7 @@
         "startAfterEnd": "シナリオの開始時刻は終了時刻より前である必要があります。",
         "invalidDates": "シナリオの開始時刻と終了時刻は有効な日付である必要があります。",
         "bothBoundsRequired": "シナリオの開始時刻と終了時刻の両方を設定する必要があります。",
-        "nameTooLong": "シナリオ名は30文字未満である必要があります。"
+        "nameTooLong": "シナリオ名は30文字以内で入力してください。"
       },
       "defaults": {
         "scenarioName": "マイシナリオ",

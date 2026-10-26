@@ -143,7 +143,7 @@ export class ScenarioManagementPlugin extends KeepTrackPlugin {
       return false;
     }
 
-    // Name must be less than 30 characters
+    // Name must be 30 characters or fewer
     if (scenario.name.length > 30) {
       errorManagerInstance.warn(t7e('plugins.ScenarioManagementMenu.errorMsgs.nameTooLong'));
 

@@ -43,7 +43,7 @@
         "startAfterEnd": "Czas rozpoczęcia scenariusza musi być wcześniejszy niż czas zakończenia.",
         "invalidDates": "Czas rozpoczęcia i zakończenia scenariusza musi być prawidłową datą.",
         "bothBoundsRequired": "Należy ustawić zarówno czas rozpoczęcia, jak i zakończenia scenariusza.",
-        "nameTooLong": "Nazwa scenariusza musi mieć mniej niż 30 znaków."
+        "nameTooLong": "Nazwa scenariusza może mieć najwyżej 30 znaków."
       },
       "defaults": {
         "scenarioName": "Mój scenariusz",

@@ -2,11 +2,13 @@ import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
+import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { TranslationKey, t7e } from '@app/locales/keys';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -98,16 +100,20 @@ export class SearchManager {
     uiWrapper!.prepend(searchResults);
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
+    // A filter change can hide (or reveal) objects in the open results, so re-run the search.
+    EventBus.getInstance().on(EventBusEvent.filterChanged, () => this.refreshForFilterChange_());
 
     this.setupTopMenu_();
     this.setupKeyboardShortcut_();
   }
 
+  /** The chord that toggles and focuses search (Shift+F); also named in the search box placeholder. */
+  private static readonly SEARCH_SHORTCUT_: Pick<IKeyboardShortcut, 'key' | 'ctrl'> = { key: 'F', ctrl: false };
+
   private setupKeyboardShortcut_() {
     const keyboard = new KeyboardComponent('SearchManager', [
       {
-        key: 'F',
-        ctrl: false,
+        ...SearchManager.SEARCH_SHORTCUT_,
         description: t7e('keyboard.descriptions.toggleSearch' as TranslationKey),
         callback: () => {
           this.toggleSearch();
@@ -236,17 +242,49 @@ export class SearchManager {
       }
     });
 
-    // Add keyboard hint to search placeholder (skip on mobile — no keyboard)
+    // Add keyboard hint to search placeholder (skip on mobile: no keyboard)
     if (!settingsManager.isMobileModeEnabled) {
       const searchInput = getEl('search') as HTMLInputElement | null;
 
       if (searchInput) {
-        const currentPlaceholder = searchInput.placeholder;
-
-        if (!currentPlaceholder.includes('(F)')) {
-          searchInput.placeholder = `${currentPlaceholder} (F)`;
-        }
+        searchInput.placeholder = SearchManager.placeholderWithHint(searchInput.placeholder);
       }
+    }
+  }
+
+  /**
+   * The search placeholder plus the real chord that focuses search, e.g. "Search... (Shift+F)".
+   * Built from the registered shortcut so it can never name the wrong key again.
+   */
+  static placeholderWithHint(placeholder: string): string {
+    const hint = `(${KeyboardShortcutRegistry.formatShortcut({ ...SearchManager.SEARCH_SHORTCUT_, callback: () => undefined })})`;
+
+    return placeholder.includes(hint) ? placeholder : `${placeholder} ${hint}`;
+  }
+
+  /**
+   * Drops blank tokens from a comma list ("1,,2," -> "1,2"). Groups whose members have
+   * no catalog number (JSC Vimpel, the Unknown country bucket) used to write them.
+   * `keepTrailingComma` keeps one trailing comma so a user typing "25544," is not
+   * interrupted mid-list.
+   */
+  static dropBlankTokens(searchString: string, keepTrailingComma = false): string {
+    const tokens = searchString.split(',');
+    const cleaned = tokens.filter((token) => token.trim().length > 0).join(',');
+    const hasTrailingComma = tokens.length > 1 && tokens[tokens.length - 1].trim().length === 0;
+
+    return keepTrailingComma && hasTrailingComma && cleaned.length > 0 ? `${cleaned},` : cleaned;
+  }
+
+  /** Re-runs the current search after a Filter Menu change, so hidden objects leave the results. */
+  private refreshForFilterChange_(): void {
+    if (!this.isResultsOpen) {
+      return;
+    }
+    const current = this.getCurrentSearch();
+
+    if (current.length > 0) {
+      this.doSearch(current);
     }
   }
 
@@ -371,7 +409,14 @@ export class SearchManager {
       const groupManagerInstance = ServiceLocator.getGroupsManager();
       const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-      slideOutUp(getEl('search-results')!, 200);
+      const resultsEl = getEl('search-results', true);
+
+      if (resultsEl) {
+        slideOutUp(resultsEl, 200);
+        // Drop the old rows too: a hidden box full of stale rows still answered keyboard navigation and
+        // showed again on the next open.
+        resultsEl.innerHTML = '';
+      }
       groupManagerInstance.clearSelect();
       this.isResultsOpen = false;
 
@@ -400,7 +445,18 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     this.selectedIndex_ = -1;
 
+    const searchInput = getEl('search', true);
+    const isUserTyping = typeof document !== 'undefined' && searchInput !== null && document.activeElement === searchInput;
+
+    searchString = SearchManager.dropBlankTokens(searchString, isUserTyping);
+
     if (searchString === '') {
+      const emptiedDom = getEl('search', true) as HTMLInputElement | null;
+
+      // A list of only blank tokens must not linger in the box.
+      if (emptiedDom && emptiedDom.value.trim().replace(/,/gu, '') === '') {
+        emptiedDom.value = '';
+      }
       this.hideResults();
       EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
@@ -436,6 +492,11 @@ export class SearchManager {
      * are typed otherwise there are just too many search results.
      */
     if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
+      // The open rows belong to an earlier, longer query: drop them rather than show stale results.
+      if (this.isResultsOpen) {
+        this.hideResults();
+      }
+
       return;
     }
 

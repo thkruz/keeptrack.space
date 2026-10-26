@@ -78,7 +78,8 @@ describe('SplashScreen_class', () => {
 
       expect(getEl('loading-hint-text')?.textContent?.trim().length).toBeGreaterThan(0);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
-      expect(getEl('loading-hint-text')?.textContent).toBe('Press L: Toggle orbit lines');
+      // An uppercase key is pressed with Shift, so the tip names the real chord.
+      expect(getEl('loading-hint-text')?.textContent).toBe('Press Shift+L: Toggle orbit lines');
     });
 
     it('starts with a nonempty hint and a hidden disabled start button', () => {

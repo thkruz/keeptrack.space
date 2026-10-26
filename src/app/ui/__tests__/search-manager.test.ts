@@ -5,12 +5,14 @@ import { GroupsManager } from '@app/app/data/groups-manager';
 import { SearchManager, SearchResultType } from '@app/app/ui/search-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
-import { BaseObject, Degrees, Radians, Satellite, Star } from '@ootk/src/main';
+import { BaseObject, Degrees, Radians, Satellite, SpaceObjectType, Star } from '@ootk/src/main';
 import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -450,6 +452,92 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults).toEqual([]);
     });
 
+    describe('Filter Menu hides objects from search', () => {
+      const savedFilter = settingsManager.filter;
+      const ambient = (globalThis as unknown as { settingsManager?: typeof settingsManager }).settingsManager;
+      const savedAmbientFilter = ambient?.filter;
+      // search-query reads the imported settingsManager, color-scheme-manager the ambient global: set both.
+      const setFilter = (filter: typeof settingsManager.filter) => {
+        settingsManager.filter = filter;
+        if (ambient) {
+          ambient.filter = filter;
+        }
+      };
+      let colorSchemeSpy: ReturnType<typeof vi.spyOn>;
+
+      beforeEach(() => {
+        // The real "is...Off" checks; they read only settingsManager.filter.
+        const colorSchemeManager = Object.assign(Object.create(ColorSchemeManager.prototype) as ColorSchemeManager, { calculateColorBuffers: vi.fn() });
+
+        colorSchemeSpy = vi.spyOn(ServiceLocator, 'getColorSchemeManager').mockReturnValue(colorSchemeManager);
+        objects.push(new Satellite({ ...defaultSat, id: 4, name: 'FENGYUN 1C DEB', sccNum: '29228', type: SpaceObjectType.DEBRIS }));
+        wireUpServiceLocator(buildCatalog(objects));
+      });
+
+      afterEach(() => {
+        settingsManager.filter = savedFilter;
+        if (ambient) {
+          ambient.filter = savedAmbientFilter ?? {};
+        }
+        colorSchemeSpy.mockRestore();
+      });
+
+      it('does not return a satellite a filter hides, by name or by NORAD number', () => {
+        setFilter({ debris: false });
+        searchManager.doSearch('FENGYUN');
+        expect(settingsManager.lastSearchResults).toEqual([]);
+        searchManager.doSearch('29228');
+        expect(settingsManager.lastSearchResults).toEqual([]);
+        // Unfiltered objects still match.
+        searchManager.doSearch('25544');
+        expect(settingsManager.lastSearchResults).toEqual([0]);
+
+        setFilter({ debris: true });
+        searchManager.doSearch('29228');
+        expect(settingsManager.lastSearchResults).toEqual([4]);
+      });
+
+      it('hides ground sensors and launch sites with their filters', () => {
+        settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: true, launchSite: true };
+        setFilter({ groundSensors: false, launchFacilities: false });
+        searchManager.doSearch('CAPE');
+        expect(settingsManager.lastSearchResults).toEqual([]);
+        searchManager.doSearch('BAIKONUR');
+        expect(settingsManager.lastSearchResults).toEqual([]);
+      });
+
+      it('re-runs the open search when a filter changes', () => {
+        searchManager.init();
+        searchManager.isResultsOpen = true;
+        (document.getElementById('search') as HTMLInputElement).value = 'FENGYUN';
+        const doSearch = vi.spyOn(searchManager, 'doSearch');
+
+        EventBus.getInstance().emit(EventBusEvent.filterChanged);
+        expect(doSearch).toHaveBeenCalledWith('FENGYUN');
+      });
+    });
+
+    it('drops blank tokens that groups without catalog numbers wrote into #search', () => {
+      searchManager.doSearch('25544,,, ,');
+      expect((document.getElementById('search') as HTMLInputElement).value).toBe('25544');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
+
+      // A list of only blank tokens is an empty search.
+      (document.getElementById('search') as HTMLInputElement).value = ',,,';
+      searchManager.doSearch(',,,');
+      expect((document.getElementById('search') as HTMLInputElement).value).toBe('');
+    });
+
+    it('hides stale rows when the query drops below the minimum length', () => {
+      settingsManager.minimumSearchCharacters = 2;
+      searchManager.doSearch('ZARYA');
+      searchManager.isResultsOpen = true;
+      const hide = vi.spyOn(searchManager, 'hideResults');
+
+      searchManager.doSearch('ZA');
+      expect(hide).toHaveBeenCalled();
+    });
+
     it('hides a MIRV child until it separates, then includes it', () => {
       const rv = new MissileObject({
         id: 4,
@@ -514,6 +602,27 @@ describe('SearchManager interactions', () => {
     const topMenu = PluginRegistry.getPlugin(TopMenu);
 
     expect(topMenu?.navItems.some((n) => n.id === 'search-btn')).toBe(true);
+  });
+
+  it('dropBlankTokens removes empty tokens and keeps one trailing comma only while typing', () => {
+    expect(SearchManager.dropBlankTokens('1,,2,')).toBe('1,2');
+    expect(SearchManager.dropBlankTokens(',,')).toBe('');
+    expect(SearchManager.dropBlankTokens('ISS (ZARYA)')).toBe('ISS (ZARYA)');
+    expect(SearchManager.dropBlankTokens('25544,', true)).toBe('25544,');
+    expect(SearchManager.dropBlankTokens('25544,,', true)).toBe('25544,');
+  });
+
+  it('the placeholder names the real search chord (Shift+F) exactly once', () => {
+    expect(SearchManager.placeholderWithHint('Search...')).toBe('Search... (Shift+F)');
+    expect(SearchManager.placeholderWithHint('Search... (Shift+F)')).toBe('Search... (Shift+F)');
+  });
+
+  it('hideResults removes the old result rows', () => {
+    const results = document.getElementById('search-results') as HTMLElement;
+
+    results.innerHTML = '<div class="search-result" data-obj-id="0">ISS</div>';
+    mgr.hideResults();
+    expect(results.querySelectorAll('.search-result')).toHaveLength(0);
   });
 
   it('doArraySearch builds a comma-separated list of sccNums', () => {

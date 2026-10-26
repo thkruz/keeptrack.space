@@ -379,6 +379,11 @@ function getSearchableObjects(onlySatellites = false): BaseObject[] {
         return false;
       } // Everything has a name. If it doesn't then assume it isn't what we are searching for.
 
+      // Objects the Filter Menu hides are not drawn or pickable, so search must not offer them either.
+      if (isHiddenByFilter(obj)) {
+        return false;
+      }
+
       // Skip decayed satellites (position 0,0,0) if setting is disabled. Static
       // objects (stars, sensors, launch sites, planets) hold fixed positions that
       // are not in the dots position buffer, so never treat them as decayed.
@@ -430,6 +435,70 @@ export function isReplacedByOemObject(obj: BaseObject, oemNoradIds: Set<string>)
   const sccNum = (obj as Satellite).sccNum;
 
   return typeof sccNum === 'string' && sccNum.length > 0 && oemNoradIds.has(sccNum);
+}
+
+/**
+ * The ColorSchemeManager "is...Off" checks behind the Filter Menu, in the order the
+ * color pass applies them. Each returns true when a filter hides the object.
+ */
+const SATELLITE_FILTER_CHECKS = [
+  'isDebrisOff',
+  'isJscVimpelSatOff',
+  'isStarlinkSatOff',
+  'isCelestrakSatOff',
+  'isCelestrakSupSatOff',
+  'isSatnogsSatOff',
+  'isUnitedStatesOff',
+  'isUnitedKingdomOff',
+  'isFranceOff',
+  'isGermanyOff',
+  'isJapanOff',
+  'isChinaOff',
+  'isIndiaOff',
+  'isRussiaOff',
+  'isUssrOff',
+  'isSouthKoreaOff',
+  'isAustraliaOff',
+  'isOtherCountriesOff',
+  'isvLeoSatOff',
+  'isXGeoSatOff',
+  'isLeoSatOff',
+  'isOperationalPayloadOff',
+  'isNonOperationalPayloadOff',
+  'isRocketBodyOff',
+  'isUnknownTypeOff',
+  'isNotionalSatOff',
+  'isHeoSatOff',
+  'isMeoSatOff',
+  'isGeoSatOff',
+] as const;
+
+/**
+ * True when the Filter Menu (`settingsManager.filter`) hides `obj`: a satellite matching
+ * any disabled filter, a ground sensor with Ground Sensors off, or a launch site with
+ * Launch Facilities off. Uses the same checks as the color pass, so search, drawing and
+ * picking agree. Other kinds (stars, planets, missiles) have no filter.
+ */
+export function isHiddenByFilter(obj: BaseObject): boolean {
+  const filter = settingsManager.filter as Record<string, boolean | undefined> | undefined;
+
+  // Fast path: nothing is filtered (the common case), so skip the per-object checks.
+  if (!filter || !Object.values(filter).includes(false)) {
+    return false;
+  }
+  if (obj.isSensor()) {
+    return filter.groundSensors === false;
+  }
+  if (obj.type === SpaceObjectType.LAUNCH_SITE) {
+    return filter.launchFacilities === false;
+  }
+  if (!obj.isSatellite()) {
+    return false;
+  }
+
+  const colorSchemeManager = ServiceLocator.getColorSchemeManager();
+
+  return SATELLITE_FILTER_CHECKS.some((check) => colorSchemeManager?.[check]?.(obj) === true);
 }
 
 /**

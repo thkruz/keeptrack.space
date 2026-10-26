@@ -1135,7 +1135,8 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
-    const orbits = Math.min(20, Math.max(0.5, minutes / period));
+    // Round to the 2 decimals the Orbits field shows, so the field, the trace and the stored value agree.
+    const orbits = Math.round(Math.min(20, Math.max(0.5, minutes / period)) * 100) / 100;
 
     this.orbitMultiplier_ = orbits;
 

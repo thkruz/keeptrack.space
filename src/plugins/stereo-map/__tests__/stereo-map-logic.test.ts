@@ -132,5 +132,28 @@ describe('StereoMap input synchronization', () => {
 
       expect(p().orbitMultiplier_).toBeCloseTo(2, 5);
     });
+
+    it('rounds the derived orbit multiplier to the 2 decimals the Orbits field shows', () => {
+      // ISS-like period: 186 / 92.97 = 2.00064..., which used to be kept (and stored) unrounded.
+      vi.spyOn(p(), 'getSelectedSatPeriod_').mockReturnValue(92.97);
+      vi.spyOn(p(), 'debouncedMapUpdate_').mockImplementation(() => undefined);
+      (getEl('stereo-map-minutes') as HTMLInputElement).value = '186';
+
+      p().onMinutesInputChanged_();
+
+      expect(p().orbitMultiplier_).toBe(2);
+      expect((getEl('stereo-map-orbit-mult') as HTMLInputElement).value).toBe('2.00');
+      expect(parseFloat((getEl('stereo-map-orbit-mult') as HTMLInputElement).value)).toBe(p().orbitMultiplier_);
+    });
+
+    it('rounds after clamping to the 20-orbit maximum', () => {
+      vi.spyOn(p(), 'getSelectedSatPeriod_').mockReturnValue(90);
+      vi.spyOn(p(), 'debouncedMapUpdate_').mockImplementation(() => undefined);
+      (getEl('stereo-map-minutes') as HTMLInputElement).value = '5000';
+
+      p().onMinutesInputChanged_();
+
+      expect(p().orbitMultiplier_).toBe(20);
+    });
   });
 });

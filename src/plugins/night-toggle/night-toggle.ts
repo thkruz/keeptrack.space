@@ -52,6 +52,7 @@ export class NightToggle extends KeepTrackPlugin {
     return [
       {
         key: 'N',
+        description: t7e('plugins.NightToggle.commandPalette.toggle'),
         callback: () => this.bottomMenuClicked(),
       },
     ];

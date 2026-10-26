@@ -7,6 +7,7 @@ import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-cap
 import { TopMenuPlugin } from '@app/engine/plugins/top-menu-plugin';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { shake } from '@app/engine/utils/shake';
 import { TranslationKey, t7e } from '@app/locales/keys';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
@@ -434,6 +435,44 @@ export function syncBadgesFromEvents(updateBadgeFn: (id: string, badge: DrawerBa
       updateBadgeFn(id, null);
     }
   }
+}
+
+// ---- Disabled Utility Icons ----
+
+/**
+ * Explain a click on a disabled utility icon instead of swallowing it.
+ *
+ * The icon shakes, and when its plugin is disabled because it needs a selection
+ * (`isRequireSensorSelected` / `isRequireSatelliteSelected`) the plugin's own
+ * verify method shows the matching "Select a ... first!" toast. Nothing is
+ * emitted, so the action itself never runs from a disabled icon.
+ * @returns true when a "needs selection" message was shown.
+ */
+export function explainDisabledUtilityIcon(iconEl: HTMLElement): boolean {
+  shake(iconEl);
+
+  const bottomIconId = iconEl.dataset.pluginId;
+
+  if (!bottomIconId) {
+    return false;
+  }
+
+  const plugin = PluginRegistry.plugins.find((p) => p.bottomIconElementName === bottomIconId);
+
+  if (!plugin) {
+    return false;
+  }
+
+  // Same order as the base bottomMenuClick handler: sensor first, then satellite.
+  if (plugin.isRequireSensorSelected && !plugin.verifySensorSelected()) {
+    return true;
+  }
+
+  if (plugin.isRequireSatelliteSelected && !plugin.verifySatelliteSelected()) {
+    return true;
+  }
+
+  return false;
 }
 
 // ---- Utility Footer Sync ----

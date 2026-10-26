@@ -24,6 +24,7 @@ import {
   type DrawerItemData,
   drawerItemPluginId,
   drawerItemsForPluginSelector,
+  explainDisabledUtilityIcon,
   loadRecents,
   type RecentEntry,
   recordRecent,
@@ -469,6 +470,14 @@ export class PluginDrawer {
         const iconEl = (evt.target as HTMLElement).closest('.drawer-utility-icon') as HTMLElement | null;
 
         if (!iconEl || iconEl.classList.contains('disabled')) {
+          return;
+        }
+
+        // A disabled icon stays clickable so it can explain itself ("Select a
+        // satellite first!") without running the action.
+        if (iconEl.classList.contains('bmenu-item-disabled')) {
+          explainDisabledUtilityIcon(iconEl);
+
           return;
         }
 

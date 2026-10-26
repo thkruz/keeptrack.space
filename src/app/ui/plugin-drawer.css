@@ -745,8 +745,19 @@ body.drawer-mode {
     opacity: 1;
   }
 
+  /*
+   * Stay clickable when disabled: the click shows why the icon is unavailable
+   * ("Select a satellite first!") without running the action. No hover lift, so
+   * it does not read as a normal action.
+   */
   .drawer-utility-icon.bmenu-item-disabled {
-    pointer-events: none;
+    /* !important: the Tooltips plugin sets an inline `cursor: pointer` on every kt-tooltip element. */
+    cursor: not-allowed !important;
+  }
+
+  .drawer-utility-icon.bmenu-item-disabled:hover {
+    background: transparent;
+    transform: none;
   }
 
   .drawer-utility-icon.bmenu-item-disabled img {

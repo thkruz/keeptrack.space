@@ -65,6 +65,7 @@
         "plannedFuture": "Für zukünftiges Update geplant."
       },
       "filterPlaceholder": "Körper filtern…",
+      "filterNoMatches": "Keine passenden Himmelskörper",
       "commands": {
         "toggleMenu": "Planetenmenü umschalten",
         "centerOn": "Kamera auf {body} zentrieren"
@@ -75,7 +76,6 @@
         "imgCaption": "Klicken Sie auf einen Körper, um die Kamera darauf zu zentrieren.",
         "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Planeten</strong> über die Plugin-Leiste oder drücken Sie <strong>P</strong>.</li><li>Klicken Sie auf einen Körper, zum Beispiel <strong>Mars</strong> oder <strong>Mond</strong>. Die Kamera zentriert sich darauf und die Zoomgrenzen passen sich dem neuen Maßstab an.</li><li>Drücken Sie <strong>Home</strong>, um zur Erde zurückzukehren, oder <strong>Shift</strong>+<strong>Home</strong>, um die Erde wieder im Bild zu zentrieren.</li></ol>",
         "tip1": "Die Bahn eines Mondes wird nur innerhalb des Systems seines Planeten gezeichnet - zentrieren Sie also zuerst Jupiter oder Saturn.",
-        "tip2": "Sie können auch mit der rechten Maustaste in den leeren Raum klicken und einen Körper im Kontextmenü auswählen.",
         "shortcutToggle": "Planeten-Menü umschalten",
         "shortcutHome": "Erde als Zentralkörper festlegen",
         "shortcutCenterEarth": "Kamera auf die Erde zentrieren"

@@ -89,3 +89,9 @@
 #planets-menu .planets-menu-disabled::after {
   display: none;
 }
+
+/* === Empty filter result === */
+#planets-menu .planets-filter-empty {
+  margin: 0;
+  padding: var(--kt-space-3) var(--kt-space-2) 0;
+}

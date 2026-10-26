@@ -3,8 +3,9 @@
     "FpsView": {
       "bottomIconLabel": "FPS-Ansicht",
       "commandPalette": {
-        "switch": "Zur FPS-Ansicht wechseln"
-      }
+        "switch": "FPS-Ansicht umschalten"
+      },
+      "firstUseHint": "FPS-Ansicht: W A S D zum Fliegen, Q und E nach oben und unten, Numpad 4 6 8 2 zum Drehen und Umsehen, Shift halten für langsam oder rechte Shift-Taste für schnell. Erneut 8 drücken zum Verlassen."
     }
   }
 }

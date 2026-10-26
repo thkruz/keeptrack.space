@@ -3,8 +3,9 @@
     "FpsView": {
       "bottomIconLabel": "FPS pohled",
       "commandPalette": {
-        "switch": "Přepnout na pohled FPS"
-      }
+        "switch": "Přepnout pohled FPS"
+      },
+      "firstUseHint": "Pohled FPS: W A S D pro let, Q a E pro pohyb nahoru a dolů, Numpad 4 6 8 2 pro otáčení a rozhlížení, podržte Shift pro pomalý nebo pravý Shift pro rychlý pohyb. Opětovným stiskem 8 pohled opustíte."
     }
   }
 }

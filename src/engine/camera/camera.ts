@@ -379,35 +379,17 @@ export class Camera {
         break;
     }
 
-    // Skip delegate-backed camera modes if their delegate isn't registered (pro plugin not loaded)
-    if (this.cameraType === CameraType.FLAT_MAP && !this.hasModeDelegate(CameraType.FLAT_MAP)) {
-      this.cameraType++;
-    }
+    /*
+     * Skip every mode whose prerequisite is missing: a selected satellite (ECI, LVLH, satellite
+     * first person), a selected sensor (polar, planetarium, astronomy) or a registered Pro delegate
+     * (flat map, polar). The cycle runs in enum order, so each skip lands on the next candidate,
+     * which gets its own check. A mode is skipped only when it IS the candidate: an empty
+     * selection must not bump a mode that does not need one (e.g. Earth view -> flat map).
+     */
+    const isSatSelected = (selectSatManagerInstance?.selectedSat ?? -1) !== -1;
+    const isSensorSelected = sensorManagerInstance.isSensorSelected();
 
-    if ((this.cameraType === CameraType.FIXED_TO_SAT_LVLH && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
-      this.cameraType++;
-    }
-    if ((this.cameraType === CameraType.FIXED_TO_SAT_ECI && !selectSatManagerInstance) || selectSatManagerInstance?.selectedSat === -1) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.POLAR_VIEW && !sensorManagerInstance.isSensorSelected()) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.POLAR_VIEW && !this.hasModeDelegate(CameraType.POLAR_VIEW)) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.PLANETARIUM && !sensorManagerInstance.isSensorSelected()) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.ASTRONOMY && !sensorManagerInstance.isSensorSelected()) {
-      this.cameraType++;
-    }
-
-    if (this.cameraType === CameraType.SATELLITE_FIRST_PERSON && selectSatManagerInstance?.selectedSat === -1) {
+    while (this.cameraType < CameraType.MAX_CAMERA_TYPES && !this.isCycleCandidateAvailable_(this.cameraType, isSatSelected, isSensorSelected)) {
       this.cameraType++;
     }
 
@@ -421,7 +403,7 @@ export class Camera {
       this.state.isLocalRotateReset = true;
       this.fov = 0.6 as Radians;
       renderer.glInit();
-      if ((selectSatManagerInstance?.selectedSat ?? '-1') !== '-1') {
+      if (isSatSelected) {
         this.state.camZoomSnappedOnSat = true;
         this.cameraType = CameraType.FIXED_TO_SAT_ECI;
       } else {
@@ -469,7 +451,7 @@ export class Camera {
     const isZoomingOut = delta > 0;
     const zoomSensitivity = isZoomingOut ? Math.max(this.state.zoomLevel, Camera.zoomOutSensitivityFloor_()) : Math.max(this.state.zoomLevel, 0.001);
 
-    if (settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? '-1') === '-1' || !this.state.camZoomSnappedOnSat) {
+    if (settingsManager.isZoomStopsSnappedOnSat || (selectSatManagerInstance?.selectedSat ?? -1) === -1 || !this.state.camZoomSnappedOnSat) {
       // No satellite selected, not snapped, or snapping disabled — standard Earth-centered zoom
       this.state.zoomTarget += (delta / 100 / 25 / this.state.speedModifier) * zoomSensitivity;
     } else {
@@ -653,6 +635,13 @@ export class Camera {
     if (this.lastCameraType_ !== this.cameraType) {
       this.getModeDelegate_(this.lastCameraType_)?.onExit(this);
       this.getModeDelegate_(this.cameraType)?.onEnter(this);
+
+      if (this.cameraType === CameraType.FPS) {
+        // Every entry starts from the default FPS pose, whatever route set cameraType
+        this.resetFpsPos_();
+      } else if (this.lastCameraType_ === CameraType.FPS) {
+        this.resetScreenPan_();
+      }
 
       // Set FOV target based on new camera mode
       if (this.isSatelliteFocusedMode_(this.cameraType)) {
@@ -1036,6 +1025,57 @@ export class Camera {
 
     this.cameraType = val;
     this.resetFpsPos_();
+  }
+
+  /** Whether the `v` cycle may stop on this mode with the current selection and plugins. */
+  private isCycleCandidateAvailable_(type: CameraType, isSatSelected: boolean, isSensorSelected: boolean): boolean {
+    switch (type) {
+      case CameraType.FLAT_MAP:
+        return this.hasModeDelegate(CameraType.FLAT_MAP);
+      case CameraType.FIXED_TO_SAT_ECI:
+      case CameraType.FIXED_TO_SAT_LVLH:
+      case CameraType.SATELLITE_FIRST_PERSON:
+        return isSatSelected;
+      case CameraType.POLAR_VIEW:
+        return isSensorSelected && this.hasModeDelegate(CameraType.POLAR_VIEW);
+      case CameraType.PLANETARIUM:
+      case CameraType.ASTRONOMY:
+        return isSensorSelected;
+      default:
+        return true;
+    }
+  }
+
+  /**
+   * Return to a camera mode remembered earlier (e.g. the mode FPS View was entered from).
+   * Satellite-relative modes re-run the selection pipeline, as the `v` cycle does, so the
+   * orientation resets; a mode whose prerequisite is gone (no satellite, no sensor, no Pro
+   * delegate) falls back to Earth view.
+   */
+  restoreCameraType(type: CameraType): void {
+    const ssm = PluginRegistry.getPlugin(SelectSatManager);
+    const isSatSelected = (ssm?.selectedSat ?? -1) !== -1;
+    const isSensorSelected = ServiceLocator.getSensorManager()?.isSensorSelected() ?? false;
+    const needsSat = type === CameraType.FIXED_TO_SAT_ECI || type === CameraType.FIXED_TO_SAT_LVLH || type === CameraType.SATELLITE_FIRST_PERSON;
+    const needsSensor = type === CameraType.POLAR_VIEW || type === CameraType.PLANETARIUM || type === CameraType.ASTRONOMY;
+    const needsDelegate = type === CameraType.FLAT_MAP || type === CameraType.POLAR_VIEW;
+    const isInvalid = type <= CameraType.CURRENT || type >= CameraType.MAX_CAMERA_TYPES || type === CameraType.FPS;
+
+    if (isInvalid || (needsSat && !isSatSelected) || (needsSensor && !isSensorSelected) || (needsDelegate && !this.hasModeDelegate(type))) {
+      this.cameraType = CameraType.FIXED_TO_EARTH;
+
+      return;
+    }
+
+    if (ssm && (type === CameraType.FIXED_TO_SAT_ECI || type === CameraType.FIXED_TO_SAT_LVLH)) {
+      ssm.lastSatCameraType = type;
+      this.cameraType = CameraType.FIXED_TO_EARTH;
+      ssm.selectSat(ssm.selectedSat);
+
+      return;
+    }
+
+    this.cameraType = type;
   }
 
   /**
@@ -1717,6 +1757,28 @@ export class Camera {
     }
   }
 
+  /**
+   * Drop any screen-pan offset and stop the arrow-key auto-pan. The arrows pan the screen in
+   * FPS View; without this the offset (and a latched auto-pan) carried into the next camera.
+   */
+  private resetScreenPan_(): void {
+    settingsManager.isAutoPanL = false;
+    settingsManager.isAutoPanR = false;
+    settingsManager.isAutoPanU = false;
+    settingsManager.isAutoPanD = false;
+    this.state.panCurrent.x = 0;
+    this.state.panCurrent.y = 0;
+    this.state.panCurrent.z = 0;
+    this.state.panTarget.x = 0;
+    this.state.panTarget.y = 0;
+    this.state.panTarget.z = 0;
+    this.state.panDif.x = 0;
+    this.state.panDif.y = 0;
+    this.state.panDif.z = 0;
+    this.state.panSpeed = { x: 0, y: 0, z: 0 };
+    this.state.panStartPosition = { x: 0, y: 0, z: 0 };
+  }
+
   private resetFpsPos_(): void {
     this.state.fpsPitch = <Degrees>0;
     this.state.fpsYaw = <Degrees>0;
@@ -2102,12 +2164,15 @@ export class Camera {
     this.state.panDif.y = this.state.screenDragPoint[1] - this.state.mouseY;
     this.state.panDif.z = this.state.screenDragPoint[1] - this.state.mouseY;
 
-    // Slow down the panning if a satellite is selected
-    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? '-1') !== '-1') {
-      this.state.panDif.x /= 30;
-      this.state.panDif.y /= 30;
-      this.state.panDif.z /= 30;
-    }
+    /*
+     * Scale the drag down. This used to be gated on "a satellite is selected", but the check
+     * compared the numeric selectedSat with the string '-1' and so always passed: every pan
+     * has shipped at this rate. Kept unconditional so panning with nothing selected does not
+     * suddenly become 30x faster.
+     */
+    this.state.panDif.x /= 30;
+    this.state.panDif.y /= 30;
+    this.state.panDif.z /= 30;
 
     this.state.panTarget.x = this.state.panStartPosition.x + this.state.panDif.x * this.panMovementSpeed_ * this.state.zoomLevel;
     if (this.state.isWorldPan) {

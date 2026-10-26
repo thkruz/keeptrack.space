@@ -3,8 +3,9 @@
     "FpsView": {
       "bottomIconLabel": "FPS View",
       "commandPalette": {
-        "switch": "Switch to FPS View"
-      }
+        "switch": "Toggle FPS View"
+      },
+      "firstUseHint": "FPS View: W A S D to fly, Q and E to move up and down, Numpad 4 6 8 2 to turn and look, hold Shift for slow or Right Shift for fast. Press 8 again to leave."
     }
   }
 }

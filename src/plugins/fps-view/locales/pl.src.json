@@ -3,8 +3,9 @@
     "FpsView": {
       "bottomIconLabel": "Widok pierwszoosobowy",
       "commandPalette": {
-        "switch": "Przełącz na widok FPS"
-      }
+        "switch": "Przełącz widok FPS"
+      },
+      "firstUseHint": "Widok FPS: W A S D do lotu, Q i E do ruchu w górę i w dół, klawiatura numeryczna 4 6 8 2 do obrotu i rozglądania się, przytrzymaj Shift, aby zwolnić, lub prawy Shift, aby przyspieszyć. Naciśnij ponownie 8, aby wyjść."
     }
   }
 }

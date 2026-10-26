@@ -3,8 +3,9 @@
     "FpsView": {
       "bottomIconLabel": "FPSビュー",
       "commandPalette": {
-        "switch": "FPSビューに切り替え"
-      }
+        "switch": "FPSビューの切り替え"
+      },
+      "firstUseHint": "FPSビュー: W A S Dで飛行、QとEで上昇・下降、テンキー4 6 8 2で旋回と視点移動、Shiftを押し続けると低速、右Shiftで高速。もう一度8を押すと終了します。"
     }
   }
 }

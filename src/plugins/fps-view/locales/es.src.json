@@ -3,8 +3,9 @@
     "FpsView": {
       "bottomIconLabel": "Vista FPS",
       "commandPalette": {
-        "switch": "Cambiar a vista FPS"
-      }
+        "switch": "Alternar vista FPS"
+      },
+      "firstUseHint": "Vista FPS: W A S D para volar, Q y E para subir y bajar, teclado numérico 4 6 8 2 para girar y mirar, mantén Shift para ir lento o Shift derecho para ir rápido. Pulsa 8 de nuevo para salir."
     }
   }
 }

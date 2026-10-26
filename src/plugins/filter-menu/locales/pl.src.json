@@ -15,6 +15,7 @@
       "resetToDefaults": "Przywróć domyślne",
       "defaultTooltip": "Wyłącz, aby ukryć {name}",
       "searchPlaceholder": "Szukaj filtrów...",
+      "noResults": "Żaden filtr nie pasuje do wyszukiwania.",
       "commands": {
         "category": "Filtry",
         "open": "Otwórz menu filtrów",

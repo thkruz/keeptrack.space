@@ -9,6 +9,8 @@ import { ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilit
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { GraphicsMenuPlugin } from '@app/plugins/graphics-menu/graphics-menu';
+import { GraticuleToggle } from '@app/plugins/graticule-toggle/graticule-toggle';
+import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
 import { settingsManager as moduleSettingsManager, SettingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -185,6 +187,53 @@ describe('GraphicsMenuPlugin behaviour', () => {
     input.dispatchEvent(new Event('change', { bubbles: true }));
 
     expect(moduleSettingsManager.orbitEclipseAlpha).toBe(1);
+  });
+
+  it('mirrors flags another plugin changed onto the rendered checkboxes in place on saveSettings', () => {
+    moduleSettingsManager.isDrawNightAsDay = false;
+    moduleSettingsManager.isDrawGraticule = false;
+    plugin.syncOnLoad();
+    const night = toggleEl('graphics-display', 'nightAsDay');
+
+    night.focus();
+    moduleSettingsManager.isDrawNightAsDay = true;
+    moduleSettingsManager.isDrawGraticule = true;
+    EventBus.getInstance().emit(EventBusEvent.saveSettings);
+
+    // Same element (no re-render), so focus is kept.
+    expect(toggleEl('graphics-display', 'nightAsDay')).toBe(night);
+    expect(document.activeElement).toBe(night);
+    expect(night.checked).toBe(true);
+    expect(toggleEl('graphics-display', 'graticule').checked).toBe(true);
+  });
+
+  it('follows the Night and Graticule toggles while open', () => {
+    moduleSettingsManager.isDrawNightAsDay = false;
+    moduleSettingsManager.isDrawGraticule = false;
+    plugin.syncOnLoad();
+
+    new NightToggle().on();
+    new GraticuleToggle().setGraticule(true);
+
+    expect(toggleEl('graphics-display', 'nightAsDay').checked).toBe(true);
+    expect(toggleEl('graphics-display', 'graticule').checked).toBe(true);
+    expect(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_NIGHT_AS_DAY)).toBe('true');
+    expect(PersistenceManager.getInstance().getItem(StorageKey.SETTINGS_DRAW_GRATICULE)).toBe('true');
+
+    new NightToggle().off();
+    expect(toggleEl('graphics-display', 'nightAsDay').checked).toBe(false);
+  });
+
+  it('re-syncs every control when the menu is opened', () => {
+    moduleSettingsManager.isDrawNightAsDay = false;
+    plugin.syncOnLoad();
+    // A change that announced nothing (no saveSettings), e.g. while the menu was closed.
+    moduleSettingsManager.isDrawNightAsDay = true;
+
+    plugin.isMenuButtonActive = true;
+    plugin.bottomIconCallback();
+
+    expect(toggleEl('graphics-display', 'nightAsDay').checked).toBe(true);
   });
 });
 

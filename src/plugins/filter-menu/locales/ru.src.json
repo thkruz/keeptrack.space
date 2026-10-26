@@ -15,6 +15,7 @@
       "resetToDefaults": "Сбросить по умолчанию",
       "defaultTooltip": "Отключите, чтобы скрыть {name}",
       "searchPlaceholder": "Поиск фильтров...",
+      "noResults": "Нет фильтров, соответствующих запросу.",
       "commands": {
         "category": "Фильтры",
         "open": "Открыть меню фильтров",

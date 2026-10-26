@@ -15,6 +15,7 @@
       "resetToDefaults": "重置为默认值",
       "defaultTooltip": "关闭以隐藏{name}",
       "searchPlaceholder": "搜索过滤器...",
+      "noResults": "没有与搜索匹配的过滤器。",
       "commands": {
         "category": "过滤器",
         "open": "打开过滤菜单",

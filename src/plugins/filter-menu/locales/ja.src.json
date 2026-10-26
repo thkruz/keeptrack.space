@@ -15,6 +15,7 @@
       "resetToDefaults": "デフォルトにリセット",
       "defaultTooltip": "{name}を非表示にするには無効にします",
       "searchPlaceholder": "フィルタを検索...",
+      "noResults": "検索に一致するフィルタはありません。",
       "commands": {
         "category": "フィルタ",
         "open": "フィルタメニューを開く",

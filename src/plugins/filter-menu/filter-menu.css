@@ -49,3 +49,12 @@
   width: calc(100% - 12px);
   margin: 8px 6px 0;
 }
+
+/* ===== Empty state (search with no matching filter) ===== */
+#filter-menu .filter-no-results {
+  margin: 4px 6px 12px;
+  padding: 12px;
+  color: var(--color-dark-text-muted);
+  font-size: 13px;
+  text-align: center;
+}

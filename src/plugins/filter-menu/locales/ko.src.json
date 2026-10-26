@@ -15,6 +15,7 @@
       "resetToDefaults": "기본값으로 재설정",
       "defaultTooltip": "{name} 숨기려면 비활성화",
       "searchPlaceholder": "필터 검색...",
+      "noResults": "검색과 일치하는 필터가 없습니다.",
       "commands": {
         "category": "필터",
         "open": "필터 메뉴 열기",

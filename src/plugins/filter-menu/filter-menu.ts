@@ -116,6 +116,8 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     return [
       {
         key: 'f',
+        // Explicit: an undefined modifier is a wildcard, which let Ctrl+F (Find Satellite) open this menu.
+        ctrl: false,
         callback: () => this.bottomMenuClicked(),
       },
     ];
@@ -305,6 +307,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
           <div id="filter-sections">
             ${this.generateFilterHtml_()}
           </div>
+          <div id="filter-no-results" class="filter-no-results" style="display: none;">${t7e('plugins.FilterMenuPlugin.noResults')}</div>
           <button id="filter-reset" type="button" class="kt-action waves-effect">
             <span class="kt-action-label">${t7e('plugins.FilterMenuPlugin.resetToDefaults')}</span>
           </button>
@@ -493,6 +496,13 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     }
 
     const checkbox = e.target as HTMLInputElement;
+
+    // Only the filter checkboxes are filters. The search box also fires `change` when an edit is
+    // committed (blur), and must not be written into settingsManager.filter.
+    if (checkbox?.type !== 'checkbox' || !checkbox.id.startsWith('filter-')) {
+      return;
+    }
+
     const filterId = checkbox.id.replace('filter-', '');
 
     this.setFilterValue_(filterId, checkbox.checked);
@@ -519,6 +529,7 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     }
 
     const needle = this.searchQuery_.trim().toLowerCase();
+    let isAnyRowVisible = false;
 
     menu.querySelectorAll<HTMLElement>('.kt-section').forEach((section) => {
       let anyVisible = false;
@@ -533,7 +544,15 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
       });
 
       section.style.display = anyVisible ? '' : 'none';
+      isAnyRowVisible ||= anyVisible;
     });
+
+    // Empty state: say so instead of leaving a blank menu.
+    const noResults = getEl('filter-no-results', true);
+
+    if (noResults) {
+      noResults.style.display = isAnyRowVisible ? 'none' : '';
+    }
   }
 
   private updateFilterUI_(): void {
@@ -560,6 +579,14 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     getFilters().forEach((filter) => {
       this.writeFilterValue_(filter.id!, defaultFilterValue(filter));
     });
+
+    // A reset shows the whole list again: clear the in-menu search too.
+    this.searchQuery_ = '';
+    const searchInput = getEl('filter-search', true) as HTMLInputElement | null;
+
+    if (searchInput) {
+      searchInput.value = '';
+    }
 
     this.saveSettings_();
     this.applySearchFilter_();

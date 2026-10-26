@@ -1,5 +1,9 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { EarthPresetsPlugin } from '@app/plugins/earth-presets/earth-presets';
+import { NightToggle } from '@app/plugins/night-toggle/night-toggle';
+import { PoliticalMapToggle } from '@app/plugins/political-map-toggle/political-map-toggle';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -44,6 +48,39 @@ describe('EarthPresetsPlugin onContextMenuAction', () => {
     expect(changeEarthTextureStyle).toHaveBeenCalled();
     expect(settingsManager.isDrawPoliticalMap).toBe(true);
     expect(EarthPresetsPlugin.lastAppliedPresetId).toBe('satellite');
+  });
+
+  it('Engineering Tool turns the political map off and dims its icon, and lights the Night icon', () => {
+    const political = new PoliticalMapToggle();
+    const night = new NightToggle();
+
+    political.init();
+    night.init();
+    settingsManager.isDrawPoliticalMap = true;
+    settingsManager.isDrawPoliticalLabels = false;
+    political.syncIconState();
+    expect(political.isMenuButtonActive).toBe(true);
+
+    plugin.onContextMenuAction('earth-engineer-rmb');
+
+    expect(settingsManager.isDrawPoliticalMap).toBe(false);
+    expect(political.isMenuButtonActive).toBe(false);
+    expect(settingsManager.isDrawNightAsDay).toBe(true);
+    expect(night.isMenuButtonActive).toBe(true);
+  });
+
+  it('Satellite Images switches night off without closing the open side menu', () => {
+    const night = new NightToggle();
+
+    night.init();
+    night.on();
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    plugin.onContextMenuAction('earth-satellite-rmb');
+
+    expect(settingsManager.isDrawNightAsDay).toBe(false);
+    expect(night.isMenuButtonActive).toBe(false);
+    expect(emitSpy.mock.calls.some(([event]) => event === EventBusEvent.hideSideMenus)).toBe(false);
   });
 
   it('exposes one command palette entry per preset', () => {

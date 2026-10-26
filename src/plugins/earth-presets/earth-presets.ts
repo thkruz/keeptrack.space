@@ -6,6 +6,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { NightToggle } from '../night-toggle/night-toggle';
+import { PoliticalMapToggle } from '../political-map-toggle/political-map-toggle';
 
 export type EarthPresetId = 'satellite' | 'nadir' | 'engineer' | 'opscenter' | '90sGraphics';
 
@@ -44,7 +45,6 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = true;
-        PluginRegistry.getPlugin(NightToggle)?.setBottomIconToUnselected();
         PluginRegistry.getPlugin(NightToggle)?.off();
       },
     },
@@ -60,7 +60,6 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
         settingsManager.isDrawPoliticalMap = true;
         settingsManager.isDrawAtmosphere = AtmosphereSettings.ON;
         settingsManager.isEarthAmbientLighting = true;
-        PluginRegistry.getPlugin(NightToggle)?.setBottomIconToUnselected();
         PluginRegistry.getPlugin(NightToggle)?.off();
       },
     },
@@ -124,6 +123,8 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
       return;
     }
     preset.apply();
+    // Presets write isDrawPoliticalMap directly; keep the Political Map icon in step with it.
+    PluginRegistry.getPlugin(PoliticalMapToggle)?.syncIconState();
     EarthPresetsPlugin.lastAppliedPresetId = preset.id;
   }
 

@@ -2,6 +2,7 @@ import { apiFetch } from '@app/app/data/api-fetch';
 import { CatalogLoader, JsSat, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -15,7 +16,8 @@ import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { Satellite } from '@ootk/src/main';
 import satelliteAltPng from '@public/img/icons/satellite-alt.png';
-import { CatalogBrowserData } from './catalog-browser-data';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { CatalogBrowserData, CatalogEntry } from './catalog-browser-data';
 import type { CatalogBrowserConfiguration } from './catalog-browser-settings';
 import { CelesTrakNoDataError } from './celestrak-no-data-error';
 import './catalog-browser.css';
@@ -25,12 +27,26 @@ type T7eKey = Parameters<typeof t7e>[0];
 const CELESTRAK_GP_URL = 'https://celestrak.org/NORAD/elements/gp.php';
 const CELESTRAK_SUP_GP_URL = 'https://celestrak.org/NORAD/elements/supplemental/sup-gp.php';
 
+/** Upper bound on waiting for the propagation worker after a live catalog swap. */
+const CATALOG_READY_TIMEOUT_MS = 30000;
+
+type KeepTrackCatalogMode = 'DEFAULT' | 'CELESTRAK_ONLY' | 'VIMPEL_ONLY';
+
+/** Row id, display-name key, success toast key and failure toast key for each KeepTrack catalog. */
+const KEEPTRACK_CATALOGS: Readonly<Record<KeepTrackCatalogMode, { id: string; nameKey: string; toastKey: string; errorKey: string }>> = {
+  DEFAULT: { id: 'default', nameKey: 'defaultCatalog', toastKey: 'defaultLoaded', errorKey: 'DefaultFailed' },
+  CELESTRAK_ONLY: { id: 'celestrak-only', nameKey: 'celestrakOnly', toastKey: 'celestrakLoaded', errorKey: 'CelestrakFailed' },
+  VIMPEL_ONLY: { id: 'vimpel-only', nameKey: 'vimpelOnly', toastKey: 'vimpelLoaded', errorKey: 'VimpelFailed' },
+};
+
 export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPaletteCapable {
   readonly id = 'CatalogBrowserPlugin';
   dependencies_: string[] = [];
 
   private isLoading_ = false;
   private orbitalDataOnly_ = false;
+  /** data-id of the catalog row that is currently loaded, or null when another tool swapped the catalog. */
+  private currentCatalogId_: string | null = KEEPTRACK_CATALOGS.DEFAULT.id;
 
   private get hideKeepTrackCatalogs_(): boolean {
     return (settingsManager.plugins?.CatalogBrowserPlugin as CatalogBrowserConfiguration | undefined)?.hideKeepTrackCatalogs ?? false;
@@ -133,7 +149,7 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
           id: `CatalogBrowserPlugin.load.${entry.id}`,
           label: t7e('plugins.CatalogBrowserPlugin.commands.loadCatalog' as T7eKey).replace('{name}', label),
           category,
-          callback: () => this.fetchAndLoadCatalog_(entry.queryParam),
+          callback: () => this.fetchAndLoadCatalog_(entry),
         });
       }
     }
@@ -149,6 +165,14 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+
+    // Another tool (Catalog Management, Historic Catalog, scenarios) replaced the catalog:
+    // no row describes what is loaded any more.
+    EventBus.getInstance().on(EventBusEvent.catalogReloaded, () => {
+      if (!this.isLoading_) {
+        this.setCurrentCatalog_(null);
+      }
+    });
   }
 
   private uiManagerFinal_(): void {
@@ -184,16 +208,34 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       if (queryParam === 'DEFAULT' || queryParam === 'CELESTRAK_ONLY' || queryParam === 'VIMPEL_ONLY') {
         this.loadKeepTrackCatalog_(queryParam);
       } else {
-        this.fetchAndLoadCatalog_(queryParam);
+        const entry = CatalogBrowserPlugin.findEntry_(queryParam);
+
+        if (entry) {
+          this.fetchAndLoadCatalog_(entry);
+        }
       }
     });
+
+    this.renderCurrentCatalog_();
+  }
+
+  private static findEntry_(queryParam: string): CatalogEntry | null {
+    for (const cat of CatalogBrowserData.categories) {
+      const entry = cat.entries.find((e) => e.queryParam === queryParam);
+
+      if (entry) {
+        return entry;
+      }
+    }
+
+    return null;
   }
 
   // =========================================================================
   // Core logic
   // =========================================================================
 
-  private async loadKeepTrackCatalog_(mode: 'DEFAULT' | 'CELESTRAK_ONLY' | 'VIMPEL_ONLY'): Promise<void> {
+  private async loadKeepTrackCatalog_(mode: KeepTrackCatalogMode): Promise<void> {
     if (this.isLoading_) {
       return;
     }
@@ -201,54 +243,61 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     this.isLoading_ = true;
     showAsyncIndicator();
     const uiManager = ServiceLocator.getUiManager();
+    const catalog = KEEPTRACK_CATALOGS[mode];
+    const wasMenuOpen = this.isMenuButtonActive;
+    let readyWait: { ready: Promise<void>; cancel: () => void } | null = null;
 
     try {
       this.cachedCatalog_ = null;
+      // Vimpel Only needs its data before the swap starts; a failed fetch leaves the catalog alone.
+      const vimpelData = mode === 'VIMPEL_ONLY' ? await CatalogBrowserPlugin.fetchVimpel_() : null;
 
-      if (mode === 'CELESTRAK_ONLY') {
+      // Every KeepTrack catalog swap ends with catalogReloaded once the worker has positions for
+      // the new catalog (CatalogLoader.load included), so all three report success only then.
+      this.prepareForSwap_();
+      readyWait = this.waitForCatalogReloaded_();
+
+      if (vimpelData) {
+        // Route through the JSC Vimpel pipeline (not raw-TLE reload) so altIds,
+        // labels, and object types match the initial-boot processing.
+        await CatalogLoader.reloadVimpelCatalog(vimpelData);
+      } else if (mode === 'CELESTRAK_ONLY') {
         settingsManager.isEnableJscCatalog = false;
         try {
           await CatalogLoader.load();
         } finally {
           settingsManager.isEnableJscCatalog = true;
         }
-      } else if (mode === 'VIMPEL_ONLY') {
-        const resp = await apiFetch(settingsManager.dataSources.vimpel);
-
-        if (!resp.ok) {
-          throw new Error(`Vimpel fetch returned HTTP ${resp.status}`);
-        }
-        const vimpelData = (await resp.json()) as JsSat[];
-
-        // Route through the JSC Vimpel pipeline (not raw-TLE reload) so altIds,
-        // labels, and object types match the initial-boot processing.
-        await CatalogLoader.reloadVimpelCatalog(vimpelData);
       } else {
         await CatalogLoader.load();
       }
+      await readyWait.ready;
 
-      let toastSuffix: string;
-
-      if (mode === 'DEFAULT') {
-        toastSuffix = 'defaultLoaded';
-      } else if (mode === 'CELESTRAK_ONLY') {
-        toastSuffix = 'celestrakLoaded';
-      } else {
-        toastSuffix = 'vimpelLoaded';
-      }
-
-      uiManager.toast(t7e(`plugins.CatalogBrowserPlugin.toasts.${toastSuffix}` as T7eKey), ToastMsgType.normal);
+      this.setCurrentCatalog_(catalog.id);
+      uiManager.toast(t7e(`plugins.CatalogBrowserPlugin.toasts.${catalog.toastKey}` as T7eKey), ToastMsgType.normal);
     } catch (error) {
+      readyWait?.cancel();
       // The localized toast below replaces the raw (English) error message.
       errorManagerInstance.error(error, 'CatalogBrowserPlugin', undefined, { skipToast: true });
-      uiManager.toast(t7e('plugins.CatalogBrowserPlugin.errorMsgs.DefaultFailed' as T7eKey), ToastMsgType.critical);
+      uiManager.toast(t7e(`plugins.CatalogBrowserPlugin.errorMsgs.${catalog.errorKey}` as T7eKey), ToastMsgType.critical);
     } finally {
       this.isLoading_ = false;
       hideAsyncIndicator();
+      this.restoreMenu_(wasMenuOpen);
     }
   }
 
-  private async fetchAndLoadCatalog_(queryParam: string): Promise<void> {
+  private static async fetchVimpel_(): Promise<JsSat[]> {
+    const resp = await apiFetch(settingsManager.dataSources.vimpel);
+
+    if (!resp.ok) {
+      throw new Error(`Vimpel fetch returned HTTP ${resp.status}`);
+    }
+
+    return (await resp.json()) as JsSat[];
+  }
+
+  private async fetchAndLoadCatalog_(entry: CatalogEntry): Promise<void> {
     if (this.isLoading_) {
       return;
     }
@@ -256,9 +305,11 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     this.isLoading_ = true;
     showAsyncIndicator();
     const uiManager = ServiceLocator.getUiManager();
+    const wasMenuOpen = this.isMenuButtonActive;
+    let readyWait: { ready: Promise<void>; cancel: () => void } | null = null;
 
     try {
-      const url = this.buildCelesTrackUrl_(queryParam);
+      const url = this.buildCelesTrackUrl_(entry.queryParam);
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -282,14 +333,26 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
         this.ensureCatalogCached_();
         const merged = this.mergeWithCache_(tleContent);
 
+        this.prepareForSwap_();
+        readyWait = this.waitForCatalogReloaded_();
         await CatalogLoader.reloadCatalogFromData(merged);
       } else {
         this.cachedCatalog_ = null;
+        this.prepareForSwap_();
+        readyWait = this.waitForCatalogReloaded_();
         await CatalogLoader.reloadCatalog(tleContent);
       }
 
-      uiManager.toast(t7e('plugins.CatalogBrowserPlugin.toasts.loaded' as T7eKey).replace('{catalog}', queryParam.split('=')[1]), ToastMsgType.normal);
+      // The swap resolves before the propagation worker has positions for the new
+      // catalog; until then every object sits at 0,0,0 and cannot be selected.
+      await readyWait.ready;
+
+      this.setCurrentCatalog_(entry.id);
+      const name = t7e(`plugins.CatalogBrowserPlugin.entries.${entry.nameKey}` as T7eKey);
+
+      uiManager.toast(t7e('plugins.CatalogBrowserPlugin.toasts.loaded' as T7eKey).replace('{catalog}', name), ToastMsgType.normal);
     } catch (error) {
+      readyWait?.cancel();
       const { messageKey, toastType, isTransient } = this.classifyFetchError_(error);
 
       if (!isTransient) {
@@ -300,6 +363,124 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
     } finally {
       this.isLoading_ = false;
       hideAsyncIndicator();
+      this.restoreMenu_(wasMenuOpen);
+    }
+  }
+
+  /**
+   * Runs right before the catalog is replaced. Object ids are positions in the
+   * catalog, so a selection or search result kept across the swap would point at
+   * an unrelated object: clear the primary and secondary selection and the search.
+   */
+  private prepareForSwap_(): void {
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+    if (selectSatManager) {
+      if (selectSatManager.secondarySat !== -1) {
+        selectSatManager.setSecondarySat(-1, true);
+      }
+      selectSatManager.selectSat(-1);
+    }
+
+    this.clearSearch_();
+  }
+
+  /** Empties #search and its result rows without closing the side menus (closeSearch would). */
+  private clearSearch_(): void {
+    const searchManager = ServiceLocator.getUiManager().searchManager;
+    const searchInput = getEl('search', true) as HTMLInputElement | null;
+
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    try {
+      searchManager?.doSearch('');
+    } catch (error) {
+      errorManagerInstance.log(error);
+    }
+
+    getEl('search-results', true)?.replaceChildren();
+  }
+
+  /**
+   * Resolves on the next catalogReloaded (the propagation worker has positions
+   * for the new catalog), or after a timeout so a stuck worker cannot wedge the menu.
+   * Register before starting the swap; cancel() when the swap fails.
+   */
+  private waitForCatalogReloaded_(): { ready: Promise<void>; cancel: () => void } {
+    const eventBus = EventBus.getInstance();
+    let isDone = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    let resolveReady: () => void = () => {
+      // Replaced by the promise executor below.
+    };
+    const ready = new Promise<void>((resolve) => {
+      resolveReady = resolve;
+    });
+    const finish = (isInsideEmit: boolean): void => {
+      if (isDone) {
+        return;
+      }
+      isDone = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      if (isInsideEmit) {
+        // Unregister after the current emit loop so splicing does not skip the next listener.
+        queueMicrotask(() => eventBus.unregister(EventBusEvent.catalogReloaded, onReloaded));
+      } else {
+        eventBus.unregister(EventBusEvent.catalogReloaded, onReloaded);
+      }
+      resolveReady();
+    };
+    const onReloaded = (): void => finish(true);
+
+    eventBus.on(EventBusEvent.catalogReloaded, onReloaded);
+    timer = setTimeout(() => finish(false), CATALOG_READY_TIMEOUT_MS);
+
+    return { ready, cancel: () => finish(false) };
+  }
+
+  /** Deselecting during a swap can close side menus; reopen this one if it was open before. */
+  private restoreMenu_(wasMenuOpen: boolean): void {
+    if (wasMenuOpen && !this.isMenuButtonActive && this.bottomIconElementName) {
+      EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, this.bottomIconElementName);
+    }
+  }
+
+  private setCurrentCatalog_(catalogId: string | null): void {
+    this.currentCatalogId_ = catalogId;
+    this.renderCurrentCatalog_();
+  }
+
+  /** Marks the row of the loaded catalog (class, aria-current and a "Current" chip). */
+  private renderCurrentCatalog_(): void {
+    const listEl = getEl('cb-catalog-list', true);
+
+    if (!listEl) {
+      return;
+    }
+
+    for (const chip of Array.from(listEl.querySelectorAll('.cb-chip-current'))) {
+      chip.remove();
+    }
+
+    for (const row of Array.from(listEl.querySelectorAll<HTMLElement>('.cb-catalog-item'))) {
+      const isCurrent = this.currentCatalogId_ !== null && row.dataset.id === this.currentCatalogId_;
+
+      row.classList.toggle('cb-catalog-item-current', isCurrent);
+
+      if (isCurrent) {
+        row.setAttribute('aria-current', 'true');
+        const chip = document.createElement('span');
+
+        chip.className = 'cb-chip cb-chip-current';
+        chip.textContent = t7e('plugins.CatalogBrowserPlugin.labels.current' as T7eKey);
+        row.querySelector('.kt-action-label')?.after(chip);
+      } else {
+        row.removeAttribute('aria-current');
+      }
     }
   }
 

@@ -8,7 +8,8 @@
         "allData": "All Data",
         "orbitalOnly": "Orbital Only",
         "allDataDesc": "Replaces entire catalog with selected data",
-        "orbitalOnlyDesc": "Updates TLEs while preserving satellite metadata"
+        "orbitalOnlyDesc": "Updates TLEs while preserving satellite metadata",
+        "current": "Current"
       },
       "categories": {
         "special": "Special Interest",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "Failed to fetch catalog",
         "DefaultFailed": "Failed to restore default catalog",
+        "CelestrakFailed": "Failed to load the CelesTrak catalog",
+        "VimpelFailed": "Failed to load the JSC Vimpel catalog",
         "Forbidden": "CelesTrak rejected the request (HTTP 403). This is usually a Cloudflare rate limit; wait a minute and try again.",
         "RateLimited": "Too many catalog requests. Please wait a minute before trying again.",
         "ServerError": "CelesTrak is temporarily unavailable. Please try again in a few minutes.",

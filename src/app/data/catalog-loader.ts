@@ -207,6 +207,23 @@ export class CatalogLoader {
    *  If all files are missing, the function will return an error.
    */
   static async load(): Promise<void> {
+    /*
+     * At boot nothing is propagated yet and keeptrack.ts builds the buffers after this returns.
+     * Called again later (Catalog Browser: Default, CelesTrak Only) it is a live catalog swap: run
+     * it through the same scaffolding as the other reload paths, so the selection is cleared, the
+     * buffers are rebuilt for the new size and catalogReloaded fires once the new positions exist.
+     */
+    if (window.settingsManager.cruncherReady) {
+      await CatalogLoader.reloadWith_(() => CatalogLoader.loadSources_());
+
+      return;
+    }
+
+    await CatalogLoader.loadSources_();
+  }
+
+  /** Fetches the configured catalog sources and parses them (the body of {@link load}). */
+  private static async loadSources_(): Promise<void> {
     const settingsManager: SettingsManager = window.settingsManager;
 
     // Loading the live catalog measures GP age against the wall clock again.
@@ -460,6 +477,15 @@ export class CatalogLoader {
    * and keeps the loading screen up until the propagation worker reports ready.
    */
   private static async reloadFromParseArgs_(parseArgs: Parameters<typeof CatalogLoader.parse>[0]): Promise<void> {
+    await CatalogLoader.reloadWith_(() => CatalogLoader.parse(parseArgs));
+  }
+
+  /**
+   * The live-swap scaffolding around any catalog parse: deselects, resets the rendering
+   * subsystems, runs `runParse`, rebuilds the buffers, and emits catalogReloaded once the
+   * propagation worker has positions for the new catalog.
+   */
+  private static async reloadWith_(runParse: () => Promise<void>): Promise<void> {
     const { showLoadingSticky, hideLoading } = await import('../../engine/utils/showLoading');
     const { SelectSatManager } = await import('../../plugins/select-sat-manager/select-sat-manager');
     const { EventBus } = await import('../../engine/events/event-bus');
@@ -503,7 +529,7 @@ export class CatalogLoader {
       colorSchemeManager.resetForCatalogSwap();
 
       // Re-parse the catalog via existing pipeline
-      await CatalogLoader.parse(parseArgs);
+      await runParse();
 
       // Re-init GPU buffers with the new catalog size
       // This must run after parse (which sets objectCache/numObjects) but before

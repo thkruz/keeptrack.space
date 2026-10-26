@@ -1,11 +1,16 @@
 /* eslint-disable camelcase */
 import { CatalogLoader } from '@app/app/data/catalog-loader';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { CatalogBrowserPlugin } from '@app/plugins/catalog-browser/catalog-browser';
+import { CatalogEntry } from '@app/plugins/catalog-browser/catalog-browser-data';
 import { CelesTrakNoDataError } from '@app/plugins/catalog-browser/celestrak-no-data-error';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -19,6 +24,16 @@ const fakeSat = (over: Record<string, unknown> = {}) => ({
   rcs: 99.05,
   ...over,
 });
+
+const ACTIVE_ENTRY: CatalogEntry = { id: 'active', queryParam: 'GROUP=active', nameKey: 'active' };
+const ISS_ENTRY: CatalogEntry = { id: 'iss-supgp', queryParam: 'FILE=iss', nameKey: 'iss' };
+
+/** A swap mock that finishes the way the real loader does: catalogReloaded once the worker is ready. */
+const reloadThatSettles = () => {
+  EventBus.getInstance().emit(EventBusEvent.catalogReloaded);
+
+  return Promise.resolve();
+};
 
 describe('CatalogBrowserPlugin behavior', () => {
   let plugin: CatalogBrowserPlugin;
@@ -138,13 +153,14 @@ describe('CatalogBrowserPlugin behavior', () => {
       'fetch',
       vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('1 25544U\n2 25544') }))
     );
-    const reloadSpy = vi.spyOn(CatalogLoader, 'reloadCatalog').mockResolvedValue(undefined as never);
+    const reloadSpy = vi.spyOn(CatalogLoader, 'reloadCatalog').mockImplementation(reloadThatSettles);
     const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
-    await p().fetchAndLoadCatalog_('GROUP=active');
+    await p().fetchAndLoadCatalog_(ACTIVE_ENTRY);
 
     expect(reloadSpy).toHaveBeenCalled();
-    expect(toastSpy).toHaveBeenCalled();
+    // The toast names the source by its display name, not the raw query value ("active").
+    expect(toastSpy).toHaveBeenCalledWith('Loaded Active Satellites', ToastMsgType.normal);
   });
 
   it('VIMPEL_ONLY routes parsed vimpel.json through reloadVimpelCatalog, not reloadCatalog', async () => {
@@ -156,7 +172,7 @@ describe('CatalogBrowserPlugin behavior', () => {
       'fetch',
       vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve(vimpelData) }))
     );
-    const vimpelSpy = vi.spyOn(CatalogLoader, 'reloadVimpelCatalog').mockResolvedValue(undefined as never);
+    const vimpelSpy = vi.spyOn(CatalogLoader, 'reloadVimpelCatalog').mockImplementation(reloadThatSettles);
     const asciiSpy = vi.spyOn(CatalogLoader, 'reloadCatalog').mockResolvedValue(undefined as never);
 
     vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
@@ -181,7 +197,7 @@ describe('CatalogBrowserPlugin behavior', () => {
     const errorSpy = vi.spyOn(errorManagerInstance, 'error').mockImplementation(() => undefined);
     const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
-    await p().fetchAndLoadCatalog_('GROUP=active');
+    await p().fetchAndLoadCatalog_(ACTIVE_ENTRY);
 
     expect(reloadSpy).not.toHaveBeenCalled();
     expect(reloadFromDataSpy).not.toHaveBeenCalled();
@@ -196,8 +212,194 @@ describe('CatalogBrowserPlugin behavior', () => {
     );
     const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
-    await p().fetchAndLoadCatalog_('GROUP=active');
+    await p().fetchAndLoadCatalog_(ACTIVE_ENTRY);
 
     expect(toastSpy).toHaveBeenCalledWith(expect.anything(), ToastMsgType.caution);
+  });
+
+  describe('catalog swaps (gap-batch-1 catalog-browser)', () => {
+    let fakeSelectSat: { secondarySat: number; selectSat: ReturnType<typeof vi.fn>; setSecondarySat: ReturnType<typeof vi.fn> };
+
+    beforeEach(() => {
+      vi.clearAllMocks();
+      fakeSelectSat = { secondarySat: -1, selectSat: vi.fn(), setSecondarySat: vi.fn() };
+      const realGetPlugin = PluginRegistry.getPlugin.bind(PluginRegistry);
+
+      vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(((cls: unknown) =>
+        cls === SelectSatManager ? fakeSelectSat : realGetPlugin(cls as never)) as typeof PluginRegistry.getPlugin);
+      vi.spyOn(errorManagerInstance, 'error').mockImplementation(() => undefined);
+    });
+
+    const currentRowIds = () => Array.from(getEl('cb-catalog-list')!.querySelectorAll<HTMLElement>('[aria-current="true"]')).map((row) => row.dataset.id);
+
+    it('deselects the primary and secondary object before restoring the default catalog', async () => {
+      fakeSelectSat.secondarySat = 7;
+      const order: string[] = [];
+
+      fakeSelectSat.selectSat.mockImplementation(() => order.push('deselect'));
+      vi.spyOn(CatalogLoader, 'load').mockImplementation(() => {
+        order.push('load');
+
+        return reloadThatSettles();
+      });
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      await p().loadKeepTrackCatalog_('DEFAULT');
+
+      expect(fakeSelectSat.selectSat).toHaveBeenCalledWith(-1);
+      expect(fakeSelectSat.setSecondarySat).toHaveBeenCalledWith(-1, true);
+      expect(order).toEqual(['deselect', 'load']);
+    });
+
+    it.each(['DEFAULT', 'CELESTRAK_ONLY'])('%s reports success only after the worker has positions (catalogReloaded)', async (mode) => {
+      vi.spyOn(CatalogLoader, 'load').mockResolvedValue(undefined);
+      const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      const loading = p().loadKeepTrackCatalog_(mode);
+
+      await vi.waitFor(() => expect(CatalogLoader.load).toHaveBeenCalled());
+      await Promise.resolve();
+      expect(toastSpy).not.toHaveBeenCalled();
+      expect(p().isLoading_).toBe(true);
+
+      EventBus.getInstance().emit(EventBusEvent.catalogReloaded);
+      await loading;
+
+      expect(toastSpy).toHaveBeenCalledWith(expect.any(String), ToastMsgType.normal);
+      expect(p().isLoading_).toBe(false);
+    });
+
+    it('clears #search and its result rows on a swap', async () => {
+      // Mirror the top-menu search markup (input#search + div#search-results).
+      document.getElementById('search')?.remove();
+      document.getElementById('search-results')?.remove();
+      document.body.insertAdjacentHTML('beforeend', '<input id="search" /><div id="search-results"></div>');
+      const searchInput = getEl('search') as HTMLInputElement;
+      const results = getEl('search-results')!;
+
+      searchInput.value = '25544';
+      results.innerHTML = '<div class="search-result" data-obj-id="0">ISS (ZARYA)</div>';
+      const doSearchSpy = vi.spyOn(ServiceLocator.getUiManager().searchManager, 'doSearch').mockImplementation(() => undefined);
+      const closeSearchSpy = vi.spyOn(ServiceLocator.getUiManager().searchManager, 'closeSearch');
+
+      vi.spyOn(CatalogLoader, 'load').mockImplementation(reloadThatSettles);
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      await p().loadKeepTrackCatalog_('DEFAULT');
+
+      expect(searchInput.value).toBe('');
+      expect(results.querySelectorAll('.search-result')).toHaveLength(0);
+      expect(doSearchSpy).toHaveBeenCalledWith('');
+      // closeSearch also hides every side menu, so the swap must not use it.
+      expect(closeSearchSpy).not.toHaveBeenCalled();
+    });
+
+    it('marks the loaded catalog row and moves the marker on the next swap', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('1 25544U\n2 25544') }))
+      );
+      vi.spyOn(CatalogLoader, 'reloadCatalog').mockImplementation(reloadThatSettles);
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      // The default catalog is what boots.
+      expect(currentRowIds()).toEqual(['default']);
+      expect(getEl('cb-catalog-list')!.querySelector('[data-id="default"] .cb-chip-current')?.textContent).toBe('Current');
+
+      await p().fetchAndLoadCatalog_(ISS_ENTRY);
+
+      expect(currentRowIds()).toEqual(['iss-supgp']);
+      expect(getEl('cb-catalog-list')!.querySelectorAll('.cb-chip-current')).toHaveLength(1);
+      expect(getEl('cb-catalog-list')!.querySelector('[data-id="default"]')!.classList.contains('cb-catalog-item-current')).toBe(false);
+    });
+
+    it('drops the marker when another tool reloads the catalog', () => {
+      EventBus.getInstance().emit(EventBusEvent.catalogReloaded);
+
+      expect(currentRowIds()).toEqual([]);
+    });
+
+    it('a failed load keeps the marker on the previous catalog', async () => {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => Promise.resolve({ ok: false, status: 503, text: () => Promise.resolve('') }))
+      );
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      await p().fetchAndLoadCatalog_(ISS_ENTRY);
+
+      expect(currentRowIds()).toEqual(['default']);
+    });
+
+    it.each([
+      ['DEFAULT', 'Failed to restore default catalog'],
+      ['CELESTRAK_ONLY', 'Failed to load the CelesTrak catalog'],
+      ['VIMPEL_ONLY', 'Failed to load the JSC Vimpel catalog'],
+    ])('a failing %s load names that source in the toast', async (mode, text) => {
+      vi.spyOn(CatalogLoader, 'load').mockRejectedValue(new Error('boom'));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve([]) }))
+      );
+      const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      await p().loadKeepTrackCatalog_(mode);
+
+      expect(toastSpy).toHaveBeenCalledWith(text, ToastMsgType.critical);
+    });
+
+    it('reopens the menu when the swap deselection closed it', async () => {
+      p().isMenuButtonActive = true;
+      // Deselecting can make another plugin emit hideSideMenus, which closes this menu.
+      fakeSelectSat.selectSat.mockImplementation(() => {
+        p().isMenuButtonActive = false;
+      });
+      vi.spyOn(CatalogLoader, 'load').mockImplementation(reloadThatSettles);
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+      await p().loadKeepTrackCatalog_('DEFAULT');
+
+      expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'menu-catalog-browser');
+    });
+
+    it('does not open the menu for a palette load made while it was closed', async () => {
+      p().isMenuButtonActive = false;
+      vi.spyOn(CatalogLoader, 'load').mockImplementation(reloadThatSettles);
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+      const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+      await p().loadKeepTrackCatalog_('DEFAULT');
+
+      expect(emitSpy).not.toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, expect.anything());
+    });
+
+    it('Orbital Only reports success only after the worker has positions for the merged catalog', async () => {
+      p().orbitalDataOnly_ = true;
+      p().cachedCatalog_ = [{ tle1: 'old1', tle2: 'old2', name: 'ISS (ZARYA)', country: 'ISS', sccNum: '25544' }];
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(() => Promise.resolve({ ok: true, text: () => Promise.resolve('E2E-ISS\n1 25544U\n2 25544') }))
+      );
+      vi.spyOn(CatalogLoader, 'parseTceContent').mockReturnValue([{ SCC: '25544', TLE1: 'new1', TLE2: 'new2', ON: 'E2E-ISS' }] as never);
+      vi.spyOn(CatalogLoader, 'canonicalSccKey').mockImplementation((scc: string | number) => String(scc));
+      const reloadSpy = vi.spyOn(CatalogLoader, 'reloadCatalogFromData').mockResolvedValue(undefined);
+      const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      const loading = p().fetchAndLoadCatalog_(ISS_ENTRY);
+
+      await vi.waitFor(() => expect(reloadSpy).toHaveBeenCalled());
+      // Merged with the cached metadata: the catalog name and country survive, the TLE is new.
+      expect(reloadSpy.mock.calls[0][0]).toEqual([expect.objectContaining({ name: 'ISS (ZARYA)', country: 'ISS', tle1: 'new1', tle2: 'new2' })]);
+      await Promise.resolve();
+      expect(toastSpy).not.toHaveBeenCalled();
+      expect(p().isLoading_).toBe(true);
+
+      EventBus.getInstance().emit(EventBusEvent.catalogReloaded);
+      await loading;
+
+      expect(toastSpy).toHaveBeenCalledWith('Loaded ISS', ToastMsgType.normal);
+      expect(p().isLoading_).toBe(false);
+    });
   });
 });

@@ -8,7 +8,8 @@
         "allData": "全データ",
         "orbitalOnly": "軌道のみ",
         "allDataDesc": "選択したデータでカタログ全体を置換",
-        "orbitalOnlyDesc": "衛星メタデータを保持しながらTLEを更新"
+        "orbitalOnlyDesc": "衛星メタデータを保持しながらTLEを更新",
+        "current": "現在"
       },
       "categories": {
         "special": "特別",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "カタログの取得に失敗",
         "DefaultFailed": "デフォルトカタログの復元に失敗",
+        "CelestrakFailed": "CelesTrak カタログの読み込みに失敗",
+        "VimpelFailed": "JSC Vimpel カタログの読み込みに失敗",
         "Forbidden": "CelesTrak がリクエストを拒否しました（HTTP 403）。通常は Cloudflare のレート制限が原因です。1分ほど待ってから再試行してください。",
         "RateLimited": "カタログのリクエストが多すぎます。1分ほど待ってから再試行してください。",
         "ServerError": "CelesTrak は一時的に利用できません。数分後にもう一度お試しください。",

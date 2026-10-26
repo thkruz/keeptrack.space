@@ -8,7 +8,8 @@
         "allData": "所有数据",
         "orbitalOnly": "仅轨道",
         "allDataDesc": "用所选数据替换整个目录",
-        "orbitalOnlyDesc": "更新TLE同时保留卫星元数据"
+        "orbitalOnlyDesc": "更新TLE同时保留卫星元数据",
+        "current": "当前"
       },
       "categories": {
         "special": "特别关注",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "获取目录失败",
         "DefaultFailed": "恢复默认目录失败",
+        "CelestrakFailed": "加载 CelesTrak 目录失败",
+        "VimpelFailed": "加载 JSC Vimpel 目录失败",
         "Forbidden": "CelesTrak 拒绝了请求（HTTP 403）。这通常是 Cloudflare 的速率限制；请等待一分钟后重试。",
         "RateLimited": "目录请求过多。请等待一分钟后再试。",
         "ServerError": "CelesTrak 暂时不可用。请几分钟后重试。",

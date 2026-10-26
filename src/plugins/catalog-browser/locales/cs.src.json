@@ -8,7 +8,8 @@
         "allData": "Všechna data",
         "orbitalOnly": "Pouze orbitální",
         "allDataDesc": "Nahradí celý katalog vybranými daty",
-        "orbitalOnlyDesc": "Aktualizuje TLE při zachování metadat satelitů"
+        "orbitalOnlyDesc": "Aktualizuje TLE při zachování metadat satelitů",
+        "current": "Aktuální"
       },
       "categories": {
         "special": "Zvláštní zájmy",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "Nepodařilo se načíst katalog",
         "DefaultFailed": "Nepodařilo se obnovit výchozí katalog",
+        "CelestrakFailed": "Nepodařilo se načíst katalog CelesTrak",
+        "VimpelFailed": "Nepodařilo se načíst katalog JSC Vimpel",
         "Forbidden": "CelesTrak odmítl požadavek (HTTP 403). Obvykle jde o limit požadavků Cloudflare; počkejte minutu a zkuste to znovu.",
         "RateLimited": "Příliš mnoho požadavků na katalog. Před dalším pokusem prosím počkejte minutu.",
         "ServerError": "CelesTrak je dočasně nedostupný. Zkuste to prosím znovu za několik minut.",

@@ -118,6 +118,65 @@ describe('CatalogLoader.load orchestration', () => {
     // The 401 throws "Failed to fetch" and the catch fetches the local tle.json.
     expect(fetch).toHaveBeenCalledWith(expect.stringContaining('tle/tle.json'));
   });
+
+  describe('live catalog swap', () => {
+    it('at boot (nothing propagated yet) loads directly, without the swap scaffolding', async () => {
+      setSettings({ cruncherReady: false });
+      const reloadSpy = vi.spyOn(CL, 'reloadWith_');
+
+      await CatalogLoader.load();
+
+      expect(reloadSpy).not.toHaveBeenCalled();
+      expect(parseSpy).toHaveBeenCalled();
+    });
+
+    it('after boot routes through the reload scaffolding (deselect, rebuild, catalogReloaded)', async () => {
+      setSettings({ cruncherReady: true });
+      const reloadSpy = vi.spyOn(CL, 'reloadWith_').mockImplementation(async (runParse: unknown) => {
+        await (runParse as () => Promise<void>)();
+      });
+
+      await CatalogLoader.load();
+
+      expect(reloadSpy).toHaveBeenCalledTimes(1);
+      expect(parseSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('the scaffolding deselects and emits catalogReloaded only once the new positions arrive', async () => {
+      const { EventBus } = await import('@app/engine/events/event-bus');
+      const { EventBusEvent } = await import('@app/engine/events/event-bus-events');
+      const { PluginRegistry } = await import('@app/engine/core/plugin-registry');
+      const { ServiceLocator } = await import('@app/engine/core/service-locator');
+
+      setSettings({ cruncherReady: true });
+      const selectSat = vi.fn();
+
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectSat } as never);
+      const orbitManager = ServiceLocator.getOrbitManager();
+
+      for (const fn of ['clearSelectOrbit', 'clearHoverOrbit', 'clearInViewOrbit', 'resetForCatalogSwap'] as const) {
+        vi.spyOn(orbitManager, fn as never).mockImplementation((() => undefined) as never);
+      }
+      (orbitManager as unknown as { orbitCache: Map<number, unknown> }).orbitCache = new Map();
+      vi.spyOn(ServiceLocator, 'getHoverManager').mockReturnValue({ setHoverId: vi.fn() } as never);
+      vi.spyOn(ServiceLocator.getDotsManager(), 'resetForCatalogSwap').mockImplementation(() => undefined as never);
+      vi.spyOn(ServiceLocator.getDotsManager(), 'initBuffers').mockImplementation(() => undefined as never);
+      vi.spyOn(ServiceLocator.getColorSchemeManager(), 'resetForCatalogSwap').mockImplementation(() => undefined as never);
+      const reloaded = vi.fn();
+
+      EventBus.getInstance().on(EventBusEvent.catalogReloaded, reloaded);
+
+      await CatalogLoader.load();
+
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      expect(parseSpy).toHaveBeenCalledTimes(1);
+      expect(reloaded).not.toHaveBeenCalled();
+
+      EventBus.getInstance().emit(EventBusEvent.onCruncherReady);
+
+      expect(reloaded).toHaveBeenCalledTimes(1);
+    });
+  });
 });
 
 describe('CatalogLoader.getAdditionalCatalogs_', () => {

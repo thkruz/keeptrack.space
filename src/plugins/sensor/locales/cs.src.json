@@ -136,6 +136,11 @@
         "identity": "Identita",
         "location": "Poloha",
         "fieldOfView": "Zorné pole"
+      },
+      "toasts": {
+        "addedPrimary": "Vlastní senzor „{{name}}“ byl přidán jako primární senzor.",
+        "addedSecondary": "Vlastní senzor „{{name}}“ byl přidán jako sekundární senzor.",
+        "replaced": "Primární senzor byl nahrazen senzorem „{{name}}“."
       }
     },
     "LookAnglesPlugin": {

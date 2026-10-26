@@ -136,6 +136,11 @@
         "identity": "식별 정보",
         "location": "위치",
         "fieldOfView": "시야"
+      },
+      "toasts": {
+        "addedPrimary": "사용자 지정 센서 \"{{name}}\"을(를) 기본 센서로 추가했습니다.",
+        "addedSecondary": "사용자 지정 센서 \"{{name}}\"을(를) 보조 센서로 추가했습니다.",
+        "replaced": "기본 센서를 \"{{name}}\"(으)로 교체했습니다."
       }
     },
     "LookAnglesPlugin": {

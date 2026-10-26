@@ -136,6 +136,11 @@
         "identity": "Identity",
         "location": "Location",
         "fieldOfView": "Field of View"
+      },
+      "toasts": {
+        "addedPrimary": "Custom sensor \"{{name}}\" added as the primary sensor.",
+        "addedSecondary": "Custom sensor \"{{name}}\" added as a secondary sensor.",
+        "replaced": "Primary sensor replaced with \"{{name}}\"."
       }
     },
     "LookAnglesPlugin": {

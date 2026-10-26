@@ -136,6 +136,11 @@
         "identity": "Identité",
         "location": "Emplacement",
         "fieldOfView": "Champ de vision"
+      },
+      "toasts": {
+        "addedPrimary": "Capteur personnalisé « {{name}} » ajouté comme capteur principal.",
+        "addedSecondary": "Capteur personnalisé « {{name}} » ajouté comme capteur secondaire.",
+        "replaced": "Capteur principal remplacé par « {{name}} »."
       }
     },
     "LookAnglesPlugin": {

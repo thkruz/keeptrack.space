@@ -2,14 +2,14 @@ import { formatCustomSensorLocation, getCustomSensorDefaultDisplayName, isCustom
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { IContextMenuConfig, IHelpConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
-import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { initMaterialSelects, syncMaterialSelect } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, setInnerHtml } from '@app/engine/utils/get-el';
@@ -22,7 +22,15 @@ import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import viewListPng from '@public/img/icons/view-list.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
-import { buildCustomSensorParams, CustomSensorFormValues, parseMask, validateCustomSensor } from './custom-sensor-core';
+import {
+  buildCustomSensorParams,
+  CustomSensorFormValues,
+  customSensorFormFromSensor,
+  customSensorSubmitKey,
+  DUPLICATE_SUBMIT_WINDOW_MS,
+  parseMask,
+  validateCustomSensor,
+} from './custom-sensor-core';
 import { renderCustomSensorList } from './custom-sensor-list-renderer';
 import { buildCustomSensorStore, customSensorParamsFromRecord, parseCustomSensorStore } from './custom-sensor-persistence';
 import './custom-sensor.css';
@@ -41,11 +49,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-replace')).style.display = '';
-        CustomSensorPlugin.setFields_({
-          'cs-lat': sensorManagerInstance.currentSensors[0].lat.toString(),
-          'cs-lon': sensorManagerInstance.currentSensors[0].lon.toString(),
-          'cs-hei': sensorManagerInstance.currentSensors[0].alt.toString(),
-        });
+        CustomSensorPlugin.prefillFromSensor_(sensorManagerInstance.currentSensors[0]);
       } else {
         (<HTMLInputElement>getEl('cs-replace')).style.display = 'none';
       }
@@ -315,8 +319,34 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
    * Enter key reach this single handler.
    */
   onFormSubmit(): void {
-    CustomSensorPlugin.processCustomSensorSubmit_();
+    const result = CustomSensorPlugin.processCustomSensorSubmit_();
+
+    if (result === 'duplicate') {
+      return;
+    }
     ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    if (result === 'added') {
+      // Usage signal for telemetry: only a sensor that was actually created counts
+      EventBus.getInstance().emit(EventBusEvent.pluginFormSubmitted, this.id);
+    }
+  }
+
+  /**
+   * Replaces the base wiring, which emits `pluginFormSubmitted` on EVERY submit (rejected and
+   * double-click resubmits included). {@link onFormSubmit} emits it only for a created sensor.
+   */
+  registerSubmitButtonClicked(): void {
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      const form = getEl(`${this.sideMenuElementName}-form`);
+
+      if (!form) {
+        throw new Error(`Form not found for ${this.sideMenuElementName}`);
+      }
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        this.onFormSubmit();
+      });
+    });
   }
 
   addHtml(): void {
@@ -333,6 +363,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     // Until the boot restore has run, sensor events come from the boot sequence itself
     // (loadSensorJson clearing an unknown custom objName), and saving them would wipe the store.
     CustomSensorPlugin.isStoreRestored_ = false;
+    CustomSensorPlugin.lastSubmit_ = null;
 
     const eventBus = EventBus.getInstance();
 
@@ -477,7 +508,13 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addClearCustomSensorListener_() {
     getEl('cs-clear')!.addEventListener('click', () => {
-      ServiceLocator.getSensorManager().clearSecondarySensors();
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
+
+      sensorManagerInstance.clearSecondarySensors();
+      // clearSecondarySensors keeps a catalog primary; Clear resets every sensor
+      if (sensorManagerInstance.isSensorSelected()) {
+        sensorManagerInstance.resetSensorSelected();
+      }
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       CustomSensorPlugin.updateCustomSensorListDom();
       CustomSensorPlugin.saveCustomSensors();
@@ -486,8 +523,9 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addReplaceCustomSensorListener_() {
     getEl('cs-replace')!.addEventListener('click', () => {
-      CustomSensorPlugin.processCustomSensorSubmit_(true);
-      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+      if (CustomSensorPlugin.processCustomSensorSubmit_(true) !== 'duplicate') {
+        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+      }
     });
   }
 
@@ -511,20 +549,56 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     };
   }
 
-  /** Sets the value of any form fields named in the map (missing ones are skipped). */
+  /**
+   * Sets the value of any form fields named in the map (missing ones are skipped). A `<select>`
+   * also has its Material dropdown synced so the visible text matches the new value.
+   */
   private static setFields_(fields: Record<string, string>) {
     for (const [id, value] of Object.entries(fields)) {
-      const el = getEl(id, true) as HTMLInputElement | null;
+      const el = getEl(id, true) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null;
 
       if (el) {
         el.value = value;
+        if (el instanceof HTMLSelectElement) {
+          syncMaterialSelect(el);
+        }
       }
     }
   }
 
-  private static processCustomSensorSubmit_(isReplaceSensor = false) {
+  /**
+   * Pre-fill the whole form from an existing sensor (name, type, location, field of view and
+   * horizon mask), so Replace Sensor starts from a full copy. Telescope is switched off first so
+   * the copied field-of-view limits are visible and editable.
+   */
+  private static prefillFromSensor_(sensor: DetailedSensor): void {
+    const telescope = getEl('cs-telescope', true) as HTMLInputElement | null;
+
+    if (telescope?.checked) {
+      telescope.click();
+    }
+    CustomSensorPlugin.setFields_(customSensorFormFromSensor(sensor));
+  }
+
+  /** Submit key and time of the last sensor created, to swallow a double-click's second submit. */
+  private static lastSubmit_: { key: string; at: number } | null = null;
+
+  /**
+   * Validate the form and create the sensor. Returns `added` when a sensor was created (or
+   * replaced the primary), `rejected` when validation failed, and `duplicate` when the same
+   * values were just submitted (a double-click), in which case nothing happens.
+   */
+  private static processCustomSensorSubmit_(isReplaceSensor = false): 'added' | 'rejected' | 'duplicate' {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const values = CustomSensorPlugin.readForm_();
+    const submitKey = customSensorSubmitKey(values, isReplaceSensor);
+    const now = Date.now();
+    const last = CustomSensorPlugin.lastSubmit_;
+
+    if (last && last.key === submitKey && now - last.at < DUPLICATE_SUBMIT_WINDOW_MS) {
+      return 'duplicate';
+    }
+
     const errorKey = validateCustomSensor(values);
 
     if (errorKey) {
@@ -533,14 +607,17 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       errorManagerInstance.warn(t7e(`plugins.CustomSensorPlugin.errorMsgs.${errorKey}` as Parameters<typeof t7e>[0], { pair }));
 
-      return;
+      return 'rejected';
     }
+
+    CustomSensorPlugin.lastSubmit_ = { key: submitKey, at: now };
+    const isPrimary = !sensorManagerInstance.isSensorSelected() || isReplaceSensor;
 
     const randomUUID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
     // Only update the (SensorInfo) primary-sensor info DOM if this will become the
     // primary sensor. addSecondarySensor -> setSensor handles it for real primaries.
-    if (!sensorManagerInstance.isSensorSelected() || isReplaceSensor) {
+    if (isPrimary) {
       CustomSensorPlugin.updatePrimarySensorInfoDom_(resolveCustomSensorName(values.uiName), formatCustomSensorLocation(values.lat, values.lon));
     }
 
@@ -551,6 +628,20 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     CustomSensorPlugin.updateCustomSensorListDom();
     CustomSensorPlugin.saveCustomSensors();
+
+    let toastKey = 'addedSecondary';
+
+    if (isReplaceSensor) {
+      toastKey = 'replaced';
+    } else if (isPrimary) {
+      toastKey = 'addedPrimary';
+    }
+    ServiceLocator.getUiManager().toast(
+      t7e(`plugins.CustomSensorPlugin.toasts.${toastKey}` as Parameters<typeof t7e>[0], { name: sensor.uiName ?? sensor.name }),
+      ToastMsgType.normal
+    );
+
+    return 'added';
   }
 
   /**

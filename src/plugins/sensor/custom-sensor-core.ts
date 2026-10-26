@@ -223,3 +223,95 @@ export function buildCustomSensorParams(values: CustomSensorFormValues, objNameS
 
   return params;
 }
+
+/**
+ * Map an ootk {@link SpaceObjectType} back to the menu's type option. Catalog sensors can carry
+ * types the menu does not offer (e.g. a bistatic radar); those fall back to Observer, the same
+ * default {@link mapSensorType} uses in the other direction.
+ */
+export function sensorTypeToFormValue(type: SpaceObjectType): CustomSensorType {
+  switch (type) {
+    case SpaceObjectType.OPTICAL:
+      return 'Optical';
+    case SpaceObjectType.MECHANICAL:
+      return 'Mechanical';
+    case SpaceObjectType.PHASED_ARRAY_RADAR:
+      return 'Phased Array Radar';
+    default:
+      return 'Observer';
+  }
+}
+
+/**
+ * Write a sensor's horizon mask back into the menu's `az,el` text (one pair per line).
+ * Only interpolated vertices (`startAz` = `stopAz`) fit that format; step-sector masks from the
+ * catalog cannot be expressed in it, so they give an empty string.
+ */
+export function formatMask(masks: ElevationMask[] | undefined, isInterpolated: boolean | undefined): string {
+  if (!masks || masks.length === 0 || !isInterpolated || masks.some((m) => m.startAz !== m.stopAz)) {
+    return '';
+  }
+
+  return masks.map((m) => `${m.startAz},${m.minEl}`).join('\n');
+}
+
+/** The fields of a sensor {@link customSensorFormFromSensor} reads. */
+export interface CustomSensorFormSource {
+  name: string;
+  uiName?: string;
+  type: SpaceObjectType;
+  lat: number;
+  lon: number;
+  alt: number;
+  minAz: number;
+  maxAz: number;
+  minEl: number;
+  maxEl: number;
+  minRng: number;
+  maxRng: number;
+  elevationMasks?: ElevationMask[];
+  interpolateMask?: boolean;
+}
+
+/**
+ * Every form field (by element id) pre-filled from an existing sensor, so Replace Sensor starts
+ * from a full copy of the current sensor: name, type, location, field of view and mask.
+ */
+export function customSensorFormFromSensor(sensor: CustomSensorFormSource): Record<string, string> {
+  return {
+    'cs-uiName': sensor.uiName ?? sensor.name,
+    'cs-type': sensorTypeToFormValue(sensor.type),
+    'cs-lat': sensor.lat.toString(),
+    'cs-lon': sensor.lon.toString(),
+    'cs-hei': sensor.alt.toString(),
+    'cs-minaz': sensor.minAz.toString(),
+    'cs-maxaz': sensor.maxAz.toString(),
+    'cs-minel': sensor.minEl.toString(),
+    'cs-maxel': sensor.maxEl.toString(),
+    'cs-minrange': sensor.minRng.toString(),
+    'cs-maxrange': sensor.maxRng.toString(),
+    'cs-mask': formatMask(sensor.elevationMasks, sensor.interpolateMask),
+  };
+}
+
+/** Two submits of the same values closer together than this are one click (a double-click). */
+export const DUPLICATE_SUBMIT_WINDOW_MS = 1000;
+
+/** A stable key for a form submit, used to spot a double-click resubmitting identical values. */
+export function customSensorSubmitKey(values: CustomSensorFormValues, isReplace: boolean): string {
+  return JSON.stringify([
+    isReplace,
+    values.uiName.trim(),
+    values.type,
+    values.lat,
+    values.lon,
+    values.alt,
+    values.minAz,
+    values.maxAz,
+    values.minEl,
+    values.maxEl,
+    values.minRng,
+    values.maxRng,
+    (values.mask ?? '').trim(),
+  ]);
+}

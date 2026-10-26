@@ -1,5 +1,15 @@
-import { buildCustomSensorParams, CustomSensorFormValues, mapSensorType, parseMask, validateCustomSensor } from '@app/plugins/sensor/custom-sensor-core';
-import { SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import {
+  buildCustomSensorParams,
+  CustomSensorFormValues,
+  customSensorFormFromSensor,
+  customSensorSubmitKey,
+  formatMask,
+  mapSensorType,
+  parseMask,
+  sensorTypeToFormValue,
+  validateCustomSensor,
+} from '@app/plugins/sensor/custom-sensor-core';
+import { Degrees, SpaceObjectType, ZoomValue } from '@ootk/src/main';
 
 const VALID: CustomSensorFormValues = {
   uiName: 'My Scope',
@@ -161,5 +171,50 @@ describe('custom-sensor-core parseMask', () => {
     expect(params.elevationMasks).toHaveLength(4);
     expect(params.interpolateMask).toBe(true);
     expect(buildCustomSensorParams(VALID, 'n').elevationMasks).toBeUndefined();
+  });
+});
+
+describe('custom-sensor-core form round trip', () => {
+  it('maps every menu type back to its option and unknown types to Observer', () => {
+    for (const type of ['Observer', 'Optical', 'Mechanical', 'Phased Array Radar']) {
+      expect(sensorTypeToFormValue(mapSensorType(type))).toBe(type);
+    }
+    expect(sensorTypeToFormValue(SpaceObjectType.BISTATIC_RADIO_TELESCOPE)).toBe('Observer');
+  });
+
+  it('formats interpolated masks as az,el lines and drops step-sector masks', () => {
+    const masks = parseMask('0,5\n90,25').masks;
+
+    expect(formatMask(masks, true)).toBe('0,5\n90,25');
+    expect(parseMask(formatMask(masks, true)).masks).toEqual(masks);
+    expect(formatMask(undefined, true)).toBe('');
+    expect(formatMask(masks, false)).toBe('');
+    expect(formatMask([{ startAz: 10 as Degrees, stopAz: 40 as Degrees, minEl: 5 as Degrees }], true)).toBe('');
+  });
+
+  it('pre-fills every form field from a sensor built by the form', () => {
+    const params = buildCustomSensorParams(withValues({ uiName: 'Copy', type: 'Phased Array Radar', mask: '0,5\n180,10' }), 'x');
+    const fields = customSensorFormFromSensor({ ...params, name: params.name ?? '', type: params.type ?? SpaceObjectType.OBSERVER } as never);
+
+    expect(fields).toEqual({
+      'cs-uiName': 'Copy',
+      'cs-type': 'Phased Array Radar',
+      'cs-lat': '40',
+      'cs-lon': '-75',
+      'cs-hei': '0.1',
+      'cs-minaz': '0',
+      'cs-maxaz': '360',
+      'cs-minel': '0',
+      'cs-maxel': '90',
+      'cs-minrange': '0',
+      'cs-maxrange': '1000',
+      'cs-mask': '0,5\n180,10',
+    });
+  });
+
+  it('gives identical submits the same key and differing ones a different key', () => {
+    expect(customSensorSubmitKey(VALID, false)).toBe(customSensorSubmitKey({ ...VALID }, false));
+    expect(customSensorSubmitKey(VALID, false)).not.toBe(customSensorSubmitKey(VALID, true));
+    expect(customSensorSubmitKey(VALID, false)).not.toBe(customSensorSubmitKey(withValues({ lat: 41 }), false));
   });
 });

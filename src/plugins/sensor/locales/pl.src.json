@@ -136,6 +136,11 @@
         "identity": "Tożsamość",
         "location": "Lokalizacja",
         "fieldOfView": "Pole widzenia"
+      },
+      "toasts": {
+        "addedPrimary": "Dodano własny czujnik „{{name}}” jako czujnik główny.",
+        "addedSecondary": "Dodano własny czujnik „{{name}}” jako czujnik dodatkowy.",
+        "replaced": "Czujnik główny zastąpiono czujnikiem „{{name}}”."
       }
     },
     "LookAnglesPlugin": {

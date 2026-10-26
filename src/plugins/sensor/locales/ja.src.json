@@ -136,6 +136,11 @@
         "identity": "識別情報",
         "location": "位置",
         "fieldOfView": "視野"
+      },
+      "toasts": {
+        "addedPrimary": "カスタムセンサー「{{name}}」をプライマリセンサーとして追加しました。",
+        "addedSecondary": "カスタムセンサー「{{name}}」をセカンダリセンサーとして追加しました。",
+        "replaced": "プライマリセンサーを「{{name}}」に置き換えました。"
       }
     },
     "LookAnglesPlugin": {

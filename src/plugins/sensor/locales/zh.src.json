@@ -136,6 +136,11 @@
         "identity": "标识",
         "location": "位置",
         "fieldOfView": "视场"
+      },
+      "toasts": {
+        "addedPrimary": "已将自定义传感器“{{name}}”添加为主传感器。",
+        "addedSecondary": "已将自定义传感器“{{name}}”添加为辅助传感器。",
+        "replaced": "已将主传感器替换为“{{name}}”。"
       }
     },
     "LookAnglesPlugin": {

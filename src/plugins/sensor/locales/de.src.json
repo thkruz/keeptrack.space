@@ -136,6 +136,11 @@
         "identity": "Identität",
         "location": "Standort",
         "fieldOfView": "Sichtfeld"
+      },
+      "toasts": {
+        "addedPrimary": "Benutzerdefinierter Sensor „{{name}}“ als primärer Sensor hinzugefügt.",
+        "addedSecondary": "Benutzerdefinierter Sensor „{{name}}“ als sekundärer Sensor hinzugefügt.",
+        "replaced": "Primärer Sensor durch „{{name}}“ ersetzt."
       }
     },
     "LookAnglesPlugin": {

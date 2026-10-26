@@ -250,8 +250,12 @@ export class ShortTermFences extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.setSensor, (sensor, id): void => {
       if (sensor === null && id === null) {
+        const wasOpen = this.isMenuButtonActive;
+
         this.closeAndDisable_();
-        slideOutLeft(getEl(this.sideMenuElementName), 300);
+        if (wasOpen) {
+          slideOutLeft(getEl(this.sideMenuElementName), 300);
+        }
       } else {
         this.setBottomIconToEnabled();
       }
@@ -259,10 +263,14 @@ export class ShortTermFences extends KeepTrackPlugin {
   }
 
   private closeAndDisable_(): void {
+    // Only close the side menus when the fence panel is the one open: clearing the
+    // sensor (e.g. an account sync restoring it) must not shut an unrelated menu.
+    if (this.isMenuButtonActive) {
+      ServiceLocator.getUiManager().hideSideMenus();
+    }
     this.isMenuButtonActive = false;
     this.setBottomIconToUnselected();
     this.setBottomIconToDisabled();
-    ServiceLocator.getUiManager().hideSideMenus();
     this.refreshActiveFences_();
   }
 

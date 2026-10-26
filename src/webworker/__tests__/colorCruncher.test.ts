@@ -334,6 +334,7 @@ describe('colorCruncher', () => {
         sensorType: 0,
         maxZoomDistance: 100000,
         isMissileSimulatorEnabled: true,
+        transparent: [1, 1, 1, 0.1],
       },
     });
     dispatch({ typ: MSG.UPDATE_OBJ_TYPE_FLAGS, objectTypeFlags: { sensor: true, payload: true } });
@@ -342,6 +343,150 @@ describe('colorCruncher', () => {
     await vi.runAllTimersAsync();
 
     expect(lastColorResult()).toBeDefined();
+  });
+
+  describe('out-of-group color (Hide Others)', () => {
+    const allFiltersOn = () => ({
+      debris: true,
+      operationalPayloads: true,
+      nonOperationalPayloads: true,
+      rocketBodies: true,
+      unknownType: true,
+      notionalSatellites: true,
+      vLEOSatellites: true,
+      lEOSatellites: true,
+      mEOSatellites: true,
+      hEOSatellites: true,
+      gEOSatellites: true,
+      xGEOSatellites: true,
+      unitedStates: true,
+      unitedKingdom: true,
+      france: true,
+      germany: true,
+      japan: true,
+      china: true,
+      india: true,
+      russia: true,
+      uSSR: true,
+      southKorea: true,
+      australia: true,
+      otherCountries: true,
+      vimpelSatellites: true,
+      celestrakSatellites: true,
+      celestrakSupSatellites: true,
+      satnogsSatellites: true,
+      starlinkSatellites: true,
+    });
+    const settingsWith = (transparent: number[]) => ({
+      cameraType: 0,
+      isShowPayloads: true,
+      isShowRocketBodies: true,
+      isShowDebris: true,
+      isDisableLaunchSites: false,
+      isDisableSensors: false,
+      isSensorManagerLoaded: false,
+      sensorType: 0,
+      maxZoomDistance: 100000,
+      isMissileSimulatorEnabled: true,
+      transparent,
+    });
+    const rgbaAt = (result: ColorResult, i: number) => Array.from(result.colorData!.slice(i * 4, i * 4 + 4));
+
+    /** Recolors with ISS-like object 0 as the only group member and returns the output. */
+    const recolorGroup = (schemeId: string, transparent: number[]): ColorResult => {
+      dispatch({ typ: MSG.INIT_CATALOG, catalogData: buildCatalog(), seqNum: 9 });
+      dispatch({ typ: MSG.UPDATE_FILTERS, filterSettings: allFiltersOn() });
+      dispatch({ typ: MSG.UPDATE_DYNAMIC, inViewData: new Int8Array(12), inSunData: new Int8Array(12), satVel: null, dotsOnScreen: 12 });
+      dispatch({ typ: MSG.UPDATE_OBJ_TYPE_FLAGS, objectTypeFlags: {} });
+      dispatch({ typ: MSG.UPDATE_COLOR_THEME, colorTheme: { payload: [0, 1, 0, 0.85], rocketBody: [1, 0, 0, 1], debris: [0.5, 0.5, 0.5, 1] } });
+      dispatch({ typ: MSG.UPDATE_SETTINGS, settingsFlags: settingsWith(transparent) });
+      dispatch({ typ: MSG.UPDATE_GROUP, groupIds: [0] });
+      dispatch({ typ: MSG.UPDATE_SCHEME, schemeId, isGroupScheme: true });
+      posted = [];
+      dispatch({ typ: MSG.FORCE_RECOLOR });
+
+      return lastColorResult()!;
+    };
+
+    afterEach(() => {
+      dispatch({ typ: MSG.UPDATE_GROUP, groupIds: null });
+      dispatch({ typ: MSG.UPDATE_SCHEME, schemeId: 'ObjectTypeColorScheme', isGroupScheme: false });
+    });
+
+    for (const schemeId of ['ObjectTypeColorScheme', 'CountryColorScheme', 'CelestrakColorScheme']) {
+      it(`${schemeId}: Hide Others off draws other objects in the dim color, not pickable`, async () => {
+        await loadWorker();
+        const result = recolorGroup(schemeId, [1, 1, 1, 0.1]);
+
+        // GEO payload (index 3) is outside the group: dimmed white, never pickable
+        expect(rgbaAt(result, 3).map((v) => Number(v.toFixed(3)))).toEqual([1, 1, 1, 0.1]);
+        expect(result.pickableData![3]).toBe(0);
+        // The group member keeps its scheme color and stays pickable
+        expect(result.colorData![3]).toBeGreaterThan(0);
+        expect(result.pickableData![0]).toBe(1);
+      });
+
+      it(`${schemeId}: Hide Others on hides other objects completely`, async () => {
+        await loadWorker();
+        const result = recolorGroup(schemeId, [1, 1, 1, 0]);
+
+        expect(rgbaAt(result, 3)).toEqual([0, 0, 0, 0]);
+        expect(result.pickableData![3]).toBe(0);
+        expect(result.pickableData![0]).toBe(1);
+      });
+    }
+
+    it('keeps objects the scheme would not draw invisible when dimming', async () => {
+      await loadWorker();
+      // Debris filtered out in the filter menu is hidden without a group, so it stays hidden with one.
+      dispatch({ typ: MSG.INIT_CATALOG, catalogData: buildCatalog(), seqNum: 10 });
+      dispatch({ typ: MSG.UPDATE_FILTERS, filterSettings: { ...allFiltersOn(), debris: false } });
+      dispatch({ typ: MSG.UPDATE_SETTINGS, settingsFlags: settingsWith([1, 1, 1, 0.1]) });
+      dispatch({ typ: MSG.UPDATE_GROUP, groupIds: [0] });
+      dispatch({ typ: MSG.UPDATE_SCHEME, schemeId: 'CelestrakColorScheme', isGroupScheme: true });
+      posted = [];
+      dispatch({ typ: MSG.FORCE_RECOLOR });
+      const result = lastColorResult()!;
+
+      // Debris (index 2) is filtered out: it must not come back as a dim dot
+      expect(result.colorData![2 * 4 + 3]).toBe(0);
+      expect(result.pickableData![2]).toBe(0);
+    });
+
+    it('keeps objects the scheme itself hides invisible when dimming', async () => {
+      await loadWorker();
+      dispatch({ typ: MSG.INIT_CATALOG, catalogData: buildCatalog(), seqNum: 12 });
+      dispatch({ typ: MSG.UPDATE_FILTERS, filterSettings: allFiltersOn() });
+      dispatch({ typ: MSG.UPDATE_SETTINGS, settingsFlags: { ...settingsWith([1, 1, 1, 0.1]), isShowRocketBodies: false } });
+      dispatch({ typ: MSG.UPDATE_GROUP, groupIds: [0] });
+      dispatch({ typ: MSG.UPDATE_SCHEME, schemeId: 'ObjectTypeColorScheme', isGroupScheme: false });
+      posted = [];
+      dispatch({ typ: MSG.FORCE_RECOLOR });
+      // Precondition: the ObjectType scheme hides rocket bodies (index 1) when they are switched off
+      expect(lastColorResult()!.colorData![1 * 4 + 3]).toBe(0);
+
+      dispatch({ typ: MSG.UPDATE_SCHEME, schemeId: 'ObjectTypeColorScheme', isGroupScheme: true });
+      posted = [];
+      dispatch({ typ: MSG.FORCE_RECOLOR });
+
+      expect(lastColorResult()!.colorData![1 * 4 + 3]).toBe(0);
+      expect(lastColorResult()!.pickableData![1]).toBe(0);
+    });
+
+    it('treats a settings message without a transparent color as hidden', async () => {
+      await loadWorker();
+      const { transparent: _unused, ...legacy } = settingsWith([1, 1, 1, 0.1]);
+
+      dispatch({ typ: MSG.INIT_CATALOG, catalogData: buildCatalog(), seqNum: 11 });
+      dispatch({ typ: MSG.UPDATE_FILTERS, filterSettings: allFiltersOn() });
+      dispatch({ typ: MSG.UPDATE_SETTINGS, settingsFlags: legacy });
+      dispatch({ typ: MSG.UPDATE_GROUP, groupIds: [0] });
+      dispatch({ typ: MSG.UPDATE_SCHEME, schemeId: 'CelestrakColorScheme', isGroupScheme: true });
+      posted = [];
+      dispatch({ typ: MSG.FORCE_RECOLOR });
+
+      expect(rgbaAt(lastColorResult()!, 3)).toEqual([0, 0, 0, 0]);
+    });
   });
 
   it('ignores unknown message types without throwing', async () => {

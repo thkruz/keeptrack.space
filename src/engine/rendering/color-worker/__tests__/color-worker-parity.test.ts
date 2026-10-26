@@ -270,6 +270,7 @@ describe('Color Worker Parity', () => {
     sensorType: 0,
     maxZoomDistance: 100000,
     isMissileSimulatorEnabled: true,
+    transparent: [1, 1, 1, 0.1],
   };
 
   const defaultFilters: FilterState = {
@@ -863,6 +864,39 @@ describe('ColorSchemeManager worker-mode delegation', () => {
 
     // Should not throw — main-thread loop should execute
     expect(() => colorSchemeManager.calculateColorBuffers(true)).not.toThrow();
+  });
+
+  it('forwards a changed out-of-group color on a non-forced recolor, once', () => {
+    const mockCruncher = {
+      isReady: true,
+      sendForceRecolor: vi.fn(),
+      sendSettingsUpdate: vi.fn(),
+    };
+
+    // eslint-disable-next-line dot-notation
+    colorSchemeManager['colorCruncher_'] = mockCruncher as unknown as import('@app/app/threads/color-cruncher-thread-manager').ColorCruncherThreadManager;
+    // eslint-disable-next-line dot-notation
+    colorSchemeManager['useWorkerMode_'] = true;
+
+    // Time Machine pattern: change the color, then recolor without forcing. The manager reads the global.
+    const sm = (globalThis as unknown as { settingsManager: typeof settingsManager }).settingsManager;
+
+    sm.colors.transparent = [0, 0, 0, 0];
+    colorSchemeManager.calculateColorBuffers(false);
+
+    expect(mockCruncher.sendSettingsUpdate).toHaveBeenCalledTimes(1);
+    expect(mockCruncher.sendSettingsUpdate.mock.calls[0][0].transparent).toEqual([0, 0, 0, 0]);
+    expect(mockCruncher.sendForceRecolor).not.toHaveBeenCalled();
+
+    // Unchanged color: nothing more to send
+    colorSchemeManager.calculateColorBuffers(false);
+    expect(mockCruncher.sendSettingsUpdate).toHaveBeenCalledTimes(1);
+
+    // The sent value is a copy: mutating the setting later is still detected
+    sm.colors.transparent = [1, 1, 1, 0.1];
+    colorSchemeManager.calculateColorBuffers(false);
+    expect(mockCruncher.sendSettingsUpdate).toHaveBeenCalledTimes(2);
+    expect(mockCruncher.sendSettingsUpdate.mock.calls[1][0].transparent).toEqual([1, 1, 1, 0.1]);
   });
 
   it('should not call main-thread loop for non-force recolor in worker mode', () => {

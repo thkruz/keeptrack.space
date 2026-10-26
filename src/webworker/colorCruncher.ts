@@ -63,6 +63,8 @@ let settings: SettingsFlags = {
   sensorType: 0,
   maxZoomDistance: 100000,
   isMissileSimulatorEnabled: true,
+  // Mirrors the default `settingsManager.colors.transparent` (Hide Others off) until the main thread sends its value
+  transparent: [1.0, 1.0, 1.0, 0.1],
 };
 
 let inViewData: Int8Array | null = null;
@@ -164,6 +166,33 @@ function writeDeselected(colorData: Float32Array, pickableData: Int8Array, i: nu
     writeColorArr(colorData, pickableData, i, c, PICKABLE_NO);
   } else {
     writeTransparent(colorData, pickableData, i);
+  }
+}
+
+/**
+ * Colors an object that is outside the selected group. Port of `ColorScheme.updateGroup` on the main
+ * thread: the object takes `settingsManager.colors.transparent` (sent in the settings flags) and is
+ * never pickable. Hide Others sets that color to alpha 0 (hidden) or a dim white (off).
+ *
+ * A dim color is only applied to objects the scheme would draw at all: the scheme runs first and
+ * anything it leaves invisible (hidden layer, facility, inactive missile) stays invisible, so dimming
+ * the rest of the sky never reveals objects that are off without a group either. No allocations.
+ */
+function writeOutOfGroup(cd: Float32Array, pd: Int8Array, i: number, schemeUpdate: SchemeUpdateFn): void {
+  const t = settings.transparent;
+
+  if (!t || !(t[3] > 0)) {
+    writeTransparent(cd, pd, i);
+
+    return;
+  }
+
+  schemeUpdate(cd, pd, i);
+
+  if (cd[i * 4 + 3] > 0) {
+    writeColorArr(cd, pd, i, t, PICKABLE_NO);
+  } else {
+    pd[i] = PICKABLE_NO;
   }
 }
 
@@ -686,7 +715,7 @@ function objectTypeGroupScheme(cd: Float32Array, pd: Int8Array, i: number): void
 
       return;
     }
-    writeTransparent(cd, pd, i);
+    writeOutOfGroup(cd, pd, i, objectTypeScheme);
 
     return;
   }
@@ -924,7 +953,7 @@ function countryGroupScheme(cd: Float32Array, pd: Int8Array, i: number): void {
     } else if (flags & ObjFlags.IS_MARKER) {
       writeColor(cd, pd, i, 1, 0, 0, 1, PICKABLE_NO);
     } else {
-      writeTransparent(cd, pd, i);
+      writeOutOfGroup(cd, pd, i, countryScheme);
     }
   }
 }
@@ -1861,7 +1890,7 @@ function resolveSchemeFn_(): SchemeUpdateFn {
         } else if (flags & ObjFlags.IS_MARKER) {
           writeColor(cd, pd, i, 1, 0, 0, 1, PICKABLE_NO);
         } else {
-          writeTransparent(cd, pd, i);
+          writeOutOfGroup(cd, pd, i, entry.update);
         }
 
         return;

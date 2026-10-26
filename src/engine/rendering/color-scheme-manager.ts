@@ -148,6 +148,8 @@ export class ColorSchemeManager {
   private useWorkerMode_ = false;
   private workerReady_ = false; // true once worker has received catalog; useWorkerMode_ can be toggled per-scheme
   private catalogSeqNum_ = 0;
+  /** The out-of-group color last sent to the worker (NaN = never sent). */
+  private readonly lastSentTransparent_: [number, number, number, number] = [NaN, NaN, NaN, NaN];
 
   /** Scheme IDs the color worker knows how to compute. Plugin schemes not in this set fall back to main-thread. */
   private static readonly WORKER_SUPPORTED_SCHEMES_ = new Set([
@@ -234,6 +236,9 @@ export class ColorSchemeManager {
         if (isForceRecolor) {
           this.sendAllStateToWorker_();
           this.colorCruncher_.sendForceRecolor();
+        } else if (this.isTransparentColorStale_()) {
+          // UPDATE_SETTINGS schedules a (debounced) worker recolor on its own
+          this.forwardSettingsToWorker_();
         }
 
         return;
@@ -761,6 +766,9 @@ export class ColorSchemeManager {
     if (this.useWorkerMode_ && this.colorCruncher_) {
       this.colorCruncher_.sendSchemeChange(this.currentColorScheme.id, true);
       this.forwardGroupToWorker_();
+      if (this.isTransparentColorStale_()) {
+        this.forwardSettingsToWorker_();
+      }
     }
   }
 
@@ -1445,9 +1453,35 @@ export class ColorSchemeManager {
       sensorType: sensorManager?.currentSensors?.[0]?.type ?? 0,
       maxZoomDistance: settingsManager.maxZoomDistance,
       isMissileSimulatorEnabled: !!settingsManager.plugins?.MissileSimulatorPlugin?.enabled,
+      transparent: this.copyTransparentColor_(),
     };
 
     this.colorCruncher_.sendSettingsUpdate(flags);
+  }
+
+  /** Copies `settingsManager.colors.transparent` (the out-of-group color) and remembers it as sent. */
+  private copyTransparentColor_(): [number, number, number, number] {
+    const t = settingsManager.colors?.transparent ?? this.colorTheme?.transparent;
+    const sent = this.lastSentTransparent_;
+
+    sent[0] = t?.[0] ?? 0;
+    sent[1] = t?.[1] ?? 0;
+    sent[2] = t?.[2] ?? 0;
+    sent[3] = t?.[3] ?? 0;
+
+    return [sent[0], sent[1], sent[2], sent[3]];
+  }
+
+  /**
+   * True when `settingsManager.colors.transparent` differs from what the worker last received.
+   * Hide Others and Time Machine change that color and then recolor without forcing (Time Machine)
+   * or before the worker would otherwise hear about it, so non-forced recolors check it too.
+   */
+  private isTransparentColorStale_(): boolean {
+    const t = settingsManager.colors?.transparent ?? this.colorTheme?.transparent;
+    const sent = this.lastSentTransparent_;
+
+    return (t?.[0] ?? 0) !== sent[0] || (t?.[1] ?? 0) !== sent[1] || (t?.[2] ?? 0) !== sent[2] || (t?.[3] ?? 0) !== sent[3];
   }
 
   private forwardObjectTypeFlagsToWorker_(): void {

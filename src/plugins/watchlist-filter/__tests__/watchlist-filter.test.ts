@@ -84,6 +84,16 @@ describe('WatchlistFilterPlugin methods', () => {
     expect(plugin.setBottomIconToDisabled).toHaveBeenCalled();
   });
 
+  it('an empty list turns the filter off only when it is on, leaving the search alone otherwise', () => {
+    watchlist.isFilterActive = false;
+    EventBus.getInstance().emit(EventBusEvent.onWatchlistUpdated, []);
+    expect(watchlist.setFilterActive).not.toHaveBeenCalled();
+
+    watchlist.isFilterActive = true;
+    EventBus.getInstance().emit(EventBusEvent.onWatchlistUpdated, []);
+    expect(watchlist.setFilterActive).toHaveBeenCalledWith(false);
+  });
+
   it('bridges bottomIconCallback to onBottomIconClick', () => {
     const spy = vi.spyOn(plugin, 'onBottomIconClick');
 

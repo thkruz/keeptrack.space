@@ -67,7 +67,11 @@ export class WatchlistFilterPlugin extends KeepTrackPlugin {
       } else {
         const watchlistPlugin = PluginRegistry.getPlugin(WatchlistPlugin);
 
-        watchlistPlugin?.setFilterActive(false);
+        // Turning an inactive filter "off" would still clear the search box (setFilterActive
+        // runs doSearch('')), wiping what the user typed whenever an empty list syncs in.
+        if (watchlistPlugin?.isFilterActive) {
+          watchlistPlugin.setFilterActive(false);
+        }
         this.setBottomIconToDisabled();
       }
     };

@@ -178,8 +178,8 @@ describe('ProximityOps lifecycle / search orchestration', () => {
       (getEl('proximity-ops-ava') as HTMLInputElement).checked = false;
       (getEl('proximity-ops-type') as HTMLInputElement).value = 'GEO';
       (getEl('proximity-ops-norad') as HTMLInputElement).value = '5';
-      // A truthy (non-zero) catalog id so the not-found guard does not trip.
       ServiceLocator.getCatalogManager().sccNum2Id = vi.fn(() => 5) as never;
+      ServiceLocator.getCatalogManager().getSat = vi.fn(() => defaultSat) as never;
       vi.spyOn(p(), 'findSatsById_').mockReturnValue([defaultSat]);
 
       const request = p().gatherSearch_();
@@ -428,13 +428,31 @@ describe('ProximityOps lifecycle / search orchestration', () => {
       expect(moduleSettingsManager.isOrbitCruncherInEcf).toBe(true);
     });
 
-    it('switches back to ECI when already in ECF', () => {
-      moduleSettingsManager.isOrbitCruncherInEcf = true;
+    it('keeps GEO orbits in ECF on every later click (never toggles back to ECI)', () => {
+      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+      toast.mockClear();
+
+      moduleSettingsManager.isOrbitCruncherInEcf = false;
       p().selectSatManagerInstance.primarySatObj = { perigee: 35000 };
 
       p().onEventClicked_(rpoEvent());
+      p().onEventClicked_(rpoEvent());
+      p().onEventClicked_(rpoEvent());
 
-      expect(moduleSettingsManager.isOrbitCruncherInEcf).toBe(false);
+      expect(moduleSettingsManager.isOrbitCruncherInEcf).toBe(true);
+      // Announced once, on the switch; never an ECI announcement.
+      expect(toast.mock.calls.filter(([msg]) => /ECF/u.test(String(msg)))).toHaveLength(1);
+      expect(toast.mock.calls.some(([msg]) => /ECI/u.test(String(msg)))).toBe(false);
+    });
+
+    it('leaves the frame alone for a LEO target', () => {
+      moduleSettingsManager.isOrbitCruncherInEcf = true;
+      p().selectSatManagerInstance.primarySatObj = { perigee: 400 };
+
+      p().onEventClicked_(rpoEvent());
+
+      expect(moduleSettingsManager.isOrbitCruncherInEcf).toBe(true);
     });
   });
 

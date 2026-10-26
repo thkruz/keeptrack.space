@@ -28,7 +28,7 @@
         "thresholds": "Schwellenwerte",
         "orbitRegime": "Orbitregime"
       },
-      "noRposToDownload": "Keine RPOs zum Herunterladen!",
+      "noRposToDownload": "Keine RPOs zum Herunterladen.",
       "noRposFound": "Keine RPOs gefunden!",
       "satNotFound": "Satellit mit NORAD-ID {sccNum} nicht gefunden",
       "geoOrbitsEcf": "GEO-Orbits in ECF angezeigt",
@@ -45,16 +45,18 @@
         "intrack": "In-Track [km]",
         "crosstrack": "Cross-Track [km]",
         "pc": "Pc",
-        "date": "Datum"
+        "date": "Datum",
+        "atWindowStart": "am Fensteranfang",
+        "atWindowEnd": "am Fensterende"
       },
       "help": {
         "overview": "Rendezvous and Proximity Operations (RPO) findet langsame, koorbitale Annäherungen, etwa einen Inspektions- oder Servicesatelliten nahe einem Ziel, und prüft dafür nur Objekte, die die Bahnebene des Ziels teilen (Inklination und RAAN innerhalb von {deg}° im LEO, benachbarte Längenpositionen im GEO). Schnelle Kreuzungen zwischen verschiedenen Bahnen sind bewusst ausgeschlossen; nutzen Sie dafür <strong>Debris Screening</strong>. Geben Sie einen Satelliten an (oder durchsuchen Sie ein ganzes Orbitregime), und es liefert die koorbitalen Begegnungen innerhalb Ihrer Abstands- und Geschwindigkeitsschwellen.",
         "imgAlt": "Das RPO-Menü mit Suchparametern",
         "imgCaption": "Legen Sie Schwellenwerte und Orbittyp fest und durchsuchen Sie dann einen Satelliten oder alle gegen alle.",
         "modesHeading": "Suchmodi",
-        "modes": "Standardmäßig nimmt die Suche die eingegebene <strong>NORAD-ID</strong> und prüft diesen Satelliten gegen nahe Objekte in derselben Bahnebene. Wird <strong>Geostationär Alle gegen Alle</strong> aktiviert, wird stattdessen jeder GEO-Satellit gegen jeden anderen geprüft, womit sich der gesamte Gürtel auf Aktivität untersuchen lässt. <strong>Nur Nutzlasten vergleichen</strong> überspringt Trümmer und Raketenkörper, und <strong>Vimpel-RSO ignorieren</strong> schließt Objekte aus dem JSC-Vimpel-Katalog aus.",
+        "modes": "Standardmäßig nimmt die Suche die eingegebene <strong>NORAD-ID</strong> und prüft diesen Satelliten gegen nahe Objekte in derselben Bahnebene. Wird <strong>Geostationär Alle gegen Alle</strong> aktiviert, wird stattdessen jeder GEO-Satellit gegen jeden anderen geprüft, womit sich der gesamte Gürtel auf Aktivität untersuchen lässt. <strong>Nur Nutzlasten vergleichen</strong> überspringt Trümmer und Raketenkörper, und <strong>Vimpel-RSO ignorieren</strong> schließt Objekte aus dem JSC-Vimpel-Katalog aus. Im GEO bestimmt die Suchdauer auch die Kandidatenmenge: Das Längengradfenster wächst um etwa 3 Grad pro Suchtag, weil in einem längeren Zeitraum mehr Objekte in Reichweite driften können.",
         "resultsHeading": "Ergebnisse lesen",
-        "results": "Jede Zeile verbindet ein <strong>Ziel</strong> und einen <strong>Jäger</strong> mit ihrer geringsten <strong>Rel. Entfernung</strong>, <strong>Rel. Geschwindigkeit</strong> und dem <strong>Datum</strong> der Begegnung. Klicken Sie auf eine Zeile, um beide Satelliten auszuwählen und Kamera und Uhr zur Annäherung springen zu lassen; GEO-Ergebnisse schalten zudem die Orbitanzeige auf ECF um, damit die Relativbewegung leicht ablesbar ist. Die Schaltfläche zum Herunterladen exportiert die Liste als CSV-Datei.",
+        "results": "Jede Zeile verbindet ein <strong>Ziel</strong> und einen <strong>Jäger</strong> mit ihrer geringsten <strong>Rel. Entfernung</strong>, <strong>Rel. Geschwindigkeit</strong> und dem <strong>Datum</strong> der Begegnung. Klicken Sie auf eine Zeile, um beide Satelliten auszuwählen und Kamera und Uhr zur Annäherung springen zu lassen; GEO-Ergebnisse schalten zudem die Orbitanzeige auf ECF um, damit die Relativbewegung leicht ablesbar ist. Die Schaltfläche zum Herunterladen exportiert die Liste als CSV-Datei. Paare, die im gesamten Zeitraum nie mehr als 1 km auseinander liegen, etwa angedockte Module oder Objekte mit demselben TLE, werden ausgeblendet und unter der Gesamtzahl gezählt. Ein mit <strong>am Fensteranfang</strong> oder <strong>am Fensterende</strong> markiertes Datum ist der nächste Punkt innerhalb des Zeitraums, keine echte größte Annäherung: Das Paar entfernt sich noch voneinander oder nähert sich noch an.",
         "howToUse": "<ol><li>Öffnen Sie das Menü über die Plugin-Leiste oder drücken Sie <strong>X</strong>.</li><li>Wählen Sie den <strong>Orbittyp</strong> (geostationär oder niedrige Erdumlaufbahn) und legen Sie <strong>Maximaler Abstandsschwellenwert</strong>, <strong>Maximale Relativgeschwindigkeit</strong> und <strong>Suchdauer</strong> fest.</li><li>Geben Sie eine <strong>NORAD-ID</strong> ein oder aktivieren Sie <strong>Geostationär Alle gegen Alle</strong> für eine gürtelweite Untersuchung.</li><li>Klicken Sie auf <strong>RPOs finden</strong>. Lange Suchen zeigen den Fortschritt; Ergebnisse öffnen sich im Listenpanel.</li><li>Klicken Sie auf eine beliebige Zeile, um zu dieser Begegnung zu fliegen.</li></ol>",
         "tip1": "Eine niedrige Relativgeschwindigkeit bei geringer Entfernung unterscheidet absichtliche Annäherungsoperationen von einem schnellen Konjunktionsvorbeiflug; verschärfen Sie die Geschwindigkeitsschwelle, um nach Manövern zu filtern.",
         "tip2": "Alle-gegen-Alle-Suchen in GEO sind aufwendig; grenzen Sie zuerst die Dauer ein und erweitern Sie sie, sobald die Schwellenwerte passen.",
@@ -62,7 +64,15 @@
         "shortcutToggle": "RPO-Menü umschalten"
       },
       "scopeNote": "RPO sucht langsame, koorbitale Annäherungen: im LEO nur Objekte innerhalb von {deg}° der Inklination und Bahnebene des Ziels, im GEO nur benachbarte Längenpositionen. Für schnelle Kreuzungen aus anderen Bahnen nutzen Sie Debris Screening.",
-      "noRposFoundCoorbital": "Keine RPOs unter {count} koorbitalen Objekten gefunden. Kreuzender Verkehr wird hier nicht geprüft; versuchen Sie Debris Screening."
+      "noRposFoundCoorbital": "Keine RPOs unter {count} koorbitalen Objekten gefunden. Kreuzender Verkehr wird hier nicht geprüft; versuchen Sie Debris Screening.",
+      "runSearchFirst": "Starten Sie zuerst eine Suche.",
+      "resultCountOne": "1 Annäherung (nächste {closest} km)",
+      "searching": "Suche läuft...",
+      "coLocatedHidden": "{count} Objekte am selben Ort ausgeblendet",
+      "coLocatedHiddenOne": "1 Objekt am selben Ort ausgeblendet",
+      "invalidThreshold": "{field} muss eine Zahl größer als 0 sein.",
+      "noradRequired": "Geben Sie eine NORAD-ID ein oder aktivieren Sie Geostationär Alle gegen Alle.",
+      "resultsButton": "Ergebnisse"
     }
   }
 }

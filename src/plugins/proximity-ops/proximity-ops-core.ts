@@ -66,7 +66,25 @@ export interface ProximityOpsEvent {
    * null when it could not be computed. Filled for reported events only.
    */
   pc: number | null;
+  /**
+   * Largest separation (km) sampled over the whole search window. A pair that never gets more than
+   * {@link CO_LOCATED_MAX_KM} apart (a docked module, two objects sharing one TLE) is co-located, not a
+   * rendezvous. Optional so hand-built events (tests, older callers) stay valid.
+   */
+  maxDist?: number;
+  /**
+   * 'start' / 'end' when the minimum sits on the edge of the search window: the pair is only separating
+   * (start) or still closing (end), so the row is the closest point inside the window, not a true closest
+   * approach. null for an interior minimum.
+   */
+  windowEdge?: RpoWindowEdge;
 }
+
+/** Which edge of the search window a minimum sits on, or null for an interior minimum. */
+export type RpoWindowEdge = 'start' | 'end' | null;
+
+/** Pairs whose separation never exceeds this (km) over the window are co-located and hidden from the results. */
+export const CO_LOCATED_MAX_KM = 1;
 
 /**
  * Serializable satellite input for the worker boundary: the catalog id (so the
@@ -159,7 +177,19 @@ export function findClosestApproach(
   tolMs: number = DEFAULT_REFINE_TOLERANCE_MS
 ): ProximityOpsEvent {
   const baseMs = start.getTime();
-  const tca = findTca((tMs) => separationRange_(sat1, sat2, new Date(baseMs + tMs)), 0, durationSec * 1000, stepSeconds * 1000, tolMs);
+  const windowMs = durationSec * 1000;
+  // The coarse scan samples the whole window, so the largest sampled separation comes for free.
+  let maxDist = 0;
+  const separation = (tMs: number): number => {
+    const range = separationRange_(sat1, sat2, new Date(baseMs + tMs));
+
+    if (Number.isFinite(range) && range > maxDist) {
+      maxDist = range;
+    }
+
+    return range;
+  };
+  const tca = findTca(separation, 0, windowMs, stepSeconds * 1000, tolMs);
   const tocaMs = tca ? tca.tcaMs : 0;
   const date = new Date(baseMs + tocaMs);
 
@@ -193,7 +223,38 @@ export function findClosestApproach(
     date,
     // Filled by findRpoPairs for events that pass the distance/velocity gate.
     pc: null,
+    maxDist: Math.max(maxDist, Number.isFinite(dist) ? dist : 0),
+    windowEdge: windowEdgeOf(tocaMs, windowMs, tolMs),
   };
+}
+
+/**
+ * Classify a minimum time against the search window. The golden-section refinement stops within `tolMs` of a
+ * boundary minimum, so anything within twice that (and at least 1 s) of an edge counts as that edge.
+ */
+export function windowEdgeOf(tcaMs: number, windowMs: number, tolMs: number = DEFAULT_REFINE_TOLERANCE_MS): RpoWindowEdge {
+  const edgeTolMs = Math.max(2 * tolMs, 1000);
+
+  if (tcaMs <= edgeTolMs) {
+    return 'start';
+  }
+  if (tcaMs >= windowMs - edgeTolMs) {
+    return 'end';
+  }
+
+  return null;
+}
+
+/** True when the pair never separated by more than {@link CO_LOCATED_MAX_KM} over the window. */
+export function isCoLocated(event: ProximityOpsEvent): boolean {
+  return typeof event.maxDist === 'number' && event.maxDist <= CO_LOCATED_MAX_KM;
+}
+
+/** Split events into the rows to show and the number of co-located pairs hidden from them. */
+export function partitionCoLocated(events: ProximityOpsEvent[]): { visible: ProximityOpsEvent[]; hiddenCount: number } {
+  const visible = events.filter((event) => !isCoLocated(event));
+
+  return { visible, hiddenCount: events.length - visible.length };
 }
 
 /** Half-width (ms) of the assessment window bracketing the approach for the Pc estimate. */
@@ -440,6 +501,7 @@ export const RPO_CSV_HEADERS = [
   'dvn(km/s)',
   'rel_dist(km)',
   'rel_vel(km/s)',
+  'pc',
 ] as const;
 
 /** One ordered CSV value row for an event (aligns with {@link RPO_CSV_HEADERS}). */
@@ -460,5 +522,6 @@ export function buildRpoCsvRow(rpo: ProximityOpsEvent): (string | number)[] {
     rpo.ric.velocity.z,
     rpo.dist,
     rpo.vel,
+    typeof rpo.pc === 'number' ? rpo.pc : '',
   ];
 }

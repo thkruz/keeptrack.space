@@ -78,9 +78,15 @@ describe('proximity-ops-core', () => {
   });
 
   describe('CSV export helpers', () => {
-    it('buildRpoCsvRow produces one value per header (15 columns)', () => {
-      expect(RPO_CSV_HEADERS).toHaveLength(15);
+    it('buildRpoCsvRow produces one value per header (16 columns, Pc last)', () => {
+      expect(RPO_CSV_HEADERS).toHaveLength(16);
+      expect(RPO_CSV_HEADERS[15]).toBe('pc');
       expect(buildRpoCsvRow(rpoEvent())).toHaveLength(RPO_CSV_HEADERS.length);
+    });
+
+    it('exports the Pc the table shows, or an empty cell when it was not computed', () => {
+      expect(buildRpoCsvRow(rpoEvent({ pc: 5.42e-7 }))[15]).toBe(5.42e-7);
+      expect(buildRpoCsvRow(rpoEvent({ pc: null }))[15]).toBe('');
     });
 
     it('emits the RIC breakdown columns from the event geometry', () => {

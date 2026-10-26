@@ -28,7 +28,7 @@
         "thresholds": "Progi",
         "orbitRegime": "Reżim orbitalny"
       },
-      "noRposToDownload": "Brak RPO do pobrania!",
+      "noRposToDownload": "Brak RPO do pobrania.",
       "noRposFound": "Nie znaleziono RPO!",
       "satNotFound": "Nie znaleziono satelity o NORAD ID {sccNum}",
       "geoOrbitsEcf": "Orbity GEO wyświetlane w ECF",
@@ -45,16 +45,18 @@
         "intrack": "Wzdłuż toru [km]",
         "crosstrack": "Poprzeczny [km]",
         "pc": "Pc",
-        "date": "Data"
+        "date": "Data",
+        "atWindowStart": "na początku okna",
+        "atWindowEnd": "na końcu okna"
       },
       "help": {
         "overview": "Rendezvous and Proximity Operations (RPO) znajduje powolne zbliżenia współorbitalne, takie jak satelita inspekcyjny lub serwisowy pracujący przy celu, sprawdzając tylko obiekty, które dzielą płaszczyznę orbity celu (inklinacja i RAAN w granicach {deg}° w LEO, pobliskie pozycje długości w GEO). Szybkie przecięcia między różnymi orbitami są celowo wyłączone; do nich użyj <strong>Debris Screening</strong>. Podaj satelitę (lub przeszukaj cały reżim orbitalny), a narzędzie zwróci spotkania współorbitalne mieszczące się w progach odległości i prędkości.",
         "imgAlt": "Menu RPO z parametrami wyszukiwania",
         "imgCaption": "Ustaw progi i typ orbity, a następnie przeszukaj jednego satelitę lub wszystkie ze wszystkimi.",
         "modesHeading": "Tryby wyszukiwania",
-        "modes": "Domyślnie wyszukiwanie pobiera wprowadzony <strong>NORAD ID</strong> i porównuje tego satelitę z pobliskimi obiektami w tej samej płaszczyźnie orbity. Zaznaczenie <strong>Geostacjonarna wszystkie ze wszystkimi</strong> porównuje zamiast tego każdego satelitę GEO z każdym innym, co pozwala zbadać aktywność na całym pasie. <strong>Porównaj tylko ładunki</strong> pomija odłamki i człony rakiet, a <strong>Ignoruj RSO Vimpel</strong> wyklucza obiekty pochodzące z katalogu JSC Vimpel.",
+        "modes": "Domyślnie wyszukiwanie pobiera wprowadzony <strong>NORAD ID</strong> i porównuje tego satelitę z pobliskimi obiektami w tej samej płaszczyźnie orbity. Zaznaczenie <strong>Geostacjonarna wszystkie ze wszystkimi</strong> porównuje zamiast tego każdego satelitę GEO z każdym innym, co pozwala zbadać aktywność na całym pasie. <strong>Porównaj tylko ładunki</strong> pomija odłamki i człony rakiet, a <strong>Ignoruj RSO Vimpel</strong> wyklucza obiekty pochodzące z katalogu JSC Vimpel. Na GEO czas wyszukiwania wyznacza także pulę kandydatów: okno długości geograficznej rośnie o około 3 stopnie na każdy dzień wyszukiwania, bo w dłuższym oknie więcej obiektów może dryfować w zasięg.",
         "resultsHeading": "Odczytywanie wyników",
-        "results": "Każdy wiersz łączy <strong>Cel</strong> i <strong>Obiekt ścigający</strong> z ich najmniejszą wartością <strong>Odl. względna</strong>, <strong>Prędk. względna</strong> oraz <strong>Data</strong> spotkania. Kliknij wiersz, aby wybrać oba satelity i przenieść kamerę oraz zegar do momentu zbliżenia; wyniki GEO przełączają też wyświetlanie orbit na ECF, dzięki czemu ruch względny jest łatwy do odczytania. Przycisk pobierania eksportuje listę jako plik CSV.",
+        "results": "Każdy wiersz łączy <strong>Cel</strong> i <strong>Obiekt ścigający</strong> z ich najmniejszą wartością <strong>Odl. względna</strong>, <strong>Prędk. względna</strong> oraz <strong>Data</strong> spotkania. Kliknij wiersz, aby wybrać oba satelity i przenieść kamerę oraz zegar do momentu zbliżenia; wyniki GEO przełączają też wyświetlanie orbit na ECF, dzięki czemu ruch względny jest łatwy do odczytania. Przycisk pobierania eksportuje listę jako plik CSV. Pary, które w całym oknie nigdy nie oddalają się o więcej niż 1 km, na przykład zadokowane moduły lub obiekty z tym samym TLE, są ukrywane i liczone pod sumą. Data oznaczona <strong>na początku okna</strong> lub <strong>na końcu okna</strong> to najbliższy punkt wewnątrz okna, a nie prawdziwe największe zbliżenie: para nadal się oddala albo nadal się zbliża.",
         "howToUse": "<ol><li>Otwórz menu z panelu lub naciśnij <strong>X</strong>.</li><li>Wybierz <strong>Typ orbity</strong> (geostacjonarna lub niska orbita okołoziemska) i ustaw <strong>Próg maksymalnej odległości</strong>, <strong>Maksymalna prędkość względna</strong> oraz <strong>Czas wyszukiwania</strong>.</li><li>Wprowadź <strong>NORAD ID</strong> lub zaznacz <strong>Geostacjonarna wszystkie ze wszystkimi</strong>, aby zbadać cały pas.</li><li>Kliknij <strong>Znajdź RPO</strong>. Długie wyszukiwania pokazują postęp; wyniki otwierają się w panelu listy.</li><li>Kliknij dowolny wiersz, aby przelecieć do tego spotkania.</li></ol>",
         "tip1": "Niska prędkość względna na małej odległości odróżnia celowe operacje zbliżeniowe od szybkiego przelotu koniunkcyjnego; zawęź próg prędkości, aby odfiltrować manewry.",
         "tip2": "Wyszukiwania GEO wszystkich ze wszystkimi są kosztowne; najpierw zawęź czas trwania, a potem rozszerz go, gdy progi będą wyglądały dobrze.",
@@ -62,7 +64,15 @@
         "shortcutToggle": "Przełącz menu RPO"
       },
       "scopeNote": "RPO szuka powolnych zbliżeń współorbitalnych: w LEO sprawdza tylko obiekty w granicach {deg}° od inklinacji i płaszczyzny orbity celu, a w GEO tylko pobliskie pozycje długości. Do szybkich przecięć z innych orbit użyj Debris Screening.",
-      "noRposFoundCoorbital": "Nie znaleziono RPO wśród {count} obiektów współorbitalnych. Ruch przecinający nie jest tu sprawdzany; spróbuj Debris Screening."
+      "noRposFoundCoorbital": "Nie znaleziono RPO wśród {count} obiektów współorbitalnych. Ruch przecinający nie jest tu sprawdzany; spróbuj Debris Screening.",
+      "runSearchFirst": "Najpierw uruchom wyszukiwanie.",
+      "resultCountOne": "1 zbliżenie (najbliższe {closest} km)",
+      "searching": "Wyszukiwanie...",
+      "coLocatedHidden": "Ukryte obiekty w tym samym miejscu: {count}",
+      "coLocatedHiddenOne": "Ukryto 1 obiekt w tym samym miejscu",
+      "invalidThreshold": "{field} musi być liczbą większą od 0.",
+      "noradRequired": "Wpisz identyfikator NORAD albo włącz Geostacjonarna wszystkie ze wszystkimi.",
+      "resultsButton": "Wyniki"
     }
   }
 }

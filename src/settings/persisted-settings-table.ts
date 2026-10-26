@@ -158,6 +158,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_DRAW_NIGHT_AS_DAY,
+    serialize: (sm) => String(sm.isDrawNightAsDay),
+    deserialize: (sm, raw) => {
+      sm.isDrawNightAsDay = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR,
     serialize: (sm) => String(sm.isDrawFlatMapTerminator),
     deserialize: (sm, raw) => {

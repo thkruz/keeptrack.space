@@ -23,8 +23,17 @@ describe('resolveHelpShortcuts', () => {
     };
 
     expect(resolveHelpShortcuts(config, 'FilterMenuPlugin')).toEqual([
-      { keys: ['f'], description: 'Toggle the Filter menu' },
+      // Letters render as key caps.
+      { keys: ['F'], description: 'Toggle the Filter menu' },
       { keys: ['Esc'], description: 'Close' },
+    ]);
+  });
+
+  it('treats a hand-written bare uppercase key as the registered Shift chord', () => {
+    KeyboardShortcutRegistry.register('NightToggle', [{ key: 'N', description: 'Toggle night', callback: () => undefined }]);
+
+    expect(resolveHelpShortcuts({ title: 'Night', shortcuts: [{ keys: ['N'], description: 'stale copy' }] }, 'NightToggle')).toEqual([
+      { keys: ['Shift', 'N'], description: 'Toggle night' },
     ]);
   });
 
@@ -33,7 +42,7 @@ describe('resolveHelpShortcuts', () => {
     KeyboardShortcutRegistry.register('PluginB', [{ key: 'b', description: 'B thing', callback: () => undefined }]);
 
     expect(resolveHelpShortcuts({ title: 'A' }, 'PluginA')).toEqual([]);
-    expect(buildHelpHtml({ title: 'B', body: 'legacy' }, 'PluginB')).toContain('<kbd>b</kbd>');
+    expect(buildHelpHtml({ title: 'B', body: 'legacy' }, 'PluginB')).toContain('<kbd>B</kbd>');
     expect(buildHelpHtml({ title: 'A', body: 'legacy' }, 'PluginA')).toBe('legacy');
   });
 });

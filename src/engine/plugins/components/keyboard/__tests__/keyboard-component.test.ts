@@ -91,6 +91,33 @@ describe('KeyboardComponent', () => {
     expect(noAlt).toHaveBeenCalledTimes(1);
   });
 
+  it('a plain letter shortcut does not fire while Ctrl is held (Ctrl+F belongs to its own owner)', () => {
+    const plainF = vi.fn();
+    const ctrlF = vi.fn();
+    const plain = new KeyboardComponent('FilterMenu', [{ key: 'f', callback: plainF }]);
+    const withCtrl = new KeyboardComponent('FindSat', [{ key: 'f', ctrl: true, callback: ctrlF }]);
+
+    plain.init();
+    withCtrl.init();
+
+    emitKey('f', 'KeyF', false, false, true);
+    expect(plainF).not.toHaveBeenCalled();
+    expect(ctrlF).toHaveBeenCalledTimes(1);
+
+    emitKey('f', 'KeyF');
+    expect(plainF).toHaveBeenCalledTimes(1);
+    expect(ctrlF).toHaveBeenCalledTimes(1);
+  });
+
+  it('a non-letter shortcut keeps the Ctrl wildcard (AltGr layouts report Ctrl for brackets)', () => {
+    const callback = vi.fn();
+    const comp = new KeyboardComponent('SelectSat', [{ key: '[', callback }]);
+
+    comp.init();
+    emitKey('[', 'BracketLeft', false, false, true);
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
   it('does nothing when no shortcut matches the key', () => {
     const callback = vi.fn();
     const comp = new KeyboardComponent('PluginA', [{ key: 'a', callback }]);

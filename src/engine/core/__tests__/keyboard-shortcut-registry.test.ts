@@ -39,8 +39,8 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'WatchlistPlugin', shortcuts: [{ key: 'W' }] },
   // src/plugins/watchlist-filter/watchlist-filter.ts (lowercase 'w', distinct from 'W')
   { pluginId: 'WatchlistFilter', shortcuts: [{ key: 'w' }] },
-  // src/plugins/find-sat/find-sat.ts
-  { pluginId: 'FindSatPlugin', shortcuts: [{ key: 'F', ctrl: true }] },
+  // src/plugins/find-sat/find-sat.ts (Ctrl+F; plain 'f' is FilterMenu, which no longer matches with Ctrl held)
+  { pluginId: 'FindSatPlugin', shortcuts: [{ key: 'f', ctrl: true }] },
   // src/plugins/edit-sat/edit-sat.ts (ctrl:false; owns plain Shift+E)
   { pluginId: 'EditSat', shortcuts: [{ key: 'E', ctrl: false }] },
   // src/plugins/dops/dops.ts
@@ -193,20 +193,31 @@ describe('KeyboardShortcutRegistry', () => {
       expect(warnSpy.mock.calls[0][0]).toContain('PluginB');
     });
 
-    it('should conflict when one omits ctrl (wildcard) and the other requires it', () => {
+    it('should conflict when a non-letter key omits ctrl (wildcard) and the other requires it', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {
         /* noop */
       });
       const cb = vi.fn();
 
-      // ctrl omitted = wildcard: matches whether or not Ctrl is held, so it
-      // overlaps a shortcut that requires Ctrl (both fire on Ctrl+key). This
-      // mirrors the runtime matcher, which treats undefined as "don't care".
-      KeyboardShortcutRegistry.register('PlainKey', [{ key: 'F', callback: cb }]);
-      const result = KeyboardShortcutRegistry.register('CtrlKey', [{ key: 'F', ctrl: true, callback: cb }]);
+      // ctrl omitted = wildcard on a non-letter key: matches whether or not Ctrl
+      // is held, so it overlaps a shortcut that requires Ctrl (both fire on
+      // Ctrl+Home). This mirrors the runtime matcher.
+      KeyboardShortcutRegistry.register('PlainKey', [{ key: 'Home', callback: cb }]);
+      const result = KeyboardShortcutRegistry.register('CtrlKey', [{ key: 'Home', ctrl: true, callback: cb }]);
 
       expect(result).toHaveLength(0);
       expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(1);
+    });
+
+    it('should NOT conflict when a letter key omits ctrl and the other requires it (omitted = not held)', () => {
+      const cb = vi.fn();
+
+      // Filter Menu 'f' vs Find Satellite Ctrl+f: the plain letter owns F only.
+      KeyboardShortcutRegistry.register('FilterMenuPlugin', [{ key: 'f', callback: cb }]);
+      const result = KeyboardShortcutRegistry.register('FindSatPlugin', [{ key: 'f', ctrl: true, callback: cb }]);
+
+      expect(result).toHaveLength(1);
+      expect(KeyboardShortcutRegistry.getConflicts()).toHaveLength(0);
     });
 
     it('should NOT conflict when both specify the same modifier with opposite values', () => {
@@ -381,8 +392,9 @@ describe('KeyboardShortcutRegistry', () => {
   });
 
   describe('shortcutsConflict', () => {
+    // A non-letter key, where an omitted modifier is a pure wildcard.
     const make = (overrides: Partial<IKeyboardShortcut> = {}): IKeyboardShortcut => ({
-      key: 'F',
+      key: 'Home',
       callback: () => {
         /* noop */
       },
@@ -420,6 +432,23 @@ describe('KeyboardShortcutRegistry', () => {
     it('should return true only when all modifier dimensions overlap', () => {
       expect(KeyboardShortcutRegistry.shortcutsConflict(make({ ctrl: true, shift: true }), make({ ctrl: true, shift: true }))).toBe(true);
     });
+
+    it('treats an omitted ctrl/alt on a letter key as "not held"', () => {
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make({ key: 'f' }), make({ key: 'f', ctrl: true }))).toBe(false);
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make({ key: 'f' }), make({ key: 'f', alt: true }))).toBe(false);
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make({ key: 'f' }), make({ key: 'f', ctrl: false }))).toBe(true);
+      // Shift stays a wildcard: the letter's case already encodes it.
+      expect(KeyboardShortcutRegistry.shortcutsConflict(make({ key: 'A' }), make({ key: 'A', shift: true }))).toBe(true);
+    });
+  });
+
+  describe('resolveModifiers', () => {
+    it('defaults ctrl/alt to false on letter keys only', () => {
+      expect(KeyboardShortcutRegistry.resolveModifiers({ key: 'f', callback: vi.fn() })).toEqual({ ctrl: false, shift: undefined, alt: false });
+      expect(KeyboardShortcutRegistry.resolveModifiers({ key: 'F', ctrl: true, callback: vi.fn() })).toEqual({ ctrl: true, shift: undefined, alt: false });
+      expect(KeyboardShortcutRegistry.resolveModifiers({ key: '[', callback: vi.fn() })).toEqual({ ctrl: undefined, shift: undefined, alt: undefined });
+      expect(KeyboardShortcutRegistry.resolveModifiers({ key: 'F2', shift: true, callback: vi.fn() })).toEqual({ ctrl: undefined, shift: true, alt: undefined });
+    });
   });
 
   describe('formatShortcut', () => {
@@ -431,7 +460,15 @@ describe('KeyboardShortcutRegistry', () => {
         },
       });
 
-      expect(result).toBe('N');
+      // Uppercase letter = Shift+letter: the hint names the real chord.
+      expect(result).toBe('Shift+N');
+    });
+
+    it('shows a lowercase letter as its key cap without Shift', () => {
+      expect(KeyboardShortcutRegistry.formatShortcut({ key: 'f', callback: vi.fn() })).toBe('F');
+      expect(KeyboardShortcutRegistry.formatShortcut({ key: 'f', ctrl: true, callback: vi.fn() })).toBe('Ctrl+F');
+      expect(KeyboardShortcutRegistry.formatShortcut({ key: 'A', ctrl: false, callback: vi.fn() })).toBe('Shift+A');
+      expect(KeyboardShortcutRegistry.formatShortcut({ key: 'F2', shift: true, callback: vi.fn() })).toBe('Shift+F2');
     });
 
     it('should include required modifiers', () => {

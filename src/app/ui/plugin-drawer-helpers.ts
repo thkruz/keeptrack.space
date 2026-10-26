@@ -2,6 +2,7 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { migrateLegacyBottomIconId } from '@app/engine/plugins/bottom-icon-id';
 import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
 import { TopMenuPlugin } from '@app/engine/plugins/top-menu-plugin';
 import { getEl } from '@app/engine/utils/get-el';
@@ -526,10 +527,10 @@ export function loadRecents(): RecentEntry[] {
       .map((entry): RecentEntry | null => {
         // Legacy format: a bare string[] of plugin ids with no timestamps.
         if (typeof entry === 'string') {
-          return { id: entry, t: 0 };
+          return { id: migrateLegacyBottomIconId(entry), t: 0 };
         }
         if (typeof entry === 'object' && entry !== null && typeof (entry as RecentEntry).id === 'string' && typeof (entry as RecentEntry).t === 'number') {
-          return { id: (entry as RecentEntry).id, t: (entry as RecentEntry).t };
+          return { id: migrateLegacyBottomIconId((entry as RecentEntry).id), t: (entry as RecentEntry).t };
         }
 
         return null;

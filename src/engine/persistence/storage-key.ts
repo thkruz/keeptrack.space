@@ -36,6 +36,7 @@ export enum StorageKey {
   SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',
   SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
   SETTINGS_DRAW_GRATICULE = 'v2-keepTrack-settings-drawGraticule',
+  SETTINGS_DRAW_NIGHT_AS_DAY = 'v2-keepTrack-settings-drawNightAsDay',
   SETTINGS_DRAW_FLAT_MAP_TERMINATOR = 'v2-keepTrack-settings-drawFlatMapTerminator',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_DRAW_ORBIT_ECLIPSE = 'v2-keepTrack-settings-drawOrbitEclipse',
@@ -126,6 +127,9 @@ export enum StorageKey {
   // Color Scheme Editor
   COLOR_SCHEME_OVERRIDES = 'v2-keepTrack-colorSchemeOverrides',
 
+  // Layers legend: JSON string[] of object-type flags the user hid (survives scheme switches)
+  LEGEND_HIDDEN_FLAGS = 'v2-keepTrack-legendHiddenFlags',
+
   // Achievement progress counters (mirrors the server-synced app_preferences copy)
   ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
 
@@ -189,6 +193,9 @@ export enum StorageKey {
   // Custom Sensor (user-built sensor definitions and which one was the primary,
   // restored on boot so a custom station survives a reload)
   CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
+
+  // FPS View (the one-time "how to fly" hint was shown on this device)
+  FPS_VIEW_HINT_SEEN = 'v2-keepTrack-fpsViewHintSeen',
 
   // Per-key sync timestamps for account-scoped keys: JSON Record<StorageKey, epochMs>.
   // Maintained by PersistenceManager; wiped on version bumps so a post-wipe login

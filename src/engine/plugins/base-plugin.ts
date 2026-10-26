@@ -21,6 +21,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
+import { bottomIconSlug } from './bottom-icon-id';
 // Component imports for composition-based architecture
 import { BottomIconComponent } from './components/bottom-icon/bottom-icon-component';
 import { ContextMenuComponent } from './components/context-menu/context-menu-component';
@@ -720,9 +721,7 @@ export abstract class KeepTrackPlugin {
     this.bottomIconLabel = this.t7eIfFound_(`plugins.${this.id}.bottomIconLabel`) ?? this.bottomIconLabel;
 
     if (this.bottomIconLabel) {
-      const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');
-
-      this.bottomIconElementName = this.bottomIconElementName ?? `${bottomIconSlug}-bottom-icon`;
+      this.bottomIconElementName = this.bottomIconElementName ?? KeepTrackPlugin.defaultBottomIconElementName(this.id, this.bottomIconLabel);
     }
 
     if (this.bottomIconImg || this.bottomIconElementName || this.bottomIconLabel) {
@@ -1265,7 +1264,7 @@ export abstract class KeepTrackPlugin {
     if (!this.isMenuButtonActive) {
       return;
     }
-    this.isMenuButtonActive = false;
+    this.markMenuButtonInactive_();
     this.bottomIconComponent_?.deselect(false);
     if (this.onSetBottomIconToUnselected) {
       this.onSetBottomIconToUnselected();
@@ -1275,6 +1274,19 @@ export abstract class KeepTrackPlugin {
     }
     getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-selected');
     getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-selected');
+  }
+
+  /**
+   * Disables the icon when the satellite or sensor it needs goes away. Only a plugin with its own
+   * side menu closes menus here: a camera-mode or toggle icon (Satellite ECI View, ...) losing its
+   * selection must not close another plugin's open menu, e.g. the Countries menu after a pick
+   * deselects the satellite.
+   */
+  private disableForMissingSelection_(): void {
+    const isHideSideMenus = Boolean(this.sideMenuElementName) || this.isForceHideSideMenus;
+
+    this.setBottomIconToDisabled(isHideSideMenus);
+    this.setBottomIconToUnselected(isHideSideMenus);
   }
 
   setBottomIconToDisabled(isHideSideMenus = true): void {
@@ -1302,6 +1314,19 @@ export abstract class KeepTrackPlugin {
    * Returns the translated string if the key exists in locale data,
    * or null if t7e returned the raw key (meaning no translation found).
    */
+  /**
+   * Default bottom icon id: a slug of the plugin's ENGLISH label, so the id (telemetry
+   * content_id, drawer favorites) is the same in every language. Falls back to `label` when the
+   * plugin has no `plugins.<id>.bottomIconLabel` key. Ids saved under the old localized slug are
+   * mapped by `migrateLegacyBottomIconId`.
+   */
+  static defaultBottomIconElementName(id: string, label: string): string {
+    const key = `plugins.${id}.bottomIconLabel`;
+    const english = t7e(key as TranslationKey, { lng: 'en' });
+
+    return bottomIconSlug(english && english !== key ? english : label);
+  }
+
   private t7eIfFound_(key: string): string | null {
     const result = t7e(key as TranslationKey);
 
@@ -1434,8 +1459,7 @@ export abstract class KeepTrackPlugin {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject): void => {
         if (!obj?.isSatellite() || !ServiceLocator.getSensorManager().isSensorSelected()) {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
+          this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
         }
@@ -1444,8 +1468,7 @@ export abstract class KeepTrackPlugin {
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
       EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject): void => {
         if (!obj) {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
+          this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
         }
@@ -1455,8 +1478,7 @@ export abstract class KeepTrackPlugin {
     if (this.isRequireSensorSelected && !this.isRequireSatelliteSelected) {
       EventBus.getInstance().on(EventBusEvent.setSensor, (sensor, sensorId): void => {
         if (!sensor && !sensorId) {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
+          this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
         }
@@ -1469,7 +1491,7 @@ export abstract class KeepTrackPlugin {
           if (this.sideMenuElementName || this.isForceHideSideMenus) {
             this.hideSideMenus();
           }
-          this.isMenuButtonActive = false;
+          this.markMenuButtonInactive_();
           getEl(this.bottomIconElementName, true)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
           getEl(`${this.id}-utility-icon`, true)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         } else {
@@ -1539,7 +1561,24 @@ export abstract class KeepTrackPlugin {
       ServiceLocator.getUiManager().searchManager.closeSearch();
     }
     ServiceLocator.getUiManager().hideSideMenus();
+    this.markMenuButtonInactive_();
+  }
+
+  /**
+   * Clears `isMenuButtonActive` and, on the active -> inactive transition, runs
+   * `onBottomIconDeselect()` for legacy (`bottomIcon*` field) plugins. Composition
+   * plugins get that hook from their BottomIconComponent instead, so it is skipped
+   * for them; the transition check keeps the hook to one call per close however
+   * many close paths (icon toggle, hideSideMenus, setBottomIconToUnselected) run.
+   */
+  private markMenuButtonInactive_(): void {
+    const wasActive = this.isMenuButtonActive;
+
     this.isMenuButtonActive = false;
+
+    if (wasActive && !this.bottomIconComponent_ && 'onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
+      this.onBottomIconDeselect();
+    }
   }
 
   openSideMenu() {
@@ -1719,7 +1758,7 @@ export abstract class KeepTrackPlugin {
       }
       slideCb();
       getEl(bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
-      this.isMenuButtonActive = false;
+      this.markMenuButtonInactive_();
     });
   }
 }

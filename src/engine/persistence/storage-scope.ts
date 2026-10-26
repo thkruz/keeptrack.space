@@ -56,6 +56,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_AURORA]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_GRATICULE]: StorageScope.Account,
+  [StorageKey.SETTINGS_DRAW_NIGHT_AS_DAY]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_SUN]: StorageScope.Account,
   [StorageKey.SETTINGS_CONFIDENCE_LEVELS]: StorageScope.Account,
@@ -75,6 +76,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.LAST_MAP]: StorageScope.Account,
   [StorageKey.COLOR_SCHEME]: StorageScope.Account,
   [StorageKey.COLOR_SCHEME_OVERRIDES]: StorageScope.Account,
+  [StorageKey.LEGEND_HIDDEN_FLAGS]: StorageScope.Account,
   [StorageKey.SETTINGS_DOT_COLORS]: StorageScope.Account,
   [StorageKey.SYMBOLOGY_CONFIG]: StorageScope.Account,
   [StorageKey.SYMBOLOGY_ENABLED]: StorageScope.Account,
@@ -162,6 +164,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_SAT_LABEL_MODE]: StorageScope.Device,
   [StorageKey.ONBOARDING_STATE]: StorageScope.Device,
   [StorageKey.PLUGIN_ENABLE_OVERRIDES]: StorageScope.Device,
+  [StorageKey.FPS_VIEW_HINT_SEEN]: StorageScope.Device,
 
   // --- Device: meta/bookkeeping (never sync) ------------------------------------
   [StorageKey.VERSION]: StorageScope.Device,

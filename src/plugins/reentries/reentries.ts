@@ -674,7 +674,6 @@ export class Reentries extends KeepTrackPlugin {
       return;
     }
 
-    const now = new Date();
     const decayEpoch = new Date(
       Date.UTC(
         parseInt(this.tipList_[row].DECAY_EPOCH.substring(0, 4)),
@@ -686,7 +685,7 @@ export class Reentries extends KeepTrackPlugin {
       )
     );
 
-    ServiceLocator.getTimeManager().changeStaticOffset(decayEpoch.getTime() - now.getTime());
+    ServiceLocator.getTimeManager().changeSimulationTime(decayEpoch.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     if (this.isFlyToCorridor_) {

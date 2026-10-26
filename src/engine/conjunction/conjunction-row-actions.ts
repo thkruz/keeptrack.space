@@ -27,7 +27,7 @@ export interface RemovableLine {
  * (ms); `leadMs` defaults to 0 (jump exactly to TCA).
  */
 export const jumpToTca = (tcaMs: number, leadMs = 0): void => {
-  ServiceLocator.getTimeManager().changeStaticOffset(tcaMs - Date.now() - leadMs);
+  ServiceLocator.getTimeManager().changeSimulationTime(tcaMs - leadMs);
 };
 
 /**

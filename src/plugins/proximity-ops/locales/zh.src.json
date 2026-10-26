@@ -32,7 +32,6 @@
       "noRposFound": "未找到RPO！",
       "satNotFound": "未找到NORAD编号为{sccNum}的卫星",
       "geoOrbitsEcf": "GEO轨道以ECF显示",
-      "geoOrbitsEci": "GEO轨道以ECI显示",
       "vimpelNotSupported": "不支持Vimpel卫星",
       "table": {
         "target": "目标",

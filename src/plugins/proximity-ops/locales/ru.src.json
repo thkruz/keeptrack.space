@@ -32,7 +32,6 @@
       "noRposFound": "RPO не найдены!",
       "satNotFound": "Спутник с NORAD ID {sccNum} не найден",
       "geoOrbitsEcf": "Орбиты ГСО отображены в ECF",
-      "geoOrbitsEci": "Орбиты ГСО отображены в ECI",
       "vimpelNotSupported": "Спутники Vimpel не поддерживаются",
       "table": {
         "target": "Цель",

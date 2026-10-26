@@ -32,7 +32,6 @@
       "noRposFound": "¡No se encontraron RPOs!",
       "satNotFound": "Satélite con ID NORAD {sccNum} no encontrado",
       "geoOrbitsEcf": "Órbitas GEO mostradas en ECF",
-      "geoOrbitsEci": "Órbitas GEO mostradas en ECI",
       "vimpelNotSupported": "Los satélites Vimpel no son compatibles",
       "table": {
         "target": "Objetivo",

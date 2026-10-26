@@ -32,7 +32,6 @@
       "noRposFound": "RPO를 찾을 수 없습니다!",
       "satNotFound": "NORAD ID {sccNum}인 위성을 찾을 수 없습니다",
       "geoOrbitsEcf": "GEO 궤도가 ECF로 표시됩니다",
-      "geoOrbitsEci": "GEO 궤도가 ECI로 표시됩니다",
       "vimpelNotSupported": "Vimpel 위성은 지원되지 않습니다",
       "table": {
         "target": "대상",

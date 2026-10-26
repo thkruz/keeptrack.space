@@ -32,7 +32,6 @@
       "noRposFound": "No RPOs found!",
       "satNotFound": "Satellite with NORAD ID {sccNum} not found",
       "geoOrbitsEcf": "GEO Orbits displayed in ECF",
-      "geoOrbitsEci": "GEO Orbits displayed in ECI",
       "vimpelNotSupported": "Vimpel Satellites are not supported",
       "table": {
         "target": "Target",

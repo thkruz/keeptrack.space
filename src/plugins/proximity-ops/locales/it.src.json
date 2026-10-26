@@ -32,7 +32,6 @@
       "noRposFound": "Nessun RPO trovato!",
       "satNotFound": "Satellite con ID NORAD {sccNum} non trovato",
       "geoOrbitsEcf": "Orbite GEO visualizzate in ECF",
-      "geoOrbitsEci": "Orbite GEO visualizzate in ECI",
       "vimpelNotSupported": "I satelliti Vimpel non sono supportati",
       "table": {
         "target": "Bersaglio",

@@ -32,7 +32,6 @@
       "noRposFound": "Nie znaleziono RPO!",
       "satNotFound": "Nie znaleziono satelity o NORAD ID {sccNum}",
       "geoOrbitsEcf": "Orbity GEO wyświetlane w ECF",
-      "geoOrbitsEci": "Orbity GEO wyświetlane w ECI",
       "vimpelNotSupported": "Satelity Vimpel nie są obsługiwane",
       "table": {
         "target": "Cel",

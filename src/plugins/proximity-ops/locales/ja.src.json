@@ -32,7 +32,6 @@
       "noRposFound": "RPOが見つかりませんでした！",
       "satNotFound": "NORAD ID {sccNum} の衛星が見つかりません",
       "geoOrbitsEcf": "GEO軌道をECFで表示",
-      "geoOrbitsEci": "GEO軌道をECIで表示",
       "vimpelNotSupported": "Vimpel衛星はサポートされていません",
       "table": {
         "target": "ターゲット",

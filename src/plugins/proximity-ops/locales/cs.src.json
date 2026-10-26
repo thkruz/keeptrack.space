@@ -32,7 +32,6 @@
       "noRposFound": "Nebyly nalezeny žádné RPO!",
       "satNotFound": "Satelit s NORAD ID {sccNum} nebyl nalezen",
       "geoOrbitsEcf": "GEO orbity zobrazeny v ECF",
-      "geoOrbitsEci": "GEO orbity zobrazeny v ECI",
       "vimpelNotSupported": "Satelity Vimpel nejsou podporovány",
       "table": {
         "target": "Cíl",

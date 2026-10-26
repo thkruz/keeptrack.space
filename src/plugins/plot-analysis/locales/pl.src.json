@@ -4,7 +4,11 @@
       "bottomIconLabel": "Wykres inkl. vs wys.",
       "title": "Menu wykresu inklinacji do wysokości",
       "labels": {
-        "totalLeoPayloads": "Łączna liczba ładunków LEO"
+        "totalLeoPayloads": "Łączna liczba ładunków LEO",
+        "totalLeoRocketBodies": "Łączna liczba członów rakiet LEO",
+        "totalLeoDebris": "Łączna liczba szczątków LEO",
+        "totalLeoObjects": "Łączna liczba obiektów LEO",
+        "noMatches": "Żadne obiekty nie pasują do bieżących filtrów."
       },
       "help": {
         "overview": "Wykres inklinacji do wysokości mapuje populację LEO: każdy ładunek jest naniesiony według inklinacji względem wysokości. Konstelacje pojawiają się jako zwarte skupiska (powłoki Starlink, płaszczyzny OneWeb), a zatłoczone pasma wysokości od razu rzucają się w oczy.",

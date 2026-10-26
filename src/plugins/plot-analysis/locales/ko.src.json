@@ -4,7 +4,11 @@
       "bottomIconLabel": "경사각 대 고도 플롯",
       "title": "경사각-고도 플롯 메뉴",
       "labels": {
-        "totalLeoPayloads": "총 LEO 페이로드"
+        "totalLeoPayloads": "총 LEO 페이로드",
+        "totalLeoRocketBodies": "총 LEO 로켓 동체",
+        "totalLeoDebris": "총 LEO 파편",
+        "totalLeoObjects": "총 LEO 물체",
+        "noMatches": "현재 필터와 일치하는 물체가 없습니다."
       },
       "help": {
         "overview": "경사각 대 고도 플롯은 LEO 위성군 전체를 보여 줍니다. 모든 페이로드가 경사각과 고도로 플롯되며, 군집위성은 촘촘한 클러스터(Starlink 셸, OneWeb 궤도면)로 나타나고 혼잡한 고도 대역이 즉시 눈에 띕니다.",

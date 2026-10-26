@@ -4,7 +4,11 @@
       "bottomIconLabel": "Graf inklinace vs výška",
       "title": "Menu grafu inklinace vůči výšce",
       "labels": {
-        "totalLeoPayloads": "Celkový počet LEO nákladů"
+        "totalLeoPayloads": "Celkový počet LEO nákladů",
+        "totalLeoRocketBodies": "Celkový počet LEO raketových stupňů",
+        "totalLeoDebris": "Celkový počet LEO trosek",
+        "totalLeoObjects": "Celkový počet LEO objektů",
+        "noMatches": "Aktuálním filtrům neodpovídají žádné objekty."
       },
       "help": {
         "overview": "Graf inklinace vs výška mapuje populaci LEO: každý náklad je vynesen podle inklinace vůči výšce. Konstelace se zobrazují jako těsné shluky (slupky Starlink, roviny OneWeb) a přeplněná výšková pásma jsou okamžitě patrná.",

@@ -1,6 +1,8 @@
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
@@ -147,6 +149,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   private buildSideMenuHtml_(): string {
     const innerHtml = html`
       <div id="${this.plotCanvasId_}" class="plot-analysis-chart plot-analysis-menu-maximized"></div>
+      <div id="inc2alt-empty-message" class="inc2alt-empty-message" hidden></div>
       <div id="inc2alt-stats">
         <div id="inc2alt-total-count">--</div>
         <div id="inc2alt-constellation-counts"></div>
@@ -199,6 +202,26 @@ export class Inc2AltPlots extends KeepTrackPlugin {
   }
 
   onBottomIconDeselect(): void {
+    this.disposeChart_();
+  }
+
+  /**
+   * The menu close button and opening another plugin close this menu through hideSideMenus, which
+   * never reaches onBottomIconDeselect for a composition plugin. Dispose the chart there too, once
+   * the base listener (registered first, in super.addJs) has marked the menu inactive. Reopening
+   * runs refreshPlot_, which builds a fresh chart.
+   */
+  override addJs(): void {
+    super.addJs();
+    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => {
+      if (!this.isMenuButtonActive) {
+        this.disposeChart_();
+      }
+    });
+  }
+
+  /** Disposes the chart instance and its window resize listener. */
+  protected disposeChart_(): void {
     if (this.resizeHandler_) {
       window.removeEventListener('resize', this.resizeHandler_);
       this.resizeHandler_ = null;
@@ -234,7 +257,8 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     counts.sort((a, b) => b.count - a.count);
 
     // Update total
-    totalEl.textContent = `${t7e('plugins.Inc2AltPlots.labels.totalLeoPayloads' as Parameters<typeof t7e>[0])}: ${total}`;
+    totalEl.textContent = `${Inc2AltPlots.totalLabel_(this.currentFilters_)}: ${total}`;
+    this.updateEmptyMessage_(total === 0);
 
     // Update constellation breakdown using DOM API
     countsEl.textContent = '';
@@ -247,6 +271,38 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       span.appendChild(document.createTextNode(` ${c.count}`));
       countsEl.appendChild(span);
     });
+  }
+
+  /**
+   * Footer label naming what the total counts: payloads, rocket bodies or debris when only one
+   * type is ticked, "objects" when the set mixes types. No type ticked keeps the payload label
+   * (the plot defaults to payloads).
+   */
+  static totalLabel_(filters: Inc2AltFilters): string {
+    const hasPayloads = filters.activePayloads || filters.inactivePayloads;
+    const typeCount = [hasPayloads, filters.rocketBodies, filters.debris].filter(Boolean).length;
+    let key = 'totalLeoPayloads';
+
+    if (typeCount > 1) {
+      key = 'totalLeoObjects';
+    } else if (filters.rocketBodies) {
+      key = 'totalLeoRocketBodies';
+    } else if (filters.debris) {
+      key = 'totalLeoDebris';
+    }
+
+    return t7e(`plugins.Inc2AltPlots.labels.${key}` as Parameters<typeof t7e>[0]);
+  }
+
+  /** Shows the "nothing matched" message over the blank chart when the filtered set is empty. */
+  protected updateEmptyMessage_(isEmpty: boolean): void {
+    const messageEl = getEl('inc2alt-empty-message', true);
+
+    if (!messageEl) {
+      return;
+    }
+    messageEl.textContent = isEmpty ? t7e('plugins.Inc2AltPlots.labels.noMatches' as Parameters<typeof t7e>[0]) : '';
+    messageEl.hidden = !isEmpty;
   }
 
   // Bridge for legacy event system
@@ -283,6 +339,13 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     }
     this.resizeHandler_ = () => this.chart?.resize();
     window.addEventListener('resize', this.resizeHandler_);
+
+    /*
+     * With no points echarts has no extent to scale from and stops drawing the axes. Pin them to
+     * the filter ranges so the empty plot keeps its frame under the "nothing matched" message.
+     */
+    const isEmpty = data.every((group) => (group.value?.length ?? 0) === 0);
+    const emptyBounds = isEmpty ? Inc2AltPlots.emptyAxisBounds_(this.currentFilters_) : null;
 
     // Setup Chart - use notMerge to ensure colors reset properly on reopen
     this.chart.setOption(
@@ -338,11 +401,13 @@ export class Inc2AltPlots extends KeepTrackPlugin {
           name: t7e('plugins.Inc2AltPlots.chart.xAxis'),
           type: 'value',
           position: 'bottom',
+          ...emptyBounds?.xAxis,
         },
         yAxis: {
           name: t7e('plugins.Inc2AltPlots.chart.yAxis'),
           type: 'value',
           position: 'left',
+          ...emptyBounds?.yAxis,
         },
         zAxis: {
           name: t7e('plugins.Inc2AltPlots.chart.zAxis'),
@@ -523,6 +588,17 @@ export class Inc2AltPlots extends KeepTrackPlugin {
       { name: 'Spire', value: constellations.Spire },
       { name: t7e('plugins.Inc2AltPlots.chart.other'), value: constellations.Other },
     ];
+  }
+
+  /** Axis bounds for an empty plot: the filter ranges, widened when a range collapses to one value. */
+  static emptyAxisBounds_(filters: Inc2AltFilters): { xAxis: { min: number; max: number }; yAxis: { min: number; max: number } } {
+    const widen = (min: number, max: number, pad: number) => (max > min ? { min, max } : { min: Math.max(0, min - pad), max: max + pad });
+
+    return {
+      // Series values are [altitude, inclination, period]: x is altitude, y is inclination.
+      xAxis: widen(filters.minAltitude, filters.maxAltitude, 10),
+      yAxis: widen(filters.minInclination, Math.min(180, filters.maxInclination), 1),
+    };
   }
 
   static buildAllowedTypes_(filters: Inc2AltFilters): Set<SpaceObjectType> {

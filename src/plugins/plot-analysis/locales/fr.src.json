@@ -4,7 +4,11 @@
       "bottomIconLabel": "Trace Inc vs Alt",
       "title": "Menu Inclinaison vs Altitude",
       "labels": {
-        "totalLeoPayloads": "Total des charges utiles LEO"
+        "totalLeoPayloads": "Total des charges utiles LEO",
+        "totalLeoRocketBodies": "Total des corps de fusée LEO",
+        "totalLeoDebris": "Total des débris LEO",
+        "totalLeoObjects": "Total des objets LEO",
+        "noMatches": "Aucun objet ne correspond aux filtres actuels."
       },
       "help": {
         "overview": "La trace Inclinaison vs Altitude cartographie la population LEO : chaque charge utile est tracée selon son inclinaison en fonction de son altitude. Les constellations apparaissent comme des grappes serrées (coquilles Starlink, plans OneWeb), et les bandes d'altitude encombrées ressortent immédiatement.",

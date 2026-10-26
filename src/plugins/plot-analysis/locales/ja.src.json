@@ -4,7 +4,11 @@
       "bottomIconLabel": "傾斜角-高度プロット",
       "title": "傾斜角-高度プロットメニュー",
       "labels": {
-        "totalLeoPayloads": "LEOペイロード合計"
+        "totalLeoPayloads": "LEOペイロード合計",
+        "totalLeoRocketBodies": "LEOロケット機体合計",
+        "totalLeoDebris": "LEOデブリ合計",
+        "totalLeoObjects": "LEO物体合計",
+        "noMatches": "現在のフィルターに一致する物体はありません。"
       },
       "help": {
         "overview": "傾斜角-高度プロットはLEOの衛星群を一望できます。すべてのペイロードが傾斜角と高度でプロットされ、コンステレーションは密集したクラスター（Starlinkのシェル、OneWebの軌道面）として現れ、混雑した高度帯がすぐに見分けられます。",

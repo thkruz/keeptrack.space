@@ -4,7 +4,11 @@
       "bottomIconLabel": "Ink vs Höhe-Diagramm",
       "title": "Inklination-zu-Höhe-Diagramm-Menü",
       "labels": {
-        "totalLeoPayloads": "Gesamtzahl LEO-Nutzlasten"
+        "totalLeoPayloads": "Gesamtzahl LEO-Nutzlasten",
+        "totalLeoRocketBodies": "Gesamtzahl LEO-Raketenstufen",
+        "totalLeoDebris": "Gesamtzahl LEO-Trümmerteile",
+        "totalLeoObjects": "Gesamtzahl LEO-Objekte",
+        "noMatches": "Keine Objekte entsprechen den aktuellen Filtern."
       },
       "help": {
         "overview": "Das Inklination-vs-Höhe-Diagramm kartiert die LEO-Population: Jede Nutzlast wird nach Inklination gegen die Höhe aufgetragen. Konstellationen erscheinen als dichte Cluster (Starlink-Schalen, OneWeb-Bahnebenen), und überfüllte Höhenbänder stechen sofort hervor.",

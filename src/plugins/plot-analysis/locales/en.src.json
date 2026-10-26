@@ -4,7 +4,11 @@
       "bottomIconLabel": "Inc vs Alt Plot",
       "title": "Inclination to Altitude Plot Menu",
       "labels": {
-        "totalLeoPayloads": "Total LEO Payloads"
+        "totalLeoPayloads": "Total LEO Payloads",
+        "totalLeoRocketBodies": "Total LEO Rocket Bodies",
+        "totalLeoDebris": "Total LEO Debris",
+        "totalLeoObjects": "Total LEO Objects",
+        "noMatches": "No objects match the current filters."
       },
       "help": {
         "overview": "The Inclination vs Altitude plot maps the LEO population: every payload plotted by inclination against altitude. Constellations appear as tight clusters (Starlink shells, OneWeb planes), and crowded altitude bands stand out immediately.",

@@ -4,7 +4,11 @@
       "bottomIconLabel": "Gráfico Inc vs Alt",
       "title": "Menú de Gráfico de Inclinación a Altitud",
       "labels": {
-        "totalLeoPayloads": "Total de Cargas Útiles LEO"
+        "totalLeoPayloads": "Total de Cargas Útiles LEO",
+        "totalLeoRocketBodies": "Total de Cuerpos de Cohete LEO",
+        "totalLeoDebris": "Total de Desechos LEO",
+        "totalLeoObjects": "Total de Objetos LEO",
+        "noMatches": "Ningún objeto coincide con los filtros actuales."
       },
       "help": {
         "overview": "El gráfico de Inclinación vs Altitud mapea la población LEO: cada carga útil se representa por su inclinación frente a su altitud. Las constelaciones aparecen como agrupaciones compactas (capas de Starlink, planos de OneWeb), y las bandas de altitud congestionadas destacan de inmediato.",

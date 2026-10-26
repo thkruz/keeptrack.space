@@ -4,7 +4,11 @@
       "bottomIconLabel": "倾角-高度图",
       "title": "倾角-高度绘图菜单",
       "labels": {
-        "totalLeoPayloads": "LEO有效载荷总数"
+        "totalLeoPayloads": "LEO有效载荷总数",
+        "totalLeoRocketBodies": "LEO火箭箭体总数",
+        "totalLeoDebris": "LEO碎片总数",
+        "totalLeoObjects": "LEO物体总数",
+        "noMatches": "没有符合当前筛选条件的物体。"
       },
       "help": {
         "overview": "倾角-高度图描绘了整个LEO卫星群：每个有效载荷都按倾角与高度绘制。星座呈现为紧密的簇群（Starlink壳层、OneWeb轨道面），拥挤的高度带一目了然。",

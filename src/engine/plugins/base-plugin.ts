@@ -1219,6 +1219,13 @@ export abstract class KeepTrackPlugin {
       item.addEventListener('click', () => {
         if (item.classList.contains(KeepTrackPlugin.iconDisabledClassString)) {
           shake(item);
+          // Explain why, like the drawer footer does (explainDisabledUtilityIcon): sensor first,
+          // then satellite. The verify methods only toast; the action never runs from here.
+          if (!this.isRequireSensorSelected || this.verifySensorSelected()) {
+            if (this.isRequireSatelliteSelected) {
+              this.verifySatelliteSelected();
+            }
+          }
 
           return;
         }

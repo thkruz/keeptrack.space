@@ -1614,6 +1614,12 @@ export abstract class KeepTrackPlugin {
       // Constrain width so the right edge doesn't exceed the viewport
       secondaryMenuElement.style.maxWidth = `${window.innerWidth - leftPos}px`;
       slideInRight(secondaryMenuElement, 300);
+      // The gear always opens this legacy panel (the SecondaryMenuComponent built from
+      // getSecondaryMenuConfig is never initialised, so its own onOpen never runs). Call the hook
+      // here, or plugins that sync their form or layout in onSecondaryMenuOpen never see it open.
+      if ('onSecondaryMenuOpen' in this && typeof this.onSecondaryMenuOpen === 'function') {
+        this.onSecondaryMenuOpen();
+      }
     }
   }
 
@@ -1637,6 +1643,9 @@ export abstract class KeepTrackPlugin {
      * secondary sits to the right of the primary and needs the extra travel to clear.
      */
     slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 300, null, -300);
+    if ('onSecondaryMenuClose' in this && typeof this.onSecondaryMenuClose === 'function') {
+      this.onSecondaryMenuClose();
+    }
   }
 
   registerSubmitButtonClicked(callback: (() => void) | null = null) {

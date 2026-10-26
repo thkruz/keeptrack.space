@@ -108,6 +108,8 @@ export class ColorSchemeManager {
   iSensor = 0;
   isReady = false;
   lastDotColored = 0;
+  /** Legend classes the user hid, persisted under {@link StorageKey.LEGEND_HIDDEN_FLAGS}. */
+  private readonly hiddenLegendFlags_ = new Set<string>();
   objectTypeFlags = {
     starLow: true,
     starMed: true,
@@ -334,6 +336,7 @@ export class ColorSchemeManager {
         notional: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
       };
 
+    this.loadHiddenLegendFlags_();
     this.resetObjectTypeFlags();
     this.colorBuffer = renderer.gl.createBuffer();
     this.pickableBuffer = renderer.gl.createBuffer();
@@ -630,6 +633,69 @@ export class ColorSchemeManager {
     for (const colorScheme in this.colorSchemeInstances) {
       if (Object.hasOwn(this.colorSchemeInstances, colorScheme)) {
         this.colorSchemeInstances[colorScheme].resetObjectTypeFlags();
+      }
+    }
+
+    this.applyHiddenLegendFlags_();
+  }
+
+  /** True when the user hid this legend class (it stays hidden in every scheme that has it). */
+  isLegendFlagHidden(flag: string): boolean {
+    return this.hiddenLegendFlags_.has(flag);
+  }
+
+  /** Records a legend hide/show so it survives scheme switches and reloads. */
+  setLegendFlagHidden(flag: string, isHidden: boolean): void {
+    if (isHidden) {
+      this.hiddenLegendFlags_.add(flag);
+    } else {
+      this.hiddenLegendFlags_.delete(flag);
+    }
+
+    PersistenceManager.getInstance().saveItem(StorageKey.LEGEND_HIDDEN_FLAGS, JSON.stringify([...this.hiddenLegendFlags_]));
+  }
+
+  private loadHiddenLegendFlags_(): void {
+    this.hiddenLegendFlags_.clear();
+    const raw = PersistenceManager.getInstance().getItem(StorageKey.LEGEND_HIDDEN_FLAGS);
+
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed: unknown = JSON.parse(raw);
+
+      if (Array.isArray(parsed)) {
+        for (const flag of parsed) {
+          if (typeof flag === 'string' && flag.length > 0) {
+            this.hiddenLegendFlags_.add(flag);
+          }
+        }
+      }
+    } catch {
+      errorManagerInstance.debug('Ignoring unreadable legend hidden flags');
+    }
+  }
+
+  /** Re-applies the user's legend hides to the manager and to every scheme that has the class. */
+  private applyHiddenLegendFlags_(): void {
+    const managerFlags = this.objectTypeFlags as Record<string, boolean>;
+
+    for (const flag of this.hiddenLegendFlags_) {
+      if (Object.hasOwn(managerFlags, flag)) {
+        managerFlags[flag] = false;
+      }
+
+      for (const colorScheme in this.colorSchemeInstances) {
+        if (!Object.hasOwn(this.colorSchemeInstances, colorScheme)) {
+          continue;
+        }
+        const schemeFlags = this.colorSchemeInstances[colorScheme].objectTypeFlags as Record<string, boolean> | undefined;
+
+        if (schemeFlags && Object.hasOwn(schemeFlags, flag)) {
+          schemeFlags[flag] = false;
+        }
       }
     }
   }

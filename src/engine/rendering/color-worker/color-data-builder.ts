@@ -18,6 +18,18 @@ const COUNTRY_MAP: Record<string, CountryCode> = {
   D: CountryCode.D,
   J: CountryCode.J,
   CN: CountryCode.CN,
+  /*
+   * Aliases the main-thread Country rule (country-color-scheme.ts) also treats as China / Russia.
+   * Without them PRC and CIS objects (ISS included) fell through to "Other" in the worker.
+   */
+  PRC: CountryCode.CN,
+  China: CountryCode.CN,
+  "China, People's Reof": CountryCode.CN,
+  'Hong Kong Special Administrative Region, China': CountryCode.CN,
+  'China (Republic)': CountryCode.CN,
+  CIS: CountryCode.RU,
+  Russia: CountryCode.RU,
+  'Russian Federation': CountryCode.RU,
   IN: CountryCode.IN,
   RU: CountryCode.RU,
   SU: CountryCode.SU,

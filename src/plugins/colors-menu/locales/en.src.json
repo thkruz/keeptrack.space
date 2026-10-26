@@ -5,6 +5,9 @@
       "title": "Color Schemes",
       "rmbLabel": "Color Scheme",
       "sectionLabel": "Schemes",
+      "legend": {
+        "close": "Close legend"
+      },
       "help": {
         "overview": "The Color Schemes menu changes how every object in the scene is colored. Each scheme encodes a different property: country of origin, object type, orbital regime, sunlight status, velocity, and more, so picking the right scheme turns the dot cloud into an answer to a specific question.",
         "imgAlt": "The Color Schemes menu listing the available schemes",

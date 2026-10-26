@@ -120,7 +120,7 @@ describe('ColorMenu_class', () => {
   });
 
   describe('colorsMenuClick', () => {
-    it('should clear selected satellite when color scheme is clicked', () => {
+    it('should keep the selected satellite when a color scheme is clicked', () => {
       const selectSatManager = new SelectSatManager();
 
       PluginRegistry.addPlugin(selectSatManager);
@@ -138,7 +138,8 @@ describe('ColorMenu_class', () => {
 
         ColorMenu.colorsMenuClick(existingScheme.id);
 
-        expect(selectSatManager.selectSat).toHaveBeenCalledWith(-1);
+        expect(selectSatManager.selectSat).not.toHaveBeenCalled();
+        expect(mockColorSchemeManager.setColorScheme).toHaveBeenCalled();
       }
     });
 
@@ -236,6 +237,23 @@ describe('ColorMenu_class', () => {
 
       expect(list).toContain('shown');
       expect(list).not.toContain('hidden');
+    });
+
+    it('right-click submenu lists every scheme the Colors menu lists (incl. Velocity, Starlink, Small Satellites)', () => {
+      const plugin = new ColorMenu();
+      const mgr = ServiceLocator.getColorSchemeManager();
+      const enabled: Record<string, { enabled: boolean }> = {};
+
+      for (const id of Object.keys(mgr.colorSchemeInstances)) {
+        enabled[id] = { enabled: true };
+      }
+      settingsManager.colorSchemeInstances = enabled as any;
+
+      const menuIds = [...plugin['buildColorSchemeList_']().matchAll(/data-color="([^"]+)"/gu)].map((m) => m[1]);
+      const rmbIds = [...plugin['buildRmbColorSchemeList_']().matchAll(/id="colors-([^"]+)-rmb"/gu)].map((m) => m[1]);
+
+      expect(menuIds).toEqual(expect.arrayContaining(['VelocityColorScheme', 'StarlinkColorScheme', 'SmallSatColorScheme']));
+      expect(rmbIds).toEqual(expect.arrayContaining(menuIds));
     });
 
     it('builds command palette commands for enabled in-menu schemes and invokes one', () => {

@@ -160,6 +160,8 @@ export class LayersManager {
     }
 
     colorSchemeManagerInstance.objectTypeFlags[slug] = isFlagOn;
+    // Remember the choice so it survives a scheme switch (where the class exists) and a reload.
+    colorSchemeManagerInstance.setLegendFlagHidden(slug, !isFlagOn);
     if (colorSchemeInstance) {
       colorSchemeInstance.objectTypeFlags[slug] = colorSchemeManagerInstance.objectTypeFlags[slug];
     }
@@ -210,17 +212,20 @@ export class LayersManager {
 
   private static setColors_(colorSchemeManagerInstance: ColorSchemeManager) {
     LayersManager.layersClassList.forEach((selector) => {
+      const flag = selector.split('-')[1];
+      const isHidden = colorSchemeManagerInstance.isLegendFlagHidden(flag);
       const elementFromClass = document.querySelector(selector);
 
       if (elementFromClass && settingsManager.colors) {
-        const rgba = settingsManager.colors[selector.split('-')[1]];
+        const rgba = settingsManager.colors[flag];
 
         if (!rgba) {
           return;
         }
-        (<HTMLElement>elementFromClass).style.background = rgbCss(rgba);
+        // A class the user hid keeps its black swatch after the legend rebuilds.
+        (<HTMLElement>elementFromClass).style.background = isHidden ? 'black' : rgbCss(rgba);
       }
-      colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;
+      colorSchemeManagerInstance.objectTypeFlags[flag] = !isHidden;
     });
   }
 }

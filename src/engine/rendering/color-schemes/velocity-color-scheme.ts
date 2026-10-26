@@ -12,7 +12,6 @@ export class VelocityColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.VelocityColorScheme.label' as Parameters<typeof t7e>[0]);
   readonly id = 'VelocityColorScheme';
   static readonly id = 'VelocityColorScheme';
-  isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {
     velocitySlow: true,

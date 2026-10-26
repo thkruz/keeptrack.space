@@ -1,5 +1,4 @@
 import { MenuMode } from '@app/engine/core/interfaces';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -21,7 +20,6 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import palettePng from '@public/img/icons/palette.png';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './colors-menu.css';
 
 export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable {
@@ -214,8 +212,7 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
   static readonly colorsMenuClick = (colorName: string): void => {
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-    // If selectSatManager is loaded, clear selected sat
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+    // A scheme pick only recolors the catalog; the current satellite selection is kept.
 
     // Look through the color schemes
     for (const colorScheme in colorSchemeManagerInstance.colorSchemeInstances) {

@@ -11,7 +11,6 @@ export class SmallSatColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.SmallSatColorScheme.label' as Parameters<typeof t7e>[0]);
   readonly id = 'SmallSatColorScheme';
   static readonly id = 'SmallSatColorScheme';
-  isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {
     satSmall: true,

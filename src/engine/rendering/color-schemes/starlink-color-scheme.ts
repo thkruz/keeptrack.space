@@ -14,7 +14,6 @@ export class StarlinkColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.StarlinkColorScheme.label' as Parameters<typeof t7e>[0]);
   readonly id = 'StarlinkColorScheme';
   static readonly id = 'StarlinkColorScheme';
-  isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {
     starlinkOperational: true,

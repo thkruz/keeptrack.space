@@ -1,0 +1,30 @@
+/* Layers legend close button: a real, labelled control instead of the base box's bare dot. */
+#layers-popup-box .layers-popup-box__close {
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: transparent;
+  box-shadow: none;
+}
+
+#layers-popup-box .layers-popup-box__close:hover,
+#layers-popup-box .layers-popup-box__close:focus-visible {
+  background: rgba(255, 255, 255, 0.12);
+  outline: none;
+}
+
+.layers-popup-box__close-glyph {
+  width: 14px;
+  height: 14px;
+  display: block;
+  pointer-events: none;
+  background-color: var(--color-dark-text-accent, #ffffff);
+  -webkit-mask: var(--layers-close-icon) center / contain no-repeat;
+  mask: var(--layers-close-icon) center / contain no-repeat;
+}
+
+#layers-popup-box .layers-popup-box__close:hover .layers-popup-box__close-glyph,
+#layers-popup-box .layers-popup-box__close:focus-visible .layers-popup-box__close-glyph {
+  background-color: var(--color-primary-light, #e01a0e);
+}

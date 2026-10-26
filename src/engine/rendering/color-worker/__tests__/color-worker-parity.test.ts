@@ -157,6 +157,23 @@ describe('buildColorDataArrays', () => {
     expect(data.country[2]).toBe(CountryCode.CN);
   });
 
+  it('should encode PRC with China and CIS with Russia (main-thread Country rule parity)', () => {
+    const catalog = [
+      makePayload({ id: 0, country: 'PRC' }),
+      makePayload({ id: 1, country: 'CIS' }),
+      makePayload({ id: 2, country: 'China' }),
+      makePayload({ id: 3, country: 'Russia' }),
+      makePayload({ id: 4, country: 'ZZ' }),
+    ];
+    const data = buildColorDataArrays(catalog);
+
+    expect(data.country[0]).toBe(CountryCode.CN);
+    expect(data.country[1]).toBe(CountryCode.RU);
+    expect(data.country[2]).toBe(CountryCode.CN);
+    expect(data.country[3]).toBe(CountryCode.RU);
+    expect(data.country[4]).toBe(CountryCode.OTHER);
+  });
+
   it('should encode sources correctly', () => {
     const catalog = buildTestCatalog();
     const data = buildColorDataArrays(catalog);

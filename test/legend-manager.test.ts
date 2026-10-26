@@ -41,6 +41,7 @@ describe('LegendManager_class_mobile', () => {
   };
   const colorSchemeManagerInstance = {
     resetObjectTypeFlags: vi.fn(),
+    isLegendFlagHidden: vi.fn(() => false),
     objectTypeFlags,
   };
 
@@ -104,6 +105,7 @@ describe('LegendManager_class_mobile', () => {
     };
     const colorSchemeManagerInstance = {
       resetObjectTypeFlags: vi.fn(),
+      isLegendFlagHidden: vi.fn(() => false),
     };
 
     Container.getInstance().get = vi.fn().mockImplementation((singleton) => {
@@ -132,6 +134,7 @@ describe('LegendManager_class_desktop', () => {
   };
   const colorSchemeManagerInstance = {
     resetObjectTypeFlags: vi.fn(),
+    isLegendFlagHidden: vi.fn(() => false),
     objectTypeFlags,
   };
 
@@ -194,6 +197,7 @@ describe('LegendManager_class_desktop', () => {
     };
     const colorSchemeManagerInstance = {
       resetObjectTypeFlags: vi.fn(),
+      isLegendFlagHidden: vi.fn(() => false),
     };
 
     Container.getInstance().get = vi.fn().mockImplementation((singleton) => {

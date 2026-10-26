@@ -460,7 +460,16 @@ export class PersistenceManager {
     }
 
     if (toPush.size > 0) {
-      await provider.push(toPush);
+      try {
+        await provider.push(toPush);
+      } catch (e) {
+        // The pulled values are already applied locally: report them (plugins re-render on
+        // remoteSettingsApplied) and retry the push with the next debounced flush.
+        errorManagerInstance.debug(`Failed to push merged account settings: ${e}`);
+        for (const key of toPush.keys()) {
+          this.pendingAccountWrites_.add(key);
+        }
+      }
     }
 
     return changed;

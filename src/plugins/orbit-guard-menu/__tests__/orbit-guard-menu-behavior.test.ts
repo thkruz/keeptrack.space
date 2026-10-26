@@ -102,13 +102,13 @@ describe('OrbitGuardMenuPlugin behavior', () => {
   it('eventClicked_ jumps time and queues the satellite selection', () => {
     p().orbitGuardEvents = [event({ satNo: '25544' })];
     vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue(defaultSat);
-    const offsetSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined);
+    const jumpSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined);
 
     vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
 
     p().eventClicked_(0);
 
-    expect(offsetSpy).toHaveBeenCalled();
+    expect(jumpSpy).toHaveBeenCalledWith(new Date('2026-05-30T12:00:00').getTime());
     expect(p().selectSatIdOnCruncher_).toBe(defaultSat.id);
   });
 

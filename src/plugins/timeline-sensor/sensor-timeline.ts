@@ -1171,7 +1171,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
           ServiceLocator.getSensorManager().setSensor(sensorPass.sensor);
 
-          timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+          timeManagerInstance.changeSimulationTime(new Date(passStart).getTime());
           timeManagerInstance.calculateSimulationTime();
 
           const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager)!;

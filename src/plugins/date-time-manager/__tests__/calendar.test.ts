@@ -21,7 +21,7 @@ describe('Calendar', () => {
 
     tm.isTimeChangingEnabled = true;
     tm.getUTCDateFromDayOfYear = vi.fn((year: number, day: number) => new Date(Date.UTC(year, 0, day)));
-    tm.changeStaticOffset = vi.fn();
+    tm.changeSimulationTime = vi.fn();
     tm.calculateSimulationTime = vi.fn(() => new Date());
     tm.changePropRate = vi.fn();
     cal = new Calendar('cal-container');
@@ -97,7 +97,7 @@ describe('Calendar', () => {
     expect(c().calendarDate.getUTCMonth()).toBe(7);
     expect((document.querySelector('#ui-datepicker-div select.ui-datepicker-year') as HTMLSelectElement).value).toBe('2024');
     expect(cal.getSelectedDate()?.toISOString()).toBe('2026-10-16T12:00:00.000Z');
-    expect(ServiceLocator.getTimeManager().changeStaticOffset).not.toHaveBeenCalled();
+    expect(ServiceLocator.getTimeManager().changeSimulationTime).not.toHaveBeenCalled();
   });
 
   it('the typed Go-to field applies a UTC date/time on Enter', () => {
@@ -110,7 +110,7 @@ describe('Calendar', () => {
 
     expect(cal.getSelectedDate()?.toISOString()).toBe('2024-08-15T06:30:00.000Z');
     expect(c().calendarDate.getUTCMonth()).toBe(7);
-    expect(ServiceLocator.getTimeManager().changeStaticOffset).toHaveBeenCalled();
+    expect(ServiceLocator.getTimeManager().changeSimulationTime).toHaveBeenCalledWith(Date.UTC(2024, 7, 15, 6, 30));
     expect((document.getElementById(Calendar.GOTO_INPUT_ID) as HTMLInputElement).value).toBe('2024-08-15 06:30:00');
   });
 

@@ -191,20 +191,20 @@ describe('StereoMap draw chain and interactions', () => {
   describe('mapMenuClick_', () => {
     it('jumps the simulation time to the clicked dot timestamp', () => {
       const tm = ServiceLocator.getTimeManager();
-      const offsetSpy = vi.spyOn(tm, 'changeStaticOffset').mockImplementation(() => undefined as never);
+      const jumpSpy = vi.spyOn(tm, 'changeSimulationTime').mockImplementation(() => undefined as never);
 
       p().mapMenuClick_({ target: { dataset: { time: '2026-05-31 12:00:00' } } });
 
-      expect(offsetSpy).toHaveBeenCalled();
+      expect(jumpSpy).toHaveBeenCalledWith(Date.UTC(2026, 4, 31, 12));
     });
 
     it('is a no-op when the clicked element has no time', () => {
       const tm = ServiceLocator.getTimeManager();
-      const offsetSpy = vi.spyOn(tm, 'changeStaticOffset').mockImplementation(() => undefined as never);
+      const jumpSpy = vi.spyOn(tm, 'changeSimulationTime').mockImplementation(() => undefined as never);
 
       p().mapMenuClick_({ target: { dataset: {} } });
 
-      expect(offsetSpy).not.toHaveBeenCalled();
+      expect(jumpSpy).not.toHaveBeenCalled();
     });
   });
 

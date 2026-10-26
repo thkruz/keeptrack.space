@@ -555,7 +555,7 @@ export class NewLaunch extends KeepTrackPlugin {
      * }
      * Set time to 0000z for relative time.
      */
-    const today = new Date(); // Need to know today for offset calculation
+    const today = new Date(); // Need to know today for the 0000z launch time
     const quadZTime = new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
 
     // Date object defaults to local time.
@@ -567,7 +567,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const cacheStaticOffset = timeManagerInstance.staticOffset; // Cache the current static offset
 
-    timeManagerInstance.changeStaticOffset(launchTime.getTime() - today.getTime()); // Find the offset from today
+    timeManagerInstance.changeSimulationTime(launchTime.getTime());
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 

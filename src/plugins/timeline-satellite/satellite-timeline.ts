@@ -475,7 +475,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
           if (drawEvent(mouseX, mouseY)) {
             const timeManagerInstance = ServiceLocator.getTimeManager();
 
-            timeManagerInstance.changeStaticOffset(new Date(passStart).getTime() - timeManagerInstance.realTime);
+            timeManagerInstance.changeSimulationTime(new Date(passStart).getTime());
             timeManagerInstance.calculateSimulationTime();
             PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satellitePass.satellite.id);
           }

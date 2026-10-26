@@ -834,9 +834,7 @@ export class Calendar {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-    const today = new Date();
-
-    timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
+    timeManagerInstance.changeSimulationTime(this.simulationDate.getTime());
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
 
     colorSchemeManagerInstance.calculateColorBuffers(true);

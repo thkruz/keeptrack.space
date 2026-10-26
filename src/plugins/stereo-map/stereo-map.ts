@@ -1057,9 +1057,8 @@ export class StereoMap extends KeepTrackPlugin {
     if (time !== null) {
       const timeArr = time.split(' ');
       const timeObj = new Date(`${timeArr[0]}T${timeArr[1]}Z`);
-      const today = new Date(); // Need to know today for offset calculation
 
-      timeManagerInstance.changeStaticOffset(timeObj.getTime() - today.getTime()); // Find the offset from today
+      timeManagerInstance.changeSimulationTime(timeObj.getTime());
     }
   }
 

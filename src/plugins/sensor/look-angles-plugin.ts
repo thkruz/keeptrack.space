@@ -446,7 +446,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       // Create click listener
       tr.addEventListener('click', () => {
-        timeManagerInstance.changeStaticOffset(new Date(`${dateFormat(entry.time, 'isoDateTime', false)}z`).getTime() - timeManagerInstance.realTime);
+        timeManagerInstance.changeSimulationTime(new Date(`${dateFormat(entry.time, 'isoDateTime', false)}z`).getTime());
       });
 
       if (tdType) {

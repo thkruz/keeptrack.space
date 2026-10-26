@@ -115,18 +115,17 @@ describe('NewLaunch launch-window matching', () => {
     p().matchedLaunchTime_ = matched;
 
     // Short-circuit the launch after the time change: an orbit-fit error path
-    // reverts the offset, so only the FIRST changeStaticOffset call matters.
+    // reverts the offset, so only the time jump (changeSimulationTime) matters.
     vi.spyOn(p(), 'buildLaunchTle_').mockReturnValue(['Error', 'stop']);
     vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ServiceLocator.getColorSchemeManager() as any).calculateColorBuffers = vi.fn();
-    const offsetSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined as never);
+    vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined as never);
+    const jumpSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined as never);
 
     p().launchFromSite_(issSat, 5);
 
-    const firstOffset = offsetSpy.mock.calls[0][0] as number;
-
-    // Offset from "now" to the matched time (5 h), not to 0000z.
-    expect(Math.abs(firstOffset - 5 * 3600 * 1000)).toBeLessThan(5000);
+    // Jumps to the matched time itself, not to 0000z.
+    expect(jumpSpy).toHaveBeenCalledWith(matched.getTime());
   });
 });

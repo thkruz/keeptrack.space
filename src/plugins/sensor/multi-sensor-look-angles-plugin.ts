@@ -481,7 +481,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
         tdV.setAttribute('style', 'color: #c62828');
       }
       tr.addEventListener('click', () => {
-        timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
+        timeManagerInstance.changeSimulationTime(new Date(entry.time).getTime());
         sensorManagerInstance.setSensor(sensor, sensor.sensorId);
       });
     }

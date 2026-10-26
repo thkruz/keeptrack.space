@@ -121,10 +121,9 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const now = new Date();
     const eventTime = new Date(this.orbitGuardEvents[row].event_end_timestamp);
 
-    ServiceLocator.getTimeManager().changeStaticOffset(eventTime.getTime() - now.getTime());
+    ServiceLocator.getTimeManager().changeSimulationTime(eventTime.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);

@@ -32,6 +32,7 @@ describe('NewLaunch launch flow', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ServiceLocator.getColorSchemeManager() as any).calculateColorBuffers = vi.fn();
     vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined as never);
+    vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined as never);
     // errorManagerInstance.error re-throws in the test env; the code calls it on TLE-gen failure.
     vi.spyOn(errorManagerInstance, 'error').mockImplementation(() => undefined);
   });

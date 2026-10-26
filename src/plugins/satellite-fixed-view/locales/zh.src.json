@@ -4,6 +4,9 @@
       "bottomIconLabel": "卫星固定视图",
       "commandPalette": {
         "activate": "切换到卫星固定视图"
+      },
+      "shortcuts": {
+        "enter": "进入卫星固定视图"
       }
     }
   }

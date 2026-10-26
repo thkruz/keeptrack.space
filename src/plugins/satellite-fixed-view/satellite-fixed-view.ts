@@ -40,6 +40,8 @@ export class SatelliteFixedView extends KeepTrackPlugin {
     return [
       {
         key: '4',
+        // Key 4 only enters the mode (a second press stays), so the guide must not say "Toggle".
+        description: t7e('plugins.SatelliteFixedView.shortcuts.enter'),
         callback: () => this.bottomIconCallback(),
       },
     ];

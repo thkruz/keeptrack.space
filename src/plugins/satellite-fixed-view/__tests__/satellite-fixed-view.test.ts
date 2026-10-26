@@ -3,6 +3,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { t7e } from '@app/locales/keys';
 import { SatelliteFixedView } from '@app/plugins/satellite-fixed-view/satellite-fixed-view';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -43,6 +44,13 @@ describe('SatelliteFixedView methods', () => {
     expect(plugin.getKeyboardShortcuts()[0].key).toBe('4');
     expect(() => plugin.getKeyboardShortcuts()[0].callback()).not.toThrow();
     expect(() => plugin.getCommandPaletteCommands()[0].callback()).not.toThrow();
+  });
+
+  it('describes key 4 as entering the mode, not toggling it', () => {
+    const shortcut = plugin.getKeyboardShortcuts()[0];
+
+    expect(shortcut.description).toBe(t7e('plugins.SatelliteFixedView.shortcuts.enter'));
+    expect(shortcut.description).not.toMatch(/^Toggle/u);
   });
 
   it('toasts and shakes when no satellite is selected', () => {

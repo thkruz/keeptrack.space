@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "衛星ビュー"
+      "bottomIconLabel": "衛星ビュー",
+      "commandPalette": {
+        "activate": "衛星ビューに切り替え"
+      },
+      "shortcuts": {
+        "enter": "衛星ビューに入る"
+      }
     }
   }
 }

@@ -29,7 +29,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { t7e } from '@app/locales/keys';
 import viewInAirPng from '@public/img/icons/view-in-air.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
-import { IconPlacement, IKeyboardShortcut, UtilityGroup } from '../../engine/plugins/core/plugin-capabilities';
+import { ICommandPaletteCommand, IconPlacement, IKeyboardShortcut, UtilityGroup } from '../../engine/plugins/core/plugin-capabilities';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class SatelliteViewPlugin extends KeepTrackPlugin {
@@ -55,7 +55,20 @@ export class SatelliteViewPlugin extends KeepTrackPlugin {
     return [
       {
         key: '5',
+        // Key 5 only enters the mode (a second press stays), so the guide must not say "Toggle".
+        description: t7e('plugins.SatelliteViewPlugin.shortcuts.enter'),
         callback: () => this.bottomIconCallback(),
+      },
+    ];
+  }
+
+  getCommandPaletteCommands(): ICommandPaletteCommand[] {
+    return [
+      {
+        id: 'SatelliteViewPlugin.activate',
+        label: t7e('plugins.SatelliteViewPlugin.commandPalette.activate'),
+        category: 'View',
+        callback: () => this.bottomMenuClicked(),
       },
     ];
   }

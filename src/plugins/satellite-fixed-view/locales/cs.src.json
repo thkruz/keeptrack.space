@@ -4,6 +4,9 @@
       "bottomIconLabel": "Fixní pohled na satelit",
       "commandPalette": {
         "activate": "Přepnout na pohled pevný vůči satelitu"
+      },
+      "shortcuts": {
+        "enter": "Přejít do fixního pohledu na satelit"
       }
     }
   }

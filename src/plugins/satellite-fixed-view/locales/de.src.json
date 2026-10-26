@@ -4,6 +4,9 @@
       "bottomIconLabel": "Satellitenfeste Ansicht",
       "commandPalette": {
         "activate": "Zur satellitenfesten Ansicht wechseln"
+      },
+      "shortcuts": {
+        "enter": "Satellitenfeste Ansicht öffnen"
       }
     }
   }

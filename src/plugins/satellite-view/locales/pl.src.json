@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "Widok satelity"
+      "bottomIconLabel": "Widok satelity",
+      "commandPalette": {
+        "activate": "Przełącz na widok satelity"
+      },
+      "shortcuts": {
+        "enter": "Przejdź do widoku satelity"
+      }
     }
   }
 }

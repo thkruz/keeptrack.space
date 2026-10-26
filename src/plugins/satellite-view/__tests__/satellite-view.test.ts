@@ -143,6 +143,48 @@ describe('SatelliteViewPlugin methods', () => {
     expect(() => plugin.getKeyboardShortcuts()[0].callback()).not.toThrow();
   });
 
+  it('describes key 5 as entering the mode, not toggling it', () => {
+    const shortcut = plugin.getKeyboardShortcuts()[0];
+
+    expect(shortcut.description).toBe(t7e('plugins.SatelliteViewPlugin.shortcuts.enter'));
+    expect(shortcut.description).not.toMatch(/^Toggle/u);
+  });
+
+  it('exposes a "Switch to Satellite View" command-palette row', () => {
+    const commands = plugin.getCommandPaletteCommands();
+
+    expect(commands).toHaveLength(1);
+    expect(commands[0].id).toBe('SatelliteViewPlugin.activate');
+    expect(commands[0].label).toBe(t7e('plugins.SatelliteViewPlugin.commandPalette.activate'));
+    expect(commands[0].category).toBe('View');
+  });
+
+  it('the palette row enters Satellite View when a satellite is selected', () => {
+    const ssm = PluginRegistry.getPlugin(SelectSatManager) as SelectSatManager;
+
+    ssm.selectedSat = 0;
+    plugin.isIconDisabled = false;
+    ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
+    vi.spyOn(plugin, 'setBottomIconToSelected').mockImplementation(() => undefined);
+
+    plugin.getCommandPaletteCommands()[0].callback();
+
+    expect(ServiceLocator.getMainCamera().cameraType).toBe(CameraType.SATELLITE_FIRST_PERSON);
+  });
+
+  it('the palette row only warns when no satellite is selected', () => {
+    const ssm = PluginRegistry.getPlugin(SelectSatManager) as SelectSatManager;
+
+    ssm.selectedSat = -1;
+    ServiceLocator.getMainCamera().cameraType = CameraType.FIXED_TO_EARTH;
+    const verify = vi.spyOn(plugin, 'verifySatelliteSelected');
+
+    plugin.getCommandPaletteCommands()[0].callback();
+
+    expect(verify).toHaveReturnedWith(false);
+    expect(ServiceLocator.getMainCamera().cameraType).toBe(CameraType.FIXED_TO_EARTH);
+  });
+
   it('toasts and shakes when no satellite is selected', () => {
     const ssm = PluginRegistry.getPlugin(SelectSatManager) as SelectSatManager;
 

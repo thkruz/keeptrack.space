@@ -364,6 +364,10 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         // left; centering back on Earth has to drop them the same way pressing
         // Home does, or they stay drawn around the selected satellite.
         PluginRegistry.getPlugin(PlanetsMenuPlugin)?.clearHeliocentricOrbits();
+        // The color schemes blank the GP/TLE catalog while maxZoomDistance is above 2e6 km
+        // and only re-read it on a forced recolour, so without this every other satellite
+        // stays hidden at Earth scale. Home runs the same recolour.
+        ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
       }
       PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);
     }

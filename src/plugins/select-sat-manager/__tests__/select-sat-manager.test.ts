@@ -484,6 +484,27 @@ describe('SelectSatManager_planetViewCleanup', () => {
     expect(clearSpy).toHaveBeenCalled();
   });
 
+  it('recolours the catalog at Earth scale after a pick from a planet view', () => {
+    vi.spyOn(planetsMenu, 'clearHeliocentricOrbits').mockImplementation(() => undefined);
+    const colorSchemeManager = ServiceLocator.getColorSchemeManager();
+    const zoomAtForcedRecolour: number[] = [];
+
+    vi.spyOn(colorSchemeManager, 'calculateColorBuffers').mockImplementation((isForceRecolor?: boolean) => {
+      if (isForceRecolor) {
+        zoomAtForcedRecolour.push(settingsManager.maxZoomDistance);
+      }
+    });
+
+    settingsManager.centerBody = SolarBody.Jupiter;
+    settingsManager.maxZoomDistance = 13e9 as Kilometers;
+
+    selectSatManager.selectSat(0);
+
+    // The forced recolour has to run after the ceiling drops back under 2e6 km, or the color
+    // schemes keep blanking every GP/TLE object (the planet-view rule).
+    expect(zoomAtForcedRecolour.some((zoom) => zoom <= 2e6)).toBe(true);
+  });
+
   it('leaves lines alone when the camera was already Earth-centered', () => {
     const clearSpy = vi.spyOn(planetsMenu, 'clearHeliocentricOrbits').mockImplementation(() => undefined);
 

@@ -27,7 +27,6 @@ import { BottomIconComponent } from './components/bottom-icon/bottom-icon-compon
 import { ContextMenuComponent } from './components/context-menu/context-menu-component';
 import { HelpComponent } from './components/help/help-component';
 import { KeyboardComponent } from './components/keyboard/keyboard-component';
-import { SecondaryMenuComponent } from './components/secondary-menu/secondary-menu-component';
 import { SideMenuComponent } from './components/side-menu/side-menu-component';
 
 export { default as fileExcelPng } from '@public/img/icons/file-excel.png';
@@ -419,11 +418,6 @@ export abstract class KeepTrackPlugin {
   protected sideMenuComponent_: SideMenuComponent | null = null;
 
   /**
-   * Secondary menu component instance (when using composition pattern).
-   */
-  protected secondaryMenuComponent_: SecondaryMenuComponent | null = null;
-
-  /**
    * Context menu component instance (when using composition pattern).
    */
   protected contextMenuComponent_: ContextMenuComponent | null = null;
@@ -560,12 +554,14 @@ export abstract class KeepTrackPlugin {
       });
     }
 
-    // Initialize secondary menu component if config method exists
+    /*
+     * Secondary menu: the config feeds the legacy properties, and addHtml() builds the
+     * `-secondary` panel, the gear toggle and the close button from them.
+     * openSecondaryMenu()/closeSecondaryMenu() call onSecondaryMenuOpen/Close.
+     */
     if (hasSecondaryMenu(this) && hasSideMenu(this)) {
       const config = this.getSecondaryMenuConfig();
-      const sideMenuConfig = this.getSideMenuConfig();
 
-      // Sync with legacy properties for backwards compatibility
       this.sideMenuSecondaryHtml = config.html;
       this.sideMenuSecondaryOptions = {
         width: config.width ?? 300,
@@ -578,20 +574,6 @@ export abstract class KeepTrackPlugin {
       if (config.dragOptions) {
         this.dragOptionsSecondary = config.dragOptions as ClickDragOptions;
       }
-
-      this.secondaryMenuComponent_ = new SecondaryMenuComponent(this.id, sideMenuConfig.elementName, config, {
-        onOpen: () => {
-          if ('onSecondaryMenuOpen' in this && typeof this.onSecondaryMenuOpen === 'function') {
-            this.onSecondaryMenuOpen();
-          }
-        },
-        onClose: () => {
-          if ('onSecondaryMenuClose' in this && typeof this.onSecondaryMenuClose === 'function') {
-            this.onSecondaryMenuClose();
-          }
-        },
-        onDownload: hasDownload(this) ? () => this.onDownload() : undefined,
-      });
     }
 
     // Initialize context menu component if config method exists
@@ -650,9 +632,12 @@ export abstract class KeepTrackPlugin {
       this.submitCallback = () => this.onFormSubmit();
     }
 
-    // Sync download callback if present (and no secondary menu to handle it)
-    if (hasDownload(this) && !hasSecondaryMenu(this)) {
-      this.downloadIconCb = () => this.onDownload();
+    /*
+     * Sync download callback: addHtml() renders the title-bar download icon and wires its
+     * click to downloadIconCb. A callback a subclass already assigned is kept.
+     */
+    if (hasDownload(this)) {
+      this.downloadIconCb ??= () => this.onDownload();
     }
   }
 
@@ -693,11 +678,8 @@ export abstract class KeepTrackPlugin {
 
         return undefined;
       },
-      onDeselect: () => {
-        if ('onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
-          this.onBottomIconDeselect();
-        }
-      },
+      // No onDeselect: markMenuButtonInactive_() runs onBottomIconDeselect for every plugin, so
+      // wiring it here too would call the hook twice when setBottomIconToUnselected() runs.
     });
   }
 
@@ -1573,17 +1555,18 @@ export abstract class KeepTrackPlugin {
 
   /**
    * Clears `isMenuButtonActive` and, on the active -> inactive transition, runs
-   * `onBottomIconDeselect()` for legacy (`bottomIcon*` field) plugins. Composition
-   * plugins get that hook from their BottomIconComponent instead, so it is skipped
-   * for them; the transition check keeps the hook to one call per close however
-   * many close paths (icon toggle, hideSideMenus, setBottomIconToUnselected) run.
+   * `onBottomIconDeselect()`. This is the only caller of that hook, for legacy
+   * (`bottomIcon*` field) and composition plugins alike, so it runs once per close
+   * whichever path closed the menu: icon toggle, the close button or another plugin
+   * opening (both via hideSideMenus), or setBottomIconToUnselected. The flag is
+   * cleared before the hook runs, so a hook that hides menus again cannot re-enter.
    */
   private markMenuButtonInactive_(): void {
     const wasActive = this.isMenuButtonActive;
 
     this.isMenuButtonActive = false;
 
-    if (wasActive && !this.bottomIconComponent_ && 'onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
+    if (wasActive && 'onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
       this.onBottomIconDeselect();
     }
   }
@@ -1614,9 +1597,8 @@ export abstract class KeepTrackPlugin {
       // Constrain width so the right edge doesn't exceed the viewport
       secondaryMenuElement.style.maxWidth = `${window.innerWidth - leftPos}px`;
       slideInRight(secondaryMenuElement, 300);
-      // The gear always opens this legacy panel (the SecondaryMenuComponent built from
-      // getSecondaryMenuConfig is never initialised, so its own onOpen never runs). Call the hook
-      // here, or plugins that sync their form or layout in onSecondaryMenuOpen never see it open.
+      // The gear opens this panel for legacy and getSecondaryMenuConfig plugins alike. Call the
+      // hook here, or plugins that sync their form or layout in onSecondaryMenuOpen never see it open.
       if ('onSecondaryMenuOpen' in this && typeof this.onSecondaryMenuOpen === 'function') {
         this.onSecondaryMenuOpen();
       }

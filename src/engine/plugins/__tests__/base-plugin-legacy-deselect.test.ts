@@ -60,7 +60,7 @@ describe('KeepTrackPlugin onBottomIconDeselect for legacy bottom-icon plugins', 
     expect(plugin.onBottomIconDeselect).not.toHaveBeenCalled();
   });
 
-  it('leaves composition plugins to their BottomIconComponent (no double call)', () => {
+  it('fires once for a composition plugin too (BottomIconComponent.deselect does not call it again)', () => {
     const plugin = makeLegacyPlugin(true);
     const deselect = vi.fn();
 
@@ -68,6 +68,6 @@ describe('KeepTrackPlugin onBottomIconDeselect for legacy bottom-icon plugins', 
     plugin.setBottomIconToUnselected(false);
 
     expect(deselect).toHaveBeenCalledWith(false);
-    expect(plugin.onBottomIconDeselect).not.toHaveBeenCalled();
+    expect(plugin.onBottomIconDeselect).toHaveBeenCalledTimes(1);
   });
 });

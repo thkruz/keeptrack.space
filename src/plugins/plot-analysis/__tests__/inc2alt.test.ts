@@ -121,28 +121,27 @@ describe('Inc2AltPlots_class', () => {
   });
 
   describe('Chart disposal on close', () => {
-    it('disposes the chart when hideSideMenus closes the menu', () => {
+    it('disposes the chart once when hideSideMenus closes the open menu', () => {
+      const plugin = new Inc2AltPlots();
+
+      websiteInit(plugin);
+      const disposeSpy = vi.spyOn(plugin as unknown as { disposeChart_: () => void }, 'disposeChart_');
+
+      plugin['isMenuButtonActive'] = true;
+      EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
+      EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
+
+      expect(plugin['isMenuButtonActive']).toBe(false);
+      expect(disposeSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('leaves the chart alone when hideSideMenus fires while the menu is closed', () => {
       const plugin = new Inc2AltPlots();
 
       websiteInit(plugin);
       const disposeSpy = vi.spyOn(plugin as unknown as { disposeChart_: () => void }, 'disposeChart_');
 
       plugin['isMenuButtonActive'] = false;
-      EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
-
-      expect(disposeSpy).toHaveBeenCalled();
-    });
-
-    it('keeps the chart when the menu is still active', () => {
-      const plugin = new Inc2AltPlots();
-
-      websiteInit(plugin);
-      const disposeSpy = vi.spyOn(plugin as unknown as { disposeChart_: () => void }, 'disposeChart_');
-      // Block the base listener from marking the menu inactive, so this models a hideSideMenus
-      // emitted while the plot is being opened.
-      vi.spyOn(plugin as unknown as { markMenuButtonInactive_: () => void }, 'markMenuButtonInactive_').mockImplementation(() => undefined);
-
-      plugin['isMenuButtonActive'] = true;
       EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
 
       expect(disposeSpy).not.toHaveBeenCalled();

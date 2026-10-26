@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * The legacy secondary panel opened by the settings gear must call the plugin's
- * onSecondaryMenuOpen / onSecondaryMenuClose hooks. The SecondaryMenuComponent built from
- * getSecondaryMenuConfig is never initialised, so the legacy panel is the only caller.
+ * onSecondaryMenuOpen / onSecondaryMenuClose hooks. It is the only secondary panel, for legacy and
+ * getSecondaryMenuConfig plugins alike, so it is the only caller.
  */
 type HookedPlugin = KeepTrackPlugin & { onSecondaryMenuOpen: () => void; onSecondaryMenuClose: () => void };
 
@@ -14,7 +14,6 @@ const makePlugin = (): HookedPlugin => {
   plugin.id = 'LegacySecondary';
   plugin.sideMenuElementName = 'legacy-menu';
   plugin.sideMenuSecondaryOptions = { width: 300, leftOffset: null, zIndex: 3 };
-  (plugin as unknown as { secondaryMenuComponent_: unknown }).secondaryMenuComponent_ = null;
   plugin.onSecondaryMenuOpen = vi.fn();
   plugin.onSecondaryMenuClose = vi.fn();
 
@@ -42,14 +41,15 @@ describe('KeepTrackPlugin legacy secondary panel hooks', () => {
     expect(plugin.isSideMenuSettingsOpen).toBe(false);
   });
 
-  it('still calls the hooks once when a (never initialised) SecondaryMenuComponent exists', () => {
+  it('calls each hook once per open/close cycle', () => {
     const plugin = makePlugin();
 
-    (plugin as unknown as { secondaryMenuComponent_: unknown }).secondaryMenuComponent_ = {};
+    plugin.openSecondaryMenu();
+    plugin.closeSecondaryMenu();
     plugin.openSecondaryMenu();
     plugin.closeSecondaryMenu();
 
-    expect(plugin.onSecondaryMenuOpen).toHaveBeenCalledTimes(1);
-    expect(plugin.onSecondaryMenuClose).toHaveBeenCalledTimes(1);
+    expect(plugin.onSecondaryMenuOpen).toHaveBeenCalledTimes(2);
+    expect(plugin.onSecondaryMenuClose).toHaveBeenCalledTimes(2);
   });
 });

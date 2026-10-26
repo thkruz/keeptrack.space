@@ -1,8 +1,6 @@
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
@@ -201,23 +199,12 @@ export class Inc2AltPlots extends KeepTrackPlugin {
     this.updateStatistics_(plotData);
   }
 
+  /**
+   * The base class calls this once whenever the open menu closes (icon, close button, or another
+   * plugin opening). Reopening runs onBottomIconClick, which builds a fresh chart.
+   */
   onBottomIconDeselect(): void {
     this.disposeChart_();
-  }
-
-  /**
-   * The menu close button and opening another plugin close this menu through hideSideMenus, which
-   * never reaches onBottomIconDeselect for a composition plugin. Dispose the chart there too, once
-   * the base listener (registered first, in super.addJs) has marked the menu inactive. Reopening
-   * runs refreshPlot_, which builds a fresh chart.
-   */
-  override addJs(): void {
-    super.addJs();
-    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => {
-      if (!this.isMenuButtonActive) {
-        this.disposeChart_();
-      }
-    });
   }
 
   /** Disposes the chart instance and its window resize listener. */

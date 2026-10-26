@@ -92,7 +92,11 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
       return;
     }
 
-    if (!this.selectedEventId_) {
+    if (this.selectedEventId_) {
+      // Closing the menu disposed the Gabbard chart (onBottomIconDeselect); reopening on the
+      // same event's detail view must build it again.
+      this.renderGabbard_();
+    } else {
       this.showEventList_();
     }
   }

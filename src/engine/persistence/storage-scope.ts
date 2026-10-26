@@ -47,7 +47,6 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_DRAW_ASTEROID_BELT]: StorageScope.Account,
   [StorageKey.SETTINGS_GRAY_SKYBOX]: StorageScope.Account,
   [StorageKey.SETTINGS_ECI_ON_HOVER]: StorageScope.Account,
-  [StorageKey.SETTINGS_HOS]: StorageScope.Account,
   [StorageKey.SETTINGS_HIDE_OTHER_SATS]: StorageScope.Account,
   [StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION]: StorageScope.Account,
   [StorageKey.SETTINGS_ECF_ORBIT_COUNT]: StorageScope.Account,

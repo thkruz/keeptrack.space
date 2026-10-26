@@ -23,7 +23,6 @@ export enum StorageKey {
   SETTINGS_DRAW_ASTEROID_BELT = 'v2-keepTrack-settings-drawAsteroidBelt',
   SETTINGS_GRAY_SKYBOX = 'v2-keepTrack-settings-graySkybox',
   SETTINGS_ECI_ON_HOVER = 'v2-keepTrack-settings-eciOnHover',
-  SETTINGS_HOS = 'v2-keepTrack-settings-hos',
   /** Hide Others toggle state ('true' = others hidden), written only by HideOtherSatellitesPlugin. */
   SETTINGS_HIDE_OTHER_SATS = 'v2-keepTrack-settings-hideOtherSats',
   SETTINGS_DEMO_MODE = 'v2-keepTrack-settings-demoMode',

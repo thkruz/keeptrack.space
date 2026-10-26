@@ -71,7 +71,6 @@ describe('storage-scope registry', () => {
         StorageKey.SETTINGS_DRAW_ASTEROID_BELT,
         StorageKey.SETTINGS_GRAY_SKYBOX,
         StorageKey.SETTINGS_ECI_ON_HOVER,
-        StorageKey.SETTINGS_HOS,
         StorageKey.SETTINGS_HIDE_OTHER_SATS,
         StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION,
         StorageKey.SETTINGS_ECF_ORBIT_COUNT,

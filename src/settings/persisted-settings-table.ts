@@ -255,15 +255,6 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
-    // Write-only mirror of the hide-other-sats state; the color scheme owns the
-    // live value, so nothing is restored here.
-    key: StorageKey.SETTINGS_HOS,
-    serialize: (sm) => (sm.colors?.transparent ? String(sm.colors.transparent[3] === 0) : null),
-    deserialize: () => {
-      // Owned by the color scheme pipeline
-    },
-  },
-  {
     // Presence implies enabled: serialize removes the key when false.
     key: StorageKey.SETTINGS_CONFIDENCE_LEVELS,
     serialize: (sm) => (sm.isShowConfidenceLevels ? 'true' : null),

@@ -1,6 +1,13 @@
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
-import { applyPersistedSetting, PERSISTED_SETTINGS_TABLE, SETTINGS_MENU_OWNED_KEYS } from '@app/settings/persisted-settings-table';
+import {
+  applyPersistedSetting,
+  holdPersistedValue,
+  PERSISTED_SETTINGS_TABLE,
+  releasePersistedValue,
+  SETTINGS_MENU_OWNED_KEYS,
+  serializeForSave,
+} from '@app/settings/persisted-settings-table';
 import { SettingsManager } from '@app/settings/settings';
 import { vi } from 'vitest';
 
@@ -21,10 +28,11 @@ describe('persisted-settings-table', () => {
      * Keys under the settings/graphics prefixes with a different owner:
      * dot colors belong to the color pipeline (setColorSettings_), the legacy
      * sat-label boolean is a migration source only, and search settings are
-     * owned by SearchSettingsPlugin.
+     * owned by SearchSettingsPlugin; Hide Others saves its own toggle.
      */
     const ownedElsewhere = new Set<StorageKey>([
       StorageKey.SETTINGS_DOT_COLORS,
+      StorageKey.SETTINGS_HIDE_OTHER_SATS,
       StorageKey.SETTINGS_SAT_LABEL_MODE,
       StorageKey.SETTINGS_SEARCH_LIMIT,
       StorageKey.SETTINGS_SHOW_DECAYED_IN_SEARCH,
@@ -84,6 +92,25 @@ describe('persisted-settings-table', () => {
     expect(settings.graphicsQuality).toBe('ultra');
   });
 
+  it('restores the four Settings menu controls that used to forget their value on reload', () => {
+    const settings = new SettingsManager();
+
+    applyPersistedSetting(settings, StorageKey.SETTINGS_SHOW_INFO_ON_HOVER, 'false');
+    applyPersistedSetting(settings, StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION, 'false');
+    applyPersistedSetting(settings, StorageKey.SETTINGS_SHOW_NEXT_PASS, 'true');
+    applyPersistedSetting(settings, StorageKey.SETTINGS_ECF_ORBIT_COUNT, '5');
+
+    expect(settings.enableHoverOverlay).toBe(false);
+    expect(settings.isCompensateForEarthRotation).toBe(false);
+    expect(settings.isShowNextPass).toBe(true);
+    expect(settings.numberOfEcfOrbitsToDraw).toBe(5);
+
+    // An out-of-range or corrupt orbit count is ignored.
+    applyPersistedSetting(settings, StorageKey.SETTINGS_ECF_ORBIT_COUNT, '0');
+    applyPersistedSetting(settings, StorageKey.SETTINGS_ECF_ORBIT_COUNT, 'many');
+    expect(settings.numberOfEcfOrbitsToDraw).toBe(5);
+  });
+
   it('returns false for keys outside the table', () => {
     const settings = new SettingsManager();
 
@@ -123,5 +150,19 @@ describe('persisted-settings-table', () => {
     expect(settings.isDrawOrbits).toBe(true);
 
     spy.mockRestore();
+  });
+});
+
+describe('held persisted values', () => {
+  it('writes the held value while held and the live value after release', () => {
+    const entry = PERSISTED_SETTINGS_TABLE.find((e) => e.key === StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION);
+
+    expect(entry).toBeDefined();
+    const sm = { isCompensateForEarthRotation: false } as unknown as Parameters<typeof serializeForSave>[1];
+
+    holdPersistedValue(StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION, 'true');
+    expect(serializeForSave(entry!, sm)).toBe('true');
+    releasePersistedValue(StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION);
+    expect(serializeForSave(entry!, sm)).toBe('false');
   });
 });

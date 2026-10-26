@@ -58,8 +58,8 @@ export const LEO_PLANE_TOLERANCE_DEG = 5;
 
 /**
  * A single-satellite worker search is sent as a series of small runs of this many candidates. The main thread
- * checks the cancel flag between runs, so Cancel stops the search after the current run instead of leaving the
- * worker busy with the whole candidate list (the worker screens one run without yielding).
+ * checks the cancel flag between runs, and the worker yields between candidates inside a run, so Cancel stops the
+ * search after the current pair and progress stays live.
  */
 export const SINGLE_SEARCH_CHUNK_SIZE = 10;
 

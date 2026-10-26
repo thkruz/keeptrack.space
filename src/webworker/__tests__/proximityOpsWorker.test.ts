@@ -168,6 +168,33 @@ describe('proximityOpsWorker', () => {
     expect(posted.find((p) => p.typ === OUT.COMPLETE)).toBeUndefined();
   });
 
+  it('stops the single-satellite survey between neighbors when CANCEL arrives', async () => {
+    await loadWorker();
+    posted = [];
+
+    const run = (globalThis.onmessage as (m: { data: unknown }) => Promise<void>)({
+      data: {
+        typ: IN.START,
+        runId: 10,
+        mode: 'single',
+        sats: [proxSat(1, '41866', TLE1_A, TLE2_A), proxSat(2, '41867', TLE1_B, TLE2_B), proxSat(3, '41868', TLE1_B, TLE2_B)],
+        params: params(),
+      },
+    });
+
+    // The first neighbor is screened synchronously; the cancel lands at the first yield.
+    dispatch({ typ: IN.CANCEL, runId: 10 });
+
+    await vi.runAllTimersAsync();
+    await run;
+
+    const progress = posted.filter((p) => p.typ === OUT.PROGRESS && p.runId === 10);
+
+    expect(progress).toHaveLength(1);
+    expect(progress[0]).toMatchObject({ done: 1, total: 2 });
+    expect(posted.find((p) => p.typ === OUT.COMPLETE)).toBeUndefined();
+  });
+
   it('ignores unknown message types without throwing', async () => {
     await loadWorker();
 

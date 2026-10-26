@@ -38,3 +38,13 @@
   word-break: break-word;
   line-height: 1.5;
 }
+
+/* "No upcoming launches returned": a message row, not a header, even when it is the only row. */
+.launch-calendar-results-table tr.launch-calendar-empty-row td {
+  padding: 12px 4px;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--color-dark-text-muted);
+}

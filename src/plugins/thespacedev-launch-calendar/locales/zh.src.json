@@ -24,15 +24,37 @@
         "fetching": "正在获取即将进行的发射...",
         "unknown": "未知",
         "tbd": "待定",
-        "apiUnavailable": "{url} 不可用！"
+        "apiUnavailable": "{url} 不可用！",
+        "noLaunches": "未返回即将进行的发射。",
+        "rateLimited": "The Space Devs 目前正在限制请求。请几分钟后再试。",
+        "nothingToExport": "没有可导出的发射。请先加载发射列表。"
       },
       "help": {
-        "overview": "下次发射列出全球即将进行的轨道发射，数据实时来自 The Space Devs 发射库：每次发射的发射窗口、任务、发射场、机构和国家。任务和发射场名称在可用时链接到更多资料。",
-        "imgAlt": "显示即将进行任务的下次发射表格",
+        "overview": "发射日历列出全球接下来的 20 次轨道发射，数据实时来自 The Space Devs 发射库：每次发射的发射窗口、任务、火箭、发射场、机构和国家。任务、火箭、发射场和机构名称在有资料时会链接到延伸阅读。",
+        "imgAlt": "显示即将发射任务的发射日历表格",
         "imgCaption": "每一行都是一次即将进行的发射，包含其窗口、任务、发射场和机构。",
-        "howToUse": "<ol><li>从抽屉（事件模式）打开<strong>下次发射</strong>。</li><li>点击获取按钮下载当前发射列表；需要互联网连接。</li><li>浏览表格；带链接的任务和发射台名称会打开背景资料页面。</li><li>使用导出按钮将列表保存为电子表格。</li></ol>",
+        "howToUse": "<ol><li>从抽屉中打开<strong>发射日历</strong>。首次打开时会自动下载发射列表，需要联网。如果下载失败，请点击<strong>获取数据</strong>重试。</li><li>浏览表格；点击带链接的名称会在侧边面板中打开参考页面。</li><li>点击<strong>刷新</strong>获取最新列表。如果请求失败，您正在查看的行会保留在屏幕上。</li><li>点击<strong>导出发射信息</strong>将所有字段保存为电子表格，时间为 UTC。</li></ol>",
         "tip1": "发射窗口以 UTC 显示；超过一天的条目会显示“待定”，直到获取到最新数据。",
         "tip2": "将此列表与新发射工具结合使用，可在发射发生前模拟其轨迹。"
+      },
+      "export": {
+        "name": "名称",
+        "updated": "最后更新 (UTC)",
+        "windowStart": "窗口开始 (UTC)",
+        "windowEnd": "窗口结束 (UTC)",
+        "location": "地点",
+        "locationURL": "地点 URL",
+        "agency": "机构",
+        "agencyURL": "机构 URL",
+        "country": "国家",
+        "mission": "任务描述",
+        "missionName": "任务名称",
+        "missionType": "任务类型",
+        "missionURL": "任务 URL",
+        "rocket": "火箭",
+        "rocketConfig": "火箭构型",
+        "rocketFamily": "火箭系列",
+        "rocketURL": "火箭 URL"
       }
     }
   }

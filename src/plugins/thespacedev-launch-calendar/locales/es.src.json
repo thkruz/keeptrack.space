@@ -24,15 +24,37 @@
         "fetching": "Obteniendo próximos lanzamientos...",
         "unknown": "Desconocido",
         "tbd": "Por determinar",
-        "apiUnavailable": "¡{url} no está disponible!"
+        "apiUnavailable": "¡{url} no está disponible!",
+        "noLaunches": "No se recibieron próximos lanzamientos.",
+        "rateLimited": "The Space Devs está limitando las solicitudes en este momento. Vuelva a intentarlo en unos minutos.",
+        "nothingToExport": "No hay lanzamientos para exportar. Cargue primero la lista de lanzamientos."
       },
       "help": {
-        "overview": "Próximos Lanzamientos muestra los próximos lanzamientos orbitales de todo el mundo, obtenidos en vivo de la biblioteca de lanzamientos de The Space Devs: la ventana de lanzamiento, la misión, el sitio de lanzamiento, la agencia y el país de cada uno. Los nombres de misiones y sitios enlazan a más información cuando está disponible.",
-        "imgAlt": "La tabla de Próximos Lanzamientos con las misiones próximas",
+        "overview": "Calendario de Lanzamientos muestra los próximos 20 lanzamientos orbitales de todo el mundo, obtenidos en directo de la biblioteca de lanzamientos de The Space Devs: la ventana de lanzamiento, la misión, el cohete, el sitio de lanzamiento, la agencia y el país de cada uno. Los nombres de misión, cohete, sitio y agencia enlazan a más información cuando está disponible.",
+        "imgAlt": "La tabla de Calendario de Lanzamientos con los próximos lanzamientos",
         "imgCaption": "Cada fila es un lanzamiento próximo con su ventana, misión, sitio y agencia.",
-        "howToUse": "<ol><li>Abra <strong>Próximos Lanzamientos</strong> desde el panel de complementos (modo Eventos).</li><li>Haga clic en el botón de obtención para descargar la lista actual de lanzamientos; requiere conexión a internet.</li><li>Explore la tabla; los nombres enlazados de misiones y plataformas abren páginas con más contexto.</li><li>Use el botón de exportación para guardar la lista como hoja de cálculo.</li></ol>",
+        "howToUse": "<ol><li>Abra <strong>Calendario de Lanzamientos</strong> desde el panel. La lista de lanzamientos se descarga automáticamente la primera vez que lo abre; necesita conexión a internet. Si la descarga falla, haga clic en <strong>Obtener datos</strong> para volver a intentarlo.</li><li>Explore la tabla; los nombres enlazados abren páginas de referencia en un panel lateral.</li><li>Haga clic en <strong>Actualizar</strong> para obtener la lista más reciente. Si la solicitud falla, las filas que estaba leyendo permanecen en pantalla.</li><li>Haga clic en <strong>Exportar información de lanzamientos</strong> para guardar todos los campos en una hoja de cálculo, con las horas en UTC.</li></ol>",
         "tip1": "Las ventanas de lanzamiento se muestran en UTC; las entradas con más de un día de antigüedad muestran «Por determinar» hasta que se obtengan datos nuevos.",
         "tip2": "Combine esta lista con la herramienta Nuevo Lanzamiento para modelar la trayectoria de un lanzamiento próximo antes de que ocurra."
+      },
+      "export": {
+        "name": "Nombre",
+        "updated": "Última actualización (UTC)",
+        "windowStart": "Inicio de la ventana (UTC)",
+        "windowEnd": "Fin de la ventana (UTC)",
+        "location": "Ubicación",
+        "locationURL": "URL de la ubicación",
+        "agency": "Agencia",
+        "agencyURL": "URL de la agencia",
+        "country": "País",
+        "mission": "Descripción de la misión",
+        "missionName": "Nombre de la misión",
+        "missionType": "Tipo de misión",
+        "missionURL": "URL de la misión",
+        "rocket": "Cohete",
+        "rocketConfig": "Configuración del cohete",
+        "rocketFamily": "Familia del cohete",
+        "rocketURL": "URL del cohete"
       }
     }
   }

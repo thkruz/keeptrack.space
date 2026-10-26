@@ -24,15 +24,37 @@
         "fetching": "Načítání nadcházejících startů...",
         "unknown": "Neznámé",
         "tbd": "Bude upřesněno",
-        "apiUnavailable": "{url} není dostupné!"
+        "apiUnavailable": "{url} není dostupné!",
+        "noLaunches": "Nebyly vráceny žádné nadcházející starty.",
+        "rateLimited": "The Space Devs právě omezuje počet požadavků. Zkuste to znovu za několik minut.",
+        "nothingToExport": "Žádné starty k exportu. Nejprve načtěte seznam startů."
       },
       "help": {
-        "overview": "Další starty zobrazují seznam nadcházejících orbitálních startů z celého světa, načítaný živě z knihovny startů The Space Devs: startovní okno, misi, místo startu, agenturu a zemi každého z nich. Názvy misí a míst startu odkazují na další informace, pokud jsou k dispozici.",
-        "imgAlt": "Tabulka Další starty s nadcházejícími misemi",
+        "overview": "Kalendář startů zobrazuje 20 nejbližších orbitálních startů na světě, načítaných živě z knihovny startů The Space Devs: startovní okno, misi, raketu, startovní místo, agenturu a zemi u každého z nich. Názvy misí, raket, míst a agentur odkazují na další informace, pokud jsou k dispozici.",
+        "imgAlt": "Tabulka Kalendář startů s nadcházejícími starty",
         "imgCaption": "Každý řádek je nadcházející start se svým oknem, misí, místem a agenturou.",
-        "howToUse": "<ol><li>Otevřete <strong>Další starty</strong> z panelu (režim Události).</li><li>Kliknutím na tlačítko načtení stáhněte aktuální seznam startů; je vyžadováno připojení k internetu.</li><li>Procházejte tabulku; odkazované názvy misí a ramp otevírají stránky s dalšími informacemi.</li><li>Pomocí tlačítka exportu uložte seznam jako tabulku.</li></ol>",
+        "howToUse": "<ol><li>Otevřete <strong>Kalendář startů</strong> ze zásuvky. Seznam startů se při prvním otevření stáhne automaticky; je potřeba připojení k internetu. Pokud se stažení nezdaří, klikněte na <strong>Načíst data</strong> a zkuste to znovu.</li><li>Procházejte tabulku; odkazované názvy otevírají podkladové stránky v bočním panelu.</li><li>Klikněte na <strong>Obnovit</strong> pro nejnovější seznam. Pokud se požadavek nezdaří, řádky, které jste četli, zůstanou na obrazovce.</li><li>Klikněte na <strong>Exportovat informace o startech</strong> pro uložení všech polí do tabulky, s časy v UTC.</li></ol>",
         "tip1": "Startovní okna se zobrazují v UTC; u záznamů starších než jeden den se zobrazuje „Bude upřesněno“, dokud nejsou načtena čerstvá data.",
         "tip2": "Zkombinujte tento seznam s nástrojem Nový start a namodelujte trajektorii nadcházejícího startu ještě před jeho uskutečněním."
+      },
+      "export": {
+        "name": "Název",
+        "updated": "Poslední aktualizace (UTC)",
+        "windowStart": "Začátek okna (UTC)",
+        "windowEnd": "Konec okna (UTC)",
+        "location": "Místo",
+        "locationURL": "URL místa",
+        "agency": "Agentura",
+        "agencyURL": "URL agentury",
+        "country": "Země",
+        "mission": "Popis mise",
+        "missionName": "Název mise",
+        "missionType": "Typ mise",
+        "missionURL": "URL mise",
+        "rocket": "Raketa",
+        "rocketConfig": "Konfigurace rakety",
+        "rocketFamily": "Rodina raket",
+        "rocketURL": "URL rakety"
       }
     }
   }

@@ -135,19 +135,38 @@ export class ObjectGroup<T extends GroupType> {
   };
 
   private createGroupByCountry_(data: GroupData[GroupType.COUNTRY], satData: Satellite[]) {
-    // Map country name to country code
-    const expandedData = data.split('|').map((countryName: string) => getCountryMapList()[countryName]);
-    // Concat data with expandedData using | as a delimiter
+    const countryValues = getCountryGroupValues(data);
 
-    data = `${data}|${expandedData.join('|')}`;
-    // Exclude analyst sats from country groups. The legacy check looked at
-    // sccNum5?.startsWith('T') as a heuristic for analyst slots, but that
-    // pattern doesn't reliably identify them — analyst sats are tagged
-    // explicitly via `country === 'ANALSAT'` in catalog-loader, so test that.
-    this.ids = satData
-      .filter((sat: Satellite) => data.split('|').includes(sat.country) && sat.country !== 'ANALSAT')
-      // .slice(0, settingsManager.maxOrbitsDisplayed)
-      // eslint-disable-next-line arrow-body-style
-      .map((sat: Satellite) => sat.id);
+    // Exclude analyst sats from country groups. They are tagged explicitly via
+    // `country === 'ANALSAT'` in catalog-loader.
+    this.ids = satData.filter((sat: Satellite) => isInCountryGroup(sat.country, countryValues)).map((sat: Satellite) => sat.id);
   }
 }
+
+/**
+ * The set of `sat.country` values a COUNTRY group matches: each `|`-separated code plus
+ * its mapped name from getCountryMapList(). Empty and unmapped entries are dropped; an
+ * unmapped code used to add '' to the set, which matched every object with no country.
+ */
+export const getCountryGroupValues = (data: string): Set<string> => {
+  const codes = data.split('|');
+  const countryMap = getCountryMapList() as Record<string, string | undefined>;
+  const values = new Set<string>();
+
+  for (const code of codes) {
+    if (code) {
+      values.add(code);
+    }
+    const mapped = countryMap[code];
+
+    if (typeof mapped === 'string' && mapped !== '') {
+      values.add(mapped);
+    }
+  }
+
+  return values;
+};
+
+/** True when an object with this country value belongs to the country group (ANALSAT never does). */
+export const isInCountryGroup = (country: string | undefined, countryValues: Set<string>): boolean =>
+  typeof country === 'string' && country !== '' && country !== 'ANALSAT' && countryValues.has(country);

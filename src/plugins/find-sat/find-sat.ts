@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable complexity */
 
-import { countryCodeList, countryNameList, getCountryDisplayName } from '@app/app/data/catalogs/countries';
+import { buildCountryCodeGroups } from '@app/app/data/catalogs/countries';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { GetSatType, MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -93,6 +93,7 @@ interface SearchValidityFlags {
   isSpecificShape: boolean;
   isSpecificSource: boolean;
   isSpecificPayload: boolean;
+  isSpecificObjType: boolean;
 }
 
 /** Resolved (defaulted) margins applied to each numeric search filter. */
@@ -187,7 +188,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
-        key: 'F',
+        key: 'f',
         ctrl: true,
         callback: () => {
           if (ServiceLocator.getMainCamera().cameraType === CameraType.FPS) {
@@ -202,6 +203,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
   onDownload(): void {
     if (!this.hasSearchBeenRun_) {
       errorManagerInstance.warn(t7e('plugins.FindSatPlugin.errorMsgs.TryFindingFirst'));
+
+      return;
+    }
+    if (this.lastAllMatches_.length === 0 && this.lastResults_.length === 0) {
+      // A search ran but matched nothing: say so instead of silently skipping the download.
+      ServiceLocator.getUiManager().toast(t7e('plugins.FindSatPlugin.errorMsgs.NoMatchesToExport' as Parameters<typeof t7e>[0]), ToastMsgType.caution);
 
       return;
     }
@@ -517,12 +524,9 @@ export class FindSatPlugin extends KeepTrackPlugin {
     FindSatPlugin.addSelectFilter_('fbl-bus-filter', 'fbl-bus');
 
     // Values stay the catalog codes; only the option text follows the UI language.
-    countryNameList
-      .map((countryName: string) => ({ code: countryCodeList[countryName], label: getCountryDisplayName(countryName) }))
-      .sort((a, b) => a.label.localeCompare(b.label))
-      .forEach(({ code, label }) => {
-        getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${code}">${label}</option>`);
-      });
+    FindSatPlugin.buildCountryOptions_().forEach(({ code, label }) => {
+      getEl('fbl-country')!.insertAdjacentHTML('beforeend', `<option value="${code}">${label}</option>`);
+    });
 
     FindSatPlugin.wireAllOptionExclusivity_('fbl-type', '0');
     FindSatPlugin.wireAllOptionExclusivity_('fbl-country', 'All');
@@ -575,6 +579,15 @@ export class FindSatPlugin extends KeepTrackPlugin {
       menuRoot.classList.add('kt-ui-v13');
       initMaterialSelects(menuRoot);
     }
+  }
+
+  /**
+   * One Country option per display name; its value is every catalog code for that country,
+   * pipe-joined. The grouping (same-name merge plus region-code aliases) is shared with the
+   * Countries menu through {@link buildCountryCodeGroups}.
+   */
+  protected static buildCountryOptions_(): { code: string; label: string }[] {
+    return buildCountryCodeGroups().map(({ label, codes }) => ({ code: codes.join('|'), label }));
   }
 
   protected static addSelectFilter_(filterInputId: string, selectId: string): void {
@@ -762,10 +775,37 @@ export class FindSatPlugin extends KeepTrackPlugin {
       this.lastResults_ = this.searchSats_(searchParams);
       this.onSearchComplete_(this.lastResults_);
     } catch (e) {
+      // A failed or invalid search must not leave the previous result on screen.
+      this.clearSearchResults_();
       this.handleSearchError_(e, uiManagerInstance);
     }
 
     return true;
+  }
+
+  /**
+   * Drops the last result: the result count, the global search box, the
+   * search-result list and the selected group. Export then asks for a search
+   * first again.
+   */
+  protected clearSearchResults_(): void {
+    this.hasSearchBeenRun_ = false;
+    this.lastResults_ = [];
+    this.lastAllMatches_ = [];
+
+    const countEl = getEl(this.resultCountElId_, true);
+
+    if (countEl) {
+      countEl.textContent = '';
+    }
+
+    const searchInput = getEl('search', true) as HTMLInputElement | null;
+
+    if (searchInput) {
+      searchInput.value = '';
+    }
+    // An empty search hides the result list and clears the selected group.
+    ServiceLocator.getUiManager().doSearch('');
   }
 
   /** Reports search results to the user (empty-result toast + result count). */
@@ -908,6 +948,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       isSpecificShape: params.shape !== 'All',
       isSpecificSource: params.source !== 'All',
       isSpecificPayload: params.payload !== 'All',
+      isSpecificObjType: FindSatPlugin.objTypesOf_(params).length > 0,
     };
   }
 
@@ -930,8 +971,14 @@ export class FindSatPlugin extends KeepTrackPlugin {
       !flags.isSpecificBus &&
       !flags.isSpecificShape &&
       !flags.isSpecificSource &&
-      !flags.isSpecificPayload
+      !flags.isSpecificPayload &&
+      !flags.isSpecificObjType
     );
+  }
+
+  /** The specific object types a search asks for; empty means every type. */
+  private static objTypesOf_(params: SearchSatParams): number[] {
+    return (Array.isArray(params.objType) ? params.objType : [params.objType]).filter((type) => typeof type === 'number' && type !== 0);
   }
 
   /** Applies the look-angle (az / el / range) filters relative to the selected sensor. */
@@ -1077,13 +1124,19 @@ export class FindSatPlugin extends KeepTrackPlugin {
 
     res = !flags.isValidInc && !flags.isValidPeriod && !flags.isValidTleAge && (flags.isValidAz || flags.isValidEl || flags.isValidRange) ? FindSatPlugin.checkInview_(res) : res;
 
-    const objTypes = (Array.isArray(searchParams.objType) ? searchParams.objType : [searchParams.objType]).filter((type) => type !== 0);
+    const objTypes = FindSatPlugin.objTypesOf_(searchParams);
 
     res = objTypes.length > 0 ? filterByObjType(res, objTypes) : res;
 
     res = FindSatPlugin.applyLookAngleFilters_(res, searchParams, margins, flags);
     res = FindSatPlugin.applyOrbitalFilters_(res, searchParams, margins, flags);
     res = FindSatPlugin.applyCategoricalFilters_(res, searchParams);
+    /*
+     * Results reach the globe as a NORAD list in the search box, so an object
+     * without a NORAD number (e.g. a JSC Vimpel entry) can never be selected or
+     * highlighted. Drop it so the count, the selected group and the export agree.
+     */
+    res = res.filter((sat) => typeof sat.sccNum === 'string' && sat.sccNum !== '');
 
     // Keep every match for export; only the displayed set is capped.
     this.lastAllMatches_ = res;

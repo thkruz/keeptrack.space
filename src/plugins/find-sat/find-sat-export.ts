@@ -69,12 +69,15 @@ const payloadStatusDetail = (sat: Satellite, isDecayed?: DecayedPredicate): stri
 };
 
 /**
- * Builds the export rows: satellites with TLEs only, analyst objects dropped,
+ * Builds the export rows: satellites with a NORAD number and TLEs only, analyst objects dropped,
  * sorted by catalog number. `isDecayed` marks objects that have decayed at the
  * current simulation time so their status columns match the results list.
  */
 export const buildFindSatExportRows = (objs: BaseObject[], isDecayed?: DecayedPredicate): FindSatExportRow[] => {
-  const sats = objs.filter((obj) => obj.isSatellite() && (obj as Satellite).tle1 && (obj as Satellite).tle2 && (obj as Satellite).country !== 'ANALSAT') as Satellite[];
+  // No-NORAD objects (JSC Vimpel) are dropped: the search can not select them, so they are not results.
+  const sats = objs.filter(
+    (obj) => obj.isSatellite() && (obj as Satellite).sccNum && (obj as Satellite).tle1 && (obj as Satellite).tle2 && (obj as Satellite).country !== 'ANALSAT'
+  ) as Satellite[];
 
   return [...sats]
     .sort((a, b) => a.sccNum.localeCompare(b.sccNum, 'en', { numeric: true }))

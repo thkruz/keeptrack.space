@@ -74,7 +74,8 @@
         "TooManyResults": "Zobrazeno {limit} z {total} shod. Zvyšte \"Maximální počet výsledků vyhledávání\" v Nastavení vyhledávání pro zobrazení dalších; export přesto uloží všechny shody.",
         "TryFindingFirst": "Nejprve zkuste vyhledat satelity!",
         "SearchFailed": "Hledání selhalo: {error}",
-        "NothingToExport": "Žádné výsledky s orbitálními daty k exportu"
+        "NothingToExport": "Žádné výsledky s orbitálními daty k exportu",
+        "NoMatchesToExport": "Poslední hledání nenašlo žádné satelity, takže není co exportovat."
       }
     }
   }

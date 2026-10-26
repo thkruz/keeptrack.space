@@ -1,5 +1,5 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
-import { GroupType, ObjectGroup } from '@app/app/data/object-group';
+import { GroupType, getCountryGroupValues, isInCountryGroup, ObjectGroup } from '@app/app/data/object-group';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite, SpaceObjectType, TleLine1 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
@@ -96,6 +96,38 @@ describe('ObjectGroup', () => {
     const group = new ObjectGroup(GroupType.COUNTRY, 'US');
 
     expect(group.ids).toStrictEqual([0]);
+  });
+
+  it('COUNTRY with an unmapped code does not match objects that have no country', () => {
+    sat1.country = '';
+    // 'NOSUCHCODE' has no entry in getCountryMapList(); it used to add '' to the match set.
+    const group = new ObjectGroup(GroupType.COUNTRY, 'US|NOSUCHCODE');
+
+    expect(group.ids).toStrictEqual([0]);
+  });
+
+  it('COUNTRY merged codes collect every code and nothing else', () => {
+    const group = new ObjectGroup(GroupType.COUNTRY, 'US|CN');
+
+    expect(group.ids).toStrictEqual([0, 1]);
+  });
+
+  it('getCountryGroupValues drops empty and unmapped entries', () => {
+    const values = getCountryGroupValues('US||NOSUCHCODE');
+
+    expect(values.has('')).toBe(false);
+    expect(values.has('US')).toBe(true);
+    expect(values.has('NOSUCHCODE')).toBe(true);
+    expect([...values].every((v) => typeof v === 'string' && v !== '')).toBe(true);
+  });
+
+  it('isInCountryGroup rejects empty, undefined and ANALSAT countries', () => {
+    const values = new Set(['US', 'ANALSAT']);
+
+    expect(isInCountryGroup('US', values)).toBe(true);
+    expect(isInCountryGroup('', values)).toBe(false);
+    expect(isInCountryGroup(undefined, values)).toBe(false);
+    expect(isInCountryGroup('ANALSAT', values)).toBe(false);
   });
 
   it('COUNTRY excludes analyst satellites (ANALSAT)', () => {

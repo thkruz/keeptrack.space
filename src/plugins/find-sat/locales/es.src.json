@@ -74,7 +74,8 @@
         "TooManyResults": "Mostrando {limit} de {total} coincidencias. Aumente \"Resultados máximos en la búsqueda\" en Configuración de búsqueda para ver más; la exportación guarda todas las coincidencias.",
         "TryFindingFirst": "¡Intente buscar satélites primero!",
         "SearchFailed": "Error en la búsqueda: {error}",
-        "NothingToExport": "No hay resultados con datos orbitales para exportar"
+        "NothingToExport": "No hay resultados con datos orbitales para exportar",
+        "NoMatchesToExport": "La última búsqueda no encontró satélites, así que no hay nada que exportar."
       }
     }
   }

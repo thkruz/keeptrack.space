@@ -102,6 +102,36 @@ export const getCountryDisplayName = (id: string): string => {
   return id;
 };
 
+/**
+ * One entry per country display name, shared by every country picker (Find Satellite's Country
+ * filter, the Countries menu). Each entry lists every catalog code for that country: the
+ * {@link countryCodeList} entry's own codes, plus the codes the flag table resolves to the same
+ * region that no other entry claims (e.g. the GCAT code `L` and the operator code `SES` for
+ * Luxembourg). Entries that share a display name (LUXE and O3B both read "Luxembourg") merge into
+ * one. Sorted by display name in the UI language.
+ */
+export const buildCountryCodeGroups = (): { label: string; codes: string[] }[] => {
+  const codeTable = countryCodeList as Record<string, string>;
+  const flagMap = countryFlagIconMap as Record<string, string>;
+  const ownedCodes = new Set(countryNameList.flatMap((name) => codeTable[name].split('|')));
+  const codesByLabel = new Map<string, Set<string>>();
+
+  for (const name of countryNameList) {
+    const ownCodes = codeTable[name].split('|');
+    const regions = new Set(ownCodes.map((code) => (flagMap[code] ?? code).toUpperCase()));
+    const aliases = Object.keys(flagMap).filter((code) => !ownedCodes.has(code) && regions.has(flagMap[code].toUpperCase()));
+    const label = getCountryDisplayName(name);
+    const codes = codesByLabel.get(label) ?? new Set<string>();
+
+    for (const code of [...ownCodes, ...aliases]) {
+      codes.add(code);
+    }
+    codesByLabel.set(label, codes);
+  }
+
+  return [...codesByLabel.entries()].map(([label, codes]) => ({ label, codes: [...codes] })).sort((a, b) => a.label.localeCompare(b.label));
+};
+
 export const getCountryMapList = () => ({
   AAT: t7e('countries.AAT'),
   ADG: t7e('countries.ADG'),

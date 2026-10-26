@@ -74,7 +74,8 @@
         "TooManyResults": "{total}개 일치 항목 중 {limit}개를 표시합니다. 더 보려면 검색 설정에서 \"검색 최대 결과 수\"를 늘리세요. 내보내기는 모든 일치 항목을 저장합니다.",
         "TryFindingFirst": "먼저 위성을 찾아보세요!",
         "SearchFailed": "검색 실패: {error}",
-        "NothingToExport": "내보낼 궤도 데이터가 있는 결과가 없습니다"
+        "NothingToExport": "내보낼 궤도 데이터가 있는 결과가 없습니다",
+        "NoMatchesToExport": "마지막 검색에서 위성을 찾지 못해 내보낼 항목이 없습니다."
       }
     }
   }

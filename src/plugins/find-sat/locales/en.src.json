@@ -74,7 +74,8 @@
         "TooManyResults": "Showing {limit} of {total} matches. Raise \"Maximum Results in Search\" in Search Settings to show more; Export still saves every match.",
         "TryFindingFirst": "Try finding satellites first!",
         "SearchFailed": "Search failed: {error}",
-        "NothingToExport": "No results with orbit data to export"
+        "NothingToExport": "No results with orbit data to export",
+        "NoMatchesToExport": "The last search found no satellites, so there is nothing to export."
       }
     }
   }

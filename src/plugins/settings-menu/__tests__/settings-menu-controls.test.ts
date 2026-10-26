@@ -1,6 +1,13 @@
 import { ISettingSelectControl, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { KeepTrack } from '@app/keeptrack';
-import { getOwnSettingsSections, resetOwnSettings, SETTINGS_OWN_FAST_CPU_SECTION, SETTINGS_OWN_GENERAL_SECTION } from '@app/plugins/settings-menu/settings-menu-controls';
+import {
+  getOwnSettingsSections,
+  OWN_SETTING_DEFAULTS,
+  resetDemoLabelMemoryForTest,
+  resetOwnSettings,
+  SETTINGS_OWN_FAST_CPU_SECTION,
+  SETTINGS_OWN_GENERAL_SECTION,
+} from '@app/plugins/settings-menu/settings-menu-controls';
 import { SettingsManager } from '@app/settings/settings';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -85,5 +92,95 @@ describe('settings-menu-controls', () => {
     expect(settingsManager.numberOfEcfOrbitsToDraw).toBe(1);
     expect(settingsManager.satLabelMode).toBe(SatLabelMode.FOV_ONLY);
     expect(settingsManager.isDisableTimeMachineToasts).toBe(false);
+  });
+
+  it('Reset leaves Draw Orbits in ECF off (its real default), not on', () => {
+    settingsManager.isOrbitCruncherInEcf = false;
+
+    resetOwnSettings();
+    expect(settingsManager.isOrbitCruncherInEcf).toBe(false);
+
+    settingsManager.isOrbitCruncherInEcf = true;
+    resetOwnSettings();
+    expect(settingsManager.isOrbitCruncherInEcf).toBe(false);
+  });
+
+  it('every Reset value matches the settings classes own defaults', () => {
+    // A fresh SettingsManager carries exactly the class defaults.
+    const fresh = new SettingsManager() as unknown as Record<string, unknown>;
+    const sm = settingsManager as unknown as Record<string, unknown>;
+
+    settingsManager.isMobileModeEnabled = false;
+    for (const key of Object.keys(OWN_SETTING_DEFAULTS)) {
+      const fallback = (OWN_SETTING_DEFAULTS as Record<string, unknown>)[key];
+
+      expect(fallback, key).toBe(fresh[key]);
+      // Push every setting off its default so Reset has to restore each one.
+      sm[key] = typeof fallback === 'boolean' ? !fallback : 3;
+    }
+
+    resetOwnSettings();
+
+    for (const key of Object.keys(OWN_SETTING_DEFAULTS)) {
+      expect(sm[key], key).toBe(fresh[key]);
+    }
+  });
+
+  it('Reset uses the mobile default for Show Info On Hover on phones', () => {
+    settingsManager.isMobileModeEnabled = true;
+    settingsManager.enableHoverOverlay = true;
+
+    resetOwnSettings();
+
+    expect(settingsManager.enableHoverOverlay).toBe(false);
+    settingsManager.isMobileModeEnabled = false;
+  });
+
+  it('Reset restores Epoch Age and covariance confidence but leaves the onboarding toggle alone', () => {
+    settingsManager.isShowEpochAge = false;
+    settingsManager.covarianceConfidenceLevel = 3;
+    settingsManager.isDisableOnboarding = true;
+
+    resetOwnSettings();
+
+    expect(settingsManager.isShowEpochAge).toBe(true);
+    expect(settingsManager.covarianceConfidenceLevel).toBe(1);
+    expect(settingsManager.isDisableOnboarding).toBe(true);
+  });
+
+  describe('demo mode label memory', () => {
+    beforeEach(() => {
+      resetDemoLabelMemoryForTest();
+      settingsManager.isDemoModeOn = false;
+    });
+
+    const demo = () => findControl(SETTINGS_OWN_GENERAL_SECTION, 'enableDemoMode') as ISettingToggleControl;
+
+    it('restores the label mode the user had before demo mode', () => {
+      settingsManager.satLabelMode = SatLabelMode.ALL;
+
+      demo().set(true);
+      expect(settingsManager.satLabelMode).toBe(SatLabelMode.OFF);
+
+      demo().set(false);
+      expect(settingsManager.satLabelMode).toBe(SatLabelMode.ALL);
+    });
+
+    it('keeps a label mode the user picked while demo mode ran', () => {
+      settingsManager.satLabelMode = SatLabelMode.ALL;
+      demo().set(true);
+      settingsManager.satLabelMode = SatLabelMode.FOV_ONLY;
+
+      demo().set(false);
+      expect(settingsManager.satLabelMode).toBe(SatLabelMode.FOV_ONLY);
+    });
+
+    it('falls back to the default label mode when demo mode was already on at boot', () => {
+      settingsManager.isDemoModeOn = true;
+      settingsManager.satLabelMode = SatLabelMode.OFF;
+
+      demo().set(false);
+      expect(settingsManager.satLabelMode).toBe(SatLabelMode.FOV_ONLY);
+    });
   });
 });

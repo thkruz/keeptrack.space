@@ -4,6 +4,7 @@
       "bottomIconLabel": "Impostazioni",
       "title": "Menu impostazioni",
       "filterPlaceholder": "Filtra impostazioni...",
+      "noMatches": "Nessuna impostazione corrispondente",
       "buttons": {
         "resetToDefaults": "Ripristina predefiniti"
       },
@@ -50,7 +51,7 @@
         "overview": "Il menu Impostazioni raccoglie le opzioni di visualizzazione e interazione dell'intera applicazione: disegno delle orbite, comportamento al passaggio del mouse, ausili della camera ed extra sensibili alle prestazioni. Anche altri plugin aggiungono qui le proprie sezioni, quindi questo è l'unico posto dove regolare il comportamento di KeepTrack.",
         "imgAlt": "Il menu Impostazioni con i suoi interruttori delle opzioni generali",
         "imgCaption": "Attiva qualsiasi opzione per applicarla all'istante; usa il filtro per trovare rapidamente le impostazioni.",
-        "howToUse": "<ol><li>Apri <strong>Impostazioni</strong> dal pannello.</li><li>Attiva qualsiasi interruttore per applicarlo all'istante; passa il mouse su una riga per vedere una descrizione che la spiega.</li><li>Usa la casella <strong>filtro</strong> in alto per trovare rapidamente un'impostazione per nome.</li><li><strong>Ripristina predefiniti</strong> riporta tutte le opzioni, comprese le sezioni aggiunte dai plugin, ai valori di fabbrica.</li></ol>",
+        "howToUse": "<ol><li>Apri <strong>Impostazioni</strong> dal pannello.</li><li>Attiva qualsiasi interruttore per applicarlo all'istante; passa il mouse su una riga per vedere una descrizione che la spiega.</li><li>Usa la casella <strong>filtro</strong> in alto per trovare rapidamente un'impostazione per nome.</li><li><strong>Ripristina predefiniti</strong> riporta tutte le opzioni di visualizzazione, comprese le sezioni aggiunte dai plugin, ai valori di fabbrica.</li></ol>",
         "tip1": "Le opzioni sotto Richiede CPU veloce, come mostrare il prossimo passaggio al passaggio del mouse, eseguono calcoli extra a ogni fotogramma; lasciale disattivate sulle macchine più lente.",
         "tip2": "Le sezioni dei plugin in fondo provengono da altri plugin (Lista di osservazione, Macchina del Tempo e altri), quindi il menu cresce man mano che i plugin vengono abilitati."
       }

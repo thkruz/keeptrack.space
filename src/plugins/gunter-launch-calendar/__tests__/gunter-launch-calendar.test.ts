@@ -1,3 +1,4 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { createColorbox } from '@app/engine/utils/colorbox';
@@ -99,5 +100,17 @@ describe('gunter_launch_calendar_plugin', () => {
     vi.advanceTimersByTime(4000);
     // eslint-disable-next-line dot-notation
     expect(() => launchCalendarPlugin['closeColorbox_']()).not.toThrow();
+  });
+
+  test('opening the calendar hides open side menus and stays active', () => {
+    launchCalendarPlugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    const hideSpy = vi.spyOn(ServiceLocator.getUiManager(), 'hideSideMenus');
+
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+
+    expect(hideSpy).toHaveBeenCalled();
+    expect(launchCalendarPlugin.isMenuButtonActive).toBe(true);
   });
 });

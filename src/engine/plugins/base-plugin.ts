@@ -1533,6 +1533,10 @@ export abstract class KeepTrackPlugin {
             // Show the side menu if it exists
             if (this.sideMenuElementName) {
               this.openSideMenu();
+            } else if (this.isForceHideSideMenus) {
+              // A plugin without its own side menu (e.g. one that opens a colorbox overlay) still closes
+              // whatever side menu is open, before it marks itself active so it is not closed in turn.
+              this.hideSideMenus();
             }
 
             // Show the bottom icon as selected

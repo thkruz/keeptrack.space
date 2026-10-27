@@ -17,3 +17,21 @@ describe('SettingsManager graphics proxy: isSkipTleInterpolation', () => {
     expect(sm.isSkipTleInterpolation).toBe(false);
   });
 });
+
+describe('SettingsManager graphics proxy: isDrawEarth', () => {
+  it('reads true (not undefined) on a fresh settings manager', () => {
+    const sm = new SettingsManager();
+
+    expect(sm.isDrawEarth).toBe(true);
+  });
+
+  it('round-trips through the settings proxy (flat <-> nested)', () => {
+    const sm = new SettingsManager();
+
+    sm.isDrawEarth = false;
+    expect(sm.graphics.isDrawEarth).toBe(false);
+
+    sm.graphics.isDrawEarth = true;
+    expect(sm.isDrawEarth).toBe(true);
+  });
+});

@@ -73,6 +73,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isDrawAurora: 'graphics',
   isDrawGraticule: 'graphics',
   isDrawFlatMapTerminator: 'graphics',
+  isDrawEarth: 'graphics',
   isDrawSun: 'graphics',
   sizeOfSun: 'graphics',
   isUseSunTexture: 'graphics',

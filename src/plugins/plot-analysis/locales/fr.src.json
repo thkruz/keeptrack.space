@@ -102,7 +102,8 @@
         "yAxis": "Latitude (°)",
         "latitude": "Latitude",
         "longitude": "Longitude",
-        "other": "Autres"
+        "other": "Autres",
+        "snapshotTime": "Instantané à {time} UTC"
       }
     },
     "EciPlot": {
@@ -121,7 +122,7 @@
       "bottomIconLabel": "Trace ECF",
       "title": "Menu Trace ECF",
       "help": {
-        "overview": "La trace ECF dessine la trajectoire du satellite sélectionné dans le repère terrestre fixe centré sur la Terre (ECF), qui tourne avec la planète. Les satellites géosynchrones se réduisent à de petites boucles, et les orbites à trace au sol répétitive se referment sur elles-mêmes, ce qui en fait le repère idéal pour étudier le comportement relatif à la Terre.",
+        "overview": "La trace ECF dessine une période orbitale de la trajectoire du satellite sélectionné dans le repère terrestre fixe centré sur la Terre (ECF), qui tourne avec la planète : chaque échantillon est tourné de l'angle de rotation de la Terre (GMST) à son propre instant, si bien que sa longitude correspond à la trace au sol. Les satellites géosynchrones se réduisent à de petites boucles, tandis qu'une orbite basse dessine un passage de sa trace au sol en 3D, ce qui en fait le repère idéal pour étudier le comportement relatif à la Terre.",
         "howToUse": "<ol><li>Sélectionnez un satellite ; son icône dans le tiroir des extensions est désactivée tant qu'aucun n'est sélectionné.</li><li>Ouvrez la <strong>Trace ECF</strong> depuis le tiroir des extensions (mode Analyse).</li><li>Faites glisser pour faire pivoter la vue 3D et utilisez la molette pour zoomer ; survolez la courbe pour afficher les valeurs de position.</li></ol>",
         "tip1": "Le petit huit serré d'un satellite GEO en ECF correspond à son cycle quotidien d'inclinaison et d'excentricité ; plus la boucle est serrée, meilleur est le maintien à poste."
       },

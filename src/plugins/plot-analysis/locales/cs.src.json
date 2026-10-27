@@ -102,7 +102,8 @@
         "yAxis": "Zeměpisná šířka (°)",
         "latitude": "Zeměpisná šířka",
         "longitude": "Zeměpisná délka",
-        "other": "Ostatní"
+        "other": "Ostatní",
+        "snapshotTime": "Snímek k {time} UTC"
       }
     },
     "EciPlot": {
@@ -121,7 +122,7 @@
       "bottomIconLabel": "Graf ECF",
       "title": "Menu grafu ECF",
       "help": {
-        "overview": "Graf ECF vykresluje trajektorii vybraného satelitu v soustavě pevně spojené se Zemí a se středem v Zemi (ECF), která rotuje s planetou. Geosynchronní satelity se smršťují do malých smyček a dráhy s opakující se pozemní stopou se samy uzavírají, takže je to ideální soustava pro studium chování vůči Zemi.",
+        "overview": "Graf ECF vykresluje jednu oběžnou periodu trajektorie vybraného satelitu v soustavě pevně spojené se Zemí a se středem v Zemi (ECF), která rotuje s planetou: každý vzorek je otočen o úhel rotace Země (GMST) v jeho vlastním čase, takže jeho zeměpisná délka odpovídá pozemní stopě. Geosynchronní satelity se smršťují do malých smyček, zatímco nízká dráha vykreslí jeden přelet pozemní stopy ve 3D, takže je to ideální soustava pro studium chování vůči Zemi.",
         "howToUse": "<ol><li>Vyberte satelit; ikona pluginu v panelu je neaktivní, dokud žádný není vybrán.</li><li>Otevřete <strong>Graf ECF</strong> z panelu (režim Analýza).</li><li>Tažením 3D graf otáčejte a kolečkem přibližujte; najetím na křivku zobrazíte hodnoty polohy.</li></ol>",
         "tip1": "Těsná osmička GEO satelitu v ECF je jeho denní cyklus inklinace a excentricity; čím těsnější smyčka, tím lepší udržování pozice."
       },

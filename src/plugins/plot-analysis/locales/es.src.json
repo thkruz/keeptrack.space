@@ -102,7 +102,8 @@
         "yAxis": "Latitud (°)",
         "latitude": "Latitud",
         "longitude": "Longitud",
-        "other": "Otros"
+        "other": "Otros",
+        "snapshotTime": "Instantánea a las {time} UTC"
       }
     },
     "EciPlot": {
@@ -121,7 +122,7 @@
       "bottomIconLabel": "Gráfico ECF",
       "title": "Menú de Gráfico ECF",
       "help": {
-        "overview": "El gráfico ECF dibuja la trayectoria del satélite seleccionado en el marco Fijo a la Tierra Centrado en la Tierra (ECF), que rota con el planeta. Los satélites geosíncronos se contraen en pequeños bucles, y las órbitas con traza terrestre repetitiva se cierran sobre sí mismas, lo que convierte a este marco en el ideal para estudiar el comportamiento relativo a la Tierra.",
+        "overview": "El gráfico ECF dibuja un periodo orbital de la trayectoria del satélite seleccionado en el marco Fijo a la Tierra Centrado en la Tierra (ECF), que rota con el planeta: cada muestra se rota según el ángulo de rotación terrestre (GMST) en su propio instante, de modo que su longitud coincide con la traza terrestre. Los satélites geosíncronos se contraen en pequeños bucles, mientras que una órbita baja traza un paso de su traza terrestre en 3D, lo que convierte a este marco en el ideal para estudiar el comportamiento relativo a la Tierra.",
         "howToUse": "<ol><li>Seleccione un satélite; su icono en el panel de complementos está deshabilitado hasta que haya uno seleccionado.</li><li>Abra el <strong>Gráfico ECF</strong> desde el panel de complementos (modo Análisis).</li><li>Arrastre para rotar el gráfico 3D y use la rueda para acercar; pase el cursor sobre la curva para ver los valores de posición.</li></ol>",
         "tip1": "La pequeña figura de ocho de un satélite GEO en ECF es su ciclo diario de inclinación y excentricidad; cuanto más cerrado el bucle, mejor el mantenimiento de posición."
       },

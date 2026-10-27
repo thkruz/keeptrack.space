@@ -102,7 +102,8 @@
         "yAxis": "Latitude (°)",
         "latitude": "Latitude",
         "longitude": "Longitude",
-        "other": "Other"
+        "other": "Other",
+        "snapshotTime": "Snapshot at {time} UTC"
       }
     },
     "EciPlot": {
@@ -121,7 +122,7 @@
       "bottomIconLabel": "ECF Plot",
       "title": "ECF Plot Menu",
       "help": {
-        "overview": "The ECF plot draws the selected satellite's trajectory in the Earth Centered Earth Fixed frame, which rotates with the planet. Geosynchronous satellites collapse to small loops, and repeating ground track orbits close on themselves, making this the frame for studying Earth relative behavior.",
+        "overview": "The ECF plot draws one orbital period of the selected satellite's trajectory in the Earth Centered Earth Fixed frame, which rotates with the planet: each sample is rotated by the Earth's rotation angle (GMST) at its own time, so its longitude matches the ground track. Geosynchronous satellites collapse to small loops, while a low orbit traces one ground track pass in 3D, making this the frame for studying Earth relative behavior.",
         "howToUse": "<ol><li>Select a satellite; its drawer icon is disabled until one is selected.</li><li>Open the <strong>ECF Plot</strong> from the drawer (Analysis mode).</li><li>Drag to rotate the 3D plot and scroll to zoom; hover the curve for position values.</li></ol>",
         "tip1": "A GEO satellite's tight figure eight in ECF is its daily inclination and eccentricity cycle; the tighter the loop, the better the station keeping."
       },

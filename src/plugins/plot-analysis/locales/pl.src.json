@@ -102,7 +102,8 @@
         "yAxis": "Szerokość geograficzna (°)",
         "latitude": "Szerokość geograficzna",
         "longitude": "Długość geograficzna",
-        "other": "Inne"
+        "other": "Inne",
+        "snapshotTime": "Migawka z {time} UTC"
       }
     },
     "EciPlot": {
@@ -121,7 +122,7 @@
       "bottomIconLabel": "Wykres ECF",
       "title": "Menu wykresu ECF",
       "help": {
-        "overview": "Wykres ECF rysuje trajektorię wybranego satelity w układzie odniesienia związanym z Ziemią o środku w Ziemi (ECF), który obraca się wraz z planetą. Satelity geosynchroniczne kurczą się do małych pętli, a orbity o powtarzalnym śladzie naziemnym zamykają się same w sobie, co czyni ten układ najlepszym do badania zachowania względem Ziemi.",
+        "overview": "Wykres ECF rysuje jeden okres orbitalny trajektorii wybranego satelity w układzie odniesienia związanym z Ziemią o środku w Ziemi (ECF), który obraca się wraz z planetą: każda próbka jest obracana o kąt obrotu Ziemi (GMST) w jej własnej chwili, więc jej długość geograficzna odpowiada śladowi naziemnemu. Satelity geosynchroniczne kurczą się do małych pętli, a niska orbita kreśli w 3D jeden przelot śladu naziemnego, co czyni ten układ najlepszym do badania zachowania względem Ziemi.",
         "howToUse": "<ol><li>Wybierz satelitę; ikona wtyczki w panelu jest nieaktywna, dopóki żaden nie jest wybrany.</li><li>Otwórz <strong>Wykres ECF</strong> z panelu (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D, i przewijaj, aby przybliżać; najedź na krzywą, aby zobaczyć wartości pozycji.</li></ol>",
         "tip1": "Ciasna ósemka satelity GEO w ECF to jego dobowy cykl inklinacji i mimośrodu; im ciaśniejsza pętla, tym lepsze utrzymywanie pozycji."
       },

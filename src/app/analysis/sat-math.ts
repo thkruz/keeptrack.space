@@ -30,7 +30,6 @@ import {
   BaseObject,
   DEG2RAD,
   Degrees,
-  ecef2eci,
   ecefRad2rae,
   eci2ecef,
   eci2lla,
@@ -55,7 +54,6 @@ import {
   SpaceObjectType,
   StateVectorSgp4,
   SunStatus,
-  TAU,
   TemeVec3,
   Vector3D,
 } from '@ootk/src/main';
@@ -579,13 +577,19 @@ export abstract class SatMath {
 
   /**
    * Calculates the ECF (Earth Centered Fixed) coordinates for a given number of points along a satellite's current orbit.
+   * Each ECI (TEME) sample is rotated into the Earth-fixed frame by GMST at that sample's own time, so the
+   * curve traces the orbit relative to the rotating Earth (its longitude matches the subpoint at that time).
    * @param sat The satellite object.
    * @param points The number of points to calculate along the orbit.
    * @param getOffsetTimeObj A function that returns a Date object with the specified offset from the current simulation time.
    * @returns An array of objects containing the ECF coordinates for each point along the orbit.
    */
   static getEcfOfCurrentOrbit(sat: Satellite, points: number, getOffsetTimeObj: (offset: number) => Date): { x: number; y: number; z: number }[] {
-    return SatMath.getOrbitPoints(sat, points, getOffsetTimeObj, (params: { eciPts: TemeVec3; angle: number }) => ecef2eci(params.eciPts, params.angle));
+    return SatMath.getOrbitPoints(sat, points, getOffsetTimeObj, (params: { eciPts: TemeVec3; offset: number }) => {
+      const { gmst } = SatMath.calculateTimeVariables(getOffsetTimeObj(params.offset));
+
+      return eci2ecef(params.eciPts, gmst);
+    });
   }
 
   /**
@@ -669,14 +673,7 @@ export abstract class SatMath {
     sat: Satellite,
     points: number,
     getOffsetTimeObj: (offset: number) => Date,
-    transformFunc: (params: {
-      eciPts: TemeVec3;
-      eciPts2: TemeVec3;
-      velPts: TemeVec3<KilometersPerSecond>;
-      velPts2: TemeVec3<KilometersPerSecond>;
-      angle: number;
-      offset: number;
-    }) => T,
+    transformFunc: (params: { eciPts: TemeVec3; eciPts2: TemeVec3; velPts: TemeVec3<KilometersPerSecond>; velPts2: TemeVec3<KilometersPerSecond>; offset: number }) => T,
     sat2?: Satellite,
     orbits = 1
   ): T[] {
@@ -685,7 +682,6 @@ export abstract class SatMath {
     for (let i = 0; i < points; i++) {
       const offset = ((i * sat.period * orbits) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
       const now = getOffsetTimeObj(offset);
-      const angle = (-i * (sat.period / points) * TAU) / sat.period;
       const eciPts = SatMath.getEci(sat, now).position;
       const velPts = SatMath.getEci(sat, now).velocity;
 
@@ -706,7 +702,7 @@ export abstract class SatMath {
         }
       }
 
-      orbitPoints.push(transformFunc({ eciPts, velPts, eciPts2, velPts2, angle, offset }));
+      orbitPoints.push(transformFunc({ eciPts, velPts, eciPts2, velPts2, offset }));
     }
 
     return orbitPoints;

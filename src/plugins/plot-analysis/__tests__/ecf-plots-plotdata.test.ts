@@ -1,5 +1,7 @@
 /* eslint-disable dot-notation */
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { EcfPlot } from '@app/plugins/plot-analysis/ecf-plots';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -14,7 +16,8 @@ describe('EcfPlot getPlotData / createPlot', () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const p = () => plugin as any;
 
-  const fakeSat = { name: 'SAT-A', period: 90 };
+  const fakeSat = { id: 0, name: 'SAT-A', period: 90 };
+  const otherSat = { id: 7, name: 'SAT-B', period: 120 };
 
   const stubEnv = () => {
     const catalog = ServiceLocator.getCatalogManager();
@@ -39,25 +42,103 @@ describe('EcfPlot getPlotData / createPlot', () => {
 
   afterEach(() => vi.restoreAllMocks());
 
-  it('builds plot data for the primary satellite only by default', () => {
+  it('a lone selected satellite is plotted once (no duplicate series)', () => {
     p().selectSatManager_.selectedSat = 0;
+    // lastSelectedSat() tracks the current primary; it must not add a second copy.
+    p().selectSatManager_.lastSelectedSat(0);
 
     const data = plugin.getPlotData();
 
-    // last-selected defaults to -1 and the ecf guard is `!== -1`, so only the primary is plotted.
     expect(data).toHaveLength(1);
     expect(data[0].name).toBe('SAT-A');
     expect(data[0].value![0]).toEqual([1, 2, 3, expect.any(String)]);
   });
 
-  it('adds series for the secondary and last-selected satellites', () => {
+  it('adds a second series only for a secondary that is a different object', () => {
     p().selectSatManager_.selectedSat = 0;
-    p().selectSatManager_.secondarySatObj = fakeSat;
-    p().selectSatManager_.lastSelectedSat(2);
+    p().selectSatManager_.secondarySatObj = otherSat;
+    p().selectSatManager_.lastSelectedSat(0);
 
     const data = plugin.getPlotData();
 
-    expect(data).toHaveLength(3);
+    expect(data.map((d) => d.name)).toEqual(['SAT-A', 'SAT-B']);
+  });
+
+  it('skips a secondary that is the primary itself', () => {
+    p().selectSatManager_.selectedSat = 0;
+    p().selectSatManager_.secondarySatObj = fakeSat;
+
+    expect(plugin.getPlotData()).toHaveLength(1);
+  });
+
+  it('labels each sample with its time over one period of that satellite', () => {
+    p().selectSatManager_.selectedSat = 0;
+    p().selectSatManager_.secondarySatObj = otherSat;
+
+    const [primary, secondary] = plugin.getPlotData();
+
+    expect(primary.value![0][3]).toBe(new Date(NOW).toISOString());
+    expect(primary.value![1][3]).toBe(new Date(NOW + ((90 * 60) / 100) * 1000).toISOString());
+    expect(secondary.value![1][3]).toBe(new Date(NOW + ((120 * 60) / 100) * 1000).toISOString());
+  });
+
+  it('returns no series when the primary is missing from the catalog', () => {
+    vi.mocked(ServiceLocator.getCatalogManager().getObject).mockReturnValue(null as never);
+    p().selectSatManager_.selectedSat = 0;
+
+    expect(plugin.getPlotData()).toEqual([]);
+  });
+
+  describe('selection changes while open', () => {
+    const mountCanvas = () => {
+      const canvas = document.createElement('div');
+
+      canvas.id = plugin.plotCanvasId;
+      document.body.appendChild(canvas);
+    };
+
+    beforeEach(() => {
+      plugin.addHtml();
+      mountCanvas();
+    });
+
+    afterEach(() => {
+      document.getElementById(plugin.plotCanvasId)?.remove();
+    });
+
+    it('redraws when a new primary is selected', () => {
+      p().selectSatManager_.selectedSat = 0;
+      const spy = vi.spyOn(plugin, 'createPlot');
+
+      EventBus.getInstance().emit(EventBusEvent.selectSatData, fakeSat as never, 0);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('redraws when the secondary changes', () => {
+      p().selectSatManager_.selectedSat = 0;
+      const spy = vi.spyOn(plugin, 'createPlot');
+
+      p().selectSatManager_.secondarySatObj = otherSat;
+      EventBus.getInstance().emit(EventBusEvent.setSecondarySat, otherSat as never, 7);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+      expect(spy.mock.calls[0][0].map((d) => d.name)).toEqual(['SAT-A', 'SAT-B']);
+    });
+
+    it('does not redraw while closed or after the primary is cleared', () => {
+      const spy = vi.spyOn(plugin, 'createPlot');
+
+      p().isMenuButtonActive = false;
+      p().selectSatManager_.selectedSat = 0;
+      EventBus.getInstance().emit(EventBusEvent.selectSatData, fakeSat as never, 0);
+
+      p().isMenuButtonActive = true;
+      p().selectSatManager_.selectedSat = -1;
+      EventBus.getInstance().emit(EventBusEvent.selectSatData, undefined as never, undefined as never);
+
+      expect(spy).not.toHaveBeenCalled();
+    });
   });
 
   it('renders the chart via echarts and exercises the tooltip formatter', () => {

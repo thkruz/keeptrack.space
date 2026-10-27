@@ -8,6 +8,8 @@ export enum StorageKey {
   SETTINGS_DOT_COLORS = 'v2-keepTrack-settings-dotColors',
   IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
   LAST_MAP = 'v2-keepTrack-earthTexture',
+  /** Id of the Earth style preset in effect (EarthPresetsPlugin); removed once the look is changed by hand. */
+  EARTH_PRESET = 'v2-keepTrack-earthPreset',
   COLOR_SCHEME = 'v2-keepTrack-colorScheme',
   SETTINGS_DRAW_CAMERA_WIDGET = 'v2-keepTrack-settings-drawCameraWidget',
   SETTINGS_DRAW_ORBITS = 'v2-keepTrack-settings-drawOrbits',

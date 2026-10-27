@@ -76,6 +76,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
 
   // --- Account: workspace/layout ----------------------------------------------
   [StorageKey.LAST_MAP]: StorageScope.Account,
+  [StorageKey.EARTH_PRESET]: StorageScope.Account,
   [StorageKey.COLOR_SCHEME]: StorageScope.Account,
   [StorageKey.COLOR_SCHEME_OVERRIDES]: StorageScope.Account,
   [StorageKey.LEGEND_HIDDEN_FLAGS]: StorageScope.Account,

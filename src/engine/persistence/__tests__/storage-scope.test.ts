@@ -96,6 +96,7 @@ describe('storage-scope registry', () => {
         StorageKey.SETTINGS_SEARCHABLE_FIELDS,
         StorageKey.SETTINGS_SEARCHABLE_TYPES,
         StorageKey.LAST_MAP,
+        StorageKey.EARTH_PRESET,
         StorageKey.COLOR_SCHEME,
         StorageKey.COLOR_SCHEME_OVERRIDES,
         StorageKey.LEGEND_HIDDEN_FLAGS,

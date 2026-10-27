@@ -77,6 +77,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   sizeOfSun: 'graphics',
   isUseSunTexture: 'graphics',
   isDrawNightAsDay: 'graphics',
+  isSkipTleInterpolation: 'graphics',
   isDisablePerformanceDowngrade: 'graphics',
   isDisableGodrays: 'graphics',
   godraysSamples: 'graphics',

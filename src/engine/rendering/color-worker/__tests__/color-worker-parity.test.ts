@@ -871,6 +871,8 @@ describe('ColorSchemeManager worker-mode delegation', () => {
       isReady: true,
       sendForceRecolor: vi.fn(),
       sendSettingsUpdate: vi.fn(),
+      // Every manager built by an earlier test still hears layerUpdated on the shared EventBus.
+      sendObjectTypeFlags: vi.fn(),
     };
 
     // eslint-disable-next-line dot-notation

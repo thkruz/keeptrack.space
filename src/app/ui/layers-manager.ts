@@ -180,17 +180,18 @@ export class LayersManager {
       layersHoverDom = getEl('layers-hover-menu-popup', true);
     }
 
-    if (!layersHoverDom) {
-      return;
-    }
+    // The legend popup is only built once it has been opened. Without it there is no legend to rewrite, but the
+    // flag reset and the layerUpdated event must still happen: listeners (e.g. Symbology turning itself off) rely
+    // on hearing every scheme change, and each of them tolerates a missing legend DOM.
+    if (layersHoverDom) {
+      // TODO there should be a setting that determines the defaults (Celestrak Rebase)
+      const option = LayersManager.menuOptions[menu];
+      const selectedOption = typeof option === 'function' ? option() : (option ?? ObjectTypeColorScheme.layersHtml);
 
-    // TODO there should be a setting that determines the defaults (Celestrak Rebase)
-    const option = LayersManager.menuOptions[menu];
-    const selectedOption = typeof option === 'function' ? option() : (option ?? ObjectTypeColorScheme.layersHtml);
-
-    layersHoverDom.innerHTML = selectedOption;
-    if (menu === 'clear') {
-      layersHoverDom.style.display = 'none';
+      layersHoverDom.innerHTML = selectedOption;
+      if (menu === 'clear') {
+        layersHoverDom.style.display = 'none';
+      }
     }
 
     // Update Layers Colors

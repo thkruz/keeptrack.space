@@ -264,6 +264,21 @@ describe('UrlManager.getShareUrl', () => {
     expect(UrlManager.getShareUrl(true, true)).toContain('date=2024-08-15T06:30:00.000Z');
   });
 
+  it('reads the rate from the time manager, so a clock paused by an incoming ?rate=0 stays paused in the link', () => {
+    const tm = ServiceLocator.getTimeManager();
+
+    // propRate_ is stale at 1: changePropRate(0) on an already-0 clock never emits propRateChanged.
+    Url.propRate_ = 1;
+    tm.propRate = 0;
+    expect(UrlManager.getShareUrl()).toMatch(/[?&]rate=0(?:&|$)/u);
+
+    tm.propRate = 1;
+    expect(UrlManager.getShareUrl()).not.toContain('rate=');
+
+    tm.propRate = 5;
+    expect(UrlManager.getShareUrl()).toContain('rate=5');
+  });
+
   it('does not navigate (leaves window.location unchanged)', () => {
     const before = window.location.href;
 

@@ -343,8 +343,14 @@ export abstract class UrlManager {
       }
     }
 
-    if (this.propRate_ < 0.99 || this.propRate_ > 1.01) {
-      paramSlices.push(`rate=${this.propRate_}`);
+    /*
+     * Read the rate from the time manager: propRate_ only updates on propRateChanged, which never fires when an
+     * incoming ?rate=0 pauses a clock that was already at 0 during boot, so the paused state was dropped.
+     */
+    const propRate = typeof timeManagerInstance?.propRate === 'number' && Number.isFinite(timeManagerInstance.propRate) ? timeManagerInstance.propRate : this.propRate_;
+
+    if (propRate < 0.99 || propRate > 1.01) {
+      paramSlices.push(`rate=${propRate}`);
     }
 
     const satParamValue = UrlManager.buildSatParamValue(this.selectedSat_);

@@ -135,6 +135,85 @@ describe('ShareMenuPlugin methods', () => {
   });
 });
 
+describe('ShareMenuPlugin live refresh while open', () => {
+  let plugin: ShareMenuPlugin;
+  let n = 0;
+  let spy: ReturnType<typeof vi.spyOn>;
+  const input = () => getEl(ShareMenuPlugin.URL_INPUT_ID) as HTMLInputElement;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new ShareMenuPlugin();
+    plugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    n = 0;
+    spy = vi.spyOn(UrlManager, 'getShareUrl').mockImplementation(() => `https://keeptrack.space/?n=${++n}`);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('rebuilds the link on selection, rate and search changes while open', () => {
+    plugin.isMenuButtonActive = true;
+    plugin.onBottomIconClick();
+    expect(input().value).toBe('https://keeptrack.space/?n=1');
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, null as never, -1);
+    expect(input().value).toBe('https://keeptrack.space/?n=2');
+
+    EventBus.getInstance().emit(EventBusEvent.propRateChanged, 0);
+    expect(input().value).toBe('https://keeptrack.space/?n=3');
+
+    EventBus.getInstance().emit(EventBusEvent.searchUpdated, '25544', 1, 1);
+    expect(input().value).toBe('https://keeptrack.space/?n=4');
+  });
+
+  it('does not rebuild while the menu is closed', () => {
+    plugin.isMenuButtonActive = false;
+
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, null as never, -1);
+    EventBus.getInstance().emit(EventBusEvent.propRateChanged, 2);
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+    vi.advanceTimersByTime(ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS * 2);
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('throttles sim-time rebuilds to one per window with a trailing rebuild', () => {
+    plugin.isMenuButtonActive = true;
+    vi.advanceTimersByTime(ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS);
+
+    // First time change rebuilds at once.
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // A burst inside the window is coalesced into one trailing rebuild.
+    for (let i = 0; i < 10; i++) {
+      EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+      EventBus.getInstance().emit(EventBusEvent.staticOffsetChange, i);
+    }
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS);
+    expect(spy).toHaveBeenCalledTimes(2);
+    expect(input().value).toBe('https://keeptrack.space/?n=2');
+  });
+
+  it('drops a pending trailing rebuild when the menu closes', () => {
+    plugin.isMenuButtonActive = true;
+    vi.advanceTimersByTime(ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS);
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+    EventBus.getInstance().emit(EventBusEvent.updateDateTime, new Date());
+
+    plugin.isMenuButtonActive = false;
+    vi.advanceTimersByTime(ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS);
+
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('ShareMenuPlugin clipboard failure', () => {
   beforeEach(() => {
     setupStandardEnvironment();

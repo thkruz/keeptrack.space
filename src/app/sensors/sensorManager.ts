@@ -617,7 +617,7 @@ export class SensorManager {
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;
-    const sunStatus = SatMath.calculateIsInSun(sensor, sunPos);
+    const sunStatus = SatMath.calculateGroundSiteSunStatus(sensorPos, sunPos);
 
     return {
       sunStatus,
@@ -629,9 +629,8 @@ export class SensorManager {
       return true;
     }
 
-    const status = this.sensorSunStatus_(now, sensor).sunStatus;
-
-    return status === SunStatus.UMBRAL || status === SunStatus.PENUMBRAL;
+    // Dark means the Sun is fully below the site's horizon, the same test Sensor Timeline and Look Angles use
+    return this.sensorSunStatus_(now, sensor).sunStatus === SunStatus.UMBRAL;
   }
 
   canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {

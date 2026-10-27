@@ -13,20 +13,23 @@ describe('SensorMath.checkIfVisibleForOptical', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('is visible when the ground station is in shadow and the satellite is sunlit', () => {
-    // First call = station status, second = satellite status.
-    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.UMBRAL).mockReturnValueOnce(SunStatus.SUN);
+    // The station uses the ground-site night test; calculateIsInSun is only asked about the satellite.
+    vi.spyOn(SatMath, 'isGroundSiteInNight').mockReturnValueOnce(true);
+    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.SUN);
 
     expect(SensorMath.checkIfVisibleForOptical(defaultSat, defaultSensor, new Date('2022-01-01T00:00:00Z'))).toBe(true);
   });
 
   it('is NOT visible when the station is also sunlit', () => {
-    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.SUN).mockReturnValueOnce(SunStatus.SUN);
+    vi.spyOn(SatMath, 'isGroundSiteInNight').mockReturnValueOnce(false);
+    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.SUN);
 
     expect(SensorMath.checkIfVisibleForOptical(defaultSat, defaultSensor, new Date('2022-01-01T00:00:00Z'))).toBe(false);
   });
 
   it('is NOT visible when the satellite is itself in shadow', () => {
-    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.PENUMBRAL).mockReturnValueOnce(SunStatus.UMBRAL);
+    vi.spyOn(SatMath, 'isGroundSiteInNight').mockReturnValueOnce(true);
+    vi.spyOn(SatMath, 'calculateIsInSun').mockReturnValueOnce(SunStatus.UMBRAL);
 
     expect(SensorMath.checkIfVisibleForOptical(defaultSat, defaultSensor, new Date('2022-01-01T00:00:00Z'))).toBe(false);
   });

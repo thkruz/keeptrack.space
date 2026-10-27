@@ -479,10 +479,8 @@ export class SensorMath {
     const sensorPos = lla2eci(sensor.llaRad(), gmst);
 
     sensor.position = sensorPos;
-    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
-    const satInSun = SatMath.calculateIsInSun(sat, sunPos);
 
-    // For optical sensors: check if the station is in darkness (umbral/penumbral) and the satellite is in sunlight - this means the satellite is visible
-    return (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) && satInSun === SunStatus.SUN;
+    // An optical sensor sees the satellite when the site is dark (Sun fully below its horizon) and the satellite is sunlit
+    return SatMath.isGroundSiteInNight(sensorPos, sunPos) && SatMath.calculateIsInSun(sat, sunPos) === SunStatus.SUN;
   }
 }

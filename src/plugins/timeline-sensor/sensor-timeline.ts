@@ -82,8 +82,6 @@ type WeatherDataInput = {
 
 export class SensorTimeline extends KeepTrackPlugin {
   readonly id = 'SensorTimeline';
-  /** Mean solar radius in km, for the sunset test in checkStationInNight. */
-  private static readonly SUN_RADIUS_KM_ = 695_700;
   dependencies_ = [SelectSatManager.name];
 
   /** Translated display label for a pass type drawn on the canvas. */
@@ -811,11 +809,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   /**
    * True when the Sun is below the site's horizon (its centre more than its own radius, about 0.27 deg, below it).
-   *
-   * This is a sun-elevation test, not SatMath.calculateIsInSun: that shadow model compares the point's distance from
-   * Earth's centre with the EQUATORIAL radius (6378.137 km), while lla2eci places sites on a 6371 km sphere, so every
-   * ground site sits "inside" the Earth, asin(R / r) is NaN and the site always reads as sunlit. That is why the
-   * Station in Eclipse row (and every optical Can Observe row) stayed empty.
+   * Delegates to SatMath.isGroundSiteInNight, the shared ground-site test used by Look Angles and SensorManager.
    */
   static checkStationInNight(now: Date, sensor: DetailedSensor): boolean {
     const lla = {
@@ -825,25 +819,11 @@ export class SensorTimeline extends KeepTrackPlugin {
     };
 
     const { gmst } = calcGmst(now);
-    const sunPos = Sun.eci(now);
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;
 
-    // Geocentric zenith of the site and the site-to-Sun direction
-    const r = Math.hypot(sensorPos.x, sensorPos.y, sensorPos.z);
-    const toSun = { x: sunPos.x - sensorPos.x, y: sunPos.y - sensorPos.y, z: sunPos.z - sensorPos.z };
-    const sunDist = Math.hypot(toSun.x, toSun.y, toSun.z);
-
-    if (r === 0 || sunDist === 0) {
-      return false;
-    }
-
-    const sinSunEl = (sensorPos.x * toSun.x + sensorPos.y * toSun.y + sensorPos.z * toSun.z) / (r * sunDist);
-    const sunEl = Math.asin(Math.min(1, Math.max(-1, sinSunEl)));
-    const sunAngularRadius = Math.asin(Math.min(1, SensorTimeline.SUN_RADIUS_KM_ / sunDist));
-
-    return sunEl < -sunAngularRadius;
+    return SatMath.isGroundSiteInNight(sensorPos, Sun.eci(now));
   }
 
   static checkSatinSun(now: Date, satellite: Satellite) {

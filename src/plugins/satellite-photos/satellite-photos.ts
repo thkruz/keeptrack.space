@@ -213,17 +213,17 @@ export class SatellitePhotos extends KeepTrackPlugin {
       url += `${url.includes('?') ? '&' : '?'}_=${Date.now()}`;
     }
 
-    SatellitePhotos.openImage_(url, title);
+    SatellitePhotos.openImage_(url, title, t7e('plugins.SatellitePhotos.errorMsgs.ImageLoadFailed').replace('{source}', source.label));
     this.showRefresh_();
   }
 
-  private static openImage_(url: string, title: string): void {
+  private static openImage_(url: string, title: string, imageErrorMessage: string): void {
     settingsManager.isPreventColorboxClose = true;
     setTimeout(() => {
       settingsManager.isPreventColorboxClose = false;
     }, 2000);
 
-    openColorbox(url, { title, image: true });
+    openColorbox(url, { title, image: true, imageErrorMessage });
   }
 
   private showRefresh_(): void {

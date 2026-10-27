@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR（L1）"
       },
       "errorMsgs": {
-        "FuturePictures": "无法加载未来的影像。正在加载最新影像。"
+        "FuturePictures": "无法加载未来的影像。正在加载最新影像。",
+        "ImageLoadFailed": "无法加载 {source} 图像"
       },
       "help": {
         "overview": "卫星影像显示真实气象卫星拍摄的最新照片：地球静止轨道上 MeteoSat、Himawari、GOES 和 Elektro-L 的全圆盘视图，以及位于 L1 点的 DSCOVR 拍摄的整个地球影像。它将您在模拟中看到的内容与这些卫星此刻正在实际拍摄的画面联系起来。",

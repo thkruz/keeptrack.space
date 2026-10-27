@@ -9,6 +9,11 @@ interface ColorboxOptions {
   title?: string;
   image?: boolean;
   callback?: () => void;
+  /**
+   * Toast shown when an image fails to load, e.g. one that names the image's source. The URL is
+   * still written to the console warning. Defaults to the generic "Failed to load image: {url}".
+   */
+  imageErrorMessage?: string;
 }
 
 let isColorBoxReady = false;
@@ -42,10 +47,14 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
   showLoading(() => {
     colorboxDom.style.display = 'block';
     if (options.image) {
-      setupImageColorbox_(url, () => {
-        slideInRight(getEl('colorbox-container'), 750);
-        hideLoading();
-      });
+      setupImageColorbox_(
+        url,
+        () => {
+          slideInRight(getEl('colorbox-container'), 750);
+          hideLoading();
+        },
+        options.imageErrorMessage
+      );
     } else {
       setupIframeColorbox_(url, () => {
         slideInRight(getEl('colorbox-container'), 750);
@@ -187,7 +196,7 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
 /**
  * Sets the colorbox to display an image
  */
-const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
+const setupImageColorbox_ = (url: string, onLoadCb: () => void, errorMessage?: string) => {
   const colorboxContainerDom = getEl('colorbox-container');
 
   if (!colorboxContainerDom) {
@@ -206,7 +215,12 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void) => {
   };
   // Catch failures to load images
   colorboxImage.onerror = () => {
-    errorManagerInstance.warn(t7e('errorMsgs.Colorbox.imageLoadFailed').replace('{url}', url));
+    if (errorMessage) {
+      // The toast names the source; the URL only goes to the console for debugging.
+      errorManagerInstance.warn(errorMessage, url);
+    } else {
+      errorManagerInstance.warn(t7e('errorMsgs.Colorbox.imageLoadFailed').replace('{url}', url));
+    }
     closeColorbox();
     hideLoading();
   };

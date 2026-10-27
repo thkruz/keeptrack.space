@@ -1,4 +1,5 @@
 import { openColorbox } from '@app/engine/utils/colorbox';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getElAll from '@app/engine/utils/get-el';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
@@ -120,6 +121,31 @@ describe('openColorbox_function', () => {
     const colorboxImg = <HTMLElement>getEl('colorbox-img');
 
     expect(colorboxImg.style.display).toBe('none');
+  });
+
+  // Image load failures toast the caller's message (e.g. naming the source) and keep the URL for the console
+  it('test_image_error_uses_custom_message', () => {
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    openColorbox('https://www.example.com/a.jpg', { image: true, imageErrorMessage: 'Could not load the Example image' });
+    vi.advanceTimersByTime(2000);
+    (<HTMLImageElement>getEl('colorbox-img')).onerror!(new Event('error'));
+
+    expect(warn).toHaveBeenCalledWith('Could not load the Example image', 'https://www.example.com/a.jpg');
+    warn.mockRestore();
+  });
+
+  // Without a custom message the generic text names the URL
+  it('test_image_error_default_message', () => {
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    openColorbox('https://www.example.com/b.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    (<HTMLImageElement>getEl('colorbox-img')).onerror!(new Event('error'));
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('https://www.example.com/b.jpg');
+    warn.mockRestore();
   });
 
   // Tests that colorbox is closed when clicked

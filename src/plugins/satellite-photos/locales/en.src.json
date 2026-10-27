@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "Can't load images from the future. Loading most recent imagery."
+        "FuturePictures": "Can't load images from the future. Loading most recent imagery.",
+        "ImageLoadFailed": "Could not load the {source} image"
       },
       "help": {
         "overview": "Satellite Imagery shows the most recent pictures taken by real weather satellites: full disk views from MeteoSat, Himawari, GOES, and Elektro-L in geostationary orbit, plus whole Earth images from DSCOVR out at the L1 point. It connects what you see in the simulation to what those satellites are actually photographing right now.",

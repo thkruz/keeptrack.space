@@ -89,6 +89,16 @@ describe('imagery-sources', () => {
       expect(goes19!.buildImage(new Date(), Date.now()).url).toContain('GOES19');
     });
 
+    it('Himawari-8 reports the UTC time of the slot it requests', () => {
+      const himawari = IMAGERY_SOURCES.find((s) => s.id === 'himawari8')!;
+      const real = Date.parse('2026-10-26T12:00:00Z');
+      const result = himawari.buildImage(new Date('2026-10-26T10:07:00Z'), real);
+
+      expect(result.url).toBe('https://himawari8.nict.go.jp/img/D531106/1d/550/2026/10/26/093000_0_0.png');
+      expect(result.timestampUtc).toBe(formatUtcTime(new Date('2026-10-26T09:30:00Z')));
+      expect(result.isFuture).toBe(false);
+    });
+
     it('no longer ships the decommissioned GOES-16 East feed', () => {
       expect(IMAGERY_SOURCES.find((s) => s.id === 'goes16')).toBeUndefined();
     });

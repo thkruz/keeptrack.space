@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "Nelze načíst snímky z budoucnosti. Načítám nejnovější snímky."
+        "FuturePictures": "Nelze načíst snímky z budoucnosti. Načítám nejnovější snímky.",
+        "ImageLoadFailed": "Nepodařilo se načíst snímek {source}"
       },
       "help": {
         "overview": "Satelitní snímky zobrazují nejnovější fotografie pořízené skutečnými meteorologickými satelity: snímky celého disku z družic MeteoSat, Himawari, GOES a Elektro-L na geostacionární dráze a snímky celé Země z DSCOVR v bodě L1. Propojují to, co vidíte v simulaci, s tím, co tyto satelity právě teď skutečně fotografují.",

@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR（L1）"
       },
       "errorMsgs": {
-        "FuturePictures": "未来の画像は読み込めません。最新の画像を読み込んでいます。"
+        "FuturePictures": "未来の画像は読み込めません。最新の画像を読み込んでいます。",
+        "ImageLoadFailed": "{source} の画像を読み込めませんでした"
       },
       "help": {
         "overview": "衛星画像は、実際の気象衛星が撮影した最新の写真を表示します。静止軌道上のMeteoSat、Himawari、GOES、Elektro-Lによる全球（フルディスク）画像と、L1点にあるDSCOVRによる地球全体の画像です。シミュレーションで見ているものと、それらの衛星が今まさに撮影しているものを結び付けます。",

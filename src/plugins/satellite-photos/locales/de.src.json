@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "Bilder aus der Zukunft können nicht geladen werden. Die neuesten Aufnahmen werden geladen."
+        "FuturePictures": "Bilder aus der Zukunft können nicht geladen werden. Die neuesten Aufnahmen werden geladen.",
+        "ImageLoadFailed": "Das Bild von {source} konnte nicht geladen werden"
       },
       "help": {
         "overview": "Satellitenbilder zeigt die neuesten Aufnahmen echter Wettersatelliten: Vollscheibenansichten von MeteoSat, Himawari, GOES und Elektro-L im geostationären Orbit sowie Aufnahmen der gesamten Erde von DSCOVR am L1-Punkt. So verbinden Sie das, was Sie in der Simulation sehen, mit dem, was diese Satelliten gerade tatsächlich fotografieren.",

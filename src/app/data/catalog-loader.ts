@@ -746,8 +746,13 @@ export class CatalogLoader {
   /**
    * Reloads the catalog from pre-built KeepTrackTLEFile data (with full metadata).
    * Use this when merging has already been done externally (e.g., against a cached catalog).
+   *
+   * @param vimpelCatalog Optional JSC Vimpel objects without a NORAD number, added through the
+   * same Vimpel pipeline as at boot (keyed by their own Vimpel id). Their TLEs all carry catalog
+   * number 00000, so passing them inside `data` collapses them onto one sccIndex slot and drops
+   * all but one.
    */
-  static async reloadCatalogFromData(data: KeepTrackTLEFile[]): Promise<void> {
+  static async reloadCatalogFromData(data: KeepTrackTLEFile[], vimpelCatalog: JsSat[] = []): Promise<void> {
     const { showLoadingSticky, hideLoading } = await import('../../engine/utils/showLoading');
     const { SelectSatManager } = await import('../../plugins/select-sat-manager/select-sat-manager');
     const { EventBus } = await import('../../engine/events/event-bus');
@@ -786,6 +791,7 @@ export class CatalogLoader {
 
       await CatalogLoader.parse({
         keepTrackTle: data,
+        ...(vimpelCatalog.length > 0 ? { vimpelCatalog: Promise.resolve(vimpelCatalog) } : {}),
       });
 
       dotsManager.initBuffers(colorSchemeManager.colorBuffer!);

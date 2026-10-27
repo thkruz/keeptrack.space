@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { SoundNames } from '@app/engine/audio/sounds';
-import { MenuMode, Singletons } from '@app/engine/core/interfaces';
+import { MenuMode, Singletons, ToastMsgType } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { KeepTrack } from '@app/keeptrack';
 import { TranslationKey, t7e } from '@app/locales/keys';
@@ -1183,13 +1183,9 @@ export abstract class KeepTrackPlugin {
       item.addEventListener('click', () => {
         if (item.classList.contains(KeepTrackPlugin.iconDisabledClassString)) {
           shake(item);
-          // Explain why, like the drawer footer does (explainDisabledUtilityIcon): sensor first,
-          // then satellite. The verify methods only toast; the action never runs from here.
-          if (!this.isRequireSensorSelected || this.verifySensorSelected()) {
-            if (this.isRequireSatelliteSelected) {
-              this.verifySatelliteSelected();
-            }
-          }
+          // Explain why, like the drawer footer does (explainDisabledUtilityIcon). Only toasts;
+          // the action never runs from here.
+          this.explainDisabledIcon();
 
           return;
         }
@@ -1258,6 +1254,50 @@ export abstract class KeepTrackPlugin {
 
     this.setBottomIconToDisabled(isHideSideMenus);
     this.setBottomIconToUnselected(isHideSideMenus);
+  }
+
+  /**
+   * Why this plugin's icon is disabled, for gates other than the sensor/satellite
+   * selection (e.g. "Add satellites to the watchlist first"). Override it in a
+   * plugin that disables its own icon; null means no explanation.
+   */
+  getDisabledReason(): string | null {
+    return null;
+  }
+
+  /**
+   * Explain a click on the disabled icon without running the action: the
+   * missing sensor first, then the missing satellite, then the plugin's own
+   * getDisabledReason(). Shared by the drawer item, the drawer footer and the
+   * utility panel icon.
+   * @returns true when a message was shown.
+   */
+  explainDisabledIcon(): boolean {
+    if (this.isRequireSensorSelected && !this.verifySensorSelected()) {
+      return true;
+    }
+
+    if (this.isRequireSatelliteSelected && !this.verifySatelliteSelected()) {
+      return true;
+    }
+
+    return this.explainDisabledReason();
+  }
+
+  /**
+   * Toasts getDisabledReason() when the plugin has one.
+   * @returns true when a message was shown.
+   */
+  explainDisabledReason(): boolean {
+    const reason = this.getDisabledReason();
+
+    if (!reason) {
+      return false;
+    }
+
+    ServiceLocator.getUiManager().toast(reason, ToastMsgType.caution);
+
+    return true;
   }
 
   setBottomIconToDisabled(isHideSideMenus = true): void {

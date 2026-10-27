@@ -24,6 +24,7 @@ import {
   type DrawerItemData,
   drawerItemPluginId,
   drawerItemsForPluginSelector,
+  explainDisabledPluginReason,
   explainDisabledUtilityIcon,
   loadRecents,
   type RecentEntry,
@@ -404,14 +405,14 @@ export class PluginDrawer {
         const topMenuId = itemEl.dataset.topMenuId;
 
         // A disabled item should explain itself rather than silently ignore the
-        // click. Shake it for feedback, and for a plugin item forward the click
-        // so the plugin's onBottomIconClick can toast *why* it is unavailable
-        // (e.g. "add a satellite to the watchlist"). The base handler's
-        // isIconDisabled guard keeps the side menu from opening, matching the
-        // bottom-bar behavior; the drawer stays open so the hint is visible.
+        // click. Shake it for feedback. A plugin with a reason for its disabled
+        // state (getDisabledReason, e.g. "add satellites to the watchlist") toasts
+        // it here; otherwise forward the click so the plugin's onBottomIconClick
+        // can explain. The base handler's isIconDisabled guard keeps the side
+        // menu from opening; the drawer stays open so the hint is visible.
         if (itemEl.classList.contains('disabled')) {
           shake(itemEl);
-          if (pluginId) {
+          if (pluginId && !explainDisabledPluginReason(pluginId)) {
             EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, pluginId);
           }
 

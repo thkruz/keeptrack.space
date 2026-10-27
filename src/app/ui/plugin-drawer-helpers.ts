@@ -442,37 +442,31 @@ export function syncBadgesFromEvents(updateBadgeFn: (id: string, badge: DrawerBa
 /**
  * Explain a click on a disabled utility icon instead of swallowing it.
  *
- * The icon shakes, and when its plugin is disabled because it needs a selection
- * (`isRequireSensorSelected` / `isRequireSatelliteSelected`) the plugin's own
- * verify method shows the matching "Select a ... first!" toast. Nothing is
- * emitted, so the action itself never runs from a disabled icon.
- * @returns true when a "needs selection" message was shown.
+ * The icon shakes, and its plugin explains why it is disabled
+ * (KeepTrackPlugin.explainDisabledIcon): the matching "Select a ... first!"
+ * toast when it needs a selection, else the plugin's own getDisabledReason().
+ * Nothing is emitted, so the action itself never runs from a disabled icon.
+ * @returns true when a message was shown.
  */
 export function explainDisabledUtilityIcon(iconEl: HTMLElement): boolean {
   shake(iconEl);
 
   const bottomIconId = iconEl.dataset.pluginId;
 
-  if (!bottomIconId) {
-    return false;
-  }
+  return bottomIconId ? (findPluginByBottomIcon_(bottomIconId)?.explainDisabledIcon() ?? false) : false;
+}
 
-  const plugin = PluginRegistry.plugins.find((p) => p.bottomIconElementName === bottomIconId);
+function findPluginByBottomIcon_(bottomIconId: string) {
+  return PluginRegistry.plugins.find((p) => p.bottomIconElementName === bottomIconId);
+}
 
-  if (!plugin) {
-    return false;
-  }
-
-  // Same order as the base bottomMenuClick handler: sensor first, then satellite.
-  if (plugin.isRequireSensorSelected && !plugin.verifySensorSelected()) {
-    return true;
-  }
-
-  if (plugin.isRequireSatelliteSelected && !plugin.verifySatelliteSelected()) {
-    return true;
-  }
-
-  return false;
+/**
+ * Toasts the plugin's own reason for its disabled state (getDisabledReason),
+ * without the sensor/satellite checks the base click handler already makes.
+ * @returns true when a message was shown.
+ */
+export function explainDisabledPluginReason(bottomIconId: string): boolean {
+  return findPluginByBottomIcon_(bottomIconId)?.explainDisabledReason() ?? false;
 }
 
 // ---- Utility Footer Sync ----

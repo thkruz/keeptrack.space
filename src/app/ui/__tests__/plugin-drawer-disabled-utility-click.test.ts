@@ -1,6 +1,8 @@
 import { explainDisabledUtilityIcon } from '@app/app/ui/plugin-drawer-helpers';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -17,6 +19,10 @@ describe('explainDisabledUtilityIcon', () => {
     isRequireSensorSelected: false,
     verifySatelliteSelected: vi.fn(() => false),
     verifySensorSelected: vi.fn(() => true),
+    getDisabledReason: vi.fn((): string | null => null),
+    // The real shared explanation logic, run against this plugin shape.
+    explainDisabledIcon: KeepTrackPlugin.prototype.explainDisabledIcon,
+    explainDisabledReason: KeepTrackPlugin.prototype.explainDisabledReason,
     ...over,
   });
 
@@ -80,6 +86,29 @@ describe('explainDisabledUtilityIcon', () => {
 
     PluginRegistry.addPlugin(satisfied as never);
     expect(explainDisabledUtilityIcon(makeIcon('satellite-fixed-bottom-icon'))).toBe(false);
+  });
+
+  it('toasts the plugin reason for a gate other than a selection (Overflight: empty watchlist)', () => {
+    const plugin = makePlugin({ isRequireSatelliteSelected: false, getDisabledReason: vi.fn(() => 'Add satellites to the watchlist first') });
+
+    PluginRegistry.addPlugin(plugin as never);
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+    const emit = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    expect(explainDisabledUtilityIcon(makeIcon('satellite-fixed-bottom-icon'))).toBe(true);
+    expect(toast).toHaveBeenCalledWith('Add satellites to the watchlist first', expect.anything());
+    expect(emit).not.toHaveBeenCalled();
+  });
+
+  it('a missing selection wins over the plugin reason, so only one message shows', () => {
+    const plugin = makePlugin({ getDisabledReason: vi.fn(() => 'Other reason') });
+
+    PluginRegistry.addPlugin(plugin as never);
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+
+    expect(explainDisabledUtilityIcon(makeIcon('satellite-fixed-bottom-icon'))).toBe(true);
+    expect(plugin.getDisabledReason).not.toHaveBeenCalled();
+    expect(toast).not.toHaveBeenCalledWith('Other reason', expect.anything());
   });
 
   it('ignores icons with no plugin id or an unknown plugin', () => {

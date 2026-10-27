@@ -379,6 +379,7 @@
     "removeItem": "Удалить {label}"
   },
   "colorbox": {
-    "openInNewTab": "Открыть в новой вкладке"
+    "openInNewTab": "Открыть в новой вкладке",
+    "blankPageHint": "Страница пуста? Откройте её в новой вкладке."
   }
 }

@@ -379,6 +379,7 @@
     "removeItem": "Usuń {label}"
   },
   "colorbox": {
-    "openInNewTab": "Otwórz w nowej karcie"
+    "openInNewTab": "Otwórz w nowej karcie",
+    "blankPageHint": "Pusta strona? Otwórz ją w nowej karcie."
   }
 }

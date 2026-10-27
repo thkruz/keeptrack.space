@@ -662,6 +662,7 @@
     "removeItem": "{label} entfernen"
   },
   "colorbox": {
-    "openInNewTab": "In neuem Tab öffnen"
+    "openInNewTab": "In neuem Tab öffnen",
+    "blankPageHint": "Seite leer? In neuem Tab öffnen."
   }
 }

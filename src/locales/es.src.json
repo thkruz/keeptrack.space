@@ -379,6 +379,7 @@
     "removeItem": "Quitar {label}"
   },
   "colorbox": {
-    "openInNewTab": "Abrir en una pestaña nueva"
+    "openInNewTab": "Abrir en una pestaña nueva",
+    "blankPageHint": "¿Página en blanco? Ábrala en una pestaña nueva."
   }
 }

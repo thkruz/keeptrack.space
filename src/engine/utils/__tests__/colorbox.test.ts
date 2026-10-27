@@ -1,4 +1,4 @@
-import { openColorbox } from '@app/engine/utils/colorbox';
+import { createColorbox, openColorbox } from '@app/engine/utils/colorbox';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getElAll from '@app/engine/utils/get-el';
 import { getEl } from '@app/engine/utils/get-el';
@@ -163,5 +163,81 @@ describe('openColorbox_function', () => {
     vi.advanceTimersByTime(1000);
 
     expect(cb).toHaveBeenCalled();
+  });
+});
+
+describe('colorbox new tab and blank-page hint', () => {
+  beforeEach(() => {
+    KeepTrack.getInstance().containerRoot = document.body as HTMLDivElement;
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+    createColorbox();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const hint = () => <HTMLElement>getEl('colorbox-hint');
+  const openButton = () => <HTMLButtonElement>getEl('colorbox-open-button');
+
+  it('opens the iframe source in a new tab with noopener,noreferrer', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    openButton().click();
+
+    expect(open).toHaveBeenCalledWith('https://www.example.com/page.htm', '_blank', 'noopener,noreferrer');
+  });
+
+  it('opens an image source in a new tab with noopener,noreferrer', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    openColorbox('https://www.example.com/a.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    openButton().click();
+
+    expect(open).toHaveBeenCalledWith('https://www.example.com/a.jpg', '_blank', 'noopener,noreferrer');
+  });
+
+  it('the new-tab button follows the iframe again after an image colorbox', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    openColorbox('https://www.example.com/a.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    openButton().click();
+
+    expect(open).toHaveBeenLastCalledWith('https://www.example.com/page.htm', '_blank', 'noopener,noreferrer');
+  });
+
+  it('shows the blank-page hint for an external iframe', () => {
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+
+    expect(hint().style.display).toBe('inline');
+    expect(hint().textContent).toBe('Page blank? Open it in a new tab.');
+  });
+
+  it('hides the hint for a same-origin iframe and for images', () => {
+    openColorbox(`${window.location.origin}/local.html`);
+    vi.advanceTimersByTime(2000);
+    expect(hint().style.display).toBe('none');
+
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    openColorbox('https://www.example.com/a.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    expect(hint().style.display).toBe('none');
+  });
+
+  it('a click on the hint does not close the colorbox', () => {
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    hint().click();
+    vi.advanceTimersByTime(1000);
+
+    expect((<HTMLElement>getEl('colorbox-div')).style.display).toBe('block');
   });
 });

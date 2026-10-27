@@ -31,7 +31,7 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
   }
 
   const handleClick = (event: MouseEvent) => {
-    if (event.target === colorboxHeader) {
+    if (event.target === colorboxHeader || event.target === getEl('colorbox-hint', true)) {
       return;
     }
 
@@ -146,9 +146,23 @@ export const createColorbox = () => {
     const iframe = <HTMLIFrameElement>getEl('colorbox-iframe');
 
     if (iframe?.src) {
-      window.open(iframe.src, '_blank');
+      openInNewTab_(iframe.src);
     }
   };
+
+  // External pages can refuse to be framed or fail to load, and a cross-origin iframe gives no reliable
+  // error event, so external iframes show this hint next to the new-tab control (see setupIframeColorbox_).
+  const hint = document.createElement('span');
+
+  hint.id = 'colorbox-hint';
+  hint.textContent = t7e('colorbox.blankPageHint');
+  hint.style.display = 'none';
+  hint.style.alignSelf = 'center';
+  hint.style.whiteSpace = 'nowrap';
+  hint.style.marginRight = '8px';
+  hint.style.fontSize = '0.85rem';
+  hint.style.opacity = '0.85';
+  headerDiv.appendChild(hint);
   headerDiv.appendChild(openButton);
   colorboxContainer.appendChild(headerDiv);
 
@@ -179,6 +193,17 @@ const setupIframeColorbox_ = (url: string, onLoadCb: () => void) => {
   const colorboxIframe = <HTMLIFrameElement>getEl('colorbox-iframe');
 
   colorboxIframe.style.display = 'block';
+  setHintVisible_(isExternalUrl_(url));
+  const openButton = getEl('colorbox-open-button', true);
+
+  if (openButton) {
+    // An earlier image colorbox may have pointed the button at its image
+    openButton.onclick = () => {
+      if (colorboxIframe?.src) {
+        openInNewTab_(colorboxIframe.src);
+      }
+    };
+  }
   // Catch failures to load
   (<HTMLImageElement>getEl('colorbox-img')).onerror = () => {
     errorManagerInstance.warn(t7e('errorMsgs.Colorbox.loadFailed').replace('{url}', url));
@@ -207,6 +232,7 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void, errorMessage?: s
 
   colorboxContainerDom.style.transform = 'translateX(-200%)';
   (<HTMLIFrameElement>getEl('colorbox-iframe')).style.display = 'none';
+  setHintVisible_(false);
   const colorboxImage = <HTMLImageElement>getEl('colorbox-img');
 
   colorboxImage.style.display = 'block';
@@ -231,8 +257,33 @@ const setupImageColorbox_ = (url: string, onLoadCb: () => void, errorMessage?: s
   if (openButton) {
     openButton.onclick = () => {
       if (colorboxImage?.src) {
-        window.open(colorboxImage.src, '_blank');
+        openInNewTab_(colorboxImage.src);
       }
     };
+  }
+};
+
+/**
+ * Opens a colorbox source in a new tab. noopener/noreferrer keep the (often external) page from reaching
+ * back into KeepTrack through window.opener (reverse tabnabbing) and from receiving our URL as referrer.
+ */
+const openInNewTab_ = (url: string): void => {
+  window.open(url, '_blank', 'noopener,noreferrer');
+};
+
+/** True when the URL points at another origin than the app (a page KeepTrack does not control). */
+const isExternalUrl_ = (url: string): boolean => {
+  try {
+    return new URL(url, window.location.href).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
+};
+
+const setHintVisible_ = (isVisible: boolean): void => {
+  const hint = getEl('colorbox-hint', true);
+
+  if (hint) {
+    hint.style.display = isVisible ? 'inline' : 'none';
   }
 };

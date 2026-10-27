@@ -379,6 +379,7 @@
     "removeItem": "{label} を削除"
   },
   "colorbox": {
-    "openInNewTab": "新しいタブで開く"
+    "openInNewTab": "新しいタブで開く",
+    "blankPageHint": "ページが空白ですか？新しいタブで開いてください。"
   }
 }

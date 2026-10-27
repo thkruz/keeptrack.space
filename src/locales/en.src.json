@@ -374,6 +374,7 @@
     "removeItem": "Remove {label}"
   },
   "colorbox": {
-    "openInNewTab": "Open in new tab"
+    "openInNewTab": "Open in new tab",
+    "blankPageHint": "Page blank? Open it in a new tab."
   }
 }

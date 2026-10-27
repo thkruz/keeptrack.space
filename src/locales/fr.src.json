@@ -379,6 +379,7 @@
     "removeItem": "Retirer {label}"
   },
   "colorbox": {
-    "openInNewTab": "Ouvrir dans un nouvel onglet"
+    "openInNewTab": "Ouvrir dans un nouvel onglet",
+    "blankPageHint": "Page vide ? Ouvrez-la dans un nouvel onglet."
   }
 }

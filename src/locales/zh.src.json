@@ -379,6 +379,7 @@
     "removeItem": "移除 {label}"
   },
   "colorbox": {
-    "openInNewTab": "在新标签页中打开"
+    "openInNewTab": "在新标签页中打开",
+    "blankPageHint": "页面空白？请在新标签页中打开。"
   }
 }

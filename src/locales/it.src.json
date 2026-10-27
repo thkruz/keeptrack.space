@@ -379,6 +379,7 @@
     "removeItem": "Rimuovi {label}"
   },
   "colorbox": {
-    "openInNewTab": "Apri in una nuova scheda"
+    "openInNewTab": "Apri in una nuova scheda",
+    "blankPageHint": "Pagina vuota? Aprila in una nuova scheda."
   }
 }

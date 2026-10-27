@@ -379,6 +379,7 @@
     "removeItem": "{label} 제거"
   },
   "colorbox": {
-    "openInNewTab": "새 탭에서 열기"
+    "openInNewTab": "새 탭에서 열기",
+    "blankPageHint": "페이지가 비어 있나요? 새 탭에서 여세요."
   }
 }

@@ -379,6 +379,7 @@
     "removeItem": "Odebrat {label}"
   },
   "colorbox": {
-    "openInNewTab": "Otevřít na nové kartě"
+    "openInNewTab": "Otevřít na nové kartě",
+    "blankPageHint": "Prázdná stránka? Otevřete ji na nové kartě."
   }
 }

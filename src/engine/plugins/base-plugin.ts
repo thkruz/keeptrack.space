@@ -27,7 +27,6 @@ import { BottomIconComponent } from './components/bottom-icon/bottom-icon-compon
 import { ContextMenuComponent } from './components/context-menu/context-menu-component';
 import { HelpComponent } from './components/help/help-component';
 import { KeyboardComponent } from './components/keyboard/keyboard-component';
-import { SideMenuComponent } from './components/side-menu/side-menu-component';
 
 export { default as fileExcelPng } from '@public/img/icons/file-excel.png';
 
@@ -413,11 +412,6 @@ export abstract class KeepTrackPlugin {
   protected bottomIconComponent_: BottomIconComponent | null = null;
 
   /**
-   * Side menu component instance (when using composition pattern).
-   */
-  protected sideMenuComponent_: SideMenuComponent | null = null;
-
-  /**
    * Context menu component instance (when using composition pattern).
    */
   protected contextMenuComponent_: ContextMenuComponent | null = null;
@@ -539,19 +533,7 @@ export abstract class KeepTrackPlugin {
       if (config.dragOptions) {
         this.dragOptions = config.dragOptions as ClickDragOptions;
       }
-
-      this.sideMenuComponent_ = new SideMenuComponent(this.id, config, {
-        onOpen: () => {
-          if ('onSideMenuOpen' in this && typeof this.onSideMenuOpen === 'function') {
-            this.onSideMenuOpen();
-          }
-        },
-        onClose: () => {
-          if ('onSideMenuClose' in this && typeof this.onSideMenuClose === 'function') {
-            this.onSideMenuClose();
-          }
-        },
-      });
+      // addHtml() builds the panel from these legacy properties and openSideMenu() calls onSideMenuOpen.
     }
 
     /*
@@ -1577,6 +1559,12 @@ export abstract class KeepTrackPlugin {
 
     if (this.isRenderPausedOnOpen) {
       KeepTrack.getInstance().engine.pause();
+    }
+
+    // Every open path (bottom icon, palette, shortcut, direct calls) ends here, legacy and
+    // getSideMenuConfig plugins alike, so this is the one place onSideMenuOpen fires.
+    if ('onSideMenuOpen' in this && typeof this.onSideMenuOpen === 'function') {
+      this.onSideMenuOpen();
     }
   }
 

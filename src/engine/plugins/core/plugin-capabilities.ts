@@ -211,14 +211,11 @@ export interface ISideMenuCapable {
   getSideMenuConfig(): ISideMenuConfig;
 
   /**
-   * Called when the side menu is opened.
+   * Called once each time the side menu opens, by any path (bottom icon, command palette,
+   * keyboard shortcut, or a direct openSideMenu() call). KeepTrackPlugin.openSideMenu() is the
+   * only caller. For the close side, use onBottomIconDeselect().
    */
   onSideMenuOpen?(): void;
-
-  /**
-   * Called when the side menu is closed.
-   */
-  onSideMenuClose?(): void;
 }
 
 // ============================================================================

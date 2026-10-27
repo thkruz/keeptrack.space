@@ -27,5 +27,3 @@ export * from './context-menu';
 export * from './help';
 // Keyboard Component
 export * from './keyboard';
-// Side Menu Component
-export * from './side-menu';

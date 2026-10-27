@@ -45,7 +45,8 @@
         "tip3": "Kratší intervaly výpočtu zachytí i krátké přelety, ale výpočet trvá déle; 30 sekund je dobrý kompromis pro 24hodinové okno."
       },
       "errorMsgs": {
-        "sensorListMissing": "Seznam senzorů nebyl nalezen"
+        "sensorListMissing": "Seznam senzorů nebyl nalezen",
+        "invalidSetting": "{setting} musí být číslo větší než nula."
       }
     }
   }

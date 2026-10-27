@@ -16,7 +16,8 @@
         "noPasses": "Aucun passage"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Ajoutez des satellites à la liste ou sélectionnez un satellite"
+        "addSatellitesOrSelect": "Ajoutez des satellites à la liste ou sélectionnez un satellite",
+        "invalidSetting": "{setting} doit être un nombre supérieur à zéro."
       },
       "help": {
         "overview": "La Chronologie Satellite est l'image miroir de la Chronologie Capteur : elle montre quand un capteur sélectionné peut voir une liste de satellites. Chaque ligne est un satellite de votre liste de suivi (ou le satellite actuellement sélectionné) et chaque barre colorée est un passage, ce qui permet de planifier les observations d'un seul site sur de nombreuses cibles.",

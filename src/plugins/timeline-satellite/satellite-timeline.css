@@ -19,3 +19,11 @@
 }
 
 #satellite-timeline-menu-secondary .input-field input:focus-visible { outline: none; }
+
+/* Settings panel stacking (same fix as Sensor Timeline): the global rule puts secondary panels at z-index 4, under
+ * this full-width timeline (z-index 5), and the panel opens at x 0 under the drawer rail. Lift it above the timeline
+ * and start it at the rail's right edge so mouse clicks reach it. */
+#satellite-timeline-menu-secondary.side-menu-parent {
+  z-index: 6 !important;
+  left: var(--drawer-offset, 0px) !important;
+}

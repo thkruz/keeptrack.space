@@ -45,7 +45,8 @@
         "tip3": "Intervalli di calcolo più brevi catturano i passaggi rapidi ma richiedono più tempo di calcolo; 30 secondi sono un buon equilibrio per una finestra di 24 ore."
       },
       "errorMsgs": {
-        "sensorListMissing": "Elenco dei sensori non trovato"
+        "sensorListMissing": "Elenco dei sensori non trovato",
+        "invalidSetting": "{setting} deve essere un numero maggiore di zero."
       }
     }
   }

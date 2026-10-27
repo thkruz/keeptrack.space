@@ -45,7 +45,8 @@
         "tip3": "Shorter calculation intervals catch brief passes but take longer to compute; 30 seconds is a good balance for a 24 hour window."
       },
       "errorMsgs": {
-        "sensorListMissing": "Could not find the sensor list"
+        "sensorListMissing": "Could not find the sensor list",
+        "invalidSetting": "{setting} must be a number greater than zero."
       }
     }
   }

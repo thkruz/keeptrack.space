@@ -45,7 +45,8 @@
         "tip3": "Des intervalles de calcul plus courts détectent les passages brefs mais prennent plus de temps à calculer ; 30 secondes est un bon compromis pour une fenêtre de 24 heures."
       },
       "errorMsgs": {
-        "sensorListMissing": "Liste des capteurs introuvable"
+        "sensorListMissing": "Liste des capteurs introuvable",
+        "invalidSetting": "{setting} doit être un nombre supérieur à zéro."
       }
     }
   }

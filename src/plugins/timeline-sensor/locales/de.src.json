@@ -45,7 +45,8 @@
         "tip3": "Kürzere Berechnungsintervalle erfassen auch kurze Durchgänge, brauchen aber länger; 30 Sekunden sind ein guter Kompromiss für ein 24-Stunden-Fenster."
       },
       "errorMsgs": {
-        "sensorListMissing": "Die Sensorliste wurde nicht gefunden"
+        "sensorListMissing": "Die Sensorliste wurde nicht gefunden",
+        "invalidSetting": "{setting} muss eine Zahl größer als null sein."
       }
     }
   }

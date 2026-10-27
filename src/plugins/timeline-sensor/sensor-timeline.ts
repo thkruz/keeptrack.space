@@ -15,6 +15,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { readPositiveNumberInput } from '@app/engine/utils/positive-number-input';
 import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import {
@@ -81,6 +82,8 @@ type WeatherDataInput = {
 
 export class SensorTimeline extends KeepTrackPlugin {
   readonly id = 'SensorTimeline';
+  /** Mean solar radius in km, for the sunset test in checkStationInNight. */
+  private static readonly SUN_RADIUS_KM_ = 695_700;
   dependencies_ = [SelectSatManager.name];
 
   /** Translated display label for a pass type drawn on the canvas. */
@@ -295,7 +298,7 @@ export class SensorTimeline extends KeepTrackPlugin {
           const formattedStart = pass.start.toISOString(); // Convert Date to ISO string
           const formattedEnd = pass.end.toISOString(); // Convert Date to ISO string
 
-          return `${sensorPass.sensor.sensorId},${sensorPass.sensor.objName},${formattedStart},${formattedEnd}`;
+          return `${sensorPass.sensor.sensorId},${SensorTimeline.csvField_(SensorTimeline.sensorDisplayName_(sensorPass.sensor))},${formattedStart},${formattedEnd}`;
         })
       )
       .join('\n');
@@ -305,6 +308,16 @@ export class SensorTimeline extends KeepTrackPlugin {
 
     return csvData;
   };
+
+  /** The name the timeline draws for a sensor (uiName), falling back to the short and internal names. */
+  private static sensorDisplayName_(sensor: DetailedSensor): string {
+    return sensor.uiName ?? sensor.shortName ?? sensor.objName ?? '';
+  }
+
+  /** Quote a CSV field when it holds a comma, quote or line break. */
+  private static csvField_(value: string): string {
+    return /[",\n\r]/u.test(value) ? `"${value.replace(/"/gu, '""')}"` : value;
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -319,29 +332,38 @@ export class SensorTimeline extends KeepTrackPlugin {
       this.ctx_ = this.canvas_.getContext('2d') as CanvasRenderingContext2D;
       this.ctxStatic_ = this.canvasStatic_!.getContext('2d') as CanvasRenderingContext2D;
 
-      getEl('sensor-timeline-setting-total-length')!.addEventListener('change', () => {
-        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-total-length')).value) as Hours;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
-
-      getEl('sensor-timeline-setting-interval')!.addEventListener('change', () => {
-        this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-interval')).value) as Seconds;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
-
-      getEl('sensor-timeline-setting-bad-length')!.addEventListener('change', () => {
-        this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-bad-length')).value) as Seconds;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
-
-      getEl('sensor-timeline-setting-avg-length')!.addEventListener('change', () => {
-        this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('sensor-timeline-setting-avg-length')).value) as Seconds;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
+      this.bindNumberSetting_(
+        'sensor-timeline-setting-total-length',
+        'calculationLength',
+        () => this.lengthOfLookAngles_,
+        (v) => {
+          this.lengthOfLookAngles_ = v as Hours;
+        }
+      );
+      this.bindNumberSetting_(
+        'sensor-timeline-setting-interval',
+        'calculationInterval',
+        () => this.angleCalculationInterval_,
+        (v) => {
+          this.angleCalculationInterval_ = v as Seconds;
+        }
+      );
+      this.bindNumberSetting_(
+        'sensor-timeline-setting-bad-length',
+        'badPassLength',
+        () => this.lengthOfBadPass_,
+        (v) => {
+          this.lengthOfBadPass_ = v as Seconds;
+        }
+      );
+      this.bindNumberSetting_(
+        'sensor-timeline-setting-avg-length',
+        'avgPassLength',
+        () => this.lengthOfAvgPass_,
+        (v) => {
+          this.lengthOfAvgPass_ = v as Seconds;
+        }
+      );
 
       getEl('sensor-timeline-toggle')!.addEventListener('change', () => {
         this.detailedPlot = (<HTMLInputElement>getEl('sensor-timeline-toggle')).checked;
@@ -354,6 +376,27 @@ export class SensorTimeline extends KeepTrackPlugin {
         this.ctxStatic_.reset();
         this.updateTimeline();
       });
+    });
+  }
+
+  /**
+   * Wire a numeric settings field: a number greater than zero recalculates the plot; anything else toasts, restores
+   * the previous value and leaves the plot alone (an interval of 0 used to loop forever, text gave NaN dates).
+   */
+  private bindNumberSetting_(inputId: string, labelKey: string, get: () => number, set: (value: number) => void): void {
+    const input = getEl(inputId) as HTMLInputElement;
+
+    input.addEventListener('change', () => {
+      const label = t7e(`plugins.SensorTimeline.labels.${labelKey}` as Parameters<typeof t7e>[0]);
+      const value = readPositiveNumberInput(input, get(), t7e('plugins.SensorTimeline.errorMsgs.invalidSetting').replace('{setting}', label));
+
+      if (value === null) {
+        return;
+      }
+
+      set(value);
+      this.ctxStatic_.reset();
+      this.updateTimeline();
     });
   }
 
@@ -510,13 +553,17 @@ export class SensorTimeline extends KeepTrackPlugin {
       weatherDataForAllSensors = this.enabledSensors_.map((sensor) => {
         const idx = weatherDataInput.findIndex((weather) => weather.id === sensor.sensorId);
 
+        // A failed forecast fetch returns null: the sensor's weather is then unknown, which is not a reason to stop drawing
         if (idx !== -1) {
-          return weatherDataOutput![idx];
+          return weatherDataOutput?.[idx] ?? null;
         }
 
         return null;
       }) as weatherReport[]; // We will only use this if it is not empty
     }
+
+    // Satellite sunlight does not depend on the sensor: compute it once for the whole window (only drawn in Detailed Plot)
+    const satInSunPasses = this.detailedPlot ? SensorTimeline.calculateSatInSunPasses(satellite, startDate, endDate, this.angleCalculationInterval_) : [];
 
     // Loop through all the enabled sensors and calculate the passes
     for (const [i, sensor] of this.enabledSensors_.entries()) {
@@ -533,7 +580,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       const SatinSuns: Passes = {
         sensor,
         type: PassTypes.SAT_IN_SUN,
-        passes: [],
+        passes: satInSunPasses,
       };
       const SensorNights: Passes = {
         sensor,
@@ -551,7 +598,12 @@ export class SensorTimeline extends KeepTrackPlugin {
 
       // Skip if satellite is above the max range of the sensor
       if (sensor.maxRng < satellite.perigee && (!sensor.maxRng2 || sensor.maxRng2 < satellite.perigee)) {
-        AllPasses.push(Passes); // Add empty pass to keep the order of the sensors //!!//
+        // Push an entry to EVERY list so index i still means the same sensor in all five (drawTimeline_ reads them by index)
+        AllPasses.push(Passes);
+        AllSatInFoVs.push(SatInFoVs);
+        AllSatinSuns.push(SatinSuns);
+        AllSensorNights.push(SensorNights);
+        AllClearSkies.push(ClearSkies);
         continue;
       }
 
@@ -573,11 +625,6 @@ export class SensorTimeline extends KeepTrackPlugin {
       let isEnterFov = false;
       let isExitFov = false;
       let startInFoVTime = null as unknown as Date;
-
-      let isSatInSun = false;
-      let isSatEnterSun = false;
-      let isSatExitSun = false;
-      let startSunTime = null as unknown as Date;
 
       let isStationInNight = false;
       let isStationEnterNight = false;
@@ -630,7 +677,6 @@ export class SensorTimeline extends KeepTrackPlugin {
         }
 
         const isStationInNightAtThisIter = SensorTimeline.checkStationInNight(now, sensor);
-        const isSatInSunAtThisIter = SensorTimeline.checkSatinSun(now, satellite);
 
         // -------- Find observable periods by using all conditions
 
@@ -689,25 +735,6 @@ export class SensorTimeline extends KeepTrackPlugin {
               i += satellite.period * 60 * 0.75;
             }
           }
-        }
-
-        // Check if sat in Sun
-        if (isSatInSunAtThisIter && !isSatInSun) {
-          startSunTime = now;
-          isSatInSun = true;
-          isSatEnterSun = true;
-        }
-        if (!isSatInSunAtThisIter && isSatInSun) {
-          isSatExitSun = true;
-          isSatInSun = false;
-        }
-        if ((isSatEnterSun && isSatExitSun) || (isSatEnterSun && i === durationInSeconds - this.angleCalculationInterval_)) {
-          SatinSuns.passes.push({
-            start: startSunTime,
-            end: now,
-          });
-          isSatEnterSun = false;
-          isSatExitSun = false;
         }
 
         if (sensor.type === SpaceObjectType.OPTICAL && this.detailedPlot) {
@@ -778,30 +805,19 @@ export class SensorTimeline extends KeepTrackPlugin {
       return true;
     }
 
-    const lla = {
-      lat: (sensor.lat * DEG2RAD) as Radians,
-      lon: (sensor.lon * DEG2RAD) as Radians,
-      alt: sensor.alt,
-    };
-
-    const { gmst } = calcGmst(now);
-    const sunPos = Sun.eci(now);
-    const sensorPos = lla2eci(lla, gmst);
-
-    sensor.position = sensorPos;
-    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
-    const satPos = SatMath.getEci(satellite, now);
-    const satInSun = SatMath.calculateIsInSun(satPos, sunPos);
-    // / Station is at night or penumbra
-
-    if ((stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) && satInSun === SunStatus.SUN) {
-      return true;
-    }
-
-    return false;
+    // An optical sensor sees the satellite when the site is dark and the satellite is sunlit
+    return SensorTimeline.checkStationInNight(now, sensor) && SensorTimeline.checkSatinSun(now, satellite);
   }
 
-  static checkStationInNight(now: Date, sensor: DetailedSensor) {
+  /**
+   * True when the Sun is below the site's horizon (its centre more than its own radius, about 0.27 deg, below it).
+   *
+   * This is a sun-elevation test, not SatMath.calculateIsInSun: that shadow model compares the point's distance from
+   * Earth's centre with the EQUATORIAL radius (6378.137 km), while lla2eci places sites on a 6371 km sphere, so every
+   * ground site sits "inside" the Earth, asin(R / r) is NaN and the site always reads as sunlit. That is why the
+   * Station in Eclipse row (and every optical Can Observe row) stayed empty.
+   */
+  static checkStationInNight(now: Date, sensor: DetailedSensor): boolean {
     const lla = {
       lat: (sensor.lat * DEG2RAD) as Radians,
       lon: (sensor.lon * DEG2RAD) as Radians,
@@ -813,13 +829,21 @@ export class SensorTimeline extends KeepTrackPlugin {
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;
-    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
 
-    if (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) {
-      return true;
+    // Geocentric zenith of the site and the site-to-Sun direction
+    const r = Math.hypot(sensorPos.x, sensorPos.y, sensorPos.z);
+    const toSun = { x: sunPos.x - sensorPos.x, y: sunPos.y - sensorPos.y, z: sunPos.z - sensorPos.z };
+    const sunDist = Math.hypot(toSun.x, toSun.y, toSun.z);
+
+    if (r === 0 || sunDist === 0) {
+      return false;
     }
 
-    return false;
+    const sinSunEl = (sensorPos.x * toSun.x + sensorPos.y * toSun.y + sensorPos.z * toSun.z) / (r * sunDist);
+    const sunEl = Math.asin(Math.min(1, Math.max(-1, sinSunEl)));
+    const sunAngularRadius = Math.asin(Math.min(1, SensorTimeline.SUN_RADIUS_KM_ / sunDist));
+
+    return sunEl < -sunAngularRadius;
   }
 
   static checkSatinSun(now: Date, satellite: Satellite) {
@@ -832,6 +856,36 @@ export class SensorTimeline extends KeepTrackPlugin {
     }
 
     return false;
+  }
+
+  /**
+   * Sunlit periods of the satellite over [startDate, endDate), sampled every `interval` seconds. A period still open
+   * at the last sample ends there. Independent of any sensor, so it is computed once per draw.
+   */
+  static calculateSatInSunPasses(satellite: Satellite, startDate: Date, endDate: Date, interval: Seconds): Pass[] {
+    const passes: Pass[] = [];
+    const durationInSeconds = (endDate.getTime() - startDate.getTime()) / 1000;
+    let start: Date | null = null;
+    let last: Date | null = null;
+
+    for (let i = 0; i < durationInSeconds; i += interval) {
+      const now = new Date(startDate.getTime() + i * 1000);
+      const isInSun = SensorTimeline.checkSatinSun(now, satellite);
+
+      if (isInSun && !start) {
+        start = now;
+      } else if (!isInSun && start) {
+        passes.push({ start, end: now });
+        start = null;
+      }
+      last = now;
+    }
+
+    if (start && last && last.getTime() > start.getTime()) {
+      passes.push({ start, end: last });
+    }
+
+    return passes;
   }
 
   static checkWeatherIsGood(weatherReport: weatherReport, now: Date): boolean {
@@ -925,7 +979,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       yPos += gapBetweenRows * 2;
     }
 
-    if (this.detailedPlot) {
+    if (this.detailedPlot && SatinSuns[0]) {
       this.drawPasses_(SatinSuns[0], numSensors - 1, startHourOffset, startTime, yPos, barHeight, nameOffset);
       yPos += 5 + barHeight + interBarHeight;
     }
@@ -1169,16 +1223,12 @@ export class SensorTimeline extends KeepTrackPlugin {
         if (drawEvent(mouseX, mouseY)) {
           const timeManagerInstance = ServiceLocator.getTimeManager();
 
-          ServiceLocator.getSensorManager().setSensor(sensorPass.sensor);
-
+          // Jump the clock first: setSensor re-emits selectSatData for the selected satellite, which redraws this
+          // timeline from the new time. No deselect/reselect: deselecting closed this menu (it needs a satellite).
           timeManagerInstance.changeSimulationTime(new Date(passStart).getTime());
           timeManagerInstance.calculateSimulationTime();
 
-          const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager)!;
-          const currentSatId = selectSatManagerInstance.selectedSat;
-
-          selectSatManagerInstance.selectSat(-1);
-          selectSatManagerInstance.selectSat(currentSatId);
+          ServiceLocator.getSensorManager().setSensor(sensorPass.sensor);
         }
       });
     });

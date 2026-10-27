@@ -45,7 +45,8 @@
         "tip3": "Los intervalos de cálculo más cortos capturan pases breves pero tardan más en calcularse; 30 segundos es un buen equilibrio para una ventana de 24 horas."
       },
       "errorMsgs": {
-        "sensorListMissing": "No se encontró la lista de sensores"
+        "sensorListMissing": "No se encontró la lista de sensores",
+        "invalidSetting": "{setting} debe ser un número mayor que cero."
       }
     }
   }

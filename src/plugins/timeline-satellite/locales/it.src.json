@@ -16,7 +16,8 @@
         "noPasses": "Nessun passaggio"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Aggiungi satelliti all'elenco o seleziona un satellite"
+        "addSatellitesOrSelect": "Aggiungi satelliti all'elenco o seleziona un satellite",
+        "invalidSetting": "{setting} deve essere un numero maggiore di zero."
       },
       "help": {
         "overview": "La Cronologia satellite è l'immagine speculare della Cronologia sensore: mostra quando un sensore selezionato può vedere un elenco di satelliti. Ogni riga è un satellite della tua Lista di osservazione (o il satellite attualmente selezionato) e ogni barra colorata è un passaggio, così puoi pianificare le osservazioni di un singolo sito su molti obiettivi.",

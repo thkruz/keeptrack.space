@@ -45,7 +45,8 @@
         "tip3": "更短的计算间隔可以捕捉短暂的过境，但计算耗时更长；对于24小时窗口，30秒是较好的平衡。"
       },
       "errorMsgs": {
-        "sensorListMissing": "找不到传感器列表"
+        "sensorListMissing": "找不到传感器列表",
+        "invalidSetting": "{setting}必须是大于零的数字。"
       }
     }
   }

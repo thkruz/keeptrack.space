@@ -16,7 +16,8 @@
         "noPasses": "无过境"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "请将卫星添加到列表或选择一颗卫星"
+        "addSatellitesOrSelect": "请将卫星添加到列表或选择一颗卫星",
+        "invalidSetting": "{setting}必须是大于零的数字。"
       },
       "help": {
         "overview": "卫星时间线是传感器时间线的镜像：它显示所选的一个传感器何时可以看到一组卫星。每一行代表关注列表中的一颗卫星（或当前选中的卫星），每个彩色条代表一次过境，便于为单个站点安排对多个目标的观测。",

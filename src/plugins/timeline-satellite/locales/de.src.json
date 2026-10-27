@@ -16,7 +16,8 @@
         "noPasses": "Keine Durchgänge"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Satelliten zur Liste hinzufügen oder einen Satelliten auswählen"
+        "addSatellitesOrSelect": "Satelliten zur Liste hinzufügen oder einen Satelliten auswählen",
+        "invalidSetting": "{setting} muss eine Zahl größer als null sein."
       },
       "help": {
         "overview": "Die Satelliten-Zeitachse ist das Spiegelbild der Sensor-Zeitachse: Sie zeigt, wann ein ausgewählter Sensor eine Liste von Satelliten sehen kann. Jede Zeile ist ein Satellit aus Ihrer Beobachtungsliste (oder der aktuell ausgewählte Satellit) und jeder farbige Balken ein Durchgang, sodass Sie die Beobachtungen eines einzelnen Standorts über viele Ziele hinweg planen können.",

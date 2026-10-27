@@ -9,6 +9,7 @@ import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { readPositiveNumberInput } from '@app/engine/utils/positive-number-input';
 import { shake } from '@app/engine/utils/shake';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Degrees, Hours, Kilometers, MILLISECONDS_PER_SECOND, Satellite, SatelliteRecord, Seconds } from '@ootk/src/main';
@@ -30,6 +31,8 @@ interface SatellitePasses {
 
 export class SatelliteTimeline extends KeepTrackPlugin {
   readonly id = 'SatelliteTimeline';
+  /** Delay that coalesces repeated clock changes into one redraw. */
+  private static readonly CLOCK_JUMP_REDRAW_DELAY_MS_ = 150;
   dependencies_ = [SelectSatManager.name];
   private canvas_!: HTMLCanvasElement;
   private ctx_!: CanvasRenderingContext2D;
@@ -83,9 +86,12 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       return;
     }
 
-    if (PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length === 0 && PluginRegistry.getPlugin(SelectSatManager)?.selectedSat === -1) {
+    if (!this.hasSomethingToPlot_()) {
       ServiceLocator.getUiManager().toast(t7e('plugins.SatelliteTimeline.errorMsgs.addSatellitesOrSelect'), ToastMsgType.caution);
       shake(getEl(this.bottomIconElementName));
+      // Nothing to plot: refuse the open, as the no-sensor case does. The icon normally stays disabled (see
+      // setBottomIconToEnabled) so the menu never opens; this covers an icon enabled before the list emptied.
+      this.setBottomIconToUnselected();
 
       return;
     }
@@ -95,6 +101,34 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     }
     this.resizeCanvas_();
   };
+
+  /** True when there is at least one row to draw: a watchlist entry or a selected satellite. */
+  private hasSomethingToPlot_(): boolean {
+    const watchlistLength = PluginRegistry.getPlugin(WatchlistPlugin)?.watchlistList.length ?? 0;
+    const selectedSat = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1;
+
+    return watchlistLength > 0 || selectedSat !== -1;
+  }
+
+  /**
+   * Choosing a sensor enables the icon in the base plugin, but with nothing to plot the menu would open on an empty
+   * canvas. Keep it disabled until there is a watchlist entry or a selection (getDisabledReason explains the click).
+   */
+  setBottomIconToEnabled(): void {
+    if (!this.hasSomethingToPlot_()) {
+      return;
+    }
+    super.setBottomIconToEnabled();
+  }
+
+  getDisabledReason(): string | null {
+    // The missing sensor is explained by the base plugin first
+    if (!ServiceLocator.getSensorManager().isSensorSelected() || this.hasSomethingToPlot_()) {
+      return null;
+    }
+
+    return t7e('plugins.SatelliteTimeline.errorMsgs.addSatellitesOrSelect');
+  }
 
   sideMenuElementName = 'satellite-timeline-menu';
   sideMenuElementHtml = html`
@@ -167,29 +201,59 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       this.ctx_ = this.canvas_.getContext('2d')!;
       this.ctxStatic_ = this.canvasStatic_.getContext('2d')!;
 
-      getEl('satellite-timeline-setting-total-length')!.addEventListener('change', () => {
-        this.lengthOfLookAngles_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-total-length')).value) as Hours;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
+      this.bindNumberSetting_(
+        'satellite-timeline-setting-total-length',
+        'calculationLength',
+        () => this.lengthOfLookAngles_,
+        (v) => {
+          this.lengthOfLookAngles_ = v as Hours;
+        }
+      );
+      this.bindNumberSetting_(
+        'satellite-timeline-setting-interval',
+        'calculationInterval',
+        () => this.angleCalculationInterval_,
+        (v) => {
+          this.angleCalculationInterval_ = v as Seconds;
+        }
+      );
+      this.bindNumberSetting_(
+        'satellite-timeline-setting-bad-length',
+        'badPassLength',
+        () => this.lengthOfBadPass_,
+        (v) => {
+          this.lengthOfBadPass_ = v as Seconds;
+        }
+      );
+      this.bindNumberSetting_(
+        'satellite-timeline-setting-avg-length',
+        'avgPassLength',
+        () => this.lengthOfAvgPass_,
+        (v) => {
+          this.lengthOfAvgPass_ = v as Seconds;
+        }
+      );
+    });
+  }
 
-      getEl('satellite-timeline-setting-interval')!.addEventListener('change', () => {
-        this.angleCalculationInterval_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-interval')).value) as Seconds;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
+  /**
+   * Wire a numeric settings field: a number greater than zero recalculates the plot; anything else toasts, restores
+   * the previous value and leaves the plot alone.
+   */
+  private bindNumberSetting_(inputId: string, labelKey: string, get: () => number, set: (value: number) => void): void {
+    const input = getEl(inputId) as HTMLInputElement;
 
-      getEl('satellite-timeline-setting-bad-length')!.addEventListener('change', () => {
-        this.lengthOfBadPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-bad-length')).value) as Seconds;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
+    input.addEventListener('change', () => {
+      const label = t7e(`plugins.SatelliteTimeline.labels.${labelKey}` as Parameters<typeof t7e>[0]);
+      const value = readPositiveNumberInput(input, get(), t7e('plugins.SatelliteTimeline.errorMsgs.invalidSetting').replace('{setting}', label));
 
-      getEl('satellite-timeline-setting-avg-length')!.addEventListener('change', () => {
-        this.lengthOfAvgPass_ = parseFloat((<HTMLInputElement>getEl('satellite-timeline-setting-avg-length')).value) as Seconds;
-        this.ctxStatic_.reset();
-        this.updateTimeline();
-      });
+      if (value === null) {
+        return;
+      }
+
+      set(value);
+      this.ctxStatic_.reset();
+      this.updateTimeline();
     });
   }
 
@@ -213,6 +277,28 @@ export class SatelliteTimeline extends KeepTrackPlugin {
     });
     EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, this.onWatchlistUpdated_.bind(this));
     EventBus.getInstance().on(EventBusEvent.resize, this.resizeCanvas_.bind(this));
+    // The window is anchored at the clock: a jump must redraw it, or the old axis and bars stay up
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.scheduleRedrawForClockJump_.bind(this));
+  }
+
+  private redrawTimer_: ReturnType<typeof setTimeout> | null = null;
+
+  /** Coalesce a burst of clock changes (time slider drag) into one redraw while the menu is open. */
+  private scheduleRedrawForClockJump_(): void {
+    if (!this.isMenuButtonActive) {
+      return;
+    }
+
+    if (this.redrawTimer_ !== null) {
+      clearTimeout(this.redrawTimer_);
+    }
+
+    this.redrawTimer_ = setTimeout(() => {
+      this.redrawTimer_ = null;
+      if (this.isMenuButtonActive) {
+        this.updateTimeline();
+      }
+    }, SatelliteTimeline.CLOCK_JUMP_REDRAW_DELAY_MS_);
   }
 
   private onWatchlistUpdated_(watchlistList: number[]) {
@@ -252,7 +338,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       PluginRegistry.getPlugin(WatchlistPlugin)
         ?.getSatellites()
         .concat(PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1)
-        .filter((sat) => sat !== -1) ?? [];
+        .filter((sat, index, list) => sat !== -1 && list.indexOf(sat) === index) ?? []; // A selected satellite on the watchlist is one row
 
     for (const sat of satellites) {
       const satellite = ServiceLocator.getCatalogManager().getSat(sat);
@@ -267,7 +353,9 @@ export class SatelliteTimeline extends KeepTrackPlugin {
       };
 
       // Skip if satellite is above the max range of the sensor
+      // Out of range: keep the satellite's row as the gray "No Passes" bar the help text promises
       if (sensor.maxRng < satellite.perigee && (!sensor.maxRng2 || sensor.maxRng2 < satellite.perigee)) {
+        satellitePasses.push(sensorPass);
         continue;
       }
 

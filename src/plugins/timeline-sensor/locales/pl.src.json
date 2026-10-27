@@ -45,7 +45,8 @@
         "tip3": "Krótsze interwały obliczeń wychwytują krótkie przeloty, ale obliczenia trwają dłużej; 30 sekund to dobry kompromis dla okna 24-godzinnego."
       },
       "errorMsgs": {
-        "sensorListMissing": "Nie znaleziono listy czujników"
+        "sensorListMissing": "Nie znaleziono listy czujników",
+        "invalidSetting": "{setting} musi być liczbą większą od zera."
       }
     }
   }

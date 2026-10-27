@@ -16,7 +16,8 @@
         "noPasses": "Brak przelotów"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Dodaj satelity do listy lub wybierz satelitę"
+        "addSatellitesOrSelect": "Dodaj satelity do listy lub wybierz satelitę",
+        "invalidSetting": "{setting} musi być liczbą większą od zera."
       },
       "help": {
         "overview": "Oś czasu satelity to lustrzane odbicie osi czasu czujnika: pokazuje, kiedy jeden wybrany czujnik może widzieć listę satelitów. Każdy wiersz to satelita z Twojej listy obserwowanych (lub aktualnie wybrany satelita), a każdy kolorowy pasek to przelot, dzięki czemu możesz zaplanować obserwacje jednego stanowiska dla wielu celów.",

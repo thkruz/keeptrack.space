@@ -1,6 +1,8 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { VideoDirectorPlugin } from '@app/plugins/video-director/video-director';
 import { DIRECTION_TOGGLES, getOppositeToDisable, parseSpeed, SPEED_CONFIGS } from '@app/plugins/video-director/video-director-core';
+import { CameraSettings } from '@app/settings/camera-settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardChangeTests, standardClickTests, standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -65,6 +67,12 @@ describe('video-director-core', () => {
       expect(opposite).toBeDefined();
       expect(opposite!.opposite).toBe(toggle.id);
     });
+  });
+
+  it('uses the camera settings defaults as the speed fallbacks', () => {
+    const defaults = new CameraSettings();
+
+    expect(SPEED_CONFIGS.map((c) => c.def)).toEqual([defaults.autoRotateSpeed, defaults.autoPanSpeed, defaults.autoZoomSpeed]);
   });
 
   it('exposes the three speed configs in order', () => {
@@ -150,5 +158,78 @@ describe('VideoDirectorPlugin form handlers', () => {
     plugin.triggerFormChange({ target: milkyWay } as unknown as Event);
 
     expect(settingsManager.isDrawMilkyWay).toBe(false);
+  });
+
+  it('keeps the dot hidden while its toggle is on and another control changes', () => {
+    const selectedColor = getEl('video-director-selectedColor') as HTMLInputElement;
+    const panL = getEl('video-director-panL') as HTMLInputElement;
+
+    selectedColor.checked = true;
+    plugin.triggerFormChange({ target: selectedColor } as unknown as Event);
+    panL.checked = true;
+    plugin.triggerFormChange({ target: panL } as unknown as Event);
+
+    expect(settingsManager.selectedColor).toEqual([0, 0, 0, 0]);
+    expect(settingsManager.selectedColorFallback).toEqual([1, 1, 1, 1]);
+  });
+
+  it('re-hides the dot from the toggle state when something else restored it', () => {
+    const selectedColor = getEl('video-director-selectedColor') as HTMLInputElement;
+    const panL = getEl('video-director-panL') as HTMLInputElement;
+
+    selectedColor.checked = true;
+    plugin.triggerFormChange({ target: selectedColor } as unknown as Event);
+    settingsManager.selectedColor = [1, 1, 1, 1];
+    plugin.triggerFormChange({ target: panL } as unknown as Event);
+
+    expect(settingsManager.selectedColor).toEqual([0, 0, 0, 0]);
+  });
+
+  it('does not touch the dot colour on other changes while the toggle is off', () => {
+    const panL = getEl('video-director-panL') as HTMLInputElement;
+
+    settingsManager.selectedColor = [0, 1, 0, 1];
+    plugin.triggerFormChange({ target: panL } as unknown as Event);
+
+    expect(settingsManager.selectedColor).toEqual([0, 1, 0, 1]);
+  });
+
+  it('opens with the same pan/zoom values a blank field falls back to', () => {
+    const defaults = new CameraSettings();
+    const panSpeed = getEl('video-director-panSpeed') as HTMLInputElement;
+    const zoomSpeed = getEl('video-director-zoomSpeed') as HTMLInputElement;
+
+    expect(panSpeed.value).toBe(String(defaults.autoPanSpeed));
+    expect(zoomSpeed.value).toBe(String(defaults.autoZoomSpeed));
+
+    panSpeed.value = '';
+    zoomSpeed.value = 'abc';
+    plugin.triggerFormChange({ target: panSpeed } as unknown as Event);
+
+    expect(panSpeed.value).toBe(String(defaults.autoPanSpeed));
+    expect(zoomSpeed.value).toBe(String(defaults.autoZoomSpeed));
+    expect(settingsManager.autoPanSpeed).toBe(defaults.autoPanSpeed);
+    expect(settingsManager.autoZoomSpeed).toBe(defaults.autoZoomSpeed);
+  });
+
+  it('writes the rotate speed that Start uses back to the field', () => {
+    const rotateSpeed = getEl('video-director-rotateSpeed') as HTMLInputElement;
+    const camera = {
+      state: { isAutoRotate: false },
+      autoRotate: vi.fn(() => {
+        // What Camera.autoRotate does for a zero speed.
+        settingsManager.autoRotateSpeed = 0.0075;
+      }),
+    };
+
+    vi.spyOn(ServiceLocator, 'getMainCamera').mockReturnValue(camera as never);
+    rotateSpeed.value = '0';
+    plugin.triggerFormChange({ target: rotateSpeed } as unknown as Event);
+    expect(settingsManager.autoRotateSpeed).toBe(0);
+
+    (plugin as unknown as { toggleAutoRotate_(): void }).toggleAutoRotate_();
+
+    expect(camera.autoRotate).toHaveBeenCalledWith(true);
+    expect(rotateSpeed.value).toBe('0.0075');
   });
 });

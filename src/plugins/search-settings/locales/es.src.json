@@ -34,7 +34,7 @@
         }
       },
       "tooltips": {
-        "maxResults": "Número máximo de satélites a mostrar en la búsqueda",
+        "maxResults": "Número máximo de resultados a mostrar en la búsqueda",
         "minSearchChars": "Número mínimo de caracteres a escribir antes de ejecutar una búsqueda",
         "showDecayed": "Mostrar satélites desintegrados (posición 0,0,0) en los resultados de búsqueda",
         "showVimpel": "Incluir objetos Vimpel (analista) en los resultados de búsqueda. Esto puede ralentizar las búsquedas."

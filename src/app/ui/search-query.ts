@@ -307,7 +307,7 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
 
   for (const term of searchList) {
     // Don't search for things until at least the minimum characters
-    if (term.length <= settingsManager.minimumSearchCharacters) {
+    if (term.length < settingsManager.minimumSearchCharacters) {
       continue;
     }
 

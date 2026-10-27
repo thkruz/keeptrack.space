@@ -34,7 +34,7 @@
         }
       },
       "tooltips": {
-        "maxResults": "Maximální počet satelitů zobrazených ve vyhledávání",
+        "maxResults": "Maximální počet výsledků zobrazených ve vyhledávání",
         "minSearchChars": "Minimální počet znaků, které je třeba zadat, než se spustí vyhledávání",
         "showDecayed": "Zobrazit zaniklé satelity (pozice 0,0,0) ve výsledcích vyhledávání",
         "showVimpel": "Zahrnout objekty Vimpel (analytické) do výsledků vyhledávání. To může vyhledávání zpomalit."

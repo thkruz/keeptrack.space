@@ -2,13 +2,14 @@ import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { GroupsManager } from '@app/app/data/groups-manager';
-import { SearchManager, SearchResultType } from '@app/app/ui/search-manager';
+import { SearchManager, SearchResultType, searchTypeBadgeLabel } from '@app/app/ui/search-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ColorSchemeManager } from '@app/engine/rendering/color-scheme-manager';
 import { DotsManager } from '@app/engine/rendering/dots-manager';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
@@ -529,13 +530,29 @@ describe('SearchManager', () => {
     });
 
     it('hides stale rows when the query drops below the minimum length', () => {
-      settingsManager.minimumSearchCharacters = 2;
+      settingsManager.minimumSearchCharacters = 3;
       searchManager.doSearch('ZARYA');
       searchManager.isResultsOpen = true;
       const hide = vi.spyOn(searchManager, 'hideResults');
 
       searchManager.doSearch('ZA');
       expect(hide).toHaveBeenCalled();
+    });
+
+    it('"Minimum Characters Before Searching" is inclusive: N typed characters search', () => {
+      settingsManager.minimumSearchCharacters = 3;
+      searchManager.doSearch('ISS');
+      expect(settingsManager.lastSearchResults).toEqual([0]);
+
+      settingsManager.lastSearchResults = [];
+      searchManager.doSearch('IS');
+      expect(settingsManager.lastSearchResults).toEqual([]);
+    });
+
+    it('a comma-list term at exactly the minimum length still resolves', () => {
+      settingsManager.minimumSearchCharacters = 5;
+      searchManager.doSearch('25544,43013');
+      expect(settingsManager.lastSearchResults).toContain(0);
     });
 
     it('hides a MIRV child until it separates, then includes it', () => {
@@ -804,5 +821,21 @@ describe('SearchManager interactions', () => {
     expect(ServiceLocator.getUiManager().searchHoverSatId).toBe(-1);
     expect(document.getElementById('sat-hoverbox')!.style.display).toBe('none');
     document.getElementById('sat-hoverbox')!.remove();
+  });
+});
+
+describe('searchTypeBadgeLabel', () => {
+  it('names object kinds with the translated searchManager.type* strings', () => {
+    expect(searchTypeBadgeLabel(SearchResultType.STAR)).toBe(t7e('searchManager.typeStar'));
+    expect(searchTypeBadgeLabel(SearchResultType.SENSOR)).toBe(t7e('searchManager.typeSensor'));
+    expect(searchTypeBadgeLabel(SearchResultType.LAUNCH_SITE)).toBe(t7e('searchManager.typeLaunchSite'));
+    expect(searchTypeBadgeLabel(SearchResultType.PLANET)).toBe(t7e('searchManager.typePlanet'));
+    expect(searchTypeBadgeLabel(SearchResultType.LAUNCH_SITE)).not.toBe('SITE');
+  });
+
+  it('keeps the short field-match codes', () => {
+    expect(searchTypeBadgeLabel(SearchResultType.OBJECT_NAME)).toBe('NAME');
+    expect(searchTypeBadgeLabel(SearchResultType.NORAD_ID_A5)).toBe('NORAD');
+    expect(searchTypeBadgeLabel(SearchResultType.MISSILE)).toBe('MISSILE');
   });
 });

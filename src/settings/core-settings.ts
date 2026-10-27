@@ -207,7 +207,7 @@ export class CoreSettings {
   /**
    * The minimum number of characters to type before searching.
    */
-  minimumSearchCharacters = 2; // Searches after 3 characters typed
+  minimumSearchCharacters = 3; // Searches once 3 characters are typed
   /**
    * The maximum number of satellites to display when searching.
    */

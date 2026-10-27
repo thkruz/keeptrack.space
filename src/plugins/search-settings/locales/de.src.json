@@ -34,7 +34,7 @@
         }
       },
       "tooltips": {
-        "maxResults": "Maximale Anzahl der in der Suche angezeigten Satelliten",
+        "maxResults": "Maximale Anzahl der in der Suche angezeigten Ergebnisse",
         "minSearchChars": "Mindestanzahl der einzugebenden Zeichen, bevor eine Suche ausgeführt wird",
         "showDecayed": "Verglühte Satelliten (Position 0,0,0) in den Suchergebnissen anzeigen",
         "showVimpel": "Vimpel-Objekte (Analyst) in die Suchergebnisse einbeziehen. Dies kann die Suche verlangsamen."

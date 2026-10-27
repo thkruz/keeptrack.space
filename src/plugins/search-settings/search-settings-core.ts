@@ -14,7 +14,7 @@ export const SEARCH_LIMIT_DEFAULT = 600;
 /** Allowed range and default for the minimum characters before searching. */
 export const MIN_SEARCH_CHARS_MIN = 1;
 export const MIN_SEARCH_CHARS_MAX = 10;
-export const MIN_SEARCH_CHARS_DEFAULT = 2;
+export const MIN_SEARCH_CHARS_DEFAULT = 3;
 
 /** Defaults for the boolean toggles. */
 export const SHOW_DECAYED_DEFAULT = true;
@@ -120,8 +120,8 @@ export const serializeSearchableFields = (fields: SearchableFields): string => J
 
 /**
  * Parse a persisted searchable-types JSON blob. Unknown keys are dropped and
- * missing keys fall back to their default (satellites/missiles on, the rest
- * off), so an old or corrupt value never changes a toggle the user never set.
+ * missing keys fall back to their default (every type on), so an old or
+ * corrupt value never changes a toggle the user never set.
  */
 export const parseSearchableTypes = (raw: string | null): SearchableTypes => {
   const result: SearchableTypes = { ...DEFAULT_SEARCHABLE_TYPES };

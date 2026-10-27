@@ -4518,12 +4518,19 @@ a {
   color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
   margin-right: 8px;
   /*
-   * Fixed width sized to the longest label ("MISSILE"/"SENSOR") so every badge
-   * is identical and the name column lines up across rows regardless of type.
+   * Minimum width sized to the field codes ("MISSILE"/"NORAD") so those badges
+   * are identical and the name column lines up. Object-kind badges (Star,
+   * Sensor, Launch Site, Planet) are translated, so a long name may widen its
+   * badge, capped with an ellipsis.
    */
-  width: 64px;
+  min-width: 64px;
+  max-width: 128px;
   box-sizing: border-box;
   text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   flex-shrink: 0;
 }
 

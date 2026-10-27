@@ -1,3 +1,5 @@
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   DEFAULT_SEARCHABLE_FIELDS,
   DEFAULT_SEARCHABLE_TYPES,
@@ -12,6 +14,7 @@ import {
   serializeSearchableFields,
   serializeSearchableTypes,
 } from '@app/plugins/search-settings/search-settings-core';
+import { CoreSettings } from '@app/settings/core-settings';
 
 describe('search-settings-core', () => {
   describe('parseMaxResults', () => {
@@ -33,6 +36,38 @@ describe('search-settings-core', () => {
 
     it('parses with base 10 (no octal/garbage)', () => {
       expect(parseMaxResults('010')).toEqual({ value: 10, valid: true });
+    });
+  });
+
+  describe('minimum search characters default', () => {
+    it('is 3, inclusive, so the default still searches at 3 typed characters', () => {
+      expect(MIN_SEARCH_CHARS_DEFAULT).toBe(3);
+    });
+
+    it('matches the CoreSettings boot default (reset and boot agree)', () => {
+      expect(new CoreSettings().minimumSearchCharacters).toBe(MIN_SEARCH_CHARS_DEFAULT);
+    });
+  });
+
+  describe('Maximum Results tooltip', () => {
+    it('says results (not satellites) in English', () => {
+      const en = JSON.parse(readFileSync(join(__dirname, '../locales/en.src.json'), 'utf8'));
+      const tip = en.plugins.SearchSettingsPlugin.tooltips.maxResults as string;
+
+      expect(tip).toMatch(/results/u);
+      expect(tip).not.toMatch(/satellite/iu);
+    });
+
+    it('is translated (differs from English) in every other locale', () => {
+      const dir = join(__dirname, '../locales');
+      const en = JSON.parse(readFileSync(join(dir, 'en.src.json'), 'utf8')).plugins.SearchSettingsPlugin.tooltips.maxResults;
+
+      for (const file of readdirSync(dir).filter((name) => name.endsWith('.src.json') && name !== 'en.src.json')) {
+        const tip = JSON.parse(readFileSync(join(dir, file), 'utf8')).plugins.SearchSettingsPlugin.tooltips.maxResults;
+
+        expect(typeof tip, file).toBe('string');
+        expect(tip, file).not.toBe(en);
+      }
     });
   });
 

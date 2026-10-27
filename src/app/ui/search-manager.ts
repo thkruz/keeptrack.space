@@ -52,7 +52,8 @@ export enum SearchResultType {
  * It provides methods for performing searches, hiding search results, and retrieving information
  * about the current search state.
  */
-const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
+/** Field-match badges: short codes, the same in every language. */
+const SEARCH_TYPE_LABELS: Partial<Record<SearchResultType, string>> = {
   [SearchResultType.BUS]: 'BUS',
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
@@ -61,10 +62,21 @@ const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
   [SearchResultType.INTLDES]: 'INTL',
   [SearchResultType.LAUNCH_VEHICLE]: 'LV',
   [SearchResultType.MISSILE]: 'MISSILE',
-  [SearchResultType.STAR]: 'STAR',
-  [SearchResultType.SENSOR]: 'SENSOR',
-  [SearchResultType.LAUNCH_SITE]: 'SITE',
-  [SearchResultType.PLANET]: 'PLANET',
+};
+
+/** Object-kind badges: translated names (the badge CSS upper-cases them). */
+const SEARCH_TYPE_LABEL_KEYS: Partial<Record<SearchResultType, TranslationKey>> = {
+  [SearchResultType.STAR]: 'searchManager.typeStar',
+  [SearchResultType.SENSOR]: 'searchManager.typeSensor',
+  [SearchResultType.LAUNCH_SITE]: 'searchManager.typeLaunchSite',
+  [SearchResultType.PLANET]: 'searchManager.typePlanet',
+};
+
+/** The text of a search result row's type badge. */
+export const searchTypeBadgeLabel = (searchType: SearchResultType): string => {
+  const key = SEARCH_TYPE_LABEL_KEYS[searchType];
+
+  return key ? t7e(key) : (SEARCH_TYPE_LABELS[searchType] ?? '');
 };
 
 export class SearchManager {
@@ -491,7 +503,7 @@ export class SearchManager {
      * Don't search for things until at least the minimum characters
      * are typed otherwise there are just too many search results.
      */
-    if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
+    if (searchString.length < settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
       // The open rows belong to an earlier, longer query: drop them rather than show stale results.
       if (this.isResultsOpen) {
         this.hideResults();
@@ -556,7 +568,7 @@ export class SearchManager {
 
     if (idList.length === 0) {
       // lastSearch is the term list, so test the typed string's length instead.
-      if (searchString_.length > settingsManager.minimumSearchCharacters) {
+      if (searchString_.length >= settingsManager.minimumSearchCharacters) {
         uiManagerInstance.toast(t7e('searchManager.noResults' as TranslationKey), ToastMsgType.serious, false);
       }
       this.hideResults();
@@ -613,7 +625,7 @@ export class SearchManager {
       const decayedClass = isDecayed ? ' search-result-decayed' : '';
 
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;
-      html += `<span class="search-type-badge">${SEARCH_TYPE_LABELS[result.searchType] ?? ''}</span>`;
+      html += `<span class="search-type-badge">${searchTypeBadgeLabel(result.searchType)}</span>`;
       html += '<div class="truncate-search">';
 
       // Left half of search results
@@ -833,7 +845,7 @@ export class SearchManager {
     if (searchDom) {
       const curSearch = searchDom.value;
 
-      if (curSearch.length > settingsManager.minimumSearchCharacters) {
+      if (curSearch.length >= settingsManager.minimumSearchCharacters) {
         this.doSearch(curSearch);
       }
     }

@@ -31,7 +31,7 @@
         "twentyFourHourGpsDops": "GPS DOPs за 24 години"
       },
       "toast": {
-        "dopValues": "HDOP: {hdop}<br/>VDOP: {vdop}<br/>PDOP: {pdop}<br/>GDOP: {gdop}<br/>TDOP: {tdop}"
+        "dopValues": "HDOP: {hdop} | VDOP: {vdop} | PDOP: {pdop} | GDOP: {gdop} | TDOP: {tdop}"
       },
       "errorMsgs": {
         "invalidLocation": "Будь ласка, виберіть коректне місце на Землі для 24-годинних DOPs!"

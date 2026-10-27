@@ -14,7 +14,7 @@
         "sensorNotFound": "未找到传感器！请先选择一个传感器。",
         "latLonUndefined": "latLon 未定义！"
       },
-      "latLonToast": "纬度：{lat}<br>经度：{lon}"
+      "latLonToast": "纬度：{lat} | 经度：{lon}"
     }
   }
 }

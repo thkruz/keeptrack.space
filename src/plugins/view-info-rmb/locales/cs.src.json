@@ -14,7 +14,7 @@
         "sensorNotFound": "Senzor nenalezen! Nejprve vyberte senzor.",
         "latLonUndefined": "latLon není definováno!"
       },
-      "latLonToast": "Šířka: {lat}<br>Délka: {lon}"
+      "latLonToast": "Šířka: {lat} | Délka: {lon}"
     }
   }
 }

@@ -14,7 +14,7 @@
         "sensorNotFound": "センサーが見つかりません！先にセンサーを選択してください。",
         "latLonUndefined": "latLon が未定義です!"
       },
-      "latLonToast": "緯度: {lat}<br>経度: {lon}"
+      "latLonToast": "緯度: {lat} | 経度: {lon}"
     }
   }
 }

@@ -14,7 +14,7 @@
         "sensorNotFound": "Датчик не найден! Сначала выберите датчик.",
         "latLonUndefined": "latLon не определён!"
       },
-      "latLonToast": "Шир.: {lat}<br>Долг.: {lon}"
+      "latLonToast": "Шир.: {lat} | Долг.: {lon}"
     }
   }
 }

@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -43,6 +45,34 @@ describe('ViewInfoRmbPlugin onContextMenuAction', () => {
     plugin.onContextMenuAction('view-info-rmb');
 
     expect(toast).toHaveBeenCalled();
+  });
+
+  it('toasts plain text: the toast renders via textContent, so markup would show literally', () => {
+    const toast = vi.fn();
+
+    ServiceLocator.getUiManager().toast = toast;
+    ServiceLocator.getInputManager().mouse = { latLon: { lat: 10, lon: 20 }, dragPosition: [1, 2, 3] } as never;
+
+    plugin.onContextMenuAction('view-info-rmb');
+
+    const text = toast.mock.calls[0][0] as string;
+
+    expect(text).not.toMatch(/<[a-z/]/iu);
+    expect(text).toContain('10.000');
+    expect(text).toContain('20.000');
+  });
+
+  it('keeps the lat/lon toast free of markup in every locale', () => {
+    const dir = path.resolve(__dirname, '../locales');
+
+    for (const file of fs.readdirSync(dir).filter((name) => name.endsWith('.src.json'))) {
+      const json = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8')) as { plugins: { ViewInfoRmbPlugin: { latLonToast: string } } };
+      const template = json.plugins.ViewInfoRmbPlugin.latLonToast;
+
+      expect(template, file).not.toMatch(/<[a-z/]/iu);
+      expect(template, file).toContain('{lat}');
+      expect(template, file).toContain('{lon}');
+    }
   });
 
   it('falls back to eci2lla when the mouse lat/lon is undefined', () => {

@@ -14,7 +14,7 @@
         "sensorNotFound": "센서를 찾을 수 없습니다! 먼저 센서를 선택하세요.",
         "latLonUndefined": "latLon이 정의되지 않았습니다!"
       },
-      "latLonToast": "위도: {lat}<br>경도: {lon}"
+      "latLonToast": "위도: {lat} | 경도: {lon}"
     }
   }
 }

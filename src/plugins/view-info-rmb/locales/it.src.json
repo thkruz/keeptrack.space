@@ -14,7 +14,7 @@
         "sensorNotFound": "Sensore non trovato! Seleziona prima un sensore.",
         "latLonUndefined": "latLon non definito!"
       },
-      "latLonToast": "Lat: {lat}<br>Lon: {lon}"
+      "latLonToast": "Lat: {lat} | Lon: {lon}"
     }
   }
 }

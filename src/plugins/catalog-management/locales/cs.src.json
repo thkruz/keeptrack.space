@@ -10,9 +10,10 @@
       "labels": {
         "dropzone": "Přetáhněte sem soubor .tce, .tle nebo .txt pro načtení katalogu",
         "keepSatInfo": "Zachovat informace o satelitech",
-        "keepSatInfoTooltip": "Aktualizuje TLE existujících satelitů a zachová jejich název, zemi a údaje o misi. Satelity, které nejsou v importovaném souboru, budou odstraněny.",
+        "keepSatInfoTooltip": "Aktualizuje TLE existujících satelitů a zachová jejich název, zemi a údaje o misi. Satelity, které nejsou v importovaném souboru, se odstraní, včetně objektů JSC Vimpel bez čísla NORAD.",
         "importNewOnly": "Importovat pouze nové satelity",
         "importNewOnlyTooltip": "Přidá pouze satelity, které dosud nejsou v aktuálním katalogu. Stávající satelity zůstanou nezměněny.",
+        "replaceCatalogTooltip": "Když jsou oba přepínače vypnuté, soubor nahradí celý katalog: zůstanou jen objekty ze souboru, takže objekty JSC Vimpel bez čísla NORAD se odstraní.",
         "orbitalElements": "Orbitální elementy",
         "tabularStk": "Tabulky a STK",
         "selectedSatellite": "Vybraný satelit",
@@ -45,6 +46,7 @@
         "loadedCatalog": "Katalog načten ze souboru {file}",
         "failedToLoad": "Nepodařilo se načíst {file}",
         "noSatelliteSelected": "Není vybrán žádný satelit!",
+        "noSensorSelected": "Není vybrán žádný senzor!",
         "exportTooLarge": "Export je příliš velký. Zmenšete časové rozpětí nebo zvětšete velikost kroku.",
         "failedToPropagate": "Nepodařilo se propagovat satelit!"
       },

@@ -10,9 +10,10 @@
       "labels": {
         "dropzone": ".tce, .tle 또는 .txt 파일을 끌어다 놓아 카탈로그를 불러옵니다",
         "keepSatInfo": "위성 정보 유지",
-        "keepSatInfoTooltip": "기존 위성의 이름, 국가, 임무 데이터를 유지하면서 TLE를 업데이트합니다. 가져온 파일에 없는 위성은 제거됩니다.",
+        "keepSatInfoTooltip": "기존 위성의 TLE를 갱신하고 이름, 국가, 임무 데이터는 유지합니다. 가져온 파일에 없는 위성은 제거되며, NORAD 번호가 없는 JSC Vimpel 객체도 제거됩니다.",
         "importNewOnly": "새 위성만 가져오기",
         "importNewOnlyTooltip": "현재 카탈로그에 없는 위성만 추가합니다. 기존 위성은 변경되지 않습니다.",
+        "replaceCatalogTooltip": "두 스위치가 모두 꺼져 있으면 파일이 전체 카탈로그를 대체합니다. 파일에 있는 객체만 남으므로 NORAD 번호가 없는 JSC Vimpel 객체는 제거됩니다.",
         "orbitalElements": "궤도 요소",
         "tabularStk": "표 형식 및 STK",
         "selectedSatellite": "선택한 위성",
@@ -45,6 +46,7 @@
         "loadedCatalog": "{file}에서 카탈로그를 불러왔습니다",
         "failedToLoad": "{file}을(를) 불러오지 못했습니다",
         "noSatelliteSelected": "선택된 위성이 없습니다!",
+        "noSensorSelected": "선택된 센서가 없습니다!",
         "exportTooLarge": "내보내기가 너무 큽니다. 시간 범위를 줄이거나 단계 크기를 늘리세요.",
         "failedToPropagate": "위성 전파에 실패했습니다!"
       },

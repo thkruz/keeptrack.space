@@ -10,9 +10,10 @@
       "labels": {
         "dropzone": "Upuść plik .tce, .tle lub .txt, aby wczytać katalog",
         "keepSatInfo": "Zachowaj informacje o satelitach",
-        "keepSatInfoTooltip": "Aktualizuje TLE istniejących satelitów, zachowując nazwę, kraj i dane misji. Satelity nieobecne w importowanym pliku są usuwane.",
+        "keepSatInfoTooltip": "Aktualizuje TLE istniejących satelitów, zachowując ich nazwę, kraj i dane misji. Satelity, których nie ma w importowanym pliku, są usuwane, w tym obiekty JSC Vimpel bez numeru NORAD.",
         "importNewOnly": "Importuj tylko nowe satelity",
         "importNewOnlyTooltip": "Dodaje tylko satelity, których jeszcze nie ma w bieżącym katalogu. Istniejące satelity pozostają bez zmian.",
+        "replaceCatalogTooltip": "Gdy oba przełączniki są wyłączone, plik zastępuje cały katalog: zostają tylko obiekty z pliku, więc obiekty JSC Vimpel bez numeru NORAD są usuwane.",
         "orbitalElements": "Elementy orbitalne",
         "tabularStk": "Tabele i STK",
         "selectedSatellite": "Wybrany satelita",
@@ -45,6 +46,7 @@
         "loadedCatalog": "Wczytano katalog z {file}",
         "failedToLoad": "Nie udało się wczytać {file}",
         "noSatelliteSelected": "Nie wybrano satelity!",
+        "noSensorSelected": "Nie wybrano czujnika!",
         "exportTooLarge": "Eksport zbyt duży. Zmniejsz zakres czasu lub zwiększ rozmiar kroku.",
         "failedToPropagate": "Nie udało się propagować satelity!"
       },

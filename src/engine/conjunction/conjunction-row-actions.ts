@@ -1,16 +1,19 @@
 /**
  * Shared results-row behaviors for the Conjunctions family.
  *
- * These wrap the two interactions every conjunction tool performs when a user
+ * These wrap the interactions every conjunction tool performs when a user
  * clicks an approach: jump the simulation clock to the event, and draw the line
- * between the two objects. Centralizing them keeps the behavior (and bug fixes)
- * consistent across TOCA/POCA, Close Objects, and Debris Screening.
+ * between the two objects, plus selecting the pair. Centralizing them keeps the
+ * behavior (and bug fixes) consistent across TOCA/POCA, Close Objects, and
+ * Debris Screening.
  */
 
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { LineColors } from '@app/engine/rendering/line-manager/line';
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Satellite } from '@ootk/src/main';
 
 type LineObject = Satellite | MissileObject | OemSatellite | null;
@@ -46,4 +49,28 @@ export const drawPairLine = (previous: RemovableLine | null, objA: LineObject, o
   }
 
   return ServiceLocator.getLineManager().createObjToObj(objA, objB, color);
+};
+
+/**
+ * Select a conjunction pair: `primaryId` becomes the selected object and
+ * `secondaryId` the secondary (catalog ids). The secondary toast is suppressed:
+ * the row click itself, and the camera moving to the primary, are the feedback.
+ * Returns false (selecting nothing) when either id is missing or both are the
+ * same object.
+ */
+export const selectPair = (primaryId: number | null, secondaryId: number | null): boolean => {
+  if (typeof primaryId !== 'number' || typeof secondaryId !== 'number' || primaryId < 0 || secondaryId < 0 || primaryId === secondaryId) {
+    return false;
+  }
+
+  const selection = PluginRegistry.getPlugin(SelectSatManager);
+
+  if (!selection) {
+    return false;
+  }
+
+  selection.selectSat(primaryId);
+  selection.setSecondarySat(secondaryId, true);
+
+  return true;
 };

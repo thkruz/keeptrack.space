@@ -121,14 +121,16 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
       return;
     }
 
-    const eventTime = new Date(this.orbitGuardEvents[row].event_end_timestamp);
+    // Same UTC parse as the table cell, so the clock lands on the time the row shows whatever the browser zone
+    const eventTime = OrbitGuardMenuPlugin.parseUtcTimestamp(this.orbitGuardEvents[row].event_end_timestamp);
 
     ServiceLocator.getTimeManager().changeSimulationTime(eventTime.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
 
     ServiceLocator.getUiManager().doSearch(`${sat.sccNum5 ?? sat.sccNum}`);
     this.selectSatIdOnCruncher_ = sat.id;
-    this.closeSideMenu();
+    // The normal deselect path: closes the menu AND clears the drawer item / active state (closeSideMenu only slid it out)
+    this.setBottomIconToUnselected();
   }
 
   private parseManeuverData_() {
@@ -169,8 +171,13 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     this.updatePaginationControls_(); // Update pagination controls for the first page
   }
 
+  /** Pages in the current list; an empty list still reads "Page 1 of 1" next to the no-data message. */
+  private totalPages_(): number {
+    return Math.max(1, Math.ceil(this.orbitGuardEvents.length / this.pageSize));
+  }
+
   private updatePaginationControls_() {
-    const totalPages = Math.ceil(this.orbitGuardEvents.length / this.pageSize);
+    const totalPages = this.totalPages_();
     const pageText = getEl('current-page') as HTMLElement;
 
     pageText.innerText = l('labels.pageOf').replace('{current}', this.currentPage.toString()).replace('{total}', totalPages.toString());
@@ -184,7 +191,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
   }
 
   private goToNextPage_() {
-    const totalPages = Math.ceil(this.orbitGuardEvents.length / this.pageSize);
+    const totalPages = this.totalPages_();
 
     if (this.currentPage < totalPages) {
       this.currentPage++;
@@ -277,12 +284,7 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     tr.setAttribute('class', 'maneuver-object link');
     tr.dataset.row = i.toString();
 
-    const formatDateTime = (isoString: string) => {
-      const date = new Date(isoString.slice(-1).toUpperCase() === 'Z' ? isoString : `${isoString}Z`); // Ensure UTC parsing
-      const iso = date.toISOString().replace('T', ' ').split('.')[0];
-
-      return iso;
-    };
+    const formatDateTime = (isoString: string) => OrbitGuardMenuPlugin.parseUtcTimestamp(isoString).toISOString().replace('T', ' ').split('.')[0];
 
     const cells = [
       this.orbitGuardEvents[i].satNo,
@@ -336,6 +338,16 @@ export class OrbitGuardMenuPlugin extends KeepTrackPlugin {
     }
 
     return false;
+  }
+
+  /**
+   * Parse a feed timestamp as UTC. The API sends zone-less ISO strings ("2026-10-20T12:00:00"), which `new Date`
+   * would read as browser LOCAL time; a string that already carries "Z" or a +hh:mm / -hh:mm offset is kept as is.
+   */
+  static parseUtcTimestamp(timestamp: string): Date {
+    const hasZone = /(?:Z|[+-]\d{2}:?\d{2})$/iu.test(timestamp.trim());
+
+    return new Date(hasZone ? timestamp : `${timestamp}Z`);
   }
 
   private static createCell_(tr: HTMLTableRowElement, text: string): HTMLTableCellElement {

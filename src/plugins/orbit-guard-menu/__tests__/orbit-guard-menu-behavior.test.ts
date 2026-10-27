@@ -108,7 +108,7 @@ describe('OrbitGuardMenuPlugin behavior', () => {
 
     p().eventClicked_(0);
 
-    expect(jumpSpy).toHaveBeenCalledWith(new Date('2026-05-30T12:00:00').getTime());
+    expect(jumpSpy).toHaveBeenCalledWith(Date.parse('2026-05-30T12:00:00Z'));
     expect(p().selectSatIdOnCruncher_).toBe(defaultSat.id);
   });
 
@@ -146,5 +146,54 @@ describe('OrbitGuardMenuPlugin behavior', () => {
 
     // Should not throw; the catch handler logs a warning.
     await vi.waitFor(() => expect(globalThis.fetch as ReturnType<typeof vi.fn>).toHaveBeenCalled());
+  });
+
+  it('B1: an empty feed reads "Page 1 of 1" with both pager buttons disabled', () => {
+    p().setManeuverList_([]);
+
+    expect(getEl('current-page')!.innerText).toBe('Page 1 of 1');
+    expect((getEl('prev-page') as HTMLButtonElement).disabled).toBe(true);
+    expect((getEl('next-page') as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it('B2: a row click closes through the deselect path so the drawer item and active state follow', () => {
+    p().orbitGuardEvents = [event({ satNo: '25544' })];
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue(defaultSat);
+    vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined);
+    vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
+    const unselect = vi.spyOn(plugin, 'setBottomIconToUnselected');
+
+    p().eventClicked_(0);
+
+    expect(unselect).toHaveBeenCalled();
+    expect(p().isMenuButtonActive).toBe(false);
+  });
+
+  describe('B3: parseUtcTimestamp', () => {
+    it.each([
+      ['2026-10-20T12:00:00', '2026-10-20T12:00:00.000Z'],
+      ['2026-10-20T12:00:00.250', '2026-10-20T12:00:00.250Z'],
+      ['2026-10-20T12:00:00Z', '2026-10-20T12:00:00.000Z'],
+      ['2026-10-20T12:00:00z', '2026-10-20T12:00:00.000Z'],
+      ['2026-10-20T08:00:00-04:00', '2026-10-20T12:00:00.000Z'],
+      ['2026-10-20T14:00:00+0200', '2026-10-20T12:00:00.000Z'],
+    ])('%s is %s', (input, expected) => {
+      expect(OrbitGuardMenuPlugin.parseUtcTimestamp(input).toISOString()).toBe(expected);
+    });
+
+    it('the row click and the table cell use the same instant', () => {
+      p().orbitGuardEvents = [event({ satNo: '25544', event_end_timestamp: '2026-10-20T12:00:00' })];
+      vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue(defaultSat);
+      const jump = vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined);
+
+      vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockImplementation(() => undefined);
+      p().createTable_();
+      p().eventClicked_(0);
+
+      const cell = getEl('maneuver-detection-table')!.querySelectorAll('.maneuver-object td')[2] as HTMLElement;
+
+      expect(cell.textContent).toBe('2026-10-20 12:00:00');
+      expect(jump).toHaveBeenCalledWith(Date.parse('2026-10-20T12:00:00Z'));
+    });
   });
 });

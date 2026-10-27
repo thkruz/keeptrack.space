@@ -488,14 +488,36 @@ export function syncUtilityFooterState(): void {
   });
 
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {
-    const topMenuId = (el as HTMLElement).dataset.topMenuId;
-    const navBtn = topMenuId ? getEl(topMenuId, true) : null;
-    const isSelected = navBtn?.classList.contains('bmenu-item-selected') ?? false;
-    const isDisabled = navBtn?.classList.contains('bmenu-item-disabled') ?? false;
-
-    el.classList.toggle('bmenu-item-selected', isSelected);
-    el.classList.toggle('bmenu-item-disabled', isDisabled);
+    syncTopMenuUtilityIcon_(el as HTMLElement);
   });
+}
+
+/**
+ * Mirror a top-menu nav button onto its utility footer copy: the selected,
+ * disabled and error classes plus the button image. Top-menu plugins (sound,
+ * night, ...) change their nav button from shortcuts and other code paths, so
+ * the footer copy must follow the nav button rather than its own clicks.
+ */
+function syncTopMenuUtilityIcon_(el: HTMLElement): void {
+  const topMenuId = el.dataset.topMenuId;
+  const navBtn = topMenuId ? getEl(topMenuId, true) : null;
+
+  if (!navBtn) {
+    return;
+  }
+
+  const isSelected = navBtn.classList.contains('bmenu-item-selected') || !!navBtn.querySelector('.bmenu-item-selected');
+
+  el.classList.toggle('bmenu-item-selected', isSelected);
+  el.classList.toggle('bmenu-item-disabled', navBtn.classList.contains('bmenu-item-disabled'));
+  el.classList.toggle('bmenu-item-error', navBtn.classList.contains('bmenu-item-error'));
+
+  const navSrc = navBtn.querySelector('img')?.getAttribute('src');
+  const footerImg = el.querySelector('img');
+
+  if (navSrc && footerImg && footerImg.getAttribute('src') !== navSrc) {
+    footerImg.setAttribute('src', navSrc);
+  }
 }
 
 /** Set initial selected/disabled state on utility footer icons. */
@@ -517,11 +539,7 @@ export function syncInitialUtilityState(): void {
   const footerEl = getEl('drawer-utility-footer', true);
 
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {
-    const topMenuId = (el as HTMLElement).dataset.topMenuId;
-    const navBtn = topMenuId ? getEl(topMenuId, true) : null;
-    const isSelected = navBtn?.classList.contains('bmenu-item-selected') || !!navBtn?.querySelector('.bmenu-item-selected');
-
-    el.classList.toggle('bmenu-item-selected', !!isSelected);
+    syncTopMenuUtilityIcon_(el as HTMLElement);
   });
 }
 

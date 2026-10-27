@@ -9,6 +9,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { shake } from '@app/engine/utils/shake';
 import { TranslationKey, t7e } from '@app/locales/keys';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
@@ -92,6 +93,7 @@ export class PluginDrawer {
       this.populateDrawerItems_();
       this.wireEventListeners_();
       this.observeBottomIconState_();
+      this.observeTopMenuState_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -493,7 +495,9 @@ export class PluginDrawer {
           const btnEl = getEl(topMenuId, true);
 
           btnEl?.click();
-          iconEl.classList.toggle('bmenu-item-selected');
+          // The nav-button observer mirrors the real state; this keeps it
+          // synchronous for handlers that change the nav button immediately.
+          this.syncUtilityFooterState_();
         }
       });
 
@@ -716,6 +720,26 @@ export class PluginDrawer {
     });
 
     observer.observe(bottomIcons, { attributes: true, attributeFilter: ['class'], subtree: true });
+  }
+
+  /**
+   * Top-menu nav buttons (sound, night, ...) are the source of truth for their
+   * utility footer copies, and their state changes from shortcuts and
+   * programmatic calls as well as clicks. Observe the class and image src of
+   * every nav button so the footer always shows the real state.
+   */
+  private observeTopMenuState_(): void {
+    const navEl = getEl(TopMenu.TOP_RIGHT_ID, true);
+
+    if (!navEl) {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      this.syncUtilityFooterState_();
+    });
+
+    observer.observe(navEl, { attributes: true, attributeFilter: ['class', 'src'], subtree: true });
   }
 
   /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */

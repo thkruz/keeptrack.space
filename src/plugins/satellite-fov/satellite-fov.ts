@@ -376,7 +376,9 @@ export class SatelliteFov extends KeepTrackPlugin {
 
       if (cone) {
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_OFF);
-        coneFactory.remove(cone.id);
+        // Remove by source (+ no target) rather than cone.id: the id is the array index at creation and goes
+        // stale once an earlier cone is removed.
+        coneFactory.removeBySourceAndTarget(currentSat.id, -1);
       } else {
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         coneFactory.generateMesh(currentSat);
@@ -686,11 +688,8 @@ export class SatelliteFov extends KeepTrackPlugin {
 
     document.querySelectorAll(coneSelector).forEach((cone) => {
       cone.addEventListener('click', (e) => {
-        let id = parseInt((e.target as HTMLElement).dataset.id ?? '', 10);
-
-        if (isNaN(id)) {
-          id = parseInt((e.target as HTMLElement).parentElement?.dataset.id ?? '', 10);
-        }
+        // closest() so a click on any nested element (badge, label span) resolves to the row's satellite.
+        const id = parseInt(((e.target as HTMLElement).closest('[data-id]') as HTMLElement | null)?.dataset.id ?? '', 10);
 
         // id 0 is a valid object id, so check the parse explicitly instead of truthiness
         if (isNaN(id) || id < 0) {

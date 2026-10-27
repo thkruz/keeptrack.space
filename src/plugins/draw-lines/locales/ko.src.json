@@ -48,7 +48,8 @@
       },
       "errorMsgs": {
         "noPrimarySat": "위성 간 연결선을 위한 주 위성이 선택되지 않았습니다.",
-        "noSatSelected": "먼저 위성을 선택하세요."
+        "noSatSelected": "먼저 위성을 선택하세요.",
+        "noSensorSelected": "먼저 센서를 선택하세요."
       }
     }
   }

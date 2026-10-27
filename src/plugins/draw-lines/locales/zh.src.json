@@ -48,7 +48,8 @@
       },
       "errorMsgs": {
         "noPrimarySat": "未选择主卫星用于卫星到卫星连线。",
-        "noSatSelected": "请先选择一颗卫星。"
+        "noSatSelected": "请先选择一颗卫星。",
+        "noSensorSelected": "请先选择一个传感器。"
       }
     }
   }

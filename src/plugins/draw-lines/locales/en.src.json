@@ -48,7 +48,8 @@
       },
       "errorMsgs": {
         "noPrimarySat": "No primary satellite selected for Satellite to Satellite line.",
-        "noSatSelected": "Select a satellite first."
+        "noSatSelected": "Select a satellite first.",
+        "noSensorSelected": "Select a sensor first."
       }
     }
   }

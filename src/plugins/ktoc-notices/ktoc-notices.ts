@@ -1,16 +1,27 @@
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import { IBottomIconConfig, ICommandPaletteCommand, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
-import { html } from '@app/engine/utils/development/formatter';
-import { getEl } from '@app/engine/utils/get-el';
-import { t7e } from '@app/locales/keys';
-import securityPng from '@public/img/icons/security.png';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { TooltipsPlugin } from '../tooltips/tooltips';
+import {
+  createTooltip,
+  EventBus,
+  EventBusEvent,
+  findObjectIdByNorad,
+  getEl,
+  getSatByNorad,
+  getSelectedSat,
+  html,
+  type IBottomIconConfig,
+  type ICommandPaletteCommand,
+  type IDragOptions,
+  type IHelpConfig,
+  type IKeyboardShortcut,
+  type ISideMenuConfig,
+  jumpToTime,
+  KeepTrackPlugin,
+  MenuMode,
+  pluginT7e,
+  selectSat,
+  ToastMsgType,
+  t7e,
+  toast,
+} from '@keeptrack/plugin-api';
 import {
   escapeKtocHtml,
   fetchKtocNotices,
@@ -27,6 +38,7 @@ import {
   ktocStatusLabel,
   normalizeKtocCode,
 } from './ktoc-notices-api';
+import securityPng from './ktoc-notices-icon.png';
 import { KtocNoticesInfoBoxSection } from './ktoc-notices-info-box';
 import './ktoc-notices.css';
 
@@ -54,7 +66,7 @@ export const KTOC_ALL_TYPES = 'ALL';
 
 type Fetcher = (query: KtocNoticeQuery) => Promise<KtocFetchResult>;
 
-const l = (key: string): string => t7e(`plugins.KtocNoticesPlugin.${key}` as Parameters<typeof t7e>[0]);
+const l = pluginT7e('KtocNoticesPlugin');
 
 /**
  * KTOC Notices: the public feed of KTOC (KeepTrack Operations Center) event
@@ -156,9 +168,9 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
         label: l('commands.forSelected'),
         category,
         keywords: ['ktoc', 'notices', 'selected satellite'],
-        isAvailable: () => KtocNoticesInfoBoxSection.noradOf(PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj) !== null,
+        isAvailable: () => KtocNoticesInfoBoxSection.noradOf(getSelectedSat()) !== null,
         callback: () => {
-          const norad = KtocNoticesInfoBoxSection.noradOf(PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj);
+          const norad = KtocNoticesInfoBoxSection.noradOf(getSelectedSat());
 
           if (norad !== null) {
             this.showNoticesForNorad(norad);
@@ -334,7 +346,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
       this.renderTable_();
     }
     this.showStatus_(message, true);
-    ServiceLocator.getUiManager().toast(message, ToastMsgType.caution);
+    toast(message, ToastMsgType.caution);
   }
 
   private setNotices_(notices: KtocNotice[]): void {
@@ -506,14 +518,13 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
 
     const body = table.createTBody();
     const start = (this.currentPage_ - 1) * KtocNoticesPlugin.PAGE_SIZE;
-    const tooltips = PluginRegistry.getPlugin(TooltipsPlugin);
 
     this.filtered_.slice(start, start + KtocNoticesPlugin.PAGE_SIZE).forEach((notice, i) => {
-      this.createRow_(body, notice, start + i, tooltips);
+      this.createRow_(body, notice, start + i);
     });
   }
 
-  private createRow_(body: HTMLTableSectionElement, notice: KtocNotice, index: number, tooltips: TooltipsPlugin | null): void {
+  private createRow_(body: HTMLTableSectionElement, notice: KtocNotice, index: number): void {
     const tr = body.insertRow();
 
     tr.id = `ktoc-notice-row-${notice.notice_id}`;
@@ -541,7 +552,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
     if (canceled) {
       tr.classList.add('ktoc-notice-canceled');
       badge.setAttribute('kt-tooltip', escapeKtocHtml(notice.reason ?? l('values.noReason')));
-      tooltips?.createTooltip(badge);
+      createTooltip(badge);
     }
 
     const linkCell = KtocNoticesPlugin.addCell_(tr, '');
@@ -557,7 +568,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
       link.setAttribute('aria-label', l('labels.openNotice'));
       link.setAttribute('kt-tooltip', l('labels.openNotice'));
       linkCell.appendChild(link);
-      tooltips?.createTooltip(link);
+      createTooltip(link);
     }
   }
 
@@ -571,7 +582,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
 
   /** "25544 ISS (ZARYA)" when the object is in the loaded catalog, otherwise just the NORAD number. */
   private static satelliteLabel_(norad: number): string {
-    const sat = ServiceLocator.getCatalogManager().sccNum2Sat(norad);
+    const sat = getSatByNorad(norad);
 
     return sat?.name ? `${norad} ${sat.name}` : String(norad);
   }
@@ -602,17 +613,16 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
    * open, per the secondary-menu rule.
    */
   private selectNotice_(notice: KtocNotice): void {
-    const catalogManager = ServiceLocator.getCatalogManager();
-    const satId = catalogManager.sccNum2Id(notice.norad_id);
+    const satId = findObjectIdByNorad(notice.norad_id);
 
-    if (satId === null || !catalogManager.getObject(satId)) {
-      ServiceLocator.getUiManager().toast(l('errorMsgs.notInCatalog').replace('{norad}', String(notice.norad_id)), ToastMsgType.caution);
+    if (satId === null) {
+      toast(l('errorMsgs.notInCatalog').replace('{norad}', String(notice.norad_id)), ToastMsgType.caution);
 
       return;
     }
 
-    ServiceLocator.getTimeManager().changeSimulationTime(notice.event_date_ms);
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    jumpToTime(notice.event_date_ms);
+    selectSat(satId);
 
     this.selectedNoticeId_ = notice.notice_id;
     const table = getEl(KTOC_MENU_IDS.TABLE, true);

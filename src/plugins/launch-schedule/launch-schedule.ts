@@ -21,14 +21,26 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { MenuMode } from '@app/engine/core/interfaces';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
-import { openColorbox } from '@app/engine/utils/colorbox';
-import { getEl } from '@app/engine/utils/get-el';
-import { t7e } from '@app/locales/keys';
-import calendarPng from '@public/img/icons/calendar.png';
+/*
+ * Imports only from the public plugin facade (docs/plugin-api.md) and its own
+ * files, so it can move to its own repo as an external plugin unchanged.
+ */
+import {
+  getEl,
+  getSimTime,
+  type IBottomIconConfig,
+  type ICommandPaletteCommand,
+  type IHelpConfig,
+  KeepTrackPlugin,
+  MenuMode,
+  openColorbox,
+  pluginT7e,
+  settingsManager,
+  t7e,
+} from '@keeptrack/plugin-api';
+import calendarPng from './launch-schedule-icon.png';
+
+const l = pluginT7e('LaunchSchedulePlugin');
 
 /** The KeepTrack launch schedule page for one calendar year. */
 export const launchScheduleUrl = (year: number): string => `https://keeptrack.space/launches/${year}`;
@@ -42,7 +54,7 @@ export class LaunchSchedulePlugin extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'launch-schedule-bottom-icon',
-      label: t7e('plugins.LaunchSchedulePlugin.bottomIconLabel' as Parameters<typeof t7e>[0]),
+      label: l('bottomIconLabel'),
       image: calendarPng,
       menuMode: [MenuMode.EVENTS, MenuMode.ALL],
     };
@@ -50,18 +62,18 @@ export class LaunchSchedulePlugin extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.LaunchSchedulePlugin.title'),
+      title: l('title'),
       sections: [
         {
           heading: t7e('help.overview'),
-          content: t7e('plugins.LaunchSchedulePlugin.help.overview'),
+          content: l('help.overview'),
         },
         {
           heading: t7e('help.howToUse'),
-          content: t7e('plugins.LaunchSchedulePlugin.help.howToUse'),
+          content: l('help.howToUse'),
         },
       ],
-      tips: [t7e('plugins.LaunchSchedulePlugin.help.tip1'), t7e('plugins.LaunchSchedulePlugin.help.tip2')],
+      tips: [l('help.tip1'), l('help.tip2')],
     };
   }
 
@@ -77,7 +89,7 @@ export class LaunchSchedulePlugin extends KeepTrackPlugin {
         settingsManager.isPreventColorboxClose = false;
       }, 2000);
       // The year on the simulation clock (UTC), so a user looking at a past or future date sees that year's launches.
-      const year = ServiceLocator.getTimeManager().simulationTimeObj.getUTCFullYear();
+      const year = getSimTime().getUTCFullYear();
 
       openColorbox(launchScheduleUrl(year), {
         callback: this.closeColorbox_.bind(this),
@@ -89,7 +101,7 @@ export class LaunchSchedulePlugin extends KeepTrackPlugin {
     return [
       {
         id: 'LaunchSchedulePlugin.open',
-        label: t7e('plugins.LaunchSchedulePlugin.commands.open' as Parameters<typeof t7e>[0]),
+        label: l('commands.open'),
         category: 'Plugins',
         callback: () => this.bottomMenuClicked(),
       },

@@ -1,5 +1,4 @@
-import { t7e } from '@app/locales/keys';
-import { settingsManager } from '@app/settings/settings';
+import { pluginT7e, settingsManager } from '@keeptrack/plugin-api';
 
 /**
  * Client for the public KTOC (KeepTrack Operations Center) notice index,
@@ -87,7 +86,7 @@ const STATUS_KEYS: Record<string, string> = {
   CANCELLED: 'canceled',
 };
 
-const l = (key: string): string => t7e(`plugins.KtocNoticesPlugin.${key}` as Parameters<typeof t7e>[0]);
+const l = pluginT7e('KtocNoticesPlugin');
 
 /** `limit=100` first, then the optional filters, so URLs are stable and easy to match in tests. */
 export const buildKtocNoticesUrl = (query: KtocNoticeQuery = {}): string => {

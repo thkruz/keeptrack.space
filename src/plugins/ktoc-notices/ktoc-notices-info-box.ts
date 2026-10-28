@@ -1,13 +1,5 @@
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { html } from '@app/engine/utils/development/formatter';
-import { getEl } from '@app/engine/utils/get-el';
-import { t7e } from '@app/locales/keys';
-import { settingsManager } from '@app/settings/settings';
-import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
-import { SatInfoBox } from '../sat-info-box/sat-info-box';
-import { TooltipsPlugin } from '../tooltips/tooltips';
+import { addSatInfoBoxSection, type BaseObject, createTooltip, EventBus, EventBusEvent, getEl, html, isCurrentSelection, pluginT7e, settingsManager } from '@keeptrack/plugin-api';
+import { CatalogSource, Satellite } from 'ootk';
 import {
   escapeKtocHtml,
   fetchKtocNotices,
@@ -35,7 +27,7 @@ const MAX_INFO_BOX_ROWS = 5;
 /** The card asks for this many; a full page means there may be more, so the count reads "25+". */
 const INFO_BOX_FETCH_LIMIT = 25;
 
-const l = (key: string): string => t7e(`plugins.KtocNoticesPlugin.${key}` as Parameters<typeof t7e>[0]);
+const l = pluginT7e('KtocNoticesPlugin');
 
 type Fetcher = (query: KtocNoticeQuery) => Promise<KtocFetchResult>;
 
@@ -62,21 +54,20 @@ export class KtocNoticesInfoBoxSection {
   ) {}
 
   register(): void {
-    const eventBus = EventBus.getInstance();
-
-    eventBus.on(EventBusEvent.satInfoBoxInit, () => {
-      PluginRegistry.getPlugin(SatInfoBox)?.addElement({ html: KtocNoticesInfoBoxSection.createSectionHtml_(), order: 8 });
+    addSatInfoBoxSection({
+      html: () => KtocNoticesInfoBoxSection.createSectionHtml_(),
+      order: 8,
+      collapsibleSectionId: KTOC_INFO_BOX_IDS.SECTION,
+      onReady: () => {
+        getEl(KTOC_INFO_BOX_IDS.SHOW_ALL, true)?.addEventListener('click', () => {
+          if (this.currentNorad_ !== null) {
+            this.onShowAll_(this.currentNorad_);
+          }
+        });
+      },
     });
-    eventBus.on(EventBusEvent.satInfoBoxAddListeners, () => {
-      PluginRegistry.getPlugin(SatInfoBox)?.addListenerToCollapseElement(getEl(KTOC_INFO_BOX_IDS.SECTION, true));
-      getEl(KTOC_INFO_BOX_IDS.SHOW_ALL, true)?.addEventListener('click', () => {
-        if (this.currentNorad_ !== null) {
-          this.onShowAll_(this.currentNorad_);
-        }
-      });
-    });
-    eventBus.on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
-      if (SatInfoBox.isCurrentSelection(obj)) {
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
+      if (isCurrentSelection(obj)) {
         this.update(obj);
       }
     });
@@ -160,14 +151,13 @@ export class KtocNoticesInfoBoxSection {
     }
 
     list.innerHTML = '';
-    const tooltips = PluginRegistry.getPlugin(TooltipsPlugin);
 
     for (const notice of notices.slice(0, MAX_INFO_BOX_ROWS)) {
       const row = KtocNoticesInfoBoxSection.createRow_(notice);
 
       list.appendChild(row);
       if (row.hasAttribute('kt-tooltip')) {
-        tooltips?.createTooltip(row);
+        createTooltip(row);
       }
     }
 

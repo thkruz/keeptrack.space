@@ -152,7 +152,7 @@ describe('KtocNoticesPlugin', () => {
 
       expect(statusText()).toBe(message);
       expect(getEl(KTOC_MENU_IDS.STATUS_MSG)!.classList.contains('ktoc-status-msg-error')).toBe(true);
-      expect(toast).toHaveBeenCalledWith(message, expect.anything());
+      expect(toast).toHaveBeenCalledWith(message, expect.anything(), false, undefined);
       expect(rows()).toHaveLength(0);
     });
 
@@ -166,7 +166,7 @@ describe('KtocNoticesPlugin', () => {
       const message = 'KTOC notices did not load (network error). Select Refresh to try again.';
 
       expect(statusText()).toBe(message);
-      expect(toast).toHaveBeenCalledWith(message, expect.anything());
+      expect(toast).toHaveBeenCalledWith(message, expect.anything(), false, undefined);
     });
 
     it('shows a clear empty message and Page 1 of 1 for an empty feed', async () => {
@@ -311,7 +311,7 @@ describe('KtocNoticesPlugin', () => {
         vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Id').mockReturnValue(null);
         rows()[0].cells[0].click();
 
-        expect(toast).toHaveBeenCalledWith('NORAD 28158 is not in the loaded catalog.', expect.anything());
+        expect(toast).toHaveBeenCalledWith('NORAD 28158 is not in the loaded catalog.', expect.anything(), false, undefined);
         expect(selectSat).not.toHaveBeenCalled();
         expect(changeTime).not.toHaveBeenCalled();
         expect(plugin.isMenuButtonActive).toBe(true);

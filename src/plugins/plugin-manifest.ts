@@ -681,13 +681,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'Screenshot',
     defaultConfig: { enabled: true, order: 450 },
   },
-  // Off by design: frames keeptrack.space/launches/<sim year>; replaced the retired Gunter calendar. Stays off because TheSpaceDevLaunchCalendarPlugin is the default launch calendar.
-  {
-    configKey: 'LaunchSchedulePlugin',
-    ossImport: () => import('./launch-schedule/launch-schedule'),
-    ossClassName: 'LaunchSchedulePlugin',
-    defaultConfig: { enabled: false, order: 351 },
-  },
   {
     configKey: 'TimeMachine',
     ossImport: () => import('./time-machine/time-machine'),

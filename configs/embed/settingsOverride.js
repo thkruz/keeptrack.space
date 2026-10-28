@@ -228,10 +228,6 @@ const settingsOverride = {
       enabled: false,
       order: 350,
     },
-    LaunchSchedulePlugin: {
-      enabled: false,
-      order: 351,
-    },
     Calculator: {
       enabled: false,
       order: 400,

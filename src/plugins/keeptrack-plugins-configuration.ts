@@ -117,7 +117,6 @@ export type KeepTrackPluginsConfiguration = {
   PlanetsMenuPlugin?: PluginConfiguration;
   DeepSpaceMissionsPlugin?: PluginConfiguration;
   Screenshot?: PluginConfiguration;
-  LaunchSchedulePlugin?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;

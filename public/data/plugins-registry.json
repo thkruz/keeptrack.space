@@ -1,6 +1,6 @@
 {
   "formatVersion": 1,
-  "updated": "2026-07-05",
+  "updated": "2026-10-28",
   "plugins": [
     {
       "name": "keeptrack-plugin-example",
@@ -10,6 +10,16 @@
       "author": "KeepTrack",
       "repository": "https://github.com/thkruz/keeptrack-plugin-example",
       "tags": ["example", "template"],
+      "engine": ">=13.0.0 <14.0.0"
+    },
+    {
+      "name": "keeptrack-plugin-launch-schedule",
+      "configKey": "LaunchSchedulePlugin",
+      "displayName": "Launch Schedule",
+      "description": "Opens the KeepTrack launch schedule (keeptrack.space/launches) for the year on the simulation clock, with a new-tab fallback.",
+      "author": "KeepTrack",
+      "repository": "https://github.com/thkruz/keeptrack-plugin-launch-schedule",
+      "tags": ["launches", "example"],
       "engine": ">=13.0.0 <14.0.0"
     }
   ]

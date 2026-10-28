@@ -176,9 +176,6 @@ const settingsOverride = {
     TheSpaceDevLaunchCalendarPlugin: {
       enabled: false,
     },
-    LaunchSchedulePlugin: {
-      enabled: false,
-    },
     Calculator: {
       enabled: false,
     },

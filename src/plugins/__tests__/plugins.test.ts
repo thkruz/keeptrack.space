@@ -21,9 +21,6 @@ describe('plugins', () => {
         FindSatPlugin: {
           enabled: true,
         },
-        LaunchSchedulePlugin: {
-          enabled: true,
-        },
         NewLaunch: {
           enabled: true,
         },

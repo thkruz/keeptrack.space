@@ -19,7 +19,8 @@ interface ColorboxOptions {
 let isColorBoxReady = false;
 
 export const openColorbox = (url: string, options: ColorboxOptions = {}): void => {
-  if (!isColorBoxReady) {
+  // Rebuild when the DOM was replaced since the first build (a re-rendered root, or a fresh test DOM).
+  if (!isColorBoxReady || !getEl('colorbox-div', true)) {
     createColorbox();
   }
 

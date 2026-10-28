@@ -241,3 +241,26 @@ describe('colorbox new tab and blank-page hint', () => {
     expect((<HTMLElement>getEl('colorbox-div')).style.display).toBe('block');
   });
 });
+
+describe('colorbox rebuild after the DOM is replaced', () => {
+  beforeEach(() => {
+    KeepTrack.getInstance().containerRoot = document.body as HTMLDivElement;
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+  });
+
+  it('rebuilds the colorbox when its element is gone after the first open', () => {
+    openColorbox('https://www.example.com/first');
+    vi.advanceTimersByTime(1000);
+    expect(getEl('colorbox-div', true)).not.toBeNull();
+
+    // A fresh DOM (re-rendered root, or the next test's environment) drops the colorbox.
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+    expect(getEl('colorbox-div', true)).toBeNull();
+
+    expect(() => openColorbox('https://www.example.com/second')).not.toThrow();
+    vi.advanceTimersByTime(1000);
+
+    expect(getEl('colorbox-div', true)).not.toBeNull();
+    expect((<HTMLIFrameElement>getEl('colorbox-iframe')).src).toBe('https://www.example.com/second');
+  });
+});

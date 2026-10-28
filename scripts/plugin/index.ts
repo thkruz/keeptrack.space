@@ -70,7 +70,7 @@ KeepTrack Plugin CLI
   create <name>              Scaffold a new plugin skeleton
   dev <name>                 Boot the app with only this plugin, live-reload
   test <name>                Run this plugin's unit tests
-  doctor <name>              Validate a plugin (schema, collisions, locales)
+  doctor <name>              Validate a plugin (schema, collisions, pluginApi, imports, locales)
 `;
 
 async function main(): Promise<number> {

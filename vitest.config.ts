@@ -144,6 +144,12 @@ export default defineConfig({
       '@css': path.resolve(__dirname, './public/css'),
       '@test': path.resolve(__dirname, './test'),
       '@wallpapers': path.resolve(__dirname, './src/app/ui/default-wallpapers.ts'),
+      // Public plugin facade (docs/plugin-api.md). The `/testing` entry must come
+      // first: aliases match in order and the bare key also matches `<key>/...`.
+      '@keeptrack/plugin-api/testing': path.resolve(__dirname, './src/plugin-api/testing.ts'),
+      '@keeptrack/plugin-api': path.resolve(__dirname, './src/plugin-api/index.ts'),
+      // Bare `ootk` (used by external plugins) resolves to the in-tree submodule.
+      ootk: path.resolve(__dirname, './src/engine/ootk/src/main.ts'),
     },
   },
 });

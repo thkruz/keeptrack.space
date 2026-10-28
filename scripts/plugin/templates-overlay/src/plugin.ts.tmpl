@@ -7,20 +7,28 @@
  *
  * The entry MUST export a class named `__CLASS_NAME__` whose `readonly id`
  * equals its configKey (`__CONFIG_KEY__`).
+ *
+ * Import ONLY from '@keeptrack/plugin-api' (plus 'ootk' and your own files);
+ * see docs/plugin-api.md.
  */
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
-  IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IHelpConfig, IKeyboardShortcut, UtilityGroup,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import { t7e } from '@app/locales/keys';
+  type IBottomIconConfig,
+  type ICommandPaletteCommand,
+  IconPlacement,
+  type IHelpConfig,
+  type IKeyboardShortcut,
+  KeepTrackPlugin,
+  MenuMode,
+  pluginT7e,
+  t7e,
+  ToastMsgType,
+  toast,
+  UtilityGroup,
+} from '@keeptrack/plugin-api';
 import pluginIcon from './__ELEMENT_BASE__-icon.png';
 import './plugin.css';
 
-type T7eKey = Parameters<typeof t7e>[0];
-
-const l = (key: string): string => t7e(`plugins.__CONFIG_KEY__.${key}` as T7eKey);
+const l = pluginT7e('__CONFIG_KEY__');
 
 export class __CLASS_NAME__ extends KeepTrackPlugin {
   readonly id = '__CONFIG_KEY__';
@@ -82,6 +90,6 @@ export class __CLASS_NAME__ extends KeepTrackPlugin {
       this.setBottomIconToUnselected();
     }
 
-    ServiceLocator.getUiManager().toast(l(this.isActive_ ? 'toasts.on' : 'toasts.off'), ToastMsgType.normal);
+    toast(l(this.isActive_ ? 'toasts.on' : 'toasts.off'), ToastMsgType.normal);
   }
 }

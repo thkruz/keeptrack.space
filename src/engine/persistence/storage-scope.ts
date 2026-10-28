@@ -171,6 +171,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.ONBOARDING_STATE]: StorageScope.Device,
   [StorageKey.PLUGIN_ENABLE_OVERRIDES]: StorageScope.Device,
   [StorageKey.FPS_VIEW_HINT_SEEN]: StorageScope.Device,
+  [StorageKey.PLUGIN_STORAGE]: StorageScope.Device,
 
   // --- Device: meta/bookkeeping (never sync) ------------------------------------
   [StorageKey.VERSION]: StorageScope.Device,

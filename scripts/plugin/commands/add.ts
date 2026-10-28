@@ -4,7 +4,8 @@ import { writeGeneratedManifest } from '../lib/codegen';
 import { confirm } from '../lib/confirm';
 import { checkout, clone, headCommit } from '../lib/git';
 import {
-  assertNameAvailable, deriveName, enforceEngineCompat, isGitUrl, isInsideExternalDir, validatePluginStrict,
+  assertNameAvailable, deriveName, enforceEngineCompat, enforceImportPolicy, enforcePluginApiCompat, isGitUrl, isInsideExternalDir,
+  validatePluginStrict,
 } from '../lib/install-helpers';
 import { readLockfile, writeLockfile } from '../lib/lockfile';
 import { CliError, log } from '../lib/log';
@@ -56,7 +57,7 @@ async function addFromGit(
     const commit = headCommit(dir);
 
     validatePluginStrict(dir, name);
-    enforceEngineCompat(readManifest(dir).engine, force);
+    enforceCompatGates(dir, force);
 
     recordAndFinalize(name, { url, ref: ref || '(default)', commit, installedAt: new Date().toISOString() });
   } catch (e) {
@@ -91,7 +92,7 @@ async function addFromLocal(source: string, flags: Record<string, string | boole
   }
 
   validatePluginStrict(abs, name);
-  enforceEngineCompat(readManifest(abs).engine, force);
+  enforceCompatGates(abs, force);
 
   let commit = 'local';
 
@@ -126,4 +127,13 @@ function recordAndFinalize(name: string, entry: LockEntry): void {
     log.warn('This plugin may be incompatible with the current host version — see "npm run plugin -- list".');
   }
   log.info('Run "npm run build" (or restart "npm start") to include it.');
+}
+
+/** The strict install gates: host engine range, plugin-API range, import policy. */
+function enforceCompatGates(dir: string, force: boolean): void {
+  const manifest = readManifest(dir);
+
+  enforceEngineCompat(manifest.engine, force);
+  enforcePluginApiCompat(manifest.pluginApi, force);
+  enforceImportPolicy(dir, force);
 }

@@ -1,7 +1,5 @@
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { standardPluginMenuButtonTests, standardPluginSuite } from '@test/generic-tests';
+import { EventBus, EventBusEvent } from '@keeptrack/plugin-api';
+import { setupStandardEnvironment, standardPluginMenuButtonTests, standardPluginSuite } from '@keeptrack/plugin-api/testing';
 import { vi } from 'vitest';
 import { __CLASS_NAME__ } from '../src/plugin';
 

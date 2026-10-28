@@ -1,6 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PLUGIN_API_VERSION } from '../../../src/plugin-api/version';
 import { resolveWithin } from '../../lib/safe-path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -23,6 +24,8 @@ export interface TemplateVars {
   ELEMENT_BASE: string;
   ENGINE_RANGE: string;
   ENGINE_REF: string;
+  /** Default `pluginApi` range: caret on the host's PLUGIN_API_VERSION. */
+  PLUGIN_API_RANGE: string;
   DESCRIPTION: string;
   YEAR: string;
   AUTHOR: string;
@@ -144,6 +147,7 @@ export function buildVars(base: string, hostVersion: string, opts: { description
     ELEMENT_BASE: base,
     ENGINE_RANGE: `>=${major}.0.0 <${major + 1}.0.0`,
     ENGINE_REF: `v${hostVersion}`,
+    PLUGIN_API_RANGE: `^${PLUGIN_API_VERSION}`,
     DESCRIPTION: opts.description,
     YEAR: String(new Date().getFullYear()),
     AUTHOR: opts.author,

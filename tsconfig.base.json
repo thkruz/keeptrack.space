@@ -74,6 +74,17 @@
       ],
       "@wallpapers": [
         "./src/app/ui/default-wallpapers.ts"
+      ],
+      // Public plugin facade (docs/plugin-api.md). External plugins import only these + `ootk`.
+      "@keeptrack/plugin-api": [
+        "./src/plugin-api/index.ts"
+      ],
+      "@keeptrack/plugin-api/testing": [
+        "./src/plugin-api/testing.ts"
+      ],
+      // Bare `ootk` resolves to the in-tree submodule so plugins share the app's single ootk instance.
+      "ootk": [
+        "./src/engine/ootk/src/main.ts"
       ]
     } /* Re-map imports; paths are relative to this config file (TS 7 removed baseUrl). */,
     // "rootDirs": [],                        /* List of root folders whose combined content represents the structure of the project at runtime. */

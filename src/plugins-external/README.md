@@ -32,3 +32,7 @@ plugin set with `npm run plugin -- restore` (also run automatically by
 
 To **build a plugin**, see `npm run plugin -- create <name>` and the plugin
 development guide in the docs.
+
+Plugins here import only `@keeptrack/plugin-api` (plus `ootk`, `vitest`, and
+their own files); `npm run plugin -- doctor <name>` checks it. See
+[docs/plugin-api.md](../../docs/plugin-api.md).

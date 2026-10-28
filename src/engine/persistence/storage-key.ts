@@ -204,6 +204,10 @@ export enum StorageKey {
   // FPS View (the one-time "how to fly" hint was shown on this device)
   FPS_VIEW_HINT_SEEN = 'v2-keepTrack-fpsViewHintSeen',
 
+  // Plugin API facade (createPluginStorage in src/plugin-api): one JSON object
+  // holding every plugin's namespaced values, Record<configKey, Record<key, string>>.
+  PLUGIN_STORAGE = 'v2-keepTrack-pluginStorage',
+
   // Per-key sync timestamps for account-scoped keys: JSON Record<StorageKey, epochMs>.
   // Maintained by PersistenceManager; wiped on version bumps so a post-wipe login
   // lets the cloud copy win. Never syncs itself.

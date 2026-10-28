@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
-import { classifyCompat, hostVersion } from '../lib/host-version';
+import { classifyCompat, classifyPluginApi, hostVersion, PLUGIN_API_VERSION } from '../lib/host-version';
 import { existingConfigKeys } from '../lib/existing-keys';
+import { checkPluginImports, formatViolation } from '../lib/import-policy';
 import { checkLocales } from '../lib/locale-check';
 import { CliError, log } from '../lib/log';
 import { validateManifest } from '../lib/plugin-meta';
@@ -12,6 +13,50 @@ function line(status: Status, label: string, detail = ''): void {
   const tag = status === 'PASS' ? log.dim('PASS') : status === 'WARN' ? '\x1b[33mWARN\x1b[0m' : '\x1b[31mFAIL\x1b[0m';
 
   console.log(`  [${tag}] ${label}${detail ? log.dim(`  — ${detail}`) : ''}`);
+}
+
+/** Report the pluginApi range check. Returns true when it is a blocking failure. */
+function reportPluginApi_(range: string | undefined): boolean {
+  const level = classifyPluginApi(range);
+
+  if (level === 'ok') {
+    line('PASS', `pluginApi ${range} satisfies @keeptrack/plugin-api ${PLUGIN_API_VERSION}`);
+
+    return false;
+  }
+  if (level === 'missing') {
+    line('WARN', `No "pluginApi" range in keeptrack-plugin.json`, `add "pluginApi": "^${PLUGIN_API_VERSION}"`);
+
+    return false;
+  }
+  if (level === 'invalid-range') {
+    line('FAIL', `pluginApi ${JSON.stringify(range)} is not a valid semver range`);
+  } else {
+    line('FAIL', `pluginApi ${range} is not satisfied by @keeptrack/plugin-api ${PLUGIN_API_VERSION}`);
+  }
+
+  return true;
+}
+
+/** Report imports outside the plugin API. Returns true when any were found. */
+function reportImports_(dir: string): boolean {
+  const { violations, biomeError } = checkPluginImports(dir);
+
+  if (biomeError) {
+    line('WARN', 'Biome import check unavailable; used the built-in scanner', biomeError);
+  }
+  if (violations.length === 0) {
+    line('PASS', 'Imports only @keeptrack/plugin-api, ootk, vitest, and its own files');
+
+    return false;
+  }
+
+  line('FAIL', `${violations.length} import(s) outside @keeptrack/plugin-api (see docs/plugin-api.md)`);
+  for (const v of violations) {
+    console.log(`         ${formatViolation(v)}`);
+  }
+
+  return true;
 }
 
 export function doctorCommand(positionals: string[]): number {
@@ -60,6 +105,12 @@ export function doctorCommand(positionals: string[]): number {
     failed = true;
     line('FAIL', `Engine ${manifest.engine} incompatible with host ${hostVersion()}`);
   }
+
+  // Plugin-API facade range.
+  failed = reportPluginApi_(manifest.pluginApi) || failed;
+
+  // Import policy (only @keeptrack/plugin-api, ootk, vitest, own files).
+  failed = reportImports_(dir) || failed;
 
   // Locales.
   const loc = checkLocales(dir, configKeys, manifest.localesDir);

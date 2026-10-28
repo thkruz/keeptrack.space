@@ -4,12 +4,17 @@
  * GitHub's "Use this template" flow. Keeps that repo from drifting out of sync
  * with scripts/plugin/templates.
  *
+ * The rendered plugin must import only the public facade
+ * (@keeptrack/plugin-api, its /testing kit, ootk, vitest, own files); the
+ * export fails if a template ever regresses to a deep internal import.
+ *
  *   npx tsx scripts/plugin/export-template.ts <out-dir> [--overlay]
  */
 import { rmSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { resolveStrictlyWithin } from '../lib/safe-path';
 import { hostVersion } from './lib/host-version';
+import { checkPluginImports, formatViolation } from './lib/import-policy';
 import { log } from './lib/log';
 import { REPO_ROOT } from './lib/paths';
 import { buildVars, renderPlugin } from './lib/render-template';
@@ -46,6 +51,16 @@ function main(): number {
   // Clean the target so a removed template file doesn't linger in the export.
   rmSync(outDir, { recursive: true, force: true, maxRetries: 5 });
   renderPlugin(outDir, kind, vars);
+
+  const { violations } = checkPluginImports(outDir);
+
+  if (violations.length > 0) {
+    const list = violations.map((v) => `  - ${formatViolation(v)}`).join('\n');
+
+    log.error(`Rendered template imports outside @keeptrack/plugin-api:\n${list}`);
+
+    return 1;
+  }
 
   log.success(`Rendered ${kind} template to ${outDir}`);
   log.step('Commit this directory as the public keeptrack-plugin-example repo.');

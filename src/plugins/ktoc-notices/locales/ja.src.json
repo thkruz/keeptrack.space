@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "KTOC 通知",
+      "title": "KTOC 通知",
+      "shortcutToggle": "KTOC 通知を開く・閉じる",
+      "commands": {
+        "open": "KTOC 通知を開く",
+        "forSelected": "選択中の衛星の KTOC 通知"
+      },
+      "sections": {
+        "filters": "フィルター",
+        "notices": "通知"
+      },
+      "labels": {
+        "statusFilter": "通知ステータス",
+        "all": "すべて",
+        "activeOnly": "有効のみ",
+        "eventType": "イベント種別",
+        "allTypes": "すべてのイベント種別",
+        "showAllSatellites": "すべての衛星を表示",
+        "noradFilter": "NORAD {norad} の通知を表示中",
+        "previous": "前へ",
+        "next": "次へ",
+        "pageOf": "{current} / {total} ページ",
+        "refresh": "更新",
+        "issuer": "発行元: KTOC (KeepTrack Operations Center)",
+        "loading": "KTOC 通知を読み込み中...",
+        "empty": "KTOC はまだ通知を公開していません。",
+        "emptyForNorad": "KTOC は NORAD {norad} の通知を公開していません。",
+        "noMatches": "これらのフィルターに一致する通知はありません。",
+        "openNotice": "keeptrack.space で通知全文を開く"
+      },
+      "table": {
+        "event": "イベント",
+        "date": "日時 (UTC)",
+        "satellite": "衛星",
+        "type": "種別",
+        "status": "ステータス",
+        "notice": "通知"
+      },
+      "types": {
+        "relocation": "軌道位置の移動",
+        "departure": "離脱",
+        "arrival": "到着",
+        "disposal": "廃棄",
+        "fragmentation": "破片化",
+        "breakup": "分解",
+        "debrisShed": "デブリ放出",
+        "proximity": "近接運用",
+        "deployment": "放出",
+        "maneuver": "マヌーバ",
+        "drift": "ドリフト",
+        "reentry": "再突入",
+        "other": "その他のイベント"
+      },
+      "statuses": {
+        "confirmed": "確定",
+        "potential": "暫定",
+        "canceled": "取り消し",
+        "unknown": "不明なステータス"
+      },
+      "values": {
+        "eventNumber": "イベント {num}",
+        "unnumbered": "番号なし",
+        "unknownDate": "日時不明",
+        "noReason": "KTOC により取り消されました。"
+      },
+      "errorMsgs": {
+        "fetchFailed": "KTOC 通知を読み込めませんでした ({detail})。更新を選択して再試行してください。",
+        "refreshFailedKeep": "更新に失敗しました ({detail})。前のリストを表示しています。",
+        "networkDetail": "ネットワークエラー",
+        "notInCatalog": "NORAD {norad} は読み込まれたカタログにありません。"
+      },
+      "infoBox": {
+        "title": "KTOC 通知",
+        "titleWithCount": "KTOC 通知 ({count})",
+        "showAll": "KTOC 通知で {count} 件すべてを表示"
+      },
+      "help": {
+        "overview": "KTOC 通知は KTOC (KeepTrack Operations Center) が公開したすべてのイベント通知を一覧表示します。軌道位置の移動、離脱、破片化など、KTOC が公開カタログで検出した変化が含まれます。各通知は keeptrack.space の詳細な分析にリンクしています。",
+        "statusesHeading": "通知ステータス",
+        "statuses": "<ul><li><strong>暫定</strong>: イベントを示した最初のデータに基づいて KTOC が公開しました。</li><li><strong>確定</strong>: 新しいデータが公開済みのイベントと一致しました。</li><li><strong>取り消し</strong>: 新しいデータがイベントと矛盾しました。行には取り消し線が付きます。ステータスにカーソルを合わせると理由が表示されます。</li></ul>",
+        "howToUse": "<ol><li>ドロワー (イベントモード) から <strong>KTOC 通知</strong> を開きます。最新の 100 件が新しいイベント順に読み込まれます。</li><li><strong>すべて</strong> または <strong>有効のみ</strong> を選び、イベント種別で一覧を絞り込みます。</li><li>行をクリックすると衛星が選択され、時計がイベント時刻に移動します。再生・一時停止の状態は変わりません。</li><li>リンクアイコンをクリックすると、keeptrack.space の通知全文が新しいタブで開きます。</li><li><strong>更新</strong> を選択すると最新の通知を読み込みます。</li></ol>",
+        "tip1": "通知のある衛星を選択すると、衛星情報ボックスに KTOC 通知カードが表示されます。",
+        "tip2": "コマンドパレットの「選択中の衛星の KTOC 通知」で、現在の選択に関するすべての通知を一覧表示できます。",
+        "tip3": "読み込まれたカタログにない衛星の行でも通知は開けますが、3D ビューで選択することはできません。"
+      }
+    }
+  }
+}

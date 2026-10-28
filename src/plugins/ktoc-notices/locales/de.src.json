@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "KTOC-Meldungen",
+      "title": "KTOC-Meldungen",
+      "shortcutToggle": "KTOC-Meldungen öffnen oder schließen",
+      "commands": {
+        "open": "KTOC-Meldungen öffnen",
+        "forSelected": "KTOC-Meldungen für den ausgewählten Satelliten"
+      },
+      "sections": {
+        "filters": "Filter",
+        "notices": "Meldungen"
+      },
+      "labels": {
+        "statusFilter": "Meldungsstatus",
+        "all": "Alle",
+        "activeOnly": "Nur aktive",
+        "eventType": "Ereignistyp",
+        "allTypes": "Alle Ereignistypen",
+        "showAllSatellites": "Alle Satelliten anzeigen",
+        "noradFilter": "Meldungen für NORAD {norad}",
+        "previous": "Zurück",
+        "next": "Weiter",
+        "pageOf": "Seite {current} von {total}",
+        "refresh": "Aktualisieren",
+        "issuer": "Herausgegeben von KTOC (KeepTrack Operations Center)",
+        "loading": "KTOC-Meldungen werden geladen...",
+        "empty": "KTOC hat noch keine Meldungen veröffentlicht.",
+        "emptyForNorad": "KTOC hat keine Meldungen für NORAD {norad} veröffentlicht.",
+        "noMatches": "Keine Meldungen entsprechen diesen Filtern.",
+        "openNotice": "Vollständige Meldung auf keeptrack.space öffnen"
+      },
+      "table": {
+        "event": "Ereignis",
+        "date": "Datum (UTC)",
+        "satellite": "Satellit",
+        "type": "Typ",
+        "status": "Status",
+        "notice": "Meldung"
+      },
+      "types": {
+        "relocation": "Verlagerung",
+        "departure": "Abflug",
+        "arrival": "Ankunft",
+        "disposal": "Entsorgung",
+        "fragmentation": "Fragmentierung",
+        "breakup": "Zerfall",
+        "debrisShed": "Trümmerabgabe",
+        "proximity": "Annäherungsoperationen",
+        "deployment": "Aussetzung",
+        "maneuver": "Manöver",
+        "drift": "Drift",
+        "reentry": "Wiedereintritt",
+        "other": "Anderes Ereignis"
+      },
+      "statuses": {
+        "confirmed": "Bestätigt",
+        "potential": "Möglich",
+        "canceled": "Zurückgezogen",
+        "unknown": "Unbekannter Status"
+      },
+      "values": {
+        "eventNumber": "Ereignis {num}",
+        "unnumbered": "Ohne Nummer",
+        "unknownDate": "Unbekanntes Datum",
+        "noReason": "Von KTOC zurückgezogen."
+      },
+      "errorMsgs": {
+        "fetchFailed": "KTOC-Meldungen wurden nicht geladen ({detail}). Wählen Sie Aktualisieren, um es erneut zu versuchen.",
+        "refreshFailedKeep": "Aktualisierung fehlgeschlagen ({detail}). Die vorherige Liste wird angezeigt.",
+        "networkDetail": "Netzwerkfehler",
+        "notInCatalog": "NORAD {norad} ist nicht im geladenen Katalog."
+      },
+      "infoBox": {
+        "title": "KTOC-Meldungen",
+        "titleWithCount": "KTOC-Meldungen ({count})",
+        "showAll": "Alle {count} in KTOC-Meldungen anzeigen"
+      },
+      "help": {
+        "overview": "KTOC-Meldungen listet jede von KTOC (KeepTrack Operations Center) veröffentlichte Ereignismeldung auf: Verlagerungen, Abflüge, Fragmentierungen und andere Änderungen, die KTOC im öffentlichen Katalog erkennt. Jede Meldung verlinkt auf die vollständige Analyse auf keeptrack.space.",
+        "statusesHeading": "Meldungsstatus",
+        "statuses": "<ul><li><strong>Möglich</strong>: KTOC hat das Ereignis anhand der ersten Daten veröffentlicht, die es zeigten.</li><li><strong>Bestätigt</strong>: Neuere Daten stimmen mit dem veröffentlichten Ereignis überein.</li><li><strong>Zurückgezogen</strong>: Neuere Daten widersprechen dem Ereignis. Die Zeile ist durchgestrichen; fahren Sie über den Status, um den Grund zu lesen.</li></ul>",
+        "howToUse": "<ol><li>Öffnen Sie <strong>KTOC-Meldungen</strong> in der Seitenleiste (Modus Ereignisse). Die neuesten 100 Meldungen werden geladen, neuestes Ereignis zuerst.</li><li>Wählen Sie <strong>Alle</strong> oder <strong>Nur aktive</strong> und einen Ereignistyp, um die Liste einzugrenzen.</li><li>Klicken Sie auf eine Zeile, um den Satelliten auszuwählen und die Uhr auf den Ereigniszeitpunkt zu setzen. Wiedergabe oder Pause bleibt unverändert.</li><li>Klicken Sie auf das Link-Symbol, um die vollständige Meldung auf keeptrack.space in einem neuen Tab zu öffnen.</li><li>Wählen Sie <strong>Aktualisieren</strong>, um die neuesten Meldungen zu laden.</li></ol>",
+        "tip1": "Wenn Sie einen Satelliten mit Meldungen auswählen, erscheint im Satelliten-Infofeld eine Karte KTOC-Meldungen.",
+        "tip2": "Mit dem Befehlspaletten-Eintrag \"KTOC-Meldungen für den ausgewählten Satelliten\" listen Sie alle Meldungen zur aktuellen Auswahl auf.",
+        "tip3": "Eine Zeile für einen Satelliten außerhalb des geladenen Katalogs öffnet weiterhin ihre Meldung; in der 3D-Ansicht lässt er sich nicht auswählen."
+      }
+    }
+  }
+}

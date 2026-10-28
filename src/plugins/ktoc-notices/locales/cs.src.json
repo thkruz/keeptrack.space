@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "Oznámení KTOC",
+      "title": "Oznámení KTOC",
+      "shortcutToggle": "Otevřít nebo zavřít Oznámení KTOC",
+      "commands": {
+        "open": "Otevřít Oznámení KTOC",
+        "forSelected": "Oznámení KTOC pro vybraný satelit"
+      },
+      "sections": {
+        "filters": "Filtry",
+        "notices": "Oznámení"
+      },
+      "labels": {
+        "statusFilter": "Stav oznámení",
+        "all": "Vše",
+        "activeOnly": "Jen aktivní",
+        "eventType": "Typ události",
+        "allTypes": "Všechny typy událostí",
+        "showAllSatellites": "Zobrazit všechny satelity",
+        "noradFilter": "Oznámení pro NORAD {norad}",
+        "previous": "Předchozí",
+        "next": "Další",
+        "pageOf": "Strana {current} z {total}",
+        "refresh": "Obnovit",
+        "issuer": "Vydává KTOC (KeepTrack Operations Center)",
+        "loading": "Načítání oznámení KTOC...",
+        "empty": "KTOC zatím nezveřejnilo žádná oznámení.",
+        "emptyForNorad": "KTOC nezveřejnilo žádná oznámení pro NORAD {norad}.",
+        "noMatches": "Těmto filtrům neodpovídá žádné oznámení.",
+        "openNotice": "Otevřít celé oznámení na keeptrack.space"
+      },
+      "table": {
+        "event": "Událost",
+        "date": "Datum (UTC)",
+        "satellite": "Satelit",
+        "type": "Typ",
+        "status": "Stav",
+        "notice": "Oznámení"
+      },
+      "types": {
+        "relocation": "Přemístění",
+        "departure": "Odlet",
+        "arrival": "Přílet",
+        "disposal": "Vyřazení",
+        "fragmentation": "Fragmentace",
+        "breakup": "Rozpad",
+        "debrisShed": "Uvolnění trosek",
+        "proximity": "Operace v blízkosti",
+        "deployment": "Vypuštění",
+        "maneuver": "Manévr",
+        "drift": "Drift",
+        "reentry": "Návrat do atmosféry",
+        "other": "Jiná událost"
+      },
+      "statuses": {
+        "confirmed": "Potvrzeno",
+        "potential": "Možné",
+        "canceled": "Zrušeno",
+        "unknown": "Neznámý stav"
+      },
+      "values": {
+        "eventNumber": "Událost {num}",
+        "unnumbered": "Bez čísla",
+        "unknownDate": "Neznámé datum",
+        "noReason": "Zrušeno KTOC."
+      },
+      "errorMsgs": {
+        "fetchFailed": "Oznámení KTOC se nenačetla ({detail}). Zkuste to znovu volbou Obnovit.",
+        "refreshFailedKeep": "Obnovení se nezdařilo ({detail}). Zobrazuje se předchozí seznam.",
+        "networkDetail": "chyba sítě",
+        "notInCatalog": "NORAD {norad} není v načteném katalogu."
+      },
+      "infoBox": {
+        "title": "Oznámení KTOC",
+        "titleWithCount": "Oznámení KTOC ({count})",
+        "showAll": "Zobrazit všech {count} v Oznámení KTOC"
+      },
+      "help": {
+        "overview": "Oznámení KTOC vypisuje každé oznámení o události, které zveřejnilo KTOC (KeepTrack Operations Center): přemístění, odlety, fragmentace a další změny, které KTOC zjistí ve veřejném katalogu. Každé oznámení odkazuje na úplnou analýzu na keeptrack.space.",
+        "statusesHeading": "Stavy oznámení",
+        "statuses": "<ul><li><strong>Možné</strong>: KTOC zveřejnilo událost z prvních dat, která ji ukázala.</li><li><strong>Potvrzeno</strong>: novější data odpovídají zveřejněné události.</li><li><strong>Zrušeno</strong>: novější data události odporují. Řádek je přeškrtnutý; po najetí na stav se zobrazí důvod.</li></ul>",
+        "howToUse": "<ol><li>Otevřete <strong>Oznámení KTOC</strong> z panelu (režim Události). Načte se 100 nejnovějších oznámení, nejnovější událost první.</li><li>Zvolte <strong>Vše</strong> nebo <strong>Jen aktivní</strong> a typ události pro zúžení seznamu.</li><li>Kliknutím na řádek vyberete satelit a nastavíte hodiny na čas události. Přehrávání nebo pauza zůstanou beze změny.</li><li>Kliknutím na ikonu odkazu otevřete celé oznámení na keeptrack.space na nové kartě.</li><li>Volbou <strong>Obnovit</strong> načtete nejnovější oznámení.</li></ol>",
+        "tip1": "Po výběru satelitu s oznámeními se v informačním panelu satelitu zobrazí karta Oznámení KTOC.",
+        "tip2": "Položka palety příkazů \"Oznámení KTOC pro vybraný satelit\" vypíše všechna oznámení pro aktuální výběr.",
+        "tip3": "Řádek satelitu, který není v načteném katalogu, stále otevře své oznámení; ve 3D zobrazení jej nelze vybrat."
+      }
+    }
+  }
+}

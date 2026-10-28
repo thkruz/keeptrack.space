@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "Avis KTOC",
+      "title": "Avis KTOC",
+      "shortcutToggle": "Ouvrir ou fermer Avis KTOC",
+      "commands": {
+        "open": "Ouvrir Avis KTOC",
+        "forSelected": "Avis KTOC du satellite sélectionné"
+      },
+      "sections": {
+        "filters": "Filtres",
+        "notices": "Avis"
+      },
+      "labels": {
+        "statusFilter": "Statut de l'avis",
+        "all": "Tous",
+        "activeOnly": "Actifs uniquement",
+        "eventType": "Type d'événement",
+        "allTypes": "Tous les types d'événement",
+        "showAllSatellites": "Afficher tous les satellites",
+        "noradFilter": "Avis pour NORAD {norad}",
+        "previous": "Précédent",
+        "next": "Suivant",
+        "pageOf": "Page {current} sur {total}",
+        "refresh": "Actualiser",
+        "issuer": "Publié par KTOC (KeepTrack Operations Center)",
+        "loading": "Chargement des avis KTOC...",
+        "empty": "KTOC n'a encore publié aucun avis.",
+        "emptyForNorad": "KTOC n'a publié aucun avis pour NORAD {norad}.",
+        "noMatches": "Aucun avis ne correspond à ces filtres.",
+        "openNotice": "Ouvrir l'avis complet sur keeptrack.space"
+      },
+      "table": {
+        "event": "Événement",
+        "date": "Date (UTC)",
+        "satellite": "Satellite",
+        "type": "Type",
+        "status": "Statut",
+        "notice": "Avis"
+      },
+      "types": {
+        "relocation": "Repositionnement",
+        "departure": "Départ",
+        "arrival": "Arrivée",
+        "disposal": "Mise au rebut",
+        "fragmentation": "Fragmentation",
+        "breakup": "Désintégration",
+        "debrisShed": "Libération de débris",
+        "proximity": "Opérations de proximité",
+        "deployment": "Déploiement",
+        "maneuver": "Manœuvre",
+        "drift": "Dérive",
+        "reentry": "Rentrée",
+        "other": "Autre événement"
+      },
+      "statuses": {
+        "confirmed": "Confirmé",
+        "potential": "Potentiel",
+        "canceled": "Annulé",
+        "unknown": "Statut inconnu"
+      },
+      "values": {
+        "eventNumber": "Événement {num}",
+        "unnumbered": "Sans numéro",
+        "unknownDate": "Date inconnue",
+        "noReason": "Annulé par KTOC."
+      },
+      "errorMsgs": {
+        "fetchFailed": "Les avis KTOC ne se sont pas chargés ({detail}). Sélectionnez Actualiser pour réessayer.",
+        "refreshFailedKeep": "Échec de l'actualisation ({detail}). La liste précédente est affichée.",
+        "networkDetail": "erreur réseau",
+        "notInCatalog": "NORAD {norad} ne figure pas dans le catalogue chargé."
+      },
+      "infoBox": {
+        "title": "Avis KTOC",
+        "titleWithCount": "Avis KTOC ({count})",
+        "showAll": "Voir les {count} dans Avis KTOC"
+      },
+      "help": {
+        "overview": "Avis KTOC liste chaque avis d'événement publié par KTOC (KeepTrack Operations Center) : repositionnements, départs, fragmentations et autres changements que KTOC détecte dans le catalogue public. Chaque avis renvoie vers son analyse complète sur keeptrack.space.",
+        "statusesHeading": "Statuts des avis",
+        "statuses": "<ul><li><strong>Potentiel</strong> : KTOC a publié l'événement à partir des premières données qui le montraient.</li><li><strong>Confirmé</strong> : des données plus récentes correspondent à l'événement publié.</li><li><strong>Annulé</strong> : des données plus récentes contredisent l'événement. La ligne est barrée ; survolez le statut pour lire le motif.</li></ul>",
+        "howToUse": "<ol><li>Ouvrez <strong>Avis KTOC</strong> depuis le tiroir (mode Événements). Les 100 avis les plus récents se chargent, l'événement le plus récent en premier.</li><li>Choisissez <strong>Tous</strong> ou <strong>Actifs uniquement</strong>, puis un type d'événement pour affiner la liste.</li><li>Cliquez sur une ligne pour sélectionner le satellite et placer l'horloge à l'heure de l'événement. La lecture ou la pause reste inchangée.</li><li>Cliquez sur l'icône de lien pour ouvrir l'avis complet sur keeptrack.space dans un nouvel onglet.</li><li>Sélectionnez <strong>Actualiser</strong> pour charger les derniers avis.</li></ol>",
+        "tip1": "Sélectionner un satellite qui a des avis ajoute une carte Avis KTOC à la fiche du satellite.",
+        "tip2": "L'entrée de la palette de commandes \"Avis KTOC du satellite sélectionné\" liste tous les avis de la sélection actuelle.",
+        "tip3": "La ligne d'un satellite absent du catalogue chargé ouvre toujours son avis ; il ne peut pas être sélectionné dans la vue 3D."
+      }
+    }
+  }
+}

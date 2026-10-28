@@ -126,13 +126,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'SatInfoBoxOrbital',
     defaultConfig: satInfoBoxOrbitalConfigurationDefaults,
   },
-  // Off by design: OrbitGuard partner demo; fetches maneuver history from an external API at a hardcoded IP with a shared bearer token, so it is opt-in only (disabled since 241631cb).
-  {
-    configKey: 'SatInfoBoxManeuver',
-    ossImport: () => import('./sat-info-box-orbit-guard/sat-info-box-orbit-guard'),
-    ossClassName: 'SatInfoBoxOrbitGuard',
-    defaultConfig: { enabled: false },
-  },
   {
     configKey: 'SatInfoBoxObject',
     ossImport: () => import('./sat-info-box-object/sat-info-box-object'),
@@ -384,12 +377,11 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 83 },
     isLoginRequired: true,
   },
-  // Off by design: OrbitGuard partner demo; queries the external OrbitGuard maneuver API at a hardcoded IP with a shared bearer token, so it is opt-in only (disabled since 241631cb).
   {
-    configKey: 'OrbitGuardMenuPlugin',
-    ossImport: () => import('./orbit-guard-menu/orbit-guard-menu'),
-    ossClassName: 'OrbitGuardMenuPlugin',
-    defaultConfig: { enabled: false, order: 91 },
+    configKey: 'KtocNoticesPlugin',
+    ossImport: () => import('./ktoc-notices/ktoc-notices'),
+    ossClassName: 'KtocNoticesPlugin',
+    defaultConfig: { enabled: true, order: 91 },
   },
   {
     configKey: 'Reentries',

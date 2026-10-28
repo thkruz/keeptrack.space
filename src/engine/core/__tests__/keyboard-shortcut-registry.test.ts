@@ -92,6 +92,7 @@ const pluginShortcuts: { pluginId: string; shortcuts: Omit<IKeyboardShortcut, 'c
   { pluginId: 'ProximityOps', shortcuts: [{ key: 'X' }] },
   // src/plugins/reentries/reentries.ts
   { pluginId: 'Reentries', shortcuts: [{ key: 'R', ctrl: false }] },
+  { pluginId: 'KtocNoticesPlugin', shortcuts: [{ key: 'K', shift: true, ctrl: false }] },
   // src/plugins/sat-info-box/sat-info-box.ts
   { pluginId: 'SatInfoBox', shortcuts: [{ key: 'i' }] },
   // src/plugins/satellite-eci-view/satellite-eci-view.ts

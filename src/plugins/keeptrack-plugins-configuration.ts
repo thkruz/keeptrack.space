@@ -31,7 +31,6 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxActions?: PluginConfiguration;
   SatInfoBoxLinks?: PluginConfiguration;
   SatInfoBoxOrbital?: SatInfoBoxOrbitalConfiguration;
-  SatInfoBoxManeuver?: PluginConfiguration;
   SatInfoBoxObject?: SatInfoBoxObjectConfiguration;
   SatInfoBoxMission?: PluginConfiguration;
   SatInfoBoxSponsor?: PluginConfiguration;
@@ -71,7 +70,7 @@ export type KeepTrackPluginsConfiguration = {
   Collisions?: PluginConfiguration;
   TocaPocaPlugin?: PluginConfiguration;
   NeighborhoodWatch?: PluginConfiguration;
-  OrbitGuardMenuPlugin?: PluginConfiguration;
+  KtocNoticesPlugin?: PluginConfiguration;
   Reentries?: PluginConfiguration;
   Breakup?: PluginConfiguration;
   BreakupAnalysis?: PluginConfiguration;

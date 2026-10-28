@@ -137,7 +137,7 @@ const settingsOverride = {
       enabled: false,
       order: 90,
     },
-    OrbitGuardMenuPlugin: {
+    KtocNoticesPlugin: {
       enabled: false,
       order: 91,
     },
@@ -315,9 +315,6 @@ const settingsOverride = {
       enabled: false,
     },
     SatInfoBoxMission: {
-      enabled: false,
-    },
-    SatInfoBoxManeuver: {
       enabled: false,
     },
     SatInfoBoxOrbital: {

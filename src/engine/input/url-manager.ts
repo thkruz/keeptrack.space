@@ -237,10 +237,6 @@ export abstract class UrlManager {
         case 'color':
           UrlManager.assignColorScheme_(kv, settingsManager);
           break;
-        case 'msbai':
-          settingsManager.plugins.OrbitGuardMenuPlugin = { ...settingsManager.plugins.OrbitGuardMenuPlugin, ...{ enabled: true } };
-          settingsManager.plugins.SatInfoBoxManeuver = { ...settingsManager.plugins.SatInfoBoxManeuver, ...{ enabled: true } };
-          break;
         default:
           // Do nothing for other keys, they will be handled in the EventBus.getInstance().onKeepTrackReady event
           break;

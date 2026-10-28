@@ -632,17 +632,17 @@ const RECIPES: CaptureRecipe[] = [
     shots: [{ name: 'video-director-menu', selector: '#video-director-menu' }],
   },
   {
-    id: 'orbit-guard-menu',
+    id: 'ktoc-notices',
     plugins: {
-      OrbitGuardMenuPlugin: { enabled: true },
+      KtocNoticesPlugin: { enabled: true },
     },
     steps: async (page) => {
-      await openPluginMenu(page, 'orbitguard-bottom-icon');
-      await page.locator('#maneuver-detection-menu').waitFor({ state: 'visible', timeout: 10_000 });
-      // The OrbitGuard API can be slow; give rows a chance but don't fail without them
-      await page.waitForTimeout(10_000);
+      await openPluginMenu(page, 'ktoc-notices-icon');
+      await page.locator('#ktoc-notices-menu').waitFor({ state: 'visible', timeout: 10_000 });
+      // Give the notice feed a chance to load; the empty or error state is still a valid capture
+      await page.locator('#ktoc-notices-table tr.ktoc-notice-row').first().waitFor({ state: 'visible', timeout: 10_000 }).catch(() => undefined);
     },
-    shots: [{ name: 'orbit-guard-menu', selector: '#maneuver-detection-menu' }],
+    shots: [{ name: 'ktoc-notices-menu', selector: '#ktoc-notices-menu' }],
   },
   {
     id: 'satellite-photos',

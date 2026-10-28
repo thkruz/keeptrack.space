@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "Komunikaty KTOC",
+      "title": "Komunikaty KTOC",
+      "shortcutToggle": "Otwórz lub zamknij Komunikaty KTOC",
+      "commands": {
+        "open": "Otwórz Komunikaty KTOC",
+        "forSelected": "Komunikaty KTOC dla wybranego satelity"
+      },
+      "sections": {
+        "filters": "Filtry",
+        "notices": "Komunikaty"
+      },
+      "labels": {
+        "statusFilter": "Status komunikatu",
+        "all": "Wszystkie",
+        "activeOnly": "Tylko aktywne",
+        "eventType": "Typ zdarzenia",
+        "allTypes": "Wszystkie typy zdarzeń",
+        "showAllSatellites": "Pokaż wszystkie satelity",
+        "noradFilter": "Komunikaty dla NORAD {norad}",
+        "previous": "Poprzednia",
+        "next": "Następna",
+        "pageOf": "Strona {current} z {total}",
+        "refresh": "Odśwież",
+        "issuer": "Wydawca: KTOC (KeepTrack Operations Center)",
+        "loading": "Wczytywanie komunikatów KTOC...",
+        "empty": "KTOC nie opublikowało jeszcze żadnych komunikatów.",
+        "emptyForNorad": "KTOC nie opublikowało komunikatów dla NORAD {norad}.",
+        "noMatches": "Żaden komunikat nie pasuje do tych filtrów.",
+        "openNotice": "Otwórz pełny komunikat na keeptrack.space"
+      },
+      "table": {
+        "event": "Zdarzenie",
+        "date": "Data (UTC)",
+        "satellite": "Satelita",
+        "type": "Typ",
+        "status": "Status",
+        "notice": "Komunikat"
+      },
+      "types": {
+        "relocation": "Przemieszczenie",
+        "departure": "Odejście",
+        "arrival": "Przybycie",
+        "disposal": "Wycofanie",
+        "fragmentation": "Fragmentacja",
+        "breakup": "Rozpad",
+        "debrisShed": "Uwolnienie szczątków",
+        "proximity": "Operacje zbliżeniowe",
+        "deployment": "Wypuszczenie",
+        "maneuver": "Manewr",
+        "drift": "Dryf",
+        "reentry": "Wejście w atmosferę",
+        "other": "Inne zdarzenie"
+      },
+      "statuses": {
+        "confirmed": "Potwierdzone",
+        "potential": "Możliwe",
+        "canceled": "Anulowane",
+        "unknown": "Nieznany status"
+      },
+      "values": {
+        "eventNumber": "Zdarzenie {num}",
+        "unnumbered": "Bez numeru",
+        "unknownDate": "Nieznana data",
+        "noReason": "Anulowane przez KTOC."
+      },
+      "errorMsgs": {
+        "fetchFailed": "Komunikaty KTOC nie zostały wczytane ({detail}). Wybierz Odśwież, aby spróbować ponownie.",
+        "refreshFailedKeep": "Odświeżanie nie powiodło się ({detail}). Wyświetlana jest poprzednia lista.",
+        "networkDetail": "błąd sieci",
+        "notInCatalog": "NORAD {norad} nie znajduje się we wczytanym katalogu."
+      },
+      "infoBox": {
+        "title": "Komunikaty KTOC",
+        "titleWithCount": "Komunikaty KTOC ({count})",
+        "showAll": "Pokaż wszystkie ({count}) w Komunikatach KTOC"
+      },
+      "help": {
+        "overview": "Komunikaty KTOC wyświetla każdy komunikat o zdarzeniu opublikowany przez KTOC (KeepTrack Operations Center): przemieszczenia, odejścia, fragmentacje i inne zmiany wykryte przez KTOC w publicznym katalogu. Każdy komunikat prowadzi do pełnej analizy na keeptrack.space.",
+        "statusesHeading": "Statusy komunikatów",
+        "statuses": "<ul><li><strong>Możliwe</strong>: KTOC opublikowało zdarzenie na podstawie pierwszych danych, które je pokazały.</li><li><strong>Potwierdzone</strong>: nowsze dane zgadzają się z opublikowanym zdarzeniem.</li><li><strong>Anulowane</strong>: nowsze dane przeczą zdarzeniu. Wiersz jest przekreślony; najedź na status, aby przeczytać powód.</li></ul>",
+        "howToUse": "<ol><li>Otwórz <strong>Komunikaty KTOC</strong> z szuflady (tryb Zdarzenia). Wczytuje się 100 najnowszych komunikatów, od najnowszego zdarzenia.</li><li>Wybierz <strong>Wszystkie</strong> lub <strong>Tylko aktywne</strong> oraz typ zdarzenia, aby zawęzić listę.</li><li>Kliknij wiersz, aby wybrać satelitę i ustawić zegar na czas zdarzenia. Odtwarzanie lub pauza pozostaje bez zmian.</li><li>Kliknij ikonę łącza, aby otworzyć pełny komunikat na keeptrack.space w nowej karcie.</li><li>Wybierz <strong>Odśwież</strong>, aby wczytać najnowsze komunikaty.</li></ol>",
+        "tip1": "Wybranie satelity z komunikatami dodaje kartę Komunikaty KTOC do panelu informacji o satelicie.",
+        "tip2": "Polecenie palety \"Komunikaty KTOC dla wybranego satelity\" wyświetla wszystkie komunikaty dla bieżącego wyboru.",
+        "tip3": "Wiersz satelity spoza wczytanego katalogu nadal otwiera swój komunikat; nie można go wybrać w widoku 3D."
+      }
+    }
+  }
+}

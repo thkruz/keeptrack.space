@@ -184,13 +184,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'GithubLinkPlugin',
     defaultConfig: { enabled: true },
   },
-  // Off by design: example TopMenuPlugin social link; plugin doc says it exists as a sample and its icon still needs restyling to match the GitHub icon (disabled since 241631cb).
-  {
-    configKey: 'LinkedInLinkPlugin',
-    ossImport: () => import('./linkedin-link/linkedin-link'),
-    ossClassName: 'LinkedInLinkPlugin',
-    defaultConfig: { enabled: false },
-  },
   {
     configKey: 'ClassificationBar',
     ossImport: () => import('./classification-bar/classification-bar'),

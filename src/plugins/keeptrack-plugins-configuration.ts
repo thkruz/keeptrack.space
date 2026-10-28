@@ -40,7 +40,6 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxDoppler?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;
   GithubLinkPlugin?: PluginConfiguration;
-  LinkedInLinkPlugin?: PluginConfiguration;
   ClassificationBar?: PluginConfiguration;
   EpochAge?: PluginConfiguration;
   SoundManager?: PluginConfiguration;

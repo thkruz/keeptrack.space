@@ -282,7 +282,14 @@
     "phoneLink": "スマートフォン連携",
     "phoneLinkSignIn": "スマートフォンを連携するにはサインインしてください",
     "connected": "接続済み",
-    "offline": "オフライン"
+    "offline": "オフライン",
+    "footerLinks": {
+      "label": "概要と法的情報",
+      "about": "概要",
+      "data": "データ",
+      "terms": "利用規約",
+      "privacy": "プライバシー"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "時計を一時停止",

@@ -282,7 +282,14 @@
     "phoneLink": "휴대폰 연결",
     "phoneLinkSignIn": "휴대폰을 연결하려면 로그인하세요",
     "connected": "연결됨",
-    "offline": "오프라인"
+    "offline": "오프라인",
+    "footerLinks": {
+      "label": "정보 및 법적 고지",
+      "about": "정보",
+      "data": "데이터",
+      "terms": "이용약관",
+      "privacy": "개인정보"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "시계 일시정지",

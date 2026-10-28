@@ -282,7 +282,14 @@
     "phoneLink": "手机连接",
     "phoneLinkSignIn": "登录以连接您的手机",
     "connected": "已连接",
-    "offline": "离线"
+    "offline": "离线",
+    "footerLinks": {
+      "label": "关于与法律信息",
+      "about": "关于",
+      "data": "数据",
+      "terms": "条款",
+      "privacy": "隐私"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "暂停时钟",

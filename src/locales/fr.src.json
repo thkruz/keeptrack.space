@@ -282,7 +282,14 @@
     "phoneLink": "Liaison téléphone",
     "phoneLinkSignIn": "Connectez-vous pour associer votre téléphone",
     "connected": "Connecté",
-    "offline": "Hors ligne"
+    "offline": "Hors ligne",
+    "footerLinks": {
+      "label": "À propos et mentions légales",
+      "about": "À propos",
+      "data": "Données",
+      "terms": "Conditions",
+      "privacy": "Confidentialité"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Mettre en pause l'horloge",

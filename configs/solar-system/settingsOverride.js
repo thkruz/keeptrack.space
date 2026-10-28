@@ -91,7 +91,6 @@ const settingsOverride = {
 
     // Shell.
     TopMenu: { enabled: true },
-    AboutMenuPlugin: { enabled: true },
     GithubLinkPlugin: { enabled: true },
     KeyboardShortcutsPlugin: { enabled: true },
     CommandPalettePlugin: { enabled: true },

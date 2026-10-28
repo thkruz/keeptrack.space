@@ -228,7 +228,7 @@ const settingsOverride = {
       enabled: false,
       order: 350,
     },
-    GunterLaunchCalendar: {
+    LaunchSchedulePlugin: {
       enabled: false,
       order: 351,
     },
@@ -279,10 +279,6 @@ const settingsOverride = {
     FilterMenuPlugin: {
       enabled: false,
       order: 592,
-    },
-    AboutMenuPlugin: {
-      enabled: false,
-      order: 601,
     },
     VcrPlugin: {
       enabled: false, // Disabled by default

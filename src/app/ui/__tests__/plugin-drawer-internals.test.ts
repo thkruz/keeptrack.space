@@ -1,5 +1,5 @@
 import { PluginDrawer } from '@app/app/ui/plugin-drawer';
-import { buildRecentGroupFromCache, getShortcutHint, loadRecents, recordRecent } from '@app/app/ui/plugin-drawer-helpers';
+import { buildRecentGroupFromCache, getShortcutHint, loadRecents, recordRecent, renderStatusFooter } from '@app/app/ui/plugin-drawer-helpers';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -237,5 +237,45 @@ describe('shared recents store', () => {
       { id: 'menu-apple', t: 0 },
       { id: 'menu-banana', t: 0 },
     ]);
+  });
+});
+
+describe('drawer status footer links', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+    getEl('drawer-status-footer', true)?.remove();
+    document.body.insertAdjacentHTML('beforeend', '<div id="drawer-status-footer"></div>');
+  });
+
+  afterEach(() => {
+    getEl('drawer-status-footer', true)?.remove();
+  });
+
+  it('renders About, Data, Terms and Privacy as new-tab links under the version', () => {
+    renderStatusFooter();
+
+    const footer = getEl('drawer-status-footer')!;
+    const links = [...footer.querySelectorAll<HTMLAnchorElement>('.drawer-footer-links a')].map((a) => ({
+      key: a.dataset.footerLink,
+      href: a.getAttribute('href'),
+      target: a.getAttribute('target'),
+      rel: a.getAttribute('rel'),
+      text: a.textContent,
+    }));
+
+    expect(links.map((l) => [l.key, l.href])).toEqual([
+      ['about', 'https://keeptrack.space/about'],
+      ['data', 'https://keeptrack.space/data'],
+      ['terms', 'https://keeptrack.space/terms'],
+      ['privacy', 'https://keeptrack.space/privacy'],
+    ]);
+    for (const link of links) {
+      expect(link.target).toBe('_blank');
+      expect(link.rel).toBe('noopener noreferrer');
+      expect(link.text?.length).toBeGreaterThan(0);
+    }
+    // The links row follows the version line.
+    expect(footer.querySelector('.drawer-status-version')?.nextElementSibling?.classList.contains('drawer-footer-links')).toBe(true);
+    expect(footer.querySelectorAll('.drawer-footer-links__sep')).toHaveLength(3);
   });
 });

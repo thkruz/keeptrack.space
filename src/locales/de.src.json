@@ -565,7 +565,14 @@
     "phoneLink": "Telefonverbindung",
     "phoneLinkSignIn": "Melden Sie sich an, um Ihr Telefon zu verbinden",
     "connected": "Verbunden",
-    "offline": "Offline"
+    "offline": "Offline",
+    "footerLinks": {
+      "label": "Über und Rechtliches",
+      "about": "Über",
+      "data": "Daten",
+      "terms": "Bedingungen",
+      "privacy": "Datenschutz"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Uhr anhalten",

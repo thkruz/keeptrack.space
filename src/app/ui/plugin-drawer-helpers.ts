@@ -340,7 +340,26 @@ export function updatePhoneLinkState(): void {
   phoneLinkEl.setAttribute('kt-tooltip', phoneLinkTooltip_(signedIn));
 }
 
-/** Render the status footer showing connectivity and version. */
+/** Site pages linked from the status footer (credits and legal), opened in a new tab. */
+const FOOTER_LINKS_ = [
+  { key: 'about', href: 'https://keeptrack.space/about' },
+  { key: 'data', href: 'https://keeptrack.space/data' },
+  { key: 'terms', href: 'https://keeptrack.space/terms' },
+  { key: 'privacy', href: 'https://keeptrack.space/privacy' },
+] as const;
+
+/** The About / Data / Terms / Privacy row. Plain links, so they are reachable signed out. */
+function footerLinksHtml_(): string {
+  const links = FOOTER_LINKS_.map(
+    ({ key, href }) =>
+      `<a class="drawer-footer-link" data-footer-link="${key}" href="${href}" target="_blank" rel="noopener noreferrer">${t7e(`pluginDrawer.footerLinks.${key}` as TranslationKey)}</a>`
+  ).join('<span class="drawer-footer-links__sep" aria-hidden="true">·</span>');
+
+  // A div with the navigation role, not <nav>: the global nav styles (materialize) take <nav> out of the flow.
+  return `  <div class="drawer-footer-links" role="navigation" aria-label="${t7e('pluginDrawer.footerLinks.label' as TranslationKey)}">${links}</div>`;
+}
+
+/** Render the status footer showing connectivity, version and the site links. */
 export function renderStatusFooter(): void {
   const footerEl = getEl('drawer-status-footer', true);
 
@@ -371,6 +390,7 @@ export function renderStatusFooter(): void {
     phoneLinkIcon,
     '  </div>',
     `  <span class="drawer-status-version">KeepTrack v${__VERSION__}</span>`,
+    footerLinksHtml_(),
     '</div>',
   ].join('');
 }

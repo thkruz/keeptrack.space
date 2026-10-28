@@ -282,7 +282,14 @@
     "phoneLink": "Propojení s telefonem",
     "phoneLinkSignIn": "Přihlaste se a propojte svůj telefon",
     "connected": "Připojeno",
-    "offline": "Offline"
+    "offline": "Offline",
+    "footerLinks": {
+      "label": "O aplikaci a právní informace",
+      "about": "O aplikaci",
+      "data": "Data",
+      "terms": "Podmínky",
+      "privacy": "Soukromí"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Pozastavit hodiny",

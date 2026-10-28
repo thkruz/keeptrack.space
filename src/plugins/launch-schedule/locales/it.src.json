@@ -1,0 +1,17 @@
+{
+  "plugins": {
+    "LaunchSchedulePlugin": {
+      "bottomIconLabel": "Programma lanci",
+      "title": "Programma lanci",
+      "commands": {
+        "open": "Apri programma lanci"
+      },
+      "help": {
+        "overview": "Il Programma lanci apre l'elenco dei lanci di KeepTrack (keeptrack.space/launches) in una sovrapposizione per l'anno dell'orologio di simulazione: lanci orbitali con date, veicoli, carichi utili e siti di lancio. Usalo per vedere cosa verrà lanciato prossimamente e poi ricrea i lanci imminenti con lo strumento Nuovo lancio.",
+        "howToUse": "<ol><li>Fai clic sull'icona <strong>Programma lanci</strong> nel pannello (modalità Eventi). Il programma si apre in una sovrapposizione; i menu laterali si chiudono automaticamente.</li><li>Per vedere un altro anno, imposta l'orologio di simulazione su quell'anno prima di aprirlo.</li><li>Sfoglia l'elenco, quindi chiudi la sovrapposizione per tornare alla vista 3D. Se la pagina resta vuota, usa il pulsante per aprirla in una nuova scheda nell'intestazione della sovrapposizione.</li></ol>",
+        "tip1": "Il programma è una pagina di keeptrack.space, quindi richiede una connessione a internet.",
+        "tip2": "È disponibile anche dalla tavolozza comandi come Apri programma lanci."
+      }
+    }
+  }
+}

@@ -547,6 +547,34 @@ body.drawer-mode {
     color: rgba(255, 255, 255, 0.35);
   }
 
+  /* About / Data / Terms / Privacy. Muted like the version line. The colours need !important to beat the
+     global `a { color: ... !important }` in style.common.css, which would paint them in the accent colour. */
+  .drawer-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 6px;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .drawer-footer-link,
+  .drawer-footer-link:visited {
+    color: rgba(255, 255, 255, 0.45) !important;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .drawer-footer-link:hover,
+  .drawer-footer-link:focus-visible {
+    color: rgba(255, 255, 255, 0.85) !important;
+    text-decoration: underline;
+  }
+
+  .drawer-footer-links__sep {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
   .drawer-phone-link {
     display: flex;
     align-items: center;
@@ -1157,7 +1185,8 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.rail-mode.rail-hover .drawer-status-footer-container {
     opacity: 1;
-    max-height: 80px;
+    /* Connectivity row + version + the links row (two lines when a long translation wraps). */
+    max-height: 140px;
     padding: 12px 16px;
     border-top: 1px solid var(--color-dark-border);
   }

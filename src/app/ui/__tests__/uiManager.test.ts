@@ -138,7 +138,6 @@ describe('uiManager', () => {
     <div id="layers-hover-menu"></div>
     <div id="layers-icon"></div>
     <div id="settings-menu"></div>
-    <div id="about-menu"></div>
     `;
     const uiManagerInstance = new UiManager();
 

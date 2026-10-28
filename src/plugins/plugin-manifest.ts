@@ -681,11 +681,11 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'Screenshot',
     defaultConfig: { enabled: true, order: 450 },
   },
-  // Off by design: superseded by TheSpaceDevLaunchCalendarPlugin as the default launch calendar; 54cbbbc6 states "The Gunter calendar now defaults to disabled".
+  // Off by design: frames keeptrack.space/launches/<sim year>; replaced the retired Gunter calendar. Stays off because TheSpaceDevLaunchCalendarPlugin is the default launch calendar.
   {
-    configKey: 'GunterLaunchCalendar',
-    ossImport: () => import('./gunter-launch-calendar/gunter-launch-calendar'),
-    ossClassName: 'GunterLaunchCalendar',
+    configKey: 'LaunchSchedulePlugin',
+    ossImport: () => import('./launch-schedule/launch-schedule'),
+    ossClassName: 'LaunchSchedulePlugin',
     defaultConfig: { enabled: false, order: 351 },
   },
   {
@@ -961,13 +961,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossImport: () => import('./video-director/video-director'),
     ossClassName: 'VideoDirectorPlugin',
     defaultConfig: { enabled: true, order: 510 },
-  },
-  // Off by design: class is @deprecated; the main website now covers all of this functionality (disabled since 241631cb).
-  {
-    configKey: 'AboutMenuPlugin',
-    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/about-menu/about-menu') : undefined,
-    proClassName: 'AboutMenuPlugin',
-    defaultConfig: { enabled: false, order: 601 },
   },
   {
     configKey: 'EarthPresetsPlugin',

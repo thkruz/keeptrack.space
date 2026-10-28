@@ -117,7 +117,7 @@ export type KeepTrackPluginsConfiguration = {
   PlanetsMenuPlugin?: PluginConfiguration;
   DeepSpaceMissionsPlugin?: PluginConfiguration;
   Screenshot?: PluginConfiguration;
-  GunterLaunchCalendar?: PluginConfiguration;
+  LaunchSchedulePlugin?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;
@@ -156,7 +156,6 @@ export type KeepTrackPluginsConfiguration = {
   GraphicsMenuPlugin?: PluginConfiguration;
   GamepadPlugin?: PluginConfiguration;
   VideoDirectorPlugin?: PluginConfiguration;
-  AboutMenuPlugin?: PluginConfiguration;
   EarthPresetsPlugin?: PluginConfiguration;
   DrawLinesPlugin?: PluginConfiguration;
   ViewInfoRmbPlugin?: PluginConfiguration;

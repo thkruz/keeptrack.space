@@ -2,30 +2,30 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { createColorbox } from '@app/engine/utils/colorbox';
-import { GunterLaunchCalendar } from '@app/plugins/gunter-launch-calendar/gunter-launch-calendar';
+import { LaunchSchedulePlugin, launchScheduleUrl } from '@app/plugins/launch-schedule/launch-schedule';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { settingsManager } from '@app/settings/settings';
 import { setupDefaultHtml, setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
-describe('GunterLaunchCalendar', () => {
-  let plugin: GunterLaunchCalendar;
+describe('LaunchSchedulePlugin', () => {
+  let plugin: LaunchSchedulePlugin;
 
   beforeEach(() => {
     setupDefaultHtml();
     // Disabled by default in the manifest; enable so init() runs fully under test.
-    settingsManager.plugins.GunterLaunchCalendar = { enabled: true };
-    plugin = new GunterLaunchCalendar();
+    settingsManager.plugins.LaunchSchedulePlugin = { enabled: true };
+    plugin = new LaunchSchedulePlugin();
   });
 
-  standardPluginSuite(GunterLaunchCalendar, 'GunterLaunchCalendar');
+  standardPluginSuite(LaunchSchedulePlugin, 'LaunchSchedulePlugin');
 
   describe('getBottomIconConfig', () => {
     it('should return correct config', () => {
       const config = plugin.getBottomIconConfig();
 
-      expect(config.elementName).toBe('gunter-launch-calendar-bottom-icon');
+      expect(config.elementName).toBe('launch-schedule-bottom-icon');
       expect(config.image).toBeDefined();
       expect(config.menuMode).toBeDefined();
     });
@@ -45,7 +45,7 @@ describe('GunterLaunchCalendar', () => {
       const commands = plugin.getCommandPaletteCommands();
 
       expect(commands.length).toBe(1);
-      expect(commands[0].id).toBe('GunterLaunchCalendar.open');
+      expect(commands[0].id).toBe('LaunchSchedulePlugin.open');
       expect(commands[0].callback).toBeInstanceOf(Function);
     });
 
@@ -78,19 +78,19 @@ describe('GunterLaunchCalendar', () => {
   });
 });
 
-describe('gunter_launch_calendar_plugin', () => {
-  let launchCalendarPlugin: GunterLaunchCalendar;
+describe('launch_schedule_plugin', () => {
+  let launchCalendarPlugin: LaunchSchedulePlugin;
 
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager]);
     // Disabled by default in the manifest; enable so init() runs fully under test.
-    settingsManager.plugins.GunterLaunchCalendar = { enabled: true };
+    settingsManager.plugins.LaunchSchedulePlugin = { enabled: true };
     createColorbox();
-    launchCalendarPlugin = new GunterLaunchCalendar();
+    launchCalendarPlugin = new LaunchSchedulePlugin();
   });
 
-  standardPluginSuite(GunterLaunchCalendar, 'GunterLaunchCalendar');
-  standardPluginMenuButtonTests(GunterLaunchCalendar, 'GunterLaunchCalendar');
+  standardPluginSuite(LaunchSchedulePlugin, 'LaunchSchedulePlugin');
+  standardPluginMenuButtonTests(LaunchSchedulePlugin, 'LaunchSchedulePlugin');
 
   test('close_colorbox', () => {
     launchCalendarPlugin.init();
@@ -112,5 +112,38 @@ describe('gunter_launch_calendar_plugin', () => {
 
     expect(hideSpy).toHaveBeenCalled();
     expect(launchCalendarPlugin.isMenuButtonActive).toBe(true);
+  });
+
+  test('frames keeptrack.space/launches for the simulation year, not the wall-clock year', () => {
+    launchCalendarPlugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    // Wall clock and simulation clock disagree on the year; the sim clock wins.
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date('2031-06-15T12:00:00Z');
+
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+    // openColorbox sets the iframe inside the loading-screen callback.
+    vi.advanceTimersByTime(1000);
+
+    expect((document.getElementById('colorbox-iframe') as HTMLIFrameElement).src).toBe('https://keeptrack.space/launches/2031');
+  });
+
+  test('uses the UTC year at the turn of the year', () => {
+    launchCalendarPlugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date('2027-01-01T00:30:00Z');
+
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, launchCalendarPlugin.bottomIconElementName);
+    // openColorbox sets the iframe inside the loading-screen callback.
+    vi.advanceTimersByTime(1000);
+
+    expect((document.getElementById('colorbox-iframe') as HTMLIFrameElement).src).toBe('https://keeptrack.space/launches/2027');
+  });
+});
+
+describe('launchScheduleUrl', () => {
+  it('builds the keeptrack.space launches page for a year', () => {
+    expect(launchScheduleUrl(1957)).toBe('https://keeptrack.space/launches/1957');
   });
 });

@@ -12,9 +12,6 @@ describe('plugins', () => {
         SatInfoBoxCore: {
           enabled: true,
         },
-        AboutMenuPlugin: {
-          enabled: true,
-        },
         Collisions: {
           enabled: true,
         },
@@ -24,7 +21,7 @@ describe('plugins', () => {
         FindSatPlugin: {
           enabled: true,
         },
-        GunterLaunchCalendar: {
+        LaunchSchedulePlugin: {
           enabled: true,
         },
         NewLaunch: {

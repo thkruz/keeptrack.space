@@ -277,7 +277,14 @@
     "phoneLink": "Phone Link",
     "phoneLinkSignIn": "Sign in to link your phone",
     "connected": "Connected",
-    "offline": "Offline"
+    "offline": "Offline",
+    "footerLinks": {
+      "label": "About and legal",
+      "about": "About",
+      "data": "Data",
+      "terms": "Terms",
+      "privacy": "Privacy"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Pause Clock",

@@ -1,7 +1,7 @@
 /**
  * /////////////////////////////////////////////////////////////////////////////
  *
- * gunter-launch-calendar.ts is a plugin for viewing the launch calendar on Gunter's Space Page.
+ * launch-schedule.ts is a plugin for viewing the KeepTrack launch schedule (keeptrack.space/launches).
  *
  * https://keeptrack.space
  *
@@ -22,6 +22,7 @@
  */
 
 import { MenuMode } from '@app/engine/core/interfaces';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { openColorbox } from '@app/engine/utils/colorbox';
@@ -29,16 +30,19 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import calendarPng from '@public/img/icons/calendar.png';
 
-export class GunterLaunchCalendar extends KeepTrackPlugin {
-  readonly id = 'GunterLaunchCalendar';
+/** The KeepTrack launch schedule page for one calendar year. */
+export const launchScheduleUrl = (year: number): string => `https://keeptrack.space/launches/${year}`;
+
+export class LaunchSchedulePlugin extends KeepTrackPlugin {
+  readonly id = 'LaunchSchedulePlugin';
   dependencies_ = [];
   requiresInternet = true;
   isForceHideSideMenus = true;
 
   getBottomIconConfig(): IBottomIconConfig {
     return {
-      elementName: 'gunter-launch-calendar-bottom-icon',
-      label: t7e('plugins.GunterLaunchCalendar.bottomIconLabel' as Parameters<typeof t7e>[0]),
+      elementName: 'launch-schedule-bottom-icon',
+      label: t7e('plugins.LaunchSchedulePlugin.bottomIconLabel' as Parameters<typeof t7e>[0]),
       image: calendarPng,
       menuMode: [MenuMode.EVENTS, MenuMode.ALL],
     };
@@ -46,18 +50,18 @@ export class GunterLaunchCalendar extends KeepTrackPlugin {
 
   getHelpConfig(): IHelpConfig {
     return {
-      title: t7e('plugins.GunterLaunchCalendar.title'),
+      title: t7e('plugins.LaunchSchedulePlugin.title'),
       sections: [
         {
           heading: t7e('help.overview'),
-          content: t7e('plugins.GunterLaunchCalendar.help.overview'),
+          content: t7e('plugins.LaunchSchedulePlugin.help.overview'),
         },
         {
           heading: t7e('help.howToUse'),
-          content: t7e('plugins.GunterLaunchCalendar.help.howToUse'),
+          content: t7e('plugins.LaunchSchedulePlugin.help.howToUse'),
         },
       ],
-      tips: [t7e('plugins.GunterLaunchCalendar.help.tip1'), t7e('plugins.GunterLaunchCalendar.help.tip2')],
+      tips: [t7e('plugins.LaunchSchedulePlugin.help.tip1'), t7e('plugins.LaunchSchedulePlugin.help.tip2')],
     };
   }
 
@@ -72,9 +76,10 @@ export class GunterLaunchCalendar extends KeepTrackPlugin {
       setTimeout(() => {
         settingsManager.isPreventColorboxClose = false;
       }, 2000);
-      const year = new Date().getFullYear();
+      // The year on the simulation clock (UTC), so a user looking at a past or future date sees that year's launches.
+      const year = ServiceLocator.getTimeManager().simulationTimeObj.getUTCFullYear();
 
-      openColorbox(`https://space.skyrocket.de/doc_chr/lau${year}.htm`, {
+      openColorbox(launchScheduleUrl(year), {
         callback: this.closeColorbox_.bind(this),
       });
     }
@@ -83,8 +88,8 @@ export class GunterLaunchCalendar extends KeepTrackPlugin {
   getCommandPaletteCommands(): ICommandPaletteCommand[] {
     return [
       {
-        id: 'GunterLaunchCalendar.open',
-        label: t7e('plugins.GunterLaunchCalendar.commands.open' as Parameters<typeof t7e>[0]),
+        id: 'LaunchSchedulePlugin.open',
+        label: t7e('plugins.LaunchSchedulePlugin.commands.open' as Parameters<typeof t7e>[0]),
         category: 'Plugins',
         callback: () => this.bottomMenuClicked(),
       },

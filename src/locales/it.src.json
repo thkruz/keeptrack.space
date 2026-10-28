@@ -282,7 +282,14 @@
     "phoneLink": "Collegamento telefono",
     "phoneLinkSignIn": "Accedi per collegare il tuo telefono",
     "connected": "Connesso",
-    "offline": "Offline"
+    "offline": "Offline",
+    "footerLinks": {
+      "label": "Informazioni e note legali",
+      "about": "Informazioni",
+      "data": "Dati",
+      "terms": "Termini",
+      "privacy": "Privacy"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Metti in pausa l'orologio",

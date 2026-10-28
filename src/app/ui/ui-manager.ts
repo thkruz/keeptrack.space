@@ -560,7 +560,6 @@ export class UiManager {
     });
 
     clickAndDragWidth(getEl('settings-menu'));
-    clickAndDragWidth(getEl('about-menu'));
   }
 
   toggleBottomMenu() {

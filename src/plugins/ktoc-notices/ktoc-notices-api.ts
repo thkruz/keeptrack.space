@@ -88,9 +88,20 @@ const STATUS_KEYS: Record<string, string> = {
 
 const l = pluginT7e('KtocNoticesPlugin');
 
+/** Strips trailing slashes without a backtracking regex. */
+const trimTrailingSlashes_ = (url: string): string => {
+  let end = url.length;
+
+  while (end > 0 && url[end - 1] === '/') {
+    end--;
+  }
+
+  return url.slice(0, end);
+};
+
 /** `limit=100` first, then the optional filters, so URLs are stable and easy to match in tests. */
 export const buildKtocNoticesUrl = (query: KtocNoticeQuery = {}): string => {
-  const base = settingsManager.apiServer.replace(/\/+$/u, '');
+  const base = trimTrailingSlashes_(settingsManager.apiServer);
   const params = new URLSearchParams({ limit: String(query.limit ?? KTOC_NOTICES_MAX_LIMIT) });
 
   if (typeof query.norad === 'number') {

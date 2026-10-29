@@ -169,15 +169,18 @@ function runBiome(pluginDir: string): { violations: ImportViolation[]; error: st
     return { violations: [], error: 'Biome is not installed (npm install).' };
   }
 
-  // Pass an absolute path after `--` so a folder name can never be read as a Biome option.
+  /*
+   * Lint the plugin as Biome's working directory (`.`) so the caller's path never
+   * becomes a command-line argument: every argv entry below is a constant.
+   */
   const target = resolve(pluginDir);
 
   if (!existsSync(target) || !statSync(target).isDirectory()) {
     return { violations: [], error: `Not a plugin folder: ${target}` };
   }
 
-  const res = spawnSync(process.execPath, [biomeBin, 'lint', `--config-path=${BIOME_CONFIG_DIR}`, '--reporter=json', '--max-diagnostics=none', '--', target], {
-    cwd: REPO_ROOT,
+  const res = spawnSync(process.execPath, [biomeBin, 'lint', `--config-path=${BIOME_CONFIG_DIR}`, '--reporter=json', '--max-diagnostics=none', '.'], {
+    cwd: target,
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,
   });
@@ -202,11 +205,11 @@ function runBiome(pluginDir: string): { violations: ImportViolation[]; error: st
     if (d.category !== 'plugin' || !d.location?.path || !d.location.start) {
       continue;
     }
-    const absFile = resolve(REPO_ROOT, d.location.path);
+    const absFile = resolve(target, d.location.path);
     const specifier = existsSync(absFile) ? specifierAt(absFile, d.location.start.line, d.location.start.column) : '(unknown)';
 
     violations.push({
-      file: toPosix(relative(pluginDir, absFile)),
+      file: toPosix(relative(target, absFile)),
       line: d.location.start.line,
       specifier,
       reason: 'not-allowed',

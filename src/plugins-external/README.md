@@ -7,12 +7,18 @@ is managed entirely by the plugin CLI — do not add files here by hand.
 # Install a plugin from a git repo (clones it here, wires it into the build)
 npm run plugin -- add https://github.com/someone/keeptrack-plugin-foo
 
+# Install a plugin you are developing in its own folder (a git checkout is cloned,
+# so "update" pulls your latest commits; a plain folder is copied)
+npm run plugin -- add ../keeptrack-plugin-foo
+
 # List installed plugins and their compatibility
 npm run plugin -- list
 
 # Update / remove
 npm run plugin -- update keeptrack-plugin-foo
 npm run plugin -- remove keeptrack-plugin-foo
+# A plugin scaffolded here with "create" is your source, so remove keeps its folder
+# unless you pass --delete-files
 
 # Restore every plugin recorded in external-plugins.json (run on a fresh checkout)
 npm run plugin -- restore

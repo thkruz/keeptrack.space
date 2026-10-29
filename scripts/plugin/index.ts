@@ -3,7 +3,7 @@
  * KeepTrack plugin CLI — install, scaffold, and develop external plugins.
  *
  *   npm run plugin -- add <git-url|local-path> [--ref <r>] [--name <n>] [--force] [--yes]
- *   npm run plugin -- remove <name> [--keep-files]
+ *   npm run plugin -- remove <name> [--keep-files] [--delete-files]
  *   npm run plugin -- update [name] [--ref <r>] [--force]
  *   npm run plugin -- list [--json]
  *   npm run plugin -- restore
@@ -61,8 +61,9 @@ function parseArgs(argv: string[]): ParsedArgs {
 const HELP = `
 KeepTrack Plugin CLI
 
-  add <git-url|local-path>   Install a plugin (clones into src/plugins-external/)
-  remove <name>              Uninstall a plugin
+  add <git-url|local-path>   Install a plugin into src/plugins-external/ (a local git checkout is cloned,
+                             a plain folder copied, a folder already there registered in place)
+  remove <name>              Uninstall a plugin (keeps a plugin registered in place; --delete-files deletes it)
   update [name]              Update one or all plugins to their latest ref
   list [--json]              List installed plugins and compatibility
   restore                    Clone plugins recorded in external-plugins.json

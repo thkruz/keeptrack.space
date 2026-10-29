@@ -67,6 +67,13 @@ export default defineConfig({
      * 12 forks bounds peak memory; CI runners (2-4 cores) are unaffected.
      */
     maxWorkers: Math.min(12, Math.max(1, os.availableParallelism() - 1)),
+    /*
+     * The CI coverage run is ~8x slower than a local run: plugin smoke tests
+     * that take well under a second here take 4-9 s there and trip the 5 s
+     * default. Keep the defaults locally so a real hang still fails fast.
+     */
+    testTimeout: process.env.CI ? 30_000 : 5_000,
+    hookTimeout: process.env.CI ? 30_000 : 10_000,
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./test/polyfills.js', './test/vitest-setup.ts'],

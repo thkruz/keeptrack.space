@@ -809,7 +809,7 @@ export class StereoMap extends KeepTrackPlugin {
       if (!drawer.isConnected || !menu.isConnected || !this.isMenuButtonActive) {
         return;
       }
-      if (window.getComputedStyle(menu).left === this.mapLayoutLeft_) {
+      if (globalThis.getComputedStyle(menu).left === this.mapLayoutLeft_) {
         return;
       }
       this.resize2DMap_();
@@ -823,7 +823,7 @@ export class StereoMap extends KeepTrackPlugin {
     const mapMenuDOM = getEl('map-menu');
 
     if (mapMenuDOM) {
-      this.mapLayoutLeft_ = window.getComputedStyle(mapMenuDOM).left;
+      this.mapLayoutLeft_ = globalThis.getComputedStyle(mapMenuDOM).left;
       if (isForceWidescreen || window.innerWidth > window.innerHeight) {
         // Leave room for both the drawer rail and the sat-info-box.
         const menuLeft = Number.parseFloat(this.mapLayoutLeft_);
@@ -938,8 +938,16 @@ export class StereoMap extends KeepTrackPlugin {
     ctx.lineWidth = 3;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
 
-    const latLabel = (lat: number): string => (lat === 0 ? '0\u00B0' : `${Math.abs(lat)}\u00B0${lat > 0 ? 'N' : 'S'}`);
-    const lonLabel = (lon: number): string => (lon === 0 ? '0\u00B0' : `${Math.abs(lon)}\u00B0${lon > 0 ? 'E' : 'W'}`);
+    const degLabel = (value: number, positive: string, negative: string): string => {
+      if (value === 0) {
+        return '0\u00B0';
+      }
+      const hemisphere = value > 0 ? positive : negative;
+
+      return `${Math.abs(value)}\u00B0${hemisphere}`;
+    };
+    const latLabel = (lat: number): string => degLabel(lat, 'N', 'S');
+    const lonLabel = (lon: number): string => degLabel(lon, 'E', 'W');
     // Label steps follow the drawn map size, not a fixed 20 deg: the widest
     // label ("160\u00B0W") must fit between neighbours with a gap.
     const lonStep = StereoMap.pickLabelStep(w / 360, ctx.measureText(lonLabel(-160)).width, StereoMap.LON_LABEL_STEPS_);

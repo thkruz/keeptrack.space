@@ -803,7 +803,7 @@ export class Reentries extends KeepTrackPlugin {
       if (sat.rcs) {
         rcs = `${sat.rcs}`;
       } else {
-        rcs = rcsValue !== null ? rcsValue.toFixed(2) : unknown;
+        rcs = rcsValue === null ? unknown : rcsValue.toFixed(2);
       }
 
       // Age of GP follows the simulation clock (Ted ruling 2026-10-16), so a jump to the decay epoch ages the elset.

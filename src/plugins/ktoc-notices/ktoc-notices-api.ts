@@ -238,4 +238,5 @@ export const isSafeNoticeUrl = (url: string): boolean => {
 };
 
 /** Escapes text placed into the kt-tooltip attribute (the tooltip renders it as HTML). */
-export const escapeKtocHtml = (text: string): string => text.replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;').replace(/"/gu, '&quot;').replace(/'/gu, '&#39;');
+export const escapeKtocHtml = (text: string): string =>
+  text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;');

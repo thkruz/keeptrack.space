@@ -52,8 +52,8 @@ export class KeyboardInput {
           if (event.key === 'Shift') {
             // Typing owns held letter keys now; never synthesize fresh application downs.
             for (let i = 65; i <= 90; i++) {
-              this.keyStates.set(String.fromCharCode(i), false);
-              this.keyStates.set(String.fromCharCode(i).toLowerCase(), false);
+              this.keyStates.set(String.fromCodePoint(i), false);
+              this.keyStates.set(String.fromCodePoint(i).toLowerCase(), false);
             }
           }
           EventBus.getInstance().emit(

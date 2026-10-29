@@ -24,7 +24,7 @@ export class HideOtherSatellitesPlugin extends KeepTrackPlugin {
   /** Out-of-group color with Hide Others on. */
   static readonly HIDDEN_COLOR: [number, number, number, number] = [1.0, 1.0, 1.0, 0];
   /** Out-of-group color with Hide Others off. */
-  static readonly DIM_COLOR: [number, number, number, number] = [1.0, 1.0, 1.0, 0.1];
+  static readonly DIM_COLOR: [number, number, number, number] = [1, 1, 1, 0.1];
 
   bottomIconCallback = (): void => {
     this.onBottomIconClick();

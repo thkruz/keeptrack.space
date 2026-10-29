@@ -100,7 +100,7 @@ export function createPluginStorage(configKey: string): PluginStorage {
   };
 
   const setItem = (key: string, value: string | null | undefined): void => {
-    if (value === null || typeof value === 'undefined') {
+    if (value === null || value === undefined) {
       removeItem(key);
 
       return;

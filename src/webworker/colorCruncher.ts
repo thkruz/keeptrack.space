@@ -64,7 +64,7 @@ let settings: SettingsFlags = {
   maxZoomDistance: 100000,
   isMissileSimulatorEnabled: true,
   // Mirrors the default `settingsManager.colors.transparent` (Hide Others off) until the main thread sends its value
-  transparent: [1.0, 1.0, 1.0, 0.1],
+  transparent: [1, 1, 1, 0.1],
 };
 
 let inViewData: Int8Array | null = null;

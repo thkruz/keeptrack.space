@@ -169,7 +169,14 @@ function runBiome(pluginDir: string): { violations: ImportViolation[]; error: st
     return { violations: [], error: 'Biome is not installed (npm install).' };
   }
 
-  const res = spawnSync(process.execPath, [biomeBin, 'lint', `--config-path=${BIOME_CONFIG_DIR}`, '--reporter=json', '--max-diagnostics=none', pluginDir], {
+  // Pass an absolute path after `--` so a folder name can never be read as a Biome option.
+  const target = resolve(pluginDir);
+
+  if (!existsSync(target) || !statSync(target).isDirectory()) {
+    return { violations: [], error: `Not a plugin folder: ${target}` };
+  }
+
+  const res = spawnSync(process.execPath, [biomeBin, 'lint', `--config-path=${BIOME_CONFIG_DIR}`, '--reporter=json', '--max-diagnostics=none', '--', target], {
     cwd: REPO_ROOT,
     encoding: 'utf8',
     maxBuffer: 64 * 1024 * 1024,

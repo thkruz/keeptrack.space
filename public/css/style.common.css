@@ -3625,6 +3625,12 @@ nav a.sidenav-trigger i {
   animation-iteration-count: infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .shake {
+    animation: none;
+  }
+}
+
 .start-hidden {
   display: none;
 }

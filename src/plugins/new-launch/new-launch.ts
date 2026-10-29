@@ -12,6 +12,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
@@ -417,8 +418,8 @@ export class NewLaunch extends KeepTrackPlugin {
       const msg = t7e('plugins.NewLaunch.msgs.windowFound' as T7eKey)
         .replace('{time}', `${dateFormat(window.time, 'isoDateTime', true)}z`)
         .replace('{delta}', Math.abs(window.raanError).toFixed(2))
-        .replace('{target}', context.target)
-        .replace('{site}', context.site);
+        .replace('{target}', escapeHtml(context.target))
+        .replace('{site}', escapeHtml(context.site));
       const clearLabel = t7e('plugins.NewLaunch.buttons.clearWindow' as T7eKey);
 
       note.innerHTML = html`

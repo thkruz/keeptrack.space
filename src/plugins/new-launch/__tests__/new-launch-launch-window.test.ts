@@ -57,6 +57,17 @@ describe('NewLaunch launch-window matching', () => {
     expect(note.textContent).toContain('ΔRAAN');
   });
 
+  it('renders an imported target name as text, not markup', () => {
+    issSat.name = '<img src=x onerror="alert(1)">';
+
+    p().onMatchTargetPlane_();
+
+    const note = getEl('nl-window-result')!;
+
+    expect(note.querySelector('img')).toBeNull();
+    expect(note.textContent).toContain('<img src=x onerror="alert(1)">');
+  });
+
   it('arms the window without launching and can be cleared via the result note', () => {
     p().onMatchTargetPlane_();
     expect(p().matchedLaunchTime_).not.toBeNull();

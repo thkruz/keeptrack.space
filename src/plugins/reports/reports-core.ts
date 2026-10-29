@@ -283,7 +283,11 @@ type HeaderSat = Pick<ReportableObject, 'name' | 'sccNum' | 'altId' | 'intlDes'>
  * the simulation time the report covers.
  */
 export const buildReportHeader = (title: string, sat: HeaderSat, sensor: DetailedSensor | null, generatedAt: Date, tr: ReportText = doc): string => {
-  const line = (key: string, value: string | number): string => `${tr(`header.${key}`)}: ${value}\n`;
+  const line = (key: string, value: string | number): string => {
+    const label = tr(`header.${key}`);
+
+    return `${label}: ${value}\n`;
+  };
   const none = tr('header.none');
   const satData =
     `${title}\n${HEADER_RULE}\n` +

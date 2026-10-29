@@ -7,6 +7,8 @@ export interface MediaRecorderOptions {
   video: { cursor: string };
 }
 
+const DEFAULT_DISPLAY_MEDIA_OPTIONS: MediaRecorderOptions = { video: { cursor: 'never' }, audio: false };
+
 export type RecordingState = 'idle' | 'requesting' | 'recording' | 'stopping';
 
 /**
@@ -77,7 +79,7 @@ export class StreamManager {
     return 'failed';
   }
 
-  getStream(displayMediaOptions: MediaRecorderOptions = { video: { cursor: 'never' }, audio: false }): Promise<MediaStream> | false {
+  getStream(displayMediaOptions: MediaRecorderOptions = DEFAULT_DISPLAY_MEDIA_OPTIONS): Promise<MediaStream> | false {
     if (!window.isSecureContext && !settingsManager.offlineMode) {
       this.onError_();
 

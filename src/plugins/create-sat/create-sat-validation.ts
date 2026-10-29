@@ -162,7 +162,7 @@ const label = (key: string): string => t7e(`plugins.CreateSat.labels.${key}` as 
 function toNumber(raw: string): number {
   const value = raw.trim();
 
-  return value === '' ? NaN : Number(value);
+  return value === '' ? Number.NaN : Number(value);
 }
 
 /** True when a raw value is a number inside the field's range (inclusive). */
@@ -212,7 +212,7 @@ function isAnalystScc(raw: string): boolean {
   if (!/^\d{1,5}$/u.test(value)) {
     return false;
   }
-  const num = parseInt(value, 10);
+  const num = Number.parseInt(value, 10);
 
   return num >= 90_000 && num <= 99_999;
 }

@@ -647,7 +647,7 @@ export class StereoMap extends KeepTrackPlugin {
     const satDom = getEl('map-sat', true) as HTMLImageElement | null;
 
     if (satDom && satDom.style.left !== '' && satDom.style.top !== '') {
-      icons.push({ x: parseFloat(satDom.style.left) + satDom.width / 2, y: parseFloat(satDom.style.top) + satDom.height / 2 });
+      icons.push({ x: Number.parseFloat(satDom.style.left) + satDom.width / 2, y: Number.parseFloat(satDom.style.top) + satDom.height / 2 });
     }
     const hits = (c: { x: number; y: number }): number =>
       icons.filter((icon) => icon.x + r > c.x - 8 && icon.x - r < c.x + contentW + 8 && icon.y + r > c.y - 18 && icon.y - r < c.y + contentH + 6).length;

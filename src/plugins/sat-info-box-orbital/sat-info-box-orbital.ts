@@ -492,7 +492,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.RAAN, finite(elements.rightAscensionDegrees, 2, '°'));
       setInnerHtml(EL.ARG_PE, finite(elements.argPerigeeDegrees, 2, '°'));
 
-      this.updatePeriodElement_(isElliptic ? elements.period : NaN);
+      this.updatePeriodElement_(isElliptic ? elements.period : Number.NaN);
 
       setInnerHtml(EL.ELSET_AGE, notAvailableText());
 

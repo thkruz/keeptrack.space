@@ -199,7 +199,7 @@ export const parseTipUtc = (value?: string | null): Date | null => {
 
 /** Normalizes a TIP longitude (0 to 360 east) to signed degrees in [-180, 180]. */
 export const normalizeTipLon = (lon: string): number => {
-  const lonDeg = parseFloat(lon);
+  const lonDeg = Number.parseFloat(lon);
 
   return lonDeg > 180 ? lonDeg - 360 : lonDeg;
 };
@@ -1118,13 +1118,13 @@ export class Reentries extends KeepTrackPlugin {
       return;
     }
 
-    const current = parseFloat(menuEl.style.width);
+    const current = Number.parseFloat(menuEl.style.width);
 
     if (this.lastAppliedWidth_ !== null && Number.isFinite(current) && current !== this.lastAppliedWidth_) {
       this.preferredWidth_ = current;
     }
 
-    const drawerOffset = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--drawer-offset')) || 0;
+    const drawerOffset = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--drawer-offset')) || 0;
     const width = clampReentriesMenuWidth(this.preferredWidth_, window.innerWidth, drawerOffset);
 
     menuEl.style.width = `${width}px`;

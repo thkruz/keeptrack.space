@@ -22,7 +22,7 @@ export class AnalystSlotReservations {
   static normalize(sccNum: string | number): string {
     const value = String(sccNum).trim();
 
-    return /^\d+$/u.test(value) ? parseInt(value, 10).toString() : value.toUpperCase();
+    return /^\d+$/u.test(value) ? Number.parseInt(value, 10).toString() : value.toUpperCase();
   }
 
   /** Reserve an id for `owner` (a short tag such as `new-launch`). Re-reserving replaces the owner. */

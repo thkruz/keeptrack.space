@@ -11,7 +11,7 @@ import i18next from 'i18next';
  * @param debrisColor CSS color for the "Debris" word
  */
 export function buildTimeMachineOverlay(yearStr: string, satColor: string, debrisColor: string): { html: string; inYear: string } {
-  const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
+  const yearPrefix = Number.parseInt(yearStr, 10) < 57 ? '20' : '19';
   const satellitesSpan = `<span style="color: ${satColor};">${t7e('darkClouds.satellites')} </span>`;
   const debrisSpan = `<span style="color: ${debrisColor};">${t7e('darkClouds.debris')} </span>`;
 

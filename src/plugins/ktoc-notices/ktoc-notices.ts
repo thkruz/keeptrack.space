@@ -599,7 +599,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
       return;
     }
     const row = target.closest('tr.ktoc-notice-row') as HTMLTableRowElement | null;
-    const index = row ? Number(row.dataset.index) : NaN;
+    const index = row ? Number(row.dataset.index) : Number.NaN;
     const notice = Number.isInteger(index) ? this.filtered_[index] : undefined;
 
     if (notice) {

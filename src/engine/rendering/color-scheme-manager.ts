@@ -149,7 +149,7 @@ export class ColorSchemeManager {
   private workerReady_ = false; // true once worker has received catalog; useWorkerMode_ can be toggled per-scheme
   private catalogSeqNum_ = 0;
   /** The out-of-group color last sent to the worker (NaN = never sent). */
-  private readonly lastSentTransparent_: [number, number, number, number] = [NaN, NaN, NaN, NaN];
+  private readonly lastSentTransparent_: [number, number, number, number] = [Number.NaN, Number.NaN, Number.NaN, Number.NaN];
 
   /** Scheme IDs the color worker knows how to compute. Plugin schemes not in this set fall back to main-thread. */
   private static readonly WORKER_SUPPORTED_SCHEMES_ = new Set([

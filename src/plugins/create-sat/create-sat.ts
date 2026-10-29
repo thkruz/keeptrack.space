@@ -380,15 +380,15 @@ export class CreateSat extends KeepTrackPlugin {
         return;
       }
 
-      const meanmo = parseFloat(meanmoEl.value);
-      const ecen = parseFloat(ecenEl.value) / 1e7;
-      const meana = parseFloat((getEl(`${CreateSat.elementPrefix}-meana`, true) as HTMLInputElement | null)?.value ?? '');
+      const meanmo = Number.parseFloat(meanmoEl.value);
+      const ecen = Number.parseFloat(ecenEl.value) / 1e7;
+      const meana = Number.parseFloat((getEl(`${CreateSat.elementPrefix}-meana`, true) as HTMLInputElement | null)?.value ?? '');
 
-      if (isNaN(meanmo) || isNaN(ecen) || meanmo <= 0 || ecen < 0 || ecen >= 1) {
+      if (Number.isNaN(meanmo) || Number.isNaN(ecen) || meanmo <= 0 || ecen < 0 || ecen >= 1) {
         return;
       }
 
-      const derived = CreateSat.calculateDerivedParams(meanmo, ecen, isNaN(meana) ? 0 : meana);
+      const derived = CreateSat.calculateDerivedParams(meanmo, ecen, Number.isNaN(meana) ? 0 : meana);
 
       const apogeeEl = getEl(`${CreateSat.elementPrefix}-calc-apogee`) as HTMLInputElement;
       const perigeeEl = getEl(`${CreateSat.elementPrefix}-calc-perigee`) as HTMLInputElement;
@@ -487,7 +487,7 @@ export class CreateSat extends KeepTrackPlugin {
     }
 
     const params = CreateSat.buildBasicParams(
-      { scc: raw.scc, name: raw.name, inc: parseFloat(raw.inc), apogee: parseFloat(raw.apogee), perigee: parseFloat(raw.perigee) },
+      { scc: raw.scc, name: raw.name, inc: Number.parseFloat(raw.inc), apogee: Number.parseFloat(raw.apogee), perigee: Number.parseFloat(raw.perigee) },
       new Date(ServiceLocator.getTimeManager().simulationTimeObj)
     );
 

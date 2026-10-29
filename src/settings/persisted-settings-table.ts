@@ -81,7 +81,7 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     key: StorageKey.SETTINGS_ECF_ORBIT_COUNT,
     serialize: (sm) => String(sm.numberOfEcfOrbitsToDraw),
     deserialize: (sm, raw) => {
-      const count = parseInt(raw, 10);
+      const count = Number.parseInt(raw, 10);
 
       // Same range the `ecf` URL parameter accepts (the menu offers 1-5 and 10).
       if (count >= 1 && count <= 10) {

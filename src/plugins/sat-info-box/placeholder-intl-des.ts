@@ -15,5 +15,5 @@ export const isPlaceholderIntlDes = (sat: Satellite): boolean => {
     return false;
   }
 
-  return parseInt(Tle.convertA5to6Digit(sat.sccNum), 10) >= ANALYST_START_SCC;
+  return Number.parseInt(Tle.convertA5to6Digit(sat.sccNum), 10) >= ANALYST_START_SCC;
 };

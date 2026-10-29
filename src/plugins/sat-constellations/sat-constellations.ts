@@ -46,25 +46,13 @@ const BUILT_IN_CONSTELLATIONS = [
   'wgs',
   'starlink',
   'sbirs',
-  'starlink-gen2',
-  'starlink-v2',
-  'starlink-snapshot',
-  'starshield',
-  'pwsa',
   'kuiper',
   'ast-spaceobile',
   'oneweb',
-  'telesat-lightspeed',
-  'boeing',
-  'astra',
-  'spinlaunch',
-  'hvnet',
   'lynk',
   'guanwang',
   'qianfan',
-  'honghu3',
   'yinhe',
-  'hanwha',
 ] as const;
 
 export class SatConstellations extends KeepTrackPlugin {
@@ -266,25 +254,13 @@ export class SatConstellations extends KeepTrackPlugin {
           <li class="menu-selectable" data-group="wgs">${l('wgs')}</li>
           <li class="menu-selectable" data-group="starlink">${l('starlink')}</li>
           <li class="menu-selectable" data-group="sbirs">${l('sbirs')}</li>
-          <li class="menu-selectable" data-group="starlink-gen2">${l('starlink-gen2')}</li>
-          <li class="menu-selectable" data-group="starlink-v2">${l('starlink-v2')}</li>
-          <li class="menu-selectable" data-group="starlink-snapshot">${l('starlink-snapshot')}</li>
-          <li class="menu-selectable" data-group="starshield">${l('starshield')}</li>
-          <li class="menu-selectable" data-group="pwsa">${l('pwsa')}</li>
           <li class="menu-selectable" data-group="kuiper">${l('kuiper')}</li>
           <li class="menu-selectable" data-group="ast-spaceobile">${l('ast-spaceobile')}</li>
           <li class="menu-selectable" data-group="oneweb">${l('oneweb')}</li>
-          <li class="menu-selectable" data-group="telesat-lightspeed">${l('telesat-lightspeed')}</li>
-          <li class="menu-selectable" data-group="boeing">${l('boeing')}</li>
-          <li class="menu-selectable" data-group="astra">${l('astra')}</li>
-          <li class="menu-selectable" data-group="spinlaunch">${l('spinlaunch')}</li>
-          <li class="menu-selectable" data-group="hvnet">${l('hvnet')}</li>
           <li class="menu-selectable" data-group="lynk">${l('lynk')}</li>
           <li class="menu-selectable" data-group="guanwang">${l('guanwang')}</li>
           <li class="menu-selectable" data-group="qianfan">${l('qianfan')}</li>
-          <li class="menu-selectable" data-group="honghu3">${l('honghu3')}</li>
           <li class="menu-selectable" data-group="yinhe">${l('yinhe')}</li>
-          <li class="menu-selectable" data-group="hanwha">${l('hanwha')}</li>
         </ul>
       </section>
       <section id="sc-stats" class="kt-section sc-stats start-hidden">
@@ -581,28 +557,15 @@ export class SatConstellations extends KeepTrackPlugin {
     ses: { type: GroupType.PAYLOAD_NAME_REGEX, pattern: /SES-\d+/u },
     globalstar: { type: GroupType.NAME_REGEX, pattern: /globalstar/iu },
     starlink: { type: GroupType.NAME_REGEX, pattern: /STARLINK/u },
-    // These three notional Starlink sub-architectures use anchored patterns because real
-    // Starlink Gen2/v2/snapshot sats are already caught by the `starlink` entry above.
-    'starlink-gen2': { type: GroupType.NAME_REGEX, pattern: /^Starlink Gen2 \d+$/u },
-    'starlink-v2': { type: GroupType.NAME_REGEX, pattern: /^Starlink 2 \d+$/u },
-    'starlink-snapshot': { type: GroupType.NAME_REGEX, pattern: /^Starlink \d+$/u },
-    starshield: { type: GroupType.NAME_REGEX, pattern: /starshield/iu },
-    pwsa: { type: GroupType.NAME_REGEX, pattern: /pwsa/iu },
     kuiper: { type: GroupType.NAME_REGEX, pattern: /kuiper/iu },
-    // Real BlueBird satellites appear in the catalog under "BLUEBIRD"; notional imports use "AST SpaceMobile".
-    'ast-spaceobile': { type: GroupType.NAME_REGEX, pattern: /bluebird|ast.*mobile/iu },
+    // The catalog names AST's satellites BLUEWALKER-n and SPACEMOBILE-n (the BlueBirds).
+    'ast-spaceobile': { type: GroupType.NAME_REGEX, pattern: /bluewalker|spacemobile|bluebird/iu },
     oneweb: { type: GroupType.NAME_REGEX, pattern: /oneweb/iu },
-    'telesat-lightspeed': { type: GroupType.NAME_REGEX, pattern: /telesat/iu },
-    boeing: { type: GroupType.NAME_REGEX, pattern: /^Boeing \d+$/u },
-    astra: { type: GroupType.NAME_REGEX, pattern: /^Astra \d+$/u },
-    spinlaunch: { type: GroupType.NAME_REGEX, pattern: /^SpinLaunch \d+$/u },
-    hvnet: { type: GroupType.NAME_REGEX, pattern: /hvnet/iu },
     lynk: { type: GroupType.NAME_REGEX, pattern: /lynk/iu },
-    guanwang: { type: GroupType.NAME_REGEX, pattern: /guowang/iu },
+    // Guowang satellites are catalogued as HULIANWANG DIGUI (and the HULIANWANG JISHU SHIYAN test sats).
+    guanwang: { type: GroupType.NAME_REGEX, pattern: /guowang|hulianwang/iu },
     qianfan: { type: GroupType.NAME_REGEX, pattern: /qianfan/iu },
-    honghu3: { type: GroupType.NAME_REGEX, pattern: /honghu/iu },
     yinhe: { type: GroupType.NAME_REGEX, pattern: /yinhe/iu },
-    hanwha: { type: GroupType.NAME_REGEX, pattern: /hanwha/iu },
   };
 
   /** Constellations defined by a fixed list of SCC numbers. */

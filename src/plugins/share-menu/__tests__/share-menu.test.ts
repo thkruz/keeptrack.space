@@ -2,6 +2,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { ShareMenuPlugin } from '@app/plugins/share-menu/share-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -241,5 +242,49 @@ describe('ShareMenuPlugin clipboard failure', () => {
     await Promise.resolve();
 
     expect(toastSpy).toHaveBeenCalled();
+  });
+});
+
+describe('ShareMenuPlugin native share failure', () => {
+  let plugin: ShareMenuPlugin;
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new ShareMenuPlugin();
+    plugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    vi.spyOn(UrlManager, 'getShareUrl').mockReturnValue('https://keeptrack.space/');
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(navigator, 'share');
+    vi.restoreAllMocks();
+  });
+
+  const shareWith = async (err: Error) => {
+    Object.defineProperty(navigator, 'share', { value: vi.fn().mockRejectedValue(err), configurable: true });
+    (plugin as unknown as { shareNative_: () => void }).shareNative_();
+    await Promise.resolve();
+    await Promise.resolve();
+  };
+
+  it('logs the translated failure message with the error detail, not the raw locale key', async () => {
+    const debugSpy = vi.spyOn(errorManagerInstance, 'debug');
+
+    await shareWith(new Error('boom'));
+
+    expect(debugSpy).toHaveBeenCalledWith('Native share failed: boom');
+    expect(debugSpy.mock.calls.flat().join(' ')).not.toContain('errorMsgs');
+  });
+
+  it('stays quiet when the user dismisses the share sheet', async () => {
+    const debugSpy = vi.spyOn(errorManagerInstance, 'debug');
+    const abort = new Error('dismissed');
+
+    abort.name = 'AbortError';
+    await shareWith(abort);
+
+    expect(debugSpy).not.toHaveBeenCalled();
   });
 });

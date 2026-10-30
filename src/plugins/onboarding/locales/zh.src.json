@@ -14,7 +14,7 @@
         "skipNo": "继续",
         "startTour": "开始游览",
         "exploreOnMyOwn": "自己探索",
-        "keepGoing": "继续: 进阶游览",
+        "keepGoing": "查看进阶功能",
         "finishUp": "够了，结束吧",
         "createAccount": "创建免费账户",
         "maybeLater": "以后再说",
@@ -320,7 +320,17 @@
           "body": "带实时地面轨迹的二维世界地图。经典的运控大屏画面，一目了然谁在哪片上空。"
         }
       },
-      "stepDone": "完成了，看看效果吧。"
+      "stepDone": "完成了，看看效果吧。",
+      "missions": {
+        "login": {
+          "title": "登录以继续",
+          "body": "此功能会保存到你的免费 KeepTrack 账户。登录或创建账户后，本指南会从这里继续。"
+        },
+        "addMore": {
+          "title": "完成一个，还差两个",
+          "body": "选择另一颗卫星，用同样的方式从关注列表菜单中添加。添加满三颗即完成此任务。"
+        }
+      }
     }
   }
 }

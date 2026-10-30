@@ -14,7 +14,7 @@
         "skipNo": "Continua",
         "startTour": "Inizia il tour",
         "exploreOnMyOwn": "Esploro da solo",
-        "keepGoing": "Continua: tour avanzato",
+        "keepGoing": "Mostrami le funzioni avanzate",
         "finishUp": "Va bene così, concludi",
         "createAccount": "Crea un account gratuito",
         "maybeLater": "Forse più tardi",
@@ -320,7 +320,17 @@
           "body": "Una mappa del mondo 2D con tracce al suolo in tempo reale. La classica immagine da sala operativa di cosa sorvola dove."
         }
       },
-      "stepDone": "Fatto. Dai un'occhiata."
+      "stepDone": "Fatto. Dai un'occhiata.",
+      "missions": {
+        "login": {
+          "title": "Accedi per continuare",
+          "body": "Questa funzione salva nel tuo account KeepTrack gratuito. Accedi o creane uno e questa guida riprenderà proprio da qui."
+        },
+        "addMore": {
+          "title": "Uno fatto, ne mancano due",
+          "body": "Seleziona un altro satellite e aggiungilo allo stesso modo dal menu Lista di osservazione. La missione si completa a tre."
+        }
+      }
     }
   }
 }

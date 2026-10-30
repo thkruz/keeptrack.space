@@ -14,7 +14,7 @@
         "skipNo": "Keep going",
         "startTour": "Start the tour",
         "exploreOnMyOwn": "Explore on my own",
-        "keepGoing": "Keep going: power tour",
+        "keepGoing": "Show me the power features",
         "finishUp": "I'm good, finish up",
         "createAccount": "Create free account",
         "maybeLater": "Maybe later",
@@ -320,7 +320,17 @@
           "body": "A 2D world map with live ground tracks. The classic ops-floor picture of what is overhead where."
         }
       },
-      "stepDone": "Done. Take a look."
+      "stepDone": "Done. Take a look.",
+      "missions": {
+        "login": {
+          "title": "Sign in to continue",
+          "body": "This feature saves to your free KeepTrack account. Sign in or create one and this guide picks up right here."
+        },
+        "addMore": {
+          "title": "One down, two to go",
+          "body": "Select another satellite and add it from the Watchlist menu the same way. This mission checks off at three."
+        }
+      }
     }
   }
 }

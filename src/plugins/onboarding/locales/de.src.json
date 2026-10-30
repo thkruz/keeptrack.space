@@ -14,7 +14,7 @@
         "skipNo": "Weitermachen",
         "startTour": "Tour starten",
         "exploreOnMyOwn": "Selbst erkunden",
-        "keepGoing": "Weiter: Power-Tour",
+        "keepGoing": "Power-Funktionen zeigen",
         "finishUp": "Danke, das reicht",
         "createAccount": "Kostenloses Konto erstellen",
         "maybeLater": "Vielleicht später",
@@ -320,7 +320,17 @@
           "body": "Eine 2D-Weltkarte mit Bodenspuren in Echtzeit. Das klassische Lagebild, was wo über uns fliegt."
         }
       },
-      "stepDone": "Erledigt. Sehen Sie sich das an."
+      "stepDone": "Erledigt. Sehen Sie sich das an.",
+      "missions": {
+        "login": {
+          "title": "Zum Fortfahren anmelden",
+          "body": "Diese Funktion speichert in Ihrem kostenlosen KeepTrack-Konto. Melden Sie sich an oder erstellen Sie eins, dann geht diese Anleitung genau hier weiter."
+        },
+        "addMore": {
+          "title": "Einer geschafft, noch zwei",
+          "body": "Wählen Sie einen weiteren Satelliten und fügen Sie ihn genauso über das Menü Beobachtungsliste hinzu. Bei drei ist diese Mission erledigt."
+        }
+      }
     }
   }
 }

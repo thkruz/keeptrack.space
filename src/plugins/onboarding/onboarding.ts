@@ -33,7 +33,7 @@ import {
 import { l } from './onboarding-t7e';
 import { areAllAvailableChaptersDone, buildHubStep, POWER_CHAPTERS } from './power-hub';
 import { TourEngine, type TourStep } from './tour-engine';
-import { buildBasicsSteps, openDrawer, openDrawerWithoutOverlay } from './tour-steps';
+import { buildBasicsSteps, isPluginLocked, openDrawer, openDrawerWithoutOverlay } from './tour-steps';
 import './onboarding.css';
 
 const AUTO_START_DELAY_MS = 1500;
@@ -61,6 +61,8 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   private card_: GetStartedCard | null = null;
   private missions_: ChecklistMission[] = [];
   private accountLoginCb_: ((user: User | null) => void) | null = null;
+  /** Resumes a mission after the user signs in from its sign-in card. */
+  private missionLoginCb_: (() => void) | null = null;
 
   // =========================================================================
   // Composition-based configuration
@@ -790,7 +792,80 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     }
 
     ServiceLocator.getUiManager()?.pluginDrawer?.close();
-    mission.launch();
+
+    if (mission.gatedBy && isPluginLocked(mission.gatedBy) && this.isAccountStepAvailable_()) {
+      this.showMissionLogin_(mission);
+
+      return;
+    }
+
+    const steps = mission.buildSteps?.(this.state_.persona) ?? [];
+
+    if (!steps.some((step) => step.isAvailable?.() !== false)) {
+      // Nothing to guide (e.g. no catalog yet): open the feature directly
+      mission.launch();
+
+      return;
+    }
+
+    this.teardownEngine_();
+    this.track_('onboarding_mission_started', { missionId });
+    this.engine_ = new TourEngine({
+      steps,
+      texts: this.engineTexts_(),
+      onFinish: (reason) => {
+        this.engine_ = null;
+        this.track_('onboarding_mission_finished', { missionId, reason });
+        this.renderChecklistMenu_();
+      },
+    });
+    this.engine_.start();
+  }
+
+  /**
+   * A mission whose feature needs an account starts with a sign-in card instead of the
+   * plugin's "requires login" toast; signing in continues straight into the mission.
+   */
+  private showMissionLogin_(mission: ChecklistMission): void {
+    this.clearMissionLoginCb_();
+    this.track_('onboarding_mission_login_shown', { missionId: mission.id });
+
+    this.missionLoginCb_ = () => {
+      this.clearMissionLoginCb_();
+      this.teardownEngine_();
+      // Let the login gate unlock the plugins before the steps check them
+      setTimeout(() => this.launchMission_(mission.id), 0);
+    };
+    EventBus.getInstance().on(EventBusEvent.userLogin, this.missionLoginCb_);
+
+    this.runCardStage_(
+      {
+        id: `m-login-${mission.id}`,
+        kind: 'card',
+        title: l('missions.login.title'),
+        body: l('missions.login.body'),
+        buttons: [
+          { id: 'create', label: l('buttons.createAccount'), isPrimary: true },
+          { id: 'later', label: l('buttons.maybeLater') },
+        ],
+        escButtonId: 'later',
+      },
+      (buttonId: string) => {
+        if (buttonId === 'create') {
+          KeepTrackPlugin.loginGateOpenModal?.();
+        } else {
+          this.clearMissionLoginCb_();
+        }
+      },
+      { isKeepOpenOn: ['create'] }
+    );
+  }
+
+  private clearMissionLoginCb_(): void {
+    if (this.missionLoginCb_) {
+      EventBus.getInstance().unregister(EventBusEvent.userLogin, this.missionLoginCb_);
+      this.missionLoginCb_ = null;
+    }
   }
 
   private buildSideMenuHtml_(): string {

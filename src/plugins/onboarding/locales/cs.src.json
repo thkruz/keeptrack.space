@@ -14,7 +14,7 @@
         "skipNo": "Pokračovat",
         "startTour": "Spustit prohlídku",
         "exploreOnMyOwn": "Prozkoumám sám",
-        "keepGoing": "Pokračovat: pokročilá prohlídka",
+        "keepGoing": "Ukaž mi pokročilé funkce",
         "finishUp": "Stačí, dokončit",
         "createAccount": "Vytvořit účet zdarma",
         "maybeLater": "Možná později",
@@ -320,7 +320,17 @@
           "body": "2D mapa světa s pozemními stopami v reálném čase. Klasický operační obraz toho, co kde právě letí."
         }
       },
-      "stepDone": "Hotovo. Podívejte se."
+      "stepDone": "Hotovo. Podívejte se.",
+      "missions": {
+        "login": {
+          "title": "Pro pokračování se přihlaste",
+          "body": "Tato funkce ukládá data do vašeho bezplatného účtu KeepTrack. Přihlaste se nebo si účet vytvořte a tento průvodce bude pokračovat přesně tady."
+        },
+        "addMore": {
+          "title": "Jeden hotový, zbývají dva",
+          "body": "Vyberte další satelit a přidejte ho stejným způsobem z nabídky Seznam sledovaných. Mise se splní při třech."
+        }
+      }
     }
   }
 }

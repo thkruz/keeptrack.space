@@ -509,3 +509,110 @@ describe('onboarding account step gating', () => {
     expect(openModal).toHaveBeenCalled();
   });
 });
+
+describe('onboarding guided missions', () => {
+  let plugin: OnboardingPlugin;
+  const fakePlugins: KeepTrackPlugin[] = [];
+  const addFakePlugin = (id: string, bottomIconElementName: string, isLoginRequired: boolean) => {
+    const fake = { id, bottomIconElementName, isLoginRequired } as unknown as KeepTrackPlugin;
+
+    PluginRegistry.plugins.push(fake);
+    fakePlugins.push(fake);
+  };
+  const launch = (missionId: string) => (plugin as unknown as { launchMission_: (id: string) => void }).launchMission_(missionId);
+  const tourTitle = () => document.getElementById('kt-tour-title')?.textContent ?? null;
+
+  beforeEach(() => {
+    localStorage.clear();
+    PersistenceManager.resetInstance();
+    setupStandardEnvironment();
+    plugin = new OnboardingPlugin();
+    plugin.init();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+  });
+
+  afterEach(() => {
+    for (const fake of fakePlugins.splice(0)) {
+      PluginRegistry.plugins.splice(PluginRegistry.plugins.indexOf(fake), 1);
+    }
+    KeepTrackPlugin.loginGateOpenModal = null;
+    document.getElementById('kt-tour-root')?.remove();
+    document.body.classList.remove('user-logged-in');
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+  });
+
+  it('every mission except the power tour reuses guided chapter steps', () => {
+    const missions = buildMissions(() => {
+      // launch stub
+    });
+    const stepIds = (id: string) =>
+      missions
+        .find((m) => m.id === id)
+        ?.buildSteps?.(null)
+        .map((step) => step.id);
+
+    expect(stepIds('watchlist3')).toEqual(['w1-pick-target', 'w2-add-watchlist', 'm-watchlist-add-more']);
+    expect(stepIds('selectSensor')).toEqual(['s1-sensor-list', 's2-select-sensor', 's3-coverage']);
+    expect(stepIds('lookAngles')).toEqual(['w1-pick-target', 'w4-look-angles']);
+    expect(stepIds('colorScheme')).toEqual(['v1-color-schemes']);
+  });
+
+  it('a login-gated mission shows a sign-in card instead of opening the locked menu', () => {
+    const openModal = vi.fn();
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    KeepTrackPlugin.loginGateOpenModal = openModal;
+    addFakePlugin('WatchlistPlugin', 'menu-watchlist', true);
+
+    launch('watchlist3');
+
+    expect(tourTitle()).toBe('Sign in to continue');
+    expect(emitSpy).not.toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'menu-watchlist');
+
+    (document.querySelector('[data-tour-button="create"]') as HTMLElement).click();
+    expect(openModal).toHaveBeenCalled();
+    // The card stays up behind the login modal
+    expect(tourTitle()).toBe('Sign in to continue');
+  });
+
+  it('signing in from the mission card continues into the mission', () => {
+    vi.useFakeTimers();
+    KeepTrackPlugin.loginGateOpenModal = vi.fn();
+    addFakePlugin('WatchlistPlugin', 'menu-watchlist', true);
+    const launchSpy = vi.spyOn(plugin as unknown as { launchMission_: (id: string) => void }, 'launchMission_');
+
+    launch('watchlist3');
+    document.body.classList.add('user-logged-in');
+    EventBus.getInstance().emit(EventBusEvent.userLogin, null);
+    vi.runAllTimers();
+
+    expect(launchSpy).toHaveBeenLastCalledWith('watchlist3');
+    expect(tourTitle()).not.toBe('Sign in to continue');
+  });
+
+  it('"Maybe later" on the mission card closes it without resuming on a later sign-in', () => {
+    vi.useFakeTimers();
+    KeepTrackPlugin.loginGateOpenModal = vi.fn();
+    addFakePlugin('WatchlistPlugin', 'menu-watchlist', true);
+
+    launch('watchlist3');
+    (document.querySelector('[data-tour-button="later"]') as HTMLElement).click();
+    expect(tourTitle()).toBeNull();
+
+    const launchSpy = vi.spyOn(plugin as unknown as { launchMission_: (id: string) => void }, 'launchMission_');
+
+    EventBus.getInstance().emit(EventBusEvent.userLogin, null);
+    vi.runAllTimers();
+    expect(launchSpy).not.toHaveBeenCalled();
+  });
+
+  it('an unlocked mission starts a guided step instead of opening the menu directly', () => {
+    addFakePlugin('ColorMenu', 'menu-color-scheme', false);
+
+    launch('colorScheme');
+
+    expect(tourTitle()).toBe('Color the sky');
+  });
+});

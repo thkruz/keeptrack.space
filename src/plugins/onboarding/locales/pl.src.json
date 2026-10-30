@@ -14,7 +14,7 @@
         "skipNo": "Kontynuuj",
         "startTour": "Rozpocznij wycieczkę",
         "exploreOnMyOwn": "Zwiedzę samodzielnie",
-        "keepGoing": "Dalej: wycieczka zaawansowana",
+        "keepGoing": "Pokaż funkcje zaawansowane",
         "finishUp": "Wystarczy, zakończ",
         "createAccount": "Utwórz darmowe konto",
         "maybeLater": "Może później",
@@ -320,7 +320,17 @@
           "body": "Dwuwymiarowa mapa świata ze śladami naziemnymi na żywo. Klasyczny obraz operacyjny tego, co i gdzie przelatuje."
         }
       },
-      "stepDone": "Gotowe. Rzuć okiem."
+      "stepDone": "Gotowe. Rzuć okiem.",
+      "missions": {
+        "login": {
+          "title": "Zaloguj się, aby kontynuować",
+          "body": "Ta funkcja zapisuje dane na Twoim darmowym koncie KeepTrack. Zaloguj się lub załóż konto, a ten przewodnik wznowi się dokładnie tutaj."
+        },
+        "addMore": {
+          "title": "Jeden gotowy, zostały dwa",
+          "body": "Wybierz kolejnego satelitę i dodaj go w ten sam sposób z menu Lista obserwowanych. Misja zalicza się przy trzech."
+        }
+      }
     }
   }
 }

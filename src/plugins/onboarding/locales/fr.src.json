@@ -14,7 +14,7 @@
         "skipNo": "Continuer",
         "startTour": "Commencer la visite",
         "exploreOnMyOwn": "Explorer par moi-même",
-        "keepGoing": "Continuer : visite avancée",
+        "keepGoing": "Voir les fonctions avancées",
         "finishUp": "C'est bon, terminer",
         "createAccount": "Créer un compte gratuit",
         "maybeLater": "Peut-être plus tard",
@@ -320,7 +320,17 @@
           "body": "Une carte du monde en 2D avec les traces au sol en direct. L'image classique de salle d'opérations de ce qui survole quoi."
         }
       },
-      "stepDone": "C'est fait. Jetez un œil."
+      "stepDone": "C'est fait. Jetez un œil.",
+      "missions": {
+        "login": {
+          "title": "Connectez-vous pour continuer",
+          "body": "Cette fonction enregistre dans votre compte KeepTrack gratuit. Connectez-vous ou créez-en un et ce guide reprendra ici même."
+        },
+        "addMore": {
+          "title": "Un de fait, plus que deux",
+          "body": "Sélectionnez un autre satellite et ajoutez-le de la même façon depuis le menu Liste de suivi. La mission est validée à trois."
+        }
+      }
     }
   }
 }

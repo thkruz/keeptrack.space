@@ -160,7 +160,11 @@ export const openDrawerWithoutOverlay = (): void => {
 /** Opens the drawer and expands the collapsed group containing the target row. */
 export const openDrawerAt = (pluginIds: string | string[]): void => {
   openDrawer();
-  drawerItemTarget(pluginIds)?.closest('.drawer-group')?.classList.remove('collapsed');
+  const item = drawerItemTarget(pluginIds);
+
+  item?.closest('.drawer-group')?.classList.remove('collapsed');
+  // The item can sit below the fold (e.g. under the get-started card); the coachmark needs it on screen
+  item?.scrollIntoView?.({ block: 'center' });
 };
 
 export const isCatalogLoaded = (): boolean => {

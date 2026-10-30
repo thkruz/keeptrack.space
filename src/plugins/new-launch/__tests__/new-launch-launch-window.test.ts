@@ -68,6 +68,19 @@ describe('NewLaunch launch-window matching', () => {
     expect(note.textContent).toContain('<img src=x onerror="alert(1)">');
   });
 
+  it('shows target and site names with special characters exactly as written', () => {
+    issSat.name = 'ISS & "ZARYA"';
+    (getEl('nl-facility') as HTMLSelectElement).selectedOptions[0].textContent = 'Cape A & B';
+
+    p().onMatchTargetPlane_();
+
+    const text = getEl('nl-window-result')!.textContent ?? '';
+
+    expect(text).toContain('ISS & "ZARYA" (25544)');
+    expect(text).toContain('Cape A & B');
+    expect(text).not.toContain('&amp;');
+  });
+
   it('arms the window without launching and can be cleared via the result note', () => {
     p().onMatchTargetPlane_();
     expect(p().matchedLaunchTime_).not.toBeNull();

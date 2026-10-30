@@ -74,7 +74,8 @@
         "TooManyResults": "{limit} sur {total} résultats affichés. Augmentez \"Nombre maximum de résultats de recherche\" dans Paramètres de recherche pour en voir plus ; l'export enregistre tout de même tous les résultats.",
         "TryFindingFirst": "Essayez d'abord de trouver des satellites!",
         "SearchFailed": "Échec de la recherche : {error}",
-        "NothingToExport": "Aucun résultat avec des données orbitales à exporter"
+        "NothingToExport": "Aucun résultat avec des données orbitales à exporter",
+        "NoMatchesToExport": "La dernière recherche n'a trouvé aucun satellite, il n'y a donc rien à exporter."
       }
     }
   }

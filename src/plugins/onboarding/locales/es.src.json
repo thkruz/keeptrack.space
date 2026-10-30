@@ -14,7 +14,7 @@
         "skipNo": "Continuar",
         "startTour": "Iniciar el recorrido",
         "exploreOnMyOwn": "Explorar por mi cuenta",
-        "keepGoing": "Continuar: recorrido avanzado",
+        "keepGoing": "Muéstrame las funciones avanzadas",
         "finishUp": "Estoy listo, terminar",
         "createAccount": "Crear cuenta gratuita",
         "maybeLater": "Quizás después",
@@ -63,16 +63,21 @@
         }
       },
       "bridge": {
-        "title": "Ya conoces lo básico",
+        "title": "Temas del recorrido básico",
         "body": "¿Quieres el kit del operador? Sensores, listas de seguimiento y flujos rápidos con teclado. Unos dos minutos más.",
-        "recap1": "Encontraste y seleccionaste un satélite",
-        "recap2": "Leíste sus datos orbitales en vivo",
-        "recap3": "Controlaste el tiempo de la simulación"
+        "doneLabel": "Hecho",
+        "tryNextLabel": "Prueba a continuación",
+        "tasks": {
+          "spin": "Gira el globo",
+          "search": "Busca un satélite",
+          "select": "Selecciona un satélite",
+          "time": "Acelera o ralentiza el tiempo"
+        }
       },
       "account": {
         "title": "¿Guardar tu progreso?",
         "body": "Una cuenta gratuita lleva tu configuración contigo a cualquier dispositivo.",
-        "bodyPower": "Una cuenta gratuita lleva la lista de seguimiento y el sensor que acabas de configurar a cualquier dispositivo.",
+        "bodyPower": "Una cuenta gratuita conserva sus listas y ajustes de sensores en cualquier dispositivo.",
         "benefit1": "Sincroniza tus ajustes y tu lista entre dispositivos",
         "benefit2": "Elimina los anuncios",
         "benefit3": "Desbloquea gratis todo el conjunto de herramientas Pro"
@@ -315,7 +320,17 @@
           "body": "Un mapa mundial 2D con trazas terrestres en vivo. La imagen clásica de sala de operaciones de qué sobrevuela dónde."
         }
       },
-      "stepDone": "Hecho. Échale un vistazo."
+      "stepDone": "Hecho. Échale un vistazo.",
+      "missions": {
+        "login": {
+          "title": "Inicia sesión para continuar",
+          "body": "Esta función se guarda en tu cuenta gratuita de KeepTrack. Inicia sesión o crea una y esta guía continuará justo aquí."
+        },
+        "addMore": {
+          "title": "Uno listo, faltan dos",
+          "body": "Selecciona otro satélite y añádelo desde el menú Lista de seguimiento de la misma forma. La misión se completa con tres."
+        }
+      }
     }
   }
 }

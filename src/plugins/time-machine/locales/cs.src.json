@@ -4,10 +4,14 @@
       "bottomIconLabel": "Stroj času",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "Vypnout oznámení Stroje času",
+          "helpText": "Stroj času nebude zobrazovat vyskakovací oznámení."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Přepnout stroj času"
+      },
+      "yearToast": "Stroj času v roce {year}!"
     }
   }
 }

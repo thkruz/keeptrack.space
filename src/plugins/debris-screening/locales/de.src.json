@@ -5,6 +5,7 @@
       "title": "Trümmer-Screening",
       "resultsTitle": "Screening-Ergebnisse",
       "resultsCount": "{count} Konjunktionen gefunden",
+      "notScreened": "Noch nicht geprüft",
       "exportCsv": "CSV exportieren",
       "riskLevels": {
         "critical": "Kritisch",
@@ -71,6 +72,7 @@
       "ricConvention": "RIC-Vorzeichenkonvention: Sekundärobjekt minus Primärobjekt, im RIC-System des Primärobjekts (+R radial nach außen, +I in Flugrichtung des Primärobjekts, +C = R x I, die Bahnnormale).",
       "pcInputs": "Pc-Eingaben: Hard-Body-Radius {hbr} m ({primary} m primär + {secondary} m sekundär) für jedes Paar. Kovarianz: aus dem TLE jedes Objekts geschätzt (dasselbe Modell wie die Sigmas der Infobox, {sigma} Sigma), nicht aus einer CDM.",
       "parentTag": "Ursprung dieses Analystensatelliten",
+      "uncertaintyAssumedFromParent": "Unsicherheit vom Ursprungsobjekt {name} ({norad}) übernommen",
       "showParentRows": "Ursprungszeile anzeigen ({count})",
       "notInCatalog": "(nicht im geladenen Katalog)",
       "resultsCapped": "Die {limit} höchsten von {total} Konjunktionen (nach Pc absteigend)"

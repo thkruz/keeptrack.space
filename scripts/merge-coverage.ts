@@ -24,7 +24,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
 const normalizePath = (raw: string): string => {
   const p = raw.replace(/\\/gu, '/');
-  const m = (/(?:^|.*?\/)(src\/.*)$/u).exec(p);
+  const m = (/(?:^|\/)(src\/.*)$/u).exec(p);
 
   return m ? m[1] : p.replace(`${ROOT.replace(/\\/gu, '/')}/`, '');
 };

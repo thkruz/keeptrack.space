@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "Podgląd orbity",
-    "unknown": "Nieznany"
+    "unknown": "Nieznany",
+    "close": "Zamknij",
+    "download": "Pobierz",
+    "downloadNamed": "Pobierz {name}",
+    "loading": "Wczytywanie…"
   },
   "help": {
     "overview": "Przegląd",
@@ -35,7 +39,8 @@
       "resetCamera": "Przywróć domyślny widok kamery",
       "precisionMode": "Przytrzymaj, aby poruszać kamerą powoli i precyzyjnie",
       "moveCamera": "Poruszaj kamerą w trybach pierwszoosobowych",
-      "rollCamera": "Przechyl kamerę w trybach pierwszoosobowych",
+      "moveCameraUpRoll": "Ruch w górę w widoku FPS; przechył w pozostałych trybach pierwszoosobowych",
+      "moveCameraDownRoll": "Ruch w dół w widoku FPS; przechył w pozostałych trybach pierwszoosobowych",
       "numpadRotate": "Obróć kamerę",
       "zoomIn": "Przybliż",
       "zoomOut": "Oddal",
@@ -62,7 +67,7 @@
       "embed": "Osadzony",
       "offline": "Offline",
       "epfl": "EPFL",
-      "companion": "Companion",
+      "companion": "Aplikacja towarzysząca",
       "solar-system": "Układ Słoneczny"
     }
   },
@@ -88,12 +93,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "Błąd podczas aktualizacji stylizacji interfejsu sensora."
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "Nie znaleziono wszystkich przycisków filtrów dolnego menu"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset otrzymał wartość nieskończoną: {value}",
+      "invalidDate": "synchronize() zwrócił nieprawidłową datę - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "Błąd podczas wczytywania katalogu satelitów.",
+      "usingOfflineCatalog": "Nie udało się pobrać najnowszego katalogu! Używany jest katalog offline, który może być nieaktualny!",
+      "catalogsLoadFailed": "Nie udało się wczytać katalogów TLE!",
+      "externalTlesBadFormat": "Zewnętrzne TLE mają nieprawidłowy format",
+      "externalTlesLoadError": "Błąd podczas wczytywania zewnętrznych TLE z {url}",
+      "fileLoadError": "Błąd podczas wczytywania {file}",
+      "usingOfflineVimpel": "Nie udało się pobrać najnowszego vimpel.json! Używany jest plik vimpel.json offline, który może być nieaktualny!",
+      "satProcessFailed": "Nie udało się przetworzyć satelity: {name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "Ten eksport zawiera {count} satelitów z rozszerzonym sccNum (7+ cyfr). Kolumny 3-7 formatu TLE mieszczą tylko 5 znaków, więc ponowny import tego pliku spowoduje utratę kanonicznego ID. Użyj eksportu CSV/OMM, aby zachować rozszerzone ID.",
+      "noTleData": "Brak danych TLE do eksportu"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec: nie znaleziono satId w satData",
+      "satrecError": "Błąd podczas tworzenia rekordu satelity!",
+      "analystSatInvalid": "Nowy satelita analityka jest nieprawidłowy!"
+    },
+    "apiKeyRequired": "Wymagany klucz API. Uzyskaj bezpłatny klucz na keeptrack.space i dodaj go do settings/data-settings.ts",
+    "audioLoadFailed": "Nie udało się wczytać dźwięku: {key}",
+    "rmbMenuMissingElements": "Brakujące elementy menu kontekstowego: {ids}",
+    "sgp4BackendFailed": "Nie udało się włączyć propagatora {backend}; używany jest SGP4 w TypeScript. {error}",
+    "Pwa": {
+      "registrationFailed": "Rejestracja service workera nie powiodła się:"
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "Szczegółowe modele statków kosmicznych są niedostępne, używane są modele ogólne: {error}",
+      "meshVariantsUnavailable": "Proceduralne warianty modeli są niedostępne, używane są darmowe modele bazowe: {error}",
+      "colorCruncherUpdateDropped": "Odrzucono dynamiczną aktualizację ColorCruncher: {error}",
+      "hoverPickDisabled": "Wybieranie satelitów po najechaniu wyłączone: ta przeglądarka nie obsługuje WebGL readPixels ({error}). Wybór kliknięciem nadal działa.",
+      "earthInitFailed": "Błąd podczas inicjalizacji Ziemi: {error}",
+      "textureLoadFailed": "Nie udało się wczytać tekstury: {url}",
+      "solarSystemPackUnavailable": "Pakiet Układu Słonecznego jest niedostępny, używane są wbudowane ciała niebieskie: {error}",
+      "uniformNotFound": "Nie znaleziono uniform {uniform} w programie {program}",
+      "contextLost": "Utracono kontekst WebGL",
+      "contextLostRefresh": "Utracono kontekst WebGL. Odśwież stronę, aby go przywrócić.",
+      "contextRestored": "Przywrócono kontekst WebGL",
+      "pickingResizeFailed": "Zmiana rozmiaru bufora ramki wyboru w resizeCanvas nie powiodła się; odłożono do przywrócenia kontekstu. {error}",
+      "godraysResizeFailed": "Zmiana rozmiaru efektu godrays w resizeCanvas nie powiodła się; ponowna próba przy następnej zmianie rozmiaru. {error}",
+      "bodyInitError": "Błąd podczas inicjalizacji: {name}",
+      "bodyTextureError": "Błąd podczas aktualizacji tekstury: {name}",
+      "atmosphereInitError": "Błąd podczas inicjalizacji atmosfery: {name}",
+      "atmosphereTextureError": "Błąd podczas wczytywania tekstury atmosfery: {name} (próba {attempt})",
+      "shaderInitFailed": "Nie udało się zainicjować shaderów",
+      "meshModelUndefined": "Model siatki nie jest zdefiniowany. Nie można zastosować wskaźników atrybutów.",
+      "shaderAttributeMissing": "Nie znaleziono atrybutu „{attr}” w shaderze. Czy nie jest zadeklarowany lub używany w kodzie shadera?",
+      "meshesLoadFailed": "Nie udało się wczytać modeli 3D!",
+      "flagAtlasLoadFailed": "Nie udało się wczytać atlasu flag",
+      "politicalMapLoadFailed": "Nie udało się wczytać danych mapy politycznej"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] Wyświetlono ekran odzyskiwania uruchamiania (zablokowane workery: {workers}).",
+      "line": "Wiersz: {line}",
+      "optionalWorkersStalled": "[KeepTrack] Opcjonalne workery nie uruchomiły się w ciągu {seconds} s; uruchamianie bez nich: {workers}. Powiązane funkcje (np. linie orbit) są wyłączone w tej sesji.",
+      "essentialWorkersStalled": "[KeepTrack] Niezbędne web workery nie zainicjowały się po {seconds} s. Zablokowane workery: {workers}.",
+      "selfHealReload": "[KeepTrack] Workery się zablokowały; jednorazowe przeładowanie ze świeżą pamięcią podręczną workerów w celu samonaprawy."
+    },
+    "Persistence": {
+      "versionMismatch": "Niezgodność wersji: {saved} < {current}",
+      "clearingStorage": "Czyszczenie pamięci lokalnej...",
+      "subscriberError": "Błąd w subskrybencie pamięci:",
+      "storageError": "Błąd LocalStorageProvider:",
+      "enhancedInitFailed": "Nie udało się zainicjować rozszerzonego zapisu danych: {error}",
+      "corruptSetting": "Pomijanie uszkodzonego zapisanego ustawienia „{key}”: {error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "Nie znaleziono kontenera głównego!",
+      "containerNotFound": "Nie znaleziono kontenera Colorbox!",
+      "loadFailed": "Nie udało się wczytać: {url}",
+      "imageLoadFailed": "Nie udało się wczytać obrazu: {url}"
+    },
+    "SaveVariable": {
+      "variable": "Błąd podczas zapisywania zmiennej!",
+      "csv": "Błąd podczas zapisywania pliku CSV!",
+      "xlsx": "Błąd podczas zapisywania pliku XLSX!",
+      "clipboard": "Błąd podczas kopiowania do schowka!"
+    },
+    "Fatal": {
+      "technicalDetail": "Szczegóły techniczne",
+      "recommendations": "Zalecenia",
+      "canvasMissingTitle": "Brak elementu canvas",
+      "canvasMissingDescription": "KeepTrack nie znalazł swojej powierzchni rysowania. Zwykle oznacza to, że rozszerzenie przeglądarki, firmowa zapora lub zasady bezpieczeństwa treści usuwają elementy ze strony.",
+      "webgl2Title": "WebGL 2 jest niedostępny",
+      "webgl2Description": "KeepTrack wymaga WebGL 2 do wyświetlenia sceny 3D. Twoja przeglądarka lub urządzenie go nie obsługuje albo został wyłączony.",
+      "recDisableExtensions": "Wyłącz rozszerzenia przeglądarki (blokery reklam, narzędzia prywatności) i odśwież stronę.",
+      "recManagedNetwork": "Korzystasz z zarządzanej sieci? Poproś administratora sieci lub systemu o dodanie tej witryny do dozwolonych.",
+      "recDifferentBrowser": "Spróbuj innej przeglądarki (zalecane: Chrome, Edge lub Firefox).",
+      "recUpdateBrowser": "Zaktualizuj przeglądarkę do najnowszej wersji.",
+      "recHardwareAcceleration": "Włącz akcelerację sprzętową w ustawieniach przeglądarki.",
+      "recGraphicsDrivers": "Zaktualizuj sterowniki karty graficznej.",
+      "recManagedDevice": "Korzystasz z zarządzanego urządzenia? Skontaktuj się z administratorem systemu."
     }
   },
   "hoverManager": {
     "launched": "Wystrzelony",
     "launchedPlanned": "Wystrzelenie: Planowane",
-    "launchedUnknown": "Wystrzelenie: Nieznane"
+    "launchedUnknown": "Wystrzelenie: Nieznane",
+    "orbitPeriodDays": "Okres orbitalny: {days} dni ziemskich",
+    "orbitPeriodYears": "Okres orbitalny: {years} lat ziemskich",
+    "distanceFromParent": "Odległość od {parent}: {km} km",
+    "distanceFromSun": "Odległość od Słońca: {au} AU ({mkm} mln km)",
+    "unknownLaunchSite": "Nieznane miejsce startu",
+    "unknownSite": "Nieznane miejsce",
+    "unknownCountry": "Nieznany kraj",
+    "external": "Zewnętrzne",
+    "position": "Pozycja:",
+    "velocity": "Prędkość:"
   },
   "darkClouds": {
     "in": "W",
@@ -153,22 +268,125 @@
     "groupLayerToggles": "Przełączniki warstw",
     "groupSettingsToggles": "Przełączniki ustawień",
     "groupDevTools": "Narzędzia programistyczne",
-    "groupAbout": "O programie"
+    "groupAbout": "O programie",
+    "modeAll": "Wszystkie wtyczki",
+    "openPluginMenu": "Otwórz menu wtyczek",
+    "openAppLauncher": "Otwórz program uruchamiający aplikacje",
+    "appLauncherTooltip": "Program uruchamiający aplikacje (Shift+Z)",
+    "appLauncher": "Program uruchamiający aplikacje",
+    "search": "Szukaj",
+    "searchEllipsis": "Szukaj…",
+    "toggleRailMode": "Przełącz tryb zwinięty",
+    "collapse": "Zwiń",
+    "expand": "Rozwiń",
+    "phoneLink": "Połączenie z telefonem",
+    "phoneLinkSignIn": "Zaloguj się, aby połączyć telefon",
+    "connected": "Połączono",
+    "offline": "Offline",
+    "footerLinks": {
+      "label": "O aplikacji i informacje prawne",
+      "about": "O aplikacji",
+      "data": "Dane",
+      "terms": "Regulamin",
+      "privacy": "Prywatność"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Wstrzymaj zegar",
     "resetCamera": "Zresetuj kamerę",
     "clearLines": "Wyczyść linie",
-    "clearScreen": "Wyczyść ekran"
+    "clearScreen": "Wyczyść ekran",
+    "startClock": "Uruchom zegar"
   },
   "urlManager": {
     "satNotFound": "Satelita \"{val}\" nie został znaleziony!",
     "intldesNotFound": "Międzynarodowy identyfikator \"{val}\" nie został znaleziony!",
-    "deepSpaceNoEphemeris": "{name} to obiekt w dalekiej przestrzeni kosmicznej. Jego efemerydy nie są jeszcze dostępne w KeepTrack."
+    "deepSpaceNoEphemeris": "{name} to obiekt w dalekiej przestrzeni kosmicznej. Jego efemerydy nie są jeszcze dostępne w KeepTrack.",
+    "searchFoundNothing": "Wyszukiwanie „{val}” nic nie znalazło!",
+    "missileLaunched": "Pocisk wystrzelony!",
+    "dateNotIso": "Wartość daty „{val}” nie jest prawidłowym ciągiem daty ISO 8601!",
+    "dateNotUnix": "Wartość daty „{val}” nie jest prawidłowym znacznikiem czasu Unix!",
+    "rateNotFloat": "Prędkość propagacji „{val}” nie jest prawidłową liczbą!",
+    "zoomNotFloat": "Wartość powiększenia „{val}” nie jest prawidłową liczbą!",
+    "zoomOutOfBounds": "Wartość powiększenia „{val}” jest poza zakresem!",
+    "pitchYawNotFloat": "Wartość pochylenia lub odchylenia nie jest prawidłową liczbą!",
+    "pitchOutOfBounds": "Wartość pochylenia jest poza zakresem!",
+    "yawOutOfBounds": "Wartość odchylenia jest poza zakresem!",
+    "latLonNotFloat": "Wartość szerokości lub długości geograficznej nie jest prawidłową liczbą!",
+    "latLonOutOfBounds": "Wartość szerokości lub długości geograficznej jest poza zakresem!",
+    "unknownSunParam": "Nieznany parametr słońca: {val}",
+    "unknownRegime": "Nieznany filtr reżimu orbitalnego: {val}",
+    "invalidSearchLimit": "Nieprawidłowy limit wyszukiwania: {val}"
   },
   "searchManager": {
     "resultCountOne": "1 wynik",
     "resultCount": "Wyniki: {count}",
-    "resultCountLimited": "Wyświetlono {shown} z {total} wyników"
+    "resultCountLimited": "Wyświetlono {shown} z {total} wyników",
+    "noResults": "Nie znaleziono wyników",
+    "decayed": "Spłonął",
+    "typeStar": "Gwiazda",
+    "typeSensor": "Czujnik",
+    "typeLaunchSite": "Miejsce startu",
+    "typePlanet": "Planeta"
+  },
+  "sensorMath": {
+    "withinOneBeam": "W obrębie jednej wiązki",
+    "range": "Odległość: {km} km",
+    "relativeVelocity": "Prędkość względna: {kms} km/s",
+    "noPassesInDays": "Brak przelotów w ciągu {days} dni",
+    "customLocation": "Własna lokalizacja",
+    "customSensorDefaultName": "Własny czujnik"
+  },
+  "toasts": {
+    "orbitTailsOnly": "Tylko ogony orbit",
+    "orbitsOff": "Orbity wyłączone",
+    "orbitsOn": "Orbity włączone",
+    "orbitsInEcf": "Orbity wyświetlane w ECF",
+    "orbitsInEci": "Orbity wyświetlane w ECI",
+    "cameraEarthCentered": "Tryb kamery wyśrodkowanej na Ziemi",
+    "cameraFixedLvlh": "Tryb kamery przypiętej do satelity (LVLH)",
+    "cameraFixedEci": "Tryb kamery przypiętej do satelity (ECI)",
+    "cameraFree": "Tryb swobodnej kamery",
+    "cameraPlanetarium": "Tryb kamery planetarium",
+    "cameraSatFirstPerson": "Tryb kamery z perspektywy satelity",
+    "cameraAstronomy": "Tryb kamery astronomicznej",
+    "cameraFlatMap": "Tryb kamery płaskiej mapy",
+    "propagationSpeed": "Prędkość propagacji: {rate}x",
+    "timeSetToRealTime": "Ustawiono czas rzeczywisty",
+    "noValidFov": "Brak prawidłowego pola widzenia do narysowania! Nie można rysować kilku czujników dalekiego kosmosu jednocześnie.",
+    "colorSchemeChanged": "Zmieniono schemat kolorów na {scheme}",
+    "mobileFullVersionUnavailable": "Pełna wersja KeepTrack nie jest dostępna na urządzeniach mobilnych. Aby z niej skorzystać, użyj przeglądarki na komputerze.",
+    "objectInsideEarth": "Obiekt znajduje się wewnątrz Ziemi!",
+    "propagationRate": "Prędkość propagacji: {rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "Przełącz warstwy",
+    "layers": "Warstwy"
+  },
+  "modalConfirm": {
+    "confirmAction": "Potwierdź działanie",
+    "defaultTitle": "Czy na pewno?",
+    "defaultMessage": "Czy na pewno chcesz wykonać to działanie?",
+    "yes": "Tak",
+    "no": "Nie",
+    "cancel": "Anuluj",
+    "logoutTitle": "Potwierdź wylogowanie",
+    "logoutMessage": "Czy na pewno chcesz się wylogować? Aby uzyskać dostęp do konta, trzeba będzie zalogować się ponownie.",
+    "logout": "Wyloguj",
+    "deleteTitle": "Potwierdź usunięcie",
+    "deleteNamedMessage": "Czy na pewno chcesz usunąć „{name}”? Tej operacji nie można cofnąć.",
+    "deleteMessage": "Czy na pewno chcesz usunąć ten element? Tej operacji nie można cofnąć.",
+    "delete": "Usuń",
+    "clearTitle": "Potwierdź wyczyszczenie",
+    "clearTypedMessage": "Czy na pewno chcesz wyczyścić wszystko: {dataType}? Tej operacji nie można cofnąć.",
+    "clearMessage": "Czy na pewno chcesz wyczyścić wszystkie dane? Tej operacji nie można cofnąć.",
+    "clear": "Wyczyść",
+    "input": "Wprowadzanie",
+    "ok": "OK",
+    "removeItem": "Usuń {label}"
+  },
+  "colorbox": {
+    "openInNewTab": "Otwórz w nowej karcie",
+    "blankPageHint": "Pusta strona? Otwórz ją w nowej karcie."
   }
 }

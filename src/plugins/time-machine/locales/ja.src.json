@@ -4,10 +4,14 @@
       "bottomIconLabel": "タイムマシン",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "タイムマシンの通知を無効化",
+          "helpText": "タイムマシンがトースト通知を表示しないようにします。"
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "タイムマシンの切り替え"
+      },
+      "yearToast": "タイムマシン: {year}年!"
     }
   }
 }

@@ -45,12 +45,14 @@ import {
   RIC_CONVENTION,
   type RicVector,
   type ScreeningDiff,
-  type ScreeningDiffEntry,
 } from '@app/engine/conjunction/analysis-state';
 import { findApproachMinima } from '@app/engine/conjunction/conjunction-tca';
-import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, Kilometers, RIC, Satellite, Seconds, StateCovariance } from '@ootk/src/main';
+import { analystParentSccNum } from '@app/engine/conjunction/uncertainty-source';
+import { ConjunctionAssessment, cappedScreeningCovarianceFromTle, EpochUTC, j2SecularRates, Kilometers, RIC, Satellite, Seconds, StateCovariance } from '@ootk/src/main';
+import { isPlaceholderIntlDes } from '../sat-info-box/placeholder-intl-des';
 import { screeningSigmasKm } from '../sat-info-box-orbital/screening-sigmas';
-import { formatReportTime, ReportData, ReportTable, tleEpochFromLine1 } from './reports-core';
+import { doc, docEn, fillDoc } from './report-i18n';
+import { formatReportTime, ReportData, ReportTable, ReportText, tleEpochFromLine1 } from './reports-core';
 import { formatPc, riskLevelFromPc } from './screening-diff';
 
 /** Conjunction search half-widths offered in the menu (seconds). */
@@ -74,10 +76,11 @@ const SCREENING_SIGMA_CAPS_KM: [number, number, number] = [35, 71, 32];
 const MS_PER_HOUR = 3_600_000;
 
 /**
- * Objects-table sigma row label. The sigmas are not aged to TCA: they are the TLE-epoch values of
- * the model Pc uses, the same numbers the orbital info box shows.
+ * Objects-table sigma row label (English; the text report prints it in the UI language). The sigmas
+ * are not aged to TCA: they are the TLE-epoch values of the model Pc uses, the same numbers the
+ * orbital info box shows.
  */
-export const SIGMA_ROW_LABEL = '1-sigma R / I / C (km, own RIC frame, at TLE epoch)';
+export const SIGMA_ROW_LABEL = docEn('objects.sigma');
 
 /** App-side context every analysis needs. */
 export interface AnalysisEnv {
@@ -93,29 +96,8 @@ export interface AnalysisEnv {
   secondaryHardBodyRadiusKm: number;
 }
 
-/** Analyst lineage fields, read duck-typed (the Maneuver tool writes `derivedFromSccNum`). */
-interface AnalystLineage {
-  derivedFromSccNum?: unknown;
-  parentSccNum?: unknown;
-  derivedFrom?: unknown;
-}
-
-/** NORAD number of the object an analyst satellite was derived from, or null. */
-export const analystParentSccNum = (obj: unknown): string | null => {
-  if (typeof obj !== 'object' || obj === null) {
-    return null;
-  }
-  const lineage = obj as AnalystLineage;
-  const own = (obj as { sccNum?: unknown }).sccNum;
-
-  for (const value of [lineage.derivedFromSccNum, lineage.parentSccNum, lineage.derivedFrom]) {
-    if (typeof value === 'string' && value.length > 0 && value !== own) {
-      return value;
-    }
-  }
-
-  return null;
-};
+/** NORAD number of the object an analyst satellite was derived from (shared with the screening tools). */
+export { analystParentSccNum };
 
 // =============================================================================
 // Building blocks
@@ -179,42 +161,91 @@ const ELEMENT_KEYS = [
   'bstar',
 ] as const;
 
+const ANGLE_KEYS = new Set<string>(['raanDeg', 'argPerigeeDeg', 'meanAnomalyDeg']);
+const RAD2DEG = 180 / Math.PI;
+
+const wrap360 = (deg: number): number => ((deg % 360) + 360) % 360;
+/** Signed angle difference in [-180, 180). */
+const wrap180 = (deg: number): number => wrap360(deg + 180) - 180;
+
+/**
+ * Moves TLE mean elements to another epoch using the secular J2 rates (RAAN, argument of perigee,
+ * mean anomaly). Without this the maneuver report compared the parent at its TLE epoch with the
+ * clone at the burn epoch, so the Change column showed hours of orbital motion as a burn effect.
+ */
+export const advanceMeanElements = (el: MeanElements, targetIso: string): MeanElements => {
+  if (!el.epochIso) {
+    return el;
+  }
+  const dtSec = (new Date(targetIso).getTime() - new Date(el.epochIso).getTime()) / 1000;
+  const rates = j2SecularRates(el.semiMajorAxisKm, el.eccentricity, el.inclinationDeg / RAD2DEG);
+
+  if (!Number.isFinite(dtSec) || !Number.isFinite(rates.meanAnomalyDot)) {
+    return el;
+  }
+
+  return {
+    ...el,
+    epochIso: targetIso,
+    raanDeg: wrap360(el.raanDeg + rates.raanDot * dtSec * RAD2DEG),
+    argPerigeeDeg: wrap360(el.argPerigeeDeg + rates.argPerigeeDot * dtSec * RAD2DEG),
+    meanAnomalyDeg: wrap360(el.meanAnomalyDeg + rates.meanAnomalyDot * dtSec * RAD2DEG),
+  };
+};
+
 const meanElementDeltas = (pre: MeanElements, post: MeanElements): ManeuverOption['meanElementDeltas'] => {
   const out: NonNullable<ManeuverOption['meanElementDeltas']> = {};
 
   for (const key of ELEMENT_KEYS) {
-    out[key] = post[key] - pre[key];
+    const delta = post[key] - pre[key];
+
+    out[key] = ANGLE_KEYS.has(key) ? wrap180(delta) : delta;
   }
 
   return out;
 };
 
-/** Object summary block (name, ids, TLE epoch, GP age, Pc sigmas, mean elements). */
-export const buildObjectSummary = (sat: Satellite, role: AnalysisObjectRole, env: AnalysisEnv): AnalysisObjectSummary => {
+/**
+ * Object summary block (name, ids, TLE epoch, GP age, Pc sigmas, mean elements).
+ *
+ * `uncertaintyParent`: for an analyst clone, the cataloged object it was derived from. The clone's
+ * TLE is a fit at the burn epoch, so its own GP age is near zero (negative for a future burn) and
+ * its TLE-derived sigmas can be smaller than the parent's, as if the burn had improved our
+ * knowledge of the orbit. The clone knows no more than its parent, so it takes the parent's
+ * 1-sigma RIC and GP age, and `uncertaintyAssumedFromNoradId` says so. Its own TLE epoch is kept.
+ */
+export const buildObjectSummary = (sat: Satellite, role: AnalysisObjectRole, env: AnalysisEnv, uncertaintyParent?: Satellite | null): AnalysisObjectSummary => {
   const epoch = tleEpochFromLine1(sat.tle1);
   const parent = analystParentSccNum(sat);
-
-  return {
+  const source = uncertaintyParent ?? sat;
+  const sourceEpoch = uncertaintyParent ? tleEpochFromLine1(uncertaintyParent.tle1) : epoch;
+  const summary: AnalysisObjectSummary = {
     role,
     name: sat.name,
     noradId: sat.sccNum || null,
-    cosparId: sat.intlDes || null,
+    cosparId: sat.intlDes && !isPlaceholderIntlDes(sat) ? sat.intlDes : null,
     tleEpochIso: epoch ? epoch.toISOString() : null,
-    gpAgeHours: epoch ? (env.analysisEpoch.getTime() - epoch.getTime()) / MS_PER_HOUR : null,
-    ricSigmasKm: ricSigmas(sat),
+    gpAgeHours: sourceEpoch ? (env.analysisEpoch.getTime() - sourceEpoch.getTime()) / MS_PER_HOUR : null,
+    ricSigmasKm: ricSigmas(source),
     meanElements: meanElementsOf(sat),
     isAnalystObject: parent !== null,
     derivedFromNoradId: parent,
   };
+
+  if (uncertaintyParent) {
+    summary.uncertaintyAssumedFromNoradId = uncertaintyParent.sccNum || null;
+  }
+
+  return summary;
 };
 
 /** The Pc inputs block, built from the same constants and setting the computation uses. */
 export const buildPcInputs = (env: AnalysisEnv): PcInputs => ({
-  method: 'ootk ConjunctionAssessment: 2D Pc in the encounter plane, combined covariance in the primary RIC frame',
+  method: doc('pcInputs.methodValue'),
   primaryHardBodyRadiusKm: env.primaryHardBodyRadiusKm,
   secondaryHardBodyRadiusKm: env.secondaryHardBodyRadiusKm,
   combinedHardBodyRadiusKm: env.primaryHardBodyRadiusKm + env.secondaryHardBodyRadiusKm,
-  covarianceSource: 'Synthetic TLE-derived covariance (ootk cappedScreeningCovarianceFromTle), not an operator covariance; same as Debris Screening',
+  covarianceSource: doc('pcInputs.covarianceSourceValue'),
   covarianceConfidenceLevel: env.covarianceConfidenceLevel,
   sigmaCapsKm: [...SCREENING_SIGMA_CAPS_KM],
 });
@@ -246,7 +277,16 @@ const separationKm = (primary: Satellite, secondary: Satellite, date: Date): num
  * around it for the Pc (the same assessment the Debris Screening tool runs).
  * Returns null when the window holds no interior minimum.
  */
-export const findEncounter = (primary: Satellite, secondary: Satellite, env: AnalysisEnv, halfWidthSec: number): ConjunctionEncounter | null => {
+export const findEncounter = (
+  primary: Satellite,
+  secondary: Satellite,
+  env: AnalysisEnv,
+  halfWidthSec: number,
+  /** Object whose screening covariance stands in for the primary's (an analyst clone uses its parent's). */
+  primaryCovarianceSource: Satellite = primary,
+  /** Same for the secondary. */
+  secondaryCovarianceSource: Satellite = secondary
+): ConjunctionEncounter | null => {
   const startMs = env.analysisEpoch.getTime() - halfWidthSec * 1000;
   const windowMs = 2 * halfWidthSec * 1000;
   const distFn = (t: number): number => separationKm(primary, secondary, new Date(startMs + t));
@@ -263,8 +303,8 @@ export const findEncounter = (primary: Satellite, secondary: Satellite, env: Ana
   let ricVelocityKmS: RicVector | null = null;
   let pc: number | null = null;
 
-  const primaryCov = screeningCovariance(primary, env.covarianceConfidenceLevel);
-  const secondaryCov = screeningCovariance(secondary, env.covarianceConfidenceLevel);
+  const primaryCov = screeningCovariance(primaryCovarianceSource, env.covarianceConfidenceLevel);
+  const secondaryCov = screeningCovariance(secondaryCovarianceSource, env.covarianceConfidenceLevel);
 
   try {
     const assessment = new ConjunctionAssessment(
@@ -379,56 +419,65 @@ const RULE = '-'.repeat(31);
 const fmtKm = (v: number): string => v.toFixed(3);
 const fmtSigned = (v: number, digits = 3): string => `${v >= 0 ? '+' : ''}${v.toFixed(digits)}`;
 const fmtIsoTime = (iso: string | null): string => (iso ? formatReportTime(new Date(iso)) : 'N/A');
-const fmtAge = (hours: number | null): string => (hours === null ? 'N/A' : `${(hours / 24).toFixed(2)} days`);
+const fmtAge = (hours: number | null): string => (hours === null ? 'N/A' : fillDoc(doc('objects.days'), { days: (hours / 24).toFixed(2) }));
 const fmtSigmas = (s: RicVector | null): string => (s ? `${s.radial.toFixed(3)} / ${s.intrack.toFixed(3)} / ${s.crosstrack.toFixed(3)}` : 'N/A');
+/** Appends "(assumed from parent)" to a cell whose value was taken from the object's parent. */
+const assumedCell = (o: AnalysisObjectSummary, text: string): string => (o.uncertaintyAssumedFromNoradId && text !== 'N/A' ? `${text} ${doc('objects.assumedFromParent')}` : text);
 
 const headerBlock = (title: string, state: ConjunctionAnalysisState): string =>
   `${title}\n${RULE}\n` +
-  `Date: ${state.generatedAtIso}\n` +
-  `Generated (wall clock): ${state.generatedWallClockIso}\n` +
-  `KeepTrack version: ${state.appVersion}\n` +
-  `RIC convention: ${state.ricConvention}\n\n`;
+  `${doc('header.date')}: ${state.generatedAtIso}\n` +
+  `${doc('header.generatedWallClock')}: ${state.generatedWallClockIso}\n` +
+  `${doc('header.appVersion')}: ${state.appVersion}\n` +
+  `${doc('header.ricConvention')}: ${state.ricConvention}\n\n`;
 
 /** Object comparison table: one column per object. */
 const objectsTable = (objects: AnalysisObjectSummary[]): ReportTable => {
   const cell = (fn: (o: AnalysisObjectSummary) => string): string[] => objects.map(fn);
 
   return {
-    headers: ['Field', ...objects.map((o) => o.role.charAt(0).toUpperCase() + o.role.slice(1))],
+    headers: [doc('objects.field'), ...objects.map((o) => doc(`roles.${o.role}`))],
     rows: [
-      ['Name', ...cell((o) => o.name)],
-      ['NORAD ID', ...cell((o) => o.noradId ?? 'None')],
-      ['COSPAR ID', ...cell((o) => o.cosparId ?? 'None')],
-      ['TLE Epoch (UTC)', ...cell((o) => fmtIsoTime(o.tleEpochIso))],
-      ['GP Age', ...cell((o) => fmtAge(o.gpAgeHours))],
-      [SIGMA_ROW_LABEL, ...cell((o) => fmtSigmas(o.ricSigmasKm))],
-      ['Derived From', ...cell((o) => o.derivedFromNoradId ?? '-')],
+      [doc('objects.name'), ...cell((o) => o.name)],
+      [doc('objects.noradId'), ...cell((o) => o.noradId ?? doc('header.none'))],
+      [doc('objects.cosparId'), ...cell((o) => o.cosparId ?? doc('header.none'))],
+      [doc('objects.tleEpoch'), ...cell((o) => fmtIsoTime(o.tleEpochIso))],
+      [doc('objects.gpAge'), ...cell((o) => assumedCell(o, fmtAge(o.gpAgeHours)))],
+      [doc('objects.sigma'), ...cell((o) => assumedCell(o, fmtSigmas(o.ricSigmasKm)))],
+      [doc('objects.derivedFrom'), ...cell((o) => o.derivedFromNoradId ?? '-')],
     ],
   };
 };
 
 const encounterRows = (e: ConjunctionEncounter): string[][] => [
-  ['TCA (UTC)', formatReportTime(new Date(e.tcaMs))],
-  ['Miss Distance', `${fmtKm(e.missDistanceKm)} km`],
-  ['Radial (R)', `${fmtSigned(e.ricKm.radial)} km`],
-  ['In-Track (I)', `${fmtSigned(e.ricKm.intrack)} km`],
-  ['Cross-Track (C)', `${fmtSigned(e.ricKm.crosstrack)} km`],
-  ['Relative Speed', `${e.relativeSpeedKmS.toFixed(4)} km/s`],
+  [doc('encounter.tca'), formatReportTime(new Date(e.tcaMs))],
+  [doc('encounter.miss'), `${fmtKm(e.missDistanceKm)} km`],
+  [doc('encounter.radial'), `${fmtSigned(e.ricKm.radial)} km`],
+  [doc('encounter.intrack'), `${fmtSigned(e.ricKm.intrack)} km`],
+  [doc('encounter.crosstrack'), `${fmtSigned(e.ricKm.crosstrack)} km`],
+  [doc('encounter.relSpeed'), `${e.relativeSpeedKmS.toFixed(4)} km/s`],
   ['Pc', formatPc(e.pc)],
-  ['Risk Level', e.riskLevel],
-  ['Search Window (UTC)', `${fmtIsoTime(e.searchWindow.startIso)} to ${fmtIsoTime(e.searchWindow.endIso)} (+/- ${e.searchWindow.halfWidthHours} h)`],
+  [doc('encounter.risk'), doc(`risk.${e.riskLevel}`)],
+  [
+    doc('encounter.searchWindow'),
+    fillDoc(doc('encounter.searchWindowValue'), {
+      start: fmtIsoTime(e.searchWindow.startIso),
+      end: fmtIsoTime(e.searchWindow.endIso),
+      hours: e.searchWindow.halfWidthHours,
+    }),
+  ],
 ];
 
 const pcInputsTable = (p: PcInputs): ReportTable => ({
-  headers: ['Pc Input', 'Value'],
+  headers: [doc('pcInputs.input'), doc('common.value')],
   rows: [
-    ['Method', p.method],
-    ['Primary Hard-Body Radius', `${(p.primaryHardBodyRadiusKm * 1000).toFixed(1)} m`],
-    ['Secondary Hard-Body Radius', `${(p.secondaryHardBodyRadiusKm * 1000).toFixed(1)} m`],
-    ['Combined Hard-Body Radius', `${(p.combinedHardBodyRadiusKm * 1000).toFixed(1)} m`],
-    ['Covariance Source', p.covarianceSource],
-    ['Confidence Level (k)', p.covarianceConfidenceLevel.toString()],
-    ['1-sigma Caps R / I / C', `${p.sigmaCapsKm.join(' / ')} km`],
+    [doc('pcInputs.method'), p.method],
+    [doc('pcInputs.primaryHbr'), `${(p.primaryHardBodyRadiusKm * 1000).toFixed(1)} m`],
+    [doc('pcInputs.secondaryHbr'), `${(p.secondaryHardBodyRadiusKm * 1000).toFixed(1)} m`],
+    [doc('pcInputs.combinedHbr'), `${(p.combinedHardBodyRadiusKm * 1000).toFixed(1)} m`],
+    [doc('pcInputs.covarianceSource'), p.covarianceSource],
+    [doc('pcInputs.confidence'), p.covarianceConfidenceLevel.toString()],
+    [doc('pcInputs.sigmaCaps'), `${p.sigmaCapsKm.join(' / ')} km`],
   ],
 });
 
@@ -438,27 +487,17 @@ const missionImpactTable = (mi: MissionImpact): ReportTable | null => {
   }
 
   return {
-    headers: ['Object', 'AOS (UTC)', 'LOS (UTC)', 'Max El (deg)'],
+    headers: [doc('passes.object'), doc('passes.aos'), doc('passes.los'), doc('passes.maxEl')],
     rows: mi.passWindows.map((p) => [p.noradId ?? '', fmtIsoTime(p.aosIso), fmtIsoTime(p.losIso), p.maxElevationDeg.toFixed(1)]),
   };
 };
 
-const STATUS_LABEL: Record<ScreeningDiffEntry['status'], string> = {
-  introduced: 'Introduced',
-  removed: 'Removed',
-  unchanged: 'Unchanged',
-  appeared: 'Appeared (below threshold)',
-  dropped: 'Dropped (below threshold)',
-};
+const DIFF_COLUMNS = ['status', 'secondary', 'name', 'preTca', 'preMiss', 'prePc', 'postTca', 'postMiss', 'postPc', 'missChange'];
 
-const DIFF_HEADERS = ['Status', 'Secondary', 'Name', 'Pre TCA (UTC)', 'Pre Miss (km)', 'Pre Pc', 'Post TCA (UTC)', 'Post Miss (km)', 'Post Pc', 'Miss Change (km)'];
-
-/** Screening-diff table, one row per event. */
-export const screeningDiffTable = (diff: ScreeningDiff): ReportTable => ({
-  headers: [...DIFF_HEADERS],
-  rows: diff.entries.map((e) => [
-    STATUS_LABEL[e.status],
-    e.secondaryId || '(no id)',
+const diffRows = (diff: ScreeningDiff, tr: ReportText): string[][] =>
+  diff.entries.map((e) => [
+    tr(`status.${e.status}`),
+    e.secondaryId || tr('diff.noId'),
     e.secondaryName,
     e.pre ? formatReportTime(new Date(e.pre.tcaMs)) : '-',
     e.pre ? fmtKm(e.pre.missDistanceKm) : '-',
@@ -467,21 +506,38 @@ export const screeningDiffTable = (diff: ScreeningDiff): ReportTable => ({
     e.post ? fmtKm(e.post.missDistanceKm) : '-',
     e.post ? formatPc(e.post.pc) : '-',
     e.missDeltaKm === null ? '-' : fmtSigned(e.missDeltaKm),
-  ]),
+  ]);
+
+/**
+ * Screening-diff table, one row per event (none for a missing diff). Headers and status cells
+ * are English for CSV/JSON and translated for the text preview.
+ */
+export const screeningDiffTable = (diff: ScreeningDiff | null): ReportTable => ({
+  headers: DIFF_COLUMNS.map((key) => docEn(`diff.${key}`)),
+  rows: diff ? diffRows(diff, docEn) : [],
+  display: {
+    headers: DIFF_COLUMNS.map((key) => doc(`diff.${key}`)),
+    rows: diff ? diffRows(diff, doc) : [],
+  },
 });
 
-const diffSummaryRows = (diff: ScreeningDiff): string[][] => [
-  ['Pre Run Primary', diff.preRun.primaryId],
-  ['Pre Run Window (UTC)', `${fmtIsoTime(diff.preRun.startIso)} to ${fmtIsoTime(diff.preRun.endIso)}`],
-  ['Post Run Primary', diff.postRun.primaryId],
-  ['Post Run Window (UTC)', `${fmtIsoTime(diff.postRun.startIso)} to ${fmtIsoTime(diff.postRun.endIso)}`],
-  ['Concern Threshold', `${diff.concernThreshold} and above`],
-  ['Excluded Secondaries', diff.excludedSecondaryIds.length > 0 ? diff.excludedSecondaryIds.join(', ') : 'None'],
-  ['Introduced', diff.counts.introduced.toString()],
-  ['Removed', diff.counts.removed.toString()],
-  ['Unchanged', diff.counts.unchanged.toString()],
-  ['Appeared / Dropped (below threshold)', `${diff.counts.appeared} / ${diff.counts.dropped}`],
-];
+const diffSummaryRows = (diff: ScreeningDiff): string[][] => {
+  const range = (startIso: string | null, endIso: string | null): string => fillDoc(doc('summary.range'), { start: fmtIsoTime(startIso), end: fmtIsoTime(endIso) });
+
+  return [
+    [doc('summary.preRunPrimary'), diff.preRun.primaryId],
+    [doc('summary.preRunWindow'), range(diff.preRun.startIso, diff.preRun.endIso)],
+    [doc('summary.postRunPrimary'), diff.postRun.primaryId],
+    [doc('summary.postRunWindow'), range(diff.postRun.startIso, diff.postRun.endIso)],
+    [doc('summary.concernThreshold'), fillDoc(doc('summary.concernThresholdValue'), { level: doc(`risk.${diff.concernThreshold}`) })],
+    [doc('summary.excluded'), diff.excludedSecondaryIds.length > 0 ? diff.excludedSecondaryIds.join(', ') : doc('header.none')],
+    [doc('status.introduced'), diff.counts.introduced.toString()],
+    [doc('status.removed'), diff.counts.removed.toString()],
+    [doc('status.moved'), (diff.counts.moved ?? 0).toString()],
+    [doc('status.unchanged'), diff.counts.unchanged.toString()],
+    [doc('summary.appearedDropped'), `${diff.counts.appeared} / ${diff.counts.dropped}`],
+  ];
+};
 
 // =============================================================================
 // Conjunction Report
@@ -493,19 +549,26 @@ export interface ConjunctionReportInput {
   env: AnalysisEnv;
   halfWidthSec?: number;
   missionImpact?: MissionImpact;
+  /**
+   * Root catalog objects whose uncertainty an analyst-clone primary or secondary assumes
+   * (uncertaintyParentOf). Their covariance drives the Pc and their sigmas and GP age the summary.
+   */
+  uncertaintyParents?: { primary?: Satellite | null; secondary?: Satellite | null };
 }
 
 /** Builds the analysis state for a primary/secondary pair. */
 export const buildConjunctionState = (input: ConjunctionReportInput): ConjunctionAnalysisState => {
   const { primary, secondary, env } = input;
+  const primaryParent = input.uncertaintyParents?.primary ?? null;
+  const secondaryParent = input.uncertaintyParents?.secondary ?? null;
   const state = baseState('conjunction', env, input.missionImpact);
-  const encounter = findEncounter(primary, secondary, env, input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC);
+  const encounter = findEncounter(primary, secondary, env, input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC, primaryParent ?? primary, secondaryParent ?? secondary);
 
-  state.objects = [buildObjectSummary(primary, 'primary', env), buildObjectSummary(secondary, 'secondary', env)];
+  state.objects = [buildObjectSummary(primary, 'primary', env, primaryParent), buildObjectSummary(secondary, 'secondary', env, secondaryParent)];
   state.encounter = encounter;
   state.relativeGeometry = encounter ? sampleRelativeGeometry(primary, secondary, encounter.tcaMs) : [];
   if (!encounter) {
-    state.notes.push('No closest approach inside the search window; widen the window or move the sim time closer to the event.');
+    state.notes.push(doc('notes.noEncounter'));
   }
 
   return state;
@@ -514,25 +577,27 @@ export const buildConjunctionState = (input: ConjunctionReportInput): Conjunctio
 /** Renders a conjunction analysis state as report data (text sections, CSV time series, JSON state). */
 export const conjunctionReportFromState = (state: ConjunctionAnalysisState): ReportData => {
   const [primary, secondary] = state.objects;
-  const sections: ReportData['sections'] = [{ title: 'Objects', table: objectsTable(state.objects) }];
+  const sections: ReportData['sections'] = [{ title: doc('sections.objects'), table: objectsTable(state.objects) }];
 
   if (state.encounter) {
-    sections.push({ title: 'Closest Approach', table: { headers: ['Quantity', 'Value'], rows: encounterRows(state.encounter) } });
-    sections.push({ title: 'Probability of Collision Inputs', table: pcInputsTable(state.encounter.pcInputs) });
+    sections.push({ title: doc('sections.closestApproach'), table: { headers: [doc('common.quantity'), doc('common.value')], rows: encounterRows(state.encounter) } });
+    sections.push({ title: doc('sections.pcInputs'), table: pcInputsTable(state.encounter.pcInputs) });
   }
   const passes = missionImpactTable(state.missionImpact);
 
   if (passes) {
-    sections.push({ title: `Sensor Passes (${state.missionImpact.sensorName})`, table: passes });
+    sections.push({ title: fillDoc(doc('sections.sensorPasses'), { sensor: state.missionImpact.sensorName ?? '' }), table: passes });
   }
+  const geometryColumns = ['timeUtc', 'offsetSec', 'rangeKmSpaced', 'radialKm', 'intrackKm', 'crosstrackKm', 'relSpeed'];
 
   return {
     filename: `conjunction-${primary?.noradId ?? 'primary'}-${secondary?.noradId ?? 'secondary'}`,
-    header: headerBlock('Conjunction Report', state) + (state.notes.length > 0 ? `${state.notes.join('\n')}\n\n` : ''),
+    header: headerBlock(doc('titles.conjunction'), state) + (state.notes.length > 0 ? `${state.notes.join('\n')}\n\n` : ''),
     sections,
-    tableTitle: 'Relative Geometry (TCA +/- 5 min, 10 s)',
+    tableTitle: doc('sections.relativeGeometry'),
     table: {
-      headers: ['Time (UTC)', 'Offset (s)', 'Range (km)', 'Radial (km)', 'In-Track (km)', 'Cross-Track (km)', 'Rel Speed (km/s)'],
+      headers: geometryColumns.map((key) => docEn(`cols.${key}`)),
+      display: { headers: geometryColumns.map((key) => doc(`cols.${key}`)) },
       rows: state.relativeGeometry.map((s) => [
         formatReportTime(new Date(s.timeIso)),
         s.offsetSec.toString(),
@@ -543,7 +608,7 @@ export const conjunctionReportFromState = (state: ConjunctionAnalysisState): Rep
         s.relativeSpeedKmS.toFixed(4),
       ]),
     },
-    emptyMessage: 'No closest approach found in the search window.',
+    emptyMessage: doc('empty.noApproach'),
     json: state,
   };
 };
@@ -568,6 +633,11 @@ export interface ManeuverReportInput {
   /** Why the screening diff is missing (shown in place of the table). */
   screeningDiffUnavailableReason?: string | null;
   missionImpact?: MissionImpact;
+  /**
+   * Root catalog object of the clone chain (uncertaintyParentOf). Defaults to `parent`; differs
+   * only when `parent` is itself a clone, and then both the parent and the analyst take its uncertainty.
+   */
+  uncertaintyRoot?: Satellite | null;
 }
 
 /** Builds the analysis state for a parent/analyst pair. */
@@ -575,8 +645,11 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
   const { parent, analyst, env } = input;
   const state = baseState('maneuver', env, input.missionImpact);
   const halfWidthSec = input.halfWidthSec ?? CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
-  const parentSummary = buildObjectSummary(parent, 'parent', env);
-  const analystSummary = buildObjectSummary(analyst, 'analyst', env);
+  const root = input.uncertaintyRoot ?? parent;
+  const parentUncertainty = root === parent ? null : root;
+  const parentSummary = buildObjectSummary(parent, 'parent', env, parentUncertainty);
+  // The clone's uncertainty and GP age are its root parent's (see buildObjectSummary).
+  const analystSummary = buildObjectSummary(analyst, 'analyst', env, root);
 
   state.objects = [parentSummary, analystSummary];
 
@@ -585,13 +658,14 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
 
   if (input.secondary) {
     state.objects.push(buildObjectSummary(input.secondary, 'secondary', env));
-    preEncounter = findEncounter(parent, input.secondary, env, halfWidthSec);
-    postEncounter = findEncounter(analyst, input.secondary, env, halfWidthSec);
+    preEncounter = findEncounter(parent, input.secondary, env, halfWidthSec, root);
+    postEncounter = findEncounter(analyst, input.secondary, env, halfWidthSec, root);
     state.encounter = postEncounter;
   }
 
-  const pre = parentSummary.meanElements;
   const post = analystSummary.meanElements;
+  // Compare at one epoch: the parent's elements are carried forward to the clone's epoch.
+  const pre = parentSummary.meanElements && post?.epochIso ? advanceMeanElements(parentSummary.meanElements, post.epochIso) : parentSummary.meanElements;
   const burns = input.burns;
 
   state.maneuverOptions = [
@@ -609,7 +683,7 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
       preEncounter,
       postEncounter,
       screeningDiff: input.screeningDiff,
-      screeningDiffUnavailableReason: input.screeningDiff ? null : (input.screeningDiffUnavailableReason ?? 'No screening runs available.'),
+      screeningDiffUnavailableReason: input.screeningDiff ? null : (input.screeningDiffUnavailableReason ?? doc('notes.noScreeningRuns')),
     },
   ];
 
@@ -620,25 +694,27 @@ export const buildManeuverState = (input: ManeuverReportInput): ConjunctionAnaly
    */
   state.screeningDiff = input.screeningDiff;
 
+  state.notes.push(fillDoc(doc('notes.uncertaintyAssumed'), { parent: parent.sccNum || parent.name }));
   if (input.screeningDiff?.isWindowMismatch) {
-    state.notes.push('The pre and post screening runs cover different windows; events near the window edges may be classified wrongly.');
+    state.notes.push(doc('notes.windowMismatchManeuver'));
   }
 
   return state;
 };
 
-const ELEMENT_ROWS: [keyof Omit<MeanElements, 'epochIso'>, string, number][] = [
-  ['inclinationDeg', 'Inclination (deg)', 4],
-  ['raanDeg', 'RAAN (deg)', 4],
-  ['eccentricity', 'Eccentricity', 7],
-  ['argPerigeeDeg', 'Arg of Perigee (deg)', 4],
-  ['meanAnomalyDeg', 'Mean Anomaly (deg)', 4],
-  ['meanMotionRevPerDay', 'Mean Motion (rev/day)', 8],
-  ['periodMin', 'Period (min)', 4],
-  ['apogeeKm', 'Apogee (km)', 3],
-  ['perigeeKm', 'Perigee (km)', 3],
-  ['semiMajorAxisKm', 'Semi-Major Axis (km)', 3],
-  ['bstar', 'B*', 8],
+/** [element, decimal places]; the row label is the locale key elements.<element>. */
+const ELEMENT_ROWS: [keyof Omit<MeanElements, 'epochIso'>, number][] = [
+  ['inclinationDeg', 4],
+  ['raanDeg', 4],
+  ['eccentricity', 7],
+  ['argPerigeeDeg', 4],
+  ['meanAnomalyDeg', 4],
+  ['meanMotionRevPerDay', 8],
+  ['periodMin', 4],
+  ['apogeeKm', 3],
+  ['perigeeKm', 3],
+  ['semiMajorAxisKm', 3],
+  ['bstar', 8],
 ];
 
 const meanElementsTable = (option: ManeuverOption): ReportTable => {
@@ -647,11 +723,11 @@ const meanElementsTable = (option: ManeuverOption): ReportTable => {
   const deltas = option.meanElementDeltas;
 
   return {
-    headers: ['Mean Element (TLE)', 'Pre (parent)', 'Post (analyst)', 'Change'],
+    headers: [doc('elements.header'), doc('elements.pre'), doc('elements.post'), doc('elements.change')],
     rows: [
-      ['Epoch (UTC)', fmtIsoTime(pre?.epochIso ?? null), fmtIsoTime(post?.epochIso ?? null), '-'],
-      ...ELEMENT_ROWS.map(([key, label, digits]) => [
-        label,
+      [doc('elements.epoch'), fmtIsoTime(pre?.epochIso ?? null), fmtIsoTime(post?.epochIso ?? null), '-'],
+      ...ELEMENT_ROWS.map(([key, digits]) => [
+        doc(`elements.${key}`),
         pre ? pre[key].toFixed(digits) : 'N/A',
         post ? post[key].toFixed(digits) : 'N/A',
         typeof deltas?.[key] === 'number' ? fmtSigned(deltas[key], digits) : 'N/A',
@@ -661,7 +737,7 @@ const meanElementsTable = (option: ManeuverOption): ReportTable => {
 };
 
 const burnsTable = (burns: BurnSummary[]): ReportTable => ({
-  headers: ['#', 'Epoch (UTC)', 'Frame', 'Delta-V Input (m/s)', 'Magnitude (m/s)', 'Source', 'Label'],
+  headers: ['#', doc('burns.epoch'), doc('burns.frame'), doc('burns.dvInput'), doc('burns.magnitude'), doc('burns.source'), doc('burns.label')],
   rows: burns.map((b, i) => [
     (i + 1).toString(),
     fmtIsoTime(b.epochIso),
@@ -674,19 +750,20 @@ const burnsTable = (burns: BurnSummary[]): ReportTable => ({
 });
 
 const encounterCompareTable = (pre: ConjunctionEncounter | null, post: ConjunctionEncounter | null): ReportTable => {
-  const val = (e: ConjunctionEncounter | null, fn: (e: ConjunctionEncounter) => string): string => (e ? fn(e) : 'Not found');
+  const notFound = doc('compare.notFound');
+  const val = (e: ConjunctionEncounter | null, fn: (e: ConjunctionEncounter) => string): string => (e ? fn(e) : notFound);
 
   return {
-    headers: ['Quantity', 'Pre (parent)', 'Post (analyst)'],
+    headers: [doc('common.quantity'), doc('compare.pre'), doc('compare.post')],
     rows: [
-      ['TCA (UTC)', val(pre, (e) => formatReportTime(new Date(e.tcaMs))), val(post, (e) => formatReportTime(new Date(e.tcaMs)))],
-      ['Miss Distance (km)', val(pre, (e) => fmtKm(e.missDistanceKm)), val(post, (e) => fmtKm(e.missDistanceKm))],
+      [doc('encounter.tca'), val(pre, (e) => formatReportTime(new Date(e.tcaMs))), val(post, (e) => formatReportTime(new Date(e.tcaMs)))],
+      [doc('compare.miss'), val(pre, (e) => fmtKm(e.missDistanceKm)), val(post, (e) => fmtKm(e.missDistanceKm))],
       [
-        'R / I / C (km)',
+        doc('compare.ric'),
         val(pre, (e) => `${fmtSigned(e.ricKm.radial)} / ${fmtSigned(e.ricKm.intrack)} / ${fmtSigned(e.ricKm.crosstrack)}`),
         val(post, (e) => `${fmtSigned(e.ricKm.radial)} / ${fmtSigned(e.ricKm.intrack)} / ${fmtSigned(e.ricKm.crosstrack)}`),
       ],
-      ['Relative Speed (km/s)', val(pre, (e) => e.relativeSpeedKmS.toFixed(4)), val(post, (e) => e.relativeSpeedKmS.toFixed(4))],
+      [doc('compare.relSpeed'), val(pre, (e) => e.relativeSpeedKmS.toFixed(4)), val(post, (e) => e.relativeSpeedKmS.toFixed(4))],
       ['Pc', val(pre, (e) => formatPc(e.pc)), val(post, (e) => formatPc(e.pc))],
     ],
   };
@@ -695,31 +772,31 @@ const encounterCompareTable = (pre: ConjunctionEncounter | null, post: Conjuncti
 /** Renders a maneuver analysis state as report data. */
 export const maneuverReportFromState = (state: ConjunctionAnalysisState): ReportData => {
   const option = state.maneuverOptions[0];
-  const sections: ReportData['sections'] = [{ title: 'Objects', table: objectsTable(state.objects) }];
+  const sections: ReportData['sections'] = [{ title: doc('sections.objects'), table: objectsTable(state.objects) }];
 
   if (option?.burns && option.burns.length > 0) {
-    sections.push({ title: `Burns (total ${option.totalDeltaVMs?.toFixed(4)} m/s)`, table: burnsTable(option.burns) });
+    sections.push({ title: fillDoc(doc('sections.burnsTotal'), { dv: option.totalDeltaVMs?.toFixed(4) ?? '' }), table: burnsTable(option.burns) });
   } else {
-    sections.push({ title: 'Burns', table: { headers: ['Burn Parameters'], rows: [['Burn parameters unavailable']] } });
+    sections.push({ title: doc('sections.burns'), table: { headers: [doc('burns.parameters')], rows: [[doc('burns.unavailable')]] } });
   }
   if (option) {
-    sections.push({ title: 'Mean Elements, Pre vs Post', table: meanElementsTable(option) });
+    sections.push({ title: doc('sections.meanElements'), table: meanElementsTable(option) });
   }
   if (option && (option.preEncounter || option.postEncounter)) {
     const secondary = state.objects.find((o) => o.role === 'secondary');
 
     sections.push({
-      title: `Close Approach to ${secondary?.name ?? 'Secondary'} (${secondary?.noradId ?? ''}), Pre vs Post`,
+      title: fillDoc(doc('sections.closeApproachTo'), { name: secondary?.name ?? doc('roles.secondary'), id: secondary?.noradId ?? '' }),
       table: encounterCompareTable(option.preEncounter, option.postEncounter),
     });
   }
   if (option?.screeningDiff) {
-    sections.push({ title: 'Screening Diff Summary', table: { headers: ['Item', 'Value'], rows: diffSummaryRows(option.screeningDiff) } });
+    sections.push({ title: doc('sections.diffSummary'), table: { headers: [doc('common.item'), doc('common.value')], rows: diffSummaryRows(option.screeningDiff) } });
   }
   const passes = missionImpactTable(state.missionImpact);
 
   if (passes) {
-    sections.push({ title: `Sensor Passes (${state.missionImpact.sensorName})`, table: passes });
+    sections.push({ title: fillDoc(doc('sections.sensorPasses'), { sensor: state.missionImpact.sensorName ?? '' }), table: passes });
   }
 
   const parent = state.objects.find((o) => o.role === 'parent');
@@ -727,11 +804,11 @@ export const maneuverReportFromState = (state: ConjunctionAnalysisState): Report
 
   return {
     filename: `maneuver-${parent?.noradId ?? 'parent'}-${analyst?.noradId ?? 'analyst'}`,
-    header: headerBlock('Maneuver Report', state) + (state.notes.length > 0 ? `${state.notes.join('\n')}\n\n` : ''),
+    header: headerBlock(doc('titles.maneuver'), state) + (state.notes.length > 0 ? `${state.notes.join('\n')}\n\n` : ''),
     sections,
-    tableTitle: 'Screening Diff (parent before vs analyst after)',
-    table: option?.screeningDiff ? screeningDiffTable(option.screeningDiff) : { headers: [...DIFF_HEADERS], rows: [] },
-    emptyMessage: option?.screeningDiffUnavailableReason ?? 'No screening events in either run.',
+    tableTitle: doc('sections.diffManeuver'),
+    table: screeningDiffTable(option?.screeningDiff ?? null),
+    emptyMessage: option?.screeningDiffUnavailableReason ?? doc('empty.noScreeningEvents'),
     json: state,
   };
 };
@@ -748,20 +825,32 @@ export interface ScreeningCompareInput {
   env: AnalysisEnv;
   /** Objects screened in the two runs, when they are still in the catalog. */
   objects?: { pre: Satellite | null; post: Satellite | null };
+  /**
+   * Root catalog objects whose uncertainty a clone `pre` / `post` assumes (uncertaintyParentOf).
+   * When omitted, a `post` clone of `pre` still takes `pre`'s uncertainty.
+   */
+  uncertaintyParents?: { pre?: Satellite | null; post?: Satellite | null };
 }
 
 export const buildScreeningCompareState = (input: ScreeningCompareInput): ConjunctionAnalysisState => {
   const state = baseState('screening-compare', input.env, undefined);
 
   state.screeningDiff = input.diff;
-  if (input.objects?.pre) {
-    state.objects.push(buildObjectSummary(input.objects.pre, analystParentSccNum(input.objects.pre) ? 'analyst' : 'primary', input.env));
+  const pre = input.objects?.pre ?? null;
+  const post = input.objects?.post ?? null;
+
+  if (pre) {
+    state.objects.push(buildObjectSummary(pre, analystParentSccNum(pre) ? 'analyst' : 'primary', input.env, input.uncertaintyParents?.pre ?? null));
   }
-  if (input.objects?.post && input.objects.post !== input.objects.pre) {
-    state.objects.push(buildObjectSummary(input.objects.post, analystParentSccNum(input.objects.post) ? 'analyst' : 'primary', input.env));
+  if (post && post !== pre) {
+    // A clone takes its root parent's uncertainty (see buildObjectSummary).
+    const fallbackParent = pre && analystParentSccNum(post) === pre.sccNum ? pre : null;
+    const uncertaintyParent = input.uncertaintyParents ? (input.uncertaintyParents.post ?? null) : fallbackParent;
+
+    state.objects.push(buildObjectSummary(post, analystParentSccNum(post) ? 'analyst' : 'primary', input.env, uncertaintyParent));
   }
   if (input.diff.isWindowMismatch) {
-    state.notes.push('The two screening runs cover different windows; events near the window edges may be classified wrongly.');
+    state.notes.push(doc('notes.windowMismatchCompare'));
   }
 
   return state;
@@ -772,19 +861,19 @@ export const screeningCompareReportFromState = (state: ConjunctionAnalysisState)
   const sections: ReportData['sections'] = [];
 
   if (state.objects.length > 0) {
-    sections.push({ title: 'Objects', table: objectsTable(state.objects) });
+    sections.push({ title: doc('sections.objects'), table: objectsTable(state.objects) });
   }
   if (diff) {
-    sections.push({ title: 'Screening Diff Summary', table: { headers: ['Item', 'Value'], rows: diffSummaryRows(diff) } });
+    sections.push({ title: doc('sections.diffSummary'), table: { headers: [doc('common.item'), doc('common.value')], rows: diffSummaryRows(diff) } });
   }
 
   return {
     filename: `screening-compare-${diff?.preRun.primaryId ?? 'pre'}-${diff?.postRun.primaryId ?? 'post'}`,
-    header: headerBlock('Screening Comparison Report', state) + (state.notes.length > 0 ? `${state.notes.join('\n')}\n\n` : ''),
+    header: headerBlock(doc('titles.screeningCompare'), state) + (state.notes.length > 0 ? `${state.notes.join('\n')}\n\n` : ''),
     sections,
-    tableTitle: 'Screening Diff (older run vs newer run)',
-    table: diff ? screeningDiffTable(diff) : { headers: [...DIFF_HEADERS], rows: [] },
-    emptyMessage: 'No screening events in either run.',
+    tableTitle: doc('sections.diffCompare'),
+    table: screeningDiffTable(diff),
+    emptyMessage: doc('empty.noScreeningEvents'),
     json: state,
   };
 };

@@ -2,7 +2,8 @@
   "plugins": {
     "GamepadPlugin": {
       "connected": "手柄已连接",
-      "disconnected": "手柄已断开"
+      "disconnected": "手柄已断开",
+      "notSupported": "不支持此手柄。请在 GitHub 上提交 issue 并注明手柄型号，以便添加支持。"
     }
   }
 }

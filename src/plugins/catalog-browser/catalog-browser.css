@@ -56,3 +56,14 @@
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
+
+/* The catalog that is loaded right now: accent bar plus a "Current" chip. */
+#catalog-browser-menu .cb-catalog-item-current {
+  box-shadow: inset 3px 0 0 var(--color-primary-light, #e01a0e);
+}
+
+#catalog-browser-menu .cb-chip-current {
+  background: transparent;
+  color: var(--color-dark-text-accent);
+  border: 1px solid var(--color-dark-border);
+}

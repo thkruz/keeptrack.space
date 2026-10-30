@@ -7,6 +7,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { Radians } from '@ootk/src/main';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -28,13 +29,13 @@ export class GamepadPlugin {
       }
     });
     window.addEventListener('gamepaddisconnected', () => {
-      ServiceLocator.getUiManager().toast('Gamepad disconnected', ToastMsgType.critical);
+      ServiceLocator.getUiManager().toast(t7e('plugins.GamepadPlugin.disconnected'), ToastMsgType.critical);
       this.currentController = null;
     });
   }
 
   initializeGamepad(gamepad: Gamepad): void {
-    ServiceLocator.getUiManager().toast('Gamepad connected', ToastMsgType.normal);
+    ServiceLocator.getUiManager().toast(t7e('plugins.GamepadPlugin.connected'), ToastMsgType.normal);
 
     // Only initialize once
     if (!this.currentController) {
@@ -67,7 +68,7 @@ export class GamepadPlugin {
     if (controller.buttons.length < 17) {
       // Check if this gamepad has already been reported
       if (!this.previouslyReportedGamepads.includes(controller.id)) {
-        errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+        errorManagerInstance.warn(t7e('plugins.GamepadPlugin.notSupported'));
         this.previouslyReportedGamepads.push(controller.id);
       }
 
@@ -75,7 +76,7 @@ export class GamepadPlugin {
     }
     if (controller.axes.length < 4) {
       if (!this.previouslyReportedGamepads.includes(controller.id)) {
-        errorManagerInstance.warn('This gamepad is not supported. Please open an issue on GitHub with the gamepad model to get it added.');
+        errorManagerInstance.warn(t7e('plugins.GamepadPlugin.notSupported'));
         this.previouslyReportedGamepads.push(controller.id);
       }
 

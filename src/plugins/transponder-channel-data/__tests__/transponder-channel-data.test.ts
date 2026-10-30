@@ -225,3 +225,88 @@ describe('TransponderChannelData_class', () => {
     });
   });
 });
+
+describe('channel request identity regression', () => {
+  beforeEach(() => setupStandardEnvironment());
+  afterEach(() => vi.restoreAllMocks());
+
+  it.each([
+    [0, 1, 2],
+    [2, 1, 0],
+    [1, 0, 2],
+  ])('keeps newest A for A/B/A completion order %j', async (first, second, third) => {
+    const plugin = new TransponderChannelData();
+    websiteInit(plugin);
+    const aSat = { id: 1, name: 'ABS2', altName: '', isSatellite: () => true };
+    const bSat = { ...aSat, id: 2, name: 'ABS2A' };
+    let selected = aSat;
+    const { PluginRegistry } = await import('@app/engine/core/plugin-registry');
+    vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(() => ({ primarySatObj: selected }) as never);
+    const finish: ((value: Response) => void)[] = [];
+    global.fetch = vi.fn(() => new Promise<Response>((resolve) => finish.push(resolve))) as never;
+    const requests = [plugin['loadChannelData_']()];
+    selected = bSat;
+    requests.push(plugin['loadChannelData_']());
+    selected = aSat;
+    requests.push(plugin['loadChannelData_']());
+    for (const index of [first, second, third]) {
+      finish[index]({ ok: true, json: async () => [{ ...mockChannelData[0], tvchannel: `request-${index}` }] } as Response);
+      await requests[index];
+    }
+    plugin['toggleSort_']('tvchannel');
+    expect(plugin['dataCache_'][0].tvchannel).toBe('request-2');
+    expect(plugin['lastLoadedSat_']).toBe(1);
+  });
+
+  it('keeps B after late A and stale rejection; clears on close and unsupported selection', async () => {
+    const plugin = new TransponderChannelData();
+    websiteInit(plugin);
+    let selected = { id: 1, name: 'ABS2', altName: '', isSatellite: () => true };
+    const { PluginRegistry } = await import('@app/engine/core/plugin-registry');
+    vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(() => ({ primarySatObj: selected }) as never);
+    let rejectOld!: (error: Error) => void;
+    global.fetch = vi
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectOld = reject;
+          })
+      )
+      .mockResolvedValueOnce({ ok: true, json: async () => [{ ...mockChannelData[0], satellite: 'ABS2A' }] }) as never;
+    const old = plugin['loadChannelData_']();
+    selected = { ...selected, id: 2, name: 'ABS2A' };
+    await plugin['loadChannelData_']();
+    rejectOld(new Error('late failure'));
+    await old;
+    plugin['toggleSort_']('tvchannel');
+    expect(plugin['dataCache_'].map((row) => row.satellite)).toEqual(['ABS2A']);
+    plugin.onBottomIconDeselect();
+    expect(plugin['dataCache_']).toHaveLength(0);
+    selected = { ...selected, isSatellite: () => false };
+    await plugin['loadChannelData_']();
+    expect(plugin['lastLoadedSat_']).toBe(-1);
+  });
+  it('offers retry after a failed request and restores export after recovery', async () => {
+    const plugin = new TransponderChannelData();
+    websiteInit(plugin);
+    const selected = { id: 1, name: 'ABS2', altName: '', isSatellite: () => true };
+    const { PluginRegistry } = await import('@app/engine/core/plugin-registry');
+    vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(() => ({ primarySatObj: selected }) as never);
+    global.fetch = vi
+      .fn()
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce({ ok: true, json: async () => mockChannelData }) as never;
+    await plugin['loadChannelData_']();
+    const retry = document.getElementById('TransponderChannelData-retry') as HTMLButtonElement;
+    expect(retry.hidden).toBe(false);
+    retry.click();
+    for (let count = 0; count < 10; count++) {
+      // biome-ignore lint/performance/noAwaitInLoops: flush one request promise chain
+      await Promise.resolve();
+    }
+    expect(plugin['dataCache_']).toHaveLength(2);
+    expect(retry.hidden).toBe(true);
+    expect((document.getElementById('TransponderChannelData-export-csv') as HTMLButtonElement).disabled).toBe(false);
+  });
+});

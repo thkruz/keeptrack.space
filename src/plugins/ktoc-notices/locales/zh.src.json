@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "KTOC 通告",
+      "title": "KTOC 通告",
+      "shortcutToggle": "打开或关闭 KTOC 通告",
+      "commands": {
+        "open": "打开 KTOC 通告",
+        "forSelected": "所选卫星的 KTOC 通告"
+      },
+      "sections": {
+        "filters": "筛选",
+        "notices": "通告"
+      },
+      "labels": {
+        "statusFilter": "通告状态",
+        "all": "全部",
+        "activeOnly": "仅有效",
+        "eventType": "事件类型",
+        "allTypes": "所有事件类型",
+        "showAllSatellites": "显示所有卫星",
+        "noradFilter": "正在显示 NORAD {norad} 的通告",
+        "previous": "上一页",
+        "next": "下一页",
+        "pageOf": "第 {current} 页,共 {total} 页",
+        "refresh": "刷新",
+        "issuer": "发布方:KTOC (KeepTrack Operations Center)",
+        "loading": "正在加载 KTOC 通告...",
+        "empty": "KTOC 尚未发布任何通告。",
+        "emptyForNorad": "KTOC 未发布 NORAD {norad} 的通告。",
+        "noMatches": "没有符合这些筛选条件的通告。",
+        "openNotice": "在 keeptrack.space 上打开完整通告"
+      },
+      "table": {
+        "event": "事件",
+        "date": "日期 (UTC)",
+        "satellite": "卫星",
+        "type": "类型",
+        "status": "状态",
+        "notice": "通告"
+      },
+      "types": {
+        "relocation": "轨位迁移",
+        "departure": "离开",
+        "arrival": "抵达",
+        "disposal": "处置",
+        "fragmentation": "碎裂",
+        "breakup": "解体",
+        "debrisShed": "碎片脱落",
+        "proximity": "近距离操作",
+        "deployment": "释放",
+        "maneuver": "机动",
+        "drift": "漂移",
+        "reentry": "再入",
+        "other": "其他事件"
+      },
+      "statuses": {
+        "confirmed": "已确认",
+        "potential": "待确认",
+        "canceled": "已撤销",
+        "unknown": "未知状态"
+      },
+      "values": {
+        "eventNumber": "事件 {num}",
+        "unnumbered": "未编号",
+        "unknownDate": "日期未知",
+        "noReason": "已被 KTOC 撤销。"
+      },
+      "errorMsgs": {
+        "fetchFailed": "KTOC 通告未能加载 ({detail})。请选择刷新重试。",
+        "refreshFailedKeep": "刷新失败 ({detail})。正在显示之前的列表。",
+        "networkDetail": "网络错误",
+        "notInCatalog": "NORAD {norad} 不在已加载的目录中。"
+      },
+      "infoBox": {
+        "title": "KTOC 通告",
+        "titleWithCount": "KTOC 通告 ({count})",
+        "showAll": "在 KTOC 通告中查看全部 {count} 条"
+      },
+      "help": {
+        "overview": "KTOC 通告列出 KTOC (KeepTrack Operations Center) 发布的每一条事件通告:轨位迁移、离开、碎裂以及 KTOC 在公开目录中检测到的其他变化。每条通告都链接到 keeptrack.space 上的完整分析。",
+        "statusesHeading": "通告状态",
+        "statuses": "<ul><li><strong>待确认</strong>:KTOC 根据首次显示该事件的数据发布了通告。</li><li><strong>已确认</strong>:更新的数据与已发布的事件一致。</li><li><strong>已撤销</strong>:更新的数据与事件相矛盾。该行显示删除线;将鼠标悬停在状态上可查看原因。</li></ul>",
+        "howToUse": "<ol><li>从抽屉(事件模式)打开 <strong>KTOC 通告</strong>。将加载最新的 100 条通告,最新事件在前。</li><li>选择 <strong>全部</strong> 或 <strong>仅有效</strong>,并选择事件类型以缩小列表。</li><li>点击某一行可选中该卫星并将时钟跳到事件时间。播放或暂停状态保持不变。</li><li>点击链接图标可在新标签页中打开 keeptrack.space 上的完整通告。</li><li>选择 <strong>刷新</strong> 可加载最新通告。</li></ol>",
+        "tip1": "选中有通告的卫星时,卫星信息框会显示 KTOC 通告卡片。",
+        "tip2": "使用命令面板中的“所选卫星的 KTOC 通告”可列出当前选中对象的所有通告。",
+        "tip3": "不在已加载目录中的卫星所在行仍可打开其通告,但无法在 3D 视图中选中。"
+      }
+    }
+  }
+}

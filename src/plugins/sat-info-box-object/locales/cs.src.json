@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = sekundární mínus primární, v RIC soustavě primárního objektu."
-    }
+      "ricConvention": "RIC = sekundární mínus primární, v RIC soustavě primárního objektu.",
+      "title": "Sekundární družice",
+      "linear": "Lineární",
+      "linearTooltip": "Přímá vzdálenost od sekundární družice",
+      "radial": "Radiální",
+      "radialTooltip": "Radiální vzdálenost",
+      "inTrack": "Podél dráhy",
+      "inTrackTooltip": "Vzdálenost podél dráhy od sekundární družice",
+      "crossTrack": "Napříč dráhou",
+      "crossTrackTooltip": "Vzdálenost napříč dráhou od sekundární družice"
+    },
+    "noData": "ŽÁDNÁ DATA"
   }
 }

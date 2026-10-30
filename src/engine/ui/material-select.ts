@@ -9,6 +9,17 @@ import { FormSelect } from '@materializecss/materialize';
  * select's options or value programmatically so the styled trigger reflects
  * the new state.
  */
+/**
+ * Toggles `.kt-select-open` on every `.input-field` around a select. Materialize wraps the select in
+ * `.select-wrapper.input-field`, often inside the row's own tooltipped `.input-field`; the outer one
+ * holds the stacking context that has to rise above the rows below.
+ */
+function setSelectFieldsOpen_(select: Element, isOpen: boolean): void {
+  for (let field = select.closest('.input-field'); field; field = field.parentElement?.closest('.input-field') ?? null) {
+    field.classList.toggle('kt-select-open', isOpen);
+  }
+}
+
 export function refreshMaterialSelect(select: HTMLSelectElement): void {
   /*
    * FormSelect moves a `<label for="<select id>">` INSIDE its wrapper on init, and destroy()
@@ -36,8 +47,15 @@ export function refreshMaterialSelect(select: HTMLSelectElement): void {
        * open/close callbacks plus a plain class keeps invalidation scoped. See
        * `.kt-section.kt-dropdown-open` in menu-v13.css.
        */
-      onOpenStart: () => select.closest('.kt-section')?.classList.add('kt-dropdown-open'),
-      onCloseEnd: () => select.closest('.kt-section')?.classList.remove('kt-dropdown-open'),
+      onOpenStart: () => {
+        select.closest('.kt-section')?.classList.add('kt-dropdown-open');
+        // Lift this select's own field(s) above later tooltipped rows (see `.kt-select-open`).
+        setSelectFieldsOpen_(select, true);
+      },
+      onCloseEnd: () => {
+        select.closest('.kt-section')?.classList.remove('kt-dropdown-open');
+        setSelectFieldsOpen_(select, false);
+      },
     },
   });
 

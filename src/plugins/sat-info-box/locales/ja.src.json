@@ -30,10 +30,14 @@
       "external": "外部"
     },
     "notAvailable": "該当なし",
+    "notAvailableJscVimpel": "該当なし (JSC Vimpel)",
     "oemFile": "OEMファイル",
     "copy": {
       "copied": "クリップボードにコピーしました",
       "tooltip": "クリックしてコピー"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "衛星情報パネルの読み込みが完了しなかったため、詳細を更新できませんでした。"
     }
   }
 }

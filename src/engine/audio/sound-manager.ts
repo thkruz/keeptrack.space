@@ -2,6 +2,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { SoundNames, sounds } from './sounds';
 
@@ -132,7 +133,7 @@ export class SoundManager {
 
         this.audioBuffers.set(key, audioBuffer);
       } catch (error) {
-        errorManagerInstance.warn(`Failed to load audio: ${key}`, error);
+        errorManagerInstance.warn(t7e('errorMsgs.audioLoadFailed').replace('{key}', key), error);
       }
     });
 

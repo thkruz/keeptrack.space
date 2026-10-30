@@ -54,6 +54,8 @@ describe('TheSpaceDevLaunchCalendar_class', () => {
 
     // eslint-disable-next-line require-await
     global.fetch = vi.fn().mockImplementation(async () => ({
+      ok: true,
+      status: 200,
       json: () => ({
         results: JSON.parse(readFileSync('./test/environment/lldev.json', 'utf8')),
       }),

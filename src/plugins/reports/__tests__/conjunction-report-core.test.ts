@@ -237,6 +237,46 @@ describe('Maneuver Report', () => {
   });
 });
 
+describe('Maneuver Report: clone uncertainty assumed from the parent (Ted ruling 2026-10-24)', () => {
+  // A clone fitted at a burn 4 h after the analysis epoch: own TLE epoch in the future, BSTAR 0.
+  const clone = new Satellite({
+    name: 'LANDSAT 8 (burn 1)',
+    tle1: withChecksum('1 90000U 13008A   22222.16666667  .00000000  00000-0  00000-0 0  9999') as TleLine1,
+    tle2: withChecksum(L8_TLE2.replace('2 39084', '2 90000')) as TleLine2,
+  });
+
+  clone.derivedFromSccNum = '39084';
+
+  const state = buildManeuverState({ parent: landsat8, analyst: clone, env, burns: null, screeningDiff: null, secondary });
+  const [parentSummary, cloneSummary] = state.objects;
+
+  it('gives the clone the parent 1-sigma RIC and GP age, flagged as assumed', () => {
+    expect(cloneSummary.ricSigmasKm).toEqual(parentSummary.ricSigmasKm);
+    expect(cloneSummary.gpAgeHours).toBeCloseTo(parentSummary.gpAgeHours!, 9);
+    expect(cloneSummary.gpAgeHours!).toBeGreaterThan(0);
+    expect(cloneSummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(parentSummary.uncertaintyAssumedFromNoradId).toBeUndefined();
+    // The clone keeps its own TLE epoch (the burn time).
+    expect(cloneSummary.tleEpochIso).toBe('2022-08-10T04:00:00.000Z');
+  });
+
+  it('labels the inherited cells "(assumed from parent)" and adds a note', () => {
+    const text = buildDownloadPayload(generateManeuverReport({ parent: landsat8, analyst: clone, env, burns: null, screeningDiff: null }), 'text').content;
+    const lines = text.split('\n');
+    const sigmaLine = lines.find((line) => line.startsWith('1-sigma'))!;
+    const ageLine = lines.find((line) => line.startsWith('GP Age'))!;
+
+    expect(sigmaLine.match(/\(assumed from parent\)/gu)).toHaveLength(1);
+    expect(ageLine.match(/\(assumed from parent\)/gu)).toHaveLength(1);
+    expect(text).toContain('assumed from its parent (39084)');
+  });
+
+  it('computes the post-burn Pc with the parent covariance and still validates', () => {
+    expect(state.maneuverOptions[0].postEncounter).not.toBeNull();
+    expect(validateConjunctionAnalysisState(JSON.parse(JSON.stringify(state)))).toEqual([]);
+  });
+});
+
 describe('validateConjunctionAnalysisState', () => {
   it('reports every violation with its path', () => {
     const errors = validateConjunctionAnalysisState({ schemaVersion: 3, kind: 'nope', objects: 'x' });
@@ -245,5 +285,50 @@ describe('validateConjunctionAnalysisState', () => {
     expect(errors.some((e) => e.startsWith('$.kind'))).toBe(true);
     expect(errors).toContain('$.objects: expected array');
     expect(validateConjunctionAnalysisState(null)).toEqual(['$: expected object']);
+  });
+});
+
+describe('Conjunction and Maneuver Reports: clone uncertainty from the root catalog object', () => {
+  // A clone fitted at a burn 4 h after the analysis epoch (own TLE epoch in the future, BSTAR 0).
+  const clone = new Satellite({
+    name: 'LANDSAT 8 (burn 1)',
+    tle1: withChecksum('1 90000U 13008A   22222.16666667  .00000000  00000-0  00000-0 0  9999') as TleLine1,
+    tle2: withChecksum(L8_TLE2.replace('2 39084', '2 90000')) as TleLine2,
+  });
+  // A second burn on the clone: a clone of a clone.
+  const cloneOfClone = new Satellite({
+    name: 'LANDSAT 8 (burn 2)',
+    tle1: withChecksum('1 90001U 13008A   22222.20833333  .00000000  00000-0  00000-0 0  9999') as TleLine1,
+    tle2: withChecksum(L8_TLE2.replace('2 39084', '2 90001')) as TleLine2,
+  });
+
+  clone.derivedFromSccNum = '39084';
+  cloneOfClone.derivedFromSccNum = '90000';
+
+  it('a clone primary of a Conjunction Report takes the parent covariance, sigmas and GP age', () => {
+    const own = buildConjunctionState({ primary: clone, secondary, env });
+    const assumed = buildConjunctionState({ primary: clone, secondary, env, uncertaintyParents: { primary: landsat8 } });
+    const parentState = buildConjunctionState({ primary: landsat8, secondary, env });
+    const [primarySummary] = assumed.objects;
+
+    expect(primarySummary.ricSigmasKm).toEqual(parentState.objects[0].ricSigmasKm);
+    expect(primarySummary.gpAgeHours).toBeCloseTo(parentState.objects[0].gpAgeHours!, 9);
+    expect(primarySummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(own.objects[0].uncertaintyAssumedFromNoradId).toBeUndefined();
+    // The clone's own TLE would claim a smaller uncertainty; the geometry is the clone's either way.
+    expect(own.objects[0].ricSigmasKm).not.toEqual(primarySummary.ricSigmasKm);
+    expect(assumed.encounter!.tcaMs).toBe(own.encounter!.tcaMs);
+    expect(validateConjunctionAnalysisState(JSON.parse(JSON.stringify(assumed)))).toEqual([]);
+  });
+
+  it('a Maneuver Report on a clone of a clone gives both the parent clone and the analyst the root uncertainty', () => {
+    const state = buildManeuverState({ parent: clone, analyst: cloneOfClone, env, burns: null, screeningDiff: null, uncertaintyRoot: landsat8 });
+    const rootSummary = buildConjunctionState({ primary: landsat8, secondary, env }).objects[0];
+    const [parentSummary, analystSummary] = state.objects;
+
+    expect(parentSummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(analystSummary.uncertaintyAssumedFromNoradId).toBe('39084');
+    expect(analystSummary.ricSigmasKm).toEqual(rootSummary.ricSigmasKm);
+    expect(parentSummary.ricSigmasKm).toEqual(rootSummary.ricSigmasKm);
   });
 });

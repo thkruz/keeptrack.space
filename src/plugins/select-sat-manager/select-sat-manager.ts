@@ -274,7 +274,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       }
     }
 
-    const spaceObj = obj as Satellite | MissileObject;
+    const spaceObj = obj?.active ? (obj as Satellite | MissileObject) : undefined;
 
     // Set the primary sat
     this.primarySatObj = spaceObj ?? this.noSatObj_;
@@ -294,7 +294,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
   private selectSensorObject_(sensor: DetailedSensor) {
     // All sensors should have a sensorId
     if (!sensor.isSensor()) {
-      errorManagerInstance.log(`SelectSatManager.selectSensorObject_: SensorObject does not have a sensorId: ${sensor}`);
+      errorManagerInstance.log(t7e('plugins.SelectSatManager.errorMsgs.sensorWithoutId').replace('{sensor}', String(sensor)));
 
       return;
     }
@@ -312,7 +312,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       EventBus.getInstance().emit(EventBusEvent.sensorDotSelected, sensor);
     }
 
-    this.setSelectedSat_(-1);
+    this.selectSatReset_();
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, undefined, undefined);
     getEl('menu-sensor-info', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-fov-bubble', true)?.classList.remove('bmenu-item-disabled');
     getEl('menu-surveillance', true)?.classList.remove('bmenu-item-disabled');
@@ -363,6 +364,10 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         // left; centering back on Earth has to drop them the same way pressing
         // Home does, or they stay drawn around the selected satellite.
         PluginRegistry.getPlugin(PlanetsMenuPlugin)?.clearHeliocentricOrbits();
+        // The color schemes blank the GP/TLE catalog while maxZoomDistance is above 2e6 km
+        // and only re-read it on a forced recolour, so without this every other satellite
+        // stays hidden at Earth scale. Home runs the same recolour.
+        ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
       }
       PluginRegistry.getPlugin(PlanetsMenuPlugin)?.setAllPlanetsDotSize(0);
     }
@@ -426,6 +431,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     }
 
     this.setSelectedSat_(-1);
+    this.primarySatObj = this.noSatObj_;
+    this.primarySatCovMatrix = null;
   }
 
   private selectSatObject_(sat: Satellite | MissileObject) {
@@ -497,10 +504,10 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       if (computed && computed[0] && computed[1] && computed[2]) {
         radii = computed;
       } else {
-        errorManagerInstance.log(`${logContext}: Invalid covariance matrix`);
+        errorManagerInstance.log(t7e('plugins.SelectSatManager.errorMsgs.invalidCovariance').replace('{context}', logContext));
       }
     } catch {
-      errorManagerInstance.log(`${logContext}: Failed to compute covariance from TLE`);
+      errorManagerInstance.log(t7e('plugins.SelectSatManager.errorMsgs.covarianceFromTleFailed').replace('{context}', logContext));
     }
 
     return radii;
@@ -692,7 +699,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       if (this.secondarySatObj instanceof MissileObject) {
         this.secondarySatObj = null;
 
-        errorManagerInstance.warn('Selecting a missile as the secondary object is not supported!');
+        errorManagerInstance.warn(t7e('plugins.SelectSatManager.errorMsgs.missileSecondaryUnsupported'));
 
         return;
       }
@@ -719,9 +726,8 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       ServiceLocator.getOrbitManager().clearSelectOrbit(true);
     }
 
-    if (this.secondarySat === this.selectedSat) {
-      this.selectedSat = -1;
-      this.setSelectedSat_(-1);
+    if (this.secondarySat === this.selectedSat && this.selectedSat !== -1) {
+      this.selectSat(-1);
       ServiceLocator.getOrbitManager().clearSelectOrbit(false);
     }
 

@@ -49,6 +49,9 @@
         "estimatedTotal": "Estimated Total",
         "trackingRatio": "Tracking Ratio",
         "typeBreakdown": "Payloads / R. Bodies / Debris",
+        "likelyDecayed": "Likely Decayed",
+        "likelyDecayedNote": "Kept in the counts above. A member is flagged when its perigee is below {perigee} km or its element set is more than {days} days older than {date}.",
+        "likelyDecayedTag": "likely decayed",
         "parameter": "Parameter",
         "min": "Min",
         "max": "Max",
@@ -72,6 +75,68 @@
       "errorMsgs": {
         "parentNotFound": "Parent object is not in the current catalog.",
         "noDataToExport": "No tracked fragments to export."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Fengyun-1C ASAT Test",
+          "cause": "Intentional ASAT Test",
+          "orbitType": "LEO Sun-Synchronous",
+          "description": "Chinese anti-satellite missile test that destroyed the Fengyun-1C weather satellite, creating the largest tracked debris cloud in history."
+        },
+        "cosmos2251": {
+          "name": "Cosmos 2251 / Iridium 33 Collision",
+          "cause": "Accidental Collision",
+          "orbitType": "LEO",
+          "description": "First accidental hypervelocity collision between two intact satellites. Cosmos 2251 collided with the operational Iridium 33 communications satellite."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (from Collision)",
+          "cause": "Accidental Collision",
+          "orbitType": "LEO",
+          "description": "Debris field from the operational Iridium 33 satellite after collision with defunct Cosmos 2251."
+        },
+        "cosmos1408": {
+          "name": "Cosmos 1408 ASAT Test",
+          "cause": "Intentional ASAT Test",
+          "orbitType": "LEO",
+          "description": "Russian direct-ascent ASAT test that destroyed the defunct Cosmos 1408 ELINT satellite, generating debris that threatened the ISS crew."
+        },
+        "microsatr": {
+          "name": "Microsat-R ASAT Test (Mission Shakti)",
+          "cause": "Intentional ASAT Test",
+          "orbitType": "LEO",
+          "description": "Indian direct-ascent ASAT test (Mission Shakti) against the Microsat-R satellite. The low intercept altitude limited the long-lived debris population, though some fragments were lofted above the ISS."
+        },
+        "breezem": {
+          "name": "Briz-M Upper Stage Explosion",
+          "cause": "Accidental Explosion",
+          "orbitType": "GTO",
+          "description": "Briz-M upper stage exploded after failed Arabsat-4A mission, likely due to residual propellant. Created debris across a wide range of altitudes."
+        },
+        "cz6a": {
+          "name": "CZ-6A Upper Stage Breakup",
+          "cause": "Accidental Explosion",
+          "orbitType": "LEO Sun-Synchronous",
+          "description": "A Chinese Long March 6A second stage fragmented shortly after deploying Yunhai-3, scattering hundreds of fragments through heavily used sun-synchronous altitudes."
+        },
+        "noaa16": {
+          "name": "NOAA-16 Breakup",
+          "cause": "Battery / Thermal Failure",
+          "orbitType": "LEO Sun-Synchronous",
+          "description": "The decommissioned NOAA-16 weather satellite fragmented on orbit, attributed to a battery or thermal failure, adding long-lived debris to a congested polar altitude."
+        },
+        "dmspf13": {
+          "name": "DMSP-F13 Breakup",
+          "cause": "Battery Explosion",
+          "orbitType": "LEO Sun-Synchronous",
+          "description": "A US Defense Meteorological Satellite Program spacecraft ruptured after a battery overcharge and overheating, a failure mode later traced across several DMSP and NOAA satellites of the same design."
+        },
+        "usa193": {
+          "name": "USA-193 Shootdown",
+          "cause": "Intentional Shootdown",
+          "orbitType": "LEO",
+          "description": "US Navy SM-3 missile destroyed the malfunctioning NRO satellite USA-193 (NROL-21). Low-altitude breakup meant most debris reentered within weeks."
+        }
       }
     }
   }

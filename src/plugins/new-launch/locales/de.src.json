@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Start im Fenster erstellen"
       },
       "msgs": {
-        "windowFound": "Start um {time} zur Angleichung an die Zielebene (ΔRAAN {delta}°)",
+        "windowFound": "Start um {time} von {site} zur Angleichung an die Bahnebene von {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Startnominal erstellt!",
         "timeRelativeToLaunch": "Die Zeit ist jetzt relativ zur Startzeit."
       },

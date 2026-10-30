@@ -20,4 +20,7 @@ export const EL = {
   UNCERTAINTY_RADIAL: 'sat-uncertainty-radial',
   UNCERTAINTY_INTRACK: 'sat-uncertainty-intrack',
   UNCERTAINTY_CROSSTRACK: 'sat-uncertainty-crosstrack',
+  /** OEM-only rows: the ephemeris center body and reference frame from the OEM header. */
+  CENTER_BODY: 'sat-center-body',
+  REF_FRAME: 'sat-ref-frame',
 };

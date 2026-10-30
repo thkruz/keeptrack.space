@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "Satellite View"
+      "bottomIconLabel": "Satellite View",
+      "commandPalette": {
+        "activate": "Switch to Satellite View"
+      },
+      "shortcuts": {
+        "enter": "Enter Satellite View"
+      }
     }
   }
 }

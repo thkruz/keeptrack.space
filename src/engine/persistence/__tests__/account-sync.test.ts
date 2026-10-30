@@ -91,6 +91,20 @@ describe('PersistenceManager account sync (per-key LWW)', () => {
     expect(provider.pushed[0].get(StorageKey.FAVORITES_LIST)).toEqual({ v: '["9"]', t: 300 });
   });
 
+  it('still reports pulled changes when the merge push fails, and re-queues the push', async () => {
+    seedLocal(StorageKey.SCENARIO_LIBRARY, '{}', 100);
+    seedLocal(StorageKey.FAVORITES_LIST, '["9"]', 300);
+    pm = PersistenceManager.getInstance();
+    provider.remote.set(StorageKey.SCENARIO_LIBRARY, { v: '{"a":1}', t: 200 });
+    provider.failNextPush = true;
+
+    const changed = await pm.attachAccountSyncProvider(provider);
+
+    expect(changed).toEqual([StorageKey.SCENARIO_LIBRARY]);
+    expect(pm.getItem(StorageKey.SCENARIO_LIBRARY)).toBe('{"a":1}');
+    expect(pm.pendingAccountWrites_.has(StorageKey.FAVORITES_LIST)).toBe(true);
+  });
+
   it('pushes a local tombstone when a stamped key has no value', async () => {
     // A removal leaves a stamp with no value
     pm = PersistenceManager.getInstance();

@@ -28,7 +28,8 @@
         "inFov": "Im FOV",
         "atNight": "Bei Nacht",
         "clearSkies": "Klarer Himmel",
-        "noPasses": "Keine Durchgänge"
+        "noPasses": "Keine Durchgänge",
+        "missingUiName": "Sensor ohne Namen"
       },
       "help": {
         "overview": "Die Sensor-Zeitachse zeigt, wann ein Netz von Sensoren den ausgewählten Satelliten in den kommenden Stunden sehen kann. Jede Zeile ist ein Sensor und jeder farbige Balken ein Durchgang, sodass Sie die Gelegenheiten aller Standorte auf einen Blick vergleichen und den besten Sensor für die nächste Beobachtung auswählen können.",
@@ -42,6 +43,10 @@
         "tip1": "Die Wetterdaten stammen aus der Open-Meteo-Bewölkungsvorhersage für jeden optischen Standort; Radare ignorieren Wetter, Sonnenlicht und Dunkelheit vollständig.",
         "tip2": "Ein Klick auf einen Durchgang wählt den Satelliten nach dem Wechsel von Sensor und Zeit erneut aus, sodass andere geöffnete Menüs mit der neuen Geometrie aktualisiert werden.",
         "tip3": "Kürzere Berechnungsintervalle erfassen auch kurze Durchgänge, brauchen aber länger; 30 Sekunden sind ein guter Kompromiss für ein 24-Stunden-Fenster."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "Die Sensorliste wurde nicht gefunden",
+        "invalidSetting": "{setting} muss eine Zahl größer als null sein."
       }
     }
   }

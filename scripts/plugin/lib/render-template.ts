@@ -1,6 +1,7 @@
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PLUGIN_API_VERSION } from '../../../src/plugin-api/version';
 import { resolveWithin } from '../../lib/safe-path';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -23,6 +24,8 @@ export interface TemplateVars {
   ELEMENT_BASE: string;
   ENGINE_RANGE: string;
   ENGINE_REF: string;
+  /** Default `pluginApi` range: caret on the host's PLUGIN_API_VERSION. */
+  PLUGIN_API_RANGE: string;
   DESCRIPTION: string;
   YEAR: string;
   AUTHOR: string;
@@ -36,8 +39,23 @@ export function titleCase(kebab: string): string {
   return kebab.split('-').filter(Boolean).map((s) => s.charAt(0).toUpperCase() + s.slice(1)).join(' ');
 }
 
+/** Strips `char` from both ends of `text` without a backtracking regex. */
+export function trimChar(text: string, char: string, { start = true, end = true } = {}): string {
+  let from = 0;
+  let to = text.length;
+
+  while (start && from < to && text[from] === char) {
+    from++;
+  }
+  while (end && to > from && text[to - 1] === char) {
+    to--;
+  }
+
+  return text.slice(from, to);
+}
+
 export function kebabCase(input: string): string {
-  return input.replace(/^keeptrack-plugin-/u, '').toLowerCase().replaceAll(/[^a-z0-9]+/gu, '-').replace(/^-+|-+$/gu, '');
+  return trimChar(input.replace(/^keeptrack-plugin-/u, '').toLowerCase().replaceAll(/[^a-z0-9]+/gu, '-'), '-');
 }
 
 function substitute(content: string, vars: TemplateVars): string {
@@ -144,6 +162,7 @@ export function buildVars(base: string, hostVersion: string, opts: { description
     ELEMENT_BASE: base,
     ENGINE_RANGE: `>=${major}.0.0 <${major + 1}.0.0`,
     ENGINE_REF: `v${hostVersion}`,
+    PLUGIN_API_RANGE: `^${PLUGIN_API_VERSION}`,
     DESCRIPTION: opts.description,
     YEAR: String(new Date().getFullYear()),
     AUTHOR: opts.author,

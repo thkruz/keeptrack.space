@@ -30,10 +30,14 @@
       "external": "外部"
     },
     "notAvailable": "不适用",
+    "notAvailableJscVimpel": "不适用 (JSC Vimpel)",
     "oemFile": "OEM文件",
     "copy": {
       "copied": "已复制到剪贴板",
       "tooltip": "点击复制"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "卫星信息面板未完成加载，因此无法更新其详细信息。"
     }
   }
 }

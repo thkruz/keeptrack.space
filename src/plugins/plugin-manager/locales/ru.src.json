@@ -1,72 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "Плагины",
+      "title": "Менеджер плагинов",
+      "helpBody": "Включайте и отключайте встроенные плагины и просматривайте установленные сторонние плагины.",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "Открыть менеджер плагинов"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "Установленные",
+        "browse": "Обзор",
+        "develop": "Разработка"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "Загрузка доступных плагинов…",
+        "empty": "В реестре пока нет плагинов.",
+        "error": "Не удалось загрузить реестр плагинов.",
+        "install": "Установить",
+        "installing": "Установка…",
+        "installed": "Установлено. Идёт пересборка; приложение скоро перезагрузится.",
+        "installedBtn": "Установлено",
+        "installFailed": "Установка не удалась. Подробности смотрите в терминале.",
+        "copyCommand": "Копировать команду установки",
+        "byAuthor": "автор: {author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "Что такое плагин?",
+        "intro": "KeepTrack состоит из десятков независимых плагинов, и вы можете написать свои. Плагин представляет собой небольшой пакет, который добавляет значок на панель, меню, наложение или инструмент. Плагины разрабатываются и устанавливаются с помощью CLI плагинов из копии репозитория KeepTrack.",
+        "createHeading": "1. Создание",
+        "create": "Создать заготовку нового плагина (интерактивно: запрашивает имя, тип и описание).",
+        "previewHeading": "2. Предпросмотр",
+        "preview": "Запустить приложение только с вашим плагином и живой перезагрузкой при редактировании.",
+        "rulesHeading": "Два правила",
+        "rule1": "Входной файл должен экспортировать класс, соответствующий className в keeptrack-plugin.json.",
+        "rule2": "Поле readonly id этого класса должно совпадать с его configKey.",
+        "docsLink": "Открыть руководство по разработке плагинов"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "Ожидающие изменения: {count}",
+        "button": "Перезагрузить"
       },
       "labels": {
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
-        "gitUrl": "Git URL",
-        "source": "Source"
+        "noMatches": "Нет подходящих плагинов. Попробуйте название или ID.",
+        "search": "Поиск плагинов",
+        "builtInSection": "Встроенные плагины",
+        "externalSection": "Внешние плагины",
+        "externalEmpty": "Внешние плагины не установлены. Добавьте плагин с помощью CLI плагинов.",
+        "installSection": "Установка плагина",
+        "installHint": "Для установки плагина нужно пересобрать KeepTrack. Скопируйте эту команду и выполните её в своей копии репозитория KeepTrack.",
+        "gitUrl": "URL Git",
+        "source": "Исходный код",
+        "copy": "Копировать",
+        "alwaysEnabled": "Всегда включено"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "Совместим",
+        "incompatible": "Проверьте версию"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "Копировать команду установки"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "Команда установки скопирована в буфер обмена!",
+        "commandCopied": "Команда скопирована в буфер обмена!"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "Менеджер плагинов позволяет включать и отключать встроенные плагины KeepTrack и видеть, какие сторонние плагины установлены. Плагины загружаются при запуске приложения, поэтому изменения вступают в силу после перезагрузки.",
+        "togglesHeading": "Включение и отключение",
+        "toggles": "Переключите переключатель, чтобы включить или отключить плагин, затем нажмите «Перезагрузить», чтобы применить изменения. Всегда включённые инфраструктурные плагины заблокированы и не могут быть отключены.",
+        "externalHeading": "Внешние плагины",
+        "external": "Сторонние плагины, установленные через CLI плагинов, показаны в отдельном разделе с версией, значком совместимости и ссылкой на исходный код. Чтобы установить новый, скопируйте команду из раздела «Установка» и выполните её в своей копии репозитория KeepTrack."
+      },
+      "searchAliases": {
+        "multiView": "Мультиэкран,Несколько видов"
+      },
+      "loader": {
+        "proFailed": "Не удалось загрузить Pro-версию плагина «{plugin}» ({error}). {consequence} Эта сборка включает KeepTrack Pro, поэтому файлы src/plugins-pro могут отсутствовать, быть устаревшими или недоступными. Подробнее на {url}.",
+        "consequenceFallback": "Вместо неё загружается стандартная версия.",
+        "consequenceUnavailable": "Эта функция будет недоступна в текущем сеансе.",
+        "downloadFailed": "Не удалось загрузить плагин «{plugin}» ({error}), он будет недоступен в текущем сеансе. Обычно это вызвано обрывом сети; перезагрузка страницы повторит попытку.",
+        "initFailed": "Не удалось инициализировать плагин «{plugin}» ({error}), он будет недоступен в текущем сеансе.",
+        "stoppedEarly": "Загрузка плагинов прервалась раньше времени ({error}). Некоторые функции могут отсутствовать; перезагрузка страницы повторит попытку."
       }
     }
   }

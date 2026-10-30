@@ -8,7 +8,8 @@
         "allData": "Wszystkie dane",
         "orbitalOnly": "Tylko orbitalne",
         "allDataDesc": "Zastępuje cały katalog wybranymi danymi",
-        "orbitalOnlyDesc": "Aktualizuje TLE zachowując metadane satelitów"
+        "orbitalOnlyDesc": "Aktualizuje TLE zachowując metadane satelitów",
+        "current": "Bieżący"
       },
       "categories": {
         "special": "Szczególne zainteresowanie",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "Nie udało się pobrać katalogu",
         "DefaultFailed": "Nie udało się przywrócić domyślnego katalogu",
+        "CelestrakFailed": "Nie udało się załadować katalogu CelesTrak",
+        "VimpelFailed": "Nie udało się załadować katalogu JSC Vimpel",
         "Forbidden": "CelesTrak odrzucił żądanie (HTTP 403). Zazwyczaj jest to limit żądań Cloudflare; odczekaj minutę i spróbuj ponownie.",
         "RateLimited": "Zbyt wiele żądań katalogu. Odczekaj minutę przed kolejną próbą.",
         "ServerError": "CelesTrak jest tymczasowo niedostępny. Spróbuj ponownie za kilka minut.",

@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "Satellite Fixed View"
+      "bottomIconLabel": "Satellite Fixed View",
+      "commandPalette": {
+        "activate": "Switch to Satellite-Fixed View"
+      },
+      "shortcuts": {
+        "enter": "Enter Satellite Fixed View"
+      }
     }
   }
 }

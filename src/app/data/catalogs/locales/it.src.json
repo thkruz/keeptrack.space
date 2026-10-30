@@ -283,5 +283,59 @@
     "ZA": "Sudafrica",
     "ZR": "Zaire",
     "ZW": "Zimbabwe"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Sensori della Space Surveillance Network",
+      "topLink": "Tutti i sensori della Space Surveillance Network"
+    },
+    "mw": {
+      "header": "Sensori statunitensi di allerta missilistica",
+      "topLink": "Tutti i sensori di allerta missilistica"
+    },
+    "md": {
+      "header": "Sensori della Missile Defense Agency statunitense",
+      "topLink": "Tutti i sensori di difesa missilistica"
+    },
+    "OWL-Net": {
+      "header": "Sensori OWL-Net",
+      "topLink": "Tutti i sensori OWL-Net"
+    },
+    "leolabs": {
+      "header": "Sensori LeoLabs",
+      "topLink": "Tutti i sensori LeoLabs"
+    },
+    "esoc": {
+      "header": "Sensori del Centro europeo per le operazioni spaziali",
+      "topLink": "Tutti i sensori ESOC"
+    },
+    "rus": {
+      "header": "Sensori russi",
+      "topLink": "Tutti i sensori russi"
+    },
+    "prc": {
+      "header": "Sensori cinesi",
+      "topLink": "Tutti i sensori cinesi"
+    },
+    "other": {
+      "header": "Altri sensori",
+      "topLink": "Altri sensori"
+    },
+    "dsn": {
+      "header": "Deep Space Network della NASA",
+      "topLink": "Tutti i complessi della Deep Space Network"
+    },
+    "scn": {
+      "header": "Rete di controllo satellitare (AFSCN)",
+      "topLink": "Tutte le stazioni di tracciamento remote"
+    },
+    "estrack": {
+      "header": "Rete di tracciamento dell'ESA (ESTRACK)",
+      "topLink": "Tutte le stazioni ESTRACK"
+    },
+    "galileo": {
+      "header": "Segmento di terra di Galileo",
+      "topLink": "Tutte le stazioni di terra di Galileo"
+    }
   }
 }

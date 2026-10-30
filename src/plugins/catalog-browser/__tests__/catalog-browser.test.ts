@@ -99,7 +99,7 @@ describe('CatalogBrowserPlugin_fetch', () => {
     const mockFetch = vi.fn();
 
     globalThis.fetch = mockFetch;
-    await (plugin as any).fetchAndLoadCatalog_('GROUP=STARLINK');
+    await (plugin as any).fetchAndLoadCatalog_({ id: 'starlink', queryParam: 'GROUP=starlink', nameKey: 'starlink' });
     expect(mockFetch).not.toHaveBeenCalled();
   });
 });

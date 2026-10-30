@@ -30,10 +30,14 @@
       "external": "External"
     },
     "notAvailable": "N/A",
+    "notAvailableJscVimpel": "N/A (JSC Vimpel)",
     "oemFile": "OEM File",
     "copy": {
       "copied": "Copied to clipboard",
       "tooltip": "Click to copy"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "The satellite info panel did not finish loading, so its details could not be updated."
     }
   }
 }

@@ -9,6 +9,11 @@
         "take4k": "스크린샷 (4K)",
         "takeHd": "스크린샷 (HD)",
         "take8k": "스크린샷 (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "기본 로고 이미지를 불러오지 못했습니다.",
+        "secondaryLogoFailed": "보조 로고 이미지를 불러오지 못했습니다.",
+        "noCanvasContext": "임시 캔버스의 2D 컨텍스트를 가져오지 못했습니다. 스크린샷을 만들 수 없습니다."
       }
     }
   }

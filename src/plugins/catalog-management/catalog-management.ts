@@ -24,7 +24,9 @@
 
 import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
-import { CatalogLoader, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
+import { CatalogLoader, JsSat, KeepTrackTLEFile } from '@app/app/data/catalog-loader';
+import { CatalogManager } from '@app/app/data/catalog-manager';
+import { isSyntheticVimpel } from '@app/app/data/synthetic-vimpel';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -39,7 +41,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Satellite } from '@ootk/src/main';
+import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import folderCodePng from '@public/img/icons/folder-code.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { downloadText, exportFileName, formatStkEphemeris, parseEphemerisParams, StkEphemerisRow } from './catalog-management-export';
@@ -157,16 +159,14 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
   protected buildImportTabHtml_(): string {
     return html`
       <div class="switch row cm-toggle-row">
-        <label for="cm-keep-sat-info" data-position="top" data-delay="50"
-          data-tooltip="${l('labels.keepSatInfoTooltip')}">
+        <label for="cm-keep-sat-info" kt-tooltip="${l('labels.keepSatInfoTooltip')}">
           <input id="cm-keep-sat-info" type="checkbox" />
           <span class="lever"></span>
           ${l('labels.keepSatInfo')}
         </label>
       </div>
       <div class="switch row cm-toggle-row">
-        <label for="cm-import-new-only" data-position="top" data-delay="50"
-          data-tooltip="${l('labels.importNewOnlyTooltip')}">
+        <label for="cm-import-new-only" kt-tooltip="${l('labels.importNewOnlyTooltip')}">
           <input id="cm-import-new-only" type="checkbox" />
           <span class="lever"></span>
           ${l('labels.importNewOnly')}
@@ -175,7 +175,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       <div class="row">
         <center>
           <input type="file" id="cm-import-file" accept=".tce,.tle,.txt" style="display:none" />
-          <button id="cm-import-btn" class="btn btn-ui waves-effect waves-light">
+          <button id="cm-import-btn" class="btn btn-ui waves-effect waves-light" kt-tooltip="${l('labels.replaceCatalogTooltip')}">
             ${l('buttons.importCatalog')} &#9658;
           </button>
         </center>
@@ -430,6 +430,12 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
     });
 
     getEl('de-export-fov')?.addEventListener('click', () => {
+      // Without a sensor there is no field of view: say so instead of writing an empty file.
+      if (!ServiceLocator.getSensorManager().isSensorSelected()) {
+        ServiceLocator.getUiManager().toast(l('toasts.noSensorSelected'), ToastMsgType.critical);
+
+        return;
+      }
       CatalogExporter.exportSatInFov2Csv(objData);
     });
 
@@ -482,14 +488,50 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
       return 0;
     }
 
-    // Snapshot existing satellite metadata so existing satellites are preserved
-    const merged: KeepTrackTLEFile[] = [];
+    // Snapshot every existing satellite so it survives the reload. JSC Vimpel objects without a NORAD
+    // number go through the Vimpel pipeline: their TLEs all carry catalog number 00000, so in the
+    // keepTrackTle list they would collapse onto one sccIndex slot and all but one would be dropped.
+    const { merged, vimpelCatalog } = CatalogManagementPlugin.snapshotCatalog(catalogManager.objectCache);
 
-    for (const obj of catalogManager.objectCache) {
-      if (!obj.isSatellite()) {
+    for (const entry of newEntries) {
+      merged.push({
+        tle1: entry.TLE1,
+        tle2: entry.TLE2,
+        name: entry.ON ?? 'Unknown',
+        type: entry.OT,
+      });
+    }
+
+    await CatalogLoader.reloadCatalogFromData(merged, vimpelCatalog);
+
+    return newEntries.length;
+  }
+
+  /**
+   * Split the current catalog's satellites for a metadata-preserving reload: objects with a NORAD
+   * number become KeepTrackTLEFile rows (name, country, mission... kept), and JSC Vimpel objects
+   * without one become JsSat rows for the Vimpel pipeline, which keys them by their Vimpel id
+   * exactly as at boot.
+   */
+  static snapshotCatalog(objects: readonly BaseObject[]): { merged: KeepTrackTLEFile[]; vimpelCatalog: JsSat[] } {
+    const merged: KeepTrackTLEFile[] = [];
+    const vimpelCatalog: JsSat[] = [];
+
+    for (const obj of objects) {
+      if (!obj?.isSatellite()) {
         continue;
       }
       const sat = obj as Satellite;
+
+      // The analyst slot block is rebuilt by every catalog load: copying it would add each slot twice.
+      if (CatalogManagementPlugin.isAnalystSlot_(sat)) {
+        continue;
+      }
+
+      if (isSyntheticVimpel(sat)) {
+        vimpelCatalog.push(typeof sat.vmag === 'number' ? { TLE1: sat.tle1, TLE2: sat.tle2, vmag: sat.vmag } : { TLE1: sat.tle1, TLE2: sat.tle2 });
+        continue;
+      }
 
       merged.push({
         tle1: sat.tle1,
@@ -523,21 +565,18 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
         vmag: sat.vmag ?? null,
         status: sat.status,
         altId: sat.altId,
+        source: sat.source as CatalogSource,
       });
     }
 
-    for (const entry of newEntries) {
-      merged.push({
-        tle1: entry.TLE1,
-        tle2: entry.TLE2,
-        name: entry.ON ?? 'Unknown',
-        type: entry.OT,
-      });
-    }
+    return { merged, vimpelCatalog };
+  }
 
-    await CatalogLoader.reloadCatalogFromData(merged);
+  /** An analyst slot: inside the analyst NORAD block and marked ANALSAT. Real catalog objects can share the number range. */
+  private static isAnalystSlot_(sat: Satellite): boolean {
+    const scc = Number(sat.sccNum);
 
-    return newEntries.length;
+    return sat.country === 'ANALSAT' && scc >= CatalogManager.ANALYST_START_ID && scc < CatalogManager.ANALYST_START_ID + settingsManager.maxAnalystSats;
   }
 
   protected handleImportFile_(file: File): void {

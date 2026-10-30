@@ -74,7 +74,8 @@
         "TooManyResults": "{limit} von {total} Treffern angezeigt. Erhöhen Sie \"Maximale Suchergebnisse\" in den Sucheinstellungen, um mehr zu sehen; der Export speichert trotzdem alle Treffer.",
         "TryFindingFirst": "Versuchen Sie zuerst, Satelliten zu finden!",
         "SearchFailed": "Suche fehlgeschlagen: {error}",
-        "NothingToExport": "Keine Ergebnisse mit Bahndaten zum Exportieren"
+        "NothingToExport": "Keine Ergebnisse mit Bahndaten zum Exportieren",
+        "NoMatchesToExport": "Die letzte Suche hat keine Satelliten gefunden, daher gibt es nichts zu exportieren."
       }
     }
   }

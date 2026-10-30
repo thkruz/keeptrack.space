@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { writeGeneratedManifest } from '../lib/codegen';
 import { checkout, fastForward, fetch, headCommit, remoteDefaultBranch } from '../lib/git';
-import { enforceEngineCompat, validatePluginStrict } from '../lib/install-helpers';
+import { enforceEngineCompat, enforceImportPolicy, enforcePluginApiCompat, validatePluginStrict } from '../lib/install-helpers';
 import { readLockfile, writeLockfile } from '../lib/lockfile';
 import { CliError, log } from '../lib/log';
 import { pluginDir } from '../lib/paths';
@@ -76,7 +76,12 @@ function updateOne(name: string, entry: LockEntry, flags: Record<string, string 
     }
 
     validatePluginStrict(dir, name);
-    enforceEngineCompat(readManifest(dir).engine, Boolean(flags.force));
+    const manifest = readManifest(dir);
+    const force = Boolean(flags.force);
+
+    enforceEngineCompat(manifest.engine, force);
+    enforcePluginApiCompat(manifest.pluginApi, force);
+    enforceImportPolicy(dir, force);
 
     entry.ref = newRef || entry.ref;
     entry.commit = newCommit;

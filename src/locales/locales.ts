@@ -36,7 +36,18 @@ const opts: InitOptions = {
   },
 };
 
+const syncDocumentLanguage = (): void => {
+  if (typeof document !== 'undefined') {
+    const resolved = i18next.resolvedLanguage ?? 'en';
+
+    document.documentElement.lang = Object.hasOwn(opts.resources ?? {}, resolved) ? resolved : 'en';
+  }
+};
+
+i18next.on('languageChanged', syncDocumentLanguage);
+i18next.on('initialized', syncDocumentLanguage);
 i18next.use(LanguageDetector).init(opts);
+syncDocumentLanguage();
 
 export interface SupportedLocale {
   /** BCP-47 base code matching a key in i18next `resources` above. */

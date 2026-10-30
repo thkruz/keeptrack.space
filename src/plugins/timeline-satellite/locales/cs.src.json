@@ -16,7 +16,8 @@
         "noPasses": "Žádné přelety"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Přidejte satelity do seznamu nebo vyberte satelit"
+        "addSatellitesOrSelect": "Přidejte satelity do seznamu nebo vyberte satelit",
+        "invalidSetting": "{setting} musí být číslo větší než nula."
       },
       "help": {
         "overview": "Časová osa satelitu je zrcadlovým obrazem časové osy senzoru: ukazuje, kdy jeden vybraný senzor uvidí seznam satelitů. Každý řádek je satelit ze seznamu sledovaných (nebo aktuálně vybraný satelit) a každý barevný pruh je jeden přelet, takže můžete naplánovat pozorování jednoho stanoviště pro mnoho cílů.",

@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "Impossibile caricare immagini dal futuro. Caricamento delle immagini più recenti."
+        "FuturePictures": "Impossibile caricare immagini dal futuro. Caricamento delle immagini più recenti.",
+        "ImageLoadFailed": "Impossibile caricare l'immagine di {source}"
       },
       "help": {
         "overview": "Immagini Satellitari mostra le fotografie più recenti scattate da veri satelliti meteorologici: viste a disco intero da MeteoSat, Himawari, GOES ed Elektro-L in orbita geostazionaria, oltre a immagini dell'intera Terra da DSCOVR nel punto L1. Collega ciò che vedi nella simulazione a ciò che quei satelliti stanno realmente fotografando in questo momento.",

@@ -80,6 +80,15 @@
     "meter": "m",
     "kilometer": "km",
     "second": "秒",
-    "unknown": "不明"
+    "unknown": "不明",
+    "notAvailable": "該当なし",
+    "CenterBody": {
+      "label": "中心天体",
+      "tooltip": "エフェメリスの位置の基準となる天体（OEM CENTER_NAME）"
+    },
+    "RefFrame": {
+      "label": "基準座標系",
+      "tooltip": "エフェメリスの座標系（OEM REF_FRAME）"
+    }
   }
 }

@@ -34,7 +34,7 @@
         }
       },
       "tooltips": {
-        "maxResults": "搜索中显示的最大卫星数量",
+        "maxResults": "搜索中显示的最大结果数量",
         "minSearchChars": "执行搜索前需要输入的最少字符数",
         "showDecayed": "在搜索结果中显示已陨落卫星（位置 0,0,0）",
         "showVimpel": "在搜索结果中包含 Vimpel（分析）对象。这可能会减慢搜索速度。"

@@ -45,6 +45,24 @@ describe('ShortTermFences_class', () => {
     expect(() => stf['closeAndDisable_']()).not.toThrow();
   });
 
+  it('clearing the sensor closes the side menus only when the fence panel is open', () => {
+    const stf = new ShortTermFences();
+
+    websiteInit(stf);
+    const hideSpy = vi.spyOn(ServiceLocator.getUiManager(), 'hideSideMenus');
+
+    hideSpy.mockClear();
+
+    stf.isMenuButtonActive = false;
+    stf['closeAndDisable_']();
+    expect(hideSpy).not.toHaveBeenCalled();
+
+    stf.isMenuButtonActive = true;
+    stf['closeAndDisable_']();
+    expect(hideSpy).toHaveBeenCalledTimes(1);
+    expect(stf.isMenuButtonActive).toBe(false);
+  });
+
   it('should be able to handle setSensor', () => {
     const stf = new ShortTermFences();
 

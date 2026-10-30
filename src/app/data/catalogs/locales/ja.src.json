@@ -283,5 +283,59 @@
     "ZA": "南アフリカ",
     "ZR": "ザイール",
     "ZW": "ジンバブエ"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "宇宙監視ネットワーク (SSN) のセンサー",
+      "topLink": "宇宙監視ネットワーク (SSN) の全センサー"
+    },
+    "mw": {
+      "header": "米国のミサイル警戒センサー",
+      "topLink": "全ミサイル警戒センサー"
+    },
+    "md": {
+      "header": "米国ミサイル防衛局のセンサー",
+      "topLink": "全ミサイル防衛センサー"
+    },
+    "OWL-Net": {
+      "header": "OWL-Net のセンサー",
+      "topLink": "OWL-Net の全センサー"
+    },
+    "leolabs": {
+      "header": "LeoLabs のセンサー",
+      "topLink": "LeoLabs の全センサー"
+    },
+    "esoc": {
+      "header": "欧州宇宙運用センターのセンサー",
+      "topLink": "ESOC の全センサー"
+    },
+    "rus": {
+      "header": "ロシアのセンサー",
+      "topLink": "ロシアの全センサー"
+    },
+    "prc": {
+      "header": "中国のセンサー",
+      "topLink": "中国の全センサー"
+    },
+    "other": {
+      "header": "その他のセンサー",
+      "topLink": "その他のセンサー"
+    },
+    "dsn": {
+      "header": "NASA ディープスペースネットワーク",
+      "topLink": "ディープスペースネットワークの全施設"
+    },
+    "scn": {
+      "header": "衛星管制ネットワーク (AFSCN)",
+      "topLink": "全遠隔追跡局"
+    },
+    "estrack": {
+      "header": "ESA 追跡ネットワーク (ESTRACK)",
+      "topLink": "ESTRACK の全局"
+    },
+    "galileo": {
+      "header": "Galileo 地上セグメント",
+      "topLink": "Galileo の全地上局"
+    }
   }
 }

@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "Errore nella creazione della frammentazione!",
         "InvalidStartNum": "Numero iniziale del satellite non valido! Impostazione predefinita a 90000!",
         "InvalidSlotRange": "Numero iniziale del satellite fuori intervallo. Usa da {start} a {end}.",
-        "BreakupGeneratorFailed": "Generatore di frammentazione fallito!"
+        "BreakupGeneratorFailed": "Generatore di frammentazione fallito!",
+        "NoFreeSlots": "Slot analista liberi insufficienti per {count} frammenti. Gli slot occupati da altri oggetti non vengono mai sovrascritti; riduci il numero o rimuovi alcuni oggetti analista."
       },
       "stats": {
         "meanSpeed": "Velocità media attesa",

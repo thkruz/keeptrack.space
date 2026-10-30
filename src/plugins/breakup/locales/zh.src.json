@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "创建解体时出错！",
         "InvalidStartNum": "无效的卫星起始编号！默认为90000！",
         "InvalidSlotRange": "初始卫星编号超出范围。请使用 {start} 到 {end}。",
-        "BreakupGeneratorFailed": "解体生成器失败！"
+        "BreakupGeneratorFailed": "解体生成器失败！",
+        "NoFreeSlots": "空闲分析员槽位不足以容纳 {count} 个碎片。其他对象占用的槽位绝不会被覆盖；请减少数量或移除部分分析员对象。"
       },
       "stats": {
         "meanSpeed": "预期平均速度",

@@ -1,5 +1,5 @@
 import { AdviceManager } from '@app/engine/utils/adviceManager';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /** Wires the help overlay DOM the way init() would, without the keyboard component. */
 const mountHelp = (mgr: AdviceManager): HTMLElement => {
@@ -61,5 +61,70 @@ describe('AdviceManager help overlay (Shift+F1)', () => {
     outer.click();
 
     expect(outer.style.display).toBe('none');
+  });
+
+  it('sets modal semantics and focuses an accessible close button', () => {
+    mgr.showAdvice('Title', '<a href="#details">Details</a>');
+    expect(outer.getAttribute('role')).toBe('dialog');
+    expect(outer.getAttribute('aria-modal')).toBe('true');
+    const close = outer.querySelector<HTMLButtonElement>('#help-close')!;
+
+    expect(close.getAttribute('aria-label')).toBeTruthy();
+    expect(document.activeElement).toBe(close);
+    close.click();
+    expect(outer.style.display).toBe('none');
+  });
+
+  it('wraps focus in both directions and redirects escaped focus', () => {
+    mgr.showAdvice('Title', '<a href="#details">Details</a>');
+    const close = outer.querySelector<HTMLButtonElement>('#help-close')!;
+    const link = outer.querySelector<HTMLAnchorElement>('a')!;
+
+    link.focus();
+    link.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(close);
+    close.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
+    expect(document.activeElement).toBe(link);
+    document.getElementById('search')!.focus();
+    expect(outer.contains(document.activeElement)).toBe(true);
+  });
+
+  it('keeps content clicks open and preserves links', () => {
+    mgr.showAdvice('Title', '<a href="#details">Details</a>');
+    const link = outer.querySelector<HTMLAnchorElement>('a')!;
+    const event = new MouseEvent('click', { bubbles: true, cancelable: true });
+
+    link.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+    expect(outer.style.display).toBe('block');
+  });
+
+  it('contains camera and drawer keys on keydown and keyup without cancelling scroll defaults', () => {
+    mgr.showAdvice('Title', 'body');
+    const leaked = vi.fn();
+
+    window.addEventListener('keydown', leaked);
+    window.addEventListener('keyup', leaked);
+    const down = new KeyboardEvent('keydown', { key: '9', bubbles: true, cancelable: true });
+    const scroll = new KeyboardEvent('keydown', { key: 'ArrowDown', bubbles: true, cancelable: true });
+
+    outer.dispatchEvent(down);
+    outer.dispatchEvent(new KeyboardEvent('keyup', { key: '9', bubbles: true }));
+    outer.dispatchEvent(scroll);
+    expect(leaked).not.toHaveBeenCalled();
+    expect(scroll.defaultPrevented).toBe(false);
+    window.removeEventListener('keydown', leaked);
+    window.removeEventListener('keyup', leaked);
+  });
+
+  it('closes with Shift+F1 and preserves original focus across repeated help updates', () => {
+    const input = document.getElementById('search')!;
+
+    input.focus();
+    mgr.showAdvice('First', 'body');
+    mgr.showAdvice('Second', 'body');
+    outer.dispatchEvent(new KeyboardEvent('keydown', { key: 'F1', shiftKey: true, bubbles: true, cancelable: true }));
+    expect(outer.style.display).toBe('none');
+    expect(document.activeElement).toBe(input);
   });
 });

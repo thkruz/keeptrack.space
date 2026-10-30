@@ -127,3 +127,26 @@ describe('CatalogSearch.yearOrLess special-event debris', () => {
     expect(CatalogSearch.yearOrLess([vimpel], 10)).toHaveLength(0);
   });
 });
+
+describe('CatalogSearch.findReentryObjects identity', () => {
+  it('retains distinct source objects with blank, duplicate and alpha-5 identifiers in ranked order', () => {
+    const objects = ['', '', 'A1234', '12345', '12345'].map(
+      (sccNum, id) =>
+        ({
+          id,
+          sccNum,
+          type: SpaceObjectType.DEBRIS,
+          perigee: 100 + (4 - id) * 10,
+        }) as Satellite
+    );
+    const original = [...objects];
+    const ranked = CatalogSearch.findReentryObjects(objects, 5);
+
+    expect(ranked.map((sat) => sat.id)).toEqual([4, 3, 2, 1, 0]);
+    for (const sat of ranked) {
+      expect(sat).toBe(objects[sat.id]);
+    }
+    expect(objects).toEqual(original);
+    expect(CatalogSearch.findReentryObjects(objects, 2)).toEqual([objects[4], objects[3]]);
+  });
+});

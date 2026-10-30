@@ -11,6 +11,12 @@
           "label": "Focus on Satellite When Selected",
           "helpText": "Zoom in on the satellite when selected."
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "Selecting a missile as the secondary object is not supported!",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_: SensorObject does not have a sensorId: {sensor}",
+        "invalidCovariance": "{context}: Invalid covariance matrix",
+        "covarianceFromTleFailed": "{context}: Failed to compute covariance from TLE"
       }
     }
   }

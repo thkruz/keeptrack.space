@@ -216,7 +216,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
           const sensorListDom = getEl('multi-sensor-look-angles-sensor-list');
 
           if (!sensorListDom) {
-            errorManagerInstance.warn('Could not find sensor list dom');
+            errorManagerInstance.warn(l('msgs.sensorListMissing'));
 
             return;
           }
@@ -287,7 +287,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     const satrec = isOemSat ? null : sat.satrec;
 
     if (!isOemSat && !satrec) {
-      errorManagerInstance.warn('Satellite record not found');
+      errorManagerInstance.warn(l('msgs.satrecNotFound'));
 
       return;
     }
@@ -481,7 +481,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
         tdV.setAttribute('style', 'color: #c62828');
       }
       tr.addEventListener('click', () => {
-        timeManagerInstance.changeStaticOffset(new Date(entry.time).getTime() - new Date().getTime());
+        timeManagerInstance.changeSimulationTime(new Date(entry.time).getTime());
         sensorManagerInstance.setSensor(sensor, sensor.sensorId);
       });
     }

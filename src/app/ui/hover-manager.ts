@@ -12,12 +12,14 @@ import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodi
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { CatalogSource, KM_PER_AU, LandObject, Satellite, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
+import { KM_PER_AU, LandObject, Satellite, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
 import i18next from 'i18next';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { isSyntheticVimpel } from '../data/synthetic-vimpel';
+import { OemSatellite } from '../objects/oem-satellite';
 import { Planet as PlanetDot } from '../objects/planet';
 import { SensorMath } from '../sensors/sensor-math';
 import { StringExtractor } from './string-extractor';
@@ -105,9 +107,9 @@ export class HoverManager {
       this.satHoverBoxNode3.textContent = '';
       this.satHoverBoxNode3.style.display = 'none';
     } else if (orbitPeriodInEarthDays < 1_000) {
-      this.satHoverBoxNode3.textContent = `Orbit Period: ${(orbitPeriodInEarthDays).toFixed(1)} Earth Days`;
+      this.satHoverBoxNode3.textContent = t7e('hoverManager.orbitPeriodDays').replace('{days}', orbitPeriodInEarthDays.toFixed(1));
     } else {
-      this.satHoverBoxNode3.textContent = `Orbit Period: ${(orbitPeriodInEarthDays / 365.25).toFixed(2)} Earth Years`;
+      this.satHoverBoxNode3.textContent = t7e('hoverManager.orbitPeriodYears').replace('{years}', (orbitPeriodInEarthDays / 365.25).toFixed(2));
     }
   }
 
@@ -118,14 +120,14 @@ export class HoverManager {
    * printed "Distance from Sun: NaN AU (NaN million km)" on every moon in the hover box - so
    * moons report their orbital radius about their parent instead. The finite guard covers any
    * body that ends up with neither, which is better than putting NaN on screen.
-   *
-   * TODO: these strings, and the rest of the hover box, are hardcoded English and need locales.
    */
   private static bodyDistanceText_(body: Pick<CelestialBody, 'meanDistanceToSun' | 'parentBody' | 'semiMajorAxisKm'>): string {
     const { parentBody, semiMajorAxisKm } = body;
 
     if (parentBody && Number.isFinite(semiMajorAxisKm)) {
-      return `Distance from ${parentBody}: ${Math.round(semiMajorAxisKm as number).toLocaleString()} km`;
+      return t7e('hoverManager.distanceFromParent')
+        .replace('{parent}', parentBody)
+        .replace('{km}', Math.round(semiMajorAxisKm as number).toLocaleString());
     }
 
     const distanceFromSunInAU = body.meanDistanceToSun / KM_PER_AU;
@@ -134,7 +136,9 @@ export class HoverManager {
       return '';
     }
 
-    return `Distance from Sun: ${distanceFromSunInAU.toFixed(2)} AU (${(body.meanDistanceToSun / 1000000).toFixed(2)} million km)`;
+    return t7e('hoverManager.distanceFromSun')
+      .replace('{au}', distanceFromSunInAU.toFixed(2))
+      .replace('{mkm}', (body.meanDistanceToSun / 1000000).toFixed(2));
   }
 
   private star_(star: Star): void {
@@ -228,9 +232,9 @@ export class HoverManager {
   }
 
   private launchSite_(launchSite: LaunchSite) {
-    this.satHoverBoxNode1.textContent = launchSite.name ?? 'Unknown Launch Site';
-    this.satHoverBoxNode2.textContent = launchSite.site ?? 'Unknown Site';
-    this.satHoverBoxNode3.textContent = launchSite.country ?? 'Unknown Country';
+    this.satHoverBoxNode1.textContent = launchSite.name ?? t7e('hoverManager.unknownLaunchSite');
+    this.satHoverBoxNode2.textContent = launchSite.site ?? t7e('hoverManager.unknownSite');
+    this.satHoverBoxNode3.textContent = launchSite.country ?? t7e('hoverManager.unknownCountry');
   }
 
   private launchFacility_(landObj: LandObject | LaunchSite) {
@@ -282,7 +286,7 @@ export class HoverManager {
         confidenceScoreString = ` (${confidenceScore.toString()})`;
 
         if (settingsManager.dataSources.externalTLEsOnly) {
-          confidenceScoreString = ' (External)';
+          confidenceScoreString = ` (${t7e('hoverManager.external')})`;
           color = 'gray';
         }
       }
@@ -295,7 +299,8 @@ export class HoverManager {
 
       getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;
 
-      if (sat.sccNum) {
+      // Synthetic JSC Vimpel objects carry a placeholder catalog number ("0").
+      if (sat.sccNum && !isSyntheticVimpel(sat)) {
         this.satHoverBoxNode2.textContent = `NORAD: ${sat.sccNum}`;
       } else {
         this.satHoverBoxNode2.textContent = HoverManager.getLaunchYear(sat);
@@ -305,7 +310,8 @@ export class HoverManager {
         this.satHoverBoxNode3.textContent = SensorMath.nextpass(sat);
       } else if (settingsManager.isEciOnHover) {
         this.showEciVel_(sat);
-      } else if (sat.source !== CatalogSource.VIMPEL) {
+      } else if (!isSyntheticVimpel(sat) && sat.sccNum) {
+        // Without an sccNum, line 2 already shows the launch line; repeating it read "Launched: Planned" twice.
         this.satHoverBoxNode3.textContent = HoverManager.getLaunchYear(sat);
       } else {
         this.satHoverBoxNode3.textContent = '';
@@ -319,7 +325,7 @@ export class HoverManager {
     this.satHoverBoxNode2.textContent = settingsManager.isEPFL ? HoverManager.getLaunchYear(sat) : sat.sccNum;
     let country = StringExtractor.extractCountry(sat.country);
 
-    country = country.length > 0 ? country : 'Unknown';
+    country = country.length > 0 ? country : t7e('Common.unknown');
     this.satHoverBoxNode3.textContent = country;
 
     this.satHoverBoxNode3.innerHTML = html`
@@ -331,37 +337,42 @@ export class HoverManager {
   }
 
   private static getLaunchYear(sat: Satellite) {
+    if (sat instanceof OemSatellite) {
+      // OEM objects default to NOTIONAL, but they are flown or flying spacecraft (Lucy launched in 2021),
+      // never "planned". Use a real international designator when the file carries one.
+      const designatorYear = /^(?<year>\d{4})-\d{3}/u.exec(sat.intlDes)?.groups?.year;
+
+      return designatorYear ? HoverManager.launchedText_(designatorYear) : t7e('hoverManager.launchedUnknown');
+    }
     if (sat.type === SpaceObjectType.NOTIONAL) {
       return t7e('hoverManager.launchedPlanned');
     }
-    if (sat.source === CatalogSource.VIMPEL) {
+    // Synthetic JSC Vimpel objects have no COSPAR ID; real ones on a Vimpel elset keep theirs.
+    if (isSyntheticVimpel(sat) || !sat.intlDes) {
       return t7e('hoverManager.launchedUnknown');
     }
 
     const launchYear = Number.parseInt(sat.intlDes.slice(2, 4));
 
-    if (launchYear < 57) {
-      if (i18next.language === 'zh') {
-        return `${t7e('hoverManager.launched')}20${launchYear.toString().padStart(2, '0')}`;
-      }
-
-      return `${t7e('hoverManager.launched')}: 20${launchYear.toString().padStart(2, '0')}`;
+    if (launchYear >= 0 && launchYear < 57) {
+      return HoverManager.launchedText_(`20${launchYear.toString().padStart(2, '0')}`);
     } else if (launchYear >= 57 && launchYear < 100) {
-      if (i18next.language === 'zh') {
-        return `${t7e('hoverManager.launched')}19${launchYear.toString().padStart(2, '0')}`;
-      }
-
-      return `${t7e('hoverManager.launched')}: 19${launchYear.toString().padStart(2, '0')}`;
+      return HoverManager.launchedText_(`19${launchYear.toString().padStart(2, '0')}`);
     }
 
     return t7e('hoverManager.launchedUnknown');
+  }
+
+  /** "Launched: 2021" (Chinese runs the label into the year with no separator). */
+  private static launchedText_(year: string): string {
+    return i18next.language === 'zh' ? `${t7e('hoverManager.launched')}${year}` : `${t7e('hoverManager.launched')}: ${year}`;
   }
 
   private showEciVel_(sat: Satellite) {
     this.satHoverBoxNode3.innerHTML = `
       <div style="display: flex; gap: 32px;">
         <div>
-          <strong>Position:</strong>
+          <strong>${t7e('hoverManager.position')}</strong>
           <ul style="margin:0; padding-left:16px;">
           <li>X: ${sat.position.x.toFixed(2)} km</li>
           <li>Y: ${sat.position.y.toFixed(2)} km</li>
@@ -369,7 +380,7 @@ export class HoverManager {
           </ul>
         </div>
         <div>
-          <strong>Velocity:</strong>
+          <strong>${t7e('hoverManager.velocity')}</strong>
           <ul style="margin:0; padding-left:16px;">
           <li>Ẋ: ${sat.velocity.x.toFixed(2)} km/s</li>
           <li>Ẏ: ${sat.velocity.y.toFixed(2)} km/s</li>
@@ -417,8 +428,8 @@ export class HoverManager {
       this.satHoverBoxNode1.textContent = sensor.name;
       const isTelescope = sensor.type === SpaceObjectType.OPTICAL;
 
-      this.satHoverBoxNode2.textContent = sensor.country ?? 'Unknown';
-      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.freqBand ? `${sensor.system} (${sensor.freqBand})` : (sensor.system ?? 'Unknown');
+      this.satHoverBoxNode2.textContent = sensor.country ?? t7e('Common.unknown');
+      this.satHoverBoxNode3.innerHTML = !isTelescope && sensor.freqBand ? `${sensor.system} (${sensor.freqBand})` : (sensor.system ?? t7e('Common.unknown'));
     }
   }
 

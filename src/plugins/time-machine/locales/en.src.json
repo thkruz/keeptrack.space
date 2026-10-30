@@ -5,9 +5,13 @@
       "settings": {
         "disableToasts": {
           "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "helpText": "Stop Time Machine from showing toast messages."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Toggle Time Machine"
+      },
+      "yearToast": "Time Machine In Year {year}!"
     }
   }
 }

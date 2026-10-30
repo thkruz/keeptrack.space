@@ -14,7 +14,7 @@
         "skipNo": "Continua",
         "startTour": "Inizia il tour",
         "exploreOnMyOwn": "Esploro da solo",
-        "keepGoing": "Continua: tour avanzato",
+        "keepGoing": "Mostrami le funzioni avanzate",
         "finishUp": "Va bene così, concludi",
         "createAccount": "Crea un account gratuito",
         "maybeLater": "Forse più tardi",
@@ -63,16 +63,21 @@
         }
       },
       "bridge": {
-        "title": "Conosci le basi",
+        "title": "Argomenti del tour di base",
         "body": "Vuoi il kit dell'operatore? Sensori, watchlist e flussi rapidi da tastiera. Circa altri due minuti.",
-        "recap1": "Trovato e selezionato un satellite",
-        "recap2": "Letto i suoi dati orbitali in tempo reale",
-        "recap3": "Controllato il tempo della simulazione"
+        "doneLabel": "Fatto",
+        "tryNextLabel": "Da provare",
+        "tasks": {
+          "spin": "Ruota il globo",
+          "search": "Cerca un satellite",
+          "select": "Seleziona un satellite",
+          "time": "Accelera o rallenta il tempo"
+        }
       },
       "account": {
         "title": "Salvare i tuoi progressi?",
         "body": "Un account gratuito porta la tua configurazione su qualsiasi dispositivo.",
-        "bodyPower": "Un account gratuito porta la watchlist e il sensore appena configurati su qualsiasi dispositivo.",
+        "bodyPower": "Un account gratuito mantiene liste e impostazioni dei sensori su ogni dispositivo.",
         "benefit1": "Sincronizza impostazioni e watchlist tra dispositivi",
         "benefit2": "Rimuovi la pubblicità",
         "benefit3": "Sblocca gratis l'intero set di strumenti Pro"
@@ -315,7 +320,17 @@
           "body": "Una mappa del mondo 2D con tracce al suolo in tempo reale. La classica immagine da sala operativa di cosa sorvola dove."
         }
       },
-      "stepDone": "Fatto. Dai un'occhiata."
+      "stepDone": "Fatto. Dai un'occhiata.",
+      "missions": {
+        "login": {
+          "title": "Accedi per continuare",
+          "body": "Questa funzione salva nel tuo account KeepTrack gratuito. Accedi o creane uno e questa guida riprenderà proprio da qui."
+        },
+        "addMore": {
+          "title": "Uno fatto, ne mancano due",
+          "body": "Seleziona un altro satellite e aggiungilo allo stesso modo dal menu Lista di osservazione. La missione si completa a tre."
+        }
+      }
     }
   }
 }

@@ -10,9 +10,10 @@
       "labels": {
         "dropzone": ".tce、.tle、.txt ファイルをドロップしてカタログを読み込みます",
         "keepSatInfo": "衛星情報を保持",
-        "keepSatInfoTooltip": "既存の衛星のTLEを更新しつつ、名前、国、ミッションデータを保持します。インポートしたファイルに含まれない衛星は削除されます。",
+        "keepSatInfoTooltip": "既存の衛星のTLEを更新し、名称、国、ミッションのデータは保持します。インポートしたファイルにない衛星は削除されます。NORAD番号のないJSC Vimpelの物体も削除されます。",
         "importNewOnly": "新しい衛星のみをインポート",
         "importNewOnlyTooltip": "現在のカタログにまだ存在しない衛星のみを追加します。既存の衛星は変更されません。",
+        "replaceCatalogTooltip": "両方のスイッチがオフの場合、ファイルがカタログ全体を置き換えます。ファイル内の物体だけが残るため、NORAD番号のないJSC Vimpelの物体は削除されます。",
         "orbitalElements": "軌道要素",
         "tabularStk": "表形式とSTK",
         "selectedSatellite": "選択中の衛星",
@@ -45,6 +46,7 @@
         "loadedCatalog": "{file} からカタログを読み込みました",
         "failedToLoad": "{file} の読み込みに失敗しました",
         "noSatelliteSelected": "衛星が選択されていません！",
+        "noSensorSelected": "センサーが選択されていません!",
         "exportTooLarge": "エクスポートが大きすぎます。時間範囲を狭めるか、ステップサイズを大きくしてください。",
         "failedToPropagate": "衛星の伝播に失敗しました！"
       },

@@ -4,7 +4,11 @@
       "bottomIconLabel": "Wykres inkl. vs wys.",
       "title": "Menu wykresu inklinacji do wysokości",
       "labels": {
-        "totalLeoPayloads": "Łączna liczba ładunków LEO"
+        "totalLeoPayloads": "Łączna liczba ładunków LEO",
+        "totalLeoRocketBodies": "Łączna liczba członów rakiet LEO",
+        "totalLeoDebris": "Łączna liczba szczątków LEO",
+        "totalLeoObjects": "Łączna liczba obiektów LEO",
+        "noMatches": "Żadne obiekty nie pasują do bieżących filtrów."
       },
       "help": {
         "overview": "Wykres inklinacji do wysokości mapuje populację LEO: każdy ładunek jest naniesiony według inklinacji względem wysokości. Konstelacje pojawiają się jako zwarte skupiska (powłoki Starlink, płaszczyzny OneWeb), a zatłoczone pasma wysokości od razu rzucają się w oczy.",
@@ -13,6 +17,20 @@
         "howToUse": "<ol><li>Otwórz <strong>Wykres inkl. vs wys.</strong> z panelu (tryb Analiza).</li><li>Wykres oblicza się automatycznie; najedź na punkty, aby zobaczyć nazwy satelitów, i kliknij punkt, aby wybrać danego satelitę.</li><li>Użyj legendy, aby ukrywać lub pokazywać konstelacje i kraje.</li></ol>",
         "tip1": "Kliknij pozycję legendy, aby przełączyć całą grupę; wyizolowanie jednej konstelacji uwidacznia strukturę jej powłok.",
         "tip2": "Wykres próbkuje katalog w bieżącym czasie; po zmianach w katalogu otwórz menu ponownie, aby je odświeżyć."
+      },
+      "chart": {
+        "title": "Wykres punktowy nachylenia względem wysokości",
+        "xAxis": "Wysokość (km)",
+        "yAxis": "Nachylenie (°)",
+        "zAxis": "Okres (min)",
+        "constellation": "Konstelacja",
+        "country": "Kraj",
+        "altitude": "Wysokość",
+        "inclination": "Nachylenie",
+        "period": "Okres",
+        "eccentricity": "Mimośród",
+        "unknown": "Nieznany",
+        "other": "Inne"
       }
     },
     "Inc2LonPlots": {
@@ -29,6 +47,17 @@
         "tip1": "Pionowy słupek punktów na jednej długości geograficznej to skupisko satelitów współpozycjonowanych, dzielących tę samą pozycję.",
         "tip2": "Satelity o inklinacji powyżej około 7 stopni znajdują się zwykle na orbicie cmentarnej lub nachylonej orbicie przechowawczej; aktywny pas trzyma się zera.",
         "shortcutToggle": "Przełącz wykres inkl. vs dł."
+      },
+      "chart": {
+        "loading": "Obliczanie pozycji satelitów...",
+        "title": "Wykres punktowy GEO nachylenia względem długości geograficznej",
+        "xAxis": "Długość geograficzna (°)",
+        "yAxis": "Nachylenie (°)",
+        "inclination": "Nachylenie",
+        "longitude": "Długość geograficzna",
+        "period": "Okres",
+        "periodMinutes": "Okres (minuty)",
+        "other": "Inne"
       }
     },
     "Time2LonPlots": {
@@ -47,7 +76,8 @@
         "tooltipLongitude": "Długość geograficzna",
         "tooltipTime": "Czas od teraz",
         "loading": "Obliczanie danych orbitalnych...",
-        "empty": "Żadne obiekty nie pasują do bieżących filtrów"
+        "empty": "Żadne obiekty nie pasują do bieżących filtrów",
+        "other": "Inne"
       },
       "help": {
         "overview": "Wykres kaskadowy śledzi długość geograficzną GEO w czasie: każda linia to długość geograficzna satelity dryfująca (lub utrzymywana) w wykreślonym oknie. Satelity utrzymujące pozycję rysują pionowe linie; dryfujące pochylają się; relokacje pojawiają się jako szerokie łuki.",
@@ -65,6 +95,15 @@
         "overview": "Wykres szerokości do długości geograficznej to płaska migawka tego, gdzie satelity znajdują się teraz nad Ziemią, naniesiona jako pozycje naziemne. Czyta się go jak mapę bez mapy: przydaje się do wykrywania luk w pokryciu i geometrii śladów w kształcie ósemki nachylonych satelitów pasa GEO.",
         "howToUse": "<ol><li>Otwórz <strong>Wykres szer. vs dł.</strong> z panelu (tryb Analiza).</li><li>Wykres renderuje się automatycznie; najedź na punkty, aby zobaczyć nazwy, i kliknij, aby wybrać satelitę.</li></ol>",
         "tip1": "Nachylone satelity GEO wykonują wahania północ-południe na stałej długości geograficznej, które w tym widoku wyglądają jak pionowe rozrzuty."
+      },
+      "chart": {
+        "title": "Wykres szerokości względem długości geograficznej",
+        "xAxis": "Długość geograficzna (°)",
+        "yAxis": "Szerokość geograficzna (°)",
+        "latitude": "Szerokość geograficzna",
+        "longitude": "Długość geograficzna",
+        "other": "Inne",
+        "snapshotTime": "Migawka z {time} UTC"
       }
     },
     "EciPlot": {
@@ -74,15 +113,21 @@
         "overview": "Wykres ECI rysuje orbitę wybranego satelity jako krzywą 3D w inercjalnym układzie odniesienia o środku w Ziemi (ECI): układzie związanym z gwiazdami, w którym orbity są czystymi elipsami. Jeśli wybrano satelitę dodatkowego, obie orbity są wykreślane razem w celu porównania.",
         "howToUse": "<ol><li>Wybierz satelitę; ikona wtyczki w panelu jest nieaktywna, dopóki żaden nie jest wybrany.</li><li>Otwórz <strong>Wykres ECI</strong> z panelu (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D, i przewijaj, aby przybliżać; najedź na krzywą, aby zobaczyć wartości pozycji.</li></ol>",
         "tip1": "Najpierw wybierz satelitę dodatkowego (prawy przycisk myszy lub klawisze [ i ]), aby nałożyć dwie orbity i porównać ich geometrię."
+      },
+      "chart": {
+        "title": "Wykres ECI (geocentryczny, inercjalny)"
       }
     },
     "EcfPlot": {
       "bottomIconLabel": "Wykres ECF",
       "title": "Menu wykresu ECF",
       "help": {
-        "overview": "Wykres ECF rysuje trajektorię wybranego satelity w układzie odniesienia związanym z Ziemią o środku w Ziemi (ECF), który obraca się wraz z planetą. Satelity geosynchroniczne kurczą się do małych pętli, a orbity o powtarzalnym śladzie naziemnym zamykają się same w sobie, co czyni ten układ najlepszym do badania zachowania względem Ziemi.",
+        "overview": "Wykres ECF rysuje jeden okres orbitalny trajektorii wybranego satelity w układzie odniesienia związanym z Ziemią o środku w Ziemi (ECF), który obraca się wraz z planetą: każda próbka jest obracana o kąt obrotu Ziemi (GMST) w jej własnej chwili, więc jej długość geograficzna odpowiada śladowi naziemnemu. Satelity geosynchroniczne kurczą się do małych pętli, a niska orbita kreśli w 3D jeden przelot śladu naziemnego, co czyni ten układ najlepszym do badania zachowania względem Ziemi.",
         "howToUse": "<ol><li>Wybierz satelitę; ikona wtyczki w panelu jest nieaktywna, dopóki żaden nie jest wybrany.</li><li>Otwórz <strong>Wykres ECF</strong> z panelu (tryb Analiza).</li><li>Przeciągaj, aby obracać wykres 3D, i przewijaj, aby przybliżać; najedź na krzywą, aby zobaczyć wartości pozycji.</li></ol>",
         "tip1": "Ciasna ósemka satelity GEO w ECF to jego dobowy cykl inklinacji i mimośrodu; im ciaśniejsza pętla, tym lepsze utrzymywanie pozycji."
+      },
+      "chart": {
+        "title": "Wykres ECF (geocentryczny, związany z Ziemią)"
       }
     },
     "RicPlot": {
@@ -121,6 +166,9 @@
         "overview": "Wykres RIC pokazuje ruch względny dwóch satelitów w układzie składowych promieniowej, wzdłuż toru i w poprzek toru (RIC), o środku w satelicie głównym. To standardowy widok dla spotkań orbitalnych, lotu w formacji i analizy bliskich zbliżeń: trasa satelity dodatkowego jest rysowana tak, jak widzi ją satelita główny.",
         "howToUse": "<ol><li>Wybierz satelitę głównego, a następnie satelitę dodatkowego (kliknij satelitę prawym przyciskiem lub użyj klawiszy [ i ]).</li><li>Otwórz <strong>Wykres RIC</strong> z panelu (tryb Analiza).</li><li>Odczytaj cztery wykresy 2D: radialny, wzdłuż orbity, poprzecznie do orbity oraz całkowita odległość w czasie. Przeciągnij suwak lub przewiń, aby przybliżyć oś czasu.</li></ol>",
         "tip1": "Muszą być wybrane zarówno satelita główny, jak i dodatkowy, inaczej wykres nie ma czego porównywać; dla czytelnej skali wybieraj obiekty na podobnych orbitach."
+      },
+      "errorMsgs": {
+        "missingSatData": "Brak danych satelity dla wykresu RIC"
       }
     }
   }

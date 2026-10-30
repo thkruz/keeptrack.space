@@ -25,6 +25,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { controlSites } from '@app/app/data/catalogs/control-sites';
 import { launchSiteObjects, launchSites } from '@app/app/data/catalogs/launch-sites';
 import { sensors } from '@app/app/data/catalogs/sensors';
@@ -34,6 +35,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import {
   BaseObject,
   CatalogSource,
@@ -186,7 +188,7 @@ export class CatalogManager {
     if (this.objectCache[sat.id]?.isSatellite()) {
       (this.objectCache[sat.id] as Satellite).satrec = satrec;
     } else {
-      errorManagerInstance.warn('calcSatrec: satId not found in satData');
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogManager.satIdNotFound'));
     }
 
     return satrec;
@@ -211,6 +213,11 @@ export class CatalogManager {
    * @returns The corresponding ID if found, otherwise null.
    */
   intlDes2id(intlDes: string): number | null {
+    // Objects without a COSPAR ID (synthetic JSC Vimpel) are never indexed.
+    if (!intlDes) {
+      return null;
+    }
+
     return typeof this.cosparIndex[`${intlDes}`] !== 'undefined' ? this.cosparIndex[`${intlDes}`] : null;
   }
 
@@ -338,8 +345,10 @@ export class CatalogManager {
   /**
    * Finds the next unused analyst satellite slot - an inactive PAYLOAD reserved in
    * the {@link CatalogManager.ANALYST_START_ID} block. Tools that host a generated
-   * nominal satellite (e.g. New Launch) claim one of these slots. Returns null when
-   * every analyst slot in the search window is already active.
+   * nominal satellite (e.g. New Launch) claim one of these slots. Skips slots whose
+   * NORAD id is reserved in {@link AnalystSlotReservations} (held by another object,
+   * such as a New Launch trajectory). Returns null when every analyst slot in the
+   * search window is already active or reserved.
    *
    * @param startOffset - First offset past ANALYST_START_ID to consider.
    * @param endOffset - Exclusive upper offset bound for the search.
@@ -348,7 +357,7 @@ export class CatalogManager {
     for (let offset = startOffset; offset < endOffset; offset++) {
       const sat = this.sccNum2Sat(CatalogManager.ANALYST_START_ID + offset);
 
-      if (sat && !sat.active) {
+      if (sat && !sat.active && !AnalystSlotReservations.isReserved(sat.sccNum)) {
         return sat;
       }
     }
@@ -618,7 +627,7 @@ export class CatalogManager {
     try {
       satrec = Sgp4.createSatrec(tle1, tle2);
     } catch (e) {
-      errorManagerInstance.error(e, 'catalog-manager.ts', 'Error creating satellite record!');
+      errorManagerInstance.error(e, 'catalog-manager.ts', t7e('errorMsgs.CatalogManager.satrecError'));
 
       return null;
     }
@@ -654,7 +663,7 @@ export class CatalogManager {
     }
     errorManagerInstance.debug(tle1);
     errorManagerInstance.debug(tle2);
-    errorManagerInstance.warn('New Analyst Satellite is Invalid!');
+    errorManagerInstance.warn(t7e('errorMsgs.CatalogManager.analystSatInvalid'));
 
     return null;
   }

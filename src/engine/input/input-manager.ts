@@ -229,7 +229,7 @@ export class InputManager {
     if (typeof x === 'undefined' || typeof y === 'undefined') {
       throw new Error('x and y must be defined');
     }
-    if (isNaN(x) || isNaN(y)) {
+    if (Number.isNaN(x) || Number.isNaN(y)) {
       throw new Error('x and y must be numbers');
     }
 
@@ -562,7 +562,7 @@ export class InputManager {
       this.hasWarnedPickingDisabled_ = true;
       const msg = e instanceof Error ? e.message : String(e);
 
-      errorManagerInstance.warn(`Satellite hover-pick disabled: WebGL readPixels not supported in this browser (${msg}). Click-to-select still works.`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.hoverPickDisabled').replace('{error}', msg));
     }
   }
 

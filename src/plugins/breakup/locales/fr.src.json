@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "Erreur lors de la création de la fragmentation !",
         "InvalidStartNum": "Numéro de départ du satellite invalide ! Valeur par défaut : 90000 !",
         "InvalidSlotRange": "Numéro de satellite initial hors plage. Utilisez {start} à {end}.",
-        "BreakupGeneratorFailed": "Échec du générateur de fragmentation !"
+        "BreakupGeneratorFailed": "Échec du générateur de fragmentation !",
+        "NoFreeSlots": "Pas assez d'emplacements analyste libres pour {count} fragments. Les emplacements occupés par d'autres objets ne sont jamais écrasés ; réduisez le nombre ou supprimez des objets analyste."
       },
       "stats": {
         "meanSpeed": "Vitesse moyenne attendue",

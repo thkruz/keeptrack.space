@@ -1,150 +1,88 @@
+import * as ootk from '@ootk/src/main';
 import { vi } from 'vitest';
+import { AzRangeMsgType, AzRangeOutMsgType, AzRangeOutResult } from '../az-range-heatmap-messages';
 
-// const-enum values (erased at compile time)
-const IN = { START: 0, CANCEL: 1 } as const;
-const OUT = { PARTIAL: 0, RESULT: 1, ERROR: 2 } as const;
+// Independent oracle: integrate declared piecewise-constant dwell intervals.
+// Propagation/frame transforms are intentionally mocked: these tests verify the
+// temporal metric and boundaries, not an orbit model.
+describe('Az/Range time-weighted occupancy', () => {
+  let posted: AzRangeOutResult[];
+  let dwell: (seconds: number, satellite: number) => { az: number; el: number; rng: number };
+  let index = 0;
+  let seconds = 0;
 
-const TLE1 = '1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927';
-const TLE2 = '2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537';
-
-interface Posted {
-  typ?: number;
-  runId?: number;
-  bins?: number[][];
-  numAzBins?: number;
-  numRngBins?: number;
-  maxRng?: number;
-  stepsProcessed?: number;
-  stepsTotal?: number;
-  binSatNums?: string[][][];
-  message?: string;
-}
-
-let posted: Posted[] = [];
-
-const loadWorker = async () => {
-  await import('@app/webworker/azRangeHeatmapWorker');
-};
-
-const dispatch = (data: Record<string, unknown>) => {
-  (globalThis.onmessage as (m: { data: unknown }) => void)({ data });
-};
-
-const startMsg = (overrides: Record<string, unknown> = {}) => ({
-  typ: IN.START,
-  runId: 1,
-  tleData: [{ tle1: TLE1, tle2: TLE2, sccNum: '25544' }],
-  // ISS overpass-ish observer; the worker just bins whatever passes the band.
-  sensorLat: 41.75,
-  sensorLon: -70.54,
-  sensorAlt: 0.062,
-  sensorMaxRng: 6000,
-  startTimeMs: Date.UTC(2008, 8, 20, 0, 0, 0),
-  durationSec: 600,
-  stepSec: 60,
-  // Wide band + full-sky FOV so at least some steps register hits deterministically.
-  elevationDeg: 0,
-  marginDeg: 90,
-  numAzBins: 36,
-  numRngBins: 10,
-  fovMinAz: 0,
-  fovMaxAz: 360,
-  ...overrides,
-});
-
-describe('azRangeHeatmapWorker', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     posted = [];
-    globalThis.postMessage = vi.fn((payload: Posted) => {
-      posted.push(payload);
-    }) as unknown as typeof globalThis.postMessage;
-  });
-
-  it('posts "ready" on load and installs an onmessage handler', async () => {
-    await loadWorker();
-
-    expect(posted).toContain('ready');
-    expect(typeof globalThis.onmessage).toBe('function');
-  });
-
-  it('streams PARTIAL snapshots and a terminal RESULT on START', async () => {
-    await loadWorker();
-    posted = [];
-
-    dispatch(startMsg());
-
-    await vi.runAllTimersAsync();
-
-    const partials = posted.filter((p) => p.typ === OUT.PARTIAL);
-    const result = posted.find((p) => p.typ === OUT.RESULT);
-
-    expect(partials.length).toBeGreaterThan(0);
-    expect(result).toBeDefined();
-    expect(result!.runId).toBe(1);
-    expect(result!.numAzBins).toBe(36);
-    expect(result!.numRngBins).toBe(10);
-    expect(result!.maxRng).toBe(6000);
-  });
-
-  it('RESULT carries a correctly-dimensioned bins matrix and per-bin sccNum lists', async () => {
-    await loadWorker();
-    posted = [];
-
-    dispatch(startMsg());
-
-    await vi.runAllTimersAsync();
-
-    const result = posted.find((p) => p.typ === OUT.RESULT)!;
-
-    expect(result.bins!.length).toBe(36);
-    expect(result.bins![0].length).toBe(10);
-    expect(result.binSatNums!.length).toBe(36);
-    expect(result.binSatNums![0].length).toBe(10);
-  });
-
-  it('skips a malformed TLE entry but still produces a RESULT', async () => {
-    await loadWorker();
-    posted = [];
-
-    dispatch(startMsg({ tleData: [{ tle1: 'garbage', tle2: 'garbage', sccNum: '00000' }] }));
-
-    await vi.runAllTimersAsync();
-
-    expect(posted.find((p) => p.typ === OUT.RESULT)).toBeDefined();
-  });
-
-  it('honours the dual-face FOV branch (fovMinAz2/fovMaxAz2) without throwing', async () => {
-    await loadWorker();
-    posted = [];
-
-    dispatch(startMsg({ fovMinAz: 0, fovMaxAz: 90, fovMinAz2: 270, fovMaxAz2: 360 }));
-
-    await vi.runAllTimersAsync();
-
-    expect(posted.find((p) => p.typ === OUT.RESULT)).toBeDefined();
-  });
-
-  it('aborts mid-run when CANCEL arrives after START', async () => {
-    await loadWorker();
-    posted = [];
-
-    // Long job so the first yield happens before completion, giving CANCEL a chance.
-    const run = (globalThis.onmessage as (m: { data: unknown }) => Promise<void>)({
-      data: startMsg({ runId: 9, durationSec: 36000, stepSec: 60 }),
+    index = 0;
+    globalThis.postMessage = vi.fn((data: AzRangeOutResult) => posted.push(data)) as never;
+    vi.spyOn(ootk.Sgp4, 'createSatrec').mockImplementation(() => ({ jdsatepoch: 2440587.5, satellite: index++ }) as never);
+    vi.spyOn(ootk.Sgp4, 'propagate').mockImplementation((record, minutes) => {
+      seconds = minutes * 60;
+      return { position: { x: (record as unknown as { satellite: number }).satellite, y: 0, z: 0 } } as never;
     });
+    vi.spyOn(ootk, 'eci2ecef').mockImplementation((position) => position as never);
+    vi.spyOn(ootk, 'ecefRad2rae').mockImplementation((_observer, position) => dwell(seconds, position.x) as never);
+    await import('../azRangeHeatmapWorker');
+  });
+  afterEach(() => vi.restoreAllMocks());
 
-    dispatch({ typ: IN.CANCEL, runId: 9 });
-
+  const run = async (durationSec: number, stepSec: number, satellites = 1): Promise<AzRangeOutResult> => {
+    index = 0;
+    const promise = (globalThis.onmessage as unknown as (event: { data: unknown }) => Promise<void>)({
+      data: {
+        typ: AzRangeMsgType.START,
+        runId: 1,
+        tleData: Array.from({ length: satellites }, (_, n) => ({ tle1: 'fixture', tle2: 'fixture', sccNum: String(n) })),
+        sensorLat: 0,
+        sensorLon: 0,
+        sensorAlt: 0,
+        sensorMaxRng: 100,
+        startTimeMs: 0,
+        durationSec,
+        stepSec,
+        elevationDeg: 0,
+        marginDeg: 1,
+        numAzBins: 4,
+        numRngBins: 2,
+        fovMinAz: 0,
+        fovMaxAz: 360,
+      },
+    });
     await vi.runAllTimersAsync();
-    await run;
+    await promise;
+    return posted.filter((message) => message.typ === AzRangeOutMsgType.RESULT).at(-1)!;
+  };
 
-    // Cancelled run must not post a RESULT.
-    expect(posted.find((p) => p.typ === OUT.RESULT)).toBeUndefined();
+  it('keeps constant occupancy at one and sums overlapping objects', async () => {
+    dwell = () => ({ az: 45, el: 0, rng: 25 });
+    expect((await run(125, 60)).bins[0][0]).toBe(1);
+    expect((await run(125, 30, 2)).bins[0][0]).toBe(2);
   });
 
-  it('ignores unknown message types without throwing', async () => {
-    await loadWorker();
+  it('clips the last interval, excludes the window end, and leaves empty bins zero', async () => {
+    dwell = (time) => ({ az: 45, el: time < 119 ? 10 : 0, rng: 25 });
+    const result = await run(125, 60);
+    expect(result.bins[0][0]).toBeCloseTo(5 / 125, 10);
+    expect(result.bins[1][0]).toBe(0);
+  });
 
-    expect(() => dispatch({ typ: 99, runId: 1 })).not.toThrow();
+  it('wraps azimuth 360 to zero and includes max-range boundary', async () => {
+    dwell = () => ({ az: 360, el: 0, rng: 100 });
+    const result = await run(60, 30);
+    expect(result.bins[0][1]).toBe(1);
+    expect(result.bins[3][1]).toBe(0);
+  });
+
+  it('converges on a frozen independent 123-second dwell in a 600-second window', async () => {
+    dwell = (time) => ({ az: 45, el: time < 123 ? 0 : 10, rng: 25 });
+    const expected = 123 / 600;
+    const values: number[] = [];
+    for (const step of [60, 30, 10, 5, 1]) {
+      // biome-ignore lint/performance/noAwaitInLoops: ordered sampling study limits worker memory
+      const value = (await run(600, step)).bins[0][0];
+      values.push(value);
+      expect(Math.abs(value - expected)).toBeLessThanOrEqual(step / 600 + 1e-9);
+    }
+    expect(values).toEqual([0.3, 0.25, 130 / 600, 125 / 600, expected]);
   });
 });

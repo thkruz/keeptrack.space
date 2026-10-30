@@ -1,6 +1,9 @@
 import { PluginDrawer } from '@app/app/ui/plugin-drawer';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { getEl } from '@app/engine/utils/get-el';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -84,6 +87,27 @@ describe('PluginDrawer', () => {
     // A disabled item must not be silently swallowed: it forwards bottomMenuClick
     // (the plugin's onBottomIconClick runs and can toast the reason it is disabled).
     expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'overflight-icon');
+  });
+
+  it('a disabled drawer item whose plugin gives a reason toasts it instead of forwarding the click', () => {
+    buildDrawer();
+    const content = getEl('drawer-content', true)!;
+
+    content.insertAdjacentHTML('beforeend', '<div class="drawer-item disabled" data-plugin-id="reason-icon" role="button"><span class="drawer-item-label">Reason</span></div>');
+    PluginRegistry.addPlugin({
+      id: 'ReasonPlugin',
+      bottomIconElementName: 'reason-icon',
+      getDisabledReason: () => 'Add satellites to the watchlist first',
+      explainDisabledReason: KeepTrackPlugin.prototype.explainDisabledReason,
+    } as never);
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    (content.querySelector('.drawer-item[data-plugin-id="reason-icon"]') as HTMLElement).dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(toast).toHaveBeenCalledWith('Add satellites to the watchlist first', expect.anything());
+    expect(emitSpy).not.toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'reason-icon');
+    PluginRegistry.unregisterAllPlugins();
   });
 
   describe('rail icon activation', () => {

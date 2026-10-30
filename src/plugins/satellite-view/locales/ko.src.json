@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "위성 뷰"
+      "bottomIconLabel": "위성 뷰",
+      "commandPalette": {
+        "activate": "위성 뷰로 전환"
+      },
+      "shortcuts": {
+        "enter": "위성 뷰로 들어가기"
+      }
     }
   }
 }

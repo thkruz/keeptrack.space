@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { ConeMeshFactory } from '@app/engine/rendering/draw-manager/cone-mesh-factory';
 import { getEl } from '@app/engine/utils/get-el';
 import { SatelliteFov } from '@app/plugins/satellite-fov/satellite-fov';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -63,12 +64,32 @@ describe('SatelliteFov cone management', () => {
       expect(factory.generateMesh).toHaveBeenCalledWith(defaultSat);
     });
 
-    it('removes the cone when one is cached', () => {
+    it('removes the cone by source (no target) when one is cached, never by the stale mesh id', () => {
       factory.checkCacheForMesh_.mockReturnValue({ id: 42 });
 
       p().toggleFovCone_();
 
-      expect(factory.remove).toHaveBeenCalledWith(42);
+      expect(factory.removeBySourceAndTarget).toHaveBeenCalledWith(defaultSat.id, -1);
+      expect(factory.remove).not.toHaveBeenCalled();
+    });
+
+    it('toggles the right cone off after an earlier cone was removed (real factory, stale ids)', () => {
+      const real = new ConeMeshFactory();
+      const coneA = mkCone(0, 'A');
+      const coneB = { ...mkCone(1, 'B'), obj: { id: defaultSat.id, name: 'B' } };
+
+      // Creation-time ids are array indexes: A=0, B=1.
+      real.meshes = [coneA, coneB] as never;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ServiceLocator.getScene() as any).coneFactory = real;
+
+      // Remove A first: B keeps its stale id 1 while it now sits at index 0.
+      real.removeBySourceAndTarget(0, -1);
+      expect(real.meshes.map((m) => m.obj.name)).toEqual(['B']);
+
+      p().toggleFovCone_();
+
+      expect(real.meshes).toHaveLength(0);
     });
 
     it('does nothing when no satellite is selected', () => {

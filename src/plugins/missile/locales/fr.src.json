@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} chargé",
         "simLoadFailed": "Échec du chargement de {sim}",
-        "missilesActive": "{n} / {max} missiles actifs"
+        "missilesActive": "{n} / {max} missiles actifs",
+        "massRaidLoaded": "Frappe massive de missiles chargée avec succès",
+        "missileCreated": "Le missile RV_{n}<br>a été créé.",
+        "mirvCreated": "Véhicules de rentrée (MIRV) créés :<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Latitude de la cible invalide !",
         "invalidTargetLongitude": "Longitude de la cible invalide !",
         "invalidLaunchLatitude": "Latitude de lancement invalide !",
         "invalidLaunchLongitude": "Longitude de lancement invalide !",
-        "invalidWarheads": "Le nombre d'ogives doit être un entier de 1 à 12."
+        "invalidWarheads": "Le nombre d'ogives doit être un entier de 1 à 12.",
+        "maxMissiles": "Erreur : le nombre maximal de missiles<br>a été atteint.",
+        "launchLatRange": "Erreur : la latitude de lancement doit être<br>comprise entre 90 et -90 degrés",
+        "launchLonRange": "Erreur : la longitude de lancement doit être<br>comprise entre 180 et -180 degrés",
+        "targetLatRange": "Erreur : la latitude de la cible doit être<br>comprise entre 90 et -90 degrés",
+        "targetLonRange": "Erreur : la longitude de la cible doit être<br>comprise entre 180 et -180 degrés",
+        "minDistance": "Erreur : ce missile a une portée minimale de 320 km.",
+        "maxDistance": "Erreur : ce missile a une portée maximale de {km} km.",
+        "tooClose": "Erreur : cette distance est trop courte pour le missile sélectionné.",
+        "orbitalVelocity": "Erreur : le missile a atteint la vitesse orbitale<br>(moteur trop puissant pour cette portée).",
+        "overshot": "Erreur : le missile a dépassé sa cible<br>(moteur trop puissant pour cette portée).",
+        "notGuided": "Erreur : le missile n'a pas pu être guidé<br>vers sa cible à cette portée."
       },
       "commands": {
         "open": "Ouvrir le plugin Missile",

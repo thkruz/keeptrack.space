@@ -4,7 +4,7 @@
     "overview": "Nie jest otwarte żadne menu ani widok, więc wyświetlana jest ogólna pomoc KeepTrack. Każde menu i każdy widok ma własną pomoc.",
     "howToUse": "Otwórz szufladę i wybierz narzędzie, aby otworzyć jego menu, lub przełącz się na widok, taki jak płaska mapa lub widok polarny. Następnie naciśnij Shift+F1, aby zobaczyć pomoc dla tego menu lub widoku. Kliknij obiekt na globie, aby go zaznaczyć i zobaczyć szczegóły.",
     "tip1": "Włączone warstwy (na przykład elipsoidy kowariancji) nie mają własnego menu, więc dopóki aktywne są tylko warstwy, Shift+F1 pokazuje tę ogólną pomoc.",
-    "tip2": "Kliknij w dowolnym miejscu tego panelu, aby go zamknąć.",
+    "tip2": "Aby zamknąć panel, użyj przycisku Zamknij, naciśnij Escape lub kliknij poza panelem.",
     "shortcutClose": "Zamknij pomoc"
   }
 }

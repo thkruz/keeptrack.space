@@ -65,6 +65,7 @@
         "plannedFuture": "Previsto per un aggiornamento futuro."
       },
       "filterPlaceholder": "Filtra corpi…",
+      "filterNoMatches": "Nessun corpo corrispondente",
       "commands": {
         "toggleMenu": "Attiva/disattiva il menu Pianeti",
         "centerOn": "Centra la fotocamera su {body}"
@@ -75,7 +76,6 @@
         "imgCaption": "Fai clic su un corpo qualsiasi per centrare la fotocamera su di esso.",
         "howToUse": "<ol><li>Apri il menu <strong>Pianeti</strong> dal pannello oppure premi <strong>P</strong>.</li><li>Fai clic su un corpo, ad esempio <strong>Marte</strong> o <strong>Luna</strong>. La fotocamera si ricentra su di esso e i limiti dello zoom si adattano alla nuova scala.</li><li>Premi <strong>Home</strong> per tornare alla Terra, oppure <strong>Shift</strong>+<strong>Home</strong> per ricentrare la Terra nella vista.</li></ol>",
         "tip1": "L'orbita di una luna viene disegnata solo dall'interno del sistema del suo pianeta: centra prima Giove o Saturno.",
-        "tip2": "Puoi anche fare clic destro nello spazio vuoto e scegliere un corpo dal menu contestuale.",
         "shortcutToggle": "Attiva/disattiva il menu Pianeti",
         "shortcutHome": "Imposta la Terra come corpo centrale",
         "shortcutCenterEarth": "Centra la fotocamera sulla Terra"

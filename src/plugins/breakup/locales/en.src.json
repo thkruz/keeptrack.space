@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "Error creating breakup!",
         "InvalidStartNum": "Invalid satellite starting number! Defaulting to 90000!",
         "InvalidSlotRange": "Initial satellite number out of range. Use {start} to {end}.",
-        "BreakupGeneratorFailed": "Breakup Generator Failed!"
+        "BreakupGeneratorFailed": "Breakup Generator Failed!",
+        "NoFreeSlots": "Not enough free analyst slots for {count} pieces. Slots held by other objects are never overwritten; lower the count or clear some analyst objects."
       },
       "stats": {
         "meanSpeed": "Expected mean speed",

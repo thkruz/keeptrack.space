@@ -44,7 +44,11 @@
         "reasonMaxEl": "Élévation {{value}} au-delà du max. {{limit}}",
         "reasonMask": "Élévation {{value}} sous le masque d'horizon {{limit}}",
         "reasonAzimuth": "Azimut {{value}} hors de {{min}} à {{max}}",
-        "reasonCone": "Hors du cône de visée du capteur"
+        "reasonCone": "Hors du cône de visée du capteur",
+        "unknown": "Inconnu",
+        "notApplicable": "N/D",
+        "notApplicableOem": "N/D (OEM)",
+        "notInOrbitToast": "Le satellite {sccNum} n'est pas en orbite !<br>L'heure de simulation est {simTime}.<br>Vérifiez que vous disposez du bon TLE."
       }
     }
   }

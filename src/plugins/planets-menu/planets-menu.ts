@@ -49,6 +49,9 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
 
   private isPlanetsDisabled_ = false;
 
+  /** The centre body the highlighted row was last drawn for; see {@link syncActiveBody_}. */
+  private highlightedBody_: SolarBody | null = null;
+
   // Body taxonomy is owned by planets-bodies.ts; these aliases keep the existing
   // references terse and let the scene-iterating helpers below read naturally.
   PLANETS = PLANETS;
@@ -105,7 +108,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
           content: this.t_('help.howToUse'),
         },
       ],
-      tips: [this.t_('help.tip1'), this.t_('help.tip2')],
+      tips: [this.t_('help.tip1')],
     };
   }
 
@@ -190,6 +193,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
           settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
           // Same reason as in changePlanet: nothing else notices maxZoomDistance moved.
           this.refreshCatalogVisibility_();
+          this.updateActiveBody_();
         },
       },
     ];
@@ -209,6 +213,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
         <input id="planets-filter-input" type="text" class="planets-filter-input"
           placeholder="${this.t_('filterPlaceholder')}" autocomplete="off" spellcheck="false" />
       </div>
+      <div id="planets-filter-empty" class="kt-note planets-filter-empty" style="display: none;">${this.t_('filterNoMatches')}</div>
       ${displayGroups()
         .map((group) => this.buildSectionHtml_(group.key, group.bodies))
         .join('')}
@@ -223,9 +228,9 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     let rows = '';
 
     for (const body of bodies) {
-      rows += this.buildBodyRowHtml_(body, false);
+      rows += this.buildBodyRowHtml_(body, null);
       for (const moon of satellitesOf(body)) {
-        rows += this.buildBodyRowHtml_(moon, true);
+        rows += this.buildBodyRowHtml_(moon, body);
       }
     }
 
@@ -238,18 +243,19 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
   }
 
   /**
-   * A single body row. `isSatellite` indents it under the body above, which is what turns a
-   * flat 30-row list into a readable hierarchy.
+   * A single body row. A `parent` indents it under the body above, which is what turns a
+   * flat 30-row list into a readable hierarchy, and lets the filter keep that parent visible.
    */
-  private buildBodyRowHtml_(body: SolarBody, isSatellite: boolean): string {
+  private buildBodyRowHtml_(body: SolarBody, parent: SolarBody | null): string {
     const name = this.bodyName_(body);
     const filterKey = name.toLowerCase();
-    const satelliteClass = isSatellite ? ' planets-menu-satellite' : '';
+    const satelliteClass = parent ? ' planets-menu-satellite' : '';
+    const parentAttr = parent ? ` data-parent="${parent}"` : '';
 
     if (isPlanned(body)) {
       return (
         `<button type="button" class="kt-action planets-menu-disabled${satelliteClass}" kt-tooltip="${this.t_('tooltips.plannedFuture')}" ` +
-        `data-planet-name="${filterKey}" aria-disabled="true" disabled><span class="kt-action-label">${name}</span></button>`
+        `data-planet-name="${filterKey}"${parentAttr} aria-disabled="true" disabled><span class="kt-action-label">${name}</span></button>`
       );
     }
 
@@ -257,7 +263,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
 
     return (
       `<button type="button" class="kt-action waves-effect planets-menu-item${satelliteClass}" kt-tooltip="${centerTooltip}" ` +
-      `data-planet="${body}" data-planet-name="${filterKey}"><span class="kt-action-label">${name}</span></button>`
+      `data-planet="${body}" data-planet-name="${filterKey}"${parentAttr}><span class="kt-action-label">${name}</span></button>`
     );
   }
 
@@ -383,6 +389,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     this.isPlanetsDisabled_ = settingsManager.isDisablePlanets;
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
     EventBus.getInstance().on(EventBusEvent.endOfDraw, this.checkPlanetsDisabledState_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.endOfDraw, this.syncActiveBody_.bind(this));
   }
 
   private uiManagerFinal_(): void {
@@ -413,7 +420,11 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     this.updateActiveBody_();
   }
 
-  /** Filter the body rows by display name; hide sections that end up empty. */
+  /**
+   * Filter the body rows by display name; hide sections that end up empty. A moon that matches
+   * keeps its planet's row visible too ("Titan" alone does not say where it is), and an empty
+   * result shows a "No matching bodies" note so the panel never reads as broken.
+   */
   private applyFilter_(query: string): void {
     const contentEl = getEl('planets-menu-content');
 
@@ -422,34 +433,65 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     }
 
     const q = query.trim().toLowerCase();
+    const rows = Array.from(contentEl.querySelectorAll<HTMLElement>('.kt-action[data-planet-name]'));
+    const matches = new Set(rows.filter((row) => q === '' || (row.dataset.planetName ?? '').includes(q)));
+    const parentsOfMatches = new Set<string>();
 
-    contentEl.querySelectorAll<HTMLElement>('.kt-action[data-planet-name]').forEach((row) => {
-      const match = q === '' || (row.dataset.planetName ?? '').includes(q);
+    for (const row of matches) {
+      if (row.dataset.parent) {
+        parentsOfMatches.add(row.dataset.parent);
+      }
+    }
 
-      row.style.display = match ? '' : 'none';
-    });
+    for (const row of rows) {
+      const isParentOfMatch = Boolean(row.dataset.planet) && parentsOfMatches.has(row.dataset.planet ?? '');
+
+      row.style.display = matches.has(row) || isParentOfMatch ? '' : 'none';
+    }
 
     contentEl.querySelectorAll<HTMLElement>('.kt-section').forEach((section) => {
-      const rows = Array.from(section.querySelectorAll<HTMLElement>('.kt-action[data-planet-name]'));
-      const anyVisible = rows.some((row) => row.style.display !== 'none');
+      const sectionRows = Array.from(section.querySelectorAll<HTMLElement>('.kt-action[data-planet-name]'));
+      const anyVisible = sectionRows.some((row) => row.style.display !== 'none');
 
       section.style.display = anyVisible ? '' : 'none';
     });
+
+    const emptyEl = getEl('planets-filter-empty', true);
+
+    if (emptyEl) {
+      emptyEl.style.display = matches.size === 0 ? '' : 'none';
+    }
   }
 
   /** Highlight the row matching the currently centered body. */
   private updateActiveBody_(): void {
-    const contentEl = getEl('planets-menu-content');
+    const active = settingsManager.centerBody;
+
+    // Recorded even before the menu exists, so syncActiveBody_ cannot retry every frame;
+    // uiManagerFinal_ and every menu open repaint the rows anyway.
+    this.highlightedBody_ = active;
+
+    const contentEl = getEl('planets-menu-content', true);
 
     if (!contentEl) {
       return;
     }
 
-    const active = settingsManager.centerBody;
-
     contentEl.querySelectorAll<HTMLElement>('.planets-menu-item').forEach((row) => {
       row.classList.toggle('planets-menu-active', row.dataset.planet === active);
     });
+  }
+
+  /**
+   * Keep the highlight on the centre body however it changed. Home, a satellite pick (which
+   * re-centres on Earth in SelectSatManager), the Pro deep-space menu and the OEM reader all set
+   * `centerBody` without going through this plugin, so compare once per frame instead of hooking
+   * every writer. drawOrbits_ only swaps it to the Sun synchronously, so no frame sees that.
+   */
+  private syncActiveBody_(): void {
+    if (settingsManager.centerBody !== this.highlightedBody_) {
+      this.updateActiveBody_();
+    }
   }
 
   private checkPlanetsDisabledState_(): void {

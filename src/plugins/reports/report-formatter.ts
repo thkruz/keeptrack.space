@@ -69,10 +69,13 @@ export const resolveReportTable = (data: ReportData): ReportTable => {
  * coordinates, large ECI vectors) never break the alignment.
  */
 export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): string => {
-  const colCount = Math.max(table.headers.length, ...table.rows.map((r) => r.length), 0);
+  // The text preview prefers the UI-language overrides; CSV and JSON never read them.
+  const headers = table.display?.headers ?? table.headers;
+  const dataRows = table.display?.rows ?? table.rows;
+  const colCount = Math.max(headers.length, ...dataRows.map((r) => r.length), 0);
   const widths = new Array<number>(colCount).fill(0);
 
-  for (const row of [table.headers, ...table.rows]) {
+  for (const row of [headers, ...dataRows]) {
     row.forEach((cell, i) => {
       widths[i] = Math.max(widths[i], (cell ?? '').length);
     });
@@ -86,16 +89,16 @@ export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): str
 
   const lines: string[] = [];
 
-  if (table.headers.length > 0) {
-    const headerLine = renderRow(table.headers);
+  if (headers.length > 0) {
+    const headerLine = renderRow(headers);
 
     lines.push(headerLine, '-'.repeat(headerLine.length));
   }
 
-  if (table.rows.length === 0 && emptyMessage) {
+  if (dataRows.length === 0 && emptyMessage) {
     lines.push(emptyMessage);
   } else {
-    for (const row of table.rows) {
+    for (const row of dataRows) {
       lines.push(renderRow(row));
     }
   }
@@ -168,7 +171,8 @@ export const buildDownloadPayload = (data: ReportData, format: ReportFormat): Do
 
   switch (format) {
     case 'csv': {
-      const preamble = data.csvIncludeHeader ? headerToCsvComments(data.header) : '';
+      // CSV stays English: prefer the English header copy when the generator supplies one.
+      const preamble = data.csvIncludeHeader ? headerToCsvComments(data.csvHeader ?? data.header) : '';
       const content = preamble ? `${preamble}\n${tableToCsv(table)}` : tableToCsv(table);
 
       return { content, ext: 'csv', mime: 'text/csv;charset=utf-8' };

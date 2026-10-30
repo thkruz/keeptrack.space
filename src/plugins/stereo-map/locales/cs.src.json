@@ -25,7 +25,16 @@
         "mapStyle": "Styl mapy",
         "standard": "Standardní",
         "political": "Politická",
-        "nightLights": "Noční světla"
+        "nightLights": "Noční světla",
+        "inView": "V zorném poli",
+        "outOfView": "Mimo zorné pole"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Nepodařilo se načíst hlavní logo.",
+        "secondaryLogoFailed": "Nepodařilo se načíst vedlejší logo.",
+        "earthDrawAfterLoadFailed": "Po načtení se nepodařilo vykreslit obrázek Země na plátno: {error}",
+        "earthLoadFailed": "Obrázek Země pro stereografickou mapu se nepodařilo načíst.",
+        "earthDrawFailed": "Obrázek Země se nepodařilo vykreslit na plátno: {error}"
       }
     }
   }

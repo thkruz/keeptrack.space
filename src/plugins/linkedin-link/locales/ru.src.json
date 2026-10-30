@@ -1,7 +1,0 @@
-{
-  "plugins": {
-    "LinkedInLinkPlugin": {
-      "tooltip": "Смотреть на LinkedIn"
-    }
-  }
-}

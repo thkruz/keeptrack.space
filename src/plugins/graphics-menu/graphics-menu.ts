@@ -18,7 +18,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { collectSettingsContributions } from '@app/plugins/settings-menu/settings-contributions';
-import { attachSettingControlListeners, renderSettingsSection } from '@app/plugins/settings-menu/settings-control-renderer';
+import { attachSettingControlListeners, domIdForControl, renderSettingsSection } from '@app/plugins/settings-menu/settings-control-renderer';
 import { GraphicsSettings } from '@app/settings/graphics-settings';
 import { OrbitalSettings } from '@app/settings/orbital-settings';
 import { SettingsManager } from '@app/settings/settings';
@@ -118,6 +118,13 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
   private isPersistPending_ = false;
   private isRefreshPending_ = false;
 
+  /** Re-sync the controls every time the menu opens: the toggles and presets may have changed flags while it was closed. */
+  bottomIconCallback = (): void => {
+    if (this.isMenuButtonActive) {
+      this.renderAllSections_();
+    }
+  };
+
   getHelpConfig(): IHelpConfig {
     return {
       title: l('title'),
@@ -150,6 +157,14 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     });
     eventBus.on(EventBusEvent.settingsMenuRefresh, () => {
       this.renderAllSections_();
+    });
+    /*
+     * Other plugins (Night/Graticule toggles, Earth presets) write flags this
+     * menu also shows, then persist. Mirror the new values onto the rendered
+     * checkboxes in place, so an open menu never lies and focus is kept.
+     */
+    eventBus.on(EventBusEvent.saveSettings, () => {
+      this.syncToggleValues_();
     });
     eventBus.on(EventBusEvent.performanceDowngrade, () => {
       this.isAutoReduced_ = true;
@@ -459,6 +474,38 @@ export class GraphicsMenuPlugin extends KeepTrackPlugin {
     initMaterialSelects(getEl('graphics-menu', true) ?? document.body);
     this.applyFilter_();
     this.updateQualityDisplay_(sections.flatMap((section) => section.controls));
+  }
+
+  /**
+   * Set every rendered toggle's `checked` to its control's current value
+   * without re-rendering (no focus loss, no listener churn). Updates the
+   * quality display when anything changed.
+   */
+  private syncToggleValues_(): void {
+    if (!getEl('graphics-menu-sections', true)) {
+      return;
+    }
+
+    let isChanged = false;
+
+    for (const section of this.allSections_()) {
+      for (const control of section.controls) {
+        if (control.type !== 'toggle') {
+          continue;
+        }
+        const input = getEl(domIdForControl(section.sectionId, control.id), true) as HTMLInputElement | null;
+        const value = Boolean(control.get());
+
+        if (input && input.checked !== value) {
+          input.checked = value;
+          isChanged = true;
+        }
+      }
+    }
+
+    if (isChanged) {
+      this.updateQualityDisplay_();
+    }
   }
 
   /** Highlight the derived level (or Custom) and show the auto-reduced note. */

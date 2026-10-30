@@ -35,7 +35,10 @@
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} già nell'elenco!",
         "ObjectAlreadyInList": "Oggetto {id} già nell'elenco!",
-        "SatNotFound": "Satellite {id} non trovato!"
+        "SatNotFound": "Satellite {id} non trovato!",
+        "ListFileFormatIncorrect": "Formato del file elenco non corretto",
+        "ErrorReadingList": "Errore durante la lettura dell'elenco!",
+        "ErrorSavingList": "Errore durante il salvataggio dell'elenco!"
       },
       "settings": {
         "satLabelMode": {
@@ -51,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "Aggiungi alla lista di osservazione",
         "removeFromWatchlist": "Rimuovi dalla lista di osservazione"
+      },
+      "infoBox": {
+        "addLabel": "Aggiungi alla lista di osservazione",
+        "removeLabel": "Rimuovi dalla lista di osservazione"
       }
     },
     "WatchlistOverlay": {

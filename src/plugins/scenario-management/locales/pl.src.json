@@ -39,7 +39,11 @@
         "endDateInvalid": "Data końcowa jest nieprawidłowa.",
         "savingScenario": "Błąd podczas zapisywania scenariusza!",
         "loadingScenarioFile": "Błąd podczas wczytywania pliku scenariusza!",
-        "decompressingScenarioFile": "Błąd podczas dekompresji pliku scenariusza!"
+        "decompressingScenarioFile": "Błąd podczas dekompresji pliku scenariusza!",
+        "startAfterEnd": "Czas rozpoczęcia scenariusza musi być wcześniejszy niż czas zakończenia.",
+        "invalidDates": "Czas rozpoczęcia i zakończenia scenariusza musi być prawidłową datą.",
+        "bothBoundsRequired": "Należy ustawić zarówno czas rozpoczęcia, jak i zakończenia scenariusza.",
+        "nameTooLong": "Nazwa scenariusza może mieć najwyżej 30 znaków."
       },
       "defaults": {
         "scenarioName": "Mój scenariusz",

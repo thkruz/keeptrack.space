@@ -55,14 +55,27 @@ const KEY_DISPLAY_NAMES: Record<string, string> = {
   Escape: 'Esc',
 };
 
+/** A single ASCII letter key ('f', 'F'). Ctrl/Alt chords of these are browser/OS shortcuts. */
+const LETTER_KEY_PATTERN = /^[a-z]$/iu;
+/** An uppercase ASCII letter: `event.key` is uppercase only while Shift is held. */
+const UPPERCASE_LETTER_PATTERN = /^[A-Z]$/u;
+
+/** The modifier requirements a shortcut really has once the letter-key defaults are applied. */
+export interface ResolvedModifiers {
+  ctrl: boolean | undefined;
+  shift: boolean | undefined;
+  alt: boolean | undefined;
+}
+
 /**
  * Central registry for keyboard shortcuts across all plugins.
  * Detects and warns about conflicting shortcuts at registration time.
  *
  * Two shortcuts conflict when they share the same key (or code) and their
  * modifier patterns overlap. Modifier matching uses the same semantics as
- * KeyboardComponent: `undefined` means "don't care" and overlaps with both
- * `true` and `false`.
+ * KeyboardComponent (both go through {@link KeyboardShortcutRegistry.resolveModifiers}):
+ * `undefined` means "don't care" and overlaps with both `true` and `false`,
+ * EXCEPT Ctrl and Alt on a letter key, where `undefined` means "not held".
  */
 export class KeyboardShortcutRegistry {
   private static readonly instance_ = new KeyboardShortcutRegistry();
@@ -121,11 +134,34 @@ export class KeyboardShortcutRegistry {
       return false;
     }
 
+    const modsA = KeyboardShortcutRegistry.resolveModifiers(a);
+    const modsB = KeyboardShortcutRegistry.resolveModifiers(b);
+
     return (
-      KeyboardShortcutRegistry.modifiersOverlap_(a.ctrl, b.ctrl) &&
-      KeyboardShortcutRegistry.modifiersOverlap_(a.shift, b.shift) &&
-      KeyboardShortcutRegistry.modifiersOverlap_(a.alt, b.alt)
+      KeyboardShortcutRegistry.modifiersOverlap_(modsA.ctrl, modsB.ctrl) &&
+      KeyboardShortcutRegistry.modifiersOverlap_(modsA.shift, modsB.shift) &&
+      KeyboardShortcutRegistry.modifiersOverlap_(modsA.alt, modsB.alt)
     );
+  }
+
+  /**
+   * The effective modifier requirements of a shortcut, shared by the conflict
+   * detector and the runtime matcher (KeyboardComponent) so the two never drift.
+   *
+   * An omitted modifier is a wildcard ("don't care"), with one exception: on a
+   * single letter key an omitted Ctrl or Alt means "must NOT be held". A plain
+   * `{ key: 'f' }` therefore fires on F only, never on Ctrl+F (the browser's find,
+   * and Find Satellite's chord) or Alt+F. Non-letter keys keep the wildcard so
+   * AltGr layouts (which report Ctrl+Alt for `[`, `{`, `@`...) still work.
+   */
+  static resolveModifiers(shortcut: IKeyboardShortcut): ResolvedModifiers {
+    const isLetter = typeof shortcut.key === 'string' && LETTER_KEY_PATTERN.test(shortcut.key);
+
+    return {
+      ctrl: shortcut.ctrl ?? (isLetter ? false : undefined),
+      shift: shortcut.shift,
+      alt: shortcut.alt ?? (isLetter ? false : undefined),
+    };
   }
 
   /**
@@ -166,36 +202,43 @@ export class KeyboardShortcutRegistry {
   }
 
   /**
-   * The key chips for a shortcut, modifiers first (e.g. ["Ctrl", "Shift", "F"]).
-   * Omitted modifiers are not required and are not shown.
+   * The key chips for a shortcut, modifiers first (e.g. ["Ctrl", "Shift", "F"]),
+   * naming the chord the user really presses. Omitted modifiers are not required
+   * and are not shown, except that an uppercase letter key implies Shift
+   * (`{ key: 'N' }` is pressed as Shift+N). Letters show as key caps (uppercase),
+   * so `{ key: 'f' }` reads "F".
    */
   static formatShortcutKeys(shortcut: IKeyboardShortcut): string[] {
     const parts: string[] = [];
+    const key = shortcut.key ?? '';
+    const isUppercaseLetter = UPPERCASE_LETTER_PATTERN.test(key);
 
     if (shortcut.ctrl === true) {
       parts.push('Ctrl');
     }
-    if (shortcut.shift === true) {
+    if (shortcut.shift === true || (isUppercaseLetter && shortcut.shift !== false)) {
       parts.push('Shift');
     }
     if (shortcut.alt === true) {
       parts.push('Alt');
     }
-    parts.push(KEY_DISPLAY_NAMES[shortcut.key] ?? shortcut.key);
+    parts.push(KEY_DISPLAY_NAMES[key] ?? (LETTER_KEY_PATTERN.test(key) ? key.toUpperCase() : key));
 
     return parts;
   }
 
   /**
-   * Format a shortcut as a human-readable string (e.g. "Ctrl+Shift+F").
-   * Omitted modifiers are treated as not required and are not shown.
+   * Format a shortcut as a human-readable string (e.g. "Ctrl+Shift+F", "Shift+N").
+   * Omitted modifiers are treated as not required and are not shown (an uppercase
+   * letter still shows its implied Shift).
    */
   static formatShortcut(shortcut: IKeyboardShortcut): string {
     return KeyboardShortcutRegistry.formatShortcutKeys(shortcut).join('+');
   }
 
   /**
-   * Check if two modifier requirements can be satisfied by the same key event.
+   * Check if two modifier requirements (already passed through
+   * {@link resolveModifiers}) can be satisfied by the same key event.
    *
    * This MUST mirror the runtime matcher in KeyboardComponent, which treats an
    * `undefined` modifier as a wildcard ("don't care") that matches whether or

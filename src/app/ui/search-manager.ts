@@ -2,11 +2,13 @@ import { GroupType, ObjectGroup } from '@app/app/data/object-group';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeyboardComponent } from '@app/engine/plugins/components/keyboard/keyboard-component';
+import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { TranslationKey, t7e } from '@app/locales/keys';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -20,7 +22,7 @@ import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import { runNumOnlySearch, runRegularSearch } from './search-query';
+import { isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -50,7 +52,8 @@ export enum SearchResultType {
  * It provides methods for performing searches, hiding search results, and retrieving information
  * about the current search state.
  */
-const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
+/** Field-match badges: short codes, the same in every language. */
+const SEARCH_TYPE_LABELS: Partial<Record<SearchResultType, string>> = {
   [SearchResultType.BUS]: 'BUS',
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
@@ -59,15 +62,45 @@ const SEARCH_TYPE_LABELS: Record<SearchResultType, string> = {
   [SearchResultType.INTLDES]: 'INTL',
   [SearchResultType.LAUNCH_VEHICLE]: 'LV',
   [SearchResultType.MISSILE]: 'MISSILE',
-  [SearchResultType.STAR]: 'STAR',
-  [SearchResultType.SENSOR]: 'SENSOR',
-  [SearchResultType.LAUNCH_SITE]: 'SITE',
-  [SearchResultType.PLANET]: 'PLANET',
+};
+
+/** Object-kind badges: translated names (the badge CSS upper-cases them). */
+const SEARCH_TYPE_LABEL_KEYS: Partial<Record<SearchResultType, TranslationKey>> = {
+  [SearchResultType.STAR]: 'searchManager.typeStar',
+  [SearchResultType.SENSOR]: 'searchManager.typeSensor',
+  [SearchResultType.LAUNCH_SITE]: 'searchManager.typeLaunchSite',
+  [SearchResultType.PLANET]: 'searchManager.typePlanet',
+};
+
+/** The text of a search result row's type badge. */
+export const searchTypeBadgeLabel = (searchType: SearchResultType): string => {
+  const key = SEARCH_TYPE_LABEL_KEYS[searchType];
+
+  return key ? t7e(key) : (SEARCH_TYPE_LABELS[searchType] ?? '');
 };
 
 export class SearchManager {
+  /** Body class that lets CSS move the toast stack off the open results list. */
+  static readonly RESULTS_OPEN_BODY_CLASS = 'search-results-open';
+
   isSearchOpen = false;
-  isResultsOpen = false;
+  private isResultsOpen_ = false;
+
+  get isResultsOpen(): boolean {
+    return this.isResultsOpen_;
+  }
+
+  /**
+   * Plugins (Watchlist) set this directly, so the body class is kept in sync
+   * here rather than at each slideIn/slideOut call site. The toast stack sits
+   * top-right, exactly where the results list docks, and its cards covered and
+   * swallowed clicks on the first result rows.
+   */
+  set isResultsOpen(isOpen: boolean) {
+    this.isResultsOpen_ = isOpen;
+    document.body?.classList.toggle(SearchManager.RESULTS_OPEN_BODY_CLASS, isOpen);
+  }
+
   private lastResultGroup_: ObjectGroup<GroupType> | null = null;
   private selectedIndex_ = -1;
 
@@ -79,16 +112,20 @@ export class SearchManager {
     uiWrapper!.prepend(searchResults);
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.addListeners_.bind(this));
+    // A filter change can hide (or reveal) objects in the open results, so re-run the search.
+    EventBus.getInstance().on(EventBusEvent.filterChanged, () => this.refreshForFilterChange_());
 
     this.setupTopMenu_();
     this.setupKeyboardShortcut_();
   }
 
+  /** The chord that toggles and focuses search (Shift+F); also named in the search box placeholder. */
+  private static readonly SEARCH_SHORTCUT_: Pick<IKeyboardShortcut, 'key' | 'ctrl'> = { key: 'F', ctrl: false };
+
   private setupKeyboardShortcut_() {
     const keyboard = new KeyboardComponent('SearchManager', [
       {
-        key: 'F',
-        ctrl: false,
+        ...SearchManager.SEARCH_SHORTCUT_,
         description: t7e('keyboard.descriptions.toggleSearch' as TranslationKey),
         callback: () => {
           this.toggleSearch();
@@ -111,7 +148,7 @@ export class SearchManager {
       order: 5,
       class: 'top-menu-icons__blue-img',
       icon: searchPng,
-      tooltip: 'Search',
+      tooltip: t7e('pluginDrawer.search' as TranslationKey),
     });
   }
 
@@ -217,17 +254,49 @@ export class SearchManager {
       }
     });
 
-    // Add keyboard hint to search placeholder (skip on mobile — no keyboard)
+    // Add keyboard hint to search placeholder (skip on mobile: no keyboard)
     if (!settingsManager.isMobileModeEnabled) {
       const searchInput = getEl('search') as HTMLInputElement | null;
 
       if (searchInput) {
-        const currentPlaceholder = searchInput.placeholder;
-
-        if (!currentPlaceholder.includes('(F)')) {
-          searchInput.placeholder = `${currentPlaceholder} (F)`;
-        }
+        searchInput.placeholder = SearchManager.placeholderWithHint(searchInput.placeholder);
       }
+    }
+  }
+
+  /**
+   * The search placeholder plus the real chord that focuses search, e.g. "Search... (Shift+F)".
+   * Built from the registered shortcut so it can never name the wrong key again.
+   */
+  static placeholderWithHint(placeholder: string): string {
+    const hint = `(${KeyboardShortcutRegistry.formatShortcut({ ...SearchManager.SEARCH_SHORTCUT_, callback: () => undefined })})`;
+
+    return placeholder.includes(hint) ? placeholder : `${placeholder} ${hint}`;
+  }
+
+  /**
+   * Drops blank tokens from a comma list ("1,,2," -> "1,2"). Groups whose members have
+   * no catalog number (JSC Vimpel, the Unknown country bucket) used to write them.
+   * `keepTrailingComma` keeps one trailing comma so a user typing "25544," is not
+   * interrupted mid-list.
+   */
+  static dropBlankTokens(searchString: string, keepTrailingComma = false): string {
+    const tokens = searchString.split(',');
+    const cleaned = tokens.filter((token) => token.trim().length > 0).join(',');
+    const hasTrailingComma = tokens.length > 1 && tokens[tokens.length - 1].trim().length === 0;
+
+    return keepTrailingComma && hasTrailingComma && cleaned.length > 0 ? `${cleaned},` : cleaned;
+  }
+
+  /** Re-runs the current search after a Filter Menu change, so hidden objects leave the results. */
+  private refreshForFilterChange_(): void {
+    if (!this.isResultsOpen) {
+      return;
+    }
+    const current = this.getCurrentSearch();
+
+    if (current.length > 0) {
+      this.doSearch(current);
     }
   }
 
@@ -352,7 +421,14 @@ export class SearchManager {
       const groupManagerInstance = ServiceLocator.getGroupsManager();
       const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-      slideOutUp(getEl('search-results')!, 200);
+      const resultsEl = getEl('search-results', true);
+
+      if (resultsEl) {
+        slideOutUp(resultsEl, 200);
+        // Drop the old rows too: a hidden box full of stale rows still answered keyboard navigation and
+        // showed again on the next open.
+        resultsEl.innerHTML = '';
+      }
       groupManagerInstance.clearSelect();
       this.isResultsOpen = false;
 
@@ -381,7 +457,18 @@ export class SearchManager {
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     this.selectedIndex_ = -1;
 
+    const searchInput = getEl('search', true);
+    const isUserTyping = typeof document !== 'undefined' && searchInput !== null && document.activeElement === searchInput;
+
+    searchString = SearchManager.dropBlankTokens(searchString, isUserTyping);
+
     if (searchString === '') {
+      const emptiedDom = getEl('search', true) as HTMLInputElement | null;
+
+      // A list of only blank tokens must not linger in the box.
+      if (emptiedDom && emptiedDom.value.trim().replace(/,/gu, '') === '') {
+        emptiedDom.value = '';
+      }
       this.hideResults();
       EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
@@ -416,7 +503,12 @@ export class SearchManager {
      * Don't search for things until at least the minimum characters
      * are typed otherwise there are just too many search results.
      */
-    if (searchString.length <= settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
+    if (searchString.length < settingsManager.minimumSearchCharacters && searchString !== 'RV_') {
+      // The open rows belong to an earlier, longer query: drop them rather than show stale results.
+      if (this.isResultsOpen) {
+        this.hideResults();
+      }
+
       return;
     }
 
@@ -476,8 +568,8 @@ export class SearchManager {
 
     if (idList.length === 0) {
       // lastSearch is the term list, so test the typed string's length instead.
-      if (searchString_.length > settingsManager.minimumSearchCharacters) {
-        uiManagerInstance.toast('No Results Found', ToastMsgType.serious, false);
+      if (searchString_.length >= settingsManager.minimumSearchCharacters) {
+        uiManagerInstance.toast(t7e('searchManager.noResults' as TranslationKey), ToastMsgType.serious, false);
       }
       this.hideResults();
     }
@@ -528,11 +620,12 @@ export class SearchManager {
     htmlStr += results.reduce((html, result) => {
       const obj = <Satellite | OemSatellite | MissileObject>satData[result.id];
       const pos = dotsManagerInstance.positionData ? dotsManagerInstance.getCurrentPosition(Number(obj.id)) : null;
-      const isDecayed = pos?.x === 0 && pos?.y === 0 && pos?.z === 0;
+      // OEM objects are placed on the main thread; a (0, 0, 0) slot between a cruncher message and the next frame is not a decay.
+      const isDecayed = !isNeverDecayed(obj) && pos?.x === 0 && pos?.y === 0 && pos?.z === 0;
       const decayedClass = isDecayed ? ' search-result-decayed' : '';
 
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;
-      html += `<span class="search-type-badge">${SEARCH_TYPE_LABELS[result.searchType] ?? ''}</span>`;
+      html += `<span class="search-type-badge">${searchTypeBadgeLabel(result.searchType)}</span>`;
       html += '<div class="truncate-search">';
 
       // Left half of search results
@@ -597,16 +690,17 @@ export class SearchManager {
         case SearchResultType.INTLDES:
           {
             const sat = obj as Satellite;
-            // If the international designator matched
+            // If the international designator matched (synthetic JSC Vimpel objects have none)
+            const intlDes = sat.intlDes ?? '';
 
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += sat.intlDes.substring(0, result.strIndex);
+            html += intlDes.substring(0, result.strIndex);
             html += '<span class="search-hilight">';
-            html += sat.intlDes.substring(result.strIndex, result.strIndex + result.patlen);
+            html += intlDes.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
-            html += sat.intlDes.substring(result.strIndex + result.patlen);
+            html += intlDes.substring(result.strIndex + result.patlen);
           }
           break;
         case SearchResultType.BUS:
@@ -646,24 +740,25 @@ export class SearchManager {
           }
           break;
         case SearchResultType.STAR:
-          html += 'Star';
+          html += t7e('searchManager.typeStar' as TranslationKey);
           break;
         case SearchResultType.SENSOR:
-          html += (obj as unknown as DetailedSensor).country ?? 'Sensor';
+          html += (obj as unknown as DetailedSensor).country ?? t7e('searchManager.typeSensor' as TranslationKey);
           break;
         case SearchResultType.LAUNCH_SITE:
-          html += (obj as unknown as LaunchSite).country ?? 'Launch Site';
+          html += (obj as unknown as LaunchSite).country ?? t7e('searchManager.typeLaunchSite' as TranslationKey);
           break;
         case SearchResultType.PLANET:
-          html += 'Planet';
+          html += t7e('searchManager.typePlanet' as TranslationKey);
           break;
         default:
           if (obj instanceof MissileObject) {
             html += obj.desc;
           } else if (obj instanceof Star) {
-            html += 'Star';
+            html += t7e('searchManager.typeStar' as TranslationKey);
           } else if (obj instanceof OemSatellite) {
-            html += (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
+            // A NORAD id (mission catalog or OEM comment) is shown like any catalog row; otherwise the OEM OBJECT_ID.
+            html += (obj as OemSatellite).sccNum || (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
           } else {
             html += (obj as Satellite).sccNum;
           }
@@ -672,7 +767,7 @@ export class SearchManager {
 
       html += '</div>';
       if (isDecayed) {
-        html += '<div class="search-result-decayed-badge">Decayed</div>';
+        html += `<div class="search-result-decayed-badge">${t7e('searchManager.decayed' as TranslationKey)}</div>`;
       }
       html += '</div>';
 
@@ -750,7 +845,7 @@ export class SearchManager {
     if (searchDom) {
       const curSearch = searchDom.value;
 
-      if (curSearch.length > settingsManager.minimumSearchCharacters) {
+      if (curSearch.length >= settingsManager.minimumSearchCharacters) {
         this.doSearch(curSearch);
       }
     }

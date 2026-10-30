@@ -283,5 +283,59 @@
     "ZA": "South Africa",
     "ZR": "Zaire",
     "ZW": "Zimbabwe"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Space Surveillance Network Sensors",
+      "topLink": "All Space Surveillance Network Sensors"
+    },
+    "mw": {
+      "header": "US Missile Warning Sensors",
+      "topLink": "All Missile Warning Sensors"
+    },
+    "md": {
+      "header": "US Missile Defense Agency Sensors",
+      "topLink": "All Missile Defense Sensors"
+    },
+    "OWL-Net": {
+      "header": "OWL-Net Sensors",
+      "topLink": "All OWL-Net Sensors"
+    },
+    "leolabs": {
+      "header": "LeoLabs Sensors",
+      "topLink": "All LeoLabs Sensors"
+    },
+    "esoc": {
+      "header": "European Space Operations Centre Sensors",
+      "topLink": "All ESOC Sensors"
+    },
+    "rus": {
+      "header": "Russian Sensors",
+      "topLink": "All Russian Sensors"
+    },
+    "prc": {
+      "header": "Chinese Sensors",
+      "topLink": "All Chinese Sensors"
+    },
+    "other": {
+      "header": "Other Sensors",
+      "topLink": "Other Sensors"
+    },
+    "dsn": {
+      "header": "NASA Deep Space Network",
+      "topLink": "All Deep Space Network Complexes"
+    },
+    "scn": {
+      "header": "Satellite Control Network (AFSCN)",
+      "topLink": "All Remote Tracking Stations"
+    },
+    "estrack": {
+      "header": "ESA Tracking Network (ESTRACK)",
+      "topLink": "All ESTRACK Stations"
+    },
+    "galileo": {
+      "header": "Galileo Ground Segment",
+      "topLink": "All Galileo Ground Stations"
+    }
   }
 }

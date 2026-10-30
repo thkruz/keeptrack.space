@@ -29,7 +29,7 @@
         "apogeeKm": "Apogeum (km)",
         "perigeeKm": "Perigeum (km)",
         "smaKm": "Hlavní poloosa (km)",
-        "velocityKms": "Orbitální rychlost (km/s)",
+        "velocityKms": "Rychlost v epoše (km/s)",
         "sectionIdentity": "Identita",
         "sectionOrbit": "Oběžná dráha",
         "sectionEpoch": "Epocha",
@@ -74,10 +74,21 @@
         "invalidPeriod": "Neplatná perioda. Musí být ve formátu NN.NNNN až NNNN.NNNN (např. 90.0000, 9999.9999) s celkem 8 číslicemi.",
         "invalidSource": "Neplatný zdroj. Nesmí být prázdný.",
         "invalidName": "Neplatný název. Nesmí být prázdný.",
-        "slotOccupied": "Přepisuje se stávající satelit {name} ve slotu {scc}.",
         "noFreeSlots": "Nezbývají žádné volné analytické sloty (90000-99999 jsou všechny obsazené).",
         "noSatSelected": "Nejprve vyberte satelit ke klonování.",
-        "tleChecksumMismatch": "Kontrolní součet řádku {line} TLE je {actual}, ale měl by být {expected}. Může jít o překlep. Pokračuje se i přesto."
+        "tleChecksumMismatch": "Kontrolní součet řádku {line} TLE je {actual}, ale měl by být {expected}. Může jít o překlep. Pokračuje se i přesto.",
+        "periodToMeanMotionFailed": "Chyba při převodu periody na střední pohyb",
+        "meanMotionToPeriodFailed": "Chyba při převodu středního pohybu na periodu: {error}",
+        "satrecFailed": "Chyba při vytváření záznamu družice!",
+        "cruncherFailed": "Zpráva pro Sat Cruncher selhala",
+        "orbitBufferFailed": "Změna dat vyrovnávací paměti oběžné dráhy selhala",
+        "createFailed": "Družici se nepodařilo vytvořit: {error}",
+        "rangeError": "{field} musí být mezi {min} a {max}.",
+        "rangeErrorDeg": "{field} musí být mezi {min} a {max} stupni.",
+        "meanMotionRange": "{field} musí být větší než 0 a nejvýše {max} oběhů za den.",
+        "periodPositive": "{field} musí být kladný počet minut.",
+        "numberRequired": "{field} musí být číslo.",
+        "noradIdReserved": "NORAD ID {id} používá trajektorie startu. Zvolte jiné ID nebo nejprve trajektorii odeberte."
       },
       "successMsgs": {
         "satCreated": "Satelit {name} ({scc}) byl úspěšně vytvořen",
@@ -90,7 +101,7 @@
         "tabsHeading": "Karty Základní a Pokročilé",
         "tabs": "Karta <strong>Základní</strong> vyžaduje pouze NORAD ID, název a pole <strong>Inklinace</strong>, <strong>Výška apogea</strong> a <strong>Výška perigea</strong>; zbytek orbity se odvodí automaticky. Karta <strong>Pokročilé</strong> zpřístupňuje úplnou sadu elementů: <strong>Typ objektu</strong>, <strong>Země</strong>, epochu a pole <strong>Rektascenze</strong>, <strong>Excentricita</strong>, <strong>Argument perigea</strong>, <strong>Střední anomálie</strong> a <strong>Střední pohyb</strong> nebo <strong>Perioda</strong> (úprava jednoho přepočítá druhé). Panel <strong>Vypočtené parametry</strong> průběžně ukazuje výsledné apogeum, perigeum, hlavní poloosu a orbitální rychlost.",
         "howToUse": "<ol><li>Otevřete menu <strong>Vytvořit satelit</strong> z panelu.</li><li>Zvolte volné NORAD ID mezi 90000 a 99999 a pojmenujte satelit.</li><li>Na kartě <strong>Základní</strong> zadejte inklinaci, apogeum a perigeum; nebo přepněte na kartu <strong>Pokročilé</strong> pro úplnou sadu elementů.</li><li>Klikněte na <strong>Vytvořit satelit</strong>. Nový objekt se okamžitě objeví a potvrzovací oznámení zobrazí jeho název a číslo.</li><li>Pomocí <strong>Uložit TLE</strong> exportujete elementy vytvořeného satelitu do souboru, který lze později znovu načíst.</li></ol>",
-        "tip1": "Každé pole je validováno s konkrétní chybovou zprávou; pokud vytvoření selže, oznámení vám přesně řekne, kterou hodnotu opravit.",
+        "tip1": "Každé neplatné pole je uvedeno nad tlačítkem Vytvořit satelit a označeno ve formuláři. Každá zpráva zmizí, jakmile dané pole opravíte.",
         "tip2": "Perigeum pod zhruba 100 km je odmítnuto, protože satelit by okamžitě zanikl.",
         "tip3": "Vytvořené satelity platí jen pro aktuální relaci; pokud si chcete objekt ponechat na jindy, exportujte TLE."
       },
@@ -103,6 +114,13 @@
         "gto": "Přechodová ke GEO (GTO)",
         "molniya": "Molnija",
         "polar": "Polární (600 km)"
+      },
+      "confirm": {
+        "title": "Nahradit družici?",
+        "message": "Nahradit {name} s analytickým ID {scc}?",
+        "replace": "Nahradit",
+        "cancel": "Zrušit",
+        "changed": "Družice nebo formulář se změnily. Zkontrolujte je a odešlete znovu."
       }
     }
   }

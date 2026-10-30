@@ -19,7 +19,8 @@
         "daylightOnly": "仅白天",
         "nadirReadout": "星下点幅宽约 {km} km (视场角 {fov}°)",
         "nadirReadoutUnknown": "无法计算此轨道的星下点幅宽",
-        "presetsIllustrative": "预设仅为示意，并非公开发布的规格。"
+        "presetsIllustrative": "预设仅为示意，并非公开发布的规格。",
+        "close": "关闭"
       },
       "presets": {
         "hrEo": "高分辨率光学",

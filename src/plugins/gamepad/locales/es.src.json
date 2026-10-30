@@ -2,7 +2,8 @@
   "plugins": {
     "GamepadPlugin": {
       "connected": "Mando conectado",
-      "disconnected": "Mando desconectado"
+      "disconnected": "Mando desconectado",
+      "notSupported": "Este mando no es compatible. Abre una incidencia en GitHub indicando el modelo del mando para que se añada."
     }
   }
 }

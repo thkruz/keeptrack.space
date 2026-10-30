@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "KTOC Notices",
+      "title": "KTOC Notices",
+      "shortcutToggle": "Open or close KTOC Notices",
+      "commands": {
+        "open": "Open KTOC Notices",
+        "forSelected": "KTOC notices for selected satellite"
+      },
+      "sections": {
+        "filters": "Filters",
+        "notices": "Notices"
+      },
+      "labels": {
+        "statusFilter": "Notice status",
+        "all": "All",
+        "activeOnly": "Active only",
+        "eventType": "Event type",
+        "allTypes": "All event types",
+        "showAllSatellites": "Show all satellites",
+        "noradFilter": "Showing notices for NORAD {norad}",
+        "previous": "Previous",
+        "next": "Next",
+        "pageOf": "Page {current} of {total}",
+        "refresh": "Refresh",
+        "issuer": "Issued by KTOC (KeepTrack Operations Center)",
+        "loading": "Loading KTOC notices...",
+        "empty": "KTOC has not published any notices yet.",
+        "emptyForNorad": "KTOC has not published any notices for NORAD {norad}.",
+        "noMatches": "No notices match these filters.",
+        "openNotice": "Open the full notice on keeptrack.space"
+      },
+      "table": {
+        "event": "Event",
+        "date": "Date (UTC)",
+        "satellite": "Satellite",
+        "type": "Type",
+        "status": "Status",
+        "notice": "Notice"
+      },
+      "types": {
+        "relocation": "Relocation",
+        "departure": "Departure",
+        "arrival": "Arrival",
+        "disposal": "Disposal",
+        "fragmentation": "Fragmentation",
+        "breakup": "Breakup",
+        "debrisShed": "Debris Shed",
+        "proximity": "Proximity Operations",
+        "deployment": "Deployment",
+        "maneuver": "Maneuver",
+        "drift": "Drift",
+        "reentry": "Reentry",
+        "other": "Other event"
+      },
+      "statuses": {
+        "confirmed": "Confirmed",
+        "potential": "Potential",
+        "canceled": "Canceled",
+        "unknown": "Unknown status"
+      },
+      "values": {
+        "eventNumber": "Event {num}",
+        "unnumbered": "Unnumbered",
+        "unknownDate": "Unknown date",
+        "noReason": "Canceled by KTOC."
+      },
+      "errorMsgs": {
+        "fetchFailed": "KTOC notices did not load ({detail}). Select Refresh to try again.",
+        "refreshFailedKeep": "Refresh failed ({detail}). Showing the previous list.",
+        "networkDetail": "network error",
+        "notInCatalog": "NORAD {norad} is not in the loaded catalog."
+      },
+      "infoBox": {
+        "title": "KTOC Notices",
+        "titleWithCount": "KTOC Notices ({count})",
+        "showAll": "Show all {count} in KTOC Notices"
+      },
+      "help": {
+        "overview": "KTOC Notices lists every event notice published by KTOC (KeepTrack Operations Center): relocations, departures, fragmentations and other changes KTOC detects in the public catalog. Each notice links to its full analysis on keeptrack.space.",
+        "statusesHeading": "Notice statuses",
+        "statuses": "<ul><li><strong>Potential</strong>: KTOC published the event from the first data that showed it.</li><li><strong>Confirmed</strong>: newer data matched the published event.</li><li><strong>Canceled</strong>: newer data contradicted the event. The row is struck through; hover the status to read the reason.</li></ul>",
+        "howToUse": "<ol><li>Open <strong>KTOC Notices</strong> from the drawer (Events mode). The newest 100 notices load, newest event first.</li><li>Choose <strong>All</strong> or <strong>Active only</strong>, and pick an event type to narrow the list.</li><li>Click a row to select the satellite and move the clock to the event time. Play or pause stays as it was.</li><li>Click the link icon to open the full notice on keeptrack.space in a new tab.</li><li>Select <strong>Refresh</strong> to load the latest notices.</li></ol>",
+        "tip1": "Selecting a satellite with notices adds a KTOC Notices card to the satellite info box.",
+        "tip2": "Use the command palette entry \"KTOC notices for selected satellite\" to list every notice for the current selection.",
+        "tip3": "A row for a satellite that is not in the loaded catalog still opens its notice; it cannot be selected in the 3D view."
+      }
+    }
+  }
+}

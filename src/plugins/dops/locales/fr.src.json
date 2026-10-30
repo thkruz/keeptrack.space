@@ -31,7 +31,7 @@
         "twentyFourHourGpsDops": "DOP GPS sur 24 heures"
       },
       "toast": {
-        "dopValues": "HDOP : {hdop}<br/>VDOP : {vdop}<br/>PDOP : {pdop}<br/>GDOP : {gdop}<br/>TDOP : {tdop}"
+        "dopValues": "HDOP : {hdop} | VDOP : {vdop} | PDOP : {pdop} | GDOP : {gdop} | TDOP : {tdop}"
       },
       "errorMsgs": {
         "invalidLocation": "Veuillez sélectionner un emplacement valide sur Terre pour les DOP sur 24 heures !"

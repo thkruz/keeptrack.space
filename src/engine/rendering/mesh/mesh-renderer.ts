@@ -1,6 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { mat4 } from 'gl-matrix';
 import { OBJ } from 'webgl-obj-loader';
 import { DepthManager } from '../depth-manager';
@@ -224,7 +225,7 @@ export class MeshRenderer {
     gl.linkProgram(this.program_);
 
     if (!gl.getProgramParameter(this.program_, gl.LINK_STATUS)) {
-      errorManagerInstance.warn('Could not initialise shaders');
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.shaderInitFailed'));
     }
     gl.useProgram(this.program_);
 
@@ -265,7 +266,7 @@ export class MeshRenderer {
 
   private applyAttributePointers_(model: MeshModel) {
     if (!model.mesh || !model.layout) {
-      errorManagerInstance.warn('Mesh model is not defined. Cannot apply attribute pointers.');
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.meshModelUndefined'));
 
       return;
     }
@@ -301,7 +302,7 @@ export class MeshRenderer {
           gl.disableVertexAttribArray(this.attrIndices_[attrName]);
         }
       } else if (this.numOfWarnings_ < 10) {
-        errorManagerInstance.warn(`Shader attribute "${attrName}" not found in shader. Is it undeclared or unused in the shader code?`);
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.shaderAttributeMissing').replace('{attr}', attrName));
         this.numOfWarnings_++;
       }
     }

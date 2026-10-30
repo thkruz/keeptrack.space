@@ -44,7 +44,11 @@
         "reasonMaxEl": "Elevation {{value}} über Max. {{limit}}",
         "reasonMask": "Elevation {{value}} unter der Horizontmaske {{limit}}",
         "reasonAzimuth": "Azimut {{value}} außerhalb {{min}} bis {{max}}",
-        "reasonCone": "Außerhalb des Sensor-Blickkegels"
+        "reasonCone": "Außerhalb des Sensor-Blickkegels",
+        "unknown": "Unbekannt",
+        "notApplicable": "k. A.",
+        "notApplicableOem": "k. A. (OEM)",
+        "notInOrbitToast": "Satellit {sccNum} befindet sich nicht im Orbit!<br>Die Simulationszeit ist {simTime}.<br>Prüfen Sie, ob Sie das richtige TLE haben."
       }
     }
   }

@@ -11,7 +11,7 @@ import { t7e } from '@app/locales/keys';
 import videoSettingsPng from '@public/img/icons/video-settings.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import './video-director.css';
-import { DIRECTION_TOGGLES, getOppositeToDisable, parseSpeed, ROTATE_TOGGLE_IDS, SPEED_CONFIGS } from './video-director-core';
+import { DIRECTION_TOGGLES, getOppositeToDisable, parseSpeed, ROTATE_TOGGLE_IDS, SPEED_CONFIGS, speedDefault } from './video-director-core';
 
 /**
  * /////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
         <form id="video-director-form">
           <section class="kt-section">
             <div class="kt-section-label">${l('labels.rotate')}</div>
-            ${speedField('video-director-rotateSpeed', '0.000075', 'labels.rotateSpeed')}
+            ${speedField('video-director-rotateSpeed', String(speedDefault('autoRotateSpeed')), 'labels.rotateSpeed')}
             ${lever('video-director-rotateL', 'labels.rotateLeft', true)}
             ${lever('video-director-rotateR', 'labels.rotateRight')}
             ${lever('video-director-rotateU', 'labels.rotateUp')}
@@ -97,7 +97,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
           </section>
           <section class="kt-section">
             <div class="kt-section-label">${l('labels.pan')}</div>
-            ${speedField('video-director-panSpeed', '0.05', 'labels.panSpeed')}
+            ${speedField('video-director-panSpeed', String(speedDefault('autoPanSpeed')), 'labels.panSpeed')}
             ${lever('video-director-panL', 'labels.panLeft')}
             ${lever('video-director-panR', 'labels.panRight')}
             ${lever('video-director-panU', 'labels.panUp')}
@@ -105,7 +105,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
           </section>
           <section class="kt-section">
             <div class="kt-section-label">${l('labels.zoom')}</div>
-            ${speedField('video-director-zoomSpeed', '0.0005', 'labels.zoomSpeed')}
+            ${speedField('video-director-zoomSpeed', String(speedDefault('autoZoomSpeed')), 'labels.zoomSpeed')}
             ${lever('video-director-zoomIn', 'labels.zoomIn')}
             ${lever('video-director-zoomOut', 'labels.zoomOut')}
           </section>
@@ -208,7 +208,7 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
 
     this.applySpeeds_();
     this.applyDirectionFlags_();
-    this.applySelectedDot_();
+    this.applySelectedDot_(elementId === 'video-director-selectedColor');
     this.applySceneToggle_(elementId);
   };
 
@@ -240,14 +240,21 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     });
   }
 
-  /** Hide or restore the selected-satellite highlight dot for clean footage. */
-  private applySelectedDot_(): void {
-    const isHide = (getEl('video-director-selectedColor') as HTMLInputElement)?.checked;
+  /**
+   * Hide or restore the selected-satellite highlight dot for clean footage.
+   * The toggle's own state decides: while it is on the dot stays transparent
+   * whatever else changes, and the saved colour comes back only when the toggle
+   * itself is turned off.
+   */
+  private applySelectedDot_(isToggleChanged: boolean): void {
+    const isHide = (getEl('video-director-selectedColor') as HTMLInputElement | null)?.checked ?? false;
 
-    if (isHide && settingsManager.selectedColor[3] !== 0) {
-      settingsManager.selectedColorFallback = settingsManager.selectedColor;
-      settingsManager.selectedColor = [0, 0, 0, 0];
-    } else {
+    if (isHide) {
+      if (settingsManager.selectedColor[3] !== 0) {
+        settingsManager.selectedColorFallback = settingsManager.selectedColor;
+        settingsManager.selectedColor = [0, 0, 0, 0];
+      }
+    } else if (isToggleChanged) {
       settingsManager.selectedColor = settingsManager.selectedColorFallback;
     }
   }
@@ -285,7 +292,18 @@ export class VideoDirectorPlugin extends KeepTrackPlugin {
     }
 
     camera.autoRotate(willStart);
+    // Starting may replace a zero rotate speed with the camera's own; show the value in use.
+    this.syncRotateSpeedField_();
     this.updateRotateButtonLabel_(willStart);
+  }
+
+  /** Write the stored rotate speed back into its field. */
+  private syncRotateSpeedField_(): void {
+    const input = getEl('video-director-rotateSpeed') as HTMLInputElement | null;
+
+    if (input) {
+      input.value = settingsManager.autoRotateSpeed.toString();
+    }
   }
 
   /** True when at least one rotate direction flag is enabled. */

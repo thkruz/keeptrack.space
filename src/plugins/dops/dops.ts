@@ -263,10 +263,11 @@ export class DopsPlugin extends KeepTrackPlugin {
             return;
           }
 
+          // Both branches move the form to the clicked point first, so the
+          // recompute below never reuses the previous location.
+          this.writeClickedLocation_(latLon.lat, latLon.lon);
+
           if (!this.isMenuButtonActive) {
-            (<HTMLInputElement>getEl('dops-lat')).value = latLon.lat.toFixed(3);
-            (<HTMLInputElement>getEl('dops-lon')).value = latLon.lon.toFixed(3);
-            (<HTMLInputElement>getEl('dops-alt')).value = '0';
             (<HTMLInputElement>getEl('dops-el')).value = settingsManager.gpsElevationMask.toString();
             this.bottomMenuClicked();
           } else {
@@ -279,6 +280,13 @@ export class DopsPlugin extends KeepTrackPlugin {
       default:
         break;
     }
+  }
+
+  /** Writes a right-clicked ground point into the location form (sea level). */
+  private writeClickedLocation_(lat: number, lon: number): void {
+    (<HTMLInputElement>getEl('dops-lat')).value = lat.toFixed(3);
+    (<HTMLInputElement>getEl('dops-lon')).value = lon.toFixed(3);
+    (<HTMLInputElement>getEl('dops-alt')).value = '0';
   }
 
   // =========================================================================

@@ -165,7 +165,7 @@ export const IMAGERY_SOURCES: ImagerySource[] = [
     buildImage: (simulationTime, realTime) => {
       const { slot, isFuture } = computeHimawariSlot(simulationTime, realTime);
 
-      return { url: himawariUrl(slot), isFuture };
+      return { url: himawariUrl(slot), timestampUtc: formatUtcTime(slot), isFuture };
     },
   },
   {

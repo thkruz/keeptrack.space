@@ -78,6 +78,8 @@ describe('FilterMenuPlugin_class', () => {
 
       expect(shortcuts).toHaveLength(1);
       expect(shortcuts[0].key).toBe('f');
+      // Explicit false: an undefined ctrl is a wildcard, which let Ctrl+F open this menu.
+      expect(shortcuts[0].ctrl).toBe(false);
       expect(shortcuts[0].callback).toBeDefined();
     });
 
@@ -1023,5 +1025,60 @@ describe('FilterMenuPlugin_class', () => {
 
       expect(saveSettingsSpy).toHaveBeenCalled();
     });
+  });
+});
+
+describe('FilterMenuPlugin search box', () => {
+  let plugin: FilterMenuPlugin;
+  const search = (): HTMLInputElement => getEl('filter-search') as HTMLInputElement;
+  const noResults = (): HTMLElement => getEl('filter-no-results') as HTMLElement;
+  const typeQuery = (query: string): void => {
+    search().value = query;
+    search().dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  beforeEach(() => {
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+    setupStandardEnvironment([TopMenu]);
+    plugin = new FilterMenuPlugin();
+    websiteInit(plugin);
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('committing the search box (change on blur) writes no filter value', () => {
+    const before = { ...settingsManager.filter };
+
+    typeQuery('leo');
+    search().dispatchEvent(new Event('change', { bubbles: true }));
+
+    expect(Object.keys(settingsManager.filter)).not.toContain('search');
+    expect(settingsManager.filter).toEqual(before);
+  });
+
+  it('shows a localized empty state only when no filter matches', () => {
+    expect(noResults().style.display).toBe('none');
+    expect(noResults().textContent).toBe(t7e('plugins.FilterMenuPlugin.noResults'));
+
+    typeQuery('zzzz');
+    expect(noResults().style.display).toBe('');
+
+    typeQuery('leo');
+    expect(noResults().style.display).toBe('none');
+  });
+
+  it('Reset to Defaults also clears the search box and shows every row again', () => {
+    typeQuery('zzzz');
+    plugin.resetToDefaults();
+
+    expect(search().value).toBe('');
+    expect(noResults().style.display).toBe('none');
+    const rows = [...(getEl('filter-sections') as HTMLElement).querySelectorAll<HTMLElement>('.switch.row')];
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.every((row) => row.style.display === '')).toBe(true);
   });
 });

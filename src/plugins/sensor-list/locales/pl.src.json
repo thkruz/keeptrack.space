@@ -22,7 +22,7 @@
         "setSensorGroup": "Ustaw grupę czujników: {name}"
       },
       "help": {
-        "overview": "Menu czujników to miejsce, w którym wybierasz stację naziemną, na podstawie której reszta aplikacji wykonuje obliczenia. Czujniki są pogrupowane według sieci, którą głównie obsługują, a każda pozycja pokazuje po lewej stronie nazwę czujnika, a po prawej kraj lub organizację, do której należy. Wybrany czujnik steruje kątami obserwacji, stożkami pola widzenia, alertami przelotów z listy obserwacyjnej i każdym innym menu korzystającym z czujnika.",
+        "overview": "Menu czujników to miejsce, w którym wybierasz stację naziemną, na podstawie której reszta aplikacji wykonuje obliczenia. Czujniki są pogrupowane według sieci, którą głównie obsługują, a każda pozycja pokazuje po lewej stronie nazwę czujnika, a po prawej kraj lub organizację, do której należy. Wybrany czujnik steruje kątami obserwacji, stożkami pola widzenia, alertami przelotów z listy obserwowanych i każdym innym menu korzystającym z czujnika.",
         "imgAlt": "Menu czujników pokazujące pogrupowane sieci czujników",
         "imgCaption": "Czujniki są pogrupowane według sieci. Kliknij nagłówek grupy, aby wybrać całą sieć naraz.",
         "sensorTypesHeading": "Typy czujników",
@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Użyj tego czujnika"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Nie udało się przenieść kamery do czujnika: {error}",
+        "sensorNotInCatalog": "Czujnik {sensor} z grup czujników nie został znaleziony w katalogu czujników!",
+        "groupRenderFailed": "Nie udało się wyświetlić grupy czujników."
       }
     }
   }

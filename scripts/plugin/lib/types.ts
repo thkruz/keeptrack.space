@@ -28,6 +28,8 @@ export interface KeepTrackPluginManifest {
   author?: string;
   repository?: string;
   engine: string;
+  /** Optional semver range of the @keeptrack/plugin-api facade this plugin was built against (e.g. "^1.0.0"). */
+  pluginApi?: string;
   plugins: PluginEntry[];
   localesDir?: string;
   workers?: unknown[];

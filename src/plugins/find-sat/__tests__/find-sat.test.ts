@@ -77,7 +77,8 @@ describe('FindSatPlugin_class', () => {
       const shortcuts = plugin.getKeyboardShortcuts();
 
       expect(shortcuts).toHaveLength(1);
-      expect(shortcuts[0].key).toBe('F');
+      // Lowercase 'f' + ctrl is Ctrl+F; uppercase 'F' would be Ctrl+Shift+F.
+      expect(shortcuts[0].key).toBe('f');
       expect(shortcuts[0].ctrl).toBe(true);
       expect(shortcuts[0].callback).toBeInstanceOf(Function);
     });
@@ -986,6 +987,102 @@ describe('FindSatPlugin_class', () => {
       expect(html).toContain('fbl-status');
       expect(html).toContain('findByLooks-submit');
       expect(html).toContain('findByLooks-export');
+    });
+  });
+
+  // =========================================================================
+  // Gap batch 1 fixes (object type alone, NORAD-less matches, empty export,
+  // country merge, failed search clears the old result)
+  // =========================================================================
+
+  describe('search results consistency', () => {
+    it('accepts Object Type as the only criterion', () => {
+      const payload = createFindSat(5, 'A', 'Imaging-1');
+      const debris = createFindSat(6, 'A', 'Imaging-1');
+
+      payload.type = SpaceObjectType.PAYLOAD;
+      debris.type = SpaceObjectType.DEBRIS;
+      const plugin = initPluginWithCatalog([payload, debris]);
+
+      expect(plugin['searchSats_']({ ...defaultSearchParams(), objType: [1] }).map((sat) => sat.id)).toEqual([5]);
+      expect(() => plugin['searchSats_']({ ...defaultSearchParams(), objType: 0 })).toThrow('No Search Criteria Entered');
+    });
+
+    it('drops matches without a NORAD number from the count, the search box and the export', () => {
+      const withNorad = createFindSat(5, 'Starlink', 'Imaging-1');
+      const vimpel = createFindSat(6, 'Starlink', 'Imaging-1');
+
+      vimpel.sccNum = '';
+      const plugin = initPluginWithCatalog([withNorad, vimpel]);
+
+      plugin['runSearch_']({ ...defaultSearchParams(), bus: 'Starlink' }, false);
+
+      expect(plugin['lastResults_'].map((sat) => sat.id)).toEqual([5]);
+      expect(plugin['lastAllMatches_'].map((sat) => sat.id)).toEqual([5]);
+      expect(getEl('fbl-result-count')!.textContent).toBe('1 result(s)');
+      expect(mockUiManager.doSearch).toHaveBeenCalledWith('00005');
+      expect(buildFindSatExportRows([withNorad, vimpel]).map((row) => row.satId)).toEqual(['00005']);
+    });
+
+    it('says why nothing downloads after a zero-match search', () => {
+      const plugin = initPluginWithCatalog([createFindSat(5, 'Starlink', 'Imaging-1')]);
+      const toast = vi.spyOn(mockUiManager, 'toast');
+      const warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+      plugin['runSearch_']({ ...defaultSearchParams(), bus: 'Dragon' }, false);
+      toast.mockClear();
+      plugin.onDownload();
+
+      expect(toast).toHaveBeenCalledWith(t7e('plugins.FindSatPlugin.errorMsgs.NoMatchesToExport' as Parameters<typeof t7e>[0]), expect.anything());
+      expect(warnSpy).not.toHaveBeenCalled();
+      warnSpy.mockRestore();
+    });
+
+    it('a failed search clears the previous result, the count and the search box', () => {
+      const plugin = initPluginWithCatalog([createFindSat(5, 'Starlink', 'Imaging-1')]);
+
+      plugin['runSearch_']({ ...defaultSearchParams(), bus: 'Starlink' }, false);
+      expect(getEl('fbl-result-count')!.textContent).toBe('1 result(s)');
+      const searchBox = (getEl('search', true) as HTMLInputElement | null) ?? document.body.appendChild(Object.assign(document.createElement('input'), { id: 'search' }));
+
+      searchBox.value = '00005';
+      vi.mocked(mockUiManager.doSearch).mockClear();
+
+      plugin['runSearch_'](defaultSearchParams(), false);
+
+      expect(plugin['lastResults_']).toEqual([]);
+      expect(plugin['lastAllMatches_']).toEqual([]);
+      expect(plugin['hasSearchBeenRun_']).toBe(false);
+      expect(getEl('fbl-result-count')!.textContent).toBe('');
+      expect(mockUiManager.doSearch).toHaveBeenCalledWith('');
+      expect(searchBox.value).toBe('');
+    });
+
+    it('lists Luxembourg once, covering every Luxembourg catalog code', () => {
+      initPluginWithCatalog([createFindSat(5, 'A', 'Imaging-1')]);
+      const options = Array.from((getEl('fbl-country') as HTMLSelectElement).options);
+      const luxembourg = options.filter((option) => option.text === 'Luxembourg');
+
+      expect(luxembourg).toHaveLength(1);
+      expect(luxembourg[0].value.split('|')).toEqual(expect.arrayContaining(['LUXE', 'O3B', 'L', 'SES']));
+      // No label appears twice.
+      expect(new Set(options.map((option) => option.text)).size).toBe(options.length);
+      // An alias owned by another entry stays with that entry.
+      expect(options.find((option) => option.text === 'Globalstar')?.value.split('|')).not.toContain('US');
+    });
+
+    it('a Luxembourg pick matches objects filed under any of its codes', () => {
+      const lux = createFindSat(5, 'A', 'Imaging-1');
+      const ses = createFindSat(6, 'A', 'Imaging-1');
+      const us = createFindSat(7, 'A', 'Imaging-1');
+
+      lux.country = 'L';
+      ses.country = 'O3B';
+      us.country = 'US';
+      const plugin = initPluginWithCatalog([lux, ses, us]);
+      const value = Array.from((getEl('fbl-country') as HTMLSelectElement).options).find((option) => option.text === 'Luxembourg')!.value;
+
+      expect(plugin['searchSats_']({ ...defaultSearchParams(), countryCode: value }).map((sat) => sat.id)).toEqual([5, 6]);
     });
   });
 });

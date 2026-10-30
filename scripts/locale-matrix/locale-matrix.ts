@@ -272,9 +272,13 @@ const heuristicsScript = (menuRoot: string): string => `(() => {
     if (el.clientWidth > 4 && !selfOverflowExempt && el.scrollWidth - el.clientWidth > 2 && cs.overflowX !== 'auto' && cs.overflowX !== 'scroll') {
       push('horizontalOverflow', el, el.scrollWidth - el.clientWidth);
     }
-    // 2. Element extends past the menu card's right edge (too-wide button/row).
+    // 2. Element extends past the menu card's right edge (too-wide button/row). Content inside an
+    //    intentional sideways scroller (a wide table in an overflow-x: auto wrapper) is reachable.
     const r = el.getBoundingClientRect();
-    if (r.width > 0 && r.right - rootRect.right > 2) { push('overflowsRoot', el, Math.round(r.right - rootRect.right)); }
+    let scroller = el.parentElement;
+    while (scroller && scroller !== root && !['auto', 'scroll'].includes(getComputedStyle(scroller).overflowX)) { scroller = scroller.parentElement; }
+    const isInScroller = scroller !== null && scroller !== root;
+    if (!isInScroller && r.width > 0 && r.right - rootRect.right > 2) { push('overflowsRoot', el, Math.round(r.right - rootRect.right)); }
   }
   // 3. Menu itself clipped by the viewport.
   if (rootRect.right > window.innerWidth + 2 || rootRect.bottom > window.innerHeight + 2 || rootRect.left < -2) {

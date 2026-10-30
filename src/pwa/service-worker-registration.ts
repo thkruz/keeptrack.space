@@ -1,4 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 
 const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 60 minutes
 
@@ -68,6 +69,6 @@ export function registerServiceWorker(): void {
       });
     })
     .catch((err: unknown) => {
-      errorManagerInstance.warn('Service worker registration failed:', err);
+      errorManagerInstance.warn(t7e('errorMsgs.Pwa.registrationFailed'), err);
     });
 }

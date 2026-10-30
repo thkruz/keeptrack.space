@@ -46,3 +46,31 @@
 #createSat-menu .input-field textarea:focus-visible {
   outline: none;
 }
+
+/*
+ * 3. Submit-time errors. Each form lists every failing rule above its submit
+ *    button (one line per message) and marks the fields with aria-invalid.
+ */
+#createSat-menu .create-sat-form-error {
+  margin: 8px 6px;
+  color: var(--color-error, #ffb4ab);
+  line-height: 1.4;
+}
+#createSat-menu .create-sat-form-error[hidden] {
+  display: none;
+}
+#createSat-menu .create-sat-error-item + .create-sat-error-item {
+  margin-top: 4px;
+}
+#createSat-menu .input-field input[aria-invalid="true"] {
+  border-bottom-color: var(--color-error, #ffb4ab);
+  box-shadow: 0 1px 0 0 var(--color-error, #ffb4ab);
+}
+
+/* Calculated orbit values remain readable without becoming editable. */
+#createSat-menu #createSat-calc-apogee:disabled,
+#createSat-menu #createSat-calc-perigee:disabled,
+#createSat-menu #createSat-calc-sma:disabled,
+#createSat-menu #createSat-calc-velocity:disabled {
+  color: #c4c4c4;
+}

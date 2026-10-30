@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "호환성 문제로 인해 녹화를 사용할 수 없습니다!",
-    "compatibilityError": "녹화 호환성 오류!"
+    "compatibilityError": "녹화 호환성 오류!",
+    "requesting": "화면 공유 요청 중…",
+    "recording": "녹화 중",
+    "stopping": "녹화 마무리 중…",
+    "toggleCommand": "화면 녹화 전환",
+    "saved": "녹화가 저장되었습니다",
+    "tooShort": "녹화가 너무 짧아 저장되지 않았습니다",
+    "cancelled": "녹화가 취소되었습니다",
+    "notReadable": "화면을 캡처할 수 없습니다. 다른 앱이나 시스템 설정이 차단하고 있을 수 있습니다.",
+    "failed": "녹화에 실패했습니다. 다시 시도하세요."
   }
 }

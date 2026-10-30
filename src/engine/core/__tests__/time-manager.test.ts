@@ -4,7 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 describe('TimeManager_changeStaticOffset_guards', () => {
   let tm: TimeManager;
@@ -175,6 +175,57 @@ describe('TimeManager simulation-time arithmetic', () => {
     tm.simulationTimeObj = new Date('2022-01-01T00:00:00Z');
 
     expect(tm.getOffsetTimeObj(3_600_000).getTime()).toBe(new Date('2022-01-01T01:00:00Z').getTime());
+  });
+
+  describe('a paused clock lands exactly on the pinned time while Date.now() ticks', () => {
+    const pin = new Date('2026-10-22T12:00:00.000Z');
+    let tick: number;
+
+    beforeEach(() => {
+      setupStandardEnvironment();
+      tm = new TimeManager();
+      tick = Date.now();
+      // Every read advances 1 ms, so two reads in one method would leave the paused sim time 1 ms off.
+      vi.spyOn(Date, 'now').mockImplementation(() => tick++);
+    });
+
+    afterEach(() => {
+      vi.mocked(Date.now).mockRestore();
+    });
+
+    it('init()', () => {
+      const savedSimulationTime = settingsManager.simulationTime;
+      const savedPropRate = settingsManager.propRate;
+
+      settingsManager.simulationTime = pin;
+      settingsManager.propRate = 0;
+      try {
+        tm.init();
+      } finally {
+        settingsManager.simulationTime = savedSimulationTime;
+        settingsManager.propRate = savedPropRate;
+      }
+
+      expect(tm.calculateSimulationTime().toISOString()).toBe(pin.toISOString());
+    });
+
+    it('changePropRate(0)', () => {
+      tm.isInitialized = true;
+      tm.propRate = 1;
+      tm.simulationTimeObj = new Date(pin);
+
+      tm.changePropRate(0, false);
+
+      expect(tm.calculateSimulationTime().toISOString()).toBe(pin.toISOString());
+    });
+
+    it('changeSimulationTime(target)', () => {
+      tm.propRate = 0;
+
+      tm.changeSimulationTime(pin.getTime());
+
+      expect(tm.calculateSimulationTime().toISOString()).toBe(pin.toISOString());
+    });
   });
 
   it('getPropOffset returns 0 when no date is selected', () => {

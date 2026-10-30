@@ -1,0 +1,31 @@
+// Custom Biome lint plugin: external plugins may import ONLY the public facade.
+//
+// Applies to files under src/plugins-external/ (scoped by $filename). Allowed
+// module specifiers:
+//   - @keeptrack/plugin-api           the public plugin facade
+//   - @keeptrack/plugin-api/testing   the unit-test kit (tests only, by convention)
+//   - ootk                            the public astrodynamics package
+//   - vitest                          the test runner
+//   - ./ or ../                       the plugin's own files and assets
+// Everything else (@app/*, @engine/*, @ootk/*, @public/*, @test/*, bare npm
+// packages, non-literal dynamic imports) is reported.
+//
+// The host lint (`npm run lint`) excludes src/plugins-external/** (third-party
+// code), so this rule runs through its own config, biome-plugins/plugin-api/,
+// which `npm run plugin -- doctor|add|update` invoke. Keep the allowlist in sync
+// with ALLOWED_SPECIFIER in scripts/plugin/lib/import-policy.ts (it maps each
+// finding to a facade replacement hint).
+language js
+
+or {
+    JsModuleSource() as $source,
+    `import($source)`
+} where {
+    $filename <: r".*plugins-external.*",
+    not $source <: r"['\"](?:@keeptrack/plugin-api(?:/testing)?|ootk|vitest|\.\.?/[^'\"]*)['\"]",
+    register_diagnostic(
+        span = $source,
+        message = "External plugins may import only @keeptrack/plugin-api, @keeptrack/plugin-api/testing, ootk, vitest, and their own relative files.",
+        severity = "error"
+    )
+}

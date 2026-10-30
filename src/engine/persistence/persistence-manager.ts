@@ -1,3 +1,4 @@
+import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '../utils/errorManager';
 import type { AccountKvEntry, AccountSyncProvider } from './account-sync-provider';
 import { LocalStorageProvider } from './providers/local-storage-provider';
@@ -214,8 +215,8 @@ export class PersistenceManager {
     const currentVersion = this.cache_.get(StorageKey.VERSION) ?? null;
 
     if (typeof currentVersion === 'string' && typeof sm?.versionNumber === 'string' && this.compareSemver_(currentVersion, sm.versionNumber) < 0) {
-      errorManagerInstance.warn(`Version mismatch: ${currentVersion} < ${sm.versionNumber}`);
-      errorManagerInstance.warn('Clearing local storage...');
+      errorManagerInstance.warn(t7e('errorMsgs.Persistence.versionMismatch').replace('{saved}', currentVersion).replace('{current}', sm.versionNumber));
+      errorManagerInstance.warn(t7e('errorMsgs.Persistence.clearingStorage'));
 
       const preserved = new Map<StorageKey, string>();
 
@@ -459,7 +460,16 @@ export class PersistenceManager {
     }
 
     if (toPush.size > 0) {
-      await provider.push(toPush);
+      try {
+        await provider.push(toPush);
+      } catch (e) {
+        // The pulled values are already applied locally: report them (plugins re-render on
+        // remoteSettingsApplied) and retry the push with the next debounced flush.
+        errorManagerInstance.debug(`Failed to push merged account settings: ${e}`);
+        for (const key of toPush.keys()) {
+          this.pendingAccountWrites_.add(key);
+        }
+      }
     }
 
     return changed;

@@ -4,6 +4,8 @@
     "clickToPlay": "Clicca per riprodurre",
     "clickToPause": "Clicca per mettere in pausa",
     "clickToResume": "Clicca per riprendere",
-    "endOfScenario": "Impossibile riprodurre: il tempo di simulazione è alla fine dello scenario."
+    "endOfScenario": "Impossibile riprodurre: il tempo di simulazione è alla fine dello scenario.",
+    "clickToRewind": "Clicca per riavvolgere",
+    "clickToFastForward": "Clicca per avanzare velocemente"
   }
 }

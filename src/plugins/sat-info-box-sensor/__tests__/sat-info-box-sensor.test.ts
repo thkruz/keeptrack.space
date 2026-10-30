@@ -29,6 +29,10 @@ const setupSensorAndSat = (sensor: RfSensor) => {
 
 /** Triggers a per-frame update so Sun status gets recalculated. */
 const triggerFrameUpdate = () => {
+  const selection = PluginRegistry.getPlugin(SelectSatManager)!;
+
+  selection.selectedSat = defaultSat.id;
+  selection.primarySatObj = defaultSat;
   EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
 };
 

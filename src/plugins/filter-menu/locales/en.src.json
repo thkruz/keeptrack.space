@@ -15,6 +15,7 @@
       "resetToDefaults": "Reset to Defaults",
       "defaultTooltip": "Disable to hide {name}",
       "searchPlaceholder": "Search filters...",
+      "noResults": "No filters match your search.",
       "commands": {
         "category": "Filters",
         "open": "Open Filter Menu",

@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "Nepodařilo se vytvořit popisek: prvek nemá atribut kt-tooltip.",
+        "missingElement": "Nepodařilo se vytvořit popisek: prvek je null nebo není definován."
+      }
+    }
+  }
+}

@@ -48,7 +48,9 @@
         "year": "年",
         "goTo": "跳转到 (UTC)",
         "goToTooltip": "输入 UTC 日期和时间 (YYYY-MM-DD HH:MM:SS) 并按 Enter。秒和时间可省略。",
-        "goToInvalid": "日期无效。请使用 UTC 格式 YYYY-MM-DD HH:MM:SS。"
+        "goToInvalid": "日期无效。请使用 UTC 格式 YYYY-MM-DD HH:MM:SS。",
+        "containerNotFound": "未找到 ID 为 {id} 的容器",
+        "timeInvalid": "时间格式无效！应为 HH:MM:SS、HH:MM:SS.s 或 HHMMSS"
       }
     }
   }

@@ -9,6 +9,11 @@
         "take4k": "Zrzut ekranu (4K)",
         "takeHd": "Zrzut ekranu (HD)",
         "take8k": "Zrzut ekranu (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Nie udało się wczytać obrazu głównego logo.",
+        "secondaryLogoFailed": "Nie udało się wczytać obrazu dodatkowego logo.",
+        "noCanvasContext": "Nie udało się uzyskać kontekstu 2D tymczasowego płótna. Nie można utworzyć zrzutu ekranu."
       }
     }
   }

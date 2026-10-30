@@ -1,5 +1,6 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
+import i18next from 'i18next';
 import 'flag-icons/css/flag-icons.min.css';
 import '../../../../public/css/flag-icons.css';
 import { countryCodeList, countryFlagIconMap } from './country-codes';
@@ -32,6 +33,104 @@ export const country2flagIcon = (country: string): string => {
  * An array of country names with satellites.
  */
 export const countryNameList = Object.keys(countryCodeList);
+
+/** English country names whose catalog codes are not ISO 3166 two-letter codes. */
+const ISO_ALIASES_: Record<string, string> = {
+  'Hong Kong': 'HK',
+  Jordan: 'JO',
+  Kuwait: 'KW',
+  Mauritius: 'MU',
+  Moldova: 'MD',
+  Mongolia: 'MN',
+};
+
+/**
+ * Localized display name for a country entry, for UI labels only (stored values and
+ * filters keep their English ids / catalog codes).
+ *
+ * Accepts either a catalog country code (`'D'`, `'CIS'`, `'I-ESA'`, ...) or an English
+ * name from {@link countryNameList} (`'Germany'`, `'Czechoslovakia'`, ...). Names resolve
+ * through the explicit `countries.*` locale keys (which cover historic and non-ISO
+ * entries such as the Soviet Union, Czechoslovakia, ESA and international
+ * organizations), and only through a code whose English label matches the name, so a
+ * code shared by several entries never shows the wrong name. ISO 3166 two-letter codes
+ * not in the table fall back to Intl.DisplayNames; anything else stays as given.
+ */
+export const getCountryDisplayName = (id: string): string => {
+  if (!id) {
+    return id;
+  }
+
+  const localized = getCountryMapList() as Record<string, string>;
+
+  if (Object.hasOwn(localized, id)) {
+    return localized[id];
+  }
+
+  const codes = (countryCodeList as Record<string, string>)[id]?.split('|') ?? [];
+
+  for (const code of codes) {
+    if (Object.hasOwn(localized, code) && t7e(`countries.${code}` as Parameters<typeof t7e>[0], { lng: 'en' }) === id) {
+      return localized[code];
+    }
+  }
+
+  const lang = i18next.language || 'en';
+  const isoAlias = ISO_ALIASES_[id];
+
+  if (isoAlias) {
+    try {
+      return new Intl.DisplayNames([lang], { type: 'region' }).of(isoAlias) ?? id;
+    } catch {
+      return id;
+    }
+  }
+
+  for (const code of [...codes, id]) {
+    if (!/^[A-Z]{2}$/u.test(code)) {
+      continue;
+    }
+    try {
+      if (new Intl.DisplayNames(['en'], { type: 'region' }).of(code) === id || code === id) {
+        return new Intl.DisplayNames([lang], { type: 'region' }).of(code) ?? id;
+      }
+    } catch {
+      // Engines without Intl.DisplayNames keep the English name.
+    }
+  }
+
+  return id;
+};
+
+/**
+ * One entry per country display name, shared by every country picker (Find Satellite's Country
+ * filter, the Countries menu). Each entry lists every catalog code for that country: the
+ * {@link countryCodeList} entry's own codes, plus the codes the flag table resolves to the same
+ * region that no other entry claims (e.g. the GCAT code `L` and the operator code `SES` for
+ * Luxembourg). Entries that share a display name (LUXE and O3B both read "Luxembourg") merge into
+ * one. Sorted by display name in the UI language.
+ */
+export const buildCountryCodeGroups = (): { label: string; codes: string[] }[] => {
+  const codeTable = countryCodeList as Record<string, string>;
+  const flagMap = countryFlagIconMap as Record<string, string>;
+  const ownedCodes = new Set(countryNameList.flatMap((name) => codeTable[name].split('|')));
+  const codesByLabel = new Map<string, Set<string>>();
+
+  for (const name of countryNameList) {
+    const ownCodes = codeTable[name].split('|');
+    const regions = new Set(ownCodes.map((code) => (flagMap[code] ?? code).toUpperCase()));
+    const aliases = Object.keys(flagMap).filter((code) => !ownedCodes.has(code) && regions.has(flagMap[code].toUpperCase()));
+    const label = getCountryDisplayName(name);
+    const codes = codesByLabel.get(label) ?? new Set<string>();
+
+    for (const code of [...ownCodes, ...aliases]) {
+      codes.add(code);
+    }
+    codesByLabel.set(label, codes);
+  }
+
+  return [...codesByLabel.entries()].map(([label, codes]) => ({ label, codes: [...codes] })).sort((a, b) => a.label.localeCompare(b.label));
+};
 
 export const getCountryMapList = () => ({
   AAT: t7e('countries.AAT'),

@@ -23,6 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { t7e } from '@app/locales/keys';
 import { saveAs } from 'file-saver';
 import Papa from 'papaparse';
 import { errorManagerInstance } from './errorManager';
@@ -44,7 +45,7 @@ export const saveVariable = <T>(variable: T, filename?: string): void => {
     }
     saveAs(blob, filename);
   } catch (e) {
-    errorManagerInstance.error(e, 'saveVariable', 'Error in saving variable!');
+    errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.variable'));
   }
 };
 
@@ -67,6 +68,28 @@ export const getCircularReplacer = () => {
   };
 };
 
+/** UTF-8 byte order mark. Excel on Windows needs it to read a CSV as UTF-8 instead of the ANSI codepage. */
+export const UTF8_BOM = String.fromCharCode(0xfeff);
+
+/** MIME type used for every CSV download. */
+export const CSV_MIME = 'text/csv;charset=utf-8';
+
+/**
+ * Builds the Blob for a CSV download: prepends a UTF-8 BOM (so Excel shows
+ * symbols such as degree and plus-minus correctly) and tags it as UTF-8 CSV.
+ * Text that already starts with a BOM is not given a second one. Every CSV
+ * export in the app goes through this helper.
+ * @param text The CSV text.
+ */
+export const createCsvBlob = (text: string): Blob => new Blob([text.startsWith(UTF8_BOM) ? text : `${UTF8_BOM}${text}`], { type: CSV_MIME });
+
+/**
+ * Removes a leading UTF-8 BOM, if present. Use it when parsing CSV text that
+ * may have come from one of our own exports.
+ * @param text The CSV text.
+ */
+export const stripUtf8Bom = (text: string): string => (text.startsWith(UTF8_BOM) ? text.slice(UTF8_BOM.length) : text);
+
 /**
  * Saves an array of objects as a CSV file.
  * @param items The array of objects to be saved as CSV.
@@ -74,8 +97,7 @@ export const getCircularReplacer = () => {
  */
 export const saveCsv = <T extends Record<string, unknown>>(items: Array<T>, name?: string): void => {
   try {
-    const csv = Papa.unparse(items);
-    const blob = new Blob([csv], { type: 'text/plain;charset=utf-8' });
+    const blob = createCsvBlob(Papa.unparse(items));
 
     if (!saveAs) {
       throw new Error('saveAs is unavailable!');
@@ -84,7 +106,7 @@ export const saveCsv = <T extends Record<string, unknown>>(items: Array<T>, name
     saveAs(blob, `${name}.csv`);
   } catch (e) {
     if (!isThisNode()) {
-      errorManagerInstance.error(e, 'saveVariable', 'Error in saving csv!');
+      errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.csv'));
     }
   }
 };
@@ -106,7 +128,7 @@ export const saveXlsx = async <T extends Record<string, unknown>>(items: Array<T
     XLSX.writeFile(wb, `${name}.xlsx`);
   } catch (e) {
     if (!isThisNode()) {
-      errorManagerInstance.error(e, 'saveVariable', 'Error saving xlsx!');
+      errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.xlsx'));
     }
   }
 };
@@ -124,7 +146,7 @@ export type ExportFormat = 'csv' | 'xlsx';
  */
 export const saveTable = <T extends Record<string, unknown>>(items: Array<T>, name: string, format: ExportFormat = 'csv'): void => {
   if (format === 'xlsx') {
-    saveXlsx(items, name).catch((e) => errorManagerInstance.error(e, 'saveTable', 'Error saving xlsx!'));
+    saveXlsx(items, name).catch((e) => errorManagerInstance.error(e, 'saveTable', t7e('errorMsgs.SaveVariable.xlsx')));
 
     return;
   }
@@ -142,7 +164,7 @@ export const copyTsvToClipboard = async <T extends Record<string, unknown>>(item
     await navigator.clipboard.writeText(tsv);
   } catch (e) {
     if (!isThisNode()) {
-      errorManagerInstance.error(e, 'saveVariable', 'Error copying to clipboard!');
+      errorManagerInstance.error(e, 'saveVariable', t7e('errorMsgs.SaveVariable.clipboard'));
     }
   }
 };

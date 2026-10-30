@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Vytvořit start v okně"
       },
       "msgs": {
-        "windowFound": "Start v {time} pro srovnání s cílovou rovinou (ΔRAAN {delta}°)",
+        "windowFound": "Start v {time} z {site} pro srovnání s rovinou dráhy {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Nominální start vytvořen!",
         "timeRelativeToLaunch": "Čas je nyní relativní vůči času startu."
       },

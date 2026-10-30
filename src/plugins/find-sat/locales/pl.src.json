@@ -74,7 +74,8 @@
         "TooManyResults": "Wyświetlono {limit} z {total} wyników. Zwiększ \"Maks. wyników wyszukiwania\" w Ustawieniach wyszukiwania, aby zobaczyć więcej; eksport i tak zapisuje wszystkie wyniki.",
         "TryFindingFirst": "Najpierw spróbuj wyszukać satelity!",
         "SearchFailed": "Wyszukiwanie nie powiodło się: {error}",
-        "NothingToExport": "Brak wyników z danymi orbitalnymi do eksportu"
+        "NothingToExport": "Brak wyników z danymi orbitalnymi do eksportu",
+        "NoMatchesToExport": "Ostatnie wyszukiwanie nie znalazło żadnych satelitów, więc nie ma czego eksportować."
       }
     }
   }

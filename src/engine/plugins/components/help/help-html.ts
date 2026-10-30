@@ -85,8 +85,14 @@ export const resolveHelpShortcuts = (config: IHelpConfig, pluginId?: string): IH
 
   for (const shortcut of config.shortcuts ?? []) {
     const chord = shortcut.keys.join('+').toLowerCase();
+    /*
+     * A hand-written bare uppercase letter (['N']) is the registry's Shift+N, which now
+     * renders with its implied Shift; treat both spellings as the same chord.
+     */
+    const lastKey = shortcut.keys[shortcut.keys.length - 1] ?? '';
+    const impliedShiftChord = /^[A-Z]$/u.test(lastKey) && !shortcut.keys.includes('Shift') ? [...shortcut.keys.slice(0, -1), 'Shift', lastKey].join('+').toLowerCase() : chord;
 
-    if (!seen.has(chord)) {
+    if (!seen.has(chord) && !seen.has(impliedShiftChord)) {
       seen.add(chord);
       resolved.push(shortcut);
     }

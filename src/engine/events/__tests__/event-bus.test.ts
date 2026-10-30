@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { EventBus } from '../event-bus';
 import { EventBusEvent } from '../event-bus-events';
 
@@ -81,5 +82,70 @@ describe('EventBus.emitAsync', () => {
 
   it('handles events with no registered listeners', async () => {
     await expect(bus.emitAsync(EventBusEvent.beforeFilterTLEDatabase)).resolves.toBeUndefined();
+  });
+});
+
+describe('EventBus.emit listener isolation', () => {
+  let bus: EventBus;
+  let errorSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    bus = EventBus.getInstance();
+    bus.unregisterAllEvents();
+    errorSpy = vi.spyOn(errorManagerInstance, 'error').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each([
+    ['0 args', EventBusEvent.updateLoop, [] as unknown[]],
+    ['1 arg', EventBusEvent.bottomMenuClick, ['icon']],
+    ['2+ args', EventBusEvent.rmbMenuActions, ['action', 5]],
+  ])('a throwing listener does not skip later listeners (%s)', (_label, event, args) => {
+    const calls: string[] = [];
+
+    bus.on(event as EventBusEvent.updateLoop, () => {
+      calls.push('first');
+    });
+    bus.on(event as EventBusEvent.updateLoop, () => {
+      throw new Error('boom');
+    });
+    bus.on(event as EventBusEvent.updateLoop, () => {
+      calls.push('third');
+    });
+
+    expect(() => (bus.emit as (e: EventBusEvent, ...a: unknown[]) => void)(event as EventBusEvent, ...args)).not.toThrow();
+    expect(calls).toEqual(['first', 'third']);
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+    expect(String(errorSpy.mock.calls[0][1])).toContain(String(event));
+  });
+
+  it('reports a listener that throws every frame only once', () => {
+    bus.on(EventBusEvent.updateLoop, () => {
+      throw new Error('per-frame');
+    });
+
+    for (let i = 0; i < 5; i++) {
+      bus.emit(EventBusEvent.updateLoop);
+    }
+
+    expect(errorSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports each throwing listener separately and wraps non-Error throws', () => {
+    bus.on(EventBusEvent.updateLoop, () => {
+      throw new Error('a');
+    });
+    bus.on(EventBusEvent.updateLoop, () => {
+      throw 'b';
+    });
+
+    bus.emit(EventBusEvent.updateLoop);
+
+    expect(errorSpy).toHaveBeenCalledTimes(2);
+    expect(errorSpy.mock.calls[1][0]).toBeInstanceOf(Error);
+    expect((errorSpy.mock.calls[1][0] as Error).message).toBe('b');
   });
 });

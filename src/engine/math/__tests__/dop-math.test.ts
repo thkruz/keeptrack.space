@@ -137,10 +137,31 @@ describe('calculateDops_method', () => {
     const azElList = goodAzElList.slice(0, 3);
     const dops = DopMath.calculateDops(azElList);
 
-    expect(dops.pdop).toMatchSnapshot();
-    expect(dops.hdop).toMatchSnapshot();
-    expect(dops.gdop).toMatchSnapshot();
-    expect(dops.vdop).toMatchSnapshot();
-    expect(dops.tdop).toMatchSnapshot();
+    expect(Object.values(dops)).toEqual(['N/A', 'N/A', 'N/A', 'N/A', 'N/A']);
+  });
+});
+
+describe('DOP solution geometry', () => {
+  it('matches a closed-form symmetric geometry independent of matrix inversion', () => {
+    // Four cardinal horizon satellites plus zenith: A'A diagonal is (2,2,1,5)
+    // with vertical/clock covariance block inverse [[1.25,-.25],[-.25,.25]].
+    const dops = DopMath.calculateDops([
+      { az: 0, el: 0 },
+      { az: 90, el: 0 },
+      { az: 180, el: 0 },
+      { az: 270, el: 0 },
+      { az: 0, el: 90 },
+    ] as Parameters<typeof DopMath.calculateDops>[0]);
+
+    expect(dops).toEqual({ pdop: '1.50', hdop: '1.00', gdop: '1.58', vdop: '1.12', tdop: '0.50' });
+  });
+
+  it('rejects four or more satellites without independent geometry', () => {
+    const coincident = Array.from({ length: 6 }, () => ({ az: 45, el: 30 }));
+    const sameElevation = [0, 90, 180, 270].map((az) => ({ az, el: 30 }));
+
+    for (const geometry of [[], coincident, sameElevation, [{ az: NaN, el: 30 }]]) {
+      expect(DopMath.calculateDops(geometry as Parameters<typeof DopMath.calculateDops>[0]).hdop).toBe('N/A');
+    }
   });
 });

@@ -2,7 +2,8 @@
   "plugins": {
     "GamepadPlugin": {
       "connected": "Manette connectée",
-      "disconnected": "Manette déconnectée"
+      "disconnected": "Manette déconnectée",
+      "notSupported": "Cette manette n'est pas prise en charge. Veuillez ouvrir un ticket sur GitHub en indiquant le modèle de la manette pour qu'elle soit ajoutée."
     }
   }
 }

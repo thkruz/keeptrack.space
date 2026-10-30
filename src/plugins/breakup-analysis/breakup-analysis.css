@@ -157,3 +157,33 @@
   opacity: 0.75;
   white-space: nowrap;
 }
+
+/* "Likely decayed" members (perigee below 120 km, or an element set more than
+ * 90 days older than the archive date / sim time): kept in the counts, but the
+ * row is dimmed and tagged, and the stats card shows the count. */
+.breakup-likely-decayed td {
+  opacity: 0.6;
+}
+
+.ba-decayed-tag {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 4px;
+  border: 1px solid #ffb300;
+  border-radius: 3px;
+  font-size: 10px;
+  line-height: 14px;
+  white-space: nowrap;
+  color: #ffb300;
+}
+
+.ba-decayed-count {
+  color: #ffb300;
+  font-weight: 600;
+}
+
+.ba-decayed-note {
+  margin: 6px 6px 0;
+  font-size: 11px;
+  opacity: 0.85;
+}

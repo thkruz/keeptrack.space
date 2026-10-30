@@ -8,7 +8,8 @@
         "allData": "모든 데이터",
         "orbitalOnly": "궤도만",
         "allDataDesc": "선택한 데이터로 전체 카탈로그 교체",
-        "orbitalOnlyDesc": "위성 메타데이터를 유지하면서 TLE 업데이트"
+        "orbitalOnlyDesc": "위성 메타데이터를 유지하면서 TLE 업데이트",
+        "current": "현재"
       },
       "categories": {
         "special": "특별 관심",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "카탈로그를 가져오지 못했습니다",
         "DefaultFailed": "기본 카탈로그를 복원하지 못했습니다",
+        "CelestrakFailed": "CelesTrak 카탈로그를 로드하지 못했습니다",
+        "VimpelFailed": "JSC Vimpel 카탈로그를 로드하지 못했습니다",
         "Forbidden": "CelesTrak이 요청을 거부했습니다(HTTP 403). 보통 Cloudflare 속도 제한 때문이니 1분 정도 기다린 후 다시 시도하세요.",
         "RateLimited": "카탈로그 요청이 너무 많습니다. 1분 정도 기다린 후 다시 시도해 주세요.",
         "ServerError": "CelesTrak을 일시적으로 사용할 수 없습니다. 몇 분 후에 다시 시도해 주세요.",

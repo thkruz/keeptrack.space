@@ -23,6 +23,7 @@
         "actions": "Azioni"
       },
       "labels": {
+        "modifiedData": "Orbita modificata in questa sessione",
         "apogeeKm": "Apogeo (km)",
         "perigeeKm": "Perigeo (km)",
         "periodMin": "Periodo (min)",
@@ -56,7 +57,8 @@
         "satelliteNotFound": "Satellite {sccNum} non trovato!",
         "failedToPropagate": "Impossibile propagare il satellite. Provare parametri diversi o segnalare il problema se si è certi che siano corretti.",
         "cannotCalculateDirection": "Impossibile calcolare la direzione del satellite. Riprovare più tardi.",
-        "notRealSatellite": "Non è un satellite reale"
+        "notRealSatellite": "Non è un satellite reale",
+        "satrecFailed": "Errore nella creazione del record del satellite!"
       }
     }
   }

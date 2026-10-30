@@ -407,6 +407,12 @@ export class DrawLinesPlugin extends KeepTrackPlugin {
       return;
     }
 
+    if (action.requires.includes('sensor') && !ctx.sensor) {
+      errorManagerInstance.warn(this.t_('errorMsgs.noSensorSelected'));
+
+      return;
+    }
+
     action.run(ctx);
   }
 

@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "Konfidenz" },
-    "CountryColorScheme": { "label": "Land" },
-    "GpAgeColorScheme": { "label": "GP-Alter" },
-    "MissionColorScheme": { "label": "Mission" },
-    "ObjectTypeColorScheme": { "label": "Objekttyp" },
-    "OrbitalPlaneDensityColorScheme": { "label": "Orbitalebenen-Dichte" },
-    "RcsColorScheme": { "label": "Radarquerschnitt" },
-    "ReentryRiskColorScheme": { "label": "Wiedereintrittsrisiko" },
-    "SmallSatColorScheme": { "label": "Kleinsatelliten" },
-    "SourceColorScheme": { "label": "Datenquelle" },
-    "SpatialDensityColorScheme": { "label": "Räumliche Dichte" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "Sonnenlicht-Status" },
-    "VelocityColorScheme": { "label": "Geschwindigkeit" },
-    "VisualMagnitudeColorScheme": { "label": "Standardhelligkeit" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "Konfidenz"
+    },
+    "CountryColorScheme": {
+      "label": "Land"
+    },
+    "GpAgeColorScheme": {
+      "label": "GP-Alter"
+    },
+    "MissionColorScheme": {
+      "label": "Mission"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "Objekttyp"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "Orbitalebenen-Dichte"
+    },
+    "RcsColorScheme": {
+      "label": "Radarquerschnitt"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "Wiedereintrittsrisiko"
+    },
+    "SmallSatColorScheme": {
+      "label": "Kleinsatelliten"
+    },
+    "SourceColorScheme": {
+      "label": "Datenquelle"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "Räumliche Dichte"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "Sonnenlicht-Status"
+    },
+    "VelocityColorScheme": {
+      "label": "Geschwindigkeit"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "Standardhelligkeit"
+    },
+    "legend": {
+      "activePayload": "Aktive Nutzlast",
+      "inactivePayload": "Inaktive Nutzlast",
+      "rocketBody": "Raketenstufe",
+      "debris": "Trümmer",
+      "unknown": "Unbekannt",
+      "inFieldOfView": "Im Sichtfeld",
+      "sensor": "Sensor",
+      "launchSite": "Startplatz",
+      "confidenceLow": "3 oder niedriger",
+      "confidenceMid": "Zwischen 3 und 7",
+      "confidenceHigh": "7 oder höher",
+      "other": "Sonstige",
+      "gpAgeLt05": "Weniger als 0,5 Tage",
+      "gpAge05to1": "Zwischen 0,5 und 1 Tag",
+      "gpAge1to15": "Zwischen 1 und 1,5 Tagen",
+      "gpAge15to2": "Zwischen 1,5 und 2 Tagen",
+      "gpAge2to25": "Zwischen 2 und 2,5 Tagen",
+      "gpAge25to3": "Zwischen 2,5 und 3 Tagen",
+      "gpAgeGt3": "Mehr als 3 Tage",
+      "military": "Militär",
+      "communications": "Kommunikation",
+      "technology": "Technologie",
+      "earthObservation": "Erdbeobachtung",
+      "science": "Wissenschaft",
+      "astronomy": "Astronomie",
+      "navigation": "Navigation",
+      "payload": "Nutzlast",
+      "specialSats": "Besondere Satelliten",
+      "satelliteInView": "Satellit in Sicht",
+      "missile": "Rakete",
+      "missileInView": "Rakete in Sicht",
+      "highOrbitDensity": "Hohe Bahndichte",
+      "medOrbitDensity": "Mittlere Bahndichte",
+      "lowOrbitDensity": "Niedrige Bahndichte",
+      "otherDebris": "Sonstige Trümmer",
+      "tiniest": "Winzigste",
+      "verySmall": "Sehr klein",
+      "rcsSmall": "Klein",
+      "belowAverage": "Unterdurchschnittlich",
+      "aboveAverage": "Überdurchschnittlich",
+      "rcsLarge": "Groß",
+      "largest": "Größte",
+      "noData": "Keine Daten",
+      "reentryInfo": "Die Vorhersage des Wiedereintrittsrisikos hängt von vielen Faktoren ab, darunter Bahnhaltung, atmosphärischer Widerstand, Sonnenzyklen und das Masse-Flächen-Verhältnis des Satelliten. Dies ist eine grobe Näherung auf Grundlage des Perigäums und des durchschnittlichen Widerstandseinflusses.",
+      "reentryImminent": "Unmittelbar (innerhalb von Tagen)",
+      "reentryDays": "Tage",
+      "reentryWeeks": "Wochen",
+      "reentryMonths": "Monate",
+      "noRisk": "Kein Risiko",
+      "smallSatellite": "Kleinsatellit",
+      "sourceCelestrakSup": "Celestrak Zus.",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "OEM-Import",
+      "otherOrbitDensity": "Sonstige Bahndichte",
+      "operationalStarlink": "Betriebsbereite Starlink",
+      "otherStarlink": "Sonstige Starlink",
+      "notStarlink": "Kein Starlink",
+      "inUmbral": "Im Kernschatten",
+      "inPenumbral": "Im Halbschatten",
+      "inSunlight": "Im Sonnenlicht",
+      "satelliteInFov": "Satellit im Sichtfeld",
+      "velocity7": "Geschwindigkeit ~7 km/s",
+      "velocity4": "Geschwindigkeit ~4 km/s",
+      "velocity1": "Geschwindigkeit ~1 km/s",
+      "brightest": "Am hellsten",
+      "veryBright": "Sehr hell",
+      "bright": "Hell",
+      "magMedium": "Mittel",
+      "dim": "Schwach",
+      "veryDim": "Sehr schwach",
+      "faintest": "Am schwächsten",
+      "visMagLessThan35": "Visuelle Helligkeit unter 3,5",
+      "visMagBetween35And47": "Visuelle Helligkeit zwischen 3,5 und 4,7",
+      "visMagGreaterThan47": "Visuelle Helligkeit über 4,7",
+      "apogeeBelow2000": "Apogäum < 2000 km",
+      "perigeeAbove35000": "Perigäum > 35000 km"
+    }
   }
 }

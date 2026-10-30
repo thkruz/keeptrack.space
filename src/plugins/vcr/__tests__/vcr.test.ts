@@ -1,10 +1,12 @@
 /* eslint-disable max-lines-per-function */
 import { ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
+import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { VcrPlugin } from '@app/plugins/vcr/vcr';
 import { vi } from 'vitest';
@@ -158,10 +160,11 @@ describe('VcrPlugin', () => {
 
       const currentTime = timeManager.simulationTimeObj.getTime();
 
-      // Set scenario end time to current simulation time
-      (plugin as unknown as { scenario_: { endTime: Date } }).scenario_ = {
-        endTime: new Date(currentTime),
-      };
+      // The scenario plugin replaces its scenario object after the VCR initialized; the VCR must read the new one.
+      const scenarioPlugin = { scenario: { endTime: null as Date | null } };
+
+      vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(((cls: unknown) => (cls === ScenarioManagementPlugin ? scenarioPlugin : null)) as never);
+      scenarioPlugin.scenario = { endTime: new Date(currentTime) };
 
       const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
 

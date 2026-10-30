@@ -81,13 +81,273 @@
       "errorMsgs": {
         "notSupportedForObject": "Ten raport nie jest dostępny dla wybranego obiektu.",
         "generationFailed": "Generowanie raportu nie powiodło się",
-        "parentNotFound": "Obiektu macierzystego {scc} nie ma w katalogu"
+        "parentNotFound": "Obiektu macierzystego {scc} nie ma w katalogu",
+        "reportOverwrite": "Raport o identyfikatorze „{id}” jest już zarejestrowany. Zostanie nadpisany."
       },
       "reasons": {
         "selectSecondary": "Najpierw wybierz obiekt wtórny",
         "selectAnalyst": "Wybierz satelitę analityka utworzonego narzędziem manewrów",
         "needTwoRuns": "Najpierw uruchom Debris Screening co najmniej dwa razy",
         "screeningRunsMissing": "Porównanie screeningu niedostępne: uruchom Debris Screening dla {parent} i dla {analyst} w tym samym oknie, a następnie wygeneruj ten raport ponownie."
+      },
+      "doc": {
+        "header": {
+          "date": "Data",
+          "satellite": "Satelita",
+          "noradId": "NORAD ID",
+          "altId": "Alternatywny ID",
+          "intlDes": "Oznaczenie międzynarodowe",
+          "none": "Brak",
+          "sensor": "Sensor",
+          "type": "Typ",
+          "latitude": "Szerokość geograficzna",
+          "longitude": "Długość geograficzna",
+          "altitude": "Wysokość",
+          "minAz": "Min. azymut",
+          "maxAz": "Maks. azymut",
+          "minEl": "Min. elewacja",
+          "maxEl": "Maks. elewacja",
+          "minRng": "Min. odległość",
+          "maxRng": "Maks. odległość",
+          "windowLine": "Okres raportu: od {start} do {end} UTC, krok: {step} s",
+          "generatedWallClock": "Wygenerowano (czas rzeczywisty)",
+          "appVersion": "Wersja KeepTrack",
+          "ricConvention": "Konwencja RIC"
+        },
+        "titles": {
+          "aer": "Raport azymut, elewacja, odległość",
+          "lla": "Raport szerokość, długość, wysokość",
+          "eci": "Raport inercjalny geocentryczny (TEME)",
+          "coes": "Raport klasycznych elementów orbitalnych",
+          "visibility": "Raport okien widoczności",
+          "sunEclipse": "Raport słońce/zaćmienie",
+          "conjunction": "Raport koniunkcji",
+          "maneuver": "Raport manewru",
+          "screeningCompare": "Raport porównania screeningów"
+        },
+        "cols": {
+          "timeUtc": "Czas (UTC)",
+          "pass": "Przelot",
+          "azimuthDeg": "Azymut(°)",
+          "elevationDeg": "Elewacja(°)",
+          "rangeKm": "Odległość(km)",
+          "latitudeDeg": "Szerokość(°)",
+          "longitudeDeg": "Długość(°)",
+          "altitudeKm": "Wysokość(km)",
+          "posX": "Pozycja X(km)",
+          "posY": "Pozycja Y(km)",
+          "posZ": "Pozycja Z(km)",
+          "velX": "Prędkość X(km/s)",
+          "velY": "Prędkość Y(km/s)",
+          "velZ": "Prędkość Z(km/s)",
+          "element": "Element",
+          "value": "Wartość",
+          "passNum": "Przelot nr",
+          "riseTime": "Wschód (UTC)",
+          "setTime": "Zachód (UTC)",
+          "durationMin": "Czas trwania (min)",
+          "maxElDeg": "Maks. elewacja(°)",
+          "maxElTime": "Czas maks. elewacji (UTC)",
+          "note": "Uwaga",
+          "sunIlluminated": "Oświetlony przez słońce",
+          "eclipseType": "Typ zaćmienia",
+          "sunAngleDeg": "Kąt słońca(°)",
+          "offsetSec": "Przesunięcie (s)",
+          "rangeKmSpaced": "Odległość (km)",
+          "radialKm": "Radialna (km)",
+          "intrackKm": "Wzdłuż toru (km)",
+          "crosstrackKm": "W poprzek toru (km)",
+          "relSpeed": "Prędk. wzgl. (km/s)"
+        },
+        "empty": {
+          "noPasses": "Nie znaleziono przelotów!",
+          "noPassesWindow": "Nie znaleziono przelotów w okresie raportu!",
+          "noApproach": "Nie znaleziono największego zbliżenia w oknie wyszukiwania.",
+          "noScreeningEvents": "Brak zdarzeń screeningu w obu przebiegach."
+        },
+        "passEdge": {
+          "continuous": "ciągle",
+          "start": "widoczny na początku",
+          "end": "widoczny na końcu"
+        },
+        "illumination": {
+          "sun": "Tak",
+          "penumbral": "Częściowo",
+          "umbral": "Nie",
+          "unknown": "Nieznane"
+        },
+        "eclipse": {
+          "sun": "Brak",
+          "penumbral": "Półcień",
+          "umbral": "Cień",
+          "unknown": "Nieznane"
+        },
+        "coes": {
+          "note": "Uwaga: elementy oskulacyjne (J2000) w epoce stanu, wyznaczone z propagowanego wektora stanu.\nRóżnią się od średnich elementów TLE używanych dla apogeum/perygeum w katalogu.",
+          "elementSet": "Zestaw elementów",
+          "osculatingJ2000": "Oskulacyjne (J2000)",
+          "tleEpoch": "Epoka TLE (UTC)",
+          "stateEpoch": "Epoka stanu (oskulacyjna, UTC)",
+          "apogee": "Apogeum",
+          "perigee": "Perygeum",
+          "inclination": "Inklinacja",
+          "rightAscension": "Rektascensja",
+          "argOfPerigee": "Argument perygeum",
+          "trueAnomaly": "Anomalia prawdziwa",
+          "eccentricity": "Mimośród",
+          "period": "Okres",
+          "semiMajorAxis": "Wielka półoś",
+          "meanMotion": "Ruch średni"
+        },
+        "objects": {
+          "field": "Pole",
+          "name": "Nazwa",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "Epoka TLE (UTC)",
+          "gpAge": "Wiek GP",
+          "sigma": "1-sigma R / I / C (km, własny układ RIC, w epoce TLE)",
+          "derivedFrom": "Pochodzi od",
+          "days": "Dni: {days}",
+          "assumedFromParent": "(przyjęte od rodzica)"
+        },
+        "roles": {
+          "primary": "Główny",
+          "secondary": "Drugorzędny",
+          "parent": "Pierwotny",
+          "analyst": "Analityczny"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "Odległość minięcia",
+          "radial": "Radialna (R)",
+          "intrack": "Wzdłuż toru (I)",
+          "crosstrack": "W poprzek toru (C)",
+          "relSpeed": "Prędkość względna",
+          "risk": "Poziom ryzyka",
+          "searchWindow": "Okno wyszukiwania (UTC)",
+          "searchWindowValue": "od {start} do {end} (+/- {hours} h)"
+        },
+        "risk": {
+          "critical": "krytyczny",
+          "high": "wysoki",
+          "medium": "średni",
+          "low": "niski",
+          "unknown": "nieznany"
+        },
+        "common": {
+          "value": "Wartość",
+          "quantity": "Wielkość",
+          "item": "Pozycja"
+        },
+        "pcInputs": {
+          "input": "Dane Pc",
+          "method": "Metoda",
+          "primaryHbr": "Promień bryły sztywnej obiektu głównego",
+          "secondaryHbr": "Promień bryły sztywnej obiektu drugorzędnego",
+          "combinedHbr": "Łączny promień bryły sztywnej",
+          "covarianceSource": "Źródło kowariancji",
+          "confidence": "Poziom ufności (k)",
+          "sigmaCaps": "Limity 1-sigma R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: Pc 2D w płaszczyźnie spotkania, łączna kowariancja w układzie RIC obiektu głównego",
+          "covarianceSourceValue": "Syntetyczna kowariancja wyznaczona z TLE (ootk cappedScreeningCovarianceFromTle), nie kowariancja operatora; tak samo jak w screeningu śmieci"
+        },
+        "passes": {
+          "object": "Obiekt",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "Maks. el. (stopnie)"
+        },
+        "diff": {
+          "status": "Status",
+          "secondary": "Drugorzędny",
+          "name": "Nazwa",
+          "preTca": "TCA przed (UTC)",
+          "preMiss": "Odległość przed (km)",
+          "prePc": "Pc przed",
+          "postTca": "TCA po (UTC)",
+          "postMiss": "Odległość po (km)",
+          "postPc": "Pc po",
+          "missChange": "Zmiana odległości (km)",
+          "noId": "(brak ID)"
+        },
+        "status": {
+          "introduced": "Nowe",
+          "removed": "Usunięte",
+          "unchanged": "Bez zmian",
+          "appeared": "Pojawiło się (poniżej progu)",
+          "dropped": "Zniknęło (poniżej progu)",
+          "moved": "Przesunięte"
+        },
+        "summary": {
+          "range": "od {start} do {end}",
+          "preRunPrimary": "Obiekt główny przebiegu przed",
+          "preRunWindow": "Okno przebiegu przed (UTC)",
+          "postRunPrimary": "Obiekt główny przebiegu po",
+          "postRunWindow": "Okno przebiegu po (UTC)",
+          "concernThreshold": "Próg istotności",
+          "concernThresholdValue": "{level} i wyżej",
+          "excluded": "Wykluczone obiekty drugorzędne",
+          "appearedDropped": "Pojawiło się / zniknęło (poniżej progu)"
+        },
+        "sections": {
+          "objects": "Obiekty",
+          "closestApproach": "Największe zbliżenie",
+          "pcInputs": "Dane prawdopodobieństwa kolizji",
+          "sensorPasses": "Przeloty nad sensorem ({sensor})",
+          "relativeGeometry": "Geometria względna (TCA +/- 5 min, 10 s)",
+          "burnsTotal": "Odpalenia (łącznie {dv} m/s)",
+          "burns": "Odpalenia",
+          "meanElements": "Elementy średnie, przed i po",
+          "closeApproachTo": "Zbliżenie do {name} ({id}), przed i po",
+          "diffSummary": "Podsumowanie porównania screeningu",
+          "diffManeuver": "Porównanie screeningu (pierwotny przed, analityczny po)",
+          "diffCompare": "Porównanie screeningu (starszy i nowszy przebieg)"
+        },
+        "elements": {
+          "header": "Element średni (TLE)",
+          "pre": "Przed (pierwotny, w epoce po)",
+          "post": "Po (analityczny)",
+          "change": "Zmiana",
+          "epoch": "Epoka (UTC)",
+          "inclinationDeg": "Inklinacja (stopnie)",
+          "raanDeg": "RAAN (stopnie)",
+          "eccentricity": "Mimośród",
+          "argPerigeeDeg": "Arg. perygeum (stopnie)",
+          "meanAnomalyDeg": "Anomalia średnia (stopnie)",
+          "meanMotionRevPerDay": "Ruch średni (obr./dzień)",
+          "periodMin": "Okres (min)",
+          "apogeeKm": "Apogeum (km)",
+          "perigeeKm": "Perygeum (km)",
+          "semiMajorAxisKm": "Wielka półoś (km)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "Epoka (UTC)",
+          "frame": "Układ",
+          "dvInput": "Zadane delta-V (m/s)",
+          "magnitude": "Wartość (m/s)",
+          "source": "Źródło",
+          "label": "Etykieta",
+          "parameters": "Parametry odpalenia",
+          "unavailable": "Parametry odpalenia niedostępne"
+        },
+        "compare": {
+          "pre": "Przed (pierwotny)",
+          "post": "Po (analityczny)",
+          "notFound": "Nie znaleziono",
+          "miss": "Odległość minięcia (km)",
+          "ric": "R / I / C (km)",
+          "relSpeed": "Prędkość względna (km/s)"
+        },
+        "notes": {
+          "noEncounter": "Brak największego zbliżenia w oknie wyszukiwania; poszerz okno lub przesuń czas symulacji bliżej zdarzenia.",
+          "windowMismatchManeuver": "Screeningi przed i po obejmują różne okna; zdarzenia blisko krawędzi okna mogą być błędnie sklasyfikowane.",
+          "windowMismatchCompare": "Oba screeningi obejmują różne okna; zdarzenia blisko krawędzi okna mogą być błędnie sklasyfikowane.",
+          "noScreeningRuns": "Brak dostępnych przebiegów screeningu.",
+          "noSensor": "Nie wybrano sensora; wybierz sensor, aby wyświetlić okna przelotów.",
+          "uncertaintyAssumed": "Niepewność 1-sigma i wiek GP obiektu analitycznego przyjęto od jego rodzica ({parent}), a Pc zbliżenia używa kowariancji rodzica. Błąd wykonania manewru nie jest modelowany."
+        }
       }
     }
   }

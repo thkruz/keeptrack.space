@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "分裂の作成中にエラーが発生しました！",
         "InvalidStartNum": "無効な衛星開始番号です！デフォルトで90000に設定します！",
         "InvalidSlotRange": "初期衛星番号が範囲外です。{start}から{end}を使用してください。",
-        "BreakupGeneratorFailed": "分裂ジェネレーターが失敗しました！"
+        "BreakupGeneratorFailed": "分裂ジェネレーターが失敗しました！",
+        "NoFreeSlots": "{count} 個の破片に対して空きのアナリストスロットが足りません。他のオブジェクトが使用中のスロットは上書きされません。個数を減らすか、アナリストオブジェクトを削除してください。"
       },
       "stats": {
         "meanSpeed": "期待平均速度",

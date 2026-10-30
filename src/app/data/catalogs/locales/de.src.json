@@ -283,5 +283,59 @@
     "ZA": "Südafrika",
     "ZR": "Zaire",
     "ZW": "Simbabwe"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Sensoren des Space Surveillance Network",
+      "topLink": "Alle Sensoren des Space Surveillance Network"
+    },
+    "mw": {
+      "header": "US-Raketenwarnsensoren",
+      "topLink": "Alle Raketenwarnsensoren"
+    },
+    "md": {
+      "header": "Sensoren der US Missile Defense Agency",
+      "topLink": "Alle Raketenabwehrsensoren"
+    },
+    "OWL-Net": {
+      "header": "OWL-Net-Sensoren",
+      "topLink": "Alle OWL-Net-Sensoren"
+    },
+    "leolabs": {
+      "header": "LeoLabs-Sensoren",
+      "topLink": "Alle LeoLabs-Sensoren"
+    },
+    "esoc": {
+      "header": "Sensoren des Europäischen Raumflugkontrollzentrums",
+      "topLink": "Alle ESOC-Sensoren"
+    },
+    "rus": {
+      "header": "Russische Sensoren",
+      "topLink": "Alle russischen Sensoren"
+    },
+    "prc": {
+      "header": "Chinesische Sensoren",
+      "topLink": "Alle chinesischen Sensoren"
+    },
+    "other": {
+      "header": "Sonstige Sensoren",
+      "topLink": "Sonstige Sensoren"
+    },
+    "dsn": {
+      "header": "NASA Deep Space Network",
+      "topLink": "Alle Komplexe des Deep Space Network"
+    },
+    "scn": {
+      "header": "Satellitenkontrollnetz (AFSCN)",
+      "topLink": "Alle entfernten Bahnverfolgungsstationen"
+    },
+    "estrack": {
+      "header": "ESA-Bodenstationsnetz (ESTRACK)",
+      "topLink": "Alle ESTRACK-Stationen"
+    },
+    "galileo": {
+      "header": "Galileo-Bodensegment",
+      "topLink": "Alle Galileo-Bodenstationen"
+    }
   }
 }

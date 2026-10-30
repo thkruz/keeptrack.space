@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "Spolehlivost" },
-    "CountryColorScheme": { "label": "Země" },
-    "GpAgeColorScheme": { "label": "Stáří GP" },
-    "MissionColorScheme": { "label": "Mise" },
-    "ObjectTypeColorScheme": { "label": "Typ objektu" },
-    "OrbitalPlaneDensityColorScheme": { "label": "Hustota orbitální roviny" },
-    "RcsColorScheme": { "label": "Radarový průřez" },
-    "ReentryRiskColorScheme": { "label": "Riziko znovuvstoupení" },
-    "SmallSatColorScheme": { "label": "Malé satelity" },
-    "SourceColorScheme": { "label": "Zdroj dat" },
-    "SpatialDensityColorScheme": { "label": "Prostorová hustota" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "Stav slunečního svitu" },
-    "VelocityColorScheme": { "label": "Rychlost" },
-    "VisualMagnitudeColorScheme": { "label": "Standardní magnituda" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "Spolehlivost"
+    },
+    "CountryColorScheme": {
+      "label": "Země"
+    },
+    "GpAgeColorScheme": {
+      "label": "Stáří GP"
+    },
+    "MissionColorScheme": {
+      "label": "Mise"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "Typ objektu"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "Hustota orbitální roviny"
+    },
+    "RcsColorScheme": {
+      "label": "Radarový průřez"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "Riziko znovuvstoupení"
+    },
+    "SmallSatColorScheme": {
+      "label": "Malé satelity"
+    },
+    "SourceColorScheme": {
+      "label": "Zdroj dat"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "Prostorová hustota"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "Stav slunečního svitu"
+    },
+    "VelocityColorScheme": {
+      "label": "Rychlost"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "Standardní magnituda"
+    },
+    "legend": {
+      "activePayload": "Aktivní náklad",
+      "inactivePayload": "Neaktivní náklad",
+      "rocketBody": "Raketový stupeň",
+      "debris": "Trosky",
+      "unknown": "Neznámé",
+      "inFieldOfView": "V zorném poli",
+      "sensor": "Senzor",
+      "launchSite": "Místo startu",
+      "confidenceLow": "3 nebo méně",
+      "confidenceMid": "Mezi 3 a 7",
+      "confidenceHigh": "7 nebo více",
+      "other": "Ostatní",
+      "gpAgeLt05": "Méně než 0,5 dne",
+      "gpAge05to1": "Mezi 0,5 a 1 dnem",
+      "gpAge1to15": "Mezi 1 a 1,5 dne",
+      "gpAge15to2": "Mezi 1,5 a 2 dny",
+      "gpAge2to25": "Mezi 2 a 2,5 dny",
+      "gpAge25to3": "Mezi 2,5 a 3 dny",
+      "gpAgeGt3": "Více než 3 dny",
+      "military": "Vojenské",
+      "communications": "Komunikace",
+      "technology": "Technologie",
+      "earthObservation": "Pozorování Země",
+      "science": "Věda",
+      "astronomy": "Astronomie",
+      "navigation": "Navigace",
+      "payload": "Náklad",
+      "specialSats": "Zvláštní družice",
+      "satelliteInView": "Družice v dohledu",
+      "missile": "Raketa",
+      "missileInView": "Raketa v dohledu",
+      "highOrbitDensity": "Vysoká hustota na dráze",
+      "medOrbitDensity": "Střední hustota na dráze",
+      "lowOrbitDensity": "Nízká hustota na dráze",
+      "otherDebris": "Ostatní trosky",
+      "tiniest": "Nejmenší",
+      "verySmall": "Velmi malé",
+      "rcsSmall": "Malé",
+      "belowAverage": "Podprůměrné",
+      "aboveAverage": "Nadprůměrné",
+      "rcsLarge": "Velké",
+      "largest": "Největší",
+      "noData": "Žádná data",
+      "reentryInfo": "Předpověď rizika návratu závisí na mnoha faktorech, mimo jiné na udržování polohy, atmosférickém odporu, slunečních cyklech a poměru hmotnosti k ploše družice. Jde o hrubý odhad založený na perigeu a průměrném vlivu odporu.",
+      "reentryImminent": "Bezprostřední (během dnů)",
+      "reentryDays": "Dny",
+      "reentryWeeks": "Týdny",
+      "reentryMonths": "Měsíce",
+      "noRisk": "Bez rizika",
+      "smallSatellite": "Malá družice",
+      "sourceCelestrakSup": "Celestrak dopl.",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "Import OEM",
+      "otherOrbitDensity": "Ostatní hustota na dráze",
+      "operationalStarlink": "Provozní Starlink",
+      "otherStarlink": "Ostatní Starlink",
+      "notStarlink": "Není Starlink",
+      "inUmbral": "V plném stínu",
+      "inPenumbral": "V polostínu",
+      "inSunlight": "Na slunci",
+      "satelliteInFov": "Družice v zorném poli",
+      "velocity7": "Rychlost ~7 km/s",
+      "velocity4": "Rychlost ~4 km/s",
+      "velocity1": "Rychlost ~1 km/s",
+      "brightest": "Nejjasnější",
+      "veryBright": "Velmi jasné",
+      "bright": "Jasné",
+      "magMedium": "Střední",
+      "dim": "Slabé",
+      "veryDim": "Velmi slabé",
+      "faintest": "Nejslabší",
+      "visMagLessThan35": "Vizuální mag. menší než 3,5",
+      "visMagBetween35And47": "Vizuální mag. mezi 3,5 a 4,7",
+      "visMagGreaterThan47": "Vizuální mag. větší než 4,7",
+      "apogeeBelow2000": "Apogeum < 2000 km",
+      "perigeeAbove35000": "Perigeum > 35000 km"
+    }
   }
 }

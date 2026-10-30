@@ -52,13 +52,13 @@ describe('ProximityOps behavior', () => {
     expect(lines[1]).toContain('"00005"');
   });
 
-  it('updateNoradId_ picks the LEO preset for a low-Earth satellite', () => {
+  it('updateNoradId_ picks the LEO preset (100 km) for a low-Earth satellite', () => {
     vi.spyOn(SelectSatManager.prototype, 'getSelectedSat').mockReturnValue(defaultSat as never);
 
     p().updateNoradId_();
 
     expect((getEl('proximity-ops-type') as HTMLInputElement).value).toBe('LEO');
-    expect((getEl('proximity-ops-maxDis') as HTMLInputElement).value).toBe('5000');
+    expect((getEl('proximity-ops-maxDis') as HTMLInputElement).value).toBe('100');
     expect((getEl('proximity-ops-norad') as HTMLInputElement).value).toBe(defaultSat.sccNum);
   });
 

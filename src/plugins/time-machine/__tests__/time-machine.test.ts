@@ -97,7 +97,7 @@ describe('TimeMachine branches', () => {
   it('playNextSatellite loops at present day when loopTimeMachine is set', () => {
     const groups = ServiceLocator.getGroupsManager();
 
-    vi.spyOn(groups, 'createGroup').mockReturnValue({ updateOrbits: vi.fn() } as never);
+    vi.spyOn(groups, 'createGroup').mockReturnValue({ ids: [], updateOrbits: vi.fn() } as never);
     vi.spyOn(groups, 'selectGroup').mockImplementation(() => undefined);
     // Stub the replay so the scheduled timeout doesn't recurse into a full animation run.
     const playSpy = vi.spyOn(plugin, 'historyOfSatellitesPlay').mockImplementation(() => undefined);
@@ -132,6 +132,62 @@ describe('TimeMachine branches', () => {
     plugin.removeSatellite(0);
 
     expect(clearSpy).not.toHaveBeenCalled();
+  });
+
+  it('removeSatellite un-selects the rail icon when a run ends by itself', () => {
+    plugin.historyOfSatellitesRunCount = 0;
+    plugin.isMenuButtonActive = true;
+    plugin.isTimeMachineRunning = true;
+    const unselectSpy = vi.spyOn(plugin, 'setBottomIconToUnselected');
+
+    plugin.removeSatellite(0);
+
+    expect(unselectSpy).toHaveBeenCalledWith(false);
+    expect(plugin.isMenuButtonActive).toBe(false);
+    expect(plugin.isTimeMachineRunning).toBe(false);
+  });
+
+  it('playNextSatellite leaves inactive analyst slots out of the year group', () => {
+    const groups = ServiceLocator.getGroupsManager();
+    const yearGroup = { ids: [0, 1, 2, 3], updateOrbits: vi.fn() };
+
+    vi.spyOn(groups, 'createGroup').mockReturnValue(yearGroup as never);
+    vi.spyOn(groups, 'selectGroup').mockImplementation(() => undefined);
+    ServiceLocator.getCatalogManager().objectCache = [
+      { id: 0, active: true, sccNum: '00005' },
+      { id: 1, active: false, sccNum: '90000' },
+      { id: 2, active: true, sccNum: '90001' },
+      { id: 3, active: false, sccNum: '99999' },
+    ] as never;
+
+    plugin.isTimeMachineRunning = true;
+    plugin.historyOfSatellitesRunCount = 0;
+    settingsManager.isDisableTimeMachineToasts = true;
+    settingsManager.loopTimeMachine = false;
+    plugin.playNextSatellite(0, 58);
+
+    expect(yearGroup.ids).toEqual([0, 2]);
+  });
+
+  it('starting a run empties #search along with the search filter', () => {
+    const searchManager = ServiceLocator.getUiManager().searchManager;
+    const doSearchSpy = vi.spyOn(searchManager, 'doSearch').mockImplementation(() => undefined);
+
+    vi.spyOn(plugin, 'historyOfSatellitesPlay').mockImplementation(() => undefined);
+    let searchInput = document.getElementById('search') as HTMLInputElement | null;
+
+    if (!searchInput) {
+      searchInput = document.createElement('input');
+      searchInput.id = 'search';
+      document.body.appendChild(searchInput);
+    }
+    searchInput.value = 'ISS';
+    plugin.isMenuButtonActive = true;
+
+    plugin.bottomIconCallback();
+
+    expect(searchInput.value).toBe('');
+    expect(doSearchSpy).toHaveBeenCalledWith('');
   });
 });
 

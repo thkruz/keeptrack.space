@@ -37,7 +37,7 @@ import { defaultGraphicsSettings, GraphicsSettings } from './graphics-settings';
 import { defaultOrbitalSettings, OrbitalSettings } from './orbital-settings';
 import { parseGetVariables } from './parse-get-variables';
 import { defaultPerformanceSettings, PerformanceSettings } from './performance-settings';
-import { applyPersistedSetting, PERSISTED_SETTINGS_TABLE } from './persisted-settings-table';
+import { applyPersistedSetting, PERSISTED_SETTINGS_TABLE, serializeForSave } from './persisted-settings-table';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
 import { defaultUiSettings, SatLabelMode, UiSettings } from './ui-settings';
@@ -73,10 +73,12 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isDrawAurora: 'graphics',
   isDrawGraticule: 'graphics',
   isDrawFlatMapTerminator: 'graphics',
+  isDrawEarth: 'graphics',
   isDrawSun: 'graphics',
   sizeOfSun: 'graphics',
   isUseSunTexture: 'graphics',
   isDrawNightAsDay: 'graphics',
+  isSkipTleInterpolation: 'graphics',
   isDisablePerformanceDowngrade: 'graphics',
   isDisableGodrays: 'graphics',
   godraysSamples: 'graphics',
@@ -484,7 +486,7 @@ export class SettingsManager {
           continue;
         }
 
-        const value = entry.serialize(settingsManager);
+        const value = serializeForSave(entry, settingsManager);
 
         if (value === null) {
           persistence.removeItem(entry.key);

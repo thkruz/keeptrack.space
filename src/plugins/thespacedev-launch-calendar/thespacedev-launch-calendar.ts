@@ -1,5 +1,5 @@
 import { SoundNames } from '@app/engine/audio/sounds';
-import { MenuMode } from '@app/engine/core/interfaces';
+import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -10,15 +10,17 @@ import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
-import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { truncateString } from '@app/engine/utils/truncate-string';
 import { t7e } from '@app/locales/keys';
+import type { WorkSheet } from '@e965/xlsx';
 import calendar2Png from '@public/img/icons/calendar2.png';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import './thespacedev-launch-calendar.css';
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.TheSpaceDevLaunchCalendarPlugin.${key}` as Parameters<typeof t7e>[0]);
+
+type XlsxModule = typeof import('@e965/xlsx');
 
 interface LaunchInfoData {
   window_start: string | number | Date;
@@ -71,6 +73,30 @@ export interface LaunchInfoObject {
   windowEnd: Date;
   windowStart: Date;
 }
+
+/** Error message for an HTTP 429, so the rate-limit toast replaces the generic one. */
+const RATE_LIMITED = 'TheSpaceDevs rate limited';
+
+/** Export column order: every LaunchInfoObject field, under a readable header (locale key `export.<field>`). */
+const EXPORT_FIELDS: (keyof LaunchInfoObject)[] = [
+  'name',
+  'updated',
+  'windowStart',
+  'windowEnd',
+  'location',
+  'locationURL',
+  'agency',
+  'agencyURL',
+  'country',
+  'mission',
+  'missionName',
+  'missionType',
+  'missionURL',
+  'rocket',
+  'rocketConfig',
+  'rocketFamily',
+  'rocketURL',
+];
 
 export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
   readonly id = 'TheSpaceDevLaunchCalendarPlugin';
@@ -168,21 +194,55 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
         this.fetchLaunchData_();
       });
 
+      // Refresh keeps the rows on screen until a new list arrives: a failed request (the free API tier
+      // throttles often) must not throw away the best data the user has.
       getEl('launch-calendar-refresh-btn', true)?.addEventListener('click', () => {
-        this.launchList = [];
-        const tbl = getEl('launch-calendar-table') as HTMLTableElement | null;
-
-        if (tbl) {
-          tbl.innerHTML = '';
-        }
         this.fetchLaunchData_();
       });
 
       getEl('export-launch-info')!.addEventListener('click', () => {
-        ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
-        saveXlsx(this.launchList as unknown as Array<Record<string, unknown>>, 'launchList');
+        this.exportLaunchList_();
       });
     });
+  }
+
+  /** Writes the launch list to launchList.xlsx, or explains why there is nothing to write. */
+  private exportLaunchList_(): Promise<void> {
+    if (this.launchList.length === 0) {
+      ServiceLocator.getUiManager()?.toast(l('msgs.nothingToExport'), ToastMsgType.caution);
+
+      return Promise.resolve();
+    }
+
+    ServiceLocator.getSoundManager()?.play(SoundNames.EXPORT);
+    const launchList = this.launchList;
+
+    return import('@e965/xlsx')
+      .then((XLSX) => {
+        const wb = XLSX.utils.book_new();
+
+        XLSX.utils.book_append_sheet(wb, TheSpaceDevLaunchCalendarPlugin.buildExportSheet(XLSX, launchList), 'Sheet1');
+        XLSX.writeFile(wb, 'launchList.xlsx');
+      })
+      .catch((e: unknown) => errorManagerInstance.error(e as Error, 'TheSpaceDevLaunchCalendarPlugin', t7e('errorMsgs.SaveVariable.xlsx')));
+  }
+
+  /**
+   * Builds the export sheet: every field of each launch (more than the table shows) under readable
+   * column headers, with dates written as spreadsheet dates in UTC so the file matches the table.
+   */
+  static buildExportSheet(XLSX: XlsxModule, launchList: LaunchInfoObject[]): WorkSheet {
+    const headers = EXPORT_FIELDS.map((field) => l(`export.${field}`));
+    const cell = (value: unknown): unknown => {
+      if (value instanceof Date) {
+        return Number.isNaN(value.getTime()) ? '' : value;
+      }
+
+      return value ?? '';
+    };
+    const rows = launchList.map((launch) => Object.fromEntries(EXPORT_FIELDS.map((field, i) => [headers[i], cell(launch[field])])));
+
+    return XLSX.utils.json_to_sheet(rows, { header: headers, UTC: true, dateNF: 'yyyy-mm-dd hh:mm:ss' });
   }
 
   private fetchLaunchData_(): void {
@@ -198,42 +258,69 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
     hideEl('launch-calendar-fetch-btn');
 
     const apiUrl = window.location.hostname === 'localhost' ? 'lldev' : 'll';
+    const apiRoot = `https://${apiUrl}.thespacedevs.com/2.0.0/`;
 
-    fetch(`https://${apiUrl}.thespacedevs.com/2.0.0/launch/upcoming/?format=json&limit=20&mode=detailed`)
-      .then((resp) => resp.json())
-      .then((data) => this.processData(data))
-      .catch(() => errorManagerInstance.warn(`https://${apiUrl}.thespacedevs.com/2.0.0/ is Unavailable!`))
+    fetch(`${apiRoot}launch/upcoming/?format=json&limit=20&mode=detailed`)
+      .then((resp) => {
+        if (resp.status === 429) {
+          throw new Error(RATE_LIMITED);
+        }
+        if (!resp.ok) {
+          throw new Error(`HTTP ${resp.status}`);
+        }
+
+        return resp.json();
+      })
+      .then((data: { results?: LaunchInfoData[] } | null) => {
+        // Replace the list (and the table) only once a new list has arrived.
+        this.processData({ results: Array.isArray(data?.results) ? data.results : [] });
+        this.renderTable_();
+      })
+      .catch((e: unknown) => {
+        if (e instanceof Error && e.message === RATE_LIMITED) {
+          errorManagerInstance.warn(l('msgs.rateLimited'));
+        } else {
+          errorManagerInstance.warn(l('msgs.apiUnavailable').replace('{url}', apiRoot));
+        }
+      })
       .finally(() => {
         this.isFetching_ = false;
         hideAsyncIndicator();
-
-        const tbl = getEl('launch-calendar-table') as HTMLTableElement | null;
-
-        if (!tbl) {
-          return;
-        }
-
-        if (tbl.innerHTML === '' && this.launchList.length > 0) {
-          TheSpaceDevLaunchCalendarPlugin.initTable(tbl, this.launchList);
-          const aElements = getEl('launch-calendar-table')!.querySelectorAll('a');
-
-          aElements.forEach((element) => {
-            element.addEventListener('click', (e) => {
-              e.preventDefault();
-              openColorbox(element.href);
-            });
-          });
-        }
 
         if (this.launchList.length > 0) {
           hideEl('launch-calendar-fetch-btn');
           showEl('launch-calendar-refresh-btn', 'flex');
         } else {
-          // Fetch failed or returned nothing — let the user retry via Fetch.
+          // Fetch failed or returned nothing: let the user retry via Fetch.
           showEl('launch-calendar-fetch-btn', 'flex');
           hideEl('launch-calendar-refresh-btn');
         }
       });
+  }
+
+  /** Rebuilds the results table from `launchList`; an empty list shows a message row. */
+  private renderTable_(): void {
+    const tbl = getEl('launch-calendar-table', true) as HTMLTableElement | null;
+
+    if (!tbl) {
+      return;
+    }
+
+    tbl.replaceChildren();
+
+    if (this.launchList.length === 0) {
+      TheSpaceDevLaunchCalendarPlugin.makeEmptyRow(tbl);
+
+      return;
+    }
+
+    TheSpaceDevLaunchCalendarPlugin.initTable(tbl, this.launchList);
+    tbl.querySelectorAll('a').forEach((element) => {
+      element.addEventListener('click', (e) => {
+        e.preventDefault();
+        openColorbox(element.href);
+      });
+    });
   }
 
   private onUserLogin_(): void {
@@ -284,68 +371,38 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
     }
   }
 
+  /** Replaces `launchList` with the flattened feed records. Tolerates missing or malformed parts. */
   processData(resp: { results: LaunchInfoData[] }) {
-    for (let i = 0; i < resp.results.length; i++) {
-      /**
-       * Info from launchlibrary.net
-       */
-      const launchLibResult = resp.results[i];
+    const unknown = l('msgs.unknown');
+    const text = (value: unknown, fallback = ''): string => (typeof value === 'string' ? value : fallback);
+    const toDate = (value: unknown): Date => new Date(value as string | number | Date);
 
-      const launchInfo: LaunchInfoObject = {
-        name: '',
-        updated: null as unknown as Date,
-        windowStart: new Date(launchLibResult.window_start),
-        windowEnd: new Date(launchLibResult.window_end),
-        location: '',
-        locationURL: '',
-        agency: '',
-        agencyURL: '',
-        country: '',
-        mission: '',
-        missionName: '',
-        missionType: '',
-        missionURL: '',
-        rocket: '',
-        rocketConfig: '',
-        rocketFamily: '',
-        rocketURL: '',
+    this.launchList = resp.results.map((launchLibResult): LaunchInfoObject => {
+      const provider = launchLibResult?.launch_service_provider;
+      const mission = launchLibResult?.mission;
+      const rocket = launchLibResult?.rocket?.configuration;
+      const locationName = launchLibResult?.pad?.location?.name;
+
+      return {
+        name: text(launchLibResult?.name, unknown),
+        updated: typeof launchLibResult?.last_updated === 'undefined' ? (null as unknown as Date) : toDate(launchLibResult.last_updated),
+        windowStart: toDate(launchLibResult?.window_start),
+        windowEnd: toDate(launchLibResult?.window_end),
+        location: typeof locationName === 'string' ? locationName.split(',', 1)[0] : unknown,
+        locationURL: text(launchLibResult?.pad?.wiki_url),
+        agency: provider ? text(provider.name, unknown) : unknown,
+        agencyURL: text(provider?.wiki_url),
+        country: provider ? text(provider.country_code, unknown) : 'UNK',
+        mission: text(mission?.description),
+        missionName: text(mission?.name),
+        missionType: text(mission?.type),
+        missionURL: text(mission?.wiki_url),
+        rocket: text(rocket?.full_name),
+        rocketConfig: text(rocket?.name),
+        rocketFamily: text(rocket?.family),
+        rocketURL: text(rocket?.wiki_url),
       };
-
-      if (typeof launchLibResult.last_updated !== 'undefined') {
-        launchInfo.updated = new Date(launchLibResult.last_updated);
-      }
-      launchInfo.name = typeof launchLibResult.name !== 'undefined' ? launchLibResult.name : l('msgs.unknown');
-      launchInfo.location = launchLibResult.pad?.location?.name.split(',', 1)[0] ?? l('msgs.unknown');
-      launchInfo.locationURL = launchLibResult.pad?.wiki_url ?? '';
-      if (typeof launchLibResult.launch_service_provider !== 'undefined') {
-        launchInfo.agency = typeof launchLibResult.launch_service_provider.name !== 'undefined' ? launchLibResult.launch_service_provider.name : l('msgs.unknown');
-        launchInfo.country = typeof launchLibResult.launch_service_provider.country_code !== 'undefined' ? launchLibResult.launch_service_provider.country_code : l('msgs.unknown');
-        if (typeof launchLibResult.launch_service_provider.wiki_url !== 'undefined') {
-          launchInfo.agencyURL = launchLibResult.launch_service_provider.wiki_url;
-        }
-      } else {
-        launchInfo.agency = l('msgs.unknown');
-        launchInfo.country = 'UNK';
-        launchInfo.agencyURL = '';
-      }
-      if (launchLibResult.mission) {
-        launchInfo.mission = launchLibResult.mission.description;
-        launchInfo.missionName = launchLibResult.mission.name;
-        launchInfo.missionType = launchLibResult.mission.type;
-        if (typeof launchLibResult.mission.wiki_url !== 'undefined') {
-          launchInfo.missionURL = launchLibResult.mission.wiki_url;
-        }
-      }
-      if (launchLibResult.rocket) {
-        launchInfo.rocket = launchLibResult.rocket?.configuration.full_name;
-        launchInfo.rocketConfig = launchLibResult.rocket?.configuration.name;
-        launchInfo.rocketFamily = launchLibResult.rocket?.configuration.family;
-        if (typeof launchLibResult.rocket.configuration.wiki_url !== 'undefined') {
-          launchInfo.rocketURL = launchLibResult.rocket.configuration.wiki_url;
-        }
-      }
-      this.launchList[i] = launchInfo;
-    }
+    });
   }
 
   static makeTableHeaders(tbl: HTMLTableElement): void {
@@ -369,53 +426,85 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
     tdC.appendChild(document.createTextNode(l('table.country')));
   }
 
+  /** The single row shown when the feed answered with no launches. */
+  static makeEmptyRow(tbl: HTMLTableElement): void {
+    const tr = tbl.insertRow();
+    const td = tr.insertCell();
+
+    tr.className = 'launch-calendar-empty-row';
+    td.colSpan = 5;
+    td.textContent = l('msgs.noLaunches');
+  }
+
+  /** The launch window cell text: UTC date and time, or TBD for a stale or unparseable date. */
+  static formatWindow(windowStart: Date | null | undefined): string {
+    const time = windowStart instanceof Date ? windowStart.getTime() : Number.NaN;
+
+    if (Number.isNaN(time) || time <= Date.now() - 1000 * 60 * 60 * 24) {
+      return l('msgs.tbd');
+    }
+
+    try {
+      return `${dateFormat(windowStart as Date, 'isoDateTime', true)} UTC`;
+    } catch {
+      return l('msgs.tbd');
+    }
+  }
+
+  /** Only absolute http(s) links from the feed are kept; anything else renders as plain text. */
+  static safeUrl(url: string | null | undefined): string | null {
+    if (typeof url !== 'string' || url === '') {
+      return null;
+    }
+
+    try {
+      const parsed = new URL(url);
+
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:' ? parsed.href : null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Appends feed text to a cell as a text node, wrapped in an in-app link when the feed has a safe URL.
+   * Feed strings come from a third party: they are never parsed as markup.
+   */
+  static appendFeedText(cell: HTMLElement, label: string, url?: string): void {
+    const href = TheSpaceDevLaunchCalendarPlugin.safeUrl(url);
+
+    if (!href) {
+      cell.appendChild(document.createTextNode(label));
+
+      return;
+    }
+
+    const a = document.createElement('a');
+
+    a.className = 'iframe';
+    a.href = href;
+    a.textContent = label;
+    cell.appendChild(a);
+  }
+
   static initTable(tbl: HTMLTableElement, launchList: LaunchInfoObject[]) {
     TheSpaceDevLaunchCalendarPlugin.makeTableHeaders(tbl);
 
     for (const launchEvent of launchList) {
       const tr = tbl.insertRow();
 
-      // Time Cells
-      const tdT = tr.insertCell();
-      const timeText = launchEvent.windowStart.valueOf() <= Date.now() - 1000 * 60 * 60 * 24 ? l('msgs.tbd') : `${dateFormat(launchEvent.windowStart, 'isoDateTime', true)} UTC`;
+      // Time Cell
+      tr.insertCell().textContent = TheSpaceDevLaunchCalendarPlugin.formatWindow(launchEvent.windowStart);
 
-      tdT.appendChild(document.createTextNode(timeText));
-
-      // Name Cells
+      // Mission name, line break, rocket name
       const tdN = tr.insertCell();
 
-      // Mission Name Text
-      const nameText = launchEvent?.missionName || l('msgs.unknown');
-      // Mission Name HTML Setup
-      const nameHTML =
-        !launchEvent?.missionURL || launchEvent.missionURL === ''
-          ? `${truncateString(nameText, 15)}`
-          : `<a class='iframe' href="${launchEvent.missionURL}">${truncateString(nameText, 15)}</a>`;
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdN, truncateString(launchEvent.missionName || l('msgs.unknown'), 15), launchEvent.missionURL);
+      tdN.appendChild(document.createElement('br'));
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdN, launchEvent.rocket ?? '', launchEvent.rocketURL);
 
-      // Rocket Name HTML Setup
-      const rocketHTML = !launchEvent?.rocketURL ? `${launchEvent.rocket}` : `<a class='iframe' href="${launchEvent.rocketURL}">${launchEvent.rocket}</a>`;
-
-      // Set Name and Rocket HTML
-      tdN.innerHTML = `${nameHTML}<br />${rocketHTML}`;
-
-      // Location Name HTML Setup
-      const locationHTML =
-        !launchEvent?.locationURL || launchEvent?.locationURL === ''
-          ? `${truncateString(launchEvent.location, 25)}`
-          : `<a class='iframe' href="${launchEvent.locationURL}">${truncateString(launchEvent.location, 25)}</a>`;
-
-      const tdL = tr.insertCell();
-
-      tdL.innerHTML = locationHTML;
-
-      // Agency Name HTML Setup
-      const agencyHTML = !launchEvent?.agencyURL
-        ? `${truncateString(launchEvent.agency, 30)}`
-        : `<a class='iframe' href="${launchEvent.agencyURL}">${truncateString(launchEvent.agency, 30)}</a>`;
-
-      const tdA = tr.insertCell();
-
-      tdA.innerHTML = agencyHTML;
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tr.insertCell(), truncateString(launchEvent.location ?? '', 25), launchEvent.locationURL);
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tr.insertCell(), truncateString(launchEvent.agency ?? '', 30), launchEvent.agencyURL);
 
       // Country Cell (wraps long comma-separated country lists, e.g. ESA members).
       // Render a space after each comma so the cell wraps at code boundaries
@@ -423,7 +512,7 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
       const tdC = tr.insertCell();
 
       tdC.className = 'launch-calendar-country-cell';
-      tdC.textContent = launchEvent.country.replace(/,/gu, ', ');
+      tdC.textContent = (launchEvent.country ?? '').replace(/,/gu, ', ');
     }
   }
 }

@@ -376,7 +376,7 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
             <h5 class="side-menu-title-text">${l('title')}</h5>
             <div class="side-menu-title-right">
               <button id="${MENU_ID}-close-btn" class="center-align btn btn-ui waves-effect waves-light icon-btn" type="button">
-                <img src="${leftPanelClosePng}" alt="Close" class="icon-btn-img" />
+                <img src="${leftPanelClosePng}" alt="${l('labels.close')}" class="icon-btn-img" />
               </button>
             </div>
           </div>

@@ -65,6 +65,7 @@
         "plannedFuture": "Zaplanowane na przyszłą aktualizację."
       },
       "filterPlaceholder": "Filtruj ciała…",
+      "filterNoMatches": "Brak pasujących ciał",
       "commands": {
         "toggleMenu": "Przełącz menu Planety",
         "centerOn": "Wyśrodkuj kamerę na {body}"
@@ -75,7 +76,6 @@
         "imgCaption": "Kliknij dowolne ciało, aby wyśrodkować na nim kamerę.",
         "howToUse": "<ol><li>Otwórz menu <strong>Planety</strong> z panelu lub naciśnij <strong>P</strong>.</li><li>Kliknij ciało, na przykład <strong>Mars</strong> lub <strong>Księżyc</strong>. Kamera wyśrodkuje się na nim, a limity przybliżenia dostosują się do nowej skali.</li><li>Naciśnij <strong>Home</strong>, aby wrócić do Ziemi, lub <strong>Shift</strong>+<strong>Home</strong>, aby ponownie wyśrodkować Ziemię w widoku.</li></ol>",
         "tip1": "Orbita księżyca jest rysowana tylko z wnętrza układu jego planety, więc najpierw wyśrodkuj Jowisza lub Saturna.",
-        "tip2": "Możesz też kliknąć prawym przyciskiem w pustą przestrzeń i wybrać ciało z menu kontekstowego.",
         "shortcutToggle": "Przełącz menu Planety",
         "shortcutHome": "Ustaw Ziemię jako ciało centralne",
         "shortcutCenterEarth": "Wyśrodkuj kamerę na Ziemi"

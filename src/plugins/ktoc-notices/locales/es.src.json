@@ -1,0 +1,91 @@
+{
+  "plugins": {
+    "KtocNoticesPlugin": {
+      "bottomIconLabel": "Avisos KTOC",
+      "title": "Avisos KTOC",
+      "shortcutToggle": "Abrir o cerrar Avisos KTOC",
+      "commands": {
+        "open": "Abrir Avisos KTOC",
+        "forSelected": "Avisos KTOC del satélite seleccionado"
+      },
+      "sections": {
+        "filters": "Filtros",
+        "notices": "Avisos"
+      },
+      "labels": {
+        "statusFilter": "Estado del aviso",
+        "all": "Todos",
+        "activeOnly": "Solo activos",
+        "eventType": "Tipo de evento",
+        "allTypes": "Todos los tipos de evento",
+        "showAllSatellites": "Mostrar todos los satélites",
+        "noradFilter": "Avisos de NORAD {norad}",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "pageOf": "Página {current} de {total}",
+        "refresh": "Actualizar",
+        "issuer": "Emitido por KTOC (KeepTrack Operations Center)",
+        "loading": "Cargando avisos KTOC...",
+        "empty": "KTOC aún no ha publicado avisos.",
+        "emptyForNorad": "KTOC no ha publicado avisos para NORAD {norad}.",
+        "noMatches": "Ningún aviso coincide con estos filtros.",
+        "openNotice": "Abrir el aviso completo en keeptrack.space"
+      },
+      "table": {
+        "event": "Evento",
+        "date": "Fecha (UTC)",
+        "satellite": "Satélite",
+        "type": "Tipo",
+        "status": "Estado",
+        "notice": "Aviso"
+      },
+      "types": {
+        "relocation": "Reubicación",
+        "departure": "Salida",
+        "arrival": "Llegada",
+        "disposal": "Retirada",
+        "fragmentation": "Fragmentación",
+        "breakup": "Desintegración",
+        "debrisShed": "Desprendimiento de desechos",
+        "proximity": "Operaciones de proximidad",
+        "deployment": "Despliegue",
+        "maneuver": "Maniobra",
+        "drift": "Deriva",
+        "reentry": "Reentrada",
+        "other": "Otro evento"
+      },
+      "statuses": {
+        "confirmed": "Confirmado",
+        "potential": "Potencial",
+        "canceled": "Cancelado",
+        "unknown": "Estado desconocido"
+      },
+      "values": {
+        "eventNumber": "Evento {num}",
+        "unnumbered": "Sin número",
+        "unknownDate": "Fecha desconocida",
+        "noReason": "Cancelado por KTOC."
+      },
+      "errorMsgs": {
+        "fetchFailed": "Los avisos KTOC no se cargaron ({detail}). Seleccione Actualizar para intentarlo de nuevo.",
+        "refreshFailedKeep": "La actualización falló ({detail}). Se muestra la lista anterior.",
+        "networkDetail": "error de red",
+        "notInCatalog": "NORAD {norad} no está en el catálogo cargado."
+      },
+      "infoBox": {
+        "title": "Avisos KTOC",
+        "titleWithCount": "Avisos KTOC ({count})",
+        "showAll": "Ver los {count} en Avisos KTOC"
+      },
+      "help": {
+        "overview": "Avisos KTOC muestra cada aviso de evento publicado por KTOC (KeepTrack Operations Center): reubicaciones, salidas, fragmentaciones y otros cambios que KTOC detecta en el catálogo público. Cada aviso enlaza con su análisis completo en keeptrack.space.",
+        "statusesHeading": "Estados de los avisos",
+        "statuses": "<ul><li><strong>Potencial</strong>: KTOC publicó el evento con los primeros datos que lo mostraron.</li><li><strong>Confirmado</strong>: datos más recientes coincidieron con el evento publicado.</li><li><strong>Cancelado</strong>: datos más recientes contradijeron el evento. La fila aparece tachada; pase el cursor sobre el estado para leer el motivo.</li></ul>",
+        "howToUse": "<ol><li>Abra <strong>Avisos KTOC</strong> desde el panel (modo Eventos). Se cargan los 100 avisos más recientes, el evento más reciente primero.</li><li>Elija <strong>Todos</strong> o <strong>Solo activos</strong> y un tipo de evento para acotar la lista.</li><li>Haga clic en una fila para seleccionar el satélite y llevar el reloj a la hora del evento. La reproducción o la pausa no cambian.</li><li>Haga clic en el icono de enlace para abrir el aviso completo en keeptrack.space en una pestaña nueva.</li><li>Seleccione <strong>Actualizar</strong> para cargar los avisos más recientes.</li></ol>",
+        "tip1": "Al seleccionar un satélite con avisos, la ficha del satélite muestra una tarjeta Avisos KTOC.",
+        "tip2": "Use la entrada de la paleta de comandos \"Avisos KTOC del satélite seleccionado\" para ver todos los avisos de la selección actual.",
+        "tip3": "La fila de un satélite que no está en el catálogo cargado sigue abriendo su aviso; no se puede seleccionar en la vista 3D."
+      }
+    }
+  }
+}

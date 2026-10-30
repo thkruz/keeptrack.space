@@ -4,6 +4,8 @@
     "clickToPlay": "Klikněte pro přehrávání",
     "clickToPause": "Klikněte pro pozastavení",
     "clickToResume": "Klikněte pro obnovení",
-    "endOfScenario": "Nelze přehrát: Čas simulace je na konci scénáře."
+    "endOfScenario": "Nelze přehrát: Čas simulace je na konci scénáře.",
+    "clickToRewind": "Klikněte pro přetočení zpět",
+    "clickToFastForward": "Klikněte pro přetočení vpřed"
   }
 }

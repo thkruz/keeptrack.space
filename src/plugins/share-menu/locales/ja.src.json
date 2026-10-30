@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "リンクをクリップボードにコピーしました！",
         "copyFailed": "リンクをクリップボードにコピーできませんでした。"
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "ネイティブ共有に失敗しました: {error}"
       }
     }
   }

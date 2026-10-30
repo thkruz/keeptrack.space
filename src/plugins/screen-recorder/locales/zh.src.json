@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "由于兼容性问题，录制不可用！",
-    "compatibilityError": "录制兼容性错误！"
+    "compatibilityError": "录制兼容性错误！",
+    "requesting": "正在请求屏幕共享…",
+    "recording": "正在录制",
+    "stopping": "正在完成录制…",
+    "toggleCommand": "切换屏幕录制",
+    "saved": "录制已保存",
+    "tooShort": "录制时间太短，未保存任何内容",
+    "cancelled": "录制已取消",
+    "notReadable": "无法捕获屏幕。可能有其他应用或系统设置阻止了捕获。",
+    "failed": "录制失败，请重试。"
   }
 }

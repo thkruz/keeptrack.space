@@ -18,7 +18,8 @@
         "activeS2sCones": "Coni Sat a Sat attivi",
         "fovDegrees": "Campo visivo (gradi)",
         "opacity": "Opacità",
-        "targetCatalogNumber": "Numero di catalogo del bersaglio"
+        "targetCatalogNumber": "Numero di catalogo del bersaglio",
+        "targetCatalogPlaceholder": "es. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Campo visivo del sensore",

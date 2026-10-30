@@ -39,7 +39,11 @@
         "endDateInvalid": "La data di fine non è valida.",
         "savingScenario": "Errore durante il salvataggio dello scenario!",
         "loadingScenarioFile": "Errore durante il caricamento del file di scenario!",
-        "decompressingScenarioFile": "Errore durante la decompressione del file di scenario!"
+        "decompressingScenarioFile": "Errore durante la decompressione del file di scenario!",
+        "startAfterEnd": "L'ora di inizio dello scenario deve precedere l'ora di fine.",
+        "invalidDates": "Le ore di inizio e fine dello scenario devono essere date valide.",
+        "bothBoundsRequired": "Devono essere impostate sia l'ora di inizio sia quella di fine dello scenario.",
+        "nameTooLong": "Il nome dello scenario deve avere al massimo 30 caratteri."
       },
       "defaults": {
         "scenarioName": "Il mio scenario",

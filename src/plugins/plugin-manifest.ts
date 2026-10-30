@@ -126,13 +126,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'SatInfoBoxOrbital',
     defaultConfig: satInfoBoxOrbitalConfigurationDefaults,
   },
-  // Off by design: OrbitGuard partner demo; fetches maneuver history from an external API at a hardcoded IP with a shared bearer token, so it is opt-in only (disabled since 241631cb).
-  {
-    configKey: 'SatInfoBoxManeuver',
-    ossImport: () => import('./sat-info-box-orbit-guard/sat-info-box-orbit-guard'),
-    ossClassName: 'SatInfoBoxOrbitGuard',
-    defaultConfig: { enabled: false },
-  },
   {
     configKey: 'SatInfoBoxObject',
     ossImport: () => import('./sat-info-box-object/sat-info-box-object'),
@@ -183,13 +176,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossImport: () => import('./github-link/github-link'),
     ossClassName: 'GithubLinkPlugin',
     defaultConfig: { enabled: true },
-  },
-  // Off by design: example TopMenuPlugin social link; plugin doc says it exists as a sample and its icon still needs restyling to match the GitHub icon (disabled since 241631cb).
-  {
-    configKey: 'LinkedInLinkPlugin',
-    ossImport: () => import('./linkedin-link/linkedin-link'),
-    ossClassName: 'LinkedInLinkPlugin',
-    defaultConfig: { enabled: false },
   },
   {
     configKey: 'ClassificationBar',
@@ -391,12 +377,11 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 83 },
     isLoginRequired: true,
   },
-  // Off by design: OrbitGuard partner demo; queries the external OrbitGuard maneuver API at a hardcoded IP with a shared bearer token, so it is opt-in only (disabled since 241631cb).
   {
-    configKey: 'OrbitGuardMenuPlugin',
-    ossImport: () => import('./orbit-guard-menu/orbit-guard-menu'),
-    ossClassName: 'OrbitGuardMenuPlugin',
-    defaultConfig: { enabled: false, order: 91 },
+    configKey: 'KtocNoticesPlugin',
+    ossImport: () => import('./ktoc-notices/ktoc-notices'),
+    ossClassName: 'KtocNoticesPlugin',
+    defaultConfig: { enabled: true, order: 91 },
   },
   {
     configKey: 'Reentries',
@@ -696,13 +681,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossClassName: 'Screenshot',
     defaultConfig: { enabled: true, order: 450 },
   },
-  // Off by design: superseded by TheSpaceDevLaunchCalendarPlugin as the default launch calendar; 54cbbbc6 states "The Gunter calendar now defaults to disabled".
-  {
-    configKey: 'GunterLaunchCalendar',
-    ossImport: () => import('./gunter-launch-calendar/gunter-launch-calendar'),
-    ossClassName: 'GunterLaunchCalendar',
-    defaultConfig: { enabled: false, order: 351 },
-  },
   {
     configKey: 'TimeMachine',
     ossImport: () => import('./time-machine/time-machine'),
@@ -798,6 +776,13 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/transit-finder/transit-finder') : undefined,
     proClassName: 'TransitFinderPlugin',
     defaultConfig: { enabled: true, order: 426 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'ObservabilityPlanner',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/observability-planner/observability-planner') : undefined,
+    proClassName: 'ObservabilityPlanner',
+    defaultConfig: { enabled: true, order: 427 },
     isLoginRequired: true,
   },
   {
@@ -969,13 +954,6 @@ export const pluginManifest: PluginDescriptor[] = [
     ossImport: () => import('./video-director/video-director'),
     ossClassName: 'VideoDirectorPlugin',
     defaultConfig: { enabled: true, order: 510 },
-  },
-  // Off by design: class is @deprecated; the main website now covers all of this functionality (disabled since 241631cb).
-  {
-    configKey: 'AboutMenuPlugin',
-    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/about-menu/about-menu') : undefined,
-    proClassName: 'AboutMenuPlugin',
-    defaultConfig: { enabled: false, order: 601 },
   },
   {
     configKey: 'EarthPresetsPlugin',

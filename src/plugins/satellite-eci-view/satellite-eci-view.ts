@@ -49,7 +49,7 @@ export class SatelliteEciView extends KeepTrackPlugin {
     return [
       {
         id: 'SatelliteEciView.activate',
-        label: 'Switch to Satellite ECI View',
+        label: t7e('plugins.SatelliteEciView.commandPalette.activate'),
         category: 'View',
         callback: () => this.bottomMenuClicked(),
       },
@@ -65,7 +65,8 @@ export class SatelliteEciView extends KeepTrackPlugin {
       if (isFixedToSatEci && !this.isIconDisabled) {
         this.setBottomIconToSelected();
       } else if (!isFixedToSatEci && this.isMenuButtonActive) {
-        this.setBottomIconToUnselected();
+        // Icon sync only: the camera changed elsewhere, so leave the user's open menu alone.
+        this.setBottomIconToUnselected(false);
       }
     });
   }

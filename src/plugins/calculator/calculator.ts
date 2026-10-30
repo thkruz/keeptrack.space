@@ -23,6 +23,7 @@ import {
   FrameOutputs,
   formatValue,
   frameInputToJ2000,
+  inputHasVelocity,
   j2000ToAllFrames,
   j2000ToFrameValues,
   OutputFormat,
@@ -202,6 +203,9 @@ export class Calculator extends KeepTrackPlugin {
       // <select> popups can't be themed and show an OS-blue hover).
       initMaterialSelects(getEl(this.sideMenuElementName, true) ?? document.body);
     });
+    // Keep the RAE Sensor field on the sensor in use when it changes while RAE is the input frame.
+    EventBus.getInstance().on(EventBusEvent.setSensor, () => this.refreshRaeSensorField_());
+    EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.refreshRaeSensorField_());
   }
 
   private setupEventListeners_(): void {
@@ -253,8 +257,10 @@ export class Calculator extends KeepTrackPlugin {
     getEl('calc-output-sections')?.addEventListener('click', (e) => {
       const target = (e.target as HTMLElement).closest('.calc-output-value') as HTMLElement | null;
 
-      if (target && target.textContent && target.textContent !== '-') {
-        this.copyText_(target.textContent);
+      const text = target?.textContent?.trim();
+
+      if (text && text !== '-') {
+        this.copyText_(text);
       }
     });
   }
@@ -402,18 +408,25 @@ export class Calculator extends KeepTrackPlugin {
       }
     }
 
-    // Auto-populate sensor name for RAE
-    if (this.currentInputFrame_ === CoordFrame.RAE) {
-      const sensor = ServiceLocator.getSensorManager().currentSensors[0];
-      const sensorInput = getEl('calc-in-sensor', true) as HTMLInputElement | null;
-
-      if (sensorInput) {
-        sensorInput.value = sensor?.name ?? l('msgs.noSensorSelected');
-      }
-    }
+    this.refreshRaeSensorField_();
 
     // Apply any persisted field values now that the inputs exist.
     this.applyPendingRestore_();
+  }
+
+  /** Show the current sensor's name in the read-only RAE Sensor field (RAE input only). */
+  private refreshRaeSensorField_(): void {
+    if (this.currentInputFrame_ !== CoordFrame.RAE) {
+      return;
+    }
+
+    const sensorInput = getEl('calc-in-sensor', true) as HTMLInputElement | null;
+
+    if (sensorInput) {
+      const sensor = ServiceLocator.getSensorManager().currentSensors[0];
+
+      sensorInput.value = sensor?.name ?? l('msgs.noSensorSelected');
+    }
   }
 
   private rebuildVelocityFields_(): void {
@@ -477,6 +490,16 @@ export class Calculator extends KeepTrackPlugin {
     return formatValue(value, this.outputFormat_, isAngle);
   }
 
+  /** Eccentricity is dimensionless and always shown to 7 decimals; "-" when undefined. */
+  private formatEccentricity_(ecc: number): string {
+    return Number.isFinite(ecc) ? ecc.toFixed(7) : '-';
+  }
+
+  /** A velocity component, or "-" when it is unknown (position-only input). */
+  private formatVelocity_(value: number | null): string {
+    return value === null ? '-' : this.formatValue_(value);
+  }
+
   // ── Input Reading ──
 
   private readNumericInput_(fieldId: string, fieldName: string): number {
@@ -486,9 +509,10 @@ export class Calculator extends KeepTrackPlugin {
       throw new Error(l('errorMsgs.fieldNotFound').replace('{field}', fieldName));
     }
 
-    const val = Number(el.value);
+    // Number('') is 0, so an empty (or blank) field would convert silently as zero.
+    const val = el.value.trim() === '' ? Number.NaN : Number(el.value);
 
-    if (isNaN(val)) {
+    if (Number.isNaN(val)) {
       throw new Error(l('errorMsgs.invalidInput').replace('{field}', fieldName).replace('{value}', el.value));
     }
 
@@ -545,7 +569,7 @@ export class Calculator extends KeepTrackPlugin {
       const ctx = this.buildContext_(epoch);
       const j2000 = frameInputToJ2000(this.currentInputFrame_, values, ctx);
 
-      this.lastOutputs_ = j2000ToAllFrames(j2000, this.currentInputFrame_, ctx);
+      this.lastOutputs_ = j2000ToAllFrames(j2000, this.currentInputFrame_, ctx, inputHasVelocity(this.currentInputFrame_, values));
       this.renderOutputs_();
       this.updateEpochReadout_(timeManager.simulationTimeObj);
       this.setDisplay_('calc-copy-btn', true);
@@ -571,6 +595,7 @@ export class Calculator extends KeepTrackPlugin {
         el.textContent = value;
       }
     };
+    const fmtVel = (v: number | null) => this.formatVelocity_(v);
     const setCartesian = (prefix: string, c: FrameOutputs['j2000']) => {
       if (!c) {
         return;
@@ -578,9 +603,9 @@ export class Calculator extends KeepTrackPlugin {
       set(`${prefix}-x`, fmt(c.x));
       set(`${prefix}-y`, fmt(c.y));
       set(`${prefix}-z`, fmt(c.z));
-      set(`${prefix}-vx`, fmt(c.vx));
-      set(`${prefix}-vy`, fmt(c.vy));
-      set(`${prefix}-vz`, fmt(c.vz));
+      set(`${prefix}-vx`, fmtVel(c.vx));
+      set(`${prefix}-vy`, fmtVel(c.vy));
+      set(`${prefix}-vz`, fmtVel(c.vz));
     };
 
     setCartesian('j2000', o.j2000);
@@ -642,15 +667,18 @@ export class Calculator extends KeepTrackPlugin {
       return;
     }
 
-    set('ce-sma', fmt(classical.sma));
-    set('ce-ecc', classical.ecc.toFixed(7));
-    set('ce-inc', fmt(classical.inc, true));
-    set('ce-raan', fmt(classical.raan, true));
-    set('ce-argpe', fmt(classical.argpe, true));
-    set('ce-nu', fmt(classical.nu, true));
-    set('ce-period', fmt(classical.period));
-    set('ce-apogee', fmt(classical.apogee));
-    set('ce-perigee', fmt(classical.perigee));
+    // An element undefined for a degenerate supplied velocity (NaN) reads "-", never "NaN".
+    const num = (v: number, isAngle = false) => (Number.isFinite(v) ? fmt(v, isAngle) : '-');
+
+    set('ce-sma', num(classical.sma));
+    set('ce-ecc', this.formatEccentricity_(classical.ecc));
+    set('ce-inc', num(classical.inc, true));
+    set('ce-raan', num(classical.raan, true));
+    set('ce-argpe', num(classical.argpe, true));
+    set('ce-nu', num(classical.nu, true));
+    set('ce-period', num(classical.period));
+    set('ce-apogee', num(classical.apogee));
+    set('ce-perigee', num(classical.perigee));
   }
 
   private updateEpochReadout_(date: Date): void {
@@ -684,7 +712,9 @@ export class Calculator extends KeepTrackPlugin {
       if (!c) {
         return;
       }
-      lines.push(`${coordFrameLabel(frame)}: X=${fmt(c.x)} Y=${fmt(c.y)} Z=${fmt(c.z)} Vx=${fmt(c.vx)} Vy=${fmt(c.vy)} Vz=${fmt(c.vz)}`);
+      lines.push(
+        `${coordFrameLabel(frame)}: X=${fmt(c.x)} Y=${fmt(c.y)} Z=${fmt(c.z)} Vx=${this.formatVelocity_(c.vx)} Vy=${this.formatVelocity_(c.vy)} Vz=${this.formatVelocity_(c.vz)}`
+      );
     };
 
     pushCart(CoordFrame.J2000, o.j2000);
@@ -701,13 +731,15 @@ export class Calculator extends KeepTrackPlugin {
     }
     if (o.classical && o.classical !== 'needsVelocity') {
       const c = o.classical;
+      const num = (v: number, isAngle = false) => (Number.isFinite(v) ? fmt(v, isAngle) : '-');
 
       lines.push(
-        `${coordFrameLabel(CoordFrame.CLASSICAL)}: a=${fmt(c.sma)} e=${c.ecc.toFixed(7)} i=${fmt(c.inc, true)} RAAN=${fmt(c.raan, true)} argPe=${fmt(c.argpe, true)} nu=${fmt(c.nu, true)}`
+        `${coordFrameLabel(CoordFrame.CLASSICAL)}: a=${num(c.sma)} e=${this.formatEccentricity_(c.ecc)} i=${num(c.inc, true)} RAAN=${num(c.raan, true)} argPe=${num(c.argpe, true)} nu=${num(c.nu, true)}`
       );
     }
 
-    this.copyText_(lines.join('\n'));
+    // No trailing padding on any copied line.
+    this.copyText_(lines.map((line) => line.trimEnd()).join('\n'));
   }
 
   private copyText_(text: string): void {

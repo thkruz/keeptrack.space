@@ -19,7 +19,8 @@
         "daylightOnly": "Jour uniquement",
         "nadirReadout": "Largeur au nadir env. {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Largeur au nadir inconnue pour cette orbite",
-        "presetsIllustrative": "Les préréglages sont illustratifs, pas des spécifications publiées."
+        "presetsIllustrative": "Les préréglages sont illustratifs, pas des spécifications publiées.",
+        "close": "Fermer"
       },
       "presets": {
         "hrEo": "Optique haute résolution",

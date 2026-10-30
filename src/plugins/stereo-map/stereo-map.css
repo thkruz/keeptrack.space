@@ -1,3 +1,7 @@
+#map-menu {
+  left: var(--drawer-offset, 0px) !important;
+}
+
 #map-menu-secondary {
   z-index: 5 !important;
   /* Clear the plugin-drawer rail on the left instead of pinning at 0 (where the
@@ -19,6 +23,13 @@
   outline: 2px solid white;
   outline-offset: -1px;
   box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+}
+
+#map-menu-canvas-wrap .map-look:focus-visible {
+  outline: 3px solid white;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 3px black;
+  z-index: 1;
 }
 
 /* ===== v13 secondary settings menu (Pro) ===== */

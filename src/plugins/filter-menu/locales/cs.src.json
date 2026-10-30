@@ -15,6 +15,7 @@
       "resetToDefaults": "Obnovit výchozí",
       "defaultTooltip": "Vypněte pro skrytí {name}",
       "searchPlaceholder": "Hledat filtry...",
+      "noResults": "Hledání neodpovídá žádný filtr.",
       "commands": {
         "category": "Filtry",
         "open": "Otevřít nabídku filtrů",

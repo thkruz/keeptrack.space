@@ -29,7 +29,7 @@
         "apogeeKm": "Apogeum (km)",
         "perigeeKm": "Perygeum (km)",
         "smaKm": "Półoś wielka (km)",
-        "velocityKms": "Prędkość orbitalna (km/s)",
+        "velocityKms": "Prędkość w epoce (km/s)",
         "sectionIdentity": "Tożsamość",
         "sectionOrbit": "Orbita",
         "sectionEpoch": "Epoka",
@@ -74,10 +74,21 @@
         "invalidPeriod": "Nieprawidłowy okres. Musi mieć format NN.NNNN do NNNN.NNNN (np. 90.0000, 9999.9999) z łącznie 8 cyframi.",
         "invalidSource": "Nieprawidłowe źródło. Nie może być puste.",
         "invalidName": "Nieprawidłowa nazwa. Nie może być pusta.",
-        "slotOccupied": "Nadpisywanie istniejącego satelity {name} w slocie {scc}.",
         "noFreeSlots": "Brak wolnych slotów analitycznych (90000-99999 są zajęte).",
         "noSatSelected": "Najpierw wybierz satelitę do sklonowania.",
-        "tleChecksumMismatch": "Suma kontrolna wiersza {line} TLE wynosi {actual}, a powinna wynosić {expected}. Może to wskazywać na literówkę. Kontynuowanie mimo to."
+        "tleChecksumMismatch": "Suma kontrolna wiersza {line} TLE wynosi {actual}, a powinna wynosić {expected}. Może to wskazywać na literówkę. Kontynuowanie mimo to.",
+        "periodToMeanMotionFailed": "Błąd przeliczania okresu na ruch średni",
+        "meanMotionToPeriodFailed": "Błąd przeliczania ruchu średniego na okres: {error}",
+        "satrecFailed": "Błąd tworzenia rekordu satelity!",
+        "cruncherFailed": "Komunikat do Sat Cruncher nie powiódł się",
+        "orbitBufferFailed": "Zmiana danych bufora orbity nie powiodła się",
+        "createFailed": "Nie udało się utworzyć satelity: {error}",
+        "rangeError": "{field} musi mieścić się w zakresie od {min} do {max}.",
+        "rangeErrorDeg": "{field} musi mieścić się w zakresie od {min} do {max} stopni.",
+        "meanMotionRange": "{field} musi być większy od 0 i wynosić najwyżej {max} obiegów na dobę.",
+        "periodPositive": "{field} musi być dodatnią liczbą minut.",
+        "numberRequired": "{field} musi być liczbą.",
+        "noradIdReserved": "NORAD ID {id} jest zajęty przez trajektorię startu. Wybierz inny identyfikator lub najpierw usuń trajektorię."
       },
       "successMsgs": {
         "satCreated": "Satelita {name} ({scc}) utworzony pomyślnie",
@@ -90,7 +101,7 @@
         "tabsHeading": "Zakładki Podstawowe i Zaawansowane",
         "tabs": "Zakładka <strong>Podstawowe</strong> wymaga tylko numeru NORAD, nazwy oraz pól <strong>Inklinacja</strong>, <strong>Wysokość apogeum</strong> i <strong>Wysokość perygeum</strong>; reszta orbity jest wyznaczana automatycznie. Zakładka <strong>Zaawansowane</strong> udostępnia pełny zestaw elementów: <strong>Typ obiektu</strong>, <strong>Kraj</strong>, epokę oraz pola <strong>Rektascensja</strong>, <strong>Mimośród</strong>, <strong>Argument perycentrum</strong>, <strong>Anomalia średnia</strong> i <strong>Ruch średni</strong> lub <strong>Okres</strong> (edycja jednego przelicza drugie). Panel <strong>Obliczone parametry</strong> na bieżąco pokazuje wynikowe apogeum, perygeum, półoś wielką i prędkość orbitalną.",
         "howToUse": "<ol><li>Otwórz menu <strong>Utwórz satelitę</strong> z panelu.</li><li>Wybierz wolny numer NORAD z zakresu 90000 do 99999 i nadaj satelicie nazwę.</li><li>Na zakładce <strong>Podstawowe</strong> wprowadź inklinację, apogeum i perygeum; albo przełącz się na zakładkę <strong>Zaawansowane</strong>, aby podać pełny zestaw elementów.</li><li>Kliknij <strong>Utwórz satelitę</strong>. Nowy obiekt pojawia się natychmiast, a powiadomienie potwierdza jego nazwę i numer.</li><li>Użyj <strong>Zapisz TLE</strong>, aby wyeksportować elementy utworzonego satelity do pliku, który można później wczytać ponownie.</li></ol>",
-        "tip1": "Każde pole jest walidowane z osobnym komunikatem błędu; jeśli utworzenie się nie powiedzie, powiadomienie dokładnie wskaże, którą wartość poprawić.",
+        "tip1": "Każde nieprawidłowe pole jest wymienione nad przyciskiem Utwórz satelitę i oznaczone w formularzu. Każdy komunikat znika, gdy tylko poprawisz to pole.",
         "tip2": "Perygeum poniżej około 100 km jest odrzucane, ponieważ satelita natychmiast uległby deorbitacji.",
         "tip3": "Utworzone satelity istnieją tylko w bieżącej sesji; wyeksportuj TLE, jeśli chcesz zachować obiekt na inny dzień."
       },
@@ -103,6 +114,13 @@
         "gto": "Transferowa do GEO (GTO)",
         "molniya": "Molniya",
         "polar": "Polarna (600 km)"
+      },
+      "confirm": {
+        "title": "Zastąpić satelitę?",
+        "message": "Zastąpić {name} o identyfikatorze analityka {scc}?",
+        "replace": "Zastąp",
+        "cancel": "Anuluj",
+        "changed": "Satelita lub formularz uległ zmianie. Sprawdź i wyślij ponownie."
       }
     }
   }

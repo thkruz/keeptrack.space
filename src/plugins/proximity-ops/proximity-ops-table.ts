@@ -4,7 +4,7 @@
  * The shared, column-configurable renderer (engine/conjunction) owns the table
  * structure and the row click hooks; this module only declares the RPO columns
  * (target/chaser identity, miss distance, the RIC breakdown, relative velocity,
- * a lazily-filled Pc cell, and the encounter date). Pure DOM building - no
+ * the Pc cell, and the encounter date, labelled when the minimum sits on a window edge). Pure DOM building - no
  * ServiceLocator/network - so it stays unit-testable.
  */
 
@@ -24,6 +24,24 @@ export interface ProximityOpsTableLabels {
   relVelocity: string;
   pc: string;
   date: string;
+  /** Suffix for a minimum on the window start, e.g. "at window start". */
+  atWindowStart: string;
+  /** Suffix for a minimum on the window end, e.g. "at window end". */
+  atWindowEnd: string;
+}
+
+/** Compact "YYYY-MM-DD HH:MM" (drop the ISO 'T' and seconds), plus the window-edge label when the minimum sits on an edge. */
+export function rpoDateCell(event: ProximityOpsEvent, labels: Pick<ProximityOpsTableLabels, 'atWindowStart' | 'atWindowEnd'>): string {
+  const date = event.date.toISOString().slice(0, 16).replace('T', ' ');
+
+  if (event.windowEdge === 'start') {
+    return `${date} (${labels.atWindowStart})`;
+  }
+  if (event.windowEdge === 'end') {
+    return `${date} (${labels.atWindowEnd})`;
+  }
+
+  return date;
 }
 
 /** Shown in the Pc cell when the probability of collision could not be computed. */
@@ -54,8 +72,7 @@ export function renderProximityOpsTable(
     { header: labels.crosstrack, cell: (e) => e.ric.position.z.toFixed(2), sortKey: 'crosstrack' },
     { header: labels.relVelocity, cell: (e) => e.vel.toFixed(3), sortKey: 'vel' },
     { header: labels.pc, cell: (e) => (typeof e.pc === 'number' ? e.pc.toExponential(2) : RPO_PC_PLACEHOLDER), sortKey: 'pc' },
-    // Compact "YYYY-MM-DD HH:MM" (drop the ISO 'T' and seconds) to keep the column narrow.
-    { header: labels.date, cell: (e) => e.date.toISOString().slice(0, 16).replace('T', ' '), sortKey: 'date' },
+    { header: labels.date, cell: (e) => rpoDateCell(e, labels), sortKey: 'date' },
   ];
 
   renderConjunctionTable(tbl, events, columns, { rowClass: `${eventRowClass} link`, sort });

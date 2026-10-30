@@ -8,9 +8,9 @@
         "satellite": "Satellite",
         "tvchannel": "Chaîne TV",
         "beam": "Faisceau",
-        "freq": "Fréquence",
+        "freq": "Fréquence (MHz)",
         "system": "Système",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Vidéo",
         "lang": "Langue",
         "encryption": "Chiffrement"
@@ -19,7 +19,8 @@
         "NoChannelInfo": "Le satellite n'a pas d'informations de canal",
         "NotSatellite": "L'objet sélectionné n'est pas un satellite",
         "FetchFailed": "Impossible de récupérer les informations de canal pour {name} et {altName}",
-        "NoData": "Aucune donnée de canal disponible"
+        "NoData": "Aucune donnée de canal disponible",
+        "SaveXlsxFailed": "Erreur lors de l'enregistrement du fichier xlsx !"
       },
       "help": {
         "overview": "Les informations transpondeur et canal montrent ce qu'un satellite géostationnaire de TV ou de communications diffuse réellement : chaque canal connu avec sa fréquence, son faisceau, son système de transmission et son chiffrement. Les données couvrent quelques centaines de satellites de diffusion bien connus et sont récupérées en direct à l'ouverture du menu.",
@@ -41,9 +42,11 @@
         "statusLoading": "Chargement des chaînes…",
         "statusEmpty": "Aucune donnée de chaîne disponible",
         "statusNoMatch": "Aucune chaîne ne correspond au filtre",
-        "statusError": "Impossible de charger les données de chaîne"
+        "statusError": "Impossible de charger les données de chaîne",
+        "retry": "Réessayer"
       },
-      "attribution": "Données de chaînes issues de l'API KeepTrack (listes publiques)."
+      "attribution": "Données de chaînes issues de l'API KeepTrack (listes publiques).",
+      "searchAliases": "Fréquences satellites,Transpondeur,Données des chaînes"
     }
   }
 }

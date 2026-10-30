@@ -1,7 +1,9 @@
 import { PluginDrawer } from '@app/app/ui/plugin-drawer';
-import { getShortcutHint, loadRecents, recordRecent } from '@app/app/ui/plugin-drawer-helpers';
+import { buildRecentGroupFromCache, getShortcutHint, loadRecents, recordRecent, renderStatusFooter } from '@app/app/ui/plugin-drawer-helpers';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -140,10 +142,43 @@ describe('PluginDrawer internals', () => {
 
     p().refreshRecentGroup_([{ id: 'recent-sync-icon', t: 1 }]);
 
-    const item = getEl('drawer-content')!.querySelector('.drawer-item[data-plugin-id="recent-sync-icon"]') as HTMLElement;
+    const item = getEl('drawer-content')!.querySelector('.drawer-item[data-recent-plugin-id="recent-sync-icon"]') as HTMLElement;
 
     expect(item.classList.contains('disabled')).toBe(false);
     expect(item.classList.contains('active')).toBe(true);
+  });
+
+  it('Recent rows use data-recent-plugin-id so the data-plugin-id selector stays unique', () => {
+    p().createDrawerDom_();
+    p().renderMenuGroups_({ analysis: group() }, { label: 'Recent', items: [group().items[0]] });
+    const content = getEl('drawer-content')!;
+
+    expect(content.querySelectorAll('.drawer-item[data-plugin-id="PluginA"]')).toHaveLength(1);
+    expect(content.querySelectorAll('.drawer-group[data-group-key="recent"] .drawer-item[data-recent-plugin-id="PluginA"]')).toHaveLength(1);
+    expect(content.querySelector('.drawer-group[data-group-key="recent"] [data-plugin-id]')).toBeNull();
+  });
+
+  it('a Recent row still activates its plugin on click', () => {
+    vi.useFakeTimers();
+    p().createDrawerDom_();
+    p().wireEventListeners_();
+    p().renderMenuGroups_({ analysis: group() }, { label: 'Recent', items: [group().items[0]] });
+    const emit = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    (getEl('drawer-content')!.querySelector('.drawer-item[data-recent-plugin-id="PluginA"]') as HTMLElement).click();
+    vi.advanceTimersByTime(200);
+
+    expect(emit).toHaveBeenCalledWith(EventBusEvent.bottomMenuClick, 'PluginA');
+    vi.useRealTimers();
+  });
+
+  it('buildRecentGroupFromCache skips items excluded from Recent', () => {
+    const items = new Map([
+      ['kept', { id: 'kept', label: 'Kept', imgSrc: '', isTopMenu: false, order: 0 }],
+      ['action', { id: 'action', label: 'Action', imgSrc: '', isTopMenu: false, order: 0, isExcludedFromRecent: true }],
+    ]);
+
+    expect(buildRecentGroupFromCache(['action', 'kept'], items).items.map((item) => item.id)).toEqual(['kept']);
   });
 
   it('buildRecentGroup_ indexes non-top-menu items into the drawer cache', () => {
@@ -202,5 +237,45 @@ describe('shared recents store', () => {
       { id: 'menu-apple', t: 0 },
       { id: 'menu-banana', t: 0 },
     ]);
+  });
+});
+
+describe('drawer status footer links', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+    getEl('drawer-status-footer', true)?.remove();
+    document.body.insertAdjacentHTML('beforeend', '<div id="drawer-status-footer"></div>');
+  });
+
+  afterEach(() => {
+    getEl('drawer-status-footer', true)?.remove();
+  });
+
+  it('renders About, Data, Terms and Privacy as new-tab links under the version', () => {
+    renderStatusFooter();
+
+    const footer = getEl('drawer-status-footer')!;
+    const links = [...footer.querySelectorAll<HTMLAnchorElement>('.drawer-footer-links a')].map((a) => ({
+      key: a.dataset.footerLink,
+      href: a.getAttribute('href'),
+      target: a.getAttribute('target'),
+      rel: a.getAttribute('rel'),
+      text: a.textContent,
+    }));
+
+    expect(links.map((l) => [l.key, l.href])).toEqual([
+      ['about', 'https://keeptrack.space/about'],
+      ['data', 'https://keeptrack.space/data'],
+      ['terms', 'https://keeptrack.space/terms'],
+      ['privacy', 'https://keeptrack.space/privacy'],
+    ]);
+    for (const link of links) {
+      expect(link.target).toBe('_blank');
+      expect(link.rel).toBe('noopener noreferrer');
+      expect(link.text?.length).toBeGreaterThan(0);
+    }
+    // The links row follows the version line.
+    expect(footer.querySelector('.drawer-status-version')?.nextElementSibling?.classList.contains('drawer-footer-links')).toBe(true);
+    expect(footer.querySelectorAll('.drawer-footer-links__sep')).toHaveLength(3);
   });
 });

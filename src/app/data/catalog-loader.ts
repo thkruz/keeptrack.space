@@ -1,4 +1,5 @@
 /* eslint-disable max-lines */
+
 import { DetailedSensor, DetailedSensorParams } from '@app/app/sensors/DetailedSensor';
 import { rgbaArray, SolarBody } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -7,6 +8,7 @@ import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodi
 import { allPlanetMoons } from '@app/engine/rendering/draw-manager/celestial-bodies/planet-moon-systems';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { StringPad } from '@app/engine/utils/stringPad';
+import { t7e } from '@app/locales/keys';
 import { CruncherSat } from '@app/webworker/positionCruncher';
 import {
   BaseObject,
@@ -34,6 +36,7 @@ import { CatalogManager } from './catalog-manager';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { orgDataService } from './catalogs/org-data-service';
+import { hasRealSccNum, isSyntheticVimpel } from './synthetic-vimpel';
 
 export interface JsSat {
   TLE1: string;
@@ -204,6 +207,23 @@ export class CatalogLoader {
    *  If all files are missing, the function will return an error.
    */
   static async load(): Promise<void> {
+    /*
+     * At boot nothing is propagated yet and keeptrack.ts builds the buffers after this returns.
+     * Called again later (Catalog Browser: Default, CelesTrak Only) it is a live catalog swap: run
+     * it through the same scaffolding as the other reload paths, so the selection is cleared, the
+     * buffers are rebuilt for the new size and catalogReloaded fires once the new positions exist.
+     */
+    if (window.settingsManager.cruncherReady) {
+      await CatalogLoader.reloadWith_(() => CatalogLoader.loadSources_());
+
+      return;
+    }
+
+    await CatalogLoader.loadSources_();
+  }
+
+  /** Fetches the configured catalog sources and parses them (the body of {@link load}). */
+  private static async loadSources_(): Promise<void> {
     const settingsManager: SettingsManager = window.settingsManager;
 
     // Loading the live catalog measures GP age against the wall clock again.
@@ -234,7 +254,7 @@ export class CatalogLoader {
               })
             )
             .catch((error) => {
-              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog', t7e('errorMsgs.CatalogLoader.catalogLoadError'));
             });
         } else {
           // Load the external TLEs only
@@ -255,7 +275,7 @@ export class CatalogLoader {
             })
           )
           .catch((error) => {
-            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+            errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog', t7e('errorMsgs.CatalogLoader.catalogLoadError'));
           });
       } else if (settingsManager.offlineMode) {
         await fetch(`${settingsManager.installDirectory}tle/tle.json`)
@@ -290,7 +310,7 @@ export class CatalogLoader {
           )
           .catch(async (error) => {
             if (error.message === 'Failed to fetch') {
-              errorManagerInstance.warn('Failed to download latest catalog! Using offline catalog which may be out of date!');
+              errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.usingOfflineCatalog'));
               await fetch(`${settingsManager.installDirectory}tle/tle.json`)
                 .then((response) => response.json())
                 .then((data) =>
@@ -303,12 +323,12 @@ export class CatalogLoader {
                   })
                 );
             } else {
-              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog');
+              errorManagerInstance.error(error, 'tleManagerInstance.loadCatalog', t7e('errorMsgs.CatalogLoader.catalogLoadError'));
             }
           });
       }
     } catch {
-      errorManagerInstance.warn('Failed to load TLE catalog(s)!');
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.catalogsLoadFailed'));
     }
   }
 
@@ -415,11 +435,17 @@ export class CatalogLoader {
    * Reloads the entire satellite catalog from raw TLE text content.
    * Resets all rendering subsystems and re-initializes the propagation worker.
    * Supports .tce (2-line), .tle (3-line), and .txt TLE files.
+   *
+   * @param vimpelCatalog Optional JSC Vimpel objects without a NORAD number, added
+   * after the TLE objects through the same Vimpel pipeline as at boot (keyed by
+   * their own Vimpel id). Their TLEs all carry catalog number 00000, so passing
+   * them inside `tceContent` would collapse them onto one slot. Used by the
+   * Scenario Management "Full Satellite Catalog" load.
    */
-  static async reloadCatalog(tceContent: string): Promise<void> {
+  static async reloadCatalog(tceContent: string, vimpelCatalog: JsSat[] = []): Promise<void> {
     const asciiCatalog = CatalogLoader.parseTceContent(tceContent);
 
-    if (asciiCatalog.length === 0) {
+    if (asciiCatalog.length === 0 && vimpelCatalog.length === 0) {
       throw new Error('No valid TLE data found in file');
     }
 
@@ -428,6 +454,7 @@ export class CatalogLoader {
     await CatalogLoader.reloadFromParseArgs_({
       keepTrackTle: [],
       externalCatalog: Promise.resolve(asciiCatalog),
+      ...(vimpelCatalog.length > 0 ? { vimpelCatalog: Promise.resolve(vimpelCatalog) } : {}),
     });
   }
 
@@ -457,6 +484,15 @@ export class CatalogLoader {
    * and keeps the loading screen up until the propagation worker reports ready.
    */
   private static async reloadFromParseArgs_(parseArgs: Parameters<typeof CatalogLoader.parse>[0]): Promise<void> {
+    await CatalogLoader.reloadWith_(() => CatalogLoader.parse(parseArgs));
+  }
+
+  /**
+   * The live-swap scaffolding around any catalog parse: deselects, resets the rendering
+   * subsystems, runs `runParse`, rebuilds the buffers, and emits catalogReloaded once the
+   * propagation worker has positions for the new catalog.
+   */
+  private static async reloadWith_(runParse: () => Promise<void>): Promise<void> {
     const { showLoadingSticky, hideLoading } = await import('../../engine/utils/showLoading');
     const { SelectSatManager } = await import('../../plugins/select-sat-manager/select-sat-manager');
     const { EventBus } = await import('../../engine/events/event-bus');
@@ -500,7 +536,7 @@ export class CatalogLoader {
       colorSchemeManager.resetForCatalogSwap();
 
       // Re-parse the catalog via existing pipeline
-      await CatalogLoader.parse(parseArgs);
+      await runParse();
 
       // Re-init GPU buffers with the new catalog size
       // This must run after parse (which sets objectCache/numObjects) but before
@@ -710,8 +746,13 @@ export class CatalogLoader {
   /**
    * Reloads the catalog from pre-built KeepTrackTLEFile data (with full metadata).
    * Use this when merging has already been done externally (e.g., against a cached catalog).
+   *
+   * @param vimpelCatalog Optional JSC Vimpel objects without a NORAD number, added through the
+   * same Vimpel pipeline as at boot (keyed by their own Vimpel id). Their TLEs all carry catalog
+   * number 00000, so passing them inside `data` collapses them onto one sccIndex slot and drops
+   * all but one.
    */
-  static async reloadCatalogFromData(data: KeepTrackTLEFile[]): Promise<void> {
+  static async reloadCatalogFromData(data: KeepTrackTLEFile[], vimpelCatalog: JsSat[] = []): Promise<void> {
     const { showLoadingSticky, hideLoading } = await import('../../engine/utils/showLoading');
     const { SelectSatManager } = await import('../../plugins/select-sat-manager/select-sat-manager');
     const { EventBus } = await import('../../engine/events/event-bus');
@@ -750,6 +791,7 @@ export class CatalogLoader {
 
       await CatalogLoader.parse({
         keepTrackTle: data,
+        ...(vimpelCatalog.length > 0 ? { vimpelCatalog: Promise.resolve(vimpelCatalog) } : {}),
       });
 
       dotsManager.initBuffers(colorSchemeManager.colorBuffer!);
@@ -1121,7 +1163,7 @@ export class CatalogLoader {
             } else if (content[1].startsWith('1 ')) {
               CatalogLoader.parseAscii3LE_(content, externalCatalog);
             } else {
-              errorManagerInstance.warn('External TLEs are not in the correct format');
+              errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.externalTlesBadFormat'));
             }
 
             CatalogLoader.sortByScc_(externalCatalog);
@@ -1129,14 +1171,14 @@ export class CatalogLoader {
             return externalCatalog;
           });
         }
-        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
+        errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.externalTlesLoadError').replace('{url}', settingsManager.dataSources.externalTLEs));
         errorManagerInstance.info('Reverting to internal TLEs');
         settingsManager.dataSources.externalTLEs = '';
 
         return [];
       })
       .catch(() => {
-        errorManagerInstance.warn(`Error loading external TLEs from ${settingsManager.dataSources.externalTLEs}`);
+        errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.externalTlesLoadError').replace('{url}', settingsManager.dataSources.externalTLEs));
         errorManagerInstance.info('Reverting to internal TLEs');
         settingsManager.dataSources.externalTLEs = '';
 
@@ -1151,7 +1193,7 @@ export class CatalogLoader {
    */
   private static async getExtraCatalog_(settingsManager: SettingsManager): Promise<ExtraSat[]> {
     return (await fetch(`${settingsManager.installDirectory}tle/extra.json`)).json().catch(() => {
-      errorManagerInstance.warn('Error loading extra.json');
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.fileLoadError').replace('{file}', 'extra.json'));
     });
   }
 
@@ -1178,7 +1220,7 @@ export class CatalogLoader {
         throw new Error('Error loading vimpel.json');
       })
       .catch(async () => {
-        errorManagerInstance.warn('Failed to download latest vimpel.json ! Using offline vimpel.json which may be out of date!');
+        errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.usingOfflineVimpel'));
 
         const vimpelJson = (await fetch(`${settingsManager.installDirectory}tle/vimpel.json`)
           .then((response) => {
@@ -1188,7 +1230,7 @@ export class CatalogLoader {
             throw new Error('Error loading fallback vimpel.json');
           })
           .catch(() => {
-            errorManagerInstance.warn('Error loading fallback vimpel.json');
+            errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.fileLoadError').replace('{file}', 'vimpel.json'));
 
             return [];
           })) as JsSat[];
@@ -1384,7 +1426,8 @@ export class CatalogLoader {
       resp[i].source = CatalogSource.UNKNOWN;
     }
 
-    const intlDes = CatalogLoader.parseIntlDes_(resp[i].tle1);
+    // Synthetic JSC Vimpel rows carry the Vimpel id in the designator field.
+    const intlDes = isSyntheticVimpel(resp[i]) ? '' : CatalogLoader.parseIntlDes_(resp[i].tle1);
 
     resp[i].intlDes = intlDes;
     resp[i].active = true;
@@ -1454,7 +1497,9 @@ export class CatalogLoader {
 
       if (isAddedToCatalog) {
         catalogManagerInstance.sccIndex[key] = tempObjData.length - 1;
-        catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
+        if (resp[i].intlDes) {
+          catalogManagerInstance.cosparIndex[`${resp[i].intlDes}`] = tempObjData.length - 1;
+        }
       }
     }
 
@@ -1540,7 +1585,7 @@ export class CatalogLoader {
 
       tempSatData[i] = satellite;
     } catch {
-      errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.satProcessFailed').replace('{name}', element.ON).replace('{scc}', String(element.SCC)));
     }
   }
 
@@ -1619,7 +1664,7 @@ export class CatalogLoader {
 
       tempSatData.push(satellite);
     } catch {
-      errorManagerInstance.warn(`Failed to process satellite: ${element.ON} (${element.SCC})`);
+      errorManagerInstance.warn(t7e('errorMsgs.CatalogLoader.satProcessFailed').replace('{name}', element.ON).replace('{scc}', String(element.SCC)));
     }
   }
 
@@ -1666,7 +1711,9 @@ export class CatalogLoader {
         const key = CatalogLoader.canonicalSccKey(tempSatData[idx].sccNum) ?? tempSatData[idx].sccNum;
 
         catalogManagerInstance.sccIndex[key] = idx;
-        catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
+        if (tempSatData[idx].intlDes) {
+          catalogManagerInstance.cosparIndex[`${tempSatData[idx].intlDes}`] = idx;
+        }
       }
     }
 
@@ -1788,6 +1835,8 @@ export class CatalogLoader {
             });
 
             satellite.id = tempObjData.length;
+            // Never indexed into cosparIndex: the designator field holds the Vimpel id.
+            CatalogLoader.clearSyntheticVimpelIntlDes_(satellite);
 
             tempObjData.push(satellite);
           } catch (err) {
@@ -1805,7 +1854,21 @@ export class CatalogLoader {
 
   /** True for a real NORAD number; synthetic JSC Vimpel objects carry '' or '00000'. */
   static hasRealSccNum(sccNum?: string | null): boolean {
-    return typeof sccNum === 'string' && sccNum.length > 0 && !/^0+$/u.test(sccNum);
+    return hasRealSccNum(sccNum);
+  }
+
+  /**
+   * ootk's Satellite reads intlDes from line-1 columns 10-17, but JSC Vimpel writes
+   * its own object number there (55402 reads as "2055-402", 26100 as "2026-100",
+   * which collides with a real designator). A synthetic Vimpel object has no
+   * COSPAR ID, so blank it. Real objects on a Vimpel elset keep theirs.
+   */
+  private static clearSyntheticVimpelIntlDes_<T extends BaseObject>(obj: T): T {
+    if (obj instanceof Satellite && isSyntheticVimpel(obj)) {
+      obj.intlDes = '';
+    }
+
+    return obj;
   }
 
   /**
@@ -1822,7 +1885,7 @@ export class CatalogLoader {
       return satellite;
     }
 
-    return new Satellite(params);
+    return CatalogLoader.clearSyntheticVimpelIntlDes_(new Satellite(params));
   }
 
   /**

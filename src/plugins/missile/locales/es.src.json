@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} cargado",
         "simLoadFailed": "No se pudo cargar {sim}",
-        "missilesActive": "{n} / {max} misiles activos"
+        "missilesActive": "{n} / {max} misiles activos",
+        "massRaidLoaded": "Ataque masivo de misiles cargado correctamente",
+        "missileCreated": "Se ha creado el misil<br>RV_{n}.",
+        "mirvCreated": "Vehículos de reentrada (MIRV) creados:<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "¡Latitud del objetivo no válida!",
         "invalidTargetLongitude": "¡Longitud del objetivo no válida!",
         "invalidLaunchLatitude": "¡Latitud de lanzamiento no válida!",
         "invalidLaunchLongitude": "¡Longitud de lanzamiento no válida!",
-        "invalidWarheads": "Las ojivas deben ser un número entero del 1 al 12."
+        "invalidWarheads": "Las ojivas deben ser un número entero del 1 al 12.",
+        "maxMissiles": "Error: Se ha alcanzado el número<br>máximo de misiles.",
+        "launchLatRange": "Error: La latitud de lanzamiento debe estar<br>entre 90 y -90 grados",
+        "launchLonRange": "Error: La longitud de lanzamiento debe estar<br>entre 180 y -180 grados",
+        "targetLatRange": "Error: La latitud del objetivo debe estar<br>entre 90 y -90 grados",
+        "targetLonRange": "Error: La longitud del objetivo debe estar<br>entre 180 y -180 grados",
+        "minDistance": "Error: Este misil tiene una distancia mínima de 320 km.",
+        "maxDistance": "Error: Este misil tiene una distancia máxima de {km} km.",
+        "tooClose": "Error: Esta distancia es demasiado corta para el misil seleccionado.",
+        "orbitalVelocity": "Error: El misil alcanzó la velocidad orbital<br>(motor demasiado potente para este alcance).",
+        "overshot": "Error: El misil sobrepasó su objetivo<br>(motor demasiado potente para este alcance).",
+        "notGuided": "Error: No se pudo guiar el misil<br>hasta su objetivo a este alcance."
       },
       "commands": {
         "open": "Abrir el plugin de misiles",

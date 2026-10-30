@@ -80,8 +80,8 @@
   }
   #info { top: 10px; left: 10px; }
   #info .model-name { color: #fff; font-size: 14px; font-weight: 600; }
-  #info table td { padding-right: 10px; color: #9aa1ab; }
-  #info table td:last-child { color: #dfe3e8; padding-right: 0; }
+  #info table th { padding-right: 10px; color: #9aa1ab; font-weight: normal; text-align: left; }
+  #info table td { color: #dfe3e8; padding-right: 0; }
   #controls { top: 10px; right: 10px; width: 230px; }
   #controls .row { display: flex; align-items: center; gap: 6px; margin: 4px 0; }
   #controls label { color: #9aa1ab; min-width: 30px; }
@@ -135,7 +135,7 @@
 <body>
   <div id="sidebar">
     <h1>Mesh Viewer</h1>
-    <input id="filter" type="text" placeholder="filter..." spellcheck="false">
+    <input id="filter" type="text" placeholder="filter..." aria-label="Filter meshes" spellcheck="false">
     <ul id="mesh-list"></ul>
     <div id="hint">drag rotate &middot; right-drag pan<br>wheel zoom &middot; dbl-click reset<br>&uarr;/&darr; cycle meshes</div>
   </div>
@@ -153,8 +153,8 @@
         <button data-mode="wireframe">Wire</button>
       </div>
       <h2 style="margin-top:8px">Sun</h2>
-      <div class="row"><label>az</label><input id="sun-az" type="range" min="0" max="360" value="45"><span class="val" id="sun-az-val">45&deg;</span></div>
-      <div class="row"><label>el</label><input id="sun-el" type="range" min="-90" max="90" value="30"><span class="val" id="sun-el-val">30&deg;</span></div>
+      <div class="row"><label for="sun-az">az</label><input id="sun-az" type="range" min="0" max="360" value="45"><span class="val" id="sun-az-val">45&deg;</span></div>
+      <div class="row"><label for="sun-el">el</label><input id="sun-el" type="range" min="-90" max="90" value="30"><span class="val" id="sun-el-val">30&deg;</span></div>
       <div class="seg" id="sun-seg" style="margin-top:4px">
         <button data-insun="1" class="active">Sunlit</button>
         <button data-insun="0.5">Penumbra</button>

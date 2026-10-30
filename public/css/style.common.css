@@ -2796,11 +2796,18 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   margin-right: 1rem;
 }
 
-.side-menu-title-text {
+.side-menu-title-left,
+.side-menu-title-right {
   flex: 0 0 auto;
+}
+
+.side-menu-title-text {
+  flex: 1 1 auto;
+  min-width: 0;
   margin-left: 1rem;
   text-align: center;
-  width: 300px;
+  width: auto;
+  overflow-wrap: anywhere;
 }
 
 
@@ -3229,7 +3236,6 @@ nav a.sidenav-trigger i {
 }
 
 #colorbox-container {
-  background-color: 'white';
   transform: translateX(-200%);
   transition: transform 300ms var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   display: block;
@@ -3456,7 +3462,6 @@ nav a.sidenav-trigger i {
 
 .layers-pink-box {
   background: rgb(108, 0, 50);
-  display: hidden;
 }
 
 .layers-rcsLarge-box {
@@ -3620,6 +3625,12 @@ nav a.sidenav-trigger i {
   animation-iteration-count: infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .shake {
+    animation: none;
+  }
+}
+
 .start-hidden {
   display: none;
 }
@@ -3638,7 +3649,7 @@ nav a.sidenav-trigger i {
 }
 
 .text-select {
-  -webkit-touch-callout: text;
+  -webkit-touch-callout: default;
   -webkit-user-select: text;
   -khtml-user-select: text;
   -moz-user-select: text;
@@ -3985,7 +3996,6 @@ input:focus {
 #ms-error {
   margin-top: 10px;
   padding-bottom: 10px;
-  cursor: 'pointer';
 }
 
 #footer-handle {
@@ -4008,6 +4018,16 @@ input:focus {
   right: 15px;
   top: 5px;
   font-size: 2em;
+  background: var(--color-dark-background);
+  color: white;
+  border: 0;
+  line-height: 1;
+  padding: 4px 8px;
+}
+
+#help-close:focus-visible {
+  outline: 2px solid var(--color-dark-text-accent);
+  outline-offset: 2px;
 }
 
 #help-close:hover {
@@ -4032,7 +4052,7 @@ input:focus {
   width: 100%;
   height: 100%;
   position: fixed;
-  z-index: 99;
+  z-index: 20000;
 }
 
 #help-screen {
@@ -4196,8 +4216,13 @@ input:focus {
   height: 100%;
   z-index: 0;
   overflow: hidden;
+  /*
+   * clip, not just hidden: a hidden box is still a scroll container, so focusing
+   * or typing into a control that sticks out past the edge scrolled the whole app
+   * sideways and it never scrolled back. Nothing relies on the root scrolling.
+   */
+  overflow: clip;
   touch-action: none;
-  -webkit-overflow-scrolling: none;
 
   overscroll-behavior: none;
 }
@@ -4311,11 +4336,24 @@ input:focus {
 
 #sensor-selected-container {
   display: none;
-  width: 0px;
+  /*
+   * Narrow headers (under 1024 CSS px, e.g. 150% zoom) used to give this a 0px
+   * box with the text spilling under the VCR buttons. Keep a real box and cap
+   * it; responsive-lg.css lifts the cap when there is room.
+   */
+  width: max-content;
+  max-width: 160px;
+  overflow: hidden;
   cursor: pointer;
-  padding: 0px;
+  padding: 0px 6px;
   transition: none;
   -webkit-transition: none;
+}
+
+#sensor-selected {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #sensor-selected-container:hover,
@@ -4326,6 +4364,25 @@ input:focus {
 #toast-container {
   min-width: 100%;
   top: 75px;
+}
+
+/*
+ * Keep toasts off the open search results (SearchManager toggles the class).
+ * Below 1024px the results list spans the full width under the header, so the
+ * stack drops to the bottom; from 1024px the list docks right at 360px wide
+ * (responsive-lg.css), so the stack moves left of it.
+ */
+body.search-results-open #toast-container {
+  top: auto;
+  bottom: 7%;
+}
+
+@media (min-width: 1024px) {
+  body.search-results-open #toast-container {
+    top: 75px;
+    bottom: auto;
+    right: calc(360px + 16px);
+  }
 }
 
 #version-box {
@@ -4339,7 +4396,9 @@ input:focus {
   position: absolute;
   left: 1rem;
   top: 1rem;
-  width: 100%;
+  /* width: 100% plus the left offset ran past the viewport (clipped at 1366 px). */
+  width: auto;
+  max-width: calc(100% - 4rem);
   text-align: left;
   font-size: 14px;
   color: white;
@@ -4409,10 +4468,6 @@ input:focus {
   60% {
     transform: translate3d(4px, 0, 0);
   }
-
-  100% {
-    filter: '';
-  }
 }
 
 /* non-desktop */
@@ -4461,12 +4516,19 @@ a {
   color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
   margin-right: 8px;
   /*
-   * Fixed width sized to the longest label ("MISSILE"/"SENSOR") so every badge
-   * is identical and the name column lines up across rows regardless of type.
+   * Minimum width sized to the field codes ("MISSILE"/"NORAD") so those badges
+   * are identical and the name column lines up. Object-kind badges (Star,
+   * Sensor, Launch Site, Planet) are translated, so a long name may widen its
+   * badge, capped with an ellipsis.
    */
-  width: 64px;
+  min-width: 64px;
+  max-width: 128px;
   box-sizing: border-box;
   text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   flex-shrink: 0;
 }
 

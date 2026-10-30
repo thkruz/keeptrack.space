@@ -111,8 +111,8 @@ export class CameraInputHandler {
       { key: 'A', description: d('moveCamera'), callback: noop },
       { key: 'S', description: d('moveCamera'), callback: noop },
       { key: 'D', description: d('moveCamera'), callback: noop },
-      { key: 'Q', description: d('rollCamera'), callback: noop },
-      { key: 'E', description: d('rollCamera'), callback: noop },
+      { key: 'Q', description: d('moveCameraUpRoll'), callback: noop },
+      { key: 'E', description: d('moveCameraDownRoll'), callback: noop },
       { key: 'Numpad 8/2/4/6', description: d('numpadRotate'), callback: noop },
       { key: 'Numpad +', description: d('zoomIn'), callback: noop },
       { key: 'Numpad -', description: d('zoomOut'), callback: noop },
@@ -213,34 +213,38 @@ export class CameraInputHandler {
 
   keyDownv_() {
     const uiManagerInstance = ServiceLocator.getUiManager();
+    const previousCameraType = this.camera.cameraType;
 
     this.camera.changeCameraType();
 
     switch (this.camera.cameraType) {
       case CameraType.FIXED_TO_EARTH:
-        uiManagerInstance.toast('Earth Centered Camera Mode', ToastMsgType.standby);
-        this.camera.state.zoomTarget = 0.5;
+        uiManagerInstance.toast(t7e('toasts.cameraEarthCentered' as TranslationKey), ToastMsgType.standby);
+        // FPS View never moves the orbit camera, so leaving it returns to the Earth view zoom the user had
+        if (previousCameraType !== CameraType.FPS) {
+          this.camera.state.zoomTarget = 0.5;
+        }
         break;
       case CameraType.FIXED_TO_SAT_LVLH:
-        uiManagerInstance.toast('Fixed to Satellite (LVLH) Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFixedLvlh' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.FIXED_TO_SAT_ECI:
-        uiManagerInstance.toast('Fixed to Satellite (ECI) Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFixedEci' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.FPS:
-        uiManagerInstance.toast('Free Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFree' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.PLANETARIUM:
-        uiManagerInstance.toast('Planetarium Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraPlanetarium' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.SATELLITE_FIRST_PERSON:
-        uiManagerInstance.toast('Satellite First Person Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraSatFirstPerson' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.ASTRONOMY:
-        uiManagerInstance.toast('Astronomy Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraAstronomy' as TranslationKey), ToastMsgType.standby);
         break;
       case CameraType.FLAT_MAP:
-        uiManagerInstance.toast('Flat Map Camera Mode', ToastMsgType.standby);
+        uiManagerInstance.toast(t7e('toasts.cameraFlatMap' as TranslationKey), ToastMsgType.standby);
         break;
       default:
         errorManagerInstance.log(`Invalid Camera Type: ${this.camera.cameraType}`);
@@ -305,7 +309,8 @@ export class CameraInputHandler {
       case CameraType.SATELLITE_FIRST_PERSON:
       case CameraType.PLANETARIUM:
       case CameraType.ASTRONOMY:
-        this.state.fpsPitchRate = settingsManager.fpsPitchRate / this.state.speedModifier;
+        // Pitch down: the opposite rate of Numpad 8
+        this.state.fpsPitchRate = -settingsManager.fpsPitchRate / this.state.speedModifier;
         break;
       default:
         break;

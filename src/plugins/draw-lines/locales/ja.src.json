@@ -48,7 +48,8 @@
       },
       "errorMsgs": {
         "noPrimarySat": "衛星間ラインの主衛星が選択されていません。",
-        "noSatSelected": "最初に衛星を選択してください。"
+        "noSatSelected": "最初に衛星を選択してください。",
+        "noSensorSelected": "最初にセンサーを選択してください。"
       }
     }
   }

@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "Link copiato negli appunti!",
         "copyFailed": "Impossibile copiare il link negli appunti."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Condivisione nativa non riuscita: {error}"
       }
     }
   }

@@ -5,12 +5,18 @@
   },
   "plugins": {
     "SelectSatManager": {
-      "sectionLabel": "Satellite Selection",
+      "sectionLabel": "衛星の選択",
       "settings": {
         "focusOnSatWhenSelected": {
-          "label": "Focus on Satellite When Selected",
-          "helpText": "Zoom in on the satellite when selected."
+          "label": "選択時に衛星へフォーカス",
+          "helpText": "衛星を選択したときにズームインします。"
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "ミサイルをセカンダリオブジェクトとして選択することはできません!",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_: SensorObject に sensorId がありません: {sensor}",
+        "invalidCovariance": "{context}: 共分散行列が無効です",
+        "covarianceFromTleFailed": "{context}: TLE から共分散を計算できませんでした"
       }
     }
   }

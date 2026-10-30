@@ -4,10 +4,12 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { isKeyboardFocusableTarget } from '@app/engine/input/input-manager/keyboard-native-target';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { shake } from '@app/engine/utils/shake';
 import { TranslationKey, t7e } from '@app/locales/keys';
+import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
@@ -15,11 +17,16 @@ import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
+  ALL_DRAWER_PLUGIN_ITEMS_SELECTOR,
   buildRecentGroupFromCache,
   collectDrawerItems,
   type DrawerBadge,
   type DrawerGroup,
   type DrawerItemData,
+  drawerItemPluginId,
+  drawerItemsForPluginSelector,
+  explainDisabledPluginReason,
+  explainDisabledUtilityIcon,
   loadRecents,
   type RecentEntry,
   recordRecent,
@@ -27,6 +34,7 @@ import {
   renderStatusFooter,
   renderUtilityFooter,
   syncBadgesFromEvents,
+  syncDrawerItemState,
   syncInitialUtilityState,
   syncUtilityFooterState,
   updateConnectivityStatus,
@@ -85,6 +93,7 @@ export class PluginDrawer {
       this.populateDrawerItems_();
       this.wireEventListeners_();
       this.observeBottomIconState_();
+      this.observeTopMenuState_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -184,7 +193,7 @@ export class PluginDrawer {
     btn.id = 'drawer-hamburger';
     btn.className = 'drawer-hamburger';
     btn.setAttribute('role', 'button');
-    btn.setAttribute('aria-label', 'Open plugin menu');
+    btn.setAttribute('aria-label', t7e('pluginDrawer.openPluginMenu' as TranslationKey));
     btn.innerHTML = ['<span class="drawer-hamburger-bar"></span>', '<span class="drawer-hamburger-bar"></span>', '<span class="drawer-hamburger-bar"></span>'].join('');
 
     const logoEl = settingsManager.navBarLogoUrl ? document.createElement('a') : document.createElement('div');
@@ -235,8 +244,8 @@ export class PluginDrawer {
     const launcherHtml = hasLauncher
       ? [
           '    <div class="drawer-app-launcher" id="drawer-app-launcher" role="button" tabindex="0"',
-          '      aria-label="Open app launcher" kt-tooltip="App Launcher (Shift+Z)">',
-          `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="App Launcher" />`,
+          `      aria-label="${t7e('pluginDrawer.openAppLauncher' as TranslationKey)}" kt-tooltip="${t7e('pluginDrawer.appLauncherTooltip' as TranslationKey)}">`,
+          `      <img class="drawer-app-launcher-icon" src="${appsPng}" alt="${t7e('pluginDrawer.appLauncher' as TranslationKey)}" />`,
           '    </div>',
         ].join('')
       : '';
@@ -247,8 +256,8 @@ export class PluginDrawer {
     const searchHtml = hasCommandPalette
       ? [
           '    <div class="drawer-search" id="drawer-search-trigger" role="button" tabindex="0">',
-          `      <img class="drawer-search-icon" src=${searchPng} alt="Search" />`,
-          '      <span class="drawer-search-label">Search…</span>',
+          `      <img class="drawer-search-icon" src=${searchPng} alt="${t7e('pluginDrawer.search' as TranslationKey)}" />`,
+          `      <span class="drawer-search-label">${t7e('pluginDrawer.searchEllipsis' as TranslationKey)}</span>`,
           '      <span class="drawer-search-shortcut">Ctrl+⇧+K</span>',
           '    </div>',
         ].join('')
@@ -274,9 +283,9 @@ export class PluginDrawer {
       // from under the cursor (and leave the rail toggle in its place).
       '<div id="drawer-status-footer" class="drawer-status-footer-container"></div>',
       '<div id="drawer-user-account" class="drawer-user-account"></div>',
-      '<div id="drawer-rail-toggle" class="drawer-rail-toggle" role="button" aria-label="Toggle rail mode">',
+      `<div id="drawer-rail-toggle" class="drawer-rail-toggle" role="button" aria-label="${t7e('pluginDrawer.toggleRailMode' as TranslationKey)}">`,
       `  <img class="drawer-rail-toggle-icon" src="${leftPanelClosePng}" alt="" />`,
-      '  <span class="drawer-rail-toggle-label">Collapse</span>',
+      `  <span class="drawer-rail-toggle-label">${t7e('pluginDrawer.collapse' as TranslationKey)}</span>`,
       '  <span class="drawer-rail-toggle-shortcut">Tab</span>',
       '</div>',
     ].join('');
@@ -394,18 +403,18 @@ export class PluginDrawer {
           return;
         }
 
-        const pluginId = itemEl.dataset.pluginId;
+        const pluginId = drawerItemPluginId(itemEl);
         const topMenuId = itemEl.dataset.topMenuId;
 
         // A disabled item should explain itself rather than silently ignore the
-        // click. Shake it for feedback, and for a plugin item forward the click
-        // so the plugin's onBottomIconClick can toast *why* it is unavailable
-        // (e.g. "add a satellite to the watchlist"). The base handler's
-        // isIconDisabled guard keeps the side menu from opening, matching the
-        // bottom-bar behavior; the drawer stays open so the hint is visible.
+        // click. Shake it for feedback. A plugin with a reason for its disabled
+        // state (getDisabledReason, e.g. "add satellites to the watchlist") toasts
+        // it here; otherwise forward the click so the plugin's onBottomIconClick
+        // can explain. The base handler's isIconDisabled guard keeps the side
+        // menu from opening; the drawer stays open so the hint is visible.
         if (itemEl.classList.contains('disabled')) {
           shake(itemEl);
-          if (pluginId) {
+          if (pluginId && !explainDisabledPluginReason(pluginId)) {
             EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, pluginId);
           }
 
@@ -467,6 +476,14 @@ export class PluginDrawer {
           return;
         }
 
+        // A disabled icon stays clickable so it can explain itself ("Select a
+        // satellite first!") without running the action.
+        if (iconEl.classList.contains('bmenu-item-disabled')) {
+          explainDisabledUtilityIcon(iconEl);
+
+          return;
+        }
+
         const pluginId = iconEl.dataset.pluginId;
         const topMenuId = iconEl.dataset.topMenuId;
 
@@ -478,7 +495,9 @@ export class PluginDrawer {
           const btnEl = getEl(topMenuId, true);
 
           btnEl?.click();
-          iconEl.classList.toggle('bmenu-item-selected');
+          // The nav-button observer mirrors the real state; this keeps it
+          // synchronous for handlers that change the nav button immediately.
+          this.syncUtilityFooterState_();
         }
       });
 
@@ -629,10 +648,17 @@ export class PluginDrawer {
           return;
         }
 
-        // Don't toggle if user is typing in an input/textarea
-        const activeEl = document.activeElement;
-
-        if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || (activeEl as HTMLElement).isContentEditable)) {
+        // The drawer shortcut is plain forward Tab on the scene. Controls keep
+        // browser focus traversal, and another keyboard scope retains ownership.
+        if (
+          evt.defaultPrevented ||
+          evt.shiftKey ||
+          evt.ctrlKey ||
+          evt.altKey ||
+          evt.metaKey ||
+          isKeyboardFocusableTarget(evt.target) ||
+          isKeyboardFocusableTarget(document.activeElement)
+        ) {
           return;
         }
 
@@ -646,7 +672,7 @@ export class PluginDrawer {
     // Sync menu items (both selected and disabled state)
     const contentEl = getEl('drawer-content', true);
 
-    contentEl?.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
+    contentEl?.querySelectorAll(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR).forEach((el) => {
       PluginDrawer.syncItemState_(el as HTMLElement);
     });
 
@@ -684,7 +710,7 @@ export class PluginDrawer {
         syncedIds.add(id);
 
         getEl('drawer-content', true)
-          ?.querySelectorAll(`.drawer-item[data-plugin-id="${id}"]`)
+          ?.querySelectorAll(drawerItemsForPluginSelector(id))
           .forEach((el) => {
             PluginDrawer.syncItemState_(el as HTMLElement);
           });
@@ -696,15 +722,29 @@ export class PluginDrawer {
     observer.observe(bottomIcons, { attributes: true, attributeFilter: ['class'], subtree: true });
   }
 
+  /**
+   * Top-menu nav buttons (sound, night, ...) are the source of truth for their
+   * utility footer copies, and their state changes from shortcuts and
+   * programmatic calls as well as clicks. Observe the class and image src of
+   * every nav button so the footer always shows the real state.
+   */
+  private observeTopMenuState_(): void {
+    const navEl = getEl(TopMenu.TOP_RIGHT_ID, true);
+
+    if (!navEl) {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      this.syncUtilityFooterState_();
+    });
+
+    observer.observe(navEl, { attributes: true, attributeFilter: ['class', 'src'], subtree: true });
+  }
+
   /** Mirror the live bottom-icon selected/disabled classes onto a drawer item. */
   private static syncItemState_(el: HTMLElement): void {
-    const pluginId = el.dataset.pluginId;
-    const bottomIcon = pluginId ? getEl(pluginId, true) : null;
-    const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
-    const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
-
-    el.classList.toggle('active', isSelected);
-    el.classList.toggle('disabled', isDisabled);
+    syncDrawerItemState(el);
   }
 
   private syncUtilityFooterState_(): void {
@@ -718,8 +758,8 @@ export class PluginDrawer {
   private syncDisabledState_(): void {
     const contentEl = getEl('drawer-content', true);
 
-    contentEl?.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
-      const pluginId = (el as HTMLElement).dataset.pluginId;
+    contentEl?.querySelectorAll(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR).forEach((el) => {
+      const pluginId = drawerItemPluginId(el as HTMLElement);
       const bottomIcon = pluginId ? getEl(pluginId, true) : null;
       const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
 
@@ -772,7 +812,12 @@ export class PluginDrawer {
     html += '<div class="drawer-group-items">';
 
     for (const item of group.items) {
-      const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
+      /*
+       * Recent rows repeat a plugin that already has a row in its own group. They carry
+       * data-recent-plugin-id so `.drawer-item[data-plugin-id="x"]` stays one element per plugin.
+       */
+      const pluginAttr = key === 'recent' ? 'data-recent-plugin-id' : 'data-plugin-id';
+      const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `${pluginAttr}="${item.id}"`;
       const disabledClass = item.isDisabled ? ' disabled' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
       const proClass = item.isLoginRequired && !settingsManager.isDisableLoginGate ? ' bmenu-item-pro' : '';
@@ -878,7 +923,7 @@ export class PluginDrawer {
       // The cached item data only knows load-time state, so the rebuilt rows
       // would otherwise show plugins as disabled/inactive even when their
       // bottom icon says otherwise. Re-sync each row and re-apply badges.
-      newGroupEl.querySelectorAll('.drawer-item[data-plugin-id]').forEach((el) => {
+      newGroupEl.querySelectorAll(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR).forEach((el) => {
         PluginDrawer.syncItemState_(el as HTMLElement);
       });
       this.badges_.forEach((_badge, pluginId) => {
@@ -973,7 +1018,7 @@ export class PluginDrawer {
       icon.src = isRail ? leftPanelOpenPng : leftPanelClosePng;
     }
     if (label) {
-      label.textContent = isRail ? 'Expand' : 'Collapse';
+      label.textContent = isRail ? t7e('pluginDrawer.expand' as TranslationKey) : t7e('pluginDrawer.collapse' as TranslationKey);
     }
   }
 }

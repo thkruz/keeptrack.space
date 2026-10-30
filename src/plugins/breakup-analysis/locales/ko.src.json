@@ -49,6 +49,9 @@
         "estimatedTotal": "추정 총량",
         "trackingRatio": "추적 비율",
         "typeBreakdown": "탑재체 / 로켓 몸체 / 잔해",
+        "likelyDecayed": "재진입 추정",
+        "likelyDecayedNote": "위 집계에 포함됩니다. 근지점이 {perigee} km 미만이거나 궤도 요소 기점이 {date}보다 {days}일 넘게 오래된 객체에 표시됩니다.",
+        "likelyDecayedTag": "재진입 추정",
         "parameter": "매개변수",
         "min": "최소",
         "max": "최대",
@@ -72,6 +75,68 @@
       "errorMsgs": {
         "parentNotFound": "모체 객체가 현재 카탈로그에 없습니다.",
         "noDataToExport": "내보낼 추적된 파편이 없습니다."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Fengyun-1C ASAT 시험",
+          "cause": "의도적 ASAT 시험",
+          "orbitType": "LEO 태양동기",
+          "description": "중국의 위성 요격 미사일 시험으로 기상위성 Fengyun-1C가 파괴되어 역사상 가장 큰 추적 파편 구름이 생겼습니다."
+        },
+        "cosmos2251": {
+          "name": "Cosmos 2251 / Iridium 33 충돌",
+          "cause": "우발적 충돌",
+          "orbitType": "LEO",
+          "description": "온전한 두 위성 사이의 첫 우발적 초고속 충돌입니다. Cosmos 2251이 운용 중인 통신위성 Iridium 33과 충돌했습니다."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (충돌 파편)",
+          "cause": "우발적 충돌",
+          "orbitType": "LEO",
+          "description": "운용이 중단된 Cosmos 2251과 충돌한 뒤 생긴, 운용 중이던 Iridium 33 위성의 파편 지대입니다."
+        },
+        "cosmos1408": {
+          "name": "Cosmos 1408 ASAT 시험",
+          "cause": "의도적 ASAT 시험",
+          "orbitType": "LEO",
+          "description": "러시아의 직접 상승식 ASAT 시험으로 운용이 중단된 ELINT 위성 Cosmos 1408이 파괴되었고, ISS 승무원을 위협하는 파편이 생겼습니다."
+        },
+        "microsatr": {
+          "name": "Microsat-R ASAT 시험 (Mission Shakti)",
+          "cause": "의도적 ASAT 시험",
+          "orbitType": "LEO",
+          "description": "인도가 Microsat-R 위성을 상대로 실시한 직접 상승식 ASAT 시험(Mission Shakti)입니다. 요격 고도가 낮아 장기 잔존 파편은 제한되었지만 일부 파편은 ISS보다 높이 올라갔습니다."
+        },
+        "breezem": {
+          "name": "Briz-M 상단 폭발",
+          "cause": "우발적 폭발",
+          "orbitType": "GTO",
+          "description": "Briz-M 상단이 Arabsat-4A 임무 실패 후 잔류 추진제 때문으로 보이는 폭발을 일으켜 넓은 고도 범위에 파편을 만들었습니다."
+        },
+        "cz6a": {
+          "name": "CZ-6A 상단 파쇄",
+          "cause": "우발적 폭발",
+          "orbitType": "LEO 태양동기",
+          "description": "중국 창정 6A 2단이 Yunhai-3를 분리한 직후 파쇄되어 많이 사용되는 태양동기 고도에 수백 개의 파편을 흩뿌렸습니다."
+        },
+        "noaa16": {
+          "name": "NOAA-16 파쇄",
+          "cause": "배터리 / 열 계통 고장",
+          "orbitType": "LEO 태양동기",
+          "description": "퇴역한 기상위성 NOAA-16이 궤도에서 파쇄되었습니다. 원인은 배터리 또는 열 계통 고장으로 추정되며, 혼잡한 극궤도 고도에 장기 잔존 파편을 더했습니다."
+        },
+        "dmspf13": {
+          "name": "DMSP-F13 파쇄",
+          "cause": "배터리 폭발",
+          "orbitType": "LEO 태양동기",
+          "description": "미국 국방기상위성계획(DMSP) 위성이 배터리 과충전과 과열 끝에 파열되었습니다. 이 고장 유형은 이후 같은 설계의 여러 DMSP 및 NOAA 위성에서도 확인되었습니다."
+        },
+        "usa193": {
+          "name": "USA-193 격추",
+          "cause": "의도적 격추",
+          "orbitType": "LEO",
+          "description": "미 해군 SM-3 미사일이 고장 난 NRO 위성 USA-193(NROL-21)을 파괴했습니다. 낮은 고도에서 파쇄되어 대부분의 파편이 몇 주 안에 재진입했습니다."
+        }
       }
     }
   }

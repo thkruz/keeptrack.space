@@ -1,5 +1,6 @@
 /* eslint-disable max-lines */
 import { country2flagIcon } from '@app/app/data/catalogs/countries';
+import { isSyntheticVimpel } from '@app/app/data/synthetic-vimpel';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { ToastMsgType } from '@app/engine/core/interfaces';
@@ -11,7 +12,7 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, setInnerHtml, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
@@ -20,8 +21,19 @@ import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { isPlaceholderIntlDes } from './placeholder-intl-des';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
+
+// Selection fields form one identity snapshot. Idle DOM writes can outlive the
+// selected OEM slot and mix their old header with a newly rendered orbit.
+const setInnerHtml = (id: string, value: string): void => {
+  const element = getEl(id, true);
+
+  if (element) {
+    element.innerHTML = value;
+  }
+};
 
 /**
  * This class controls all the functionality of the satellite info box.
@@ -41,6 +53,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }[] = [];
   private isVisible_ = false;
   private isHtmlReady_ = false;
+  private selectionRevision_ = 0;
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
@@ -74,9 +87,20 @@ export class SatInfoBox extends KeepTrackPlugin {
       }
     });
 
-    EventBus.getInstance().on(EventBusEvent.selectSatData, this.updateHeaderData_.bind(this));
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
+      if (!SatInfoBox.isCurrentSelection(obj)) {
+        return;
+      }
+      const revision = ++this.selectionRevision_;
 
-    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => this.selectSat_(this, obj));
+      this.renderSelection_(obj, revision);
+    });
+  }
+
+  static isCurrentSelection(obj?: BaseObject): boolean {
+    const selection = PluginRegistry.getPlugin(SelectSatManager);
+
+    return obj ? selection?.selectedSat === obj.id && selection.primarySatObj === obj : selection?.selectedSat === -1 && selection.primarySatObj.id === -1;
   }
 
   addElement(element: { html: string | null; order: number }): void {
@@ -203,8 +227,9 @@ export class SatInfoBox extends KeepTrackPlugin {
   private copyIdentifier_(elementId: string): void {
     const value = getEl(elementId, true)?.textContent?.trim() ?? '';
     const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
+    const notAvailableJsc = t7e('satInfoBox.notAvailableJscVimpel' as Parameters<typeof t7e>[0]);
 
-    if (!value || value === notAvailable) {
+    if (!value || value === notAvailable || value === notAvailableJsc) {
       return;
     }
 
@@ -288,7 +313,7 @@ export class SatInfoBox extends KeepTrackPlugin {
             ? html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.AltName.tooltip')}">${t7e('satInfoBox.AltName.label')}</div>
-          <div class="sat-info-value" id="${EL.ALT_NAME}">Alt Name</div>
+          <div class="sat-info-value" id="${EL.ALT_NAME}">${t7e('satInfoBox.AltName.label')}</div>
         </div>`
             : ''
         }
@@ -302,7 +327,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         </div>
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${t7e('satInfoBox.Confidence.tooltip')}">${t7e('satInfoBox.Confidence.label')}</div>
-          <div class="sat-info-value" id="${EL.CONFIDENCE}">High</div>
+          <div class="sat-info-value" id="${EL.CONFIDENCE}">${t7e('satInfoBox.Confidence.high' as Parameters<typeof t7e>[0])}</div>
         </div>
       </div>
     `;
@@ -327,6 +352,43 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
+  private renderSelection_(obj: BaseObject | undefined, revision: number, retries = 0): void {
+    if (revision !== this.selectionRevision_ || !SatInfoBox.isCurrentSelection(obj)) {
+      return;
+    }
+    if (!obj) {
+      this.hide();
+      const container = getEl(SatInfoBox.containerId_, true);
+
+      container?.querySelectorAll('.sat-info-value').forEach((element) => {
+        // Preserve nested identity fields (for example launch site/pad IDs).
+        const textNodes = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        let node = textNodes.nextNode();
+
+        while (node) {
+          node.textContent = '';
+          node = textNodes.nextNode();
+        }
+        element.removeAttribute('kt-tooltip');
+      });
+      setInnerHtml(EL.NAME, '');
+      setInnerHtml(EL.ALT_NAME, '');
+      setInnerHtml(EL.ALT_ID, '');
+      getEl(EL.FLAG, true)?.setAttribute('class', '');
+
+      return;
+    }
+    if (!this.isHtmlReady_) {
+      if (retries < SatInfoBox.MAX_HTML_READY_RETRIES_) {
+        setTimeout(() => this.renderSelection_(obj, revision, retries + 1), 500);
+      }
+
+      return;
+    }
+    this.updateHeaderData_(obj);
+    this.selectSat_(this, obj);
+  }
+
   private updateHeaderData_(obj: BaseObject, retries = 0): void {
     if (!obj || obj.isStatic() || obj.isSensor()) {
       return;
@@ -334,7 +396,8 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (!this.isHtmlReady_) {
       if (retries >= SatInfoBox.MAX_HTML_READY_RETRIES_) {
-        errorManagerInstance.warn('SatInfoBox HTML never became ready; giving up on header update');
+        console.warn('SatInfoBox HTML never became ready; giving up on header update');
+        errorManagerInstance.warn(t7e('satInfoBox.errorMsgs.htmlNotReady'));
 
         return;
       }
@@ -380,6 +443,15 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
 
+    if (!(obj instanceof Satellite)) {
+      setInnerHtml(EL.CONFIDENCE, notAvailable);
+      const confidence = getEl(EL.CONFIDENCE, true);
+
+      if (confidence) {
+        confidence.style.color = '';
+      }
+    }
+
     if (obj.isMissile()) {
       setInnerHtml(EL.INTL_DES, notAvailable);
       setInnerHtml(EL.OBJNUM, notAvailable);
@@ -393,12 +465,14 @@ export class SatInfoBox extends KeepTrackPlugin {
     } else {
       const sat = obj as Satellite;
 
-      setInnerHtml(EL.INTL_DES, sat.intlDes === 'none' ? notAvailable : sat.intlDes);
-      // Synthetic JSC objects have no NORAD number; real ones served from a
-      // newer Vimpel elset keep theirs.
-      if (sat.source === CatalogSource.VIMPEL && /^0*$/u.test(sat.sccNum ?? '')) {
-        setInnerHtml(EL.OBJNUM, notAvailable);
-        setInnerHtml(EL.INTL_DES, notAvailable);
+      setInnerHtml(EL.INTL_DES, !sat.intlDes || sat.intlDes === 'none' || isPlaceholderIntlDes(sat) ? notAvailable : sat.intlDes);
+      // Synthetic JSC objects have no NORAD number or COSPAR ID; real ones served
+      // from a newer Vimpel elset keep theirs.
+      if (isSyntheticVimpel(sat)) {
+        const notAvailableJsc = t7e('satInfoBox.notAvailableJscVimpel' as Parameters<typeof t7e>[0]);
+
+        setInnerHtml(EL.OBJNUM, notAvailableJsc);
+        setInnerHtml(EL.INTL_DES, notAvailableJsc);
       } else {
         setInnerHtml(EL.OBJNUM, sat.sccNum);
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
@@ -471,7 +545,8 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (!this.isHtmlReady_) {
       if (retries >= SatInfoBox.MAX_HTML_READY_RETRIES_) {
-        errorManagerInstance.warn('SatInfoBox HTML never became ready; giving up on select update');
+        console.warn('SatInfoBox HTML never became ready; giving up on select update');
+        errorManagerInstance.warn(t7e('satInfoBox.errorMsgs.htmlNotReady'));
 
         return;
       }

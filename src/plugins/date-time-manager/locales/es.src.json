@@ -48,7 +48,9 @@
         "year": "Año",
         "goTo": "Ir a (UTC)",
         "goToTooltip": "Escribe una fecha y hora UTC (YYYY-MM-DD HH:MM:SS) y pulsa Intro. Los segundos y la hora son opcionales.",
-        "goToInvalid": "Fecha no válida. Usa el formato UTC YYYY-MM-DD HH:MM:SS."
+        "goToInvalid": "Fecha no válida. Usa el formato UTC YYYY-MM-DD HH:MM:SS.",
+        "containerNotFound": "No se encontró el contenedor con ID {id}",
+        "timeInvalid": "Formato de hora no válido. Se espera HH:MM:SS, HH:MM:SS.s o HHMMSS"
       }
     }
   }

@@ -29,7 +29,7 @@
         "apogeeKm": "Apogeo (km)",
         "perigeeKm": "Perigeo (km)",
         "smaKm": "Semieje Mayor (km)",
-        "velocityKms": "Velocidad Orbital (km/s)",
+        "velocityKms": "Velocidad en la época (km/s)",
         "sectionIdentity": "Identidad",
         "sectionOrbit": "Órbita",
         "sectionEpoch": "Época",
@@ -74,10 +74,21 @@
         "invalidPeriod": "Período no válido. Debe tener el formato NN.NNNN a NNNN.NNNN (ej., 90.0000, 9999.9999) con 8 dígitos en total.",
         "invalidSource": "Fuente no válida. No debe estar vacía.",
         "invalidName": "Nombre no válido. No debe estar vacío.",
-        "slotOccupied": "Sobrescribiendo el satélite existente {name} en la ranura {scc}.",
         "noFreeSlots": "No quedan ranuras de analista libres (90000-99999 están todas en uso).",
         "noSatSelected": "Seleccione primero un satélite para clonar.",
-        "tleChecksumMismatch": "La suma de verificación de la línea {line} del TLE es {actual}, pero debería ser {expected}. Esto puede indicar un error tipográfico. Se continúa de todos modos."
+        "tleChecksumMismatch": "La suma de verificación de la línea {line} del TLE es {actual}, pero debería ser {expected}. Esto puede indicar un error tipográfico. Se continúa de todos modos.",
+        "periodToMeanMotionFailed": "Error al convertir el período en movimiento medio",
+        "meanMotionToPeriodFailed": "Error al convertir el movimiento medio en período: {error}",
+        "satrecFailed": "¡Error al crear el registro del satélite!",
+        "cruncherFailed": "Falló el mensaje al Sat Cruncher",
+        "orbitBufferFailed": "Falló el cambio de los datos del búfer de órbita",
+        "createFailed": "No se pudo crear el satélite: {error}",
+        "rangeError": "{field} debe estar entre {min} y {max}.",
+        "rangeErrorDeg": "{field} debe estar entre {min} y {max} grados.",
+        "meanMotionRange": "{field} debe ser mayor que 0 y como máximo {max} revoluciones por día.",
+        "periodPositive": "{field} debe ser un número positivo de minutos.",
+        "numberRequired": "{field} debe ser un número.",
+        "noradIdReserved": "El ID NORAD {id} lo ocupa una trayectoria de lanzamiento. Elija otro ID o elimine primero la trayectoria."
       },
       "successMsgs": {
         "satCreated": "Satélite {name} ({scc}) creado exitosamente",
@@ -90,7 +101,7 @@
         "tabsHeading": "Pestañas Básico y Avanzado",
         "tabs": "La pestaña <strong>Básico</strong> solo necesita un ID NORAD, un nombre, la <strong>Inclinación</strong>, la <strong>Altitud del Apogeo</strong> y la <strong>Altitud del Perigeo</strong>; el resto de la órbita se deriva automáticamente. La pestaña <strong>Avanzado</strong> expone el conjunto completo de elementos: <strong>Tipo de Objeto</strong>, <strong>País</strong>, época, <strong>Ascensión Recta</strong>, <strong>Excentricidad</strong>, <strong>Argumento del Perigeo</strong>, <strong>Anomalía Media</strong> y <strong>Movimiento Medio</strong> o <strong>Período</strong> (editar uno recalcula el otro). Un panel de <strong>Parámetros Calculados</strong> muestra el apogeo, el perigeo, el semieje mayor y la velocidad orbital resultantes mientras escribe.",
         "howToUse": "<ol><li>Abra el menú <strong>Crear Satélite</strong> desde el panel de complementos.</li><li>Elija un ID NORAD libre entre 90000 y 99999 y dele un nombre al satélite.</li><li>En la pestaña <strong>Básico</strong> introduzca la inclinación, el apogeo y el perigeo; o cambie a la pestaña <strong>Avanzado</strong> para el conjunto completo de elementos.</li><li>Haga clic en <strong>Crear Satélite</strong>. El nuevo objeto aparece de inmediato y un aviso de confirmación muestra su nombre y número.</li><li>Use <strong>Guardar TLE</strong> para exportar los elementos del satélite creado como un archivo que podrá recargar más adelante.</li></ol>",
-        "tip1": "Cada campo se valida con un mensaje de error específico, de modo que si la creación falla, el aviso le indica exactamente qué valor corregir.",
+        "tip1": "Cada campo no válido aparece en la lista sobre el botón Crear satélite y queda marcado en el formulario. Cada mensaje desaparece en cuanto corrige ese campo.",
         "tip2": "Un perigeo por debajo de unos 100 km se rechaza porque el satélite decaería de inmediato.",
         "tip3": "Los satélites creados solo duran la sesión; exporte un TLE si quiere conservar el objeto para otro día."
       },
@@ -103,6 +114,13 @@
         "gto": "Transferencia a GEO (GTO)",
         "molniya": "Molniya",
         "polar": "Polar (600 km)"
+      },
+      "confirm": {
+        "title": "¿Reemplazar satélite?",
+        "message": "¿Reemplazar {name} con ID de analista {scc}?",
+        "replace": "Reemplazar",
+        "cancel": "Cancelar",
+        "changed": "El satélite o el formulario cambió. Revísalo y envíalo de nuevo."
       }
     }
   }

@@ -4,10 +4,14 @@
       "bottomIconLabel": "Машина часу",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "Вимкнути сповіщення машини часу",
+          "helpText": "Машина часу більше не показуватиме спливаючі сповіщення."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Перемкнути машину часу"
+      },
+      "yearToast": "Машина часу: {year} рік!"
     }
   }
 }

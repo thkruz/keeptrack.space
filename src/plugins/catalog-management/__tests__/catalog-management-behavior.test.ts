@@ -1,7 +1,9 @@
 import { CatalogExporter } from '@app/app/data/catalog-exporter';
 import { CatalogLoader } from '@app/app/data/catalog-loader';
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
+import { t7e } from '@app/locales/keys';
 import { CatalogManagementPlugin } from '@app/plugins/catalog-management/catalog-management';
 import { formatStkEpoch } from '@app/plugins/catalog-management/catalog-management-export';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -104,6 +106,31 @@ describe('CatalogManagementPlugin behavior', () => {
 
     expect(txtSpy).toHaveBeenCalled();
     expect(csvSpy).toHaveBeenCalled();
+  });
+
+  it('Export Satellites in FOV with no sensor toasts "No sensor selected!" and writes no file', () => {
+    const fovSpy = vi.spyOn(CatalogExporter, 'exportSatInFov2Csv').mockImplementation(() => undefined);
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+    const sensorSpy = vi.spyOn(ServiceLocator.getSensorManager(), 'isSensorSelected').mockReturnValue(false);
+
+    // websiteInit already ran uiManagerFinal, which wired the export handlers.
+    getEl('de-export-fov')!.dispatchEvent(new Event('click'));
+
+    expect(fovSpy).not.toHaveBeenCalled();
+    expect(toastSpy).toHaveBeenCalledWith(t7e('plugins.CatalogManagementPlugin.toasts.noSensorSelected' as Parameters<typeof t7e>[0]), ToastMsgType.critical);
+
+    sensorSpy.mockReturnValue(true);
+    getEl('de-export-fov')!.dispatchEvent(new Event('click'));
+    expect(fovSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('the Replace (import button) and Keep Info tooltips say the Vimpel-only objects are dropped', () => {
+    const tip = (selector: string): string => document.querySelector(selector)?.getAttribute('kt-tooltip') ?? '';
+
+    expect(tip('#cm-import-btn')).toBe(t7e('plugins.CatalogManagementPlugin.labels.replaceCatalogTooltip' as Parameters<typeof t7e>[0]));
+    expect(tip('label[for="cm-keep-sat-info"]')).toBe(t7e('plugins.CatalogManagementPlugin.labels.keepSatInfoTooltip' as Parameters<typeof t7e>[0]));
+    expect(tip('#cm-import-btn')).toContain('JSC Vimpel');
+    expect(tip('label[for="cm-keep-sat-info"]')).toContain('JSC Vimpel');
   });
 
   it('hideDropzone_ removes the visible/dragging classes', () => {

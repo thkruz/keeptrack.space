@@ -1,7 +1,11 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "Vue FPS"
+      "bottomIconLabel": "Vue FPS",
+      "commandPalette": {
+        "switch": "Activer/désactiver la vue FPS"
+      },
+      "firstUseHint": "Vue FPS : W A S D pour voler, Q et E pour monter et descendre, pavé numérique 4 6 8 2 pour tourner et regarder, maintenez Maj pour ralentir ou Maj droite pour accélérer. Appuyez de nouveau sur 8 pour quitter."
     }
   }
 }

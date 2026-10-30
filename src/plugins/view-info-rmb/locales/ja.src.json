@@ -11,8 +11,10 @@
       "errorMsgs": {
         "launchSiteNotFound": "打上げサイトが見つかりません！",
         "noRelatedSats": "関連衛星が見つかりません！",
-        "sensorNotFound": "センサーが見つかりません！先にセンサーを選択してください。"
-      }
+        "sensorNotFound": "センサーが見つかりません！先にセンサーを選択してください。",
+        "latLonUndefined": "latLon が未定義です!"
+      },
+      "latLonToast": "緯度: {lat} | 経度: {lon}"
     }
   }
 }

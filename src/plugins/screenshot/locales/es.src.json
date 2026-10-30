@@ -9,6 +9,11 @@
         "take4k": "Captura de pantalla (4K)",
         "takeHd": "Captura de pantalla (HD)",
         "take8k": "Captura de pantalla (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "No se pudo cargar la imagen del logotipo principal.",
+        "secondaryLogoFailed": "No se pudo cargar la imagen del logotipo secundario.",
+        "noCanvasContext": "No se pudo obtener el contexto 2D del lienzo temporal. No se puede crear la captura de pantalla."
       }
     }
   }

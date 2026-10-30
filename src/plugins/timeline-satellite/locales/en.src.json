@@ -16,7 +16,8 @@
         "noPasses": "No Passes"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Add Satellites to List or Select a Satellite"
+        "addSatellitesOrSelect": "Add Satellites to List or Select a Satellite",
+        "invalidSetting": "{setting} must be a number greater than zero."
       },
       "help": {
         "overview": "The Satellite Timeline is the mirror image of the Sensor Timeline: it shows when one selected sensor can see a list of satellites. Each row is a satellite from your watchlist (or the currently selected satellite) and each colored bar is a pass, so you can schedule a single site's observations across many targets.",

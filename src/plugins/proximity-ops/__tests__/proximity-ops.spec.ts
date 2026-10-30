@@ -50,7 +50,7 @@ test.describe('ProximityOps', () => {
     await expect(page.locator('#proximity-ops-submit')).toBeAttached();
 
     // Verify default values
-    expect(await page.locator('#proximity-ops-norad').inputValue()).toBe('0');
+    expect(await page.locator('#proximity-ops-norad').inputValue()).toBe('');
     expect(await page.locator('#proximity-ops-maxDis').inputValue()).toBe('100');
     expect(await page.locator('#proximity-ops-maxVel').inputValue()).toBe('0.1');
     expect(await page.locator('#proximity-ops-duration').inputValue()).toBe('24');

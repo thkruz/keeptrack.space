@@ -151,22 +151,52 @@ export class EventBus {
     // per-listener arguments array + spread that forEach(cb => cb.cb(...args)) allocates.
     // for-of yields only in-range elements, so a once() listener that splices itself out
     // mid-emit stays crash-safe (same as the previous forEach).
+    // Each call is isolated: a throwing listener is reported and the remaining listeners still
+    // run (one bad listener used to skip every later one, e.g. settings-sync updates).
     switch (args.length) {
       case 0:
         for (const listener of listeners) {
-          (listener.cb as (...a: unknown[]) => void)();
+          try {
+            (listener.cb as (...a: unknown[]) => void)();
+          } catch (e) {
+            this.reportListenerError_(event, listener, e);
+          }
         }
         break;
       case 1:
         for (const listener of listeners) {
-          (listener.cb as (a: unknown) => void)(args[0]);
+          try {
+            (listener.cb as (a: unknown) => void)(args[0]);
+          } catch (e) {
+            this.reportListenerError_(event, listener, e);
+          }
         }
         break;
       default:
         for (const listener of listeners) {
-          listener.cb(...args);
+          try {
+            listener.cb(...args);
+          } catch (e) {
+            this.reportListenerError_(event, listener, e);
+          }
         }
     }
+  }
+
+  /** Listener registrations that already reported a throw, so a per-frame failure logs once. */
+  private readonly reportedListeners_ = new WeakSet<object>();
+
+  /**
+   * Reports a listener's throw through the error manager once per listener registration (one
+   * registration = one listener on one event); later throws of the same listener are dropped so a
+   * per-frame event cannot flood the log.
+   */
+  private reportListenerError_(event: EventBusEvent, listener: object, e: unknown): void {
+    if (this.reportedListeners_.has(listener)) {
+      return;
+    }
+    this.reportedListeners_.add(listener);
+    errorManagerInstance.error(e instanceof Error ? e : new Error(String(e)), `EventBus.emit(${event})`);
   }
 
   async emitAsync<T extends EventBusEvent>(event: T, ...args: EngineEventMap[T]): Promise<void> {

@@ -28,11 +28,18 @@
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite, Tle, TleLine1 } from '@ootk/src/main';
+import { doc, docEn, fillDoc } from './report-i18n';
 
 /** A structured report table: a header row plus pre-formatted string cells. */
 export interface ReportTable {
+  /** Column headers. English for the generators here: CSV and JSON read these verbatim. */
   headers: string[];
   rows: string[][];
+  /**
+   * Text-preview overrides in the UI language (translated headers, translated enum cells).
+   * CSV and JSON always use {@link headers} and {@link rows}, so exports stay English.
+   */
+  display?: { headers?: string[]; rows?: string[][] };
 }
 
 /** A titled table printed in the text output above the main table. */
@@ -49,8 +56,10 @@ export interface ReportSection {
  */
 export interface ReportData {
   filename: string;
-  /** Multi-line metadata block printed above the table. */
+  /** Multi-line metadata block printed above the table (UI language). */
   header: string;
+  /** English copy of {@link header} for the CSV `#` preamble (see {@link csvIncludeHeader}); defaults to header. */
+  csvHeader?: string;
   /** Structured table (preferred). */
   table?: ReportTable;
   /** Message shown in place of rows when the table is empty (e.g. "No passes found"). */
@@ -104,12 +113,14 @@ export interface ReportVisibilitySample {
   el: number;
 }
 
-/** Report-table note for a clipped pass window. */
-const PASS_EDGE_NOTE: Record<ReportPassEdge, string> = {
-  continuous: 'continuous',
-  start: 'in view at start',
-  end: 'in view at end',
-};
+/** A translator for report text keys: {@link doc} (UI language) or {@link docEn} (English exports). */
+export type ReportText = (key: string) => string;
+
+/** Column headers by key: English for CSV/JSON, UI language for the text preview. */
+const bilingualHeaders = (keys: string[]): Pick<ReportTable, 'headers' | 'display'> => ({
+  headers: keys.map((key) => docEn(`cols.${key}`)),
+  display: { headers: keys.map((key) => doc(`cols.${key}`)) },
+});
 
 /**
  * Adds the pass windows a rise/set finder cannot see: an object already in view at the
@@ -271,40 +282,51 @@ type HeaderSat = Pick<ReportableObject, 'name' | 'sccNum' | 'altId' | 'intlDes'>
  * timestamp is injected rather than read from the wall clock so the block matches
  * the simulation time the report covers.
  */
-export const buildReportHeader = (title: string, sat: HeaderSat, sensor: DetailedSensor | null, generatedAt: Date): string => {
+export const buildReportHeader = (title: string, sat: HeaderSat, sensor: DetailedSensor | null, generatedAt: Date, tr: ReportText = doc): string => {
+  const line = (key: string, value: string | number): string => {
+    const label = tr(`header.${key}`);
+
+    return `${label}: ${value}\n`;
+  };
+  const none = tr('header.none');
   const satData =
     `${title}\n${HEADER_RULE}\n` +
-    `Date: ${generatedAt.toISOString()}\n` +
-    `Satellite: ${sat.name}\n` +
-    `NORAD ID: ${sat.sccNum ?? 'None'}\n` +
-    `Alternate ID: ${sat.altId || 'None'}\n` +
-    `International Designator: ${sat.intlDes ?? 'None'}\n\n`;
+    line('date', generatedAt.toISOString()) +
+    line('satellite', sat.name) +
+    line('noradId', sat.sccNum ?? none) +
+    line('altId', sat.altId || none) +
+    `${line('intlDes', sat.intlDes || none)}\n`;
 
   if (!sensor) {
     return satData;
   }
 
   const sensorData =
-    `Sensor: ${sensor.name}\n` +
-    `Type: ${sensor.getTypeString()}\n` +
-    `Latitude: ${sensor.lat}\n` +
-    `Longitude: ${sensor.lon}\n` +
-    `Altitude: ${sensor.alt}\n` +
-    `Min Azimuth: ${sensor.minAz}\n` +
-    `Max Azimuth: ${sensor.maxAz}\n` +
-    `Min Elevation: ${sensor.minEl}\n` +
-    `Max Elevation: ${sensor.maxEl}\n` +
-    `Min Range: ${sensor.minRng}\n` +
-    `Max Range: ${sensor.maxRng}\n\n`;
+    line('sensor', sensor.name) +
+    line('type', sensor.getTypeString()) +
+    line('latitude', sensor.lat) +
+    line('longitude', sensor.lon) +
+    line('altitude', sensor.alt) +
+    line('minAz', sensor.minAz) +
+    line('maxAz', sensor.maxAz) +
+    line('minEl', sensor.minEl) +
+    line('maxEl', sensor.maxEl) +
+    line('minRng', sensor.minRng) +
+    `${line('maxRng', sensor.maxRng)}\n`;
 
   return satData + sensorData;
 };
 
 /** One header line stating the sampled interval, so two reports can be compared at a glance. */
-export const buildReportWindowLine = (opts: ReportOptions): string => {
+export const buildReportWindowLine = (opts: ReportOptions, tr: ReportText = doc): string => {
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
+  const text = fillDoc(tr('header.windowLine'), {
+    start: formatReportTime(opts.startTime),
+    end: formatReportTime(new Date(endMs)),
+    step: Math.max(1, opts.stepSec),
+  });
 
-  return `Report Window: ${formatReportTime(opts.startTime)} to ${formatReportTime(new Date(endMs))} UTC, Step: ${Math.max(1, opts.stepSec)} s\n\n`;
+  return `${text}\n\n`;
 };
 
 /**
@@ -314,7 +336,7 @@ export const buildReportWindowLine = (opts: ReportOptions): string => {
  * regard and never blocks on a multi-day on-thread scan.
  */
 export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Azimuth Elevation Range Report', sat, sensor, generatedAt) + buildReportWindowLine(opts);
+  const header = buildReportHeader(doc('titles.aer'), sat, sensor, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const passes = deps.findPasses(sensor, opts);
@@ -335,14 +357,14 @@ export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: 
   return {
     filename: `aer-${sat.sccNum}`,
     header,
-    table: { headers: ['Time (UTC)', 'Pass', 'Azimuth(°)', 'Elevation(°)', 'Range(km)'], rows },
-    emptyMessage: 'No passes found!',
+    table: { ...bilingualHeaders(['timeUtc', 'pass', 'azimuthDeg', 'elevationDeg', 'rangeKm']), rows },
+    emptyMessage: doc('empty.noPasses'),
   };
 };
 
 /** Latitude/Longitude/Altitude ground track over the report window. */
 export const generateLlaReport = (sat: ReportableObject, opts: ReportOptions, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Latitude Longitude Altitude Report', sat, null, generatedAt) + buildReportWindowLine(opts);
+  const header = buildReportHeader(doc('titles.lla'), sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
@@ -361,13 +383,13 @@ export const generateLlaReport = (sat: ReportableObject, opts: ReportOptions, ge
   return {
     filename: `lla-${reportId(sat)}`,
     header,
-    table: { headers: ['Time (UTC)', 'Latitude(°)', 'Longitude(°)', 'Altitude(km)'], rows },
+    table: { ...bilingualHeaders(['timeUtc', 'latitudeDeg', 'longitudeDeg', 'altitudeKm']), rows },
   };
 };
 
 /** Earth Centered Inertial (TEME) position and velocity over the report window. */
 export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Earth Centered Inertial (TEME) Report', sat, null, generatedAt) + buildReportWindowLine(opts);
+  const header = buildReportHeader(doc('titles.eci'), sat, null, generatedAt) + buildReportWindowLine(opts);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
@@ -394,10 +416,7 @@ export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, ge
   return {
     filename: `eci-${reportId(sat)}`,
     header,
-    table: {
-      headers: ['Time (UTC)', 'Position X(km)', 'Position Y(km)', 'Position Z(km)', 'Velocity X(km/s)', 'Velocity Y(km/s)', 'Velocity Z(km/s)'],
-      rows,
-    },
+    table: { ...bilingualHeaders(['timeUtc', 'posX', 'posY', 'posZ', 'velX', 'velY', 'velZ']), rows },
   };
 };
 
@@ -409,87 +428,78 @@ export const generateEciReport = (sat: ReportableObject, opts: ReportOptions, ge
  * Both epochs are printed so the convention is explicit.
  */
 export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Date, stateEpoch: Date = generatedAt): ReportData => {
-  const header =
-    `${buildReportHeader('Classical Orbital Elements Report', sat, null, generatedAt)}` +
-    'Note: osculating elements (J2000) at the state epoch, derived from the propagated state vector.\n' +
-    'They differ from the TLE mean elements used for catalog apogee/perigee.\n\n';
+  const header = `${buildReportHeader(doc('titles.coes'), sat, null, generatedAt)}${doc('coes.note')}\n\n`;
   const el = sat.toJ2000(stateEpoch).toClassicalElements();
   const tleEpoch = tleEpochFromLine1(sat.tle1);
-  const rows: string[][] = [
-    ['Element Set', 'Osculating (J2000)'],
-    ['TLE Epoch (UTC)', tleEpoch ? formatReportTime(tleEpoch) : 'N/A'],
-    ['State Epoch (osculating, UTC)', formatReportTime(el.epoch.toDateTime())],
-    ['Apogee', `${el.apogee.toFixed(3)} km`],
-    ['Perigee', `${el.perigee.toFixed(3)} km`],
-    ['Inclination', `${el.inclinationDegrees.toFixed(4)}°`],
-    ['Right Ascension', `${el.rightAscensionDegrees.toFixed(4)}°`],
-    ['Argument of Perigee', `${el.argPerigeeDegrees.toFixed(4)}°`],
-    ['True Anomaly', `${el.trueAnomalyDegrees.toFixed(4)}°`],
+  // [label key, value]: the label is English in CSV/JSON and translated in the text preview.
+  const entries: [string, string | null][] = [
+    // null value: the element-set name is itself prose and follows the same split.
+    ['elementSet', null],
+    ['tleEpoch', tleEpoch ? formatReportTime(tleEpoch) : 'N/A'],
+    ['stateEpoch', formatReportTime(el.epoch.toDateTime())],
+    ['apogee', `${el.apogee.toFixed(3)} km`],
+    ['perigee', `${el.perigee.toFixed(3)} km`],
+    ['inclination', `${el.inclinationDegrees.toFixed(4)}°`],
+    ['rightAscension', `${el.rightAscensionDegrees.toFixed(4)}°`],
+    ['argOfPerigee', `${el.argPerigeeDegrees.toFixed(4)}°`],
+    ['trueAnomaly', `${el.trueAnomalyDegrees.toFixed(4)}°`],
     // Seven places like a TLE: near-circular LEO orbits (e ~ 1e-4) would print as 0.000 at three.
-    ['Eccentricity', el.eccentricity.toFixed(7)],
-    ['Period', `${el.period.toFixed(3)} min`],
-    ['Semi-Major Axis', `${el.semimajorAxis.toFixed(3)} km`],
+    ['eccentricity', el.eccentricity.toFixed(7)],
+    ['period', `${el.period.toFixed(3)} min`],
+    ['semiMajorAxis', `${el.semimajorAxis.toFixed(3)} km`],
     // ClassicalElements.meanMotion is rad/s; revsPerDay is the rev/day value.
-    ['Mean Motion', `${el.revsPerDay.toFixed(8)} rev/day`],
+    ['meanMotion', `${el.revsPerDay.toFixed(8)} rev/day`],
   ];
+  const toRows = (tr: ReportText): string[][] => entries.map(([key, value]) => [tr(`coes.${key}`), value ?? tr('coes.osculatingJ2000')]);
+  const table = bilingualHeaders(['element', 'value']);
 
   return {
     filename: `coes-${reportId(sat)}`,
     header,
-    table: { headers: ['Element', 'Value'], rows },
+    table: { ...table, rows: toRows(docEn), display: { ...table.display, rows: toRows(doc) } },
   };
 };
 
 /** Rise/set visibility windows over a sensor for the report window. */
 export const generateVisibilityWindowsReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Visibility Windows Report', sat, sensor, generatedAt) + buildReportWindowLine(opts);
+  const header = buildReportHeader(doc('titles.visibility'), sat, sensor, generatedAt) + buildReportWindowLine(opts);
+  const csvHeader = buildReportHeader(docEn('titles.visibility'), sat, sensor, generatedAt, docEn) + buildReportWindowLine(opts, docEn);
   const passes = deps.findPasses(sensor, opts);
   // A Note column only when a window is clipped by the report interval (e.g. a GEO that never sets)
   const hasNotes = passes.some((pass) => typeof pass.edge !== 'undefined');
-  const rows = passes.map((pass, idx) => {
-    const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
-    const row = [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
+  const toRows = (tr: ReportText): string[][] =>
+    passes.map((pass, idx) => {
+      const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
+      const row = [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
 
-    if (hasNotes) {
-      row.push(pass.edge ? PASS_EDGE_NOTE[pass.edge] : '');
-    }
+      if (hasNotes) {
+        row.push(pass.edge ? tr(`passEdge.${pass.edge}`) : '');
+      }
 
-    return row;
-  });
-  const headers = ['Pass #', 'Rise Time (UTC)', 'Set Time (UTC)', 'Duration (min)', 'Max Elevation(°)', 'Max Elevation Time (UTC)'];
+      return row;
+    });
+  const columns = ['passNum', 'riseTime', 'setTime', 'durationMin', 'maxElDeg', 'maxElTime'];
 
   if (hasNotes) {
-    headers.push('Note');
+    columns.push('note');
   }
+  const table = bilingualHeaders(columns);
 
   return {
     filename: `visibility-windows-${sat.sccNum}`,
     header,
-    table: { headers, rows },
-    emptyMessage: 'No passes found in the report window!',
+    csvHeader,
+    table: { ...table, rows: toRows(docEn), display: { ...table.display, rows: toRows(doc) } },
+    emptyMessage: doc('empty.noPassesWindow'),
     // The station block (name, lat/lon/alt, mask, window) travels with the CSV too
     csvIncludeHeader: true,
   };
 };
 
-const ILLUMINATION_LABEL: Record<SunIllumination, string> = {
-  sun: 'Yes',
-  penumbral: 'Partial',
-  umbral: 'No',
-  unknown: 'Unknown',
-};
-
-const ECLIPSE_LABEL: Record<SunIllumination, string> = {
-  sun: 'None',
-  penumbral: 'Penumbral',
-  umbral: 'Umbral',
-  unknown: 'Unknown',
-};
-
 /** Sun illumination + eclipse timing over the report window (for power/thermal work). */
 export const generateSunEclipseReport = (sat: ReportableObject, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader('Sun/Eclipse Analysis Report', sat, null, generatedAt) + buildReportWindowLine(opts);
-  const rows: string[][] = [];
+  const header = buildReportHeader(doc('titles.sunEclipse'), sat, null, generatedAt) + buildReportWindowLine(opts);
+  const samples: { time: Date; illumination: SunIllumination; sunAngleDeg: number }[] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const endMs = opts.startTime.getTime() + opts.windowSec * MILLISECONDS_PER_SECOND;
 
@@ -501,12 +511,17 @@ export const generateSunEclipseReport = (sat: ReportableObject, opts: ReportOpti
       continue;
     }
 
-    rows.push([formatReportTime(time), ILLUMINATION_LABEL[status.illumination], ECLIPSE_LABEL[status.illumination], status.sunAngleDeg.toFixed(3)]);
+    samples.push({ time, illumination: status.illumination, sunAngleDeg: status.sunAngleDeg });
   }
+
+  // Illumination and eclipse cells are enums: English in CSV/JSON, translated in the text preview.
+  const toRows = (tr: ReportText): string[][] =>
+    samples.map((sample) => [formatReportTime(sample.time), tr(`illumination.${sample.illumination}`), tr(`eclipse.${sample.illumination}`), sample.sunAngleDeg.toFixed(3)]);
+  const table = bilingualHeaders(['timeUtc', 'sunIlluminated', 'eclipseType', 'sunAngleDeg']);
 
   return {
     filename: `sun-eclipse-${reportId(sat)}`,
     header,
-    table: { headers: ['Time (UTC)', 'Sun Illuminated', 'Eclipse Type', 'Sun Angle(°)'], rows },
+    table: { ...table, rows: toRows(docEn), display: { ...table.display, rows: toRows(doc) } },
   };
 };

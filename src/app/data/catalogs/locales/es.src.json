@@ -283,5 +283,59 @@
     "ZA": "Sudáfrica",
     "ZR": "Zaire",
     "ZW": "Zimbabue"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Sensores de la Space Surveillance Network",
+      "topLink": "Todos los sensores de la Space Surveillance Network"
+    },
+    "mw": {
+      "header": "Sensores de alerta de misiles de EE. UU.",
+      "topLink": "Todos los sensores de alerta de misiles"
+    },
+    "md": {
+      "header": "Sensores de la Agencia de Defensa de Misiles de EE. UU.",
+      "topLink": "Todos los sensores de defensa antimisiles"
+    },
+    "OWL-Net": {
+      "header": "Sensores de OWL-Net",
+      "topLink": "Todos los sensores de OWL-Net"
+    },
+    "leolabs": {
+      "header": "Sensores de LeoLabs",
+      "topLink": "Todos los sensores de LeoLabs"
+    },
+    "esoc": {
+      "header": "Sensores del Centro Europeo de Operaciones Espaciales",
+      "topLink": "Todos los sensores del ESOC"
+    },
+    "rus": {
+      "header": "Sensores rusos",
+      "topLink": "Todos los sensores rusos"
+    },
+    "prc": {
+      "header": "Sensores chinos",
+      "topLink": "Todos los sensores chinos"
+    },
+    "other": {
+      "header": "Otros sensores",
+      "topLink": "Otros sensores"
+    },
+    "dsn": {
+      "header": "Red de Espacio Profundo de la NASA",
+      "topLink": "Todos los complejos de la Red de Espacio Profundo"
+    },
+    "scn": {
+      "header": "Red de Control de Satélites (AFSCN)",
+      "topLink": "Todas las estaciones de seguimiento remotas"
+    },
+    "estrack": {
+      "header": "Red de seguimiento de la ESA (ESTRACK)",
+      "topLink": "Todas las estaciones de ESTRACK"
+    },
+    "galileo": {
+      "header": "Segmento terrestre de Galileo",
+      "topLink": "Todas las estaciones terrestres de Galileo"
+    }
   }
 }

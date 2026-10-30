@@ -29,6 +29,7 @@
  */
 
 import { SatMath } from '@app/app/analysis/sat-math';
+import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { Satellite, SpaceObjectType, Tle, TleLine1, TleLine2 } from '@ootk/src/main';
@@ -47,6 +48,7 @@ import {
   makeRng,
   SubOrbitalFragmentError,
   sampleDispersion,
+  selectAnalystSlots,
   Vec3,
 } from './breakup-core';
 
@@ -67,7 +69,16 @@ export interface KineticImpact {
 export const DEFAULT_IMPACT_TRANSFER_FRACTION = 0.05;
 
 /** Why a breakup run could not proceed, or null on success. Values are locale discriminators. */
-export type BreakupRunError = 'invalidSlotRange' | 'parentStateUnavailable' | 'noFragmentsCreated' | null;
+export type BreakupRunError = 'invalidSlotRange' | 'noFreeSlots' | 'parentStateUnavailable' | 'noFragmentsCreated' | null;
+
+/** Options for {@link runBreakup}. */
+export interface BreakupRunOptions {
+  /**
+   * Catalog ids the caller created earlier (its previous breakup's pieces). These may be
+   * overwritten; every other active analyst object is skipped.
+   */
+  reusableIds?: Iterable<number>;
+}
 
 /** Outcome of a {@link runBreakup} call. */
 export interface BreakupRunResult {
@@ -95,9 +106,11 @@ export interface BreakupRunResult {
  * @param epoch - Breakup time; also the fragment TLE epoch.
  * @param impact - Optional kinetic impact that biases the cloud along the impactor's
  *   momentum; omit for an isotropic (explosion-style) breakup.
+ * @param options - Ids the caller may overwrite (see {@link BreakupRunOptions}). Reserved
+ *   ids and other tools' active objects are skipped, shifting the pieces to later numbers.
  * @returns The created ids, count of skipped reentering fragments, and any hard error.
  */
-export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch: Date, impact?: KineticImpact): BreakupRunResult {
+export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch: Date, impact?: KineticImpact, options: BreakupRunOptions = {}): BreakupRunResult {
   const { breakupCount, startNum } = params;
   const noFragments = (error: BreakupRunError): BreakupRunResult => ({ createdIds: [], reenteredCount: 0, failedCount: 0, error });
 
@@ -105,6 +118,12 @@ export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch
   // (below the block) or unallocated slots (above it).
   if (!isAnalystRangeValid(startNum, breakupCount, CatalogManager.ANALYST_START_ID, settingsManager.maxAnalystSats)) {
     return noFragments('invalidSlotRange');
+  }
+
+  const slots = pickWritableSlots_(startNum, breakupCount, new Set(options.reusableIds ?? []));
+
+  if (!slots) {
+    return noFragments('noFreeSlots');
   }
 
   const parentState = sat.eci(epoch);
@@ -137,7 +156,7 @@ export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch
   for (let i = 0; i < breakupCount; i++) {
     const dvMps = frameToInertial(frameBasis, sampleDispersion(rng, dispersion));
     const deltaVKms = { x: dvMps.x * MS_TO_KMS + biasKms.x, y: dvMps.y * MS_TO_KMS + biasKms.y, z: dvMps.z * MS_TO_KMS + biasKms.z };
-    const outcome = injectFragment_(startNum + i, i + 1, { position, velocity, deltaVKms }, epoch);
+    const outcome = injectFragment_(slots[i], i + 1, { position, velocity, deltaVKms }, epoch);
 
     if (outcome === 'reentered') {
       reenteredCount++;
@@ -154,6 +173,28 @@ export function runBreakup(sat: Satellite, params: BreakupVariationParams, epoch
     failedCount,
     error: createdIds.length === 0 ? 'noFragmentsCreated' : null,
   };
+}
+
+/** Every piece object a breakup has written, so a later run can tell its own pieces from other objects. */
+const breakupPieces_ = new WeakSet<object>();
+
+/**
+ * The analyst numbers the fragments go into: from `startNum` up through the analyst block,
+ * skipping reserved ids and active objects the caller did not create (`reusableIds`).
+ */
+function pickWritableSlots_(startNum: number, count: number, requestedReusable: ReadonlySet<number>): number[] | null {
+  const catalogManagerInstance = ServiceLocator.getCatalogManager();
+  const blockEnd = CatalogManager.ANALYST_START_ID + settingsManager.maxAnalystSats;
+  // A reusable id only counts while its slot still holds a piece a breakup made: if another tool
+  // replaced the piece since, that object is protected like any other.
+  const reusableIds = new Set([...requestedReusable].filter((id) => breakupPieces_.has(catalogManagerInstance.objectCache[id] as object)));
+
+  return selectAnalystSlots(startNum, count, blockEnd, (num) => {
+    const a5Num = Tle.convert6DigitToA5(num.toString());
+    const id = catalogManagerInstance.sccNum2Id(a5Num);
+
+    return id !== null && AnalystSlotReservations.canWrite(a5Num, catalogManagerInstance.objectCache[id] as Satellite | undefined, reusableIds);
+  });
 }
 
 /**
@@ -193,7 +234,7 @@ function injectFragment_(sccNum6: number, pieceIndex: number, input: FragmentInp
   const a5Num = Tle.convert6DigitToA5(sccNum6.toString());
   const pieceSatId = catalogManagerInstance.sccNum2Id(a5Num);
 
-  if (!pieceSatId) {
+  if (pieceSatId === null) {
     return 'failed';
   }
 
@@ -233,6 +274,7 @@ function injectFragment_(sccNum6: number, pieceIndex: number, input: FragmentInp
   }
 
   catalogManagerInstance.objectCache[pieceSatId] = newSat;
+  breakupPieces_.add(newSat);
   catalogManagerInstance.satCruncherThread.sendSatEdit(pieceSatId, pieceTle1, pieceTle2, true);
   orbitManagerInstance.changeOrbitBufferData(pieceSatId, pieceTle1, pieceTle2);
   // Seed the render buffer synchronously (sendSatEdit is async) so a downstream

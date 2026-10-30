@@ -20,7 +20,7 @@ export function showFatalError(config: FatalErrorConfig): never {
 
   const detailHtml = config.technicalDetail
     ? `<div class="a11y-error__detail">
-        <span class="a11y-error__detail-label">Technical Detail</span>
+        <span class="a11y-error__detail-label">${t7e('errorMsgs.Fatal.technicalDetail')}</span>
         <code class="a11y-error__detail-value">${config.technicalDetail}</code>
       </div>`
     : '';
@@ -35,7 +35,7 @@ export function showFatalError(config: FatalErrorConfig): never {
       <div class="a11y-error__icon" aria-hidden="true">&#x26A0;&#xFE0F;</div>
       <h1 class="a11y-error__title">${config.title}</h1>
       <p class="a11y-error__description">${config.description}</p>
-      <h2 class="a11y-error__section-title">Recommendations</h2>
+      <h2 class="a11y-error__section-title">${t7e('errorMsgs.Fatal.recommendations')}</h2>
       <ul class="a11y-error__list">${recItems}</ul>
       ${detailHtml}
       <footer class="a11y-error__footer">

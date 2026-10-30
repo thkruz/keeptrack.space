@@ -23,6 +23,7 @@
 
 import { BaseObject, CatalogSource, Degrees, Minutes, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { SatMath } from '../analysis/sat-math';
+import { isSyntheticVimpel } from './synthetic-vimpel';
 
 /**
  * The CatalogSearch class provides static methods for filtering and searching through an array of satellite data.
@@ -151,12 +152,16 @@ export class CatalogSearch {
    * @returns An array of SCC numbers of the top 100 objects with the lowest perigee values.
    */
   static findReentry(satData: Satellite[], numReturns = 100): string[] {
+    return this.findReentryObjects(satData, numReturns).map((sat) => sat.sccNum);
+  }
+
+  /** Ranked source objects; external identifiers need not exist or be unique. */
+  static findReentryObjects(satData: Satellite[], numReturns = 100): Satellite[] {
     return satData
       .filter((sat) => sat.type === SpaceObjectType.PAYLOAD || sat.type === SpaceObjectType.ROCKET_BODY || sat.type === SpaceObjectType.DEBRIS)
       .filter((sat) => sat.perigee > 0)
       .sort((a, b) => a.perigee - b.perigee)
-      .slice(0, numReturns)
-      .map((sat) => sat.sccNum);
+      .slice(0, numReturns);
   }
 
   /**
@@ -204,6 +209,10 @@ export class CatalogSearch {
    */
   static year(satData: Satellite[], yr: number): Satellite[] {
     return satData.filter((sat) => {
+      // Synthetic JSC Vimpel elsets hold the Vimpel id where the designator year goes.
+      if (isSyntheticVimpel(sat)) {
+        return false;
+      }
       const tleYear = sat?.tle1?.substring(9, 11) || '-1';
 
       return Number.parseInt(tleYear) === yr;

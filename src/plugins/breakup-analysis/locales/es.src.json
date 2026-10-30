@@ -49,6 +49,9 @@
         "estimatedTotal": "Total Estimado",
         "trackingRatio": "Proporción de Rastreo",
         "typeBreakdown": "Cargas Útiles / Cuerpos de Cohete / Restos",
+        "likelyDecayed": "Probablemente reentrados",
+        "likelyDecayedNote": "Incluidos en los recuentos anteriores. Un objeto se marca cuando su perigeo está por debajo de {perigee} km o su conjunto de elementos es más de {days} días anterior a {date}.",
+        "likelyDecayedTag": "probablemente reentrado",
         "parameter": "Parámetro",
         "min": "Mín",
         "max": "Máx",
@@ -72,6 +75,68 @@
       "errorMsgs": {
         "parentNotFound": "El objeto principal no está en el catálogo actual.",
         "noDataToExport": "No hay fragmentos rastreados para exportar."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Prueba ASAT de Fengyun-1C",
+          "cause": "Prueba ASAT intencionada",
+          "orbitType": "LEO heliosíncrona",
+          "description": "Prueba china de misil antisatélite que destruyó el satélite meteorológico Fengyun-1C y creó la mayor nube de desechos rastreada de la historia."
+        },
+        "cosmos2251": {
+          "name": "Colisión Cosmos 2251 / Iridium 33",
+          "cause": "Colisión accidental",
+          "orbitType": "LEO",
+          "description": "Primera colisión accidental a hipervelocidad entre dos satélites intactos. Cosmos 2251 chocó con el satélite de comunicaciones operativo Iridium 33."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (por colisión)",
+          "cause": "Colisión accidental",
+          "orbitType": "LEO",
+          "description": "Campo de desechos del satélite operativo Iridium 33 tras su colisión con el inactivo Cosmos 2251."
+        },
+        "cosmos1408": {
+          "name": "Prueba ASAT de Cosmos 1408",
+          "cause": "Prueba ASAT intencionada",
+          "orbitType": "LEO",
+          "description": "Prueba ASAT rusa de ascenso directo que destruyó el satélite ELINT inactivo Cosmos 1408 y generó desechos que pusieron en riesgo a la tripulación de la ISS."
+        },
+        "microsatr": {
+          "name": "Prueba ASAT de Microsat-R (Misión Shakti)",
+          "cause": "Prueba ASAT intencionada",
+          "orbitType": "LEO",
+          "description": "Prueba ASAT india de ascenso directo (Misión Shakti) contra el satélite Microsat-R. La baja altitud de intercepción limitó la población de desechos de larga duración, aunque algunos fragmentos se elevaron por encima de la ISS."
+        },
+        "breezem": {
+          "name": "Explosión de la etapa superior Briz-M",
+          "cause": "Explosión accidental",
+          "orbitType": "GTO",
+          "description": "La etapa superior Briz-M explotó tras la fallida misión Arabsat-4A, probablemente por propelente residual. Generó desechos en un amplio rango de altitudes."
+        },
+        "cz6a": {
+          "name": "Fragmentación de la etapa superior CZ-6A",
+          "cause": "Explosión accidental",
+          "orbitType": "LEO heliosíncrona",
+          "description": "Una segunda etapa china Larga Marcha 6A se fragmentó poco después de desplegar Yunhai-3 y dispersó cientos de fragmentos por altitudes heliosíncronas muy utilizadas."
+        },
+        "noaa16": {
+          "name": "Fragmentación de NOAA-16",
+          "cause": "Fallo de batería / térmico",
+          "orbitType": "LEO heliosíncrona",
+          "description": "El satélite meteorológico retirado NOAA-16 se fragmentó en órbita, atribuido a un fallo de batería o térmico, y añadió desechos de larga duración a una altitud polar congestionada."
+        },
+        "dmspf13": {
+          "name": "Fragmentación de DMSP-F13",
+          "cause": "Explosión de batería",
+          "orbitType": "LEO heliosíncrona",
+          "description": "Una nave del Defense Meteorological Satellite Program de EE. UU. se rompió tras una sobrecarga y sobrecalentamiento de la batería, un modo de fallo que después se detectó en varios satélites DMSP y NOAA del mismo diseño."
+        },
+        "usa193": {
+          "name": "Derribo de USA-193",
+          "cause": "Derribo intencionado",
+          "orbitType": "LEO",
+          "description": "Un misil SM-3 de la Armada de EE. UU. destruyó el satélite averiado de la NRO USA-193 (NROL-21). La fragmentación a baja altitud hizo que la mayoría de los desechos reentraran en pocas semanas."
+        }
       }
     }
   }

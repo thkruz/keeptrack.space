@@ -49,6 +49,9 @@
         "estimatedTotal": "Szacowana liczba całkowita",
         "trackingRatio": "Współczynnik śledzenia",
         "typeBreakdown": "Ładunki / Człony rakiet / Odłamki",
+        "likelyDecayed": "Prawdopodobnie zdeorbitowane",
+        "likelyDecayedNote": "Uwzględnione w powyższych liczbach. Obiekt jest oznaczany, gdy jego perygeum jest niższe niż {perigee} km lub jego zestaw elementów jest o ponad {days} dni starszy niż {date}.",
+        "likelyDecayedTag": "prawdopodobnie zdeorbitowany",
         "parameter": "Parametr",
         "min": "Min",
         "max": "Maks",
@@ -72,6 +75,68 @@
       "errorMsgs": {
         "parentNotFound": "Obiektu macierzystego nie ma w bieżącym katalogu.",
         "noDataToExport": "Brak śledzonych fragmentów do wyeksportowania."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Test ASAT na Fengyun-1C",
+          "cause": "Celowy test ASAT",
+          "orbitType": "LEO heliosynchroniczna",
+          "description": "Chiński test pocisku antysatelitarnego, który zniszczył satelitę meteorologicznego Fengyun-1C, tworząc największą śledzoną chmurę szczątków w historii."
+        },
+        "cosmos2251": {
+          "name": "Kolizja Cosmos 2251 / Iridium 33",
+          "cause": "Przypadkowa kolizja",
+          "orbitType": "LEO",
+          "description": "Pierwsza przypadkowa kolizja z hiperprędkością między dwoma nieuszkodzonymi satelitami. Cosmos 2251 zderzył się z działającym satelitą komunikacyjnym Iridium 33."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (z kolizji)",
+          "cause": "Przypadkowa kolizja",
+          "orbitType": "LEO",
+          "description": "Pole szczątków działającego satelity Iridium 33 po kolizji z nieczynnym Cosmos 2251."
+        },
+        "cosmos1408": {
+          "name": "Test ASAT na Cosmos 1408",
+          "cause": "Celowy test ASAT",
+          "orbitType": "LEO",
+          "description": "Rosyjski test ASAT z bezpośrednim wznoszeniem, który zniszczył nieczynnego satelitę ELINT Cosmos 1408, tworząc szczątki zagrażające załodze ISS."
+        },
+        "microsatr": {
+          "name": "Test ASAT na Microsat-R (misja Shakti)",
+          "cause": "Celowy test ASAT",
+          "orbitType": "LEO",
+          "description": "Indyjski test ASAT z bezpośrednim wznoszeniem (misja Shakti) przeciwko satelicie Microsat-R. Niska wysokość przechwycenia ograniczyła liczbę długotrwałych szczątków, choć niektóre fragmenty wyrzucono powyżej ISS."
+        },
+        "breezem": {
+          "name": "Eksplozja górnego stopnia Briz-M",
+          "cause": "Przypadkowa eksplozja",
+          "orbitType": "GTO",
+          "description": "Górny stopień Briz-M eksplodował po nieudanej misji Arabsat-4A, prawdopodobnie z powodu resztek paliwa. Powstały szczątki w szerokim zakresie wysokości."
+        },
+        "cz6a": {
+          "name": "Rozpad górnego stopnia CZ-6A",
+          "cause": "Przypadkowa eksplozja",
+          "orbitType": "LEO heliosynchroniczna",
+          "description": "Drugi stopień chińskiej rakiety Długi Marsz 6A rozpadł się wkrótce po wypuszczeniu Yunhai-3, rozrzucając setki fragmentów na intensywnie wykorzystywanych wysokościach heliosynchronicznych."
+        },
+        "noaa16": {
+          "name": "Rozpad NOAA-16",
+          "cause": "Awaria baterii / termiczna",
+          "orbitType": "LEO heliosynchroniczna",
+          "description": "Wycofany satelita meteorologiczny NOAA-16 rozpadł się na orbicie z powodu awarii baterii lub awarii termicznej, dodając długotrwałe szczątki na zatłoczonej wysokości polarnej."
+        },
+        "dmspf13": {
+          "name": "Rozpad DMSP-F13",
+          "cause": "Eksplozja baterii",
+          "orbitType": "LEO heliosynchroniczna",
+          "description": "Statek amerykańskiego programu Defense Meteorological Satellite Program pękł po przeładowaniu i przegrzaniu baterii. Ten tryb awarii wykryto później w kilku satelitach DMSP i NOAA o tej samej konstrukcji."
+        },
+        "usa193": {
+          "name": "Zestrzelenie USA-193",
+          "cause": "Celowe zestrzelenie",
+          "orbitType": "LEO",
+          "description": "Pocisk SM-3 marynarki wojennej USA zniszczył niesprawnego satelitę NRO USA-193 (NROL-21). Rozpad na małej wysokości sprawił, że większość szczątków weszła w atmosferę w ciągu kilku tygodni."
+        }
       }
     }
   }

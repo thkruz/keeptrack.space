@@ -398,29 +398,29 @@ export class OrbitManager {
       // Full orbits → Tails only
       settingsManager.isDrawTrailingOrbits = true;
       this.updateOrbitType();
-      ServiceLocator.getUiManager().toast('Orbit Tails Only', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast(t7e('toasts.orbitTailsOnly' as TranslationKey), ToastMsgType.normal);
     } else if (settingsManager.isDrawOrbits && settingsManager.isDrawTrailingOrbits) {
       // Tails only → No lines
       settingsManager.isDrawOrbits = false;
       settingsManager.isDrawTrailingOrbits = false;
       this.updateOrbitType();
-      ServiceLocator.getUiManager().toast('Orbits Off', ToastMsgType.standby);
+      ServiceLocator.getUiManager().toast(t7e('toasts.orbitsOff' as TranslationKey), ToastMsgType.standby);
     } else {
       // No lines → Full orbits
       settingsManager.isDrawOrbits = true;
       settingsManager.isDrawTrailingOrbits = false;
       this.drawOrbitsSettingChanged();
       this.updateOrbitType();
-      ServiceLocator.getUiManager().toast('Orbits On', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast(t7e('toasts.orbitsOn' as TranslationKey), ToastMsgType.normal);
     }
   }
 
   private toggleEciToEcf_() {
     settingsManager.isOrbitCruncherInEcf = !settingsManager.isOrbitCruncherInEcf;
     if (settingsManager.isOrbitCruncherInEcf) {
-      ServiceLocator.getUiManager().toast('Orbits displayed in ECF', ToastMsgType.normal);
+      ServiceLocator.getUiManager().toast(t7e('toasts.orbitsInEcf' as TranslationKey), ToastMsgType.normal);
     } else {
-      ServiceLocator.getUiManager().toast('Orbits displayed in ECI', ToastMsgType.standby);
+      ServiceLocator.getUiManager().toast(t7e('toasts.orbitsInEci' as TranslationKey), ToastMsgType.standby);
     }
 
     // Cache is in wrong reference frame — clear and re-request

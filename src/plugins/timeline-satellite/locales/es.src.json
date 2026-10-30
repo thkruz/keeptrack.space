@@ -16,7 +16,8 @@
         "noPasses": "Sin Pases"
       },
       "errorMsgs": {
-        "addSatellitesOrSelect": "Añade Satélites a la Lista o Selecciona un Satélite"
+        "addSatellitesOrSelect": "Añade Satélites a la Lista o Selecciona un Satélite",
+        "invalidSetting": "{setting} debe ser un número mayor que cero."
       },
       "help": {
         "overview": "La Línea de Tiempo del Satélite es la imagen especular de la Línea de Tiempo del Sensor: muestra cuándo un sensor seleccionado puede ver una lista de satélites. Cada fila es un satélite de tu Watchlist (o el satélite actualmente seleccionado) y cada barra de color es un pase, de modo que puedes programar las observaciones de un solo sitio sobre muchos objetivos.",

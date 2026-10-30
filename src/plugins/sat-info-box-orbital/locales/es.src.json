@@ -80,6 +80,15 @@
     "meter": "m",
     "kilometer": "km",
     "second": "s",
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "notAvailable": "N/D",
+    "CenterBody": {
+      "label": "Cuerpo central",
+      "tooltip": "Cuerpo desde el que se miden las posiciones de la efeméride (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Sistema de referencia",
+      "tooltip": "Sistema de coordenadas de la efeméride (OEM REF_FRAME)"
+    }
   }
 }

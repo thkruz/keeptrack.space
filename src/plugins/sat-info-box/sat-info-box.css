@@ -149,7 +149,18 @@
   box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
   overflow-y: auto;
   scrollbar-gutter: auto;
-  z-index: 10000;
+  z-index: 4;
+}
+
+/* At native browser zoom the desktop CSS viewport may drop below 1024px.
+   Keep object context beside the 400px menu rather than covering its fields. */
+@media (min-width: 640px) and (max-width: 1023px) {
+  #sat-infobox {
+    right: 0;
+    width: min(360px, calc(100vw - 416px));
+    bottom: var(--bottom-menu-height);
+    max-height: 45%;
+  }
 }
 
 .sat-info-value {

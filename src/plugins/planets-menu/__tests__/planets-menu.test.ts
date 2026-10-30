@@ -1,7 +1,9 @@
 import { MenuMode, SolarBody } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { clearBodyRegistry } from '@app/engine/rendering/draw-manager/celestial-bodies/body-registry';
 import { registerMarsMoons } from '@app/engine/rendering/draw-manager/celestial-bodies/mars-moon-catalog';
 import { clearPlanetSystems } from '@app/engine/rendering/draw-manager/celestial-bodies/planet-moon-systems';
@@ -154,6 +156,157 @@ describe('PlanetsMenuPlugin', () => {
       for (const moon of [SolarBody.Io, SolarBody.Titan, SolarBody.Oberon, SolarBody.Triton]) {
         expect(menuHtml).not.toContain(`data-planet="${moon}"`);
       }
+    });
+  });
+
+  describe('Filter', () => {
+    const mountMenu = (plugin: PlanetsMenuPlugin): HTMLElement => {
+      const content = document.createElement('div');
+
+      content.id = 'planets-menu-content';
+      content.innerHTML = plugin.buildSideMenuHtml_();
+      // First in document order, so getEl finds it ahead of any side menu an earlier test left behind.
+      document.body.prepend(content);
+
+      return content;
+    };
+    const visibleBodies = (content: HTMLElement): string[] =>
+      Array.from(content.querySelectorAll<HTMLElement>('.planets-menu-item'))
+        .filter((row) => row.style.display !== 'none')
+        .map((row) => row.dataset.planet ?? '');
+    const emptyNote = (content: HTMLElement) => content.querySelector<HTMLElement>('#planets-filter-empty');
+
+    afterEach(() => {
+      document.getElementById('planets-menu-content')?.remove();
+    });
+
+    it("keeps a moon's planet visible when only the moon matches", () => {
+      const plugin = new PlanetsMenuPlugin();
+      const content = mountMenu(plugin);
+
+      plugin.applyFilter_('phob');
+
+      expect(visibleBodies(content)).toEqual([SolarBody.Mars, SolarBody.Phobos]);
+      // Deimos shares the parent but does not match, so it stays hidden.
+      expect(visibleBodies(content)).not.toContain(SolarBody.Deimos);
+      expect(emptyNote(content)?.style.display).toBe('none');
+    });
+
+    it('shows the "No matching bodies" note only when nothing matches', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const content = mountMenu(plugin);
+
+      // Hidden until a filter is typed.
+      expect(emptyNote(content)?.style.display).toBe('none');
+
+      plugin.applyFilter_('zzz');
+      expect(visibleBodies(content)).toEqual([]);
+      expect(emptyNote(content)?.style.display).toBe('');
+      for (const section of Array.from(content.querySelectorAll<HTMLElement>('.kt-section'))) {
+        expect(section.style.display).toBe('none');
+      }
+
+      plugin.applyFilter_('');
+      expect(emptyNote(content)?.style.display).toBe('none');
+      expect(visibleBodies(content)).toContain(SolarBody.Earth);
+    });
+
+    it('marks each moon row with its parent body', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const menuHtml = plugin.buildSideMenuHtml_();
+
+      expect(menuHtml).toContain('data-planet="Phobos" data-planet-name="phobos" data-parent="Mars"');
+      expect(menuHtml).toContain('data-planet="Mars" data-planet-name="mars">');
+    });
+  });
+
+  describe('Active-body highlight', () => {
+    const mountMenu = (plugin: PlanetsMenuPlugin): HTMLElement => {
+      const content = document.createElement('div');
+
+      content.id = 'planets-menu-content';
+      content.innerHTML = plugin.buildSideMenuHtml_();
+      // First in document order, so getEl finds it ahead of any side menu an earlier test left behind.
+      document.body.prepend(content);
+
+      return content;
+    };
+    const activeBodies = (content: HTMLElement): string[] => Array.from(content.querySelectorAll<HTMLElement>('.planets-menu-active')).map((row) => row.dataset.planet ?? '');
+
+    afterEach(() => {
+      document.getElementById('planets-menu-content')?.remove();
+      settingsManager.centerBody = SolarBody.Earth;
+    });
+
+    it('follows a centerBody change made outside the plugin (satellite pick) on the next frame', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const content = mountMenu(plugin);
+
+      settingsManager.centerBody = SolarBody.Phobos;
+      plugin.updateActiveBody_();
+      expect(activeBodies(content)).toEqual([SolarBody.Phobos]);
+
+      // SelectSatManager re-centres on Earth itself, without calling the plugin.
+      settingsManager.centerBody = SolarBody.Earth;
+      plugin.syncActiveBody_();
+
+      expect(activeBodies(content)).toEqual([SolarBody.Earth]);
+    });
+
+    it('does not repaint when the centre body is unchanged', () => {
+      const plugin = new PlanetsMenuPlugin();
+
+      mountMenu(plugin);
+      plugin.updateActiveBody_();
+      const updateSpy = vi.spyOn(plugin as unknown as { updateActiveBody_: () => void }, 'updateActiveBody_');
+
+      plugin.syncActiveBody_();
+
+      expect(updateSpy).not.toHaveBeenCalled();
+    });
+
+    it('moves the highlight to Earth when Home is pressed', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const content = mountMenu(plugin);
+      const recolorSpy = vi.fn();
+
+      vi.spyOn(ServiceLocator, 'getColorSchemeManager').mockReturnValue({
+        calculateColorBuffers: recolorSpy,
+      } as unknown as ReturnType<typeof ServiceLocator.getColorSchemeManager>);
+      settingsManager.centerBody = SolarBody.Sun;
+      plugin.updateActiveBody_();
+      expect(activeBodies(content)).toEqual([SolarBody.Sun]);
+
+      const home = plugin.getKeyboardShortcuts().find((shortcut) => shortcut.key === 'Home' && shortcut.shift === false);
+
+      home?.callback();
+
+      expect(settingsManager.centerBody).toBe(SolarBody.Earth);
+      expect(recolorSpy).toHaveBeenCalledWith(true);
+      expect(activeBodies(content)).toEqual([SolarBody.Earth]);
+    });
+  });
+
+  describe('Help', () => {
+    it('drops the right-click tip (no context menu centres a body)', () => {
+      const plugin = new PlanetsMenuPlugin();
+      const helpConfig = plugin.getHelpConfig();
+
+      expect(helpConfig.tips).toHaveLength(1);
+      expect(helpConfig.tips?.join(' ')).not.toMatch(/right-click/iu);
+    });
+
+    it('answers Shift+F1 while its menu is open, like every v13 side menu', () => {
+      const plugin = new PlanetsMenuPlugin();
+
+      plugin.init();
+      for (const other of PluginRegistry.plugins) {
+        other.isMenuButtonActive = false;
+      }
+      plugin.isMenuButtonActive = true;
+
+      expect(KeepTrackPlugin.resolveHelpTarget()).toBe(plugin);
+      plugin.isMenuButtonActive = false;
     });
   });
 

@@ -2,12 +2,14 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { getEl, hideEl, setInnerHtml } from '../../engine/utils/get-el';
 import { lat2pitch, lon2yaw } from '../../engine/utils/transforms';
 import { TimeMachine } from '../../plugins/time-machine/time-machine';
 import { SettingsManager } from '../settings';
+import { buildTimeMachineOverlay } from './time-machine-overlay';
 
 export const starTalk = (settingsManager: SettingsManager) => {
   const DEFAULT_LATITUDE = <Degrees>5; // NOTE: 0 will make the geosynchronous satellites more apparent
@@ -71,18 +73,11 @@ export const starTalk = (settingsManager: SettingsManager) => {
    */
   settingsManager.timeMachineString = (yearStr) => {
     ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
-    const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
-    const english = `In ${yearPrefix}${yearStr}`;
-    /*
-     * const french = `En ${yearPrefix}${yearStr}`;
-     * const german = `Im ${yearPrefix}${yearStr}`;
-     */
-    const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
-    const debrisSpan = '<span style="color: rgb(102, 102, 102);">Debris </span>';
+    const overlay = buildTimeMachineOverlay(yearStr, 'rgb(35, 255, 35)', 'rgb(102, 102, 102)');
 
-    setInnerHtml('textOverlay', `${satellitesSpan} and ${debrisSpan} ${english}`);
+    setInnerHtml('textOverlay', overlay.html);
 
-    return `${english}`;
+    return overlay.inYear;
   };
 
   settingsManager.onLoadCb = () => {
@@ -151,7 +146,7 @@ export const starTalk = (settingsManager: SettingsManager) => {
     settingsManager.lastInteractionTime = Date.now() - RESTART_ROTATE_TIME * 1000 + 1000;
     const allSatsGroup = ServiceLocator.getGroupsManager().createGroup(0, null); // All Satellites
 
-    setInnerHtml('textOverlay', 'Building Buffers');
+    setInnerHtml('textOverlay', t7e('darkClouds.buildingBuffers'));
 
     // Show All Orbits first to build buffers
     ServiceLocator.getGroupsManager().selectGroup(allSatsGroup); // Show all orbits

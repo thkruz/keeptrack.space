@@ -55,20 +55,21 @@ export function buildBasicTabHtml(): string {
         <div class="kt-section-label">${l('sectionOrbit')}</div>
         <div class="kt-field-row">
           <div class="input-field col s12">
-            <input placeholder="51.6" id="${P}-basic-inc" type="text" />
+            <input placeholder="51.6" id="${P}-basic-inc" aria-describedby="${P}-basic-error" type="text" />
             <label for="${P}-basic-inc" class="active">${l('inclinationDeg')}</label>
           </div>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="400" id="${P}-basic-apogee" type="text" />
+            <input placeholder="400" id="${P}-basic-apogee" aria-describedby="${P}-basic-error" type="text" />
             <label for="${P}-basic-apogee" class="active">${l('apogeeAltKm')}</label>
           </div>
           <div class="input-field col s6">
-            <input placeholder="400" id="${P}-basic-perigee" type="text" />
+            <input placeholder="400" id="${P}-basic-perigee" aria-describedby="${P}-basic-error" type="text" />
             <label for="${P}-basic-perigee" class="active">${l('perigeeAltKm')}</label>
           </div>
         </div>
+        <div id="${P}-basic-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-basic-submit', b('createSatellite'))}
       </section>
     </form>
@@ -217,6 +218,7 @@ export function buildAdvancedTabHtml(): string {
       </section>
 
       <section class="kt-section">
+        <div id="${P}-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-submit', b('createSatellite'))}
         ${createSatActionButton('createSat-save', b('saveTle'))}
       </section>

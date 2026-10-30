@@ -5,6 +5,9 @@
       "title": "Barevná schémata",
       "rmbLabel": "Barevné schéma",
       "sectionLabel": "Schémata",
+      "legend": {
+        "close": "Zavřít legendu"
+      },
       "help": {
         "overview": "Nabídka Barevná schémata mění způsob, jakým je obarven každý objekt ve scéně. Každé schéma kóduje jinou vlastnost: zemi původu, typ objektu, orbitální režim, osvětlení Sluncem, rychlost a další, takže výběr správného schématu promění mračno bodů v odpověď na konkrétní otázku.",
         "imgAlt": "Nabídka Barevná schémata se seznamem dostupných schémat",
@@ -13,6 +16,13 @@
         "tip1": "Legenda se aktualizuje spolu se schématem; pokud si nejste jisti, co barva znamená, legenda je rozhodující.",
         "tip2": "Některá schémata jsou datově náročná (například prostorová hustota) a jejich první výpočet chvíli trvá.",
         "shortcutToggle": "Přepnout nabídku Barevná schémata"
+      },
+      "commandPalette": {
+        "category": "Barvy",
+        "setScheme": "Nastavit barevné schéma: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Barevné schéma nenalezeno: {name}"
       }
     }
   }

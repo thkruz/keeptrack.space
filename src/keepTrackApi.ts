@@ -9,7 +9,7 @@ import type { HoverManager } from './app/ui/hover-manager';
 import type { UiManager } from './app/ui/ui-manager';
 import type { SoundManager } from './engine/audio/sound-manager';
 import type { Camera } from './engine/camera/camera';
-import type { ToastMsgType } from './engine/core/interfaces';
+import type { ToastAction, ToastMsgType } from './engine/core/interfaces';
 import { PluginRegistry } from './engine/core/plugin-registry';
 import type { Scene } from './engine/core/scene';
 import { ServiceLocator } from './engine/core/service-locator';
@@ -21,6 +21,7 @@ import type { ColorSchemeManager } from './engine/rendering/color-scheme-manager
 import type { DotsManager } from './engine/rendering/dots-manager';
 import type { LineManager } from './engine/rendering/line-manager';
 import type { MeshManager } from './engine/rendering/mesh-manager';
+import type { ViewportManager } from './engine/rendering/viewport-manager';
 import type { WebGLRenderer } from './engine/rendering/webgl-renderer';
 import { errorManagerInstance } from './engine/utils/errorManager';
 import { copyTsvToClipboard, saveCsv, saveVariable, saveXlsx } from './engine/utils/saveVariable';
@@ -47,7 +48,7 @@ export class KeepTrackApi {
   };
 
   // UI related methods
-  toast(toastText: string, type: ToastMsgType, isLong = false) {
+  toast(toastText: string, type: ToastMsgType, isLong = false, action?: ToastAction) {
     const uiManagerInstance = ServiceLocator.getUiManager();
 
     if (!uiManagerInstance) {
@@ -56,7 +57,7 @@ export class KeepTrackApi {
       return;
     }
 
-    uiManagerInstance.toast(toastText, type, isLong);
+    uiManagerInstance.toast(toastText, type, isLong, action);
   }
 
   // Event bus methods
@@ -98,6 +99,8 @@ export class KeepTrackApi {
   getHoverManager: () => HoverManager = ServiceLocator.getHoverManager.bind(ServiceLocator);
   getMainCamera: () => Camera = ServiceLocator.getMainCamera.bind(ServiceLocator);
   getMeshManager: () => MeshManager = ServiceLocator.getMeshManager.bind(ServiceLocator);
+  /** Multi-View pane layout and per-pane cameras; null before the engine registers it. */
+  getViewportManager: () => ViewportManager | null = ServiceLocator.getViewportManager.bind(ServiceLocator);
 
   // Save utilities
   saveCsv = saveCsv;

@@ -1,6 +1,7 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EarthDayTextureQuality, EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { t7e } from '@app/locales/keys';
 import { GetVariables } from './getVariables';
 import { darkClouds } from './presets/darkClouds';
 import { SettingsPresets } from './presets/presets';
@@ -73,7 +74,7 @@ export const parseGetVariables = (params: string[], settingsManager: SettingsMan
         if (parseInt(val) > 0) {
           settingsManager.searchLimit = parseInt(val);
         } else {
-          ServiceLocator.getUiManager().toast(`Invalid search limit: ${val}`, ToastMsgType.error);
+          ServiceLocator.getUiManager().toast(t7e('urlManager.invalidSearchLimit').replace('{val}', val), ToastMsgType.error);
         }
         break;
       case 'console':

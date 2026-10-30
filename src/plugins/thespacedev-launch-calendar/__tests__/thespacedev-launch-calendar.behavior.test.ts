@@ -2,6 +2,7 @@
 /* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable dot-notation */
+import { ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { LaunchInfoObject, TheSpaceDevLaunchCalendarPlugin } from '@app/plugins/thespacedev-launch-calendar/thespacedev-launch-calendar';
@@ -190,7 +191,9 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
     const stubFetch = (results: unknown[]) => {
       // eslint-disable-next-line require-await
       global.fetch = vi.fn().mockImplementation(async () => ({
-        json: () => ({ results }),
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve({ results }),
       })) as never;
     };
 
@@ -334,27 +337,33 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    it('the refresh button click clears the list and re-fetches', () => {
+    it('the refresh button click re-fetches and keeps the current list until new data arrives', () => {
       plugin.launchList = [futureLaunch()];
       const spy = vi.spyOn(p(), 'fetchLaunchData_').mockImplementation(() => undefined);
 
       getEl('launch-calendar-refresh-btn')!.dispatchEvent(new MouseEvent('click'));
 
-      expect(plugin.launchList).toHaveLength(0);
+      expect(plugin.launchList).toHaveLength(1);
       expect(spy).toHaveBeenCalled();
     });
 
-    it('the export button plays a sound and saves the launch list', async () => {
-      const saveVariable = await import('@app/engine/utils/saveVariable');
-      const saveSpy = vi.spyOn(saveVariable, 'saveXlsx').mockImplementation(() => undefined);
-      const soundSpy = vi.spyOn(ServiceLocator.getSoundManager()!, 'play').mockImplementation(() => undefined as never);
-
-      plugin.launchList = [futureLaunch()];
+    it('the export button hands off to the export routine', () => {
+      const spy = vi.spyOn(p(), 'exportLaunchList_').mockImplementation(() => Promise.resolve());
 
       getEl('export-launch-info')!.dispatchEvent(new MouseEvent('click'));
 
-      expect(soundSpy).toHaveBeenCalled();
-      expect(saveSpy).toHaveBeenCalledWith(expect.any(Array), 'launchList');
+      expect(spy).toHaveBeenCalled();
+    });
+
+    it('exporting an empty list shows a toast, plays no sound and writes no file', async () => {
+      const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined as never);
+      const soundSpy = vi.spyOn(ServiceLocator.getSoundManager()!, 'play').mockImplementation(() => undefined as never);
+
+      plugin.launchList = [];
+      await p().exportLaunchList_();
+
+      expect(toastSpy).toHaveBeenCalledWith(expect.any(String), ToastMsgType.caution);
+      expect(soundSpy).not.toHaveBeenCalled();
     });
   });
 });

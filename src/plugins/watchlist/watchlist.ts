@@ -63,6 +63,10 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     return t7e(`plugins.WatchlistPlugin.rmbMenu.${key}` as Parameters<typeof t7e>[0]);
   }
 
+  private static tInfoBox_(key: 'addLabel' | 'removeLabel'): string {
+    return t7e(`plugins.WatchlistPlugin.infoBox.${key}` as Parameters<typeof t7e>[0]);
+  }
+
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'watchlist-rmb',
@@ -347,7 +351,11 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     const satInfoBoxPlugin = PluginRegistry.getPlugin(SatInfoBox)!;
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, () => {
-      getEl(this.EL.WATCHLIST_TOGGLE)?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
+      const toggleEl = getEl(this.EL.WATCHLIST_TOGGLE);
+
+      toggleEl?.addEventListener('click', satInfoBoxPlugin.withClickSound(this.addRemoveWatchlist_.bind(this)));
+      // The toggle is an <img role="button">: make Enter/Space activate it like a button.
+      toggleEl?.addEventListener('keydown', WatchlistPlugin.activateOnEnterOrSpace);
     });
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, this.selectSatData_.bind(this));
@@ -372,9 +380,30 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     getEl(SAT_INFO_EL.NAME)?.insertAdjacentHTML(
       'beforebegin',
       html`
-      <img id="${this.EL.WATCHLIST_TOGGLE}" src="${bookmarkAddPng}" class="sat-watchlist-icon off-watchlist"/>
+      <img id="${this.EL.WATCHLIST_TOGGLE}" src="${bookmarkAddPng}" class="sat-watchlist-icon off-watchlist" role="button" tabindex="0"
+        alt="${WatchlistPlugin.tInfoBox_('addLabel')}" aria-label="${WatchlistPlugin.tInfoBox_('addLabel')}" kt-tooltip="${WatchlistPlugin.tInfoBox_('addLabel')}"/>
     `
     );
+  }
+
+  /** Enter/Space on a focused role="button" icon acts like a click. */
+  static activateOnEnterOrSpace(evt: KeyboardEvent): void {
+    if (evt.key !== 'Enter' && evt.key !== ' ') {
+      return;
+    }
+    evt.preventDefault();
+    (evt.currentTarget as HTMLElement).click();
+  }
+
+  /** Icon, class and accessible name of the info-box bookmark toggle. */
+  protected applyToggleState_(toggleEl: HTMLImageElement, isOnWatchlist: boolean): void {
+    const label = WatchlistPlugin.tInfoBox_(isOnWatchlist ? 'removeLabel' : 'addLabel');
+
+    toggleEl.src = isOnWatchlist ? bookmarkRemovePng : bookmarkAddPng;
+    toggleEl.classList.replace(isOnWatchlist ? 'off-watchlist' : 'on-watchlist', isOnWatchlist ? 'on-watchlist' : 'off-watchlist');
+    toggleEl.alt = label;
+    toggleEl.setAttribute('aria-label', label);
+    toggleEl.setAttribute('kt-tooltip', label);
   }
 
   protected selectSatData_(obj?: BaseObject) {
@@ -388,13 +417,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       return;
     }
 
-    if (this.isOnWatchlist(obj.id)) {
-      toggleEl.src = bookmarkRemovePng;
-      toggleEl.classList.replace('off-watchlist', 'on-watchlist');
-    } else {
-      toggleEl.src = bookmarkAddPng;
-      toggleEl.classList.replace('on-watchlist', 'off-watchlist');
-    }
+    this.applyToggleState_(toggleEl, this.isOnWatchlist(obj.id));
   }
 
   protected addRemoveWatchlist_() {
@@ -405,6 +428,12 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       this.removeSat(id);
     } else {
       this.addSat(id);
+    }
+
+    const toggleEl = getEl(this.EL.WATCHLIST_TOGGLE, true) as HTMLImageElement | null;
+
+    if (toggleEl) {
+      this.applyToggleState_(toggleEl, this.isOnWatchlist(id));
     }
   }
 
@@ -452,7 +481,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
         obj.id = sat.id;
         obj.inView = false;
       } else {
-        errorManagerInstance.warn('List File Format Incorrect');
+        errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
         return [];
       }
@@ -869,7 +898,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     const target = evt.target;
 
     if (!target) {
-      errorManagerInstance.error(new Error('target is null'), 'watchlist.ts', 'Error reading list!');
+      errorManagerInstance.error(new Error('target is null'), 'watchlist.ts', t7e('plugins.WatchlistPlugin.errorMsgs.ErrorReadingList'));
 
       return;
     }
@@ -879,7 +908,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     }
 
     if (evt.target.error) {
-      errorManagerInstance.error(evt.target.error, 'watchlist.ts', 'Error reading list!');
+      errorManagerInstance.error(evt.target.error, 'watchlist.ts', t7e('plugins.WatchlistPlugin.errorMsgs.ErrorReadingList'));
 
       return;
     }
@@ -899,13 +928,13 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
         newWatchlist = [];
       }
     } catch {
-      errorManagerInstance.warn('List File Format Incorrect');
+      errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
       return;
     }
 
     if (newWatchlist.length === 0) {
-      errorManagerInstance.warn('List File Format Incorrect');
+      errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
       return;
     }
@@ -941,7 +970,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       saveAs(blob, 'watchlist.json');
     } catch (e) {
       if (!isThisNode()) {
-        errorManagerInstance.error(e, 'watchlist.ts', 'Error saving list!');
+        errorManagerInstance.error(e, 'watchlist.ts', t7e('plugins.WatchlistPlugin.errorMsgs.ErrorSavingList'));
       }
     }
     evt.preventDefault();
@@ -962,7 +991,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
       return savedSatList;
     } catch {
-      errorManagerInstance.warn('List File Format Incorrect');
+      errorManagerInstance.warn(t7e('plugins.WatchlistPlugin.errorMsgs.ListFileFormatIncorrect'));
 
       return [];
     }

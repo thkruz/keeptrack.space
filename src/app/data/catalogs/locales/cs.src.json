@@ -283,5 +283,59 @@
     "ZA": "Jihoafrická republika",
     "ZR": "Zair",
     "ZW": "Zimbabwe"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Senzory Space Surveillance Network",
+      "topLink": "Všechny senzory Space Surveillance Network"
+    },
+    "mw": {
+      "header": "Americké senzory raketového varování",
+      "topLink": "Všechny senzory raketového varování"
+    },
+    "md": {
+      "header": "Senzory americké Agentury protiraketové obrany",
+      "topLink": "Všechny senzory protiraketové obrany"
+    },
+    "OWL-Net": {
+      "header": "Senzory OWL-Net",
+      "topLink": "Všechny senzory OWL-Net"
+    },
+    "leolabs": {
+      "header": "Senzory LeoLabs",
+      "topLink": "Všechny senzory LeoLabs"
+    },
+    "esoc": {
+      "header": "Senzory Evropského střediska pro kosmické operace",
+      "topLink": "Všechny senzory ESOC"
+    },
+    "rus": {
+      "header": "Ruské senzory",
+      "topLink": "Všechny ruské senzory"
+    },
+    "prc": {
+      "header": "Čínské senzory",
+      "topLink": "Všechny čínské senzory"
+    },
+    "other": {
+      "header": "Ostatní senzory",
+      "topLink": "Ostatní senzory"
+    },
+    "dsn": {
+      "header": "NASA Deep Space Network",
+      "topLink": "Všechny komplexy Deep Space Network"
+    },
+    "scn": {
+      "header": "Síť řízení družic (AFSCN)",
+      "topLink": "Všechny vzdálené sledovací stanice"
+    },
+    "estrack": {
+      "header": "Sledovací síť ESA (ESTRACK)",
+      "topLink": "Všechny stanice ESTRACK"
+    },
+    "galileo": {
+      "header": "Pozemní segment Galileo",
+      "topLink": "Všechny pozemní stanice Galileo"
+    }
   }
 }

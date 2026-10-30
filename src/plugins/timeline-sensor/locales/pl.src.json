@@ -28,7 +28,8 @@
         "inFov": "W FOV",
         "atNight": "W nocy",
         "clearSkies": "Czyste niebo",
-        "noPasses": "Brak przelotów"
+        "noPasses": "Brak przelotów",
+        "missingUiName": "Czujnik bez nazwy"
       },
       "help": {
         "overview": "Oś czasu czujnika pokazuje, kiedy sieć czujników może widzieć wybranego satelitę w nadchodzących godzinach. Każdy wiersz to czujnik, a każdy kolorowy pasek to przelot, dzięki czemu możesz jednym spojrzeniem porównać możliwości wszystkich stanowisk i wybrać najlepszy czujnik do następnej obserwacji.",
@@ -42,6 +43,10 @@
         "tip1": "Pogoda pochodzi z prognozy zachmurzenia Open-Meteo dla każdego stanowiska optycznego; radary całkowicie ignorują warunki pogodowe, światło słoneczne i ciemność.",
         "tip2": "Kliknięcie przelotu ponownie wybiera satelitę po zmianie czujnika i czasu, dzięki czemu inne otwarte menu odświeżają się z nową geometrią.",
         "tip3": "Krótsze interwały obliczeń wychwytują krótkie przeloty, ale obliczenia trwają dłużej; 30 sekund to dobry kompromis dla okna 24-godzinnego."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "Nie znaleziono listy czujników",
+        "invalidSetting": "{setting} musi być liczbą większą od zera."
       }
     }
   }

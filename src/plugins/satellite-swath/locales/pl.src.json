@@ -19,7 +19,8 @@
         "daylightOnly": "Tylko w świetle dziennym",
         "nadirReadout": "Szerokość w nadirze ok. {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Szerokość w nadirze nieznana dla tej orbity",
-        "presetsIllustrative": "Ustawienia wstępne są poglądowe, nie są opublikowanymi specyfikacjami."
+        "presetsIllustrative": "Ustawienia wstępne są poglądowe, nie są opublikowanymi specyfikacjami.",
+        "close": "Zamknij"
       },
       "presets": {
         "hrEo": "Optyczny, wysoka rozdzielczość",

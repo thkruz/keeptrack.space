@@ -12,6 +12,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoadingSticky } from '@app/engine/utils/showLoading';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
@@ -180,10 +181,18 @@ export class NewLaunch extends KeepTrackPlugin {
     return countryKeys
       .map(
         (country) =>
-          `<optgroup label="${country}"> ${grouped[country].map((site) => `<option value="${site.key}">${site.name}<br/> - ${site.site}</option>`).join('\n')}
+          `<optgroup label="${country}"> ${grouped[country].map((site) => `<option value="${site.key}">${NewLaunch.facilityLabel(site.name, site.site)}</option>`).join('\n')}
       </optgroup>`
       )
       .join('\n');
+  }
+
+  /**
+   * Display label of a launch facility: `Site 43 - Plesetsk Cosmodrome`. (The old markup put a `<br/>` before
+   * the dash, which the dropdown dropped together with the space, giving "Site 43- Plesetsk Cosmodrome".)
+   */
+  static facilityLabel(name: string, site: string): string {
+    return `${name.trim()} - ${site.trim()}`;
   }
 
   /**
@@ -377,7 +386,22 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-    this.applyMatchedWindow_(window);
+    this.applyMatchedWindow_(window, { target: `${targetSat.name} (${targetSat.sccNum})`, site: this.launchSiteLabel_(site) });
+  }
+
+  /**
+   * The launch site as the window note names it: the selected facility's label, or the coordinates for a
+   * custom location.
+   */
+  protected launchSiteLabel_(site: { lat: Degrees; lon: Degrees }): string {
+    const select = getEl('nl-facility', true) as HTMLSelectElement | null;
+    const optionText = select?.selectedOptions?.[0]?.textContent?.replace(/\s+/gu, ' ').trim();
+
+    if (select && select.value !== '__custom__' && optionText) {
+      return optionText;
+    }
+
+    return `${site.lat.toFixed(2)}, ${site.lon.toFixed(2)}`;
   }
 
   /**
@@ -385,7 +409,7 @@ export class NewLaunch extends KeepTrackPlugin {
    * with a Clear affordance, and updates the submit-button label so it is clear
    * that the next "Create Launch" will use this window (nothing is launched yet).
    */
-  protected applyMatchedWindow_(window: LaunchWindowResult): void {
+  protected applyMatchedWindow_(window: LaunchWindowResult, context: { target: string; site: string }): void {
     this.matchedLaunchTime_ = window.time;
 
     const note = getEl('nl-window-result', true);
@@ -393,7 +417,9 @@ export class NewLaunch extends KeepTrackPlugin {
     if (note) {
       const msg = t7e('plugins.NewLaunch.msgs.windowFound' as T7eKey)
         .replace('{time}', `${dateFormat(window.time, 'isoDateTime', true)}z`)
-        .replace('{delta}', Math.abs(window.raanError).toFixed(2));
+        .replace('{delta}', Math.abs(window.raanError).toFixed(2))
+        .replace('{target}', escapeHtml(context.target))
+        .replace('{site}', escapeHtml(context.site));
       const clearLabel = t7e('plugins.NewLaunch.buttons.clearWindow' as T7eKey);
 
       note.innerHTML = html`
@@ -530,7 +556,7 @@ export class NewLaunch extends KeepTrackPlugin {
      * }
      * Set time to 0000z for relative time.
      */
-    const today = new Date(); // Need to know today for offset calculation
+    const today = new Date(); // Need to know today for the 0000z launch time
     const quadZTime = new Date(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 0, 0, 0); // New Date object of the future collision
 
     // Date object defaults to local time.
@@ -542,7 +568,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const cacheStaticOffset = timeManagerInstance.staticOffset; // Cache the current static offset
 
-    timeManagerInstance.changeStaticOffset(launchTime.getTime() - today.getTime()); // Find the offset from today
+    timeManagerInstance.changeSimulationTime(launchTime.getTime());
 
     colorSchemeManagerInstance.calculateColorBuffers(true);
 

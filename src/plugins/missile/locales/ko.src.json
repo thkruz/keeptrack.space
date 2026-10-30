@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} 로드됨",
         "simLoadFailed": "{sim}을(를) 불러오지 못했습니다",
-        "missilesActive": "{n} / {max}개 미사일 활성"
+        "missilesActive": "{n} / {max}개 미사일 활성",
+        "massRaidLoaded": "미사일 대규모 공격을 불러왔습니다",
+        "missileCreated": "미사일 RV_{n}이(가)<br>생성되었습니다.",
+        "mirvCreated": "생성된 재진입체 (MIRV):<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "목표 위도가 잘못되었습니다!",
         "invalidTargetLongitude": "목표 경도가 잘못되었습니다!",
         "invalidLaunchLatitude": "발사 위도가 잘못되었습니다!",
         "invalidLaunchLongitude": "발사 경도가 잘못되었습니다!",
-        "invalidWarheads": "탄두 수는 1에서 12 사이의 정수여야 합니다."
+        "invalidWarheads": "탄두 수는 1에서 12 사이의 정수여야 합니다.",
+        "maxMissiles": "오류: 최대 미사일 수에<br>도달했습니다.",
+        "launchLatRange": "오류: 발사 위도는<br>90도에서 -90도 사이여야 합니다",
+        "launchLonRange": "오류: 발사 경도는<br>180도에서 -180도 사이여야 합니다",
+        "targetLatRange": "오류: 목표 위도는<br>90도에서 -90도 사이여야 합니다",
+        "targetLonRange": "오류: 목표 경도는<br>180도에서 -180도 사이여야 합니다",
+        "minDistance": "오류: 이 미사일의 최소 사거리는 320 km입니다.",
+        "maxDistance": "오류: 이 미사일의 최대 사거리는 {km} km입니다.",
+        "tooClose": "오류: 선택한 미사일에 비해 거리가 너무 가깝습니다.",
+        "orbitalVelocity": "오류: 미사일이 궤도 속도에 도달했습니다<br>(이 사거리에 비해 모터가 너무 큽니다).",
+        "overshot": "오류: 미사일이 목표를 지나쳤습니다<br>(이 사거리에 비해 모터가 너무 큽니다).",
+        "notGuided": "오류: 이 사거리에서는 미사일을<br>목표로 유도할 수 없습니다."
       },
       "commands": {
         "open": "미사일 플러그인 열기",

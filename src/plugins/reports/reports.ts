@@ -27,6 +27,7 @@ import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import type { BurnSummary, MissionImpact, ScreeningDiff } from '@app/engine/conjunction/analysis-state';
+import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -39,6 +40,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import analysisPng from '@public/img/icons/reports.png';
@@ -57,6 +59,7 @@ import {
   generateScreeningCompareReport,
 } from './conjunction-report-core';
 import { buildDownloadPayload, buildPreviewText, ReportFormat } from './report-formatter';
+import { doc } from './report-i18n';
 import {
   addWindowEdgePasses,
   generateAerReport,
@@ -220,7 +223,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
    */
   static registerReport(report: ReportGenerator): void {
     if (ReportsPlugin.reportRegistry_.has(report.id)) {
-      errorManagerInstance.warn(`Report with id "${report.id}" is already registered. Overwriting.`);
+      errorManagerInstance.warn(l('errorMsgs.reportOverwrite').replace('{id}', () => report.id));
     }
     ReportsPlugin.reportRegistry_.set(report.id, report);
   }
@@ -957,6 +960,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
           env: this.buildAnalysisEnv_(ctx),
           halfWidthSec,
           missionImpact: this.buildMissionImpact_([sat], ctx.generatedAt, halfWidthSec, sensor),
+          // An analyst clone on either side takes its root parent's uncertainty.
+          uncertaintyParents: { primary: uncertaintyParentOf(sat), secondary: uncertaintyParentOf(secondary) },
         });
       },
     });
@@ -1004,7 +1009,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const activeSensor = sensor ?? this.getSelectedSensorQuiet_();
 
     if (!activeSensor) {
-      return { sensorName: null, passWindows: null, notes: ['No sensor selected; select a sensor to list pass windows.'] };
+      return { sensorName: null, passWindows: null, notes: [doc('notes.noSensor')] };
     }
 
     const opts: ReportOptions = { startTime: new Date(epoch.getTime() - halfWidthSec * 1000), windowSec: 2 * halfWidthSec, stepSec: 30 };
@@ -1065,6 +1070,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       screeningDiff,
       screeningDiffUnavailableReason: reason,
       missionImpact: this.buildMissionImpact_([parent, sat], ctx.generatedAt, halfWidthSec, sensor),
+      uncertaintyRoot: uncertaintyParentOf(sat) ?? parent,
     });
   }
 
@@ -1089,7 +1095,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
       source: 'debris-screening-runs',
     });
 
-    return generateScreeningCompareReport({ diff, env: this.buildAnalysisEnv_(ctx), objects: { pre, post } });
+    return generateScreeningCompareReport({
+      diff,
+      env: this.buildAnalysisEnv_(ctx),
+      objects: { pre, post },
+      uncertaintyParents: { pre: pre ? uncertaintyParentOf(pre) : null, post: post ? uncertaintyParentOf(post) : null },
+    });
   }
 
   /**
@@ -1204,7 +1215,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // The window shows the chosen format: text keeps the metadata header and
     // aligned table, CSV/JSON show exactly what the download and copy produce.
     const preview = this.format_ === 'text' ? buildPreviewText(data) : payload.content;
-    const blob = new Blob([payload.content], { type: payload.mime });
+    const blob = payload.ext === 'csv' ? createCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
     const url = URL.createObjectURL(blob);
 
     win.document.open();

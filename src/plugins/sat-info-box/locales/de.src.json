@@ -10,7 +10,7 @@
       "tooltip": "Katalognummer des Nordamerikanischen Luft- und Weltraumverteidigungskommandos"
     },
     "AltName": {
-      "label": "Alt. Name",
+      "label": "Alternativname",
       "tooltip": "Alternativer Satellitenname"
     },
     "AltId": {
@@ -30,10 +30,14 @@
       "external": "Extern"
     },
     "notAvailable": "N/V",
+    "notAvailableJscVimpel": "N/V (JSC Vimpel)",
     "oemFile": "OEM-Datei",
     "copy": {
       "copied": "In die Zwischenablage kopiert",
       "tooltip": "Zum Kopieren klicken"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "Das Satelliten-Infofeld wurde nicht fertig geladen, daher konnten seine Angaben nicht aktualisiert werden."
     }
   }
 }

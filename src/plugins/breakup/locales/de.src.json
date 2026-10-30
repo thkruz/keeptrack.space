@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "Fehler beim Erstellen des Zerfalls!",
         "InvalidStartNum": "Ungültige Satellitenstartnummer! Standardmäßig auf 90000 gesetzt!",
         "InvalidSlotRange": "Anfangs-Satellitennummer außerhalb des gültigen Bereichs. Verwenden Sie {start} bis {end}.",
-        "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!"
+        "BreakupGeneratorFailed": "Zerfallsgenerator fehlgeschlagen!",
+        "NoFreeSlots": "Nicht genug freie Analysten-Slots für {count} Fragmente. Von anderen Objekten belegte Slots werden nie überschrieben; verringern Sie die Anzahl oder entfernen Sie einige Analystenobjekte."
       },
       "stats": {
         "meanSpeed": "Erwartete mittlere Geschwindigkeit",

@@ -11,7 +11,10 @@
         "fetchData": "Načíst data",
         "refresh": "Obnovit",
         "flyToCorridor": "Letět ke koridoru",
-        "flyToCorridorTooltip": "Když je zapnuto, kliknutí na řádek TIP přeletí kamerou k předpovídanému koridoru návratu na zeměkouli místo sledování objektu."
+        "flyToCorridorTooltip": "Když je zapnuto, kliknutí na řádek TIP přeletí kamerou k předpovídanému koridoru návratu na zeměkouli místo sledování objektu.",
+        "corridorNote": "Místo z TIP není bod dopadu. Objekt může během okna spadnout kdekoli podél své pozemní stopy.",
+        "showAllColumns": "Zobrazit všechny sloupce",
+        "showAllColumnsTooltip": "Nabídka je pro všechny sloupce příliš úzká, proto jsou některé skryté. Zapnutím zobrazíte všechny a tabulku můžete posouvat do stran."
       },
       "table": {
         "norad": "NORAD",
@@ -46,8 +49,10 @@
         "imgAlt": "Menu vstupů do atmosféry se zobrazenou tabulkou TIP zpráv",
         "imgCaption": "TIP předpovědi vstupů do atmosféry. Kliknutím na řádek se simulace přesune na předpokládaný čas zániku.",
         "tabsHeading": "Dvě záložky",
-        "tabs": "<ul><li><strong>TIP zprávy</strong>: zprávy Tracking and Impact Prediction publikované US Space Command, s předpokládaným časem zániku, polohou, oknem nejistoty (plus minus minuty kolem času zániku), úhlem vstupu, RCS a hmotností. Kliknutím na řádek vyberete objekt a simulační čas se přesune na předpokládanou epochu zániku. Pokud je zapnuto <strong>Letět ke koridoru</strong>, kamera místo toho přeletí k předpovězenému koridoru a objekt se nevybere.</li><li><strong>Analýza vstupů</strong>: přibližně 200 katalogizovaných objektů seřazených podle nejnižšího perigea. Řádky jsou barevně odlišeny: červená znamená, že objekt už vstoupil do atmosféry (perigeum pod 120 km nebo jeho dráhové prvky už nelze propagovat), žlutá znamená perigeum pod 160 km (vysoké riziko). Kliknutím na řádek vyberete objekt.</li></ul>",
-        "howToUse": "<ol><li>Otevřete menu z panelu nebo stiskněte Shift+R.</li><li>Kliknutím na ikonu stahování načtete nejnovější TIP data (vyžaduje připojení k internetu).</li><li>Kliknutím na libovolnou předpověď přeletíte k danému objektu v předpokládaném čase zániku.</li><li>Přepněte na záložku Analýza vstupů a podívejte se, co zanikne jako další; načte se při prvním otevření.</li></ol>",
+        "tabs": "<ul><li><strong>TIP zprávy</strong>: zprávy Tracking and Impact Prediction publikované US Space Command, s předpokládaným časem zániku, polohou, oknem nejistoty (plus minus minuty kolem času zániku), úhlem vstupu, RCS a hmotností. Kliknutím na řádek vyberete objekt a simulační čas se přesune na předpokládanou epochu zániku. Pokud je zapnuto <strong>Letět ke koridoru</strong>, objekt se přesto vybere, ale kamera místo sledování objektu přeletí k předpovězenému místu zániku na glóbu.</li><li><strong>Analýza vstupů</strong>: přibližně 200 katalogizovaných objektů seřazených podle nejnižšího perigea. Řádky jsou barevně odlišeny: červená znamená, že objekt už vstoupil do atmosféry (perigeum pod 120 km nebo jeho dráhové prvky už nelze propagovat), žlutá znamená perigeum pod 160 km (vysoké riziko). Kliknutím na řádek vyberete objekt.</li></ul>",
+        "corridorHeading": "Jak číst koridor vstupu do atmosféry",
+        "corridor": "<p>TIP zpráva uvádí jeden předpovězený čas a místo zániku a okno plus minus několik minut. Objekt se pohybuje rychlostí asi 7 až 8 km za sekundu, takže každá minuta nejistoty odpovídá zhruba 450 km podél jeho pozemní stopy. Objekt může během okna spadnout kdekoli na této stopě; místo z TIP je střed tohoto úseku, ne bod dopadu.</p><p>Koridor má přesto význam, protože je to jediné území, nad kterým může objekt během okna přeletět. Oblasti daleko od stopy tento objekt v tomto okně neohrožuje a oblasti pod ní jsou ty, které potřebují varování, letecká či námořní upozornění nebo pozorovatele připravené sledovat a nahlásit bolid. Každá nová TIP zpráva okno zkrátí a koridor se zúží na stále méně přeletů.</p>",
+        "howToUse": "<ol><li>Otevřete menu z panelu nebo stiskněte Shift+R.</li><li>Kliknutím na <strong>Načíst data</strong> načtete nejnovější TIP zprávy (vyžaduje připojení k internetu). Po prvním načtení se tlačítko změní na <strong>Obnovit</strong>.</li><li>Kliknutím na libovolnou předpověď přeletíte k danému objektu v předpokládaném čase zániku.</li><li>Přepněte na záložku Analýza vstupů a podívejte se, co zanikne jako další; načte se při prvním otevření.</li></ol>",
         "tip1": "Záznam \"Zaniklý\" ve sloupci Střední výška znamená, že objekt již nelze propagovat; s největší pravděpodobností již zanikl.",
         "tip2": "TIP předpovědi nesou skutečnou nejistotu: sloupec Okno udává plus minus tolik minut kolem času zániku, celé okno je tedy dvakrát delší a na pozemní stopě může pokrýt celé kontinenty.",
         "tip3": "Kliknutí na řádek TIP tiše změní simulační čas na epochu zániku; pomocí ovládání času se vrátíte do současnosti.",

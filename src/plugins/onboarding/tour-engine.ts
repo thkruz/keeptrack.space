@@ -1,3 +1,4 @@
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { settingsManager } from '@app/settings/settings';
@@ -25,6 +26,8 @@ export interface TourStep {
   placement?: 'top' | 'bottom' | 'left' | 'right' | 'auto';
   /** Filtered out of the run when false. Checked at start and on entry. */
   isAvailable?: () => boolean;
+  /** Keep the step when it is unavailable at tour start; isAvailable is checked again when it is reached. */
+  isAvailabilityDeferred?: boolean;
   /** Runs before the step renders (e.g. open the drawer, expand a group). */
   beforeEnter?: () => void;
   afterExit?: (reason: StepExitReason) => void;
@@ -80,6 +83,13 @@ export interface TourEngineOptions {
   /** Fired on every step entry with the position within the filtered run. */
   onStepShown?: (step: TourStep, index: number, total: number) => void;
   onStepExit?: (step: TourStep, reason: StepExitReason) => void;
+  /**
+   * Fired once when a step's advanceOn task really happened (predicate and
+   * verify passed), before any dwell. isAssisted is true when the step's
+   * "Do it for me" button was pressed on this visit to the step, so callers
+   * can tell what the user did from what the tour did for them.
+   */
+  onStepActionDone?: (step: TourStep, isAssisted: boolean) => void;
   /** Fired when a custom (card) button is clicked. */
   onCustomButton?: (stepId: string, buttonId: string) => void;
   onFinish: (reason: TourFinishReason, lastStepId: string | null) => void;
@@ -119,7 +129,22 @@ export class TourEngine {
   /** True while dwelling on a completed task step (shade lifted, done note up). */
   private isDwelling_ = false;
   private isConfirmingSkip_ = false;
+  /** The step whose "Do it for me" button was pressed during its current visit. */
+  private assistedStep_: TourStep | null = null;
   private readonly keydownCb_ = (evt: KeyboardEvent): void => this.onKeyDown_(evt);
+  private readonly keyupCb_ = (evt: KeyboardEvent): void => {
+    if (this.hasForegroundHelp_()) {
+      return;
+    }
+    const step = this.currentStep;
+
+    if (this.isActive && (step?.kind === 'card' || !step?.target || this.popoverEl_?.contains(evt.target as Node))) {
+      evt.stopImmediatePropagation();
+    }
+  };
+  private previousFocus_: HTMLElement | null = null;
+  /** Steps available at start plus deferred ones; steps_ is the subset currently shown. */
+  private candidateSteps_: TourStep[] = [];
 
   constructor(options: TourEngineOptions) {
     this.options_ = options;
@@ -139,7 +164,9 @@ export class TourEngine {
       this.stop();
     }
 
-    this.steps_ = this.options_.steps.filter((step) => step.isAvailable?.() !== false);
+    this.index_ = -1;
+    this.candidateSteps_ = this.options_.steps.filter((step) => step.isAvailabilityDeferred || step.isAvailable?.() !== false);
+    this.refreshSteps_();
 
     if (this.steps_.length === 0) {
       this.options_.onFinish('completed', null);
@@ -157,8 +184,10 @@ export class TourEngine {
       }
     }
 
+    this.previousFocus_ = document.activeElement as HTMLElement | null;
     this.buildDom_();
-    document.addEventListener('keydown', this.keydownCb_, true);
+    window.addEventListener('keydown', this.keydownCb_, true);
+    window.addEventListener('keyup', this.keyupCb_, true);
     this.showStep_(startIndex);
   }
 
@@ -168,6 +197,7 @@ export class TourEngine {
     }
 
     this.exitCurrentStep_(reason);
+    this.refreshSteps_();
 
     if (this.index_ + 1 >= this.steps_.length) {
       this.finish('completed');
@@ -184,7 +214,22 @@ export class TourEngine {
     }
 
     this.exitCurrentStep_('back');
+    this.refreshSteps_();
     this.showStep_(this.index_ - 1);
+  }
+
+  /**
+   * Rebuild the visible step list. Deferred steps (e.g. the info panel, which needs a selection
+   * the user makes during the tour) count only once they are available, so the "N of M" label
+   * matches the steps the user will actually see.
+   */
+  private refreshSteps_(): void {
+    const current = this.currentStep;
+
+    this.steps_ = this.candidateSteps_.filter((step) => !step.isAvailabilityDeferred || step === current || step.isAvailable?.() !== false);
+    if (current) {
+      this.index_ = this.steps_.indexOf(current);
+    }
   }
 
   skipTour(): void {
@@ -212,7 +257,8 @@ export class TourEngine {
     this.tickCancel_?.();
     this.tickCancel_ = null;
 
-    document.removeEventListener('keydown', this.keydownCb_, true);
+    window.removeEventListener('keydown', this.keydownCb_, true);
+    window.removeEventListener('keyup', this.keyupCb_, true);
     this.rootEl_?.remove();
     this.rootEl_ = null;
     this.popoverEl_ = null;
@@ -221,6 +267,10 @@ export class TourEngine {
     this.index_ = -1;
     this.lastRect_ = null;
     this.isConfirmingSkip_ = false;
+    if (this.previousFocus_?.isConnected) {
+      this.previousFocus_.focus({ preventScroll: true });
+    }
+    this.previousFocus_ = null;
   }
 
   // ---------------------------------------------------------------------------
@@ -230,6 +280,7 @@ export class TourEngine {
   private showStep_(index: number): void {
     this.index_ = index;
     this.isConfirmingSkip_ = false;
+    this.assistedStep_ = null;
 
     const step = this.steps_[index];
 
@@ -282,6 +333,8 @@ export class TourEngine {
         if (!this.isActive || this.currentStep !== step || this.isDwelling_) {
           return;
         }
+
+        this.options_.onStepActionDone?.(step, this.assistedStep_ === step);
 
         const dwellMs = step.advanceOn?.dwellMs ?? 0;
 
@@ -472,6 +525,10 @@ export class TourEngine {
     this.popoverEl_.setAttribute('aria-labelledby', 'kt-tour-title');
     this.popoverEl_.setAttribute('aria-describedby', 'kt-tour-body');
     this.rootEl_.classList.toggle('kt-tour-card-mode', step.kind === 'card' || !step.target);
+    this.popoverEl_.setAttribute('aria-modal', String(step.kind === 'card' || !step.target));
+    if (step.kind === 'card' || !step.target) {
+      ServiceLocator.getInputManager()?.keyboard?.keyStates.clear();
+    }
     this.wireButtons_(step);
     this.position_(step, true);
     this.popoverEl_.focus({ preventScroll: true });
@@ -504,6 +561,7 @@ export class TourEngine {
             this.toggleSkipConfirm_(false);
             break;
           case 'do-it':
+            this.assistedStep_ = step;
             step.actionButton?.action();
             break;
           default:
@@ -748,13 +806,44 @@ export class TourEngine {
   // ---------------------------------------------------------------------------
 
   private onKeyDown_(evt: KeyboardEvent): void {
-    if (!this.isActive) {
+    if (!this.isActive || this.hasForegroundHelp_()) {
+      return;
+    }
+    // An Escape already handled in front of the tour (the command palette closes on it) is not a tour skip.
+    if (evt.key === 'Escape' && evt.defaultPrevented) {
       return;
     }
 
     const step = this.currentStep;
+    const centered = step?.kind === 'card' || !step?.target;
+    const withinPopover = this.popoverEl_?.contains(evt.target as Node);
+
+    if (evt.key === 'Tab' && centered && this.popoverEl_) {
+      const focusable = Array.from(this.popoverEl_.querySelectorAll<HTMLElement>('button, a[href], input, select, textarea, [tabindex="0"]')).filter(
+        (element) => !element.closest('.start-hidden') && !(element as HTMLButtonElement).disabled
+      );
+      const first = focusable[0];
+      const last = focusable.at(-1);
+
+      if (!first || (evt.shiftKey && (document.activeElement === first || document.activeElement === this.popoverEl_)) || (!evt.shiftKey && document.activeElement === last)) {
+        evt.preventDefault();
+        (evt.shiftKey ? last : first)?.focus();
+      } else if (!withinPopover) {
+        evt.preventDefault();
+        first.focus();
+      }
+      evt.stopImmediatePropagation();
+
+      return;
+    }
+    // The spotlight target keeps its normal controls; keys owned by the card
+    // or its popover must never also move the underlying camera/time/drawer.
+    if (centered || withinPopover) {
+      evt.stopImmediatePropagation();
+    }
 
     if (evt.key === 'Escape') {
+      evt.preventDefault();
       evt.stopPropagation();
 
       if (step?.buttons) {
@@ -778,9 +867,24 @@ export class TourEngine {
     }
 
     if (evt.key === 'ArrowRight') {
+      evt.preventDefault();
+      evt.stopImmediatePropagation();
       this.next();
     } else if (evt.key === 'ArrowLeft') {
+      evt.preventDefault();
+      evt.stopImmediatePropagation();
       this.back();
     }
+  }
+
+  private hasForegroundHelp_(): boolean {
+    // The command palette sits above a tour card; its Escape must close only the palette.
+    const palette = document.getElementById('command-palette-overlay');
+
+    return (
+      document.getElementById('help-outer-container')?.style.display === 'block' ||
+      (!!palette && palette.style.display !== 'none' && getComputedStyle(palette).display !== 'none') ||
+      Array.from(document.querySelectorAll<HTMLElement>('.draggable-modal-overlay')).some((overlay) => !overlay.hidden && getComputedStyle(overlay).display !== 'none')
+    );
   }
 }

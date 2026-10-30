@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "Confianza" },
-    "CountryColorScheme": { "label": "País" },
-    "GpAgeColorScheme": { "label": "Antigüedad GP" },
-    "MissionColorScheme": { "label": "Misión" },
-    "ObjectTypeColorScheme": { "label": "Tipo de objeto" },
-    "OrbitalPlaneDensityColorScheme": { "label": "Densidad del plano orbital" },
-    "RcsColorScheme": { "label": "Sección transversal radar" },
-    "ReentryRiskColorScheme": { "label": "Riesgo de reentrada" },
-    "SmallSatColorScheme": { "label": "Satélites pequeños" },
-    "SourceColorScheme": { "label": "Fuente de datos" },
-    "SpatialDensityColorScheme": { "label": "Densidad espacial" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "Estado de luz solar" },
-    "VelocityColorScheme": { "label": "Velocidad" },
-    "VisualMagnitudeColorScheme": { "label": "Magnitud estándar" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "Confianza"
+    },
+    "CountryColorScheme": {
+      "label": "País"
+    },
+    "GpAgeColorScheme": {
+      "label": "Antigüedad GP"
+    },
+    "MissionColorScheme": {
+      "label": "Misión"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "Tipo de objeto"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "Densidad del plano orbital"
+    },
+    "RcsColorScheme": {
+      "label": "Sección transversal radar"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "Riesgo de reentrada"
+    },
+    "SmallSatColorScheme": {
+      "label": "Satélites pequeños"
+    },
+    "SourceColorScheme": {
+      "label": "Fuente de datos"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "Densidad espacial"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "Estado de luz solar"
+    },
+    "VelocityColorScheme": {
+      "label": "Velocidad"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "Magnitud estándar"
+    },
+    "legend": {
+      "activePayload": "Carga útil activa",
+      "inactivePayload": "Carga útil inactiva",
+      "rocketBody": "Cuerpo de cohete",
+      "debris": "Desechos",
+      "unknown": "Desconocido",
+      "inFieldOfView": "En el campo de visión",
+      "sensor": "Sensor",
+      "launchSite": "Sitio de lanzamiento",
+      "confidenceLow": "3 o menos",
+      "confidenceMid": "Entre 3 y 7",
+      "confidenceHigh": "7 o más",
+      "other": "Otros",
+      "gpAgeLt05": "Menos de 0,5 días",
+      "gpAge05to1": "Entre 0,5 y 1 día",
+      "gpAge1to15": "Entre 1 y 1,5 días",
+      "gpAge15to2": "Entre 1,5 y 2 días",
+      "gpAge2to25": "Entre 2 y 2,5 días",
+      "gpAge25to3": "Entre 2,5 y 3 días",
+      "gpAgeGt3": "Más de 3 días",
+      "military": "Militar",
+      "communications": "Comunicaciones",
+      "technology": "Tecnología",
+      "earthObservation": "Observación de la Tierra",
+      "science": "Ciencia",
+      "astronomy": "Astronomía",
+      "navigation": "Navegación",
+      "payload": "Carga útil",
+      "specialSats": "Satélites especiales",
+      "satelliteInView": "Satélite visible",
+      "missile": "Misil",
+      "missileInView": "Misil visible",
+      "highOrbitDensity": "Densidad orbital alta",
+      "medOrbitDensity": "Densidad orbital media",
+      "lowOrbitDensity": "Densidad orbital baja",
+      "otherDebris": "Otros desechos",
+      "tiniest": "Diminutos",
+      "verySmall": "Muy pequeños",
+      "rcsSmall": "Pequeños",
+      "belowAverage": "Por debajo de la media",
+      "aboveAverage": "Por encima de la media",
+      "rcsLarge": "Grandes",
+      "largest": "Los más grandes",
+      "noData": "Sin datos",
+      "reentryInfo": "La predicción del riesgo de reentrada depende de muchos factores, como el mantenimiento de la posición, la resistencia atmosférica, los ciclos solares y la relación masa-área del satélite. Esta es una aproximación aproximada basada en el perigeo y el efecto medio de la resistencia.",
+      "reentryImminent": "Inminente (en días)",
+      "reentryDays": "Días",
+      "reentryWeeks": "Semanas",
+      "reentryMonths": "Meses",
+      "noRisk": "Sin riesgo",
+      "smallSatellite": "Satélite pequeño",
+      "sourceCelestrakSup": "Celestrak sup.",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "Importación OEM",
+      "otherOrbitDensity": "Otra densidad orbital",
+      "operationalStarlink": "Starlink operativos",
+      "otherStarlink": "Otros Starlink",
+      "notStarlink": "No Starlink",
+      "inUmbral": "En la umbra",
+      "inPenumbral": "En la penumbra",
+      "inSunlight": "Iluminado por el Sol",
+      "satelliteInFov": "Satélite en el campo de visión",
+      "velocity7": "Velocidad ~7 km/s",
+      "velocity4": "Velocidad ~4 km/s",
+      "velocity1": "Velocidad ~1 km/s",
+      "brightest": "Más brillantes",
+      "veryBright": "Muy brillantes",
+      "bright": "Brillantes",
+      "magMedium": "Medios",
+      "dim": "Tenues",
+      "veryDim": "Muy tenues",
+      "faintest": "Más tenues",
+      "visMagLessThan35": "Magnitud visual menor que 3,5",
+      "visMagBetween35And47": "Magnitud visual entre 3,5 y 4,7",
+      "visMagGreaterThan47": "Magnitud visual mayor que 4,7",
+      "apogeeBelow2000": "Apogeo < 2000 km",
+      "perigeeAbove35000": "Perigeo > 35000 km"
+    }
   }
 }

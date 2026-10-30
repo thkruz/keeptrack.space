@@ -533,8 +533,11 @@ export class SensorManager {
     try {
       if (sensors?.[0]?.objName) {
         PluginRegistry.getPlugin(SensorInfoPlugin)?.setBottomIconToUnselected();
-        PluginRegistry.getPlugin(SensorFov)?.setBottomIconToUnselected();
-        PluginRegistry.getPlugin(SensorSurvFence)?.setBottomIconToUnselected();
+        /*
+         * Sensor FOV / Sensor Fence stay on across a switch to another sensor: the user asked for
+         * the layer. If the new sensor cannot be drawn, SensorFovMeshFactory.drawAll toasts and
+         * switches the layer off. Reset Sensor (resetSensorSelected) still turns both off.
+         */
         PluginRegistry.getPluginByName('Planetarium')?.setBottomIconToUnselected();
         PluginRegistry.getPluginByName('Astronomy')?.setBottomIconToUnselected();
 
@@ -614,7 +617,7 @@ export class SensorManager {
     const sensorPos = lla2eci(lla, gmst);
 
     sensor.position = sensorPos;
-    const sunStatus = SatMath.calculateIsInSun(sensor, sunPos);
+    const sunStatus = SatMath.calculateGroundSiteSunStatus(sensorPos, sunPos);
 
     return {
       sunStatus,
@@ -626,9 +629,8 @@ export class SensorManager {
       return true;
     }
 
-    const status = this.sensorSunStatus_(now, sensor).sunStatus;
-
-    return status === SunStatus.UMBRAL || status === SunStatus.PENUMBRAL;
+    // Dark means the Sun is fully below the site's horizon, the same test Sensor Timeline and Look Angles use
+    return this.sensorSunStatus_(now, sensor).sunStatus === SunStatus.UMBRAL;
   }
 
   canStationsObserve(now: Date, sensors: DetailedSensor[]): boolean {

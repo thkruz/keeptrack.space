@@ -283,5 +283,59 @@
     "ZA": "Republika Południowej Afryki",
     "ZR": "Zair",
     "ZW": "Zimbabwe"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "Czujniki Space Surveillance Network",
+      "topLink": "Wszystkie czujniki Space Surveillance Network"
+    },
+    "mw": {
+      "header": "Amerykańskie czujniki ostrzegania przed pociskami",
+      "topLink": "Wszystkie czujniki ostrzegania przed pociskami"
+    },
+    "md": {
+      "header": "Czujniki amerykańskiej Agencji Obrony Przeciwrakietowej",
+      "topLink": "Wszystkie czujniki obrony przeciwrakietowej"
+    },
+    "OWL-Net": {
+      "header": "Czujniki OWL-Net",
+      "topLink": "Wszystkie czujniki OWL-Net"
+    },
+    "leolabs": {
+      "header": "Czujniki LeoLabs",
+      "topLink": "Wszystkie czujniki LeoLabs"
+    },
+    "esoc": {
+      "header": "Czujniki Europejskiego Centrum Operacji Kosmicznych",
+      "topLink": "Wszystkie czujniki ESOC"
+    },
+    "rus": {
+      "header": "Czujniki rosyjskie",
+      "topLink": "Wszystkie czujniki rosyjskie"
+    },
+    "prc": {
+      "header": "Czujniki chińskie",
+      "topLink": "Wszystkie czujniki chińskie"
+    },
+    "other": {
+      "header": "Inne czujniki",
+      "topLink": "Inne czujniki"
+    },
+    "dsn": {
+      "header": "Sieć Dalekiego Kosmosu NASA",
+      "topLink": "Wszystkie kompleksy Sieci Dalekiego Kosmosu"
+    },
+    "scn": {
+      "header": "Sieć kontroli satelitów (AFSCN)",
+      "topLink": "Wszystkie zdalne stacje śledzące"
+    },
+    "estrack": {
+      "header": "Sieć śledząca ESA (ESTRACK)",
+      "topLink": "Wszystkie stacje ESTRACK"
+    },
+    "galileo": {
+      "header": "Segment naziemny Galileo",
+      "topLink": "Wszystkie stacje naziemne Galileo"
+    }
   }
 }

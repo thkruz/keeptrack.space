@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
@@ -11,6 +12,7 @@ import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export class SunlightColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.SunlightColorScheme.label' as Parameters<typeof t7e>[0]);
@@ -241,28 +243,30 @@ export class SunlightColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-sunlight">
     <li>
       <div class="Square-Box layers-satLow-box"></div>
-      In Umbral
+      ${legendLabel('inUmbral')}
     </li>
     <li>
       <div class="Square-Box layers-satMed-box"></div>
-      In Penumbral
+      ${legendLabel('inPenumbral')}
     </li>
     <li>
       <div class="Square-Box layers-satHi-box"></div>
-      In Sunlight
+      ${legendLabel('inSunlight')}
     </li>
     <li>
       <div class="Square-Box layers-sunlightFov-box"></div>
-      Satellite in FOV
+      ${legendLabel('satelliteInFov')}
     </li>
     <li>
       <div class="Square-Box layers-facility-box"></div>
-      Launch Site
+      ${legendLabel('launchSite')}
     </li>
   </ul>
   `.trim();
+  }
 }

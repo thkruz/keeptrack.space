@@ -474,7 +474,8 @@ export function perigeeAltitudeFromTle2(tle2: string): number {
  */
 export function buildFragmentTle(epoch: Date, position: Vec3, velocity: Vec3, deltaVKms: Vec3, a5Num: string): { tle1: TleLine1; tle2: TleLine2 } {
   const newVelocity = add_(velocity, deltaVKms);
-  const fit = rv2tle(epoch, position, newVelocity, { maxIterations: 15, toleranceKm: FIT_TOLERANCE_KM });
+  // rv2tle stamps the analyst number itself, so both checksums already cover it.
+  const fit = rv2tle(epoch, position, newVelocity, { maxIterations: 15, toleranceKm: FIT_TOLERANCE_KM, scc: a5Num });
 
   if (!fit) {
     throw new Error('Failed to fit SGP4 mean elements to the fragment state');
@@ -496,9 +497,8 @@ export function buildFragmentTle(epoch: Date, position: Vec3, velocity: Vec3, de
     throw new Error(`SGP4 fit did not converge (${fit.positionErrorKm.toFixed(2)} km residual)`);
   }
 
-  // rv2tle stamps a fixed 5-char SCC ("00001"); replace it with the analyst number.
-  const tle1 = `1 ${a5Num}${fit.tle1.substring(7)}` as TleLine1;
-  const tle2 = `2 ${a5Num}${fit.tle2.substring(7)}` as TleLine2;
+  const tle1 = fit.tle1 as TleLine1;
+  const tle2 = fit.tle2 as TleLine2;
 
   if (tle1.length !== TLE_LINE_LENGTH) {
     throw new Error(`Invalid tle1: length is not ${TLE_LINE_LENGTH} - "${tle1}"`);
@@ -527,6 +527,27 @@ export function isAnalystRangeValid(startNum: number, count: number, analystStar
   }
 
   return startNum >= analystStart && startNum + count <= analystStart + analystCount;
+}
+
+/**
+ * Pick `count` analyst catalog numbers for the fragments, starting at `startNum` and
+ * walking up to (not including) `blockEnd`. A number the writer may not use (reserved
+ * by another object, or holding an active object another tool made) is skipped and
+ * the pieces shift to the next usable numbers, so a breakup never overwrites another
+ * tool's object. Returns null when the block runs out first.
+ *
+ * @param isWritable - Whether the slot with this 6-digit analyst number may be written.
+ */
+export function selectAnalystSlots(startNum: number, count: number, blockEnd: number, isWritable: (num: number) => boolean): number[] | null {
+  const slots: number[] = [];
+
+  for (let num = startNum; num < blockEnd && slots.length < count; num++) {
+    if (isWritable(num)) {
+      slots.push(num);
+    }
+  }
+
+  return slots.length === count ? slots : null;
 }
 
 // =========================================================================

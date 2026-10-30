@@ -283,5 +283,59 @@
     "ZA": "남아프리카공화국",
     "ZR": "자이르",
     "ZW": "짐바브웨"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "우주 감시 네트워크(SSN) 센서",
+      "topLink": "모든 우주 감시 네트워크(SSN) 센서"
+    },
+    "mw": {
+      "header": "미국 미사일 경보 센서",
+      "topLink": "모든 미사일 경보 센서"
+    },
+    "md": {
+      "header": "미국 미사일방어청 센서",
+      "topLink": "모든 미사일 방어 센서"
+    },
+    "OWL-Net": {
+      "header": "OWL-Net 센서",
+      "topLink": "모든 OWL-Net 센서"
+    },
+    "leolabs": {
+      "header": "LeoLabs 센서",
+      "topLink": "모든 LeoLabs 센서"
+    },
+    "esoc": {
+      "header": "유럽 우주운영센터 센서",
+      "topLink": "모든 ESOC 센서"
+    },
+    "rus": {
+      "header": "러시아 센서",
+      "topLink": "모든 러시아 센서"
+    },
+    "prc": {
+      "header": "중국 센서",
+      "topLink": "모든 중국 센서"
+    },
+    "other": {
+      "header": "기타 센서",
+      "topLink": "기타 센서"
+    },
+    "dsn": {
+      "header": "NASA 심우주 통신망",
+      "topLink": "모든 심우주 통신망 단지"
+    },
+    "scn": {
+      "header": "위성 관제 네트워크 (AFSCN)",
+      "topLink": "모든 원격 추적소"
+    },
+    "estrack": {
+      "header": "ESA 추적 네트워크 (ESTRACK)",
+      "topLink": "모든 ESTRACK 기지국"
+    },
+    "galileo": {
+      "header": "갈릴레오 지상 부문",
+      "topLink": "모든 갈릴레오 지상국"
+    }
   }
 }

@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteFixedView": {
-      "bottomIconLabel": "Vista Fissa Satellite"
+      "bottomIconLabel": "Vista Fissa Satellite",
+      "commandPalette": {
+        "activate": "Passa alla vista fissa sul satellite"
+      },
+      "shortcuts": {
+        "enter": "Entra nella vista fissa satellite"
+      }
     }
   }
 }

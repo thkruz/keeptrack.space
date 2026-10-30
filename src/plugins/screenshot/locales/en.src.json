@@ -9,6 +9,11 @@
         "take4k": "Take Screenshot (4K)",
         "takeHd": "Take Screenshot (HD)",
         "take8k": "Take Screenshot (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Failed to load primary logo image.",
+        "secondaryLogoFailed": "Failed to load secondary logo image.",
+        "noCanvasContext": "Failed to get 2D context for temporary canvas. Unable to create screenshot."
       }
     }
   }

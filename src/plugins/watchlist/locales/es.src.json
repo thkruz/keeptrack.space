@@ -1,19 +1,19 @@
 {
   "plugins": {
     "WatchlistPlugin": {
-      "bottomIconLabel": "Watchlist",
-      "title": "Watchlist",
+      "bottomIconLabel": "Lista de seguimiento",
+      "title": "Lista de seguimiento",
       "help": {
-        "overview": "La watchlist es tu lista de satélites prioritarios. Se guarda en tu navegador, por lo que sobrevive a las recargas. Cuando hay un sensor seleccionado y un satélite de la watchlist entra en su campo de visión, recibes una notificación, se dibuja una línea desde el sensor hasta el satélite y el número del satélite aparece en el globo.",
-        "imgAlt": "El menú de Watchlist con varios satélites añadidos",
-        "imgCaption": "Una watchlist con varios satélites. Haz clic en un nombre para seleccionarlo; el icono de marcador lo elimina.",
+        "overview": "La lista de seguimiento es tu lista de satélites prioritarios. Se guarda en tu navegador, por lo que sobrevive a las recargas. Cuando hay un sensor seleccionado y un satélite de la lista de seguimiento entra en su campo de visión, recibes una notificación, se dibuja una línea desde el sensor hasta el satélite y el número del satélite aparece en el globo.",
+        "imgAlt": "El menú Lista de seguimiento con varios satélites añadidos",
+        "imgCaption": "Una lista de seguimiento con varios satélites. Haz clic en un nombre para seleccionarlo; el icono de marcador lo elimina.",
         "managingHeading": "Gestión de la lista",
         "managing": "<ul><li><strong>Añadir</strong>: escribe uno o más números NORAD separados por comas o espacios (los IDs alpha-5 como T0001 también funcionan) y haz clic en el icono de añadir o pulsa Enter.</li><li><strong>Añadir/eliminar rápido</strong>: cuando haya un satélite seleccionado en el globo, haz clic en el icono de marcador junto a su nombre en el cuadro de información.</li><li><strong>Seleccionar</strong>: haz clic en el número o nombre de un satélite en la lista para volar hasta él.</li><li><strong>Guardar / Cargar</strong>: exporta la lista como un archivo JSON y cárgala más tarde o compártela.</li><li><strong>Limpiar</strong>: vacía toda la lista.</li></ul>",
-        "howToUse": "<ol><li>Abre el menú desde el panel de complementos o pulsa W.</li><li>Añade satélites por número NORAD, por ejemplo, 25544 para la ISS.</li><li>Selecciona un sensor en el menú de Sensores para empezar a recibir notificaciones de visibilidad y líneas del sensor al satélite.</li><li>Abre el menú secundario (icono de engranaje) para ocultar todos los objetos que no estén en la watchlist o cambiar cuándo se dibujan las etiquetas (Siempre / Solo FOV / Desactivado).</li></ol>",
-        "tip1": "\"Ocultar otros objetos\" convierte el globo en una vista solo de la watchlist; perfecto para seguir unos pocos objetos sin el desorden del catálogo completo.",
-        "tip2": "El menú de Superposición (tiempos del próximo pase para cada satélite de la watchlist) solo funciona cuando la watchlist tiene entradas.",
+        "howToUse": "<ol><li>Abre el menú desde el panel de complementos o pulsa W.</li><li>Añade satélites por número NORAD, por ejemplo, 25544 para la ISS.</li><li>Selecciona un sensor en el menú de Sensores para empezar a recibir notificaciones de visibilidad y líneas del sensor al satélite.</li><li>Abre el menú secundario (icono de engranaje) para ocultar todos los objetos que no estén en la lista de seguimiento o cambiar cuándo se dibujan las etiquetas (Siempre / Solo FOV / Desactivado).</li></ol>",
+        "tip1": "\"Ocultar otros objetos\" convierte el globo en una vista solo de la lista de seguimiento; perfecto para seguir unos pocos objetos sin el desorden del catálogo completo.",
+        "tip2": "El menú de Superposición (tiempos del próximo pase para cada satélite de la lista de seguimiento) solo funciona cuando la lista de seguimiento tiene entradas.",
         "tip3": "Los duplicados se ignoran automáticamente y los números no válidos generan una notificación con el nombre del satélite que no se encontró.",
-        "shortcutToggle": "Alternar el menú de Watchlist"
+        "shortcutToggle": "Alternar el menú Lista de seguimiento"
       },
       "labels": {
         "newSatellites": "Nuevo(s) satélite(s)",
@@ -30,34 +30,41 @@
         "labelsHeader": "Etiquetas"
       },
       "msgs": {
-        "watchlistLoaded": "Watchlist cargada con {count} satélites"
+        "watchlistLoaded": "Lista de seguimiento cargada con {count} satélites"
       },
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: ¡{sccNum} ya está en la lista!",
         "ObjectAlreadyInList": "¡El objeto {id} ya está en la lista!",
-        "SatNotFound": "¡Satélite {id} no encontrado!"
+        "SatNotFound": "¡Satélite {id} no encontrado!",
+        "ListFileFormatIncorrect": "Formato de archivo de lista incorrecto",
+        "ErrorReadingList": "¡Error al leer la lista!",
+        "ErrorSavingList": "¡Error al guardar la lista!"
       },
       "settings": {
         "satLabelMode": {
           "label": "Modo de etiquetas de satélite",
-          "helpText": "Controla la representación de las etiquetas en los satélites de la watchlist.",
+          "helpText": "Controla la representación de las etiquetas en los satélites de la lista de seguimiento.",
           "options": {
             "off": "Desactivado",
             "fovOnly": "Solo FOV",
-            "all": "Toda la watchlist"
+            "all": "Toda la lista de seguimiento"
           }
         }
       },
       "rmbMenu": {
-        "addToWatchlist": "Añadir a la watchlist",
-        "removeFromWatchlist": "Quitar de la watchlist"
+        "addToWatchlist": "Añadir a la lista de seguimiento",
+        "removeFromWatchlist": "Quitar de la lista de seguimiento"
+      },
+      "infoBox": {
+        "addLabel": "Añadir a la lista de seguimiento",
+        "removeLabel": "Quitar de la lista de seguimiento"
       }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Superposición",
       "title": "Menú de Superposición",
-      "helpBody": "<p> La superposición de la watchlist muestra el próximo tiempo de pase para cada satélite en tu watchlist. La superposición se actualiza cada 10 segundos. </p> <p> La superposición está codificada por colores para mostrar el tiempo hasta el próximo pase. Los colores son los siguientes: </p> <ul> <li>Amarillo - En Vista</li> <li>Azul - El tiempo hasta el próximo pase es de hasta 30 minutos después del tiempo actual o 10 minutos antes del tiempo actual</li> <li>Blanco - Cualquier pase futuro que no cumpla con los requisitos anteriores</li> </ul> <p> Hacer clic en un satélite en la superposición centrará el mapa en ese satélite. </p>",
-      "openOverlayCmd": "Abrir superposición de Watchlist",
+      "helpBody": "<p> La superposición de la lista de seguimiento muestra el próximo tiempo de pase para cada satélite en tu lista de seguimiento. La superposición se actualiza cada 10 segundos. </p> <p> La superposición está codificada por colores para mostrar el tiempo hasta el próximo pase. Los colores son los siguientes: </p> <ul> <li>Amarillo - En Vista</li> <li>Azul - El tiempo hasta el próximo pase es de hasta 30 minutos después del tiempo actual o 10 minutos antes del tiempo actual</li> <li>Blanco - Cualquier pase futuro que no cumpla con los requisitos anteriores</li> </ul> <p> Hacer clic en un satélite en la superposición centrará el mapa en ese satélite. </p>",
+      "openOverlayCmd": "Abrir superposición de la lista de seguimiento",
       "addSatellitesToast": "¡Primero agregue satélites a su lista!",
       "noPassesMsg": "Sin pasos en los próximos 60 minutos",
       "inFovToast": "¡El satélite {sccNum} está en el campo de visión!",

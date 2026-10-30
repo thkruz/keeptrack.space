@@ -162,7 +162,7 @@ const main = async (): Promise<void> => {
 
     const place = (v: number[]): number[] => {
       if (!v.length) {
-        return [NaN, NaN, NaN];
+        return [Number.NaN, Number.NaN, Number.NaN];
       }
       // anchor-relative: body rotates the SMALL relative vertex (ECF only),
       // head (w<0) is already current-ECI relative; both then add u_anchorLocal.

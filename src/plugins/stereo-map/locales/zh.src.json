@@ -25,7 +25,16 @@
         "mapStyle": "地图样式",
         "standard": "标准",
         "political": "政区",
-        "nightLights": "夜间灯光"
+        "nightLights": "夜间灯光",
+        "inView": "视野内",
+        "outOfView": "视野外"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "无法加载主徽标图像。",
+        "secondaryLogoFailed": "无法加载辅助徽标图像。",
+        "earthDrawAfterLoadFailed": "加载后无法在画布上绘制地球图像：{error}",
+        "earthLoadFailed": "无法加载立体投影地图的地球图像。",
+        "earthDrawFailed": "无法在画布上绘制地球图像：{error}"
       }
     }
   }

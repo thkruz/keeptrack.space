@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Створити запуск у вікні"
       },
       "msgs": {
-        "windowFound": "Старт о {time} для узгодження з цільовою площиною (ΔRAAN {delta}°)",
+        "windowFound": "Старт о {time} з {site} для узгодження з площиною орбіти {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Номінал запуску створено!",
         "timeRelativeToLaunch": "Час тепер відраховується відносно часу запуску."
       },

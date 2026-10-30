@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} geladen",
         "simLoadFailed": "{sim} konnte nicht geladen werden",
-        "missilesActive": "{n} / {max} Raketen aktiv"
+        "missilesActive": "{n} / {max} Raketen aktiv",
+        "massRaidLoaded": "Massenangriff erfolgreich geladen",
+        "missileCreated": "Rakete RV_{n}<br>wurde erstellt.",
+        "mirvCreated": "Wiedereintrittskörper (MIRV) erstellt:<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Ungültiger Ziel-Breitengrad!",
         "invalidTargetLongitude": "Ungültiger Ziel-Längengrad!",
         "invalidLaunchLatitude": "Ungültiger Start-Breitengrad!",
         "invalidLaunchLongitude": "Ungültiger Start-Längengrad!",
-        "invalidWarheads": "Sprengköpfe müssen eine ganze Zahl von 1 bis 12 sein."
+        "invalidWarheads": "Sprengköpfe müssen eine ganze Zahl von 1 bis 12 sein.",
+        "maxMissiles": "Fehler: Die maximale Anzahl an Raketen<br>ist erreicht.",
+        "launchLatRange": "Fehler: Die Startbreite muss<br>zwischen 90 und -90 Grad liegen",
+        "launchLonRange": "Fehler: Die Startlänge muss<br>zwischen 180 und -180 Grad liegen",
+        "targetLatRange": "Fehler: Die Zielbreite muss<br>zwischen 90 und -90 Grad liegen",
+        "targetLonRange": "Fehler: Die Ziellänge muss<br>zwischen 180 und -180 Grad liegen",
+        "minDistance": "Fehler: Diese Rakete hat eine Mindestreichweite von 320 km.",
+        "maxDistance": "Fehler: Diese Rakete hat eine maximale Reichweite von {km} km.",
+        "tooClose": "Fehler: Diese Entfernung ist für die gewählte Rakete zu kurz.",
+        "orbitalVelocity": "Fehler: Die Rakete hat Orbitalgeschwindigkeit erreicht<br>(Triebwerk zu stark für diese Entfernung).",
+        "overshot": "Fehler: Die Rakete ist über ihr Ziel hinausgeflogen<br>(Triebwerk zu stark für diese Entfernung).",
+        "notGuided": "Fehler: Die Rakete konnte bei dieser Entfernung<br>nicht ins Ziel gelenkt werden."
       },
       "commands": {
         "open": "Raketen-Plugin öffnen",

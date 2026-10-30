@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "¡Enlace copiado al portapapeles!",
         "copyFailed": "No se pudo copiar el enlace al portapapeles."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Error al compartir de forma nativa: {error}"
       }
     }
   }

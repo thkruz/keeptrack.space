@@ -1,5 +1,6 @@
 import type { GraphicsQualityLevel } from '@app/engine/plugins/core/plugin-capabilities';
 import { AtmosphereSettings, EarthDayTextureQuality, EarthNightTextureQuality } from '@app/engine/rendering/draw-manager/earth-quality-enums';
+import { t7e } from '@app/locales/keys';
 import { errorManagerInstance } from '../engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '../engine/utils/persistence-manager';
 import type { SettingsManager } from './settings';
@@ -25,6 +26,24 @@ export interface PersistedSettingEntry {
 }
 
 const bool = (raw: string): boolean => raw === 'true';
+
+const heldValues_ = new Map<StorageKey, string>();
+
+/**
+ * While a plugin temporarily overrides a persisted setting (e.g. a deep-space mission turns Earth
+ * rotation compensation off), it holds the user's own value so a save during the override writes that
+ * value instead of the temporary one. Release the hold when the override ends.
+ */
+export const holdPersistedValue = (key: StorageKey, raw: string): void => {
+  heldValues_.set(key, raw);
+};
+
+export const releasePersistedValue = (key: StorageKey): void => {
+  heldValues_.delete(key);
+};
+
+/** The value a save writes for this entry: a held value if one exists, else the live setting. */
+export const serializeForSave = (entry: PersistedSettingEntry, sm: SettingsManager): string | null => heldValues_.get(entry.key) ?? entry.serialize(sm);
 
 const GRAPHICS_QUALITY_LEVELS_: readonly GraphicsQualityLevel[] = ['low', 'medium', 'high', 'ultra'];
 
@@ -55,6 +74,19 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     serialize: (sm) => String(sm.isOrbitCruncherInEcf),
     deserialize: (sm, raw) => {
       sm.isOrbitCruncherInEcf = bool(raw);
+    },
+  },
+  {
+    // The orbit worker gets this count from OrbitManager init, after settings load.
+    key: StorageKey.SETTINGS_ECF_ORBIT_COUNT,
+    serialize: (sm) => String(sm.numberOfEcfOrbitsToDraw),
+    deserialize: (sm, raw) => {
+      const count = Number.parseInt(raw, 10);
+
+      // Same range the `ecf` URL parameter accepts (the menu offers 1-5 and 10).
+      if (count >= 1 && count <= 10) {
+        sm.numberOfEcfOrbitsToDraw = count;
+      }
     },
   },
   {
@@ -157,6 +189,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_DRAW_NIGHT_AS_DAY,
+    serialize: (sm) => String(sm.isDrawNightAsDay),
+    deserialize: (sm, raw) => {
+      sm.isDrawNightAsDay = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR,
     serialize: (sm) => String(sm.isDrawFlatMapTerminator),
     deserialize: (sm, raw) => {
@@ -192,12 +231,27 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
-    // Write-only mirror of the hide-other-sats state; the color scheme owns the
-    // live value, so nothing is restored here.
-    key: StorageKey.SETTINGS_HOS,
-    serialize: (sm) => (sm.colors?.transparent ? String(sm.colors.transparent[3] === 0) : null),
-    deserialize: () => {
-      // Owned by the color scheme pipeline
+    // Device scope: phones boot with the hover overlay off (MobileManager), so a
+    // desktop choice must not follow the account onto a phone.
+    key: StorageKey.SETTINGS_SHOW_INFO_ON_HOVER,
+    serialize: (sm) => String(sm.enableHoverOverlay),
+    deserialize: (sm, raw) => {
+      sm.enableHoverOverlay = bool(raw);
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION,
+    serialize: (sm) => String(sm.isCompensateForEarthRotation),
+    deserialize: (sm, raw) => {
+      sm.isCompensateForEarthRotation = bool(raw);
+    },
+  },
+  {
+    // Device scope: a "Fast CPU Required" option, so it depends on the machine.
+    key: StorageKey.SETTINGS_SHOW_NEXT_PASS,
+    serialize: (sm) => String(sm.isShowNextPass),
+    deserialize: (sm, raw) => {
+      sm.isShowNextPass = bool(raw);
     },
   },
   {
@@ -357,7 +411,11 @@ export const applyPersistedSetting = (sm: SettingsManager, key: StorageKey, raw:
       entry.deserializeMissing?.(sm);
     }
   } catch (err) {
-    errorManagerInstance.warn(`Skipping corrupt saved setting "${key}": ${err instanceof Error ? err.message : String(err)}`);
+    errorManagerInstance.warn(
+      t7e('errorMsgs.Persistence.corruptSetting')
+        .replace('{key}', key)
+        .replace('{error}', err instanceof Error ? err.message : String(err))
+    );
   }
 
   return true;

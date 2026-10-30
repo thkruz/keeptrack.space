@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Recording unavailable due to compatibility issues!",
-    "compatibilityError": "Compatibility Error with Recording!"
+    "compatibilityError": "Compatibility Error with Recording!",
+    "requesting": "Requesting screen sharing…",
+    "recording": "Recording",
+    "stopping": "Finalizing recording…",
+    "toggleCommand": "Toggle Screen Recording",
+    "saved": "Recording saved",
+    "tooShort": "Recording too short, nothing saved",
+    "cancelled": "Recording cancelled",
+    "notReadable": "The screen could not be captured. Another app or a system setting may be blocking it.",
+    "failed": "Recording failed. Please try again."
   }
 }

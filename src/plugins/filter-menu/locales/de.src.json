@@ -15,6 +15,7 @@
       "resetToDefaults": "Auf Standard zurücksetzen",
       "defaultTooltip": "Deaktivieren, um {name} auszublenden",
       "searchPlaceholder": "Filter suchen...",
+      "noResults": "Keine Filter entsprechen Ihrer Suche.",
       "commands": {
         "category": "Filter",
         "open": "Filtermenü öffnen",

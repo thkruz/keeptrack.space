@@ -220,7 +220,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     }
 
     this.chart.showLoading({
-      text: 'Computing satellite positions...',
+      text: t7e('plugins.Inc2LonPlots.chart.loading'),
       color: '#4fc3f7',
       textColor: '#fff',
       maskColor: 'rgba(0, 0, 0, 0.7)',
@@ -244,7 +244,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
       {
         animation: false,
         title: {
-          text: 'GEO Inclination vs Longitude Scatter Plot',
+          text: t7e('plugins.Inc2LonPlots.chart.title'),
           textStyle: {
             fontSize: 16,
             color: '#fff',
@@ -276,15 +276,15 @@ export class Inc2LonPlots extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
                 <span style="font-weight: bold;">${d.name}</span>
               </div>
-              <div><b>Inclination:</b> ${d.value[1].toFixed(3)}\u00B0</div>
-              <div><b>Longitude:</b> ${d.value[0].toFixed(3)}\u00B0</div>
-              <div><b>Period:</b> ${d.value[2].toFixed(2)} min</div>
+              <div><b>${t7e('plugins.Inc2LonPlots.chart.inclination')}:</b> ${d.value[1].toFixed(3)}\u00B0</div>
+              <div><b>${t7e('plugins.Inc2LonPlots.chart.longitude')}:</b> ${d.value[0].toFixed(3)}\u00B0</div>
+              <div><b>${t7e('plugins.Inc2LonPlots.chart.period')}:</b> ${d.value[2].toFixed(2)} min</div>
             </div>
           `;
           },
         },
         xAxis: {
-          name: 'Longitude (\u00B0)',
+          name: t7e('plugins.Inc2LonPlots.chart.xAxis'),
           type: 'value' as const,
           position: 'bottom',
           nameLocation: 'middle',
@@ -293,7 +293,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
           nameTextStyle: { color: '#fff', fontSize: 14 },
         },
         yAxis: {
-          name: 'Inclination (\u00B0)',
+          name: t7e('plugins.Inc2LonPlots.chart.yAxis'),
           type: 'value' as const,
           position: 'left',
           nameLocation: 'middle',
@@ -341,7 +341,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
             itemHeight: 500,
             calculable: true,
             precision: 0.05,
-            text: ['Period (minutes)'],
+            text: [t7e('plugins.Inc2LonPlots.chart.periodMinutes')],
             textGap: 30,
             textStyle: {
               color: '#fff',
@@ -481,7 +481,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
             continue;
           }
 
-          const displayName = topCountries.get(sat.country) ?? 'Other';
+          const displayName = topCountries.get(sat.country) ?? t7e('plugins.Inc2LonPlots.chart.other');
 
           if (!countryBuckets.has(displayName)) {
             countryBuckets.set(displayName, []);
@@ -534,6 +534,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     const countryMap = getCountryMapList() as Record<string, string>;
     const topCodes = sorted.slice(0, Inc2LonPlots.topCountryCount_).map(([code]) => code);
     const lookup = new Map<string, string>();
+    const otherLabel = t7e('plugins.Inc2LonPlots.chart.other');
 
     for (const code of topCodes) {
       lookup.set(code, countryMap[code] ?? code);
@@ -542,7 +543,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
     // Everything else maps to 'Other'
     for (const [code] of sorted) {
       if (!lookup.has(code)) {
-        lookup.set(code, 'Other');
+        lookup.set(code, otherLabel);
       }
     }
 

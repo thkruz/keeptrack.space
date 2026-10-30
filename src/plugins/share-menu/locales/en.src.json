@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "Link copied to clipboard!",
         "copyFailed": "Failed to copy link to clipboard."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Native share failed: {error}"
       }
     }
   }

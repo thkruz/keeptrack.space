@@ -8,9 +8,9 @@
         "satellite": "Satellit",
         "tvchannel": "TV-Kanal",
         "beam": "Ausleuchtzone",
-        "freq": "Frequenz",
+        "freq": "Frequenz (MHz)",
         "system": "System",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Video",
         "lang": "Sprache",
         "encryption": "Verschlüsselung"
@@ -19,7 +19,8 @@
         "NoChannelInfo": "Der Satellit hat keine Kanalinformationen",
         "NotSatellite": "Das ausgewählte Objekt ist kein Satellit",
         "FetchFailed": "Kanalinformationen für {name} und {altName} konnten nicht abgerufen werden",
-        "NoData": "Keine Kanaldaten verfügbar"
+        "NoData": "Keine Kanaldaten verfügbar",
+        "SaveXlsxFailed": "Fehler beim Speichern der XLSX-Datei!"
       },
       "help": {
         "overview": "Transponder- und Kanalinformationen zeigen, was ein geostationärer TV- oder Kommunikationssatellit tatsächlich ausstrahlt: jeden bekannten Kanal mit seiner Frequenz, Ausleuchtzone, seinem Übertragungssystem und seiner Verschlüsselung. Die Daten decken einige hundert bekannte Rundfunksatelliten ab und werden beim Öffnen des Menüs live abgerufen.",
@@ -41,9 +42,11 @@
         "statusLoading": "Kanäle werden geladen…",
         "statusEmpty": "Keine Kanaldaten verfügbar",
         "statusNoMatch": "Keine Kanäle entsprechen dem Filter",
-        "statusError": "Kanaldaten konnten nicht geladen werden"
+        "statusError": "Kanaldaten konnten nicht geladen werden",
+        "retry": "Erneut versuchen"
       },
-      "attribution": "Kanaldaten von der KeepTrack-API (öffentliche Listen)."
+      "attribution": "Kanaldaten von der KeepTrack-API (öffentliche Listen).",
+      "searchAliases": "Satellitenfrequenzen,Transponder,Kanaldaten"
     }
   }
 }

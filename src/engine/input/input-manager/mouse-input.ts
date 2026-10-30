@@ -8,6 +8,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { eci2lla, Kilometers } from '@ootk/src/main';
@@ -105,7 +106,7 @@ export class MouseInput {
         const el2 = elementIdL2 ? getEl(elementIdL2, true) : null;
 
         if (!el1 || (elementIdL2 && !el2)) {
-          errorManagerInstance.warn(`Missing elements for RMB menu: ${elementIdL1}, ${elementIdL2}`);
+          errorManagerInstance.warn(t7e('errorMsgs.rmbMenuMissingElements').replace('{ids}', `${elementIdL1}, ${elementIdL2}`));
 
           return;
         }

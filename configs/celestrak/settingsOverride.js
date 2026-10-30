@@ -176,9 +176,6 @@ const settingsOverride = {
     TheSpaceDevLaunchCalendarPlugin: {
       enabled: false,
     },
-    GunterLaunchCalendar: {
-      enabled: false,
-    },
     Calculator: {
       enabled: false,
     },
@@ -214,9 +211,6 @@ const settingsOverride = {
       enabled: false,
     },
     FilterMenuPlugin: {
-      enabled: false,
-    },
-    AboutMenuPlugin: {
       enabled: false,
     },
     VcrPlugin: {

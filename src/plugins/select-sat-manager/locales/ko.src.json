@@ -5,12 +5,18 @@
   },
   "plugins": {
     "SelectSatManager": {
-      "sectionLabel": "Satellite Selection",
+      "sectionLabel": "위성 선택",
       "settings": {
         "focusOnSatWhenSelected": {
-          "label": "Focus on Satellite When Selected",
-          "helpText": "Zoom in on the satellite when selected."
+          "label": "선택 시 위성에 초점 맞추기",
+          "helpText": "위성을 선택하면 확대합니다."
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "미사일을 보조 객체로 선택하는 기능은 지원되지 않습니다!",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_: SensorObject에 sensorId가 없습니다: {sensor}",
+        "invalidCovariance": "{context}: 잘못된 공분산 행렬",
+        "covarianceFromTleFailed": "{context}: TLE에서 공분산을 계산하지 못했습니다"
       }
     }
   }

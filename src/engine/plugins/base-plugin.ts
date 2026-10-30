@@ -1,7 +1,7 @@
 /* eslint-disable max-lines */
 import { BottomMenu } from '@app/app/ui/bottom-menu';
 import { SoundNames } from '@app/engine/audio/sounds';
-import { MenuMode, Singletons } from '@app/engine/core/interfaces';
+import { MenuMode, Singletons, ToastMsgType } from '@app/engine/core/interfaces';
 import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { KeepTrack } from '@app/keeptrack';
 import { TranslationKey, t7e } from '@app/locales/keys';
@@ -21,13 +21,12 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl, hideEl } from '../utils/get-el';
 import { shake } from '../utils/shake';
 import { slideInRight, slideOutLeft } from '../utils/slide';
+import { bottomIconSlug } from './bottom-icon-id';
 // Component imports for composition-based architecture
 import { BottomIconComponent } from './components/bottom-icon/bottom-icon-component';
 import { ContextMenuComponent } from './components/context-menu/context-menu-component';
 import { HelpComponent } from './components/help/help-component';
 import { KeyboardComponent } from './components/keyboard/keyboard-component';
-import { SecondaryMenuComponent } from './components/secondary-menu/secondary-menu-component';
-import { SideMenuComponent } from './components/side-menu/side-menu-component';
 
 export { default as fileExcelPng } from '@public/img/icons/file-excel.png';
 
@@ -330,6 +329,12 @@ export abstract class KeepTrackPlugin {
    * fall back to the MenuMode group.
    */
   drawerGroupKey: string | null = null;
+  /**
+   * Keeps this plugin out of the drawer's Recent group. For one-shot action toggles
+   * (e.g. the screen recorder) whose own row already shows their state, a Recent copy
+   * is only a duplicate entry.
+   */
+  isExcludedFromDrawerRecent = false;
 
   /**
    * The maximum order for the bottom icon.
@@ -405,16 +410,6 @@ export abstract class KeepTrackPlugin {
    * Bottom icon component instance (when using composition pattern).
    */
   protected bottomIconComponent_: BottomIconComponent | null = null;
-
-  /**
-   * Side menu component instance (when using composition pattern).
-   */
-  protected sideMenuComponent_: SideMenuComponent | null = null;
-
-  /**
-   * Secondary menu component instance (when using composition pattern).
-   */
-  protected secondaryMenuComponent_: SecondaryMenuComponent | null = null;
 
   /**
    * Context menu component instance (when using composition pattern).
@@ -538,27 +533,17 @@ export abstract class KeepTrackPlugin {
       if (config.dragOptions) {
         this.dragOptions = config.dragOptions as ClickDragOptions;
       }
-
-      this.sideMenuComponent_ = new SideMenuComponent(this.id, config, {
-        onOpen: () => {
-          if ('onSideMenuOpen' in this && typeof this.onSideMenuOpen === 'function') {
-            this.onSideMenuOpen();
-          }
-        },
-        onClose: () => {
-          if ('onSideMenuClose' in this && typeof this.onSideMenuClose === 'function') {
-            this.onSideMenuClose();
-          }
-        },
-      });
+      // addHtml() builds the panel from these legacy properties and openSideMenu() calls onSideMenuOpen.
     }
 
-    // Initialize secondary menu component if config method exists
+    /*
+     * Secondary menu: the config feeds the legacy properties, and addHtml() builds the
+     * `-secondary` panel, the gear toggle and the close button from them.
+     * openSecondaryMenu()/closeSecondaryMenu() call onSecondaryMenuOpen/Close.
+     */
     if (hasSecondaryMenu(this) && hasSideMenu(this)) {
       const config = this.getSecondaryMenuConfig();
-      const sideMenuConfig = this.getSideMenuConfig();
 
-      // Sync with legacy properties for backwards compatibility
       this.sideMenuSecondaryHtml = config.html;
       this.sideMenuSecondaryOptions = {
         width: config.width ?? 300,
@@ -571,20 +556,6 @@ export abstract class KeepTrackPlugin {
       if (config.dragOptions) {
         this.dragOptionsSecondary = config.dragOptions as ClickDragOptions;
       }
-
-      this.secondaryMenuComponent_ = new SecondaryMenuComponent(this.id, sideMenuConfig.elementName, config, {
-        onOpen: () => {
-          if ('onSecondaryMenuOpen' in this && typeof this.onSecondaryMenuOpen === 'function') {
-            this.onSecondaryMenuOpen();
-          }
-        },
-        onClose: () => {
-          if ('onSecondaryMenuClose' in this && typeof this.onSecondaryMenuClose === 'function') {
-            this.onSecondaryMenuClose();
-          }
-        },
-        onDownload: hasDownload(this) ? () => this.onDownload() : undefined,
-      });
     }
 
     // Initialize context menu component if config method exists
@@ -617,7 +588,10 @@ export abstract class KeepTrackPlugin {
       // A lone shortcut on a plugin with a bottom icon is, by convention, its
       // menu toggle; give it a description so guides never fall back to the id.
       if (shortcuts.length === 1 && !shortcuts[0].description && this.bottomIconLabel) {
-        shortcuts[0].description = t7e('keyboard.toggleMenu' as TranslationKey, { name: this.bottomIconLabel });
+        // addHtml() localizes bottomIconLabel later, so read the translated label directly here.
+        const name = this.t7eIfFound_(`plugins.${this.id}.bottomIconLabel`) ?? this.bottomIconLabel;
+
+        shortcuts[0].description = t7e('keyboard.toggleMenu' as TranslationKey, { name });
       }
 
       this.keyboardComponent_ = new KeyboardComponent(
@@ -640,9 +614,12 @@ export abstract class KeepTrackPlugin {
       this.submitCallback = () => this.onFormSubmit();
     }
 
-    // Sync download callback if present (and no secondary menu to handle it)
-    if (hasDownload(this) && !hasSecondaryMenu(this)) {
-      this.downloadIconCb = () => this.onDownload();
+    /*
+     * Sync download callback: addHtml() renders the title-bar download icon and wires its
+     * click to downloadIconCb. A callback a subclass already assigned is kept.
+     */
+    if (hasDownload(this)) {
+      this.downloadIconCb ??= () => this.onDownload();
     }
   }
 
@@ -683,11 +660,8 @@ export abstract class KeepTrackPlugin {
 
         return undefined;
       },
-      onDeselect: () => {
-        if ('onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
-          this.onBottomIconDeselect();
-        }
-      },
+      // No onDeselect: markMenuButtonInactive_() runs onBottomIconDeselect for every plugin, so
+      // wiring it here too would call the hook twice when setBottomIconToUnselected() runs.
     });
   }
 
@@ -711,9 +685,7 @@ export abstract class KeepTrackPlugin {
     this.bottomIconLabel = this.t7eIfFound_(`plugins.${this.id}.bottomIconLabel`) ?? this.bottomIconLabel;
 
     if (this.bottomIconLabel) {
-      const bottomIconSlug = this.bottomIconLabel.toLowerCase().replace(' ', '-');
-
-      this.bottomIconElementName = this.bottomIconElementName ?? `${bottomIconSlug}-bottom-icon`;
+      this.bottomIconElementName = this.bottomIconElementName ?? KeepTrackPlugin.defaultBottomIconElementName(this.id, this.bottomIconLabel);
     }
 
     if (this.bottomIconImg || this.bottomIconElementName || this.bottomIconLabel) {
@@ -754,7 +726,7 @@ export abstract class KeepTrackPlugin {
                 <button id="${this.sideMenuElementName}-secondary-close-btn"
                   class="center-align btn btn-ui waves-effect waves-light icon-btn"
                   type="button">
-                  <img src="${leftPanelClosePng}" alt="Close" class="icon-btn-img" />
+                  <img src="${leftPanelClosePng}" alt="${t7e('Common.close' as TranslationKey)}" class="icon-btn-img" />
                 </button>
               </div>
             </div>
@@ -913,7 +885,7 @@ export abstract class KeepTrackPlugin {
       <button id="${this.sideMenuElementName}-download-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
         type="button">
-        <img src="${this.downloadIconSrc}" alt="Download" class="icon-btn-img" />
+        <img src="${this.downloadIconSrc}" alt="${t7e('Common.download' as TranslationKey)}" class="icon-btn-img" />
       </button>
     `
       : '';
@@ -924,14 +896,14 @@ export abstract class KeepTrackPlugin {
       <button id="${this.sideMenuElementName}-secondary-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
         type="button">
-        <img src="${secondaryIconSrc}" alt="Settings" class="icon-btn-img" />
+        <img src="${secondaryIconSrc}" alt="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" class="icon-btn-img" />
       </button>`
       : '';
     const closeIconHtml = html`
       <button id="${this.sideMenuElementName}-close-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
         type="button">
-        <img src="${leftPanelClosePng}" alt="Close" class="icon-btn-img" />
+        <img src="${leftPanelClosePng}" alt="${t7e('Common.close' as TranslationKey)}" class="icon-btn-img" />
       </button>`;
 
     return html`
@@ -1211,6 +1183,9 @@ export abstract class KeepTrackPlugin {
       item.addEventListener('click', () => {
         if (item.classList.contains(KeepTrackPlugin.iconDisabledClassString)) {
           shake(item);
+          // Explain why, like the drawer footer does (explainDisabledUtilityIcon). Only toasts;
+          // the action never runs from here.
+          this.explainDisabledIcon();
 
           return;
         }
@@ -1256,7 +1231,7 @@ export abstract class KeepTrackPlugin {
     if (!this.isMenuButtonActive) {
       return;
     }
-    this.isMenuButtonActive = false;
+    this.markMenuButtonInactive_();
     this.bottomIconComponent_?.deselect(false);
     if (this.onSetBottomIconToUnselected) {
       this.onSetBottomIconToUnselected();
@@ -1266,6 +1241,63 @@ export abstract class KeepTrackPlugin {
     }
     getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-selected');
     getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-selected');
+  }
+
+  /**
+   * Disables the icon when the satellite or sensor it needs goes away. Only a plugin with its own
+   * side menu closes menus here: a camera-mode or toggle icon (Satellite ECI View, ...) losing its
+   * selection must not close another plugin's open menu, e.g. the Countries menu after a pick
+   * deselects the satellite.
+   */
+  private disableForMissingSelection_(): void {
+    const isHideSideMenus = Boolean(this.sideMenuElementName) || this.isForceHideSideMenus;
+
+    this.setBottomIconToDisabled(isHideSideMenus);
+    this.setBottomIconToUnselected(isHideSideMenus);
+  }
+
+  /**
+   * Why this plugin's icon is disabled, for gates other than the sensor/satellite
+   * selection (e.g. "Add satellites to the watchlist first"). Override it in a
+   * plugin that disables its own icon; null means no explanation.
+   */
+  getDisabledReason(): string | null {
+    return null;
+  }
+
+  /**
+   * Explain a click on the disabled icon without running the action: the
+   * missing sensor first, then the missing satellite, then the plugin's own
+   * getDisabledReason(). Shared by the drawer item, the drawer footer and the
+   * utility panel icon.
+   * @returns true when a message was shown.
+   */
+  explainDisabledIcon(): boolean {
+    if (this.isRequireSensorSelected && !this.verifySensorSelected()) {
+      return true;
+    }
+
+    if (this.isRequireSatelliteSelected && !this.verifySatelliteSelected()) {
+      return true;
+    }
+
+    return this.explainDisabledReason();
+  }
+
+  /**
+   * Toasts getDisabledReason() when the plugin has one.
+   * @returns true when a message was shown.
+   */
+  explainDisabledReason(): boolean {
+    const reason = this.getDisabledReason();
+
+    if (!reason) {
+      return false;
+    }
+
+    ServiceLocator.getUiManager().toast(reason, ToastMsgType.caution);
+
+    return true;
   }
 
   setBottomIconToDisabled(isHideSideMenus = true): void {
@@ -1293,6 +1325,19 @@ export abstract class KeepTrackPlugin {
    * Returns the translated string if the key exists in locale data,
    * or null if t7e returned the raw key (meaning no translation found).
    */
+  /**
+   * Default bottom icon id: a slug of the plugin's ENGLISH label, so the id (telemetry
+   * content_id, drawer favorites) is the same in every language. Falls back to `label` when the
+   * plugin has no `plugins.<id>.bottomIconLabel` key. Ids saved under the old localized slug are
+   * mapped by `migrateLegacyBottomIconId`.
+   */
+  static defaultBottomIconElementName(id: string, label: string): string {
+    const key = `plugins.${id}.bottomIconLabel`;
+    const english = t7e(key as TranslationKey, { lng: 'en' });
+
+    return bottomIconSlug(english && english !== key ? english : label);
+  }
+
   private t7eIfFound_(key: string): string | null {
     const result = t7e(key as TranslationKey);
 
@@ -1425,8 +1470,7 @@ export abstract class KeepTrackPlugin {
     if (this.isRequireSensorSelected && this.isRequireSatelliteSelected) {
       EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject): void => {
         if (!obj?.isSatellite() || !ServiceLocator.getSensorManager().isSensorSelected()) {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
+          this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
         }
@@ -1435,8 +1479,7 @@ export abstract class KeepTrackPlugin {
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
       EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject): void => {
         if (!obj) {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
+          this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
         }
@@ -1446,8 +1489,7 @@ export abstract class KeepTrackPlugin {
     if (this.isRequireSensorSelected && !this.isRequireSatelliteSelected) {
       EventBus.getInstance().on(EventBusEvent.setSensor, (sensor, sensorId): void => {
         if (!sensor && !sensorId) {
-          this.setBottomIconToDisabled();
-          this.setBottomIconToUnselected();
+          this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
         }
@@ -1460,7 +1502,7 @@ export abstract class KeepTrackPlugin {
           if (this.sideMenuElementName || this.isForceHideSideMenus) {
             this.hideSideMenus();
           }
-          this.isMenuButtonActive = false;
+          this.markMenuButtonInactive_();
           getEl(this.bottomIconElementName, true)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
           getEl(`${this.id}-utility-icon`, true)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
         } else {
@@ -1491,6 +1533,10 @@ export abstract class KeepTrackPlugin {
             // Show the side menu if it exists
             if (this.sideMenuElementName) {
               this.openSideMenu();
+            } else if (this.isForceHideSideMenus) {
+              // A plugin without its own side menu (e.g. one that opens a colorbox overlay) still closes
+              // whatever side menu is open, before it marks itself active so it is not closed in turn.
+              this.hideSideMenus();
             }
 
             // Show the bottom icon as selected
@@ -1530,7 +1576,25 @@ export abstract class KeepTrackPlugin {
       ServiceLocator.getUiManager().searchManager.closeSearch();
     }
     ServiceLocator.getUiManager().hideSideMenus();
+    this.markMenuButtonInactive_();
+  }
+
+  /**
+   * Clears `isMenuButtonActive` and, on the active -> inactive transition, runs
+   * `onBottomIconDeselect()`. This is the only caller of that hook, for legacy
+   * (`bottomIcon*` field) and composition plugins alike, so it runs once per close
+   * whichever path closed the menu: icon toggle, the close button or another plugin
+   * opening (both via hideSideMenus), or setBottomIconToUnselected. The flag is
+   * cleared before the hook runs, so a hook that hides menus again cannot re-enter.
+   */
+  private markMenuButtonInactive_(): void {
+    const wasActive = this.isMenuButtonActive;
+
     this.isMenuButtonActive = false;
+
+    if (wasActive && 'onBottomIconDeselect' in this && typeof this.onBottomIconDeselect === 'function') {
+      this.onBottomIconDeselect();
+    }
   }
 
   openSideMenu() {
@@ -1539,6 +1603,12 @@ export abstract class KeepTrackPlugin {
 
     if (this.isRenderPausedOnOpen) {
       KeepTrack.getInstance().engine.pause();
+    }
+
+    // Every open path (bottom icon, palette, shortcut, direct calls) ends here, legacy and
+    // getSideMenuConfig plugins alike, so this is the one place onSideMenuOpen fires.
+    if ('onSideMenuOpen' in this && typeof this.onSideMenuOpen === 'function') {
+      this.onSideMenuOpen();
     }
   }
 
@@ -1559,6 +1629,11 @@ export abstract class KeepTrackPlugin {
       // Constrain width so the right edge doesn't exceed the viewport
       secondaryMenuElement.style.maxWidth = `${window.innerWidth - leftPos}px`;
       slideInRight(secondaryMenuElement, 300);
+      // The gear opens this panel for legacy and getSecondaryMenuConfig plugins alike. Call the
+      // hook here, or plugins that sync their form or layout in onSecondaryMenuOpen never see it open.
+      if ('onSecondaryMenuOpen' in this && typeof this.onSecondaryMenuOpen === 'function') {
+        this.onSecondaryMenuOpen();
+      }
     }
   }
 
@@ -1582,6 +1657,9 @@ export abstract class KeepTrackPlugin {
      * secondary sits to the right of the primary and needs the extra travel to clear.
      */
     slideOutLeft(getEl(`${this.sideMenuElementName}-secondary`), 300, null, -300);
+    if ('onSecondaryMenuClose' in this && typeof this.onSecondaryMenuClose === 'function') {
+      this.onSecondaryMenuClose();
+    }
   }
 
   registerSubmitButtonClicked(callback: (() => void) | null = null) {
@@ -1710,7 +1788,7 @@ export abstract class KeepTrackPlugin {
       }
       slideCb();
       getEl(bottomIconElementName)?.classList.remove(KeepTrackPlugin.iconSelectedClassString);
-      this.isMenuButtonActive = false;
+      this.markMenuButtonInactive_();
     });
   }
 }

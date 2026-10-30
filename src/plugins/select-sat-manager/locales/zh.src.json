@@ -5,12 +5,18 @@
   },
   "plugins": {
     "SelectSatManager": {
-      "sectionLabel": "Satellite Selection",
+      "sectionLabel": "卫星选择",
       "settings": {
         "focusOnSatWhenSelected": {
-          "label": "Focus on Satellite When Selected",
-          "helpText": "Zoom in on the satellite when selected."
+          "label": "选中时聚焦卫星",
+          "helpText": "选中卫星时放大到该卫星。"
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "不支持将导弹选为次要对象！",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_：SensorObject 没有 sensorId：{sensor}",
+        "invalidCovariance": "{context}：协方差矩阵无效",
+        "covarianceFromTleFailed": "{context}：无法根据 TLE 计算协方差"
       }
     }
   }

@@ -43,3 +43,25 @@
   min-width: 20px;
   text-align: center;
 }
+
+/* The picked country: brand accent bar on the left plus a stronger border and fill.
+ * Red stays an accent (bar/border), never the text color. */
+#countries-menu .country-option.country-option--selected {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--color-primary-light, #e01a0e);
+  box-shadow: inset 3px 0 0 var(--color-primary-light, #e01a0e);
+}
+
+#countries-menu .country-option.country-option--selected .country-name {
+  font-weight: 700;
+}
+
+#countries-menu .country-option.country-option--selected .country-count {
+  border-color: var(--color-primary-light, #e01a0e);
+  color: var(--color-text-light, #f5f5f5);
+}
+
+/* Clear sits above the list; keep it clear of the section label. */
+#countries-menu .countries-clear {
+  margin-bottom: 8px;
+}

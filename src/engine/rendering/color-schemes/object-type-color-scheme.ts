@@ -8,6 +8,7 @@ import { hideEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, SpaceObjectType, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface ObjectTypeColorSchemeColorMap extends ColorSchemeColorMap {
   payload: rgbaArray;
@@ -210,44 +211,46 @@ export class ObjectTypeColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-default-sensor">
     <li>
       <div class="Square-Box layers-payload-box"></div>
-      Payload
+      ${legendLabel('payload')}
     </li>
     <li>
       <div class="Square-Box layers-rocketBody-box"></div>
-      Rocket Body
+      ${legendLabel('rocketBody')}
     </li>
     <li>
       <div class="Square-Box layers-debris-box"></div>
-      Debris
+      ${legendLabel('debris')}
     </li>
     <li>
       <div class="Square-Box layers-pink-box"></div>
-      Special Sats
+      ${legendLabel('specialSats')}
     </li>
     <li>
       <div class="Square-Box layers-inFOV-box"></div>
-      Satellite In View
+      ${legendLabel('satelliteInView')}
     </li>
     <li>
       <div class="Square-Box layers-missile-box"></div>
-      Missile
+      ${legendLabel('missile')}
     </li>
     <li>
       <div class="Square-Box layers-missileInview-box"></div>
-      Missile In View
+      ${legendLabel('missileInView')}
     </li>
     <li>
       <div class="Square-Box layers-sensor-box"></div>
-      Sensor
+      ${legendLabel('sensor')}
     </li>
     <li>
       <div class="Square-Box layers-facility-box"></div>
-      Launch Site
+      ${legendLabel('launchSite')}
     </li>
   </ul>
   `.trim();
+  }
 }

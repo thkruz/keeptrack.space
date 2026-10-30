@@ -34,7 +34,7 @@
         }
       },
       "tooltips": {
-        "maxResults": "검색에 표시할 최대 위성 수",
+        "maxResults": "검색에 표시할 최대 결과 수",
         "minSearchChars": "검색이 실행되기 전에 입력해야 하는 최소 문자 수",
         "showDecayed": "검색 결과에 소멸된 위성(위치 0,0,0) 표시",
         "showVimpel": "검색 결과에 Vimpel(분석가) 객체를 포함합니다. 검색이 느려질 수 있습니다."

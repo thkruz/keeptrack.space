@@ -1,7 +1,11 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "FPS 보기"
+      "bottomIconLabel": "FPS 보기",
+      "commandPalette": {
+        "switch": "FPS 보기 전환"
+      },
+      "firstUseHint": "FPS 뷰: W A S D로 비행, Q와 E로 위아래 이동, 숫자 패드 4 6 8 2로 회전 및 시점 이동, Shift를 누르고 있으면 느리게, 오른쪽 Shift는 빠르게 이동합니다. 8을 다시 누르면 나갑니다."
     }
   }
 }

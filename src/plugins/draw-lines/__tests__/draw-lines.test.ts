@@ -1,6 +1,7 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { DrawLinesPlugin } from '@app/plugins/draw-lines/draw-lines';
 import { Satellite } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -169,5 +170,42 @@ describe('DrawLinesPlugin onContextMenuOpen visibility', () => {
 
   it('does not throw when elements are absent', () => {
     expect(() => openCtx('space', null)).not.toThrow();
+  });
+});
+
+describe('DrawLinesPlugin side-menu Sensor to Satellite', () => {
+  let plugin: DrawLinesPlugin;
+  type SideMenuInternals = { runMenuAction_: (action: never) => void };
+  const sensorAction = () => (DrawLinesPlugin as unknown as { DRAW_ACTIONS: { id: string }[] }).DRAW_ACTIONS.find((a) => a.id === 'line-sensor-sat');
+
+  beforeEach(() => {
+    setupStandardEnvironment();
+    plugin = new DrawLinesPlugin();
+    vi.spyOn(lineManagerInstance, 'createSensorToSat').mockImplementation(() => undefined as never);
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat: 0, primarySatObj: Object.create(Satellite.prototype) } as never);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('toasts "Select a sensor first." and draws nothing when no sensor is selected', () => {
+    vi.spyOn(ServiceLocator.getSensorManager(), 'getSensor').mockReturnValue(null);
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    (plugin as unknown as SideMenuInternals).runMenuAction_(sensorAction() as never);
+
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Select a sensor first.'));
+    expect(lineManagerInstance.createSensorToSat).not.toHaveBeenCalled();
+  });
+
+  it('draws the line without a warning when a sensor is selected', () => {
+    vi.spyOn(ServiceLocator.getSensorManager(), 'getSensor').mockReturnValue({ objName: 'Test' } as never);
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    (plugin as unknown as SideMenuInternals).runMenuAction_(sensorAction() as never);
+
+    expect(warn).not.toHaveBeenCalled();
+    expect(lineManagerInstance.createSensorToSat).toHaveBeenCalled();
   });
 });

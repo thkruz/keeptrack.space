@@ -1,5 +1,8 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { Calculator } from '@app/plugins/calculator/calculator';
@@ -208,6 +211,101 @@ describe('Calculator conversion engine', () => {
     getEl('calc-draw-line-btn')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 
     expect(warnSpy).toHaveBeenCalled();
+  });
+
+  it('an explicit 0, 0, 0 velocity shows 0 values and real (degenerate) Classical Elements', () => {
+    const velCheck = getEl('calc-show-velocity') as HTMLInputElement;
+
+    velCheck.checked = true;
+    velCheck.dispatchEvent(new Event('change'));
+    setInput('x', '6778');
+    setInput('y', '0');
+    setInput('z', '0');
+    setInput('vx', '0');
+    setInput('vy', '0');
+    setInput('vz', '0');
+    convert();
+
+    expect(Number(getEl('calc-out-teme-vx')!.textContent)).toBeCloseTo(0, 3);
+    expect(getEl('calc-out-teme-vy')!.textContent).not.toBe('-');
+    expect(getEl('calc-out-ce-sma')!.textContent).not.toBe('Needs velocity');
+    expect(getEl('calc-out-ce-ecc')!.textContent).toBe('1.0000000');
+    // Undefined elements of the radial orbit read "-", never "NaN".
+    expect(getEl('calc-out-ce-inc')!.textContent).toBe('-');
+    expect(getEl('calc-output-sections')!.textContent).not.toContain('NaN');
+  });
+
+  it('warns on an empty field instead of converting it as 0', () => {
+    const warnSpy = vi.spyOn(errorManagerInstance, 'warn');
+
+    setInput('x', '');
+    convert();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('J2000 X'));
+    expect(getEl('calc-out-lla-alt')!.textContent).toBe('-');
+
+    warnSpy.mockClear();
+    setInput('x', '   ');
+    convert();
+    expect(warnSpy).toHaveBeenCalled();
+    expect(getEl('calc-out-lla-alt')!.textContent).toBe('-');
+  });
+
+  it('a position-only Geodetic input reads "Needs velocity" in Classical Elements', () => {
+    setFrame('LLA');
+    fillFields({ lat: '0', lon: '0', alt: '400' });
+    convert();
+
+    expect(getEl('calc-out-itrf-x')!.textContent).not.toBe('-');
+    expect(getEl('calc-out-ce-sma')!.textContent).toBe('Needs velocity');
+    // Unknown velocity reads "-" in every Cartesian frame, never 0 or an Earth-rotation term.
+    for (const id of ['j2000-vx', 'j2000-vy', 'j2000-vz', 'itrf-vx', 'itrf-vy', 'itrf-vz', 'teme-vx', 'teme-vy', 'teme-vz']) {
+      expect(getEl(`calc-out-${id}`)!.textContent).toBe('-');
+    }
+  });
+
+  it('shows real velocity cells when the Cartesian input includes velocity', () => {
+    const velCheck = getEl('calc-show-velocity') as HTMLInputElement;
+
+    velCheck.checked = true;
+    velCheck.dispatchEvent(new Event('change'));
+    convert();
+
+    expect(getEl('calc-out-itrf-vy')!.textContent).not.toBe('-');
+    expect(getEl('calc-out-teme-vy')!.textContent).not.toBe('-');
+  });
+
+  it('refreshes the RAE Sensor field when the sensor changes while RAE is the input frame', () => {
+    ServiceLocator.getSensorManager().currentSensors = [];
+    setFrame('RAE');
+    const sensorInput = () => (getEl('calc-in-sensor') as HTMLInputElement).value;
+
+    expect(sensorInput()).toBe('No sensor selected');
+
+    ServiceLocator.getSensorManager().currentSensors = [defaultSensor];
+    EventBus.getInstance().emit(EventBusEvent.setSensor, defaultSensor, defaultSensor.sensorId ?? null);
+    expect(sensorInput()).toBe(defaultSensor.name);
+
+    ServiceLocator.getSensorManager().currentSensors = [];
+    EventBus.getInstance().emit(EventBusEvent.resetSensor);
+    expect(sensorInput()).toBe('No sensor selected');
+  });
+
+  it('Copy All Results writes lines with no trailing padding', () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    convert();
+    getEl('calc-copy-btn')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(writeText).toHaveBeenCalledTimes(1);
+    const lines = (writeText.mock.calls[0][0] as string).split('\n');
+
+    expect(lines.length).toBeGreaterThan(3);
+    for (const line of lines) {
+      expect(line).toBe(line.trimEnd());
+    }
+    // The default J2000 input has no velocity, so the copied velocities are unknown too.
+    expect(lines[0]).toMatch(/Vx=- Vy=- Vz=-$/u);
   });
 
   describe('loadSelectedSatellite_', () => {

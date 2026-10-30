@@ -65,6 +65,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           </div>
           <div id="settings-own-sections"></div>
           <div id="settings-plugin-sections"></div>
+          <div id="settings-no-matches" class="kt-note" style="display: none;">${l('noMatches')}</div>
           <button id="settings-reset" type="button" class="kt-action waves-effect">
             <span class="kt-action-label">${l('buttons.resetToDefaults')}</span>
           </button>
@@ -167,7 +168,11 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       anyApplied = true;
       if (key === StorageKey.SETTINGS_DRAW_ORBITS) {
         needsOrbitRedraw = true;
-      } else if (key === StorageKey.SETTINGS_DRAW_TRAILING_ORBITS) {
+      } else if (key === StorageKey.SETTINGS_DRAW_TRAILING_ORBITS || key === StorageKey.SETTINGS_DRAW_ECF) {
+        needsOrbitTypeUpdate = true;
+      } else if (key === StorageKey.SETTINGS_ECF_ORBIT_COUNT) {
+        // The orbit worker keeps its own copy of the count.
+        ServiceLocator.getOrbitManager().orbitThreadMgr.sendSettingsUpdate(settingsManager.numberOfEcfOrbitsToDraw);
         needsOrbitTypeUpdate = true;
       }
     }
@@ -244,8 +249,9 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
   /**
    * Narrow the visible controls to those whose label text contains the query.
    * Empty sections (every row filtered out) are hidden so the menu collapses to
-   * just the matches. Uses substring matching - no regex - so any user input is
-   * a safe literal.
+   * just the matches; when nothing matches, a "No matching settings" note shows
+   * instead of a blank menu. Uses substring matching - no regex - so any user
+   * input is a safe literal.
    */
   private static applyFilter_(query: string): void {
     const menu = getEl('settings-menu', true);
@@ -255,6 +261,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     }
 
     const needle = query.trim().toLowerCase();
+    let anySectionVisible = false;
 
     menu.querySelectorAll<HTMLElement>('.kt-section').forEach((section) => {
       let anyVisible = false;
@@ -269,7 +276,16 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
       });
 
       section.style.display = anyVisible ? '' : 'none';
+      if (anyVisible) {
+        anySectionVisible = true;
+      }
     });
+
+    const noMatches = menu.querySelector<HTMLElement>('#settings-no-matches');
+
+    if (noMatches) {
+      noMatches.style.display = needle.length > 0 && !anySectionVisible ? '' : 'none';
+    }
   }
 
   static resetToDefaults(): void {

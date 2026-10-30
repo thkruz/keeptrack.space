@@ -19,7 +19,8 @@
         "daylightOnly": "Nur bei Tageslicht",
         "nadirReadout": "Nadirbreite etwa {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "Nadirbreite für diesen Orbit unbekannt",
-        "presetsIllustrative": "Voreinstellungen sind illustrativ, keine veröffentlichten Spezifikationen."
+        "presetsIllustrative": "Voreinstellungen sind illustrativ, keine veröffentlichten Spezifikationen.",
+        "close": "Schließen"
       },
       "presets": {
         "hrEo": "Optisch, hohe Auflösung",

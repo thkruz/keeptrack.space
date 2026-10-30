@@ -261,7 +261,7 @@ export class CameraState {
 
   zoomTargetChange(): void {
     const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
-    const isNoSatSelected = (selectSatManagerInstance?.selectedSat ?? '-1') === '-1';
+    const isNoSatSelected = (selectSatManagerInstance?.selectedSat ?? -1) === -1;
 
     if (settingsManager.isZoomStopsSnappedOnSat || isNoSatSelected || !this.camZoomSnappedOnSat) {
       const wasSnapped = this.camZoomSnappedOnSat;

@@ -39,7 +39,11 @@
         "endDateInvalid": "End Date is invalid.",
         "savingScenario": "Error saving scenario!",
         "loadingScenarioFile": "Error loading scenario file!",
-        "decompressingScenarioFile": "Error decompressing scenario file!"
+        "decompressingScenarioFile": "Error decompressing scenario file!",
+        "startAfterEnd": "Scenario start time must be before end time.",
+        "invalidDates": "Scenario start time and end time must be valid dates.",
+        "bothBoundsRequired": "Both scenario start time and end time must be set.",
+        "nameTooLong": "Scenario name must be 30 characters or fewer."
       },
       "defaults": {
         "scenarioName": "My Scenario",

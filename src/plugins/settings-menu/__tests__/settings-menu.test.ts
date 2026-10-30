@@ -87,6 +87,27 @@ describe('SettingsMenuPlugin immediate-apply', () => {
     expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.settingsMenuRefresh);
   });
 
+  it('gives the previous label mode back when demo mode is switched off', () => {
+    settingsManager.isDemoModeOn = false;
+    settingsManager.satLabelMode = SatLabelMode.ALL;
+    const flipDemo = (on: boolean): void => {
+      const demo = getEl('setting-general-enableDemoMode') as HTMLInputElement;
+
+      demo.checked = on;
+      demo.dispatchEvent(new Event('change'));
+    };
+
+    flipDemo(true);
+    expect(settingsManager.satLabelMode).toBe(SatLabelMode.OFF);
+
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+
+    flipDemo(false);
+    expect(settingsManager.isDemoModeOn).toBe(false);
+    expect(settingsManager.satLabelMode).toBe(SatLabelMode.ALL);
+    expect(emitSpy).toHaveBeenCalledWith(EventBusEvent.settingsMenuRefresh);
+  });
+
   it('reflects the saved isShowNextPass value when rendered (regression: load read the wrong setting)', () => {
     settingsManager.isShowNextPass = true;
     EventBus.getInstance().emit(EventBusEvent.settingsMenuRefresh);
@@ -147,5 +168,43 @@ describe('SettingsMenuPlugin reset and filter', () => {
 
     expect(demoRow.style.display).not.toBe('none');
     expect(orbitsRow.style.display).toBe('none');
+    expect((getEl('settings-no-matches') as HTMLElement).style.display).toBe('none');
+  });
+
+  const typeFilter_ = (value: string): HTMLInputElement => {
+    const filter = getEl('settings-filter') as HTMLInputElement;
+
+    filter.value = value;
+    filter.dispatchEvent(new Event('input'));
+
+    return filter;
+  };
+
+  it('shows "No matching settings" when the filter matches nothing, and hides it again when cleared', () => {
+    const noMatches = getEl('settings-no-matches') as HTMLElement;
+
+    expect(noMatches.style.display).toBe('none');
+
+    typeFilter_('zzzz');
+    expect(noMatches.style.display).toBe('');
+    expect(noMatches.textContent).toContain('No matching settings');
+
+    typeFilter_('');
+    expect(noMatches.style.display).toBe('none');
+  });
+
+  it('keeps the filter text and the filtered view across Reset to Defaults', () => {
+    const filter = typeFilter_('trailing');
+
+    settingsManager.isDrawTrailingOrbits = true;
+    SettingsMenuPlugin.resetToDefaults();
+
+    expect(settingsManager.isDrawTrailingOrbits).toBe(false);
+    expect(filter.value).toBe('trailing');
+    // Reset re-renders every row; the filter is re-applied to the new rows.
+    expect((getEl('setting-general-drawOrbits')!.closest('.switch.row') as HTMLElement).style.display).toBe('none');
+    expect((getEl('setting-general-drawTrailingOrbits')!.closest('.switch.row') as HTMLElement).style.display).toBe('');
+
+    typeFilter_('');
   });
 });

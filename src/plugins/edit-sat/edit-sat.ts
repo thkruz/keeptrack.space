@@ -260,6 +260,9 @@ export class EditSat extends KeepTrackPlugin {
     if (!this.originalTle_.has(sat.sccNum)) {
       this.originalTle_.set(sat.sccNum, { tle1: sat.tle1, tle2: sat.tle2 });
     }
+    const original = this.originalTle_.get(sat.sccNum)!;
+
+    getEl('es-modified', true)?.classList.toggle('start-hidden', sat.tle1 === original.tle1 && sat.tle2 === original.tle2);
 
     (<HTMLInputElement>getEl(`${p}-scc`)).value = sat.sccNum;
     (<HTMLInputElement>getEl(`${p}-country`)).value = sat.country;
@@ -567,7 +570,7 @@ export class EditSat extends KeepTrackPlugin {
 
       reader.readAsText(eventTarget.files![0]);
     } catch (e) {
-      errorManagerInstance.error(e, 'edit-sat.ts', 'Error reading file!');
+      errorManagerInstance.error(e, 'edit-sat.ts', t7e('plugins.EditSat.errorMsgs.errorReadingFile' as T7eKey));
     }
   }
 

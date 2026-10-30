@@ -15,6 +15,7 @@
       "resetToDefaults": "Скинути за замовчуванням",
       "defaultTooltip": "Вимкніть, щоб приховати {name}",
       "searchPlaceholder": "Пошук фільтрів...",
+      "noResults": "Немає фільтрів, що відповідають запиту.",
       "commands": {
         "category": "Фільтри",
         "open": "Відкрити меню фільтрів",

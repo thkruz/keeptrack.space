@@ -55,6 +55,24 @@ describe('PluginManagerPlugin behavior', () => {
     expect(menu!.querySelectorAll('input[data-config-key]').length).toBeGreaterThan(0);
   });
 
+  it('finds visible labels and historical aliases regardless of punctuation, and explains no matches', () => {
+    const menu = getEl('plugin-manager-menu')!;
+    const filter = plugin as unknown as { filterRows_(query: string): void };
+
+    for (const query of ['Multi-View', 'Multi View']) {
+      filter.filterRows_(query);
+      expect(menu.querySelector('#pm-toggle-MultiView')!.closest('.pm-row')!.classList.contains('start-hidden')).toBe(false);
+    }
+    for (const query of ['Satellite Frequencies', 'Transponder', 'transponderChannelData']) {
+      filter.filterRows_(query);
+      expect(menu.querySelector('#pm-toggle-transponderChannelData')!.closest('.pm-row')!.classList.contains('start-hidden')).toBe(false);
+    }
+    filter.filterRows_('no-such-plugin-xyz');
+    expect(getEl('plugin-manager-no-matches')!.classList.contains('start-hidden')).toBe(false);
+    filter.filterRows_('');
+    expect(getEl('plugin-manager-no-matches')!.classList.contains('start-hidden')).toBe(true);
+  });
+
   it('renders Installed / Browse / Develop tabs and switches panes', () => {
     const menu = getEl('plugin-manager-menu')!;
     const tabs = [...menu.querySelectorAll<HTMLElement>('[data-pm-tab]')].map((t) => t.dataset.pmTab);

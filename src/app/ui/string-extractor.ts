@@ -213,7 +213,7 @@ export abstract class StringExtractor {
       }
 
       // Extract leading number if present (e.g., "2 Pan" → number=2, rest="Pan")
-      const numMatch = /^(?<num>\d+)\s+(?<rest>.+)$/u.exec(segment);
+      const numMatch = /^(?<num>\d+)\s+(?<rest>\S.*)$/u.exec(segment);
       let prefix = '';
       let token = segment;
 

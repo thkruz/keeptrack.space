@@ -5,6 +5,9 @@
       "title": "Schematy kolorów",
       "rmbLabel": "Schemat kolorów",
       "sectionLabel": "Schematy",
+      "legend": {
+        "close": "Zamknij legendę"
+      },
       "help": {
         "overview": "Menu Schematy kolorów zmienia sposób kolorowania każdego obiektu w scenie. Każdy schemat koduje inną właściwość: kraj pochodzenia, typ obiektu, reżim orbitalny, oświetlenie słoneczne, prędkość i inne, więc wybór właściwego schematu zamienia chmurę punktów w odpowiedź na konkretne pytanie.",
         "imgAlt": "Menu Schematy kolorów z listą dostępnych schematów",
@@ -13,6 +16,13 @@
         "tip1": "Legenda aktualizuje się wraz ze schematem; jeśli nie wiesz, co oznacza dany kolor, legenda jest rozstrzygająca.",
         "tip2": "Niektóre schematy są wymagające obliczeniowo (np. gęstość przestrzenna) i przy pierwszym wyborze ich obliczenie chwilę trwa.",
         "shortcutToggle": "Przełącz menu Schematy kolorów"
+      },
+      "commandPalette": {
+        "category": "Kolory",
+        "setScheme": "Ustaw schemat kolorów: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Nie znaleziono schematu kolorów: {name}"
       }
     }
   }

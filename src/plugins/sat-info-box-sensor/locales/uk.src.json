@@ -44,7 +44,11 @@
         "reasonMaxEl": "Кут місця {{value}} більший за макс. {{limit}}",
         "reasonMask": "Кут місця {{value}} нижче маски горизонту {{limit}}",
         "reasonAzimuth": "Азимут {{value}} поза діапазоном {{min}}–{{max}}",
-        "reasonCone": "Поза конусом візування сенсора"
+        "reasonCone": "Поза конусом візування сенсора",
+        "unknown": "Невідомо",
+        "notApplicable": "Н/Д",
+        "notApplicableOem": "Н/Д (OEM)",
+        "notInOrbitToast": "Супутник {sccNum} не на орбіті!<br>Час симуляції: {simTime}.<br>Переконайтеся, що використовуєте правильний TLE."
       }
     }
   }

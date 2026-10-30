@@ -28,7 +28,8 @@
         "inFov": "In FOV",
         "atNight": "At Night",
         "clearSkies": "Clear Skies",
-        "noPasses": "No Passes"
+        "noPasses": "No Passes",
+        "missingUiName": "Unnamed sensor"
       },
       "help": {
         "overview": "The Sensor Timeline shows when a network of sensors can see the selected satellite over the coming hours. Each row is a sensor and each colored bar is a pass, so you can compare every site's opportunities at a glance and pick the best sensor for the next observation.",
@@ -42,6 +43,10 @@
         "tip1": "Weather comes from the Open-Meteo cloud cover forecast for each optical site; radars ignore weather, sunlight, and darkness conditions entirely.",
         "tip2": "Clicking a pass re-selects the satellite after changing sensor and time, so other open menus refresh with the new geometry.",
         "tip3": "Shorter calculation intervals catch brief passes but take longer to compute; 30 seconds is a good balance for a 24 hour window."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "Could not find the sensor list",
+        "invalidSetting": "{setting} must be a number greater than zero."
       }
     }
   }

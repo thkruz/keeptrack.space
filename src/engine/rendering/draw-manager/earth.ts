@@ -38,6 +38,7 @@ import { ViewportManager } from '@app/engine/rendering/viewport-manager';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { FrameProfiler, GpuStage } from '@app/engine/utils/frame-profiler';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
 import { Body, BackdatePosition as backdatePosition, KM_PER_AU } from 'astronomy-engine';
@@ -419,7 +420,7 @@ export class Earth {
       this.buildAtmosphereMesh();
       this.buildAuroraMesh_();
     } catch (error) {
-      errorManagerInstance.warn(error);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.earthInitFailed').replace('{error}', error instanceof Error ? error.message : String(error)), error);
     }
   }
 
@@ -898,7 +899,7 @@ export class Earth {
       .catch((err: unknown) => {
         delete store[key];
         onFail?.();
-        errorManagerInstance.warn(`Failed to load earth ${label} texture: ${url}`, err);
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.textureLoadFailed').replace('{url}', `${label}: ${url}`), err);
       });
   }
 

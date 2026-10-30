@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "Nie można załadować zdjęć z przyszłości. Ładowanie najnowszych zdjęć."
+        "FuturePictures": "Nie można załadować zdjęć z przyszłości. Ładowanie najnowszych zdjęć.",
+        "ImageLoadFailed": "Nie udało się wczytać obrazu z {source}"
       },
       "help": {
         "overview": "Zdjęcia satelitarne pokazują najnowsze fotografie wykonane przez prawdziwe satelity meteorologiczne: obrazy pełnej tarczy z satelitów MeteoSat, Himawari, GOES i Elektro-L na orbicie geostacjonarnej oraz zdjęcia całej Ziemi z DSCOVR w punkcie L1. Łączą to, co widzisz w symulacji, z tym, co te satelity właśnie teraz naprawdę fotografują.",

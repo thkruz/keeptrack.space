@@ -44,7 +44,11 @@
         "reasonMaxEl": "仰角 {{value}} が最大 {{limit}} 超過",
         "reasonMask": "仰角 {{value}} が地平線マスク {{limit}} 未満",
         "reasonAzimuth": "方位角 {{value}} が {{min}}〜{{max}} の範囲外",
-        "reasonCone": "センサーの視軸コーンの外"
+        "reasonCone": "センサーの視軸コーンの外",
+        "unknown": "不明",
+        "notApplicable": "該当なし",
+        "notApplicableOem": "該当なし (OEM)",
+        "notInOrbitToast": "衛星 {sccNum} は軌道上にありません!<br>シミュレーション時刻は {simTime} です。<br>正しい TLE を使用しているか確認してください。"
       }
     }
   }

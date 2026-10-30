@@ -22,7 +22,7 @@
         "setSensorGroup": "Définir le groupe de capteurs : {name}"
       },
       "help": {
-        "overview": "Le menu Capteurs est l'endroit où vous choisissez la station au sol à partir de laquelle le reste de l'application effectue ses calculs. Les capteurs sont regroupés par le réseau qu'ils soutiennent principalement, chaque entrée affichant le nom du capteur à gauche et le pays ou l'organisation propriétaire à droite. Le capteur sélectionné détermine les angles de visée, les cônes de champ de vision, les alertes de passage de la liste de surveillance et tous les autres menus liés aux capteurs.",
+        "overview": "Le menu Capteurs est l'endroit où vous choisissez la station au sol à partir de laquelle le reste de l'application effectue ses calculs. Les capteurs sont regroupés par le réseau qu'ils soutiennent principalement, chaque entrée affichant le nom du capteur à gauche et le pays ou l'organisation propriétaire à droite. Le capteur sélectionné détermine les angles de visée, les cônes de champ de vision, les alertes de passage de la liste de suivi et tous les autres menus liés aux capteurs.",
         "imgAlt": "Le menu Capteurs affichant des réseaux de capteurs regroupés",
         "imgCaption": "Les capteurs sont regroupés par réseau. Cliquez sur l'en-tête d'un groupe pour sélectionner tout le réseau d'un coup.",
         "sensorTypesHeading": "Types de Capteurs",
@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Utiliser ce capteur"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Impossible de déplacer la caméra vers le capteur : {error}",
+        "sensorNotInCatalog": "Le capteur {sensor} listé dans les groupes de capteurs est introuvable dans le catalogue des capteurs !",
+        "groupRenderFailed": "Impossible d'afficher le groupe de capteurs."
       }
     }
   }

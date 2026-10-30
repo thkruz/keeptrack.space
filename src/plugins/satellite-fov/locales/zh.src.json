@@ -18,7 +18,8 @@
         "activeS2sCones": "活动星间锥体",
         "fovDegrees": "视场（度）",
         "opacity": "不透明度",
-        "targetCatalogNumber": "目标编目号"
+        "targetCatalogNumber": "目标编目号",
+        "targetCatalogPlaceholder": "例如 25544"
       },
       "tooltips": {
         "fovOfSensor": "传感器的视场",

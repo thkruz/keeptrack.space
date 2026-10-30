@@ -34,7 +34,7 @@ function listSubmodules(): { name: string; path: string }[] {
       // eslint-disable-next-line max-statements-per-line
       current = h[1]; continue;
     }
-    const p = line.match(/^\s*path\s*=\s*(.+)\s*$/u);
+    const p = line.match(/^\s*path\s*=(.+)$/u);
 
     if (p && current) {
       out.push({ name: current, path: p[1].trim() });

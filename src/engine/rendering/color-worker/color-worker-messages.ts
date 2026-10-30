@@ -77,6 +77,11 @@ export interface SettingsFlags {
   sensorType: number; // SpaceObjectType of current sensor (0 if none)
   maxZoomDistance: number;
   isMissileSimulatorEnabled: boolean;
+  /**
+   * RGBA for objects outside the selected group (`settingsManager.colors.transparent`): Hide Others
+   * switches it between a dim white (off) and alpha 0 (on); Time Machine forces alpha 0 while it runs.
+   */
+  transparent: [number, number, number, number];
 }
 
 /** Incoming message from main thread → worker */

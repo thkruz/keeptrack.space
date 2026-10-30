@@ -2,7 +2,8 @@
   "plugins": {
     "GamepadPlugin": {
       "connected": "Gamepad připojen",
-      "disconnected": "Gamepad odpojen"
+      "disconnected": "Gamepad odpojen",
+      "notSupported": "Tento gamepad není podporován. Otevřete prosím na GitHubu issue s modelem gamepadu, aby mohl být přidán."
     }
   }
 }

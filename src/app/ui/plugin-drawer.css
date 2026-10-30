@@ -547,6 +547,34 @@ body.drawer-mode {
     color: rgba(255, 255, 255, 0.35);
   }
 
+  /* About / Data / Terms / Privacy. Muted like the version line. The colours need !important to beat the
+     global `a { color: ... !important }` in style.common.css, which would paint them in the accent colour. */
+  .drawer-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 6px;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .drawer-footer-link,
+  .drawer-footer-link:visited {
+    color: rgba(255, 255, 255, 0.45) !important;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .drawer-footer-link:hover,
+  .drawer-footer-link:focus-visible {
+    color: rgba(255, 255, 255, 0.85) !important;
+    text-decoration: underline;
+  }
+
+  .drawer-footer-links__sep {
+    color: rgba(255, 255, 255, 0.25);
+  }
+
   .drawer-phone-link {
     display: flex;
     align-items: center;
@@ -745,8 +773,19 @@ body.drawer-mode {
     opacity: 1;
   }
 
+  /*
+   * Stay clickable when disabled: the click shows why the icon is unavailable
+   * ("Select a satellite first!") without running the action. No hover lift, so
+   * it does not read as a normal action.
+   */
   .drawer-utility-icon.bmenu-item-disabled {
-    pointer-events: none;
+    /* !important: the Tooltips plugin sets an inline `cursor: pointer` on every kt-tooltip element. */
+    cursor: not-allowed !important;
+  }
+
+  .drawer-utility-icon.bmenu-item-disabled:hover {
+    background: transparent;
+    transform: none;
   }
 
   .drawer-utility-icon.bmenu-item-disabled img {
@@ -799,10 +838,28 @@ body.drawer-mode:not(.is-mobile-mode) {
     display: none !important;
   }
 
-  /* Always-open search bar on desktop */
+  /*
+   * Always-open search bar on desktop. 420px is the preferred width, not a
+   * floor: under ~1024 CSS px (125-150% browser zoom on a 1366 screen) the
+   * header cannot fit it, and a fixed 420px pushed the box past the viewport
+   * edge so focusing it scrolled #keeptrack-root sideways. The center group
+   * keeps its content width (flex-basis 0 + min-width max-content, so it still
+   * absorbs spare space and stays centered on wide screens) and the right
+   * group plus the search box are allowed to shrink to whatever is left.
+   */
+  #nav-top-center {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+
+  #nav-top-right {
+    min-width: 0;
+  }
+
   #search-holder {
     display: flex !important;
     width: 420px !important;
+    min-width: 0;
     transition: none !important;
   }
 
@@ -1128,7 +1185,8 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.rail-mode.rail-hover .drawer-status-footer-container {
     opacity: 1;
-    max-height: 80px;
+    /* Connectivity row + version + the links row (two lines when a long translation wraps). */
+    max-height: 140px;
     padding: 12px 16px;
     border-top: 1px solid var(--color-dark-border);
   }

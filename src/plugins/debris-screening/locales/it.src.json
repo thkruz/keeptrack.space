@@ -5,6 +5,7 @@
       "title": "Screening detriti",
       "resultsTitle": "Risultati dello screening",
       "resultsCount": "{count} congiunzioni trovate",
+      "notScreened": "Non ancora analizzato",
       "exportCsv": "Esporta CSV",
       "riskLevels": {
         "critical": "Critico",
@@ -71,6 +72,7 @@
       "ricConvention": "Convenzione dei segni RIC: secondario meno primario, nel sistema RIC del primario (+R radiale verso l'esterno, +I lungo la velocità del primario, +C = R x I, la normale all'orbita).",
       "pcInputs": "Input del Pc: raggio del corpo rigido {hbr} m ({primary} m primario + {secondary} m secondario) per ogni coppia. Covarianza: stimata dal TLE di ciascun oggetto (il modello delle sigma del riquadro informazioni, a {sigma} sigma), non da un CDM.",
       "parentTag": "genitore di questo satellite dell'analista",
+      "uncertaintyAssumedFromParent": "Incertezza presa dal genitore {name} ({norad})",
       "showParentRows": "Mostra riga genitore ({count})",
       "notInCatalog": "(non nel catalogo caricato)",
       "resultsCapped": "Mostrate le prime {limit} di {total} congiunzioni (Pc più alta prima)"

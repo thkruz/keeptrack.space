@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "Odkaz zkopírován do schránky!",
         "copyFailed": "Odkaz se nepodařilo zkopírovat do schránky."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Nativní sdílení selhalo: {error}"
       }
     }
   }

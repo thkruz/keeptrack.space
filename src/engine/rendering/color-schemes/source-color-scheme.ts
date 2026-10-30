@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
@@ -7,6 +8,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite, Star } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -197,7 +199,8 @@ export class SourceColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-dataSource">
     <li>
       <div class="Square-Box layers-sourceCelestrak-box"></div>
@@ -205,11 +208,11 @@ export class SourceColorScheme extends ColorScheme {
     </li>
     <li>
       <div class="Square-Box layers-sourceCelestrakSup-box"></div>
-      Celestrak Sup
+      ${legendLabel('sourceCelestrakSup')}
     </li>
     <li>
       <div class="Square-Box layers-sourceUssf-box"></div>
-      18 SDS
+      ${legendLabel('source18Sds')}
     </li>
     <li>
       <div class="Square-Box layers-sourceVimpel-box"></div>
@@ -221,12 +224,13 @@ export class SourceColorScheme extends ColorScheme {
     </li>
     <li>
       <div class="Square-Box layers-sourceOemImport-box"></div>
-      OEM Import
+      ${legendLabel('sourceOemImport')}
     </li>
     <li>
       <div class="Square-Box layers-countryOther-box"></div>
-      Other
+      ${legendLabel('other')}
     </li>
   </ul>
   `.trim();
+  }
 }

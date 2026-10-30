@@ -11,8 +11,10 @@
       "errorMsgs": {
         "launchSiteNotFound": "Sito di lancio non trovato!",
         "noRelatedSats": "Nessun satellite correlato trovato!",
-        "sensorNotFound": "Sensore non trovato! Seleziona prima un sensore."
-      }
+        "sensorNotFound": "Sensore non trovato! Seleziona prima un sensore.",
+        "latLonUndefined": "latLon non definito!"
+      },
+      "latLonToast": "Lat: {lat} | Lon: {lon}"
     }
   }
 }

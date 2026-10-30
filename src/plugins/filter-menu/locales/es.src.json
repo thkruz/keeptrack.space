@@ -15,6 +15,7 @@
       "resetToDefaults": "Restablecer valores predeterminados",
       "defaultTooltip": "Desactivar para ocultar {name}",
       "searchPlaceholder": "Buscar filtros...",
+      "noResults": "Ningún filtro coincide con la búsqueda.",
       "commands": {
         "category": "Filtros",
         "open": "Abrir menú de filtros",

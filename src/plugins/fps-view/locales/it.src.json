@@ -1,7 +1,11 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "Vista FPS"
+      "bottomIconLabel": "Vista FPS",
+      "commandPalette": {
+        "switch": "Attiva/disattiva vista FPS"
+      },
+      "firstUseHint": "Vista FPS: W A S D per volare, Q ed E per salire e scendere, tastierino numerico 4 6 8 2 per girare e guardare, tieni premuto Shift per andare piano o Shift destro per andare veloce. Premi di nuovo 8 per uscire."
     }
   }
 }

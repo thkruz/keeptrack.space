@@ -8,9 +8,9 @@
         "satellite": "Satelit",
         "tvchannel": "TV kanál",
         "beam": "Paprsek",
-        "freq": "Frekvence",
+        "freq": "Frekvence (MHz)",
         "system": "Systém",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Video",
         "lang": "Jazyk",
         "encryption": "Šifrování"
@@ -19,7 +19,8 @@
         "NoChannelInfo": "Satelit nemá informace o kanálech",
         "NotSatellite": "Vybraný objekt není satelit",
         "FetchFailed": "Nepodařilo se načíst info o kanálech pro {name} a {altName}",
-        "NoData": "Data o kanálech nejsou k dispozici"
+        "NoData": "Data o kanálech nejsou k dispozici",
+        "SaveXlsxFailed": "Chyba při ukládání souboru xlsx!"
       },
       "help": {
         "overview": "Info o transpondéru a kanálech ukazuje, co geostacionární televizní nebo komunikační satelit skutečně vysílá: každý známý kanál s jeho frekvencí, paprskem, přenosovým systémem a šifrováním. Data pokrývají několik stovek známých vysílacích satelitů a načítají se živě při otevření nabídky.",
@@ -41,9 +42,11 @@
         "statusLoading": "Načítání kanálů…",
         "statusEmpty": "Nejsou k dispozici žádná data o kanálech",
         "statusNoMatch": "Žádný kanál neodpovídá filtru",
-        "statusError": "Nelze načíst data o kanálech"
+        "statusError": "Nelze načíst data o kanálech",
+        "retry": "Zkusit znovu"
       },
-      "attribution": "Data kanálů z rozhraní KeepTrack API (veřejné seznamy)."
+      "attribution": "Data kanálů z rozhraní KeepTrack API (veřejné seznamy).",
+      "searchAliases": "Frekvence satelitů,Transpondér,Údaje o kanálech"
     }
   }
 }

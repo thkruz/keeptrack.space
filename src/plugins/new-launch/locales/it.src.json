@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Crea lancio nella finestra"
       },
       "msgs": {
-        "windowFound": "Lancio alle {time} per allinearsi al piano bersaglio (ΔRAAN {delta}°)",
+        "windowFound": "Lancio alle {time} da {site} per allinearsi al piano di {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Lancio nominale creato!",
         "timeRelativeToLaunch": "Il tempo è ora relativo all'orario di lancio."
       },

@@ -178,7 +178,7 @@ export const widenFiltersForSelection = (filters: Time2LonFilters, sat: Satellit
  * 'Other'. The country map is injected so this stays free of the DOM/CSS-coupled
  * country-data module and remains worker-safe.
  */
-export const buildTopCountries = (countryCounts: Record<string, number>, countryMap: Record<string, string>, topCount: number): Map<string, string> => {
+export const buildTopCountries = (countryCounts: Record<string, number>, countryMap: Record<string, string>, topCount: number, otherLabel = 'Other'): Map<string, string> => {
   const sorted = Object.entries(countryCounts).sort(([, a], [, b]) => b - a);
 
   const topCodes = sorted.slice(0, topCount).map(([code]) => code);
@@ -191,7 +191,7 @@ export const buildTopCountries = (countryCounts: Record<string, number>, country
   // Everything else maps to 'Other'.
   for (const [code] of sorted) {
     if (!lookup.has(code)) {
-      lookup.set(code, 'Other');
+      lookup.set(code, otherLabel);
     }
   }
 

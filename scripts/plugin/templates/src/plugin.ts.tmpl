@@ -6,28 +6,33 @@
  * both are declared in keeptrack-plugin.json and the host wires the plugin in by
  * those names.
  *
- * See the KeepTrack plugin development guide for the full capability API. The
- * "stable subset" you can rely on across a major version: the KeepTrackPlugin
- * base class + capability getters, keepTrackApi, EventBus, and ServiceLocator.
+ * Import ONLY from '@keeptrack/plugin-api' (plus 'ootk' and your own files).
+ * That facade is the versioned plugin contract (keeptrack-plugin.json
+ * "pluginApi"); deep imports like '@app/...' are rejected by
+ * `npm run plugin -- doctor` and `add`. Reference: docs/plugin-api.md.
  */
-import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
-import { ServiceLocator } from '@app/engine/core/service-locator';
-import { EventBus } from '@app/engine/events/event-bus';
-import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import {
-  IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISideMenuConfig,
-} from '@app/engine/plugins/core/plugin-capabilities';
-import { html } from '@app/engine/utils/development/formatter';
-import { getEl } from '@app/engine/utils/get-el';
-import { t7e } from '@app/locales/keys';
+  EventBus,
+  EventBusEvent,
+  getEl,
+  html,
+  type IBottomIconConfig,
+  type ICommandPaletteCommand,
+  type IHelpConfig,
+  type IKeyboardShortcut,
+  type ISideMenuConfig,
+  KeepTrackPlugin,
+  MenuMode,
+  pluginT7e,
+  t7e,
+  ToastMsgType,
+  toast,
+} from '@keeptrack/plugin-api';
 import pluginIcon from './__ELEMENT_BASE__-icon.png';
 import './plugin.css';
 
-type T7eKey = Parameters<typeof t7e>[0];
-
 /** Shorthand for this plugin's locale keys (plugins.__CONFIG_KEY__.*). */
-const l = (key: string): string => t7e(`plugins.__CONFIG_KEY__.${key}` as T7eKey);
+const l = pluginT7e('__CONFIG_KEY__');
 
 export class __CLASS_NAME__ extends KeepTrackPlugin {
   readonly id = '__CONFIG_KEY__';
@@ -113,6 +118,6 @@ export class __CLASS_NAME__ extends KeepTrackPlugin {
   }
 
   private onAction_(): void {
-    ServiceLocator.getUiManager().toast(l('toasts.done'), ToastMsgType.normal);
+    toast(l('toasts.done'), ToastMsgType.normal);
   }
 }

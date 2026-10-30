@@ -66,7 +66,25 @@ export interface ProximityOpsEvent {
    * null when it could not be computed. Filled for reported events only.
    */
   pc: number | null;
+  /**
+   * Largest separation (km) sampled over the whole search window. A pair that never gets more than
+   * {@link CO_LOCATED_MAX_KM} apart (a docked module, two objects sharing one TLE) is co-located, not a
+   * rendezvous. Optional so hand-built events (tests, older callers) stay valid.
+   */
+  maxDist?: number;
+  /**
+   * 'start' / 'end' when the minimum sits on the edge of the search window: the pair is only separating
+   * (start) or still closing (end), so the row is the closest point inside the window, not a true closest
+   * approach. null for an interior minimum.
+   */
+  windowEdge?: RpoWindowEdge;
 }
+
+/** Which edge of the search window a minimum sits on, or null for an interior minimum. */
+export type RpoWindowEdge = 'start' | 'end' | null;
+
+/** Pairs whose separation never exceeds this (km) over the window are co-located and hidden from the results. */
+export const CO_LOCATED_MAX_KM = 1;
 
 /**
  * Serializable satellite input for the worker boundary: the catalog id (so the
@@ -103,6 +121,18 @@ export interface RpoSearchParams {
    * is not computed (the column shows "-"); the unit tests omit it.
    */
   confidenceLevel?: CovarianceConfidence;
+  /**
+   * TLE lines the Pc covariance is built from instead of an object's own, keyed by catalog id
+   * (`String(sat.id)`). An analyst clone maps to its root parent's TLE: it knows no more than
+   * the object it came from. Objects without an entry use their own TLE.
+   */
+  covarianceTles?: Record<string, CovarianceTleLines>;
+}
+
+/** A pair of TLE lines a covariance is built from. */
+export interface CovarianceTleLines {
+  tle1: string;
+  tle2: string;
 }
 
 /** Default coarse scan step for the per-pair TCA search. */
@@ -147,7 +177,19 @@ export function findClosestApproach(
   tolMs: number = DEFAULT_REFINE_TOLERANCE_MS
 ): ProximityOpsEvent {
   const baseMs = start.getTime();
-  const tca = findTca((tMs) => separationRange_(sat1, sat2, new Date(baseMs + tMs)), 0, durationSec * 1000, stepSeconds * 1000, tolMs);
+  const windowMs = durationSec * 1000;
+  // The coarse scan samples the whole window, so the largest sampled separation comes for free.
+  let maxDist = 0;
+  const separation = (tMs: number): number => {
+    const range = separationRange_(sat1, sat2, new Date(baseMs + tMs));
+
+    if (Number.isFinite(range) && range > maxDist) {
+      maxDist = range;
+    }
+
+    return range;
+  };
+  const tca = findTca(separation, 0, windowMs, stepSeconds * 1000, tolMs);
   const tocaMs = tca ? tca.tcaMs : 0;
   const date = new Date(baseMs + tocaMs);
 
@@ -181,7 +223,38 @@ export function findClosestApproach(
     date,
     // Filled by findRpoPairs for events that pass the distance/velocity gate.
     pc: null,
+    maxDist: Math.max(maxDist, Number.isFinite(dist) ? dist : 0),
+    windowEdge: windowEdgeOf(tocaMs, windowMs, tolMs),
   };
+}
+
+/**
+ * Classify a minimum time against the search window. The golden-section refinement stops within `tolMs` of a
+ * boundary minimum, so anything within twice that (and at least 1 s) of an edge counts as that edge.
+ */
+export function windowEdgeOf(tcaMs: number, windowMs: number, tolMs: number = DEFAULT_REFINE_TOLERANCE_MS): RpoWindowEdge {
+  const edgeTolMs = Math.max(2 * tolMs, 1000);
+
+  if (tcaMs <= edgeTolMs) {
+    return 'start';
+  }
+  if (tcaMs >= windowMs - edgeTolMs) {
+    return 'end';
+  }
+
+  return null;
+}
+
+/** True when the pair never separated by more than {@link CO_LOCATED_MAX_KM} over the window. */
+export function isCoLocated(event: ProximityOpsEvent): boolean {
+  return typeof event.maxDist === 'number' && event.maxDist <= CO_LOCATED_MAX_KM;
+}
+
+/** Split events into the rows to show and the number of co-located pairs hidden from them. */
+export function partitionCoLocated(events: ProximityOpsEvent[]): { visible: ProximityOpsEvent[]; hiddenCount: number } {
+  const visible = events.filter((event) => !isCoLocated(event));
+
+  return { visible, hiddenCount: events.length - visible.length };
 }
 
 /** Half-width (ms) of the assessment window bracketing the approach for the Pc estimate. */
@@ -192,11 +265,21 @@ const PC_WINDOW_MS = 5 * 60 * 1000;
  * Covariance is derived from each TLE (the same capped model the debris-screening
  * worker uses), assessed over a tight window bracketing the encounter. Pure ootk
  * math, so it runs in the worker; returns null on any failure or missing TLE.
+ * `covarianceTles` swaps in another TLE for an object's covariance (an analyst
+ * clone uses its root parent's); its own TLE still drives the geometry.
  */
-export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date, confidenceLevel?: CovarianceConfidence): number | null {
+export function computeEventPc(
+  sat1: Satellite,
+  sat2: Satellite,
+  eventDate: Date,
+  confidenceLevel?: CovarianceConfidence,
+  covarianceTles?: Record<string, CovarianceTleLines>
+): number | null {
   if (!confidenceLevel || !sat1.tle1 || !sat1.tle2 || !sat2.tle1 || !sat2.tle2) {
     return null;
   }
+  const cov1 = covarianceTles?.[String(sat1.id)] ?? sat1;
+  const cov2 = covarianceTles?.[String(sat2.id)] ?? sat2;
 
   try {
     const assessment = new ConjunctionAssessment(
@@ -204,13 +287,13 @@ export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date
         tle: new Tle(sat1.tle1, sat1.tle2),
         name: sat1.sccNum,
         radius: 0.01 as Kilometers,
-        covariance: cappedScreeningCovarianceFromTle(sat1.tle1, sat1.tle2, confidenceLevel),
+        covariance: cappedScreeningCovarianceFromTle(cov1.tle1, cov1.tle2, confidenceLevel),
       },
       {
         tle: new Tle(sat2.tle1, sat2.tle2),
         name: sat2.sccNum,
         radius: 0.01 as Kilometers,
-        covariance: cappedScreeningCovarianceFromTle(sat2.tle1, sat2.tle2, confidenceLevel),
+        covariance: cappedScreeningCovarianceFromTle(cov2.tle1, cov2.tle2, confidenceLevel),
       }
     );
 
@@ -236,14 +319,14 @@ export function computeEventPc(sat1: Satellite, sat2: Satellite, eventDate: Date
  * Otherwise the first satellite is the primary and is screened against the rest.
  */
 export function findRpoPairs(sats: Satellite[], params: RpoSearchParams, baseDate: Date, isAva: boolean, satPairs?: number[][], onProgress?: RpoProgressFn): ProximityOpsEvent[] {
-  const { maxDis, maxVel, durationSec, stepSeconds, refineToleranceMs, confidenceLevel } = params;
+  const { maxDis, maxVel, durationSec, stepSeconds, refineToleranceMs, confidenceLevel, covarianceTles } = params;
   const RPOs: ProximityOpsEvent[] = [];
   const search = (a: Satellite, b: Satellite) => findClosestApproach(a, b, baseDate, durationSec, stepSeconds, refineToleranceMs);
   // Pc is filled only for events that pass the gate (a bounded set), and only
   // when a confidence level is supplied - so it is off the per-pair hot path.
   const keep = (res: ProximityOpsEvent, primarySat: Satellite, secondarySat: Satellite) => {
     if (res.dist <= maxDis && res.vel <= maxVel) {
-      res.pc = computeEventPc(primarySat, secondarySat, res.date, confidenceLevel);
+      res.pc = computeEventPc(primarySat, secondarySat, res.date, confidenceLevel, covarianceTles);
       RPOs.push(res);
     }
   };
@@ -418,6 +501,7 @@ export const RPO_CSV_HEADERS = [
   'dvn(km/s)',
   'rel_dist(km)',
   'rel_vel(km/s)',
+  'pc',
 ] as const;
 
 /** One ordered CSV value row for an event (aligns with {@link RPO_CSV_HEADERS}). */
@@ -438,5 +522,6 @@ export function buildRpoCsvRow(rpo: ProximityOpsEvent): (string | number)[] {
     rpo.ric.velocity.z,
     rpo.dist,
     rpo.vel,
+    typeof rpo.pc === 'number' ? rpo.pc : '',
   ];
 }

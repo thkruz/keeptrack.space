@@ -68,7 +68,17 @@
       }
     },
     "Secondary": {
-      "ricConvention": "RIC = 副対象 − 主対象（主対象のRIC座標系）。"
-    }
+      "ricConvention": "RIC = 副対象 − 主対象（主対象のRIC座標系）。",
+      "title": "副衛星",
+      "linear": "直線",
+      "linearTooltip": "副衛星からの直線距離",
+      "radial": "径方向",
+      "radialTooltip": "径方向距離",
+      "inTrack": "軌道方向",
+      "inTrackTooltip": "副衛星からの軌道方向距離",
+      "crossTrack": "軌道直交方向",
+      "crossTrackTooltip": "副衛星からの軌道直交方向距離"
+    },
+    "noData": "データなし"
   }
 }

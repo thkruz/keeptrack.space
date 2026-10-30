@@ -39,6 +39,8 @@
 /* Search field: give the floating label room above the input (dense-form rule). */
 #plugin-manager-menu .pm-search-field {
   margin-top: 12px;
+  /* No helper text under the search box, so drop the default input-field bottom gap. */
+  margin-bottom: 0;
 }
 
 /* Plugin rows */

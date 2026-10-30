@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Use This Sensor"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Could not move the camera to the sensor: {error}",
+        "sensorNotInCatalog": "Sensor {sensor} listed in sensorGroups was not found in sensors catalog!",
+        "groupRenderFailed": "Could not display the sensor group."
       }
     }
   }

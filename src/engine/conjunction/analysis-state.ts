@@ -127,6 +127,11 @@ export interface AnalysisObjectSummary {
   dataSource?: string | null;
   /** v2: KeepTrack confidence score 0 to 9 (TLE line 1 column 65), null when unknown. */
   confidenceScore?: number | null;
+  /**
+   * v2: set on an analyst clone whose `ricSigmasKm` and `gpAgeHours` were taken from the object it
+   * was derived from (this NORAD number) instead of its own fitted TLE: assumed from parent.
+   */
+  uncertaintyAssumedFromNoradId?: string | null;
 }
 
 /** Everything the probability of collision was computed from. */
@@ -210,10 +215,12 @@ export interface ScreeningEventSummary {
  * - `introduced`: of concern after, not of concern (or absent) before
  * - `removed`: of concern before, not of concern (or absent) after
  * - `unchanged`: present in both screens, concern status unchanged
+ * - `moved`: the same secondary in both screens, but the TCA shifted by more than the match
+ *   tolerance (up to `movedToleranceMs`); one row with the old and new TCA and miss
  * - `appeared`: only in the post screen, below the concern threshold
  * - `dropped`: only in the pre screen, below the concern threshold
  */
-export type ScreeningDiffStatus = 'introduced' | 'removed' | 'unchanged' | 'appeared' | 'dropped';
+export type ScreeningDiffStatus = 'introduced' | 'removed' | 'unchanged' | 'moved' | 'appeared' | 'dropped';
 
 export interface ScreeningDiffEntry {
   status: ScreeningDiffStatus;
@@ -236,11 +243,14 @@ export interface ScreeningDiff {
   concernThreshold: ScreeningRiskLevel;
   /** Max TCA difference (ms) for two rows with the same secondary to count as the same event. */
   tcaMatchToleranceMs: number;
+  /** v2: max TCA difference (ms) for leftover rows of one secondary to pair as a `moved` encounter. */
+  movedToleranceMs?: number;
   /** Secondaries left out of the diff (the parent, the analyst objects themselves). */
   excludedSecondaryIds: string[];
   /** True when the two runs did not cover the same window. */
   isWindowMismatch: boolean;
-  counts: Record<ScreeningDiffStatus, number>;
+  /** `moved` is absent in states saved before it existed. */
+  counts: Omit<Record<ScreeningDiffStatus, number>, 'moved'> & { moved?: number };
   entries: ScreeningDiffEntry[];
 }
 
@@ -429,7 +439,7 @@ export interface ConjunctionAnalysisState {
 // =============================================================================
 
 const RISK_LEVELS: readonly ScreeningRiskLevel[] = ['critical', 'high', 'medium', 'low', 'unknown'];
-const DIFF_STATUSES: readonly ScreeningDiffStatus[] = ['introduced', 'removed', 'unchanged', 'appeared', 'dropped'];
+const DIFF_STATUSES: readonly ScreeningDiffStatus[] = ['introduced', 'removed', 'unchanged', 'moved', 'appeared', 'dropped'];
 const KINDS: readonly AnalysisKind[] = ['conjunction', 'maneuver', 'screening-compare'];
 const ROLES: readonly AnalysisObjectRole[] = ['primary', 'secondary', 'parent', 'analyst'];
 const VERDICTS: readonly MissionEventVerdict[] = ['unchanged', 'shifted', 'lost', 'gained'];
@@ -548,6 +558,7 @@ class Checker {
     if (v.confidenceScore !== undefined) {
       this.num(v, 'confidenceScore', path, true);
     }
+    this.optStr(v, 'uncertaintyAssumedFromNoradId', path);
   }
 
   /** An optional (v2) string field: absent, null or a string. */
@@ -776,6 +787,9 @@ class Checker {
     }
     this.oneOf(v, 'concernThreshold', path, RISK_LEVELS);
     this.num(v, 'tcaMatchToleranceMs', path);
+    if (v.movedToleranceMs !== undefined) {
+      this.num(v, 'movedToleranceMs', path);
+    }
     if (!Array.isArray(v.excludedSecondaryIds)) {
       this.fail(`${path}.excludedSecondaryIds`, 'expected array');
     }

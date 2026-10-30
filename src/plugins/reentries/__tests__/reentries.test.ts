@@ -6,9 +6,9 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { Reentries, TipMsg } from '@app/plugins/reentries/reentries';
+import { isRealNorad, normalizeTipLon, parseTipUtc, Reentries, TipMsg } from '@app/plugins/reentries/reentries';
 import { settingsManager } from '@app/settings/settings';
-import { SpaceObjectType } from '@ootk/src/main';
+import { CatalogSource, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -86,7 +86,7 @@ describe('Reentries_class', () => {
 
       expect(config.elementName).toBe('reentries-menu');
       expect(config.dragOptions?.isDraggable).toBe(true);
-      expect(config.dragOptions?.minWidth).toBe(1200);
+      expect(config.dragOptions?.minWidth).toBe(480);
       expect(config.dragOptions?.maxWidth).toBe(1500);
     });
 
@@ -104,7 +104,7 @@ describe('Reentries_class', () => {
       const dragOptions = plugin['getDragOptions_']();
 
       expect(dragOptions.isDraggable).toBe(true);
-      expect(dragOptions.minWidth).toBe(1200);
+      expect(dragOptions.minWidth).toBe(480);
       expect(dragOptions.maxWidth).toBe(1500);
     });
 
@@ -547,6 +547,42 @@ describe('Reentries_class', () => {
       expect(tabs).not.toContain('red means perigee below 120 km');
     });
 
+    it('names the Fetch Data control in How to use, not a download icon', () => {
+      const plugin = new Reentries();
+      const howTo = plugin.getHelpConfig().sections!.find((s) => s.content.includes('Shift+R'))!.content;
+
+      expect(howTo).toContain('<strong>Fetch Data</strong>');
+      expect(howTo).toContain('<strong>Refresh</strong>');
+      expect(howTo).not.toContain('download icon');
+    });
+
+    it('says Fly to corridor still selects the object, matching flyToCorridor_', () => {
+      const tabs = new Reentries().getHelpConfig().sections![1].content;
+
+      expect(tabs).toContain('the object is still selected');
+      expect(tabs).not.toContain('the object is not selected');
+    });
+
+    it('explains why the corridor matters when it is not an impact point', () => {
+      const section = new Reentries().getHelpConfig().sections!.find((s) => s.heading === 'Reading a Reentry Corridor');
+
+      expect(section).toBeDefined();
+      expect(section!.content).toContain('not an impact point');
+      expect(section!.content).toContain('only ground the object can overfly during the window');
+    });
+
+    it('shows the not-an-impact-point line beside the corridor controls', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+
+      const note = document.getElementById('reentries-corridor-note');
+
+      expect(note?.textContent).toContain('not an impact point');
+      // Same Data Actions card as the Fly to corridor switch (and the Pro layer toggle).
+      expect(note?.closest('.kt-section')?.querySelector('#reentries-flyto-corridor')).not.toBeNull();
+    });
+
     it('the shortcut callback toggles the menu', () => {
       const plugin = new Reentries();
 
@@ -620,5 +656,128 @@ describe('Reentries_class', () => {
       expect(plugin['lon2degrees_']('200.5')).toBe('159.50° W');
       expect(plugin['lon2degrees_']('350.0')).toBe('10.00° W');
     });
+  });
+});
+
+describe('Reentry Analysis source identity', () => {
+  beforeEach(() => setupStandardEnvironment());
+
+  it('labels a catalog-less JSC Vimpel row the same way the sat info box does', () => {
+    const table = document.createElement('table');
+    const vimpelObj = {
+      id: 80,
+      sccNum: '',
+      source: CatalogSource.VIMPEL,
+      name: 'JSC Vimpel 9600',
+      type: SpaceObjectType.DEBRIS,
+      perigee: 150,
+      apogee: 300,
+      inclination: 51,
+      rcs: 1,
+    };
+
+    Reentries['createReentryRow_'](table, vimpelObj as unknown as Satellite);
+
+    expect(table.rows[0].cells[0].textContent).toBe('N/A (JSC Vimpel)');
+  });
+
+  it('routes blank-NORAD rows to their original internal object without blank search', () => {
+    const plugin = new Reentries();
+    const table = document.createElement('table');
+    const sourceObjects = [71, 72].map((id) => ({
+      id,
+      sccNum: '',
+      name: `Source ${id}`,
+      type: SpaceObjectType.DEBRIS,
+      perigee: 90,
+      apogee: 200,
+      inclination: 45,
+      rcs: 1,
+    }));
+    const catalog = ServiceLocator.getCatalogManager();
+    const getSat = vi.spyOn(catalog, 'getSat').mockImplementation((id) => sourceObjects.find((sat) => sat.id === id) as any);
+    const reverseLookup = vi.spyOn(catalog, 'sccNum2Sat');
+    const search = vi.spyOn(ServiceLocator.getUiManager(), 'doSearch').mockClear();
+
+    for (const source of sourceObjects) {
+      Reentries['createReentryRow_'](table, source as any);
+    }
+    expect([...table.rows].map((row) => row.dataset.objectId)).toEqual(['71', '72']);
+    expect(table.rows[0].cells[0].textContent).toBe('Unknown');
+    for (const row of table.rows) {
+      plugin['reentryEventClicked_'](Number(row.dataset.objectId));
+      expect(plugin['selectSatIdOnCruncher_']).toBe(Number(row.dataset.objectId));
+    }
+    expect(getSat).toHaveBeenLastCalledWith(72);
+    expect(reverseLookup).not.toHaveBeenCalled();
+    expect(search).not.toHaveBeenCalled();
+  });
+});
+
+describe('Reentries TIP identity helpers', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+  });
+
+  it('parseTipUtc reads Space-Track timestamps as UTC, not local time', () => {
+    expect(parseTipUtc('2026-10-26 21:25:00')?.toISOString()).toBe('2026-10-26T21:25:00.000Z');
+    expect(parseTipUtc('2024-12-15T12:00:00Z')?.toISOString()).toBe('2024-12-15T12:00:00.000Z');
+    expect(parseTipUtc('')).toBeNull();
+    expect(parseTipUtc('not a date')).toBeNull();
+  });
+
+  it('isRealNorad rejects the blank and zero placeholders synthetic objects carry', () => {
+    expect(isRealNorad('25544')).toBe(true);
+    expect(isRealNorad('A0001')).toBe(true);
+    expect(isRealNorad('')).toBe(false);
+    expect(isRealNorad('00000')).toBe(false);
+    expect(isRealNorad(null)).toBe(false);
+  });
+
+  it('normalizeTipLon maps 0-360 east to signed degrees', () => {
+    expect(normalizeTipLon('193.5')).toBeCloseTo(-166.5, 6);
+    expect(normalizeTipLon('45')).toBe(45);
+  });
+
+  it('setTipList_ keeps blank-NORAD rows apart instead of merging them into one', () => {
+    const plugin = new Reentries();
+    const blankA = { ...mockTipData[0], NORAD_CAT_ID: '', OBJECT_NUMBER: '', ID: '901' };
+    const blankB = { ...mockTipData[1], NORAD_CAT_ID: '', OBJECT_NUMBER: '', ID: '902' };
+
+    plugin['setTipList_']([blankA, blankB, ...mockTipData]);
+
+    expect(plugin['tipList_']).toHaveLength(4);
+    expect(plugin['tipList_'].map((tip: TipMsg) => tip.ID).sort()).toEqual(['1', '2', '901', '902']);
+  });
+
+  it('the TIP table GP Age column is measured at the simulation time', () => {
+    const plugin = new Reentries();
+    const sat = new Satellite({
+      id: 12,
+      active: true,
+      sccNum: '25544',
+      intlDes: '1998-067A',
+      name: 'ISS (ZARYA)',
+      type: SpaceObjectType.PAYLOAD,
+      tle1: '1 25544U 98067A   21203.40407588  .00003453  00000-0  71172-4 0  9991' as TleLine1,
+      tle2: '2 25544  51.6423 168.5744 0001475 184.3976 313.3642 15.48839820294053' as TleLine2,
+      rcs: 99.0524,
+      source: CatalogSource.CELESTRAK,
+    });
+    const simTime = new Date('2026-10-26T21:25:00.000Z');
+
+    ServiceLocator.getTimeManager().simulationTimeObj = simTime;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'sccNum2Sat').mockReturnValue(sat);
+    document.body.insertAdjacentHTML('beforeend', '<table id="reentries-tip-table"></table>');
+    plugin['tipList_'] = [{ ...mockTipData[0], DECAY_EPOCH: '2026-10-26 21:25:00' }];
+
+    plugin['createTipTable_']();
+
+    const row = (document.getElementById('reentries-tip-table') as HTMLTableElement).rows[1];
+
+    // Columns: NORAD, Decay Date, Lat, Lon, Window, Next Report, Reentry Angle, RCS, GP Age, ...
+    expect(row.cells[8].textContent).toBe(sat.ageOfElset(simTime, 'hours').toFixed(2));
+    document.getElementById('reentries-tip-table')?.remove();
+    vi.restoreAllMocks();
   });
 });

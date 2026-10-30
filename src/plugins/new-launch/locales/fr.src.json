@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Créer le lancement à la fenêtre"
       },
       "msgs": {
-        "windowFound": "Lancement à {time} pour s'aligner sur le plan cible (ΔRAAN {delta}°)",
+        "windowFound": "Lancement à {time} depuis {site} pour s'aligner sur le plan de {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Lancement nominal créé !",
         "timeRelativeToLaunch": "Le temps est désormais relatif à l'heure de lancement."
       },

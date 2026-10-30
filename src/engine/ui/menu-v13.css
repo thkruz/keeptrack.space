@@ -123,6 +123,18 @@
   z-index: 5;
 }
 
+/* That lifts the card over the cards below, but not over rows in the SAME card: a
+   select's `.input-field` with a `data-tooltip` gets the global
+   `[data-tooltip] { position: relative; z-index: 2 }`, which caps the popup at 2,
+   and every later tooltipped row paints over the open list and takes its clicks.
+   material-select.ts marks the open select's own field `.kt-select-open`; lift only
+   that one (lifting every field of the card ties them again). Not v13-scoped:
+   legacy menus with tooltipped rows have the same trap. */
+.input-field.kt-select-open {
+  position: relative;
+  z-index: 3;
+}
+
 /* Full-bleed hairline between sub-groups within a card. */
 .kt-ui-v13 .kt-divider {
   height: 1px;

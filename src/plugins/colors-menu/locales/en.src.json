@@ -5,6 +5,9 @@
       "title": "Color Schemes",
       "rmbLabel": "Color Scheme",
       "sectionLabel": "Schemes",
+      "legend": {
+        "close": "Close legend"
+      },
       "help": {
         "overview": "The Color Schemes menu changes how every object in the scene is colored. Each scheme encodes a different property: country of origin, object type, orbital regime, sunlight status, velocity, and more, so picking the right scheme turns the dot cloud into an answer to a specific question.",
         "imgAlt": "The Color Schemes menu listing the available schemes",
@@ -13,6 +16,13 @@
         "tip1": "The legend updates with the scheme; if you are unsure what a color means, the legend is the authority.",
         "tip2": "Some schemes are data heavy (like spatial density) and take a moment to compute the first time they are selected.",
         "shortcutToggle": "Toggle the Color Schemes menu"
+      },
+      "commandPalette": {
+        "category": "Colors",
+        "setScheme": "Set Color Scheme: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Color scheme not found: {name}"
       }
     }
   }

@@ -587,11 +587,11 @@
 
     document.querySelector('#info .model-name').textContent = model.name;
     table.innerHTML = `
-      <tr><td>file units</td><td>${dims.map((d) => fmt(d)).join(' x ')}</td></tr>
-      <tr><td>real meters</td><td>${dims.map((d) => fmt(d, 1)).join(' x ')}</td></tr>
-      <tr><td>world km</td><td>${dims.map((d) => fmt(d * FILE_UNIT_TO_KM, 3)).join(' x ')}</td></tr>
-      <tr><td>vertices</td><td>${model.vertexCount}</td></tr>
-      <tr><td>triangles</td><td>${model.indexCount / 3}</td></tr>
+      <tr><th scope="row">file units</th><td>${dims.map((d) => fmt(d)).join(' x ')}</td></tr>
+      <tr><th scope="row">real meters</th><td>${dims.map((d) => fmt(d, 1)).join(' x ')}</td></tr>
+      <tr><th scope="row">world km</th><td>${dims.map((d) => fmt(d * FILE_UNIT_TO_KM, 3)).join(' x ')}</td></tr>
+      <tr><th scope="row">vertices</th><td>${model.vertexCount}</td></tr>
+      <tr><th scope="row">triangles</th><td>${model.indexCount / 3}</td></tr>
     `;
   };
 
@@ -719,7 +719,7 @@
         ?? state.meshes.find((m) => m.name === 'rb-cyl-kerolox')
         ?? state.meshes[0];
 
-      loadModel(preferred.name);
+      void loadModel(preferred.name);
     }
   };
 
@@ -728,7 +728,7 @@
     const li = evt.target.closest('li');
 
     if (li) {
-      loadModel(li.dataset.name);
+      void loadModel(li.dataset.name);
     }
   });
 
@@ -750,7 +750,7 @@
       ? (idx + 1) % state.filtered.length
       : (idx - 1 + state.filtered.length) % state.filtered.length;
 
-    loadModel(state.filtered[next].name);
+    void loadModel(state.filtered[next].name);
     document.querySelector(`#mesh-list li[data-name="${state.filtered[next].name}"]`)?.scrollIntoView({ block: 'nearest' });
   });
 
@@ -848,15 +848,15 @@
     const base = file.replace(/\.(?:obj|mtl)$/u, '');
 
     if (base === state.currentName) {
-      loadModel(state.currentName, true);
+      void loadModel(state.currentName, true);
     }
     if (file.endsWith('.obj')) {
-      refreshList();
+      refreshList().catch((err) => showError(`Failed to refresh meshes: ${err.message ?? err}`));
     }
   };
 
   // ---------------------------------------------------------------- boot ---
-  refreshList(true);
+  refreshList(true).catch((err) => showError(`Failed to load mesh list: ${err.message ?? err}`));
   updateCamPanel();
   requestAnimationFrame(render);
 })();

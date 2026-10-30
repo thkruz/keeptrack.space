@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "互換性の問題により録画が利用できません！",
-    "compatibilityError": "録画の互換性エラー！"
+    "compatibilityError": "録画の互換性エラー！",
+    "requesting": "画面共有をリクエスト中…",
+    "recording": "録画中",
+    "stopping": "録画を完了中…",
+    "toggleCommand": "画面録画の切り替え",
+    "saved": "録画を保存しました",
+    "tooShort": "録画が短すぎるため、保存されませんでした",
+    "cancelled": "録画をキャンセルしました",
+    "notReadable": "画面をキャプチャできませんでした。別のアプリまたはシステム設定がブロックしている可能性があります。",
+    "failed": "録画に失敗しました。もう一度お試しください。"
   }
 }

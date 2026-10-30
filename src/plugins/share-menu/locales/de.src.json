@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "Link in die Zwischenablage kopiert!",
         "copyFailed": "Link konnte nicht in die Zwischenablage kopiert werden."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Natives Teilen fehlgeschlagen: {error}"
       }
     }
   }

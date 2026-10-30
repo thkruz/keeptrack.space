@@ -16,10 +16,12 @@ import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, ISideMenuConfig
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
+import { normalizePluginSearch, pluginSearchAliases } from '@app/engine/utils/plugin-search';
 import { t7e } from '@app/locales/keys';
 import { pluginManifest } from '@app/plugins/plugin-manifest';
 import { externalPluginMeta } from '@app/plugins/plugin-manifest.external.generated';
 import extensionPng from '@public/img/icons/extension.png';
+import i18next from 'i18next';
 import './plugin-manager.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -115,7 +117,9 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
       seen.add(d.configKey);
       rows.push({
         configKey: d.configKey,
-        label: PluginManagerPlugin.humanize_(d.configKey),
+        label: i18next.t(`plugins.${d.ossClassName ?? d.proClassName ?? d.configKey}.bottomIconLabel`, {
+          defaultValue: PluginManagerPlugin.humanize_(d.configKey),
+        }),
         alwaysEnabled: Boolean(d.alwaysEnabled),
         defaultEnabled: Boolean(d.defaultConfig?.enabled),
       });
@@ -180,6 +184,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
       </section>
 
       ${this.buildExternalSection_()}
+      <p id="plugin-manager-no-matches" role="status" class="pm-empty start-hidden">${l('labels.noMatches')}</p>
 
       <section class="kt-section">
         <div class="kt-section-label">${l('labels.installSection')}</div>
@@ -233,7 +238,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     return html`
       <div class="pm-command">
         <code class="pm-command-text">${command}</code>
-        <button type="button" class="pm-copy-btn waves-effect" data-copy="${command}" kt-tooltip="Copy">&#128203;</button>
+        <button type="button" class="pm-copy-btn waves-effect" data-copy="${command}" kt-tooltip="${l('labels.copy')}">&#128203;</button>
       </div>
     `;
   }
@@ -241,10 +246,10 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
   private buildToggleRow_(r: BuiltinRow): string {
     const checked = this.isEnabled_(r.configKey) ? 'checked' : '';
     const disabled = r.alwaysEnabled ? 'disabled' : '';
-    const lockIcon = r.alwaysEnabled ? '<span class="pm-lock" title="Always enabled">&#128274;</span>' : '';
+    const lockIcon = r.alwaysEnabled ? `<span class="pm-lock" title="${l('labels.alwaysEnabled')}">&#128274;</span>` : '';
 
     return html`
-      <div class="pm-row" data-plugin-name="${r.label.toLowerCase()} ${r.configKey.toLowerCase()}">
+      <div class="pm-row" data-plugin-name="${r.label.toLowerCase()} ${r.configKey.toLowerCase()} ${pluginSearchAliases(r.configKey).join(' ')}">
         <label class="pm-row-label" kt-tooltip="${r.configKey}">
           <span class="pm-row-name">${r.label}${lockIcon}</span>
           <span class="switch">
@@ -412,7 +417,7 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
     return `
       <div class="pm-card kt-section">
         <div class="pm-card-title">${esc(p.displayName || p.name)}</div>
-        ${p.author ? `<div class="pm-card-author">${l('browse.by')} ${esc(p.author)}</div>` : ''}
+        ${p.author ? `<div class="pm-card-author">${l('browse.byAuthor').replace('{author}', () => esc(p.author ?? ''))}</div>` : ''}
         <p class="pm-card-desc">${esc(p.description ?? '')}</p>
         <div class="pm-card-tags">${tags}<span class="pm-card-engine">${esc(p.engine ?? '')}</span></div>
         ${button}
@@ -538,14 +543,18 @@ export class PluginManagerPlugin extends KeepTrackPlugin {
   }
 
   private filterRows_(query: string): void {
-    const q = query.trim().toLowerCase();
+    const q = normalizePluginSearch(query);
     const menu = getEl('plugin-manager-menu');
+    let matches = 0;
 
     menu?.querySelectorAll<HTMLElement>('.pm-row').forEach((row) => {
-      const hay = row.dataset.pluginName ?? '';
+      const hay = normalizePluginSearch(row.dataset.pluginName ?? '');
+      const matched = !q || hay.includes(q);
 
-      row.classList.toggle('start-hidden', q.length > 0 && !hay.includes(q));
+      row.classList.toggle('start-hidden', !matched);
+      matches += matched ? 1 : 0;
     });
+    getEl('plugin-manager-no-matches', true)?.classList.toggle('start-hidden', matches > 0 || !q);
   }
 
   private copyInstallCommand_(): void {

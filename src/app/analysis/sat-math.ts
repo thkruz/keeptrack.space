@@ -30,7 +30,6 @@ import {
   BaseObject,
   DEG2RAD,
   Degrees,
-  ecef2eci,
   ecefRad2rae,
   eci2ecef,
   eci2lla,
@@ -41,6 +40,7 @@ import {
   linearDistance,
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
+  Earth as OotkEarth,
   Sun as OotkSun,
   estimateRcs as ootkEstimateRcs,
   pow2db as ootkPow2db,
@@ -54,8 +54,8 @@ import {
   Sgp4,
   SpaceObjectType,
   StateVectorSgp4,
+  SunBody,
   SunStatus,
-  TAU,
   TemeVec3,
   Vector3D,
 } from '@ootk/src/main';
@@ -171,12 +171,31 @@ export abstract class SatMath {
       return SunStatus.UNKNOWN;
     }
 
+    const r = Math.hypot(x, y, z);
+
+    if (!Number.isFinite(r) || r === 0) {
+      return SunStatus.UNKNOWN;
+    }
+
+    /*
+     * A point at or below the equatorial radius is a ground site (lla2eci places sites on a 6371 km sphere), not a
+     * satellite: the shadow cone's asin(R / r) is NaN there, which used to fall through to SUN. Judge it by the
+     * Sun's elevation above its horizon instead.
+     */
+    if (r <= OotkEarth.radiusEquator) {
+      return SatMath.calculateGroundSiteSunStatus({ x, y, z } as TemeVec3, sunECI);
+    }
+
     // Convert to Vector3D for ootk's Sun.lightingRatio
     const satPos = new Vector3D(x, y, z);
     const sunPos = new Vector3D(sunECI.x, sunECI.y, sunECI.z);
 
     // Use ootk's lighting ratio calculation
     const ratio = OotkSun.lightingRatio(satPos, sunPos);
+
+    if (Number.isNaN(ratio)) {
+      return SunStatus.UNKNOWN;
+    }
 
     // Map ratio to SunStatus:
     // 0.0 = fully eclipsed (umbra)
@@ -190,6 +209,53 @@ export abstract class SatMath {
     }
 
     return SunStatus.SUN;
+  }
+
+  /**
+   * Sun status at a ground site from the Sun's elevation above the site's (geocentric) horizon: SUN while the whole
+   * solar disk is above it, UMBRAL once the whole disk is below it, PENUMBRAL while the disk straddles it.
+   *
+   * Use this, not the shadow cone in {@link calculateIsInSun}, for anything on the ground. Both vectors must share a
+   * frame (TEME/J2000 differ by ~0.3 deg in 2026, well inside this test's resolution).
+   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sunECI The Sun's ECI position in km.
+   * @returns UNKNOWN when either vector is degenerate.
+   */
+  static calculateGroundSiteSunStatus(sitePos: TemeVec3, sunECI: TemeVec3): SunStatus {
+    if (!sitePos || !sunECI) {
+      return SunStatus.UNKNOWN;
+    }
+
+    const r = Math.hypot(sitePos.x, sitePos.y, sitePos.z);
+    const toSun = { x: sunECI.x - sitePos.x, y: sunECI.y - sitePos.y, z: sunECI.z - sitePos.z };
+    const sunDist = Math.hypot(toSun.x, toSun.y, toSun.z);
+
+    if (!Number.isFinite(r) || !Number.isFinite(sunDist) || r === 0 || sunDist === 0) {
+      return SunStatus.UNKNOWN;
+    }
+
+    const sinSunEl = (sitePos.x * toSun.x + sitePos.y * toSun.y + sitePos.z * toSun.z) / (r * sunDist);
+    const sunEl = Math.asin(Math.min(1, Math.max(-1, sinSunEl)));
+    const sunAngularRadius = Math.asin(Math.min(1, SunBody.RADIUS / sunDist));
+
+    if (sunEl < -sunAngularRadius) {
+      return SunStatus.UMBRAL;
+    }
+    if (sunEl > sunAngularRadius) {
+      return SunStatus.SUN;
+    }
+
+    return SunStatus.PENUMBRAL;
+  }
+
+  /**
+   * True when the Sun has fully set at a ground site (its centre more than its own radius, about 0.27 deg, below the
+   * horizon). This is the "station is dark" test for optical sensors.
+   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sunECI The Sun's ECI position in km.
+   */
+  static isGroundSiteInNight(sitePos: TemeVec3, sunECI: TemeVec3): boolean {
+    return SatMath.calculateGroundSiteSunStatus(sitePos, sunECI) === SunStatus.UMBRAL;
   }
 
   /**
@@ -579,13 +645,19 @@ export abstract class SatMath {
 
   /**
    * Calculates the ECF (Earth Centered Fixed) coordinates for a given number of points along a satellite's current orbit.
+   * Each ECI (TEME) sample is rotated into the Earth-fixed frame by GMST at that sample's own time, so the
+   * curve traces the orbit relative to the rotating Earth (its longitude matches the subpoint at that time).
    * @param sat The satellite object.
    * @param points The number of points to calculate along the orbit.
    * @param getOffsetTimeObj A function that returns a Date object with the specified offset from the current simulation time.
    * @returns An array of objects containing the ECF coordinates for each point along the orbit.
    */
   static getEcfOfCurrentOrbit(sat: Satellite, points: number, getOffsetTimeObj: (offset: number) => Date): { x: number; y: number; z: number }[] {
-    return SatMath.getOrbitPoints(sat, points, getOffsetTimeObj, (params: { eciPts: TemeVec3; angle: number }) => ecef2eci(params.eciPts, params.angle));
+    return SatMath.getOrbitPoints(sat, points, getOffsetTimeObj, (params: { eciPts: TemeVec3; offset: number }) => {
+      const { gmst } = SatMath.calculateTimeVariables(getOffsetTimeObj(params.offset));
+
+      return eci2ecef(params.eciPts, gmst);
+    });
   }
 
   /**
@@ -669,14 +741,7 @@ export abstract class SatMath {
     sat: Satellite,
     points: number,
     getOffsetTimeObj: (offset: number) => Date,
-    transformFunc: (params: {
-      eciPts: TemeVec3;
-      eciPts2: TemeVec3;
-      velPts: TemeVec3<KilometersPerSecond>;
-      velPts2: TemeVec3<KilometersPerSecond>;
-      angle: number;
-      offset: number;
-    }) => T,
+    transformFunc: (params: { eciPts: TemeVec3; eciPts2: TemeVec3; velPts: TemeVec3<KilometersPerSecond>; velPts2: TemeVec3<KilometersPerSecond>; offset: number }) => T,
     sat2?: Satellite,
     orbits = 1
   ): T[] {
@@ -685,7 +750,6 @@ export abstract class SatMath {
     for (let i = 0; i < points; i++) {
       const offset = ((i * sat.period * orbits) / points) * 60 * 1000; // Offset in seconds (msec * 1000)
       const now = getOffsetTimeObj(offset);
-      const angle = (-i * (sat.period / points) * TAU) / sat.period;
       const eciPts = SatMath.getEci(sat, now).position;
       const velPts = SatMath.getEci(sat, now).velocity;
 
@@ -706,7 +770,7 @@ export abstract class SatMath {
         }
       }
 
-      orbitPoints.push(transformFunc({ eciPts, velPts, eciPts2, velPts2, angle, offset }));
+      orbitPoints.push(transformFunc({ eciPts, velPts, eciPts2, velPts2, offset }));
     }
 
     return orbitPoints;

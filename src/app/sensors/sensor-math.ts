@@ -1,6 +1,7 @@
 import { SatPassTimes } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import {
   BaseObject,
   calcGmst,
@@ -273,7 +274,7 @@ export class SensorMath {
           Number.parseFloat(distanceApart) < sensorManagerInstance.currentTEARR.rng! * Math.sin(DEG2RAD * firstSensor.beamwidth)
         ) {
           if (sensorManagerInstance.currentTEARR.rng! < sensorManagerInstance.currentSensors[0].maxRng && sensorManagerInstance.currentTEARR.rng! > 0) {
-            sameBeamStr = ' (Within One Beam)';
+            sameBeamStr = ` (${t7e('sensorMath.withinOneBeam')})`;
           }
         }
       }
@@ -281,7 +282,7 @@ export class SensorMath {
       // Intentionally Blank
     }
 
-    return `<br />Range: ${distanceApart} km${sameBeamStr}`;
+    return `<br />${t7e('sensorMath.range').replace('{km}', distanceApart)}${sameBeamStr}`;
   }
 
   static velocityString(hoverSat: BaseObject, secondaryObj?: DetailedSensor | Satellite): string {
@@ -308,7 +309,7 @@ export class SensorMath {
 
     const velApart = SatMath.velocity(hoverVel, secondaryVel).toFixed(3);
 
-    return `<br />Relative velocity: ${velApart} km/s`;
+    return `<br />${t7e('sensorMath.relativeVelocity').replace('{kms}', velApart)}`;
   }
 
   static getSunTimes(sat: Satellite, sensors?: DetailedSensor[], searchLength = 2, interval = 30) {
@@ -451,7 +452,7 @@ export class SensorMath {
       return dateFormat(inViewTime[0], 'isoDateTime', true);
     }
 
-    return `No Passes in ${searchLength} Days`;
+    return t7e('sensorMath.noPassesInDays').replace('{days}', String(searchLength));
   }
 
   static nextpassList(satArray: Satellite[], sensorArray: DetailedSensor[], interval?: number, days = 7): SatPassTimes[] {
@@ -478,10 +479,8 @@ export class SensorMath {
     const sensorPos = lla2eci(sensor.llaRad(), gmst);
 
     sensor.position = sensorPos;
-    const stationInSun = SatMath.calculateIsInSun(sensor, sunPos);
-    const satInSun = SatMath.calculateIsInSun(sat, sunPos);
 
-    // For optical sensors: check if the station is in darkness (umbral/penumbral) and the satellite is in sunlight - this means the satellite is visible
-    return (stationInSun === SunStatus.UMBRAL || stationInSun === SunStatus.PENUMBRAL) && satInSun === SunStatus.SUN;
+    // An optical sensor sees the satellite when the site is dark (Sun fully below its horizon) and the satellite is sunlit
+    return SatMath.isGroundSiteInNight(sensorPos, sunPos) && SatMath.calculateIsInSun(sat, sunPos) === SunStatus.SUN;
   }
 }

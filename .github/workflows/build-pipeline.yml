@@ -254,7 +254,9 @@ jobs:
     needs: [lint-and-test, lint-and-test-oss]
     if: always() && needs.lint-and-test-oss.result == 'success' && (needs.lint-and-test.result == 'success' || needs.lint-and-test.result == 'skipped')
     name: Boot Smoke Test
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04, which Playwright 1.60 cannot install chromium deps for.
+    # Move back to ubuntu-latest once a Playwright release supports 26.04.
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:

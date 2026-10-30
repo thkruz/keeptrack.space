@@ -1,4 +1,7 @@
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { GraticuleToggle } from '@app/plugins/graticule-toggle/graticule-toggle';
+import { SettingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -44,6 +47,25 @@ describe('GraticuleToggle methods', () => {
     plugin.isMenuButtonActive = false;
     plugin.onBottomIconClick();
     expect(settingsManager.isDrawGraticule).toBe(false);
+  });
+
+  it('lights the icon at launch when the persisted setting is on (Graphics Menu tick, then reload)', () => {
+    settingsManager.isDrawGraticule = true;
+    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+    expect(plugin.isMenuButtonActive).toBe(true);
+  });
+
+  it('setGraticule writes the setting, syncs the icon and persists', () => {
+    const preserveSpy = vi.spyOn(SettingsManager, 'preserveSettings');
+
+    plugin.setGraticule(true);
+    expect(settingsManager.isDrawGraticule).toBe(true);
+    expect(plugin.isMenuButtonActive).toBe(true);
+
+    plugin.setGraticule(false);
+    expect(settingsManager.isDrawGraticule).toBe(false);
+    expect(plugin.isMenuButtonActive).toBe(false);
+    expect(preserveSpy).toHaveBeenCalledTimes(2);
   });
 
   it('bridges bottomIconCallback to onBottomIconClick', () => {

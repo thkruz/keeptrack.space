@@ -5,12 +5,18 @@
   },
   "plugins": {
     "SelectSatManager": {
-      "sectionLabel": "Satellite Selection",
+      "sectionLabel": "Wybór satelity",
       "settings": {
         "focusOnSatWhenSelected": {
-          "label": "Focus on Satellite When Selected",
-          "helpText": "Zoom in on the satellite when selected."
+          "label": "Skup się na satelicie po wybraniu",
+          "helpText": "Przybliż widok na satelitę po jego wybraniu."
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "Wybór pocisku jako obiektu dodatkowego nie jest obsługiwany!",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_: SensorObject nie ma sensorId: {sensor}",
+        "invalidCovariance": "{context}: Nieprawidłowa macierz kowariancji",
+        "covarianceFromTleFailed": "{context}: Nie udało się obliczyć kowariancji z TLE"
       }
     }
   }

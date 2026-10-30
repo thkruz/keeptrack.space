@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Utwórz start w oknie"
       },
       "msgs": {
-        "windowFound": "Start o {time}, aby dopasować się do płaszczyzny celu (ΔRAAN {delta}°)",
+        "windowFound": "Start o {time} z {site}, aby dopasować się do płaszczyzny orbity {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Utworzono start nominalny!",
         "timeRelativeToLaunch": "Czas jest teraz liczony względem startu."
       },

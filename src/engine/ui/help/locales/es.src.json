@@ -4,7 +4,7 @@
     "overview": "No hay ningún menú ni vista abiertos, así que esta es la ayuda general de KeepTrack. Cada menú y vista tiene su propia ayuda.",
     "howToUse": "Abra el panel lateral y elija una herramienta para abrir su menú, o cambie a una vista como el mapa plano o la vista polar. Después pulse Shift+F1 para ver la ayuda de ese menú o vista. Haga clic en un objeto del globo para seleccionarlo y ver sus detalles.",
     "tip1": "Las capas que active (por ejemplo, los elipsoides de covarianza) no tienen menú propio, por lo que Shift+F1 sigue mostrando esta ayuda general mientras solo haya capas activas.",
-    "tip2": "Haga clic en cualquier parte de este panel para cerrarlo.",
+    "tip2": "Use Cerrar, pulse Escape o haga clic fuera de este panel para cerrarlo.",
     "shortcutClose": "Cerrar la ayuda"
   }
 }

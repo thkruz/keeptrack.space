@@ -20,6 +20,7 @@
  */
 
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { registerMarsMoons } from './mars-moon-catalog';
 
 /**
@@ -55,7 +56,7 @@ export async function registerSolarSystemContent(): Promise<void> {
 
       pack.registerSolarSystemPack();
     } catch (error) {
-      errorManagerInstance.warn(`Solar System Pack unavailable, falling back to the built-in bodies: ${error}`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.solarSystemPackUnavailable').replace('{error}', String(error)));
     }
   }
 }

@@ -226,6 +226,39 @@ describe('SatellitePhotos behavior', () => {
     vi.advanceTimersByTime(2500);
   });
 
+  it('Himawari-8 titles its image with the slot time, like Elektro-L 2', () => {
+    const tm = ServiceLocator.getTimeManager();
+
+    tm.simulationTimeObj = new Date(Date.now() - 1000 * 60 * 60) as never;
+    getEl('himawari8-link')!.click();
+
+    const [, options] = (colorbox.openColorbox as ReturnType<typeof vi.fn>).mock.calls.at(-1)!;
+
+    expect(options.title).toMatch(/^Himawari-8 at .+ UTC$/u);
+    vi.advanceTimersByTime(2500);
+  });
+
+  it('passes a load-failure message that names the source, not the URL', () => {
+    getEl('meteosat11-link')!.click();
+
+    const [url, options] = (colorbox.openColorbox as ReturnType<typeof vi.fn>).mock.calls.at(-1)!;
+
+    expect(options.imageErrorMessage).toBe('Could not load the Meteosat-11 (0°) image');
+    expect(options.imageErrorMessage).not.toContain(url);
+    vi.advanceTimersByTime(2500);
+  });
+
+  it('opening the menu from the bottom icon fetches DSCOVR exactly once per page load', () => {
+    global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve([]) })) as never;
+
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+    EventBus.getInstance().emit(EventBusEvent.bottomMenuClick, plugin.bottomIconElementName);
+
+    expect(plugin.isMenuButtonActive).toBe(true);
+    expect((global.fetch as ReturnType<typeof vi.fn>).mock.calls.length).toBe(1);
+  });
+
   it('refresh reloads the last opened source with a cache-busted URL', () => {
     getEl('goes19-link')!.click();
     const openCalls = (colorbox.openColorbox as ReturnType<typeof vi.fn>).mock.calls.length;

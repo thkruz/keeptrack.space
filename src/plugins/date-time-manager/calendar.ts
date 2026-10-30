@@ -5,6 +5,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { setInnerHtml } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import { ScenarioManagementPlugin } from '../scenario-management/scenario-management';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 import './date-time-manager.css';
 import { formatUtcDateTime, parseUtcDateTime } from './parse-utc-date-time';
@@ -41,7 +42,7 @@ export class Calendar {
     const container = document.getElementById(this.containerId);
 
     if (!container) {
-      errorManagerInstance.warn(`Container with ID ${this.containerId} not found`);
+      errorManagerInstance.warn(dt('calendar.containerNotFound').replace('{id}', this.containerId));
 
       return;
     }
@@ -557,9 +558,38 @@ export class Calendar {
     this.simulationDate = parsed;
     this.calendarDate = new Date(parsed);
     this.datetimeInputFormChange();
-    this.updateTimeInput();
+
+    /*
+     * A scenario time limit clamps the clock (and toasts) inside datetimeInputFormChange. Show the clamped
+     * instant in the calendar and the "Go to" box instead of the out-of-range text that was typed.
+     */
+    const clampedTime = Calendar.clampToScenario(parsed.getTime());
+    const isClamped = clampedTime !== parsed.getTime();
+
+    if (isClamped) {
+      this.simulationDate = new Date(clampedTime);
+      this.calendarDate = new Date(clampedTime);
+    }
+    this.updateTimeInput(isClamped);
     this.render();
     this.attachEvents();
+  }
+
+  /** The time (ms) the scenario bounds let the clock reach for a requested time (ms); unchanged without bounds. */
+  static clampToScenario(timeMs: number): number {
+    const scenario = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario;
+    const start = scenario?.startTime?.getTime();
+    const end = scenario?.endTime?.getTime();
+
+    if (typeof start === 'number' && timeMs < start) {
+      return start;
+    }
+
+    if (typeof end === 'number' && timeMs > end) {
+      return end;
+    }
+
+    return timeMs;
   }
 
   private goToPreviousMonth(): void {
@@ -739,7 +769,7 @@ export class Calendar {
     const match = /^(?<h>\d{2}):?(?<m>\d{2}):?(?<s>\d{2})(?:\.(?<f>\d{1,3}))?$/u.exec(timeInput.value.trim());
 
     if (!match?.groups) {
-      errorManagerInstance.warn('Invalid time format entered! Expected HH:MM:SS, HH:MM:SS.s or HHMMSS');
+      errorManagerInstance.warn(dt('calendar.timeInvalid'));
 
       return;
     }
@@ -804,9 +834,7 @@ export class Calendar {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-    const today = new Date();
-
-    timeManagerInstance.changeStaticOffset(this.simulationDate.getTime() - today.getTime());
+    timeManagerInstance.changeSimulationTime(this.simulationDate.getTime());
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
 
     colorSchemeManagerInstance.calculateColorBuffers(true);

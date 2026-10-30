@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "軌道プレビュー",
-    "unknown": "不明"
+    "unknown": "不明",
+    "close": "閉じる",
+    "download": "ダウンロード",
+    "downloadNamed": "{name} をダウンロード",
+    "loading": "読み込み中…"
   },
   "help": {
     "overview": "概要",
@@ -35,7 +39,8 @@
       "resetCamera": "カメラを初期表示に戻す",
       "precisionMode": "押し続けるとカメラがゆっくり正確に動く",
       "moveCamera": "一人称モードでカメラを移動",
-      "rollCamera": "一人称モードでカメラをロール",
+      "moveCameraUpRoll": "FPSビューで上昇、他の一人称モードではロール",
+      "moveCameraDownRoll": "FPSビューで下降、他の一人称モードではロール",
       "numpadRotate": "カメラを回転",
       "zoomIn": "ズームイン",
       "zoomOut": "ズームアウト",
@@ -60,9 +65,9 @@
       "oss": "オープンソース",
       "celestrak": "CelesTrak",
       "embed": "埋め込み",
-      "offline": "Offline",
+      "offline": "オフライン",
       "epfl": "EPFL",
-      "companion": "Companion",
+      "companion": "コンパニオン",
       "solar-system": "太陽系"
     }
   },
@@ -88,12 +93,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "センサーUIスタイリングの更新中にエラーが発生しました。"
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "下部メニューのフィルターボタンがすべて見つかりませんでした"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset が有限でない値を受け取りました: {value}",
+      "invalidDate": "synchronize() が無効な日付を生成しました - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "衛星カタログの読み込み中にエラーが発生しました。",
+      "usingOfflineCatalog": "最新のカタログをダウンロードできませんでした。古い可能性のあるオフラインカタログを使用します！",
+      "catalogsLoadFailed": "TLE カタログを読み込めませんでした！",
+      "externalTlesBadFormat": "外部 TLE の形式が正しくありません",
+      "externalTlesLoadError": "{url} から外部 TLE を読み込む際にエラーが発生しました",
+      "fileLoadError": "{file} の読み込み中にエラーが発生しました",
+      "usingOfflineVimpel": "最新の vimpel.json をダウンロードできませんでした。古い可能性のあるオフラインの vimpel.json を使用します！",
+      "satProcessFailed": "衛星を処理できませんでした: {name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "このエクスポートには拡張 sccNum (7 桁以上) の衛星が {count} 件含まれています。TLE 形式の 3-7 列目は 5 文字しか入らないため、このファイルを再インポートすると正規の ID が失われます。拡張 ID を保持するには CSV/OMM エクスポートを使用してください。",
+      "noTleData": "エクスポートする TLE データがありません"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec: satData に satId が見つかりません",
+      "satrecError": "衛星レコードの作成中にエラーが発生しました！",
+      "analystSatInvalid": "新しいアナリスト衛星は無効です！"
+    },
+    "apiKeyRequired": "API キーが必要です。keeptrack.space で無料のキーを取得し、settings/data-settings.ts に追加してください",
+    "audioLoadFailed": "音声を読み込めませんでした: {key}",
+    "rmbMenuMissingElements": "右クリックメニューの要素がありません: {ids}",
+    "sgp4BackendFailed": "{backend} プロパゲーターを有効化できませんでした。TypeScript 版 SGP4 を使用します。{error}",
+    "Pwa": {
+      "registrationFailed": "Service Worker の登録に失敗しました:"
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "詳細な宇宙機モデルを利用できないため、汎用モデルを使用します: {error}",
+      "meshVariantsUnavailable": "プロシージャルなモデルバリエーションを利用できないため、無料の基本モデルを使用します: {error}",
+      "colorCruncherUpdateDropped": "ColorCruncher の動的更新が破棄されました: {error}",
+      "hoverPickDisabled": "衛星のホバー選択を無効にしました: このブラウザーは WebGL readPixels に対応していません ({error})。クリックでの選択は引き続き使えます。",
+      "earthInitFailed": "地球の初期化中にエラーが発生しました: {error}",
+      "textureLoadFailed": "テクスチャを読み込めませんでした: {url}",
+      "solarSystemPackUnavailable": "太陽系パックを利用できないため、内蔵の天体を使用します: {error}",
+      "uniformNotFound": "プログラム {program} に uniform {uniform} が見つかりません",
+      "contextLost": "WebGL コンテキストが失われました",
+      "contextLostRefresh": "WebGL コンテキストが失われました。復旧するにはページを再読み込みしてください。",
+      "contextRestored": "WebGL コンテキストが復元されました",
+      "pickingResizeFailed": "resizeCanvas 中にピッキング用フレームバッファのリサイズに失敗しました。コンテキスト復元まで延期します。{error}",
+      "godraysResizeFailed": "resizeCanvas 中にゴッドレイのリサイズに失敗しました。次回のリサイズで再試行します。{error}",
+      "bodyInitError": "{name} の初期化中にエラーが発生しました",
+      "bodyTextureError": "{name} のテクスチャ更新中にエラーが発生しました",
+      "atmosphereInitError": "{name} の大気の初期化中にエラーが発生しました",
+      "atmosphereTextureError": "{name} の大気テクスチャの読み込み中にエラーが発生しました (試行 {attempt})",
+      "shaderInitFailed": "シェーダーを初期化できませんでした",
+      "meshModelUndefined": "メッシュモデルが定義されていません。属性ポインターを適用できません。",
+      "shaderAttributeMissing": "シェーダー属性「{attr}」がシェーダー内に見つかりません。シェーダーコードで未宣言または未使用ではありませんか？",
+      "meshesLoadFailed": "3D モデルを読み込めませんでした！",
+      "flagAtlasLoadFailed": "国旗アトラスを読み込めませんでした",
+      "politicalMapLoadFailed": "政治地図データを読み込めませんでした"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] 起動回復画面を表示しました (停止したワーカー: {workers})。",
+      "line": "行: {line}",
+      "optionalWorkersStalled": "[KeepTrack] オプションのワーカーが {seconds} 秒以内に起動しなかったため、それらなしで起動します: {workers}。影響を受ける機能 (軌道線など) はこのセッションでは無効です。",
+      "essentialWorkersStalled": "[KeepTrack] 必須の Web ワーカーが {seconds} 秒後も初期化されませんでした。停止したワーカー: {workers}。",
+      "selfHealReload": "[KeepTrack] ワーカーが停止しました。自動復旧のため、新しいワーカーキャッシュで一度だけ再読み込みします。"
+    },
+    "Persistence": {
+      "versionMismatch": "バージョンの不一致: {saved} < {current}",
+      "clearingStorage": "ローカルストレージを消去しています...",
+      "subscriberError": "ストレージのサブスクライバーでエラーが発生しました:",
+      "storageError": "LocalStorageProvider のエラー:",
+      "enhancedInitFailed": "拡張永続化を初期化できませんでした: {error}",
+      "corruptSetting": "破損した保存設定「{key}」をスキップします: {error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "ルートコンテナーが見つかりません！",
+      "containerNotFound": "Colorbox コンテナーが見つかりません！",
+      "loadFailed": "読み込みに失敗しました: {url}",
+      "imageLoadFailed": "画像を読み込めませんでした: {url}"
+    },
+    "SaveVariable": {
+      "variable": "変数の保存中にエラーが発生しました！",
+      "csv": "CSV の保存中にエラーが発生しました！",
+      "xlsx": "XLSX の保存中にエラーが発生しました！",
+      "clipboard": "クリップボードへのコピー中にエラーが発生しました！"
+    },
+    "Fatal": {
+      "technicalDetail": "技術的な詳細",
+      "recommendations": "推奨事項",
+      "canvasMissingTitle": "キャンバス要素がありません",
+      "canvasMissingDescription": "KeepTrack の描画領域が見つかりませんでした。通常、ブラウザー拡張機能、企業のファイアウォール、またはコンテンツセキュリティポリシーがページから要素を取り除いていることが原因です。",
+      "webgl2Title": "WebGL 2 を利用できません",
+      "webgl2Description": "KeepTrack で 3D シーンを描画するには WebGL 2 が必要です。お使いのブラウザーまたはデバイスが対応していないか、無効になっています。",
+      "recDisableExtensions": "ブラウザー拡張機能 (広告ブロッカー、プライバシーツール) を無効にして再読み込みしてください。",
+      "recManagedNetwork": "管理されたネットワークをお使いですか？ネットワーク管理者またはシステム管理者にこのサイトの許可を依頼してください。",
+      "recDifferentBrowser": "別のブラウザーをお試しください (Chrome、Edge、Firefox を推奨)。",
+      "recUpdateBrowser": "ブラウザーを最新バージョンに更新してください。",
+      "recHardwareAcceleration": "ブラウザーの設定でハードウェアアクセラレーションを有効にしてください。",
+      "recGraphicsDrivers": "グラフィックドライバーを更新してください。",
+      "recManagedDevice": "管理されたデバイスをお使いですか？システム管理者にお問い合わせください。"
     }
   },
   "hoverManager": {
     "launched": "打ち上げ済み",
     "launchedPlanned": "打ち上げ：予定",
-    "launchedUnknown": "打ち上げ：不明"
+    "launchedUnknown": "打ち上げ：不明",
+    "orbitPeriodDays": "公転周期: 地球日で {days} 日",
+    "orbitPeriodYears": "公転周期: 地球年で {years} 年",
+    "distanceFromParent": "{parent} からの距離: {km} km",
+    "distanceFromSun": "太陽からの距離: {au} AU ({mkm} 百万 km)",
+    "unknownLaunchSite": "不明な発射場",
+    "unknownSite": "不明な場所",
+    "unknownCountry": "不明な国",
+    "external": "外部",
+    "position": "位置:",
+    "velocity": "速度:"
   },
   "darkClouds": {
     "in": "内",
@@ -153,22 +268,125 @@
     "groupLayerToggles": "レイヤー切替",
     "groupSettingsToggles": "設定切替",
     "groupDevTools": "開発ツール",
-    "groupAbout": "概要"
+    "groupAbout": "概要",
+    "modeAll": "すべてのプラグイン",
+    "openPluginMenu": "プラグインメニューを開く",
+    "openAppLauncher": "アプリランチャーを開く",
+    "appLauncherTooltip": "アプリランチャー (Shift+Z)",
+    "appLauncher": "アプリランチャー",
+    "search": "検索",
+    "searchEllipsis": "検索…",
+    "toggleRailMode": "レールモードの切り替え",
+    "collapse": "折りたたむ",
+    "expand": "展開",
+    "phoneLink": "スマートフォン連携",
+    "phoneLinkSignIn": "スマートフォンを連携するにはサインインしてください",
+    "connected": "接続済み",
+    "offline": "オフライン",
+    "footerLinks": {
+      "label": "概要と法的情報",
+      "about": "概要",
+      "data": "データ",
+      "terms": "利用規約",
+      "privacy": "プライバシー"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "時計を一時停止",
     "resetCamera": "カメラをリセット",
     "clearLines": "ラインを消去",
-    "clearScreen": "画面を消去"
+    "clearScreen": "画面を消去",
+    "startClock": "時計を開始"
   },
   "urlManager": {
     "satNotFound": "衛星「{val}」が見つかりませんでした!",
     "intldesNotFound": "国際識別符号「{val}」が見つかりませんでした!",
-    "deepSpaceNoEphemeris": "{name}は深宇宙の物体です。その軌道暦はまだKeepTrackでは利用できません。"
+    "deepSpaceNoEphemeris": "{name}は深宇宙の物体です。その軌道暦はまだKeepTrackでは利用できません。",
+    "searchFoundNothing": "「{val}」の検索結果はありませんでした！",
+    "missileLaunched": "ミサイルが発射されました！",
+    "dateNotIso": "日付の値「{val}」は正しい ISO 8601 形式の日付文字列ではありません！",
+    "dateNotUnix": "日付の値「{val}」は正しい Unix タイムスタンプではありません！",
+    "rateNotFloat": "伝搬速度「{val}」は有効な数値ではありません！",
+    "zoomNotFloat": "ズーム値「{val}」は有効な数値ではありません！",
+    "zoomOutOfBounds": "ズーム値「{val}」が範囲外です！",
+    "pitchYawNotFloat": "ピッチまたはヨーの値が有効な数値ではありません！",
+    "pitchOutOfBounds": "ピッチ値が範囲外です！",
+    "yawOutOfBounds": "ヨー値が範囲外です！",
+    "latLonNotFloat": "緯度または経度の値が有効な数値ではありません！",
+    "latLonOutOfBounds": "緯度または経度の値が範囲外です！",
+    "unknownSunParam": "不明な太陽パラメーター: {val}",
+    "unknownRegime": "不明な軌道領域フィルター: {val}",
+    "invalidSearchLimit": "無効な検索上限: {val}"
   },
   "searchManager": {
     "resultCountOne": "1 件の結果",
     "resultCount": "{count} 件の結果",
-    "resultCountLimited": "{total} 件中 {shown} 件を表示"
+    "resultCountLimited": "{total} 件中 {shown} 件を表示",
+    "noResults": "結果が見つかりません",
+    "decayed": "落下済み",
+    "typeStar": "恒星",
+    "typeSensor": "センサー",
+    "typeLaunchSite": "発射場",
+    "typePlanet": "惑星"
+  },
+  "sensorMath": {
+    "withinOneBeam": "同一ビーム内",
+    "range": "距離: {km} km",
+    "relativeVelocity": "相対速度: {kms} km/s",
+    "noPassesInDays": "{days} 日以内にパスなし",
+    "customLocation": "カスタム位置",
+    "customSensorDefaultName": "カスタムセンサー"
+  },
+  "toasts": {
+    "orbitTailsOnly": "軌道の尾のみ",
+    "orbitsOff": "軌道オフ",
+    "orbitsOn": "軌道オン",
+    "orbitsInEcf": "軌道を ECF で表示",
+    "orbitsInEci": "軌道を ECI で表示",
+    "cameraEarthCentered": "地球中心カメラモード",
+    "cameraFixedLvlh": "衛星固定カメラモード (LVLH)",
+    "cameraFixedEci": "衛星固定カメラモード (ECI)",
+    "cameraFree": "フリーカメラモード",
+    "cameraPlanetarium": "プラネタリウムカメラモード",
+    "cameraSatFirstPerson": "衛星一人称カメラモード",
+    "cameraAstronomy": "天文カメラモード",
+    "cameraFlatMap": "平面地図カメラモード",
+    "propagationSpeed": "伝搬速度: {rate}x",
+    "timeSetToRealTime": "時刻をリアルタイムに設定しました",
+    "noValidFov": "描画できる有効な視野がありません。複数の深宇宙センサーを同時に描画することはできません。",
+    "colorSchemeChanged": "配色を {scheme} に変更しました",
+    "mobileFullVersionUnavailable": "KeepTrack のフルバージョンはモバイル端末では利用できません。フルバージョンを使用するにはデスクトップブラウザをご利用ください。",
+    "objectInsideEarth": "オブジェクトが地球の内部にあります！",
+    "propagationRate": "伝搬速度: {rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "レイヤーの切り替え",
+    "layers": "レイヤー"
+  },
+  "modalConfirm": {
+    "confirmAction": "操作の確認",
+    "defaultTitle": "よろしいですか？",
+    "defaultMessage": "この操作を本当に実行しますか？",
+    "yes": "はい",
+    "no": "いいえ",
+    "cancel": "キャンセル",
+    "logoutTitle": "ログアウトの確認",
+    "logoutMessage": "ログアウトしてもよろしいですか？アカウントにアクセスするには再度サインインが必要です。",
+    "logout": "ログアウト",
+    "deleteTitle": "削除の確認",
+    "deleteNamedMessage": "「{name}」を削除してもよろしいですか？この操作は元に戻せません。",
+    "deleteMessage": "この項目を削除してもよろしいですか？この操作は元に戻せません。",
+    "delete": "削除",
+    "clearTitle": "消去の確認",
+    "clearTypedMessage": "{dataType} をすべて消去してもよろしいですか？この操作は元に戻せません。",
+    "clearMessage": "すべてのデータを消去してもよろしいですか？この操作は元に戻せません。",
+    "clear": "消去",
+    "input": "入力",
+    "ok": "OK",
+    "removeItem": "{label} を削除"
+  },
+  "colorbox": {
+    "openInNewTab": "新しいタブで開く",
+    "blankPageHint": "ページが空白ですか？新しいタブで開いてください。"
   }
 }

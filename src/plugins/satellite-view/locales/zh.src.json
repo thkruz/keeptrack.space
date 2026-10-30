@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "卫星视图"
+      "bottomIconLabel": "卫星视图",
+      "commandPalette": {
+        "activate": "切换到卫星视图"
+      },
+      "shortcuts": {
+        "enter": "进入卫星视图"
+      }
     }
   }
 }

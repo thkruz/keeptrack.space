@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "Lien copié dans le presse-papiers !",
         "copyFailed": "Échec de la copie du lien dans le presse-papiers."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Échec du partage natif : {error}"
       }
     }
   }

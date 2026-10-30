@@ -1,0 +1,272 @@
+/*
+ * KTOC Notices. The menu opts into the shared v13 card system (.kt-ui-v13 +
+ * kt-section, see src/engine/ui/menu-v13.css); this file only styles the
+ * status segmented control, the notices table, paging, and the info-box card.
+ */
+
+/* ===== Filters ===== */
+#ktoc-notices-menu .ktoc-segmented {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  margin: 4px 0 10px;
+  border-radius: var(--kt-radius-md, 6px);
+  background: rgba(0, 0, 0, 0.25);
+}
+
+#ktoc-notices-menu .ktoc-segment {
+  flex: 1;
+  padding: 6px 10px;
+  border: none;
+  border-radius: var(--kt-radius-sm, 4px);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#ktoc-notices-menu .ktoc-segment:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+#ktoc-notices-menu .ktoc-segment.active {
+  background: var(--color-primary, #b71c1c);
+  color: #fff;
+}
+
+#ktoc-notices-menu .ktoc-field-label {
+  display: block;
+  margin: 2px 0 4px;
+  font-size: 11px;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-menu .ktoc-type-filter {
+  width: 100%;
+}
+
+#ktoc-notices-menu .ktoc-norad-filter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 12px;
+}
+
+#ktoc-notices-menu .ktoc-norad-filter-clear {
+  padding: 4px 10px;
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* ===== Status line (loading, empty, errors) ===== */
+#ktoc-notices-menu .ktoc-status-msg {
+  margin: 6px 0;
+  padding: 8px;
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-menu .ktoc-status-msg.ktoc-status-msg-error {
+  border-left: 3px solid var(--color-primary, #b71c1c);
+  text-align: left;
+  color: var(--color-text-light, #f5f5f5);
+}
+
+/* ===== Table ===== */
+/* Long translated headers (ru, pl, uk) make the table wider than the menu; scroll it inside the card. */
+.ktoc-table-scroll {
+  overflow-x: auto;
+}
+
+#ktoc-notices-table {
+  width: 100%;
+  margin: 4px 0 0;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+#ktoc-notices-table th,
+#ktoc-notices-table td {
+  padding: 5px 6px;
+  text-align: left;
+  border-bottom: 1px solid var(--color-dark-border);
+}
+
+/* Event, date, status and link stay on one line; only the satellite name may wrap. */
+#ktoc-notices-table td:nth-child(1),
+#ktoc-notices-table td:nth-child(2),
+#ktoc-notices-table td:nth-child(5),
+#ktoc-notices-table td:nth-child(6) {
+  white-space: nowrap;
+}
+
+#ktoc-notices-table .ktoc-notices-header th {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-table tr.ktoc-notice-row {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+#ktoc-notices-table tr.ktoc-notice-row:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+#ktoc-notices-table tr.ktoc-notice-row-selected {
+  box-shadow: inset 3px 0 0 var(--color-primary, #b71c1c);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Canceled notices stay listed but read as retracted */
+#ktoc-notices-table tr.ktoc-notice-canceled td:not(:last-child) {
+  text-decoration: line-through;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-table tr.ktoc-notice-canceled .ktoc-status-badge {
+  text-decoration: none;
+  display: inline-block;
+}
+
+#ktoc-notices-table .ktoc-notice-link {
+  font-size: 18px;
+  /* Beats the global `a { color: ... !important }`; red is reserved for the hover accent. */
+  color: var(--color-text-light, #f5f5f5) !important;
+  text-decoration: none;
+}
+
+#ktoc-notices-table .ktoc-notice-link:hover {
+  color: var(--color-primary-light, #e01a0e) !important;
+}
+
+/* ===== Status badges (menu + info box) ===== */
+.ktoc-status-badge {
+  padding: 1px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  /* Set, not inherited: canceled rows and the info box muted line would otherwise grey it out. */
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.ktoc-status-badge.ktoc-status-confirmed {
+  background: rgba(46, 125, 50, 0.45);
+}
+
+.ktoc-status-badge.ktoc-status-potential {
+  background: rgba(249, 168, 37, 0.35);
+}
+
+.ktoc-status-badge.ktoc-status-canceled {
+  background: rgba(97, 97, 97, 0.9);
+}
+
+/* ===== Paging ===== */
+#ktoc-notices-menu .ktoc-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin: 10px 0;
+}
+
+#ktoc-notices-menu .ktoc-pagination-btn {
+  padding: 6px 14px;
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-light, #f5f5f5);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#ktoc-notices-menu .ktoc-pagination-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--color-primary-light, #e01a0e);
+}
+
+#ktoc-notices-menu .ktoc-pagination-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#ktoc-notices-menu .ktoc-pagination-text {
+  font-size: 12px;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-menu .ktoc-attribution {
+  display: block;
+  margin-top: 8px;
+  text-align: center;
+  color: var(--color-dark-text-muted);
+}
+
+/* ===== Selected-object info box card ===== */
+#ktoc-notices-sat-info .ktoc-sat-info-row {
+  display: block;
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--color-dark-border);
+  /* The global `a { color: ... !important }` in style.common.css would paint these brand red. */
+  color: var(--color-text-light, #f5f5f5) !important;
+  text-decoration: none;
+}
+
+#ktoc-notices-sat-info a.ktoc-sat-info-row:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+#ktoc-notices-sat-info .ktoc-sat-info-row-bottom {
+  font-size: 11px;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-sat-info .ktoc-sat-info-row.ktoc-notice-canceled .ktoc-sat-info-row-top {
+  text-decoration: line-through;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-sat-info .ktoc-sat-info-show-all {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#ktoc-notices-sat-info .ktoc-sat-info-show-all::after {
+  content: '\203A';
+  font-size: 16px;
+  color: var(--color-dark-text-muted);
+}
+
+#ktoc-notices-sat-info .ktoc-sat-info-show-all:hover {
+  background-color: rgba(255, 255, 255, 0.07);
+}
+
+#ktoc-notices-sat-info.collapsed .ktoc-sat-info-list,
+#ktoc-notices-sat-info.collapsed .ktoc-sat-info-show-all {
+  display: none !important;
+}
+
+/* Phones: drop the event id column; the rest scrolls sideways in .ktoc-table-scroll. */
+body.is-mobile-mode #ktoc-notices-table th:nth-child(1),
+body.is-mobile-mode #ktoc-notices-table td:nth-child(1) {
+  display: none;
+}

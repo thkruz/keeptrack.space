@@ -39,7 +39,11 @@
         "endDateInvalid": "La date de fin est invalide.",
         "savingScenario": "Erreur lors de l'enregistrement du scénario !",
         "loadingScenarioFile": "Erreur lors du chargement du fichier de scénario !",
-        "decompressingScenarioFile": "Erreur lors de la décompression du fichier de scénario !"
+        "decompressingScenarioFile": "Erreur lors de la décompression du fichier de scénario !",
+        "startAfterEnd": "L'heure de début du scénario doit être antérieure à l'heure de fin.",
+        "invalidDates": "Les heures de début et de fin du scénario doivent être des dates valides.",
+        "bothBoundsRequired": "Les heures de début et de fin du scénario doivent toutes deux être définies.",
+        "nameTooLong": "Le nom du scénario doit comporter 30 caractères au maximum."
       },
       "defaults": {
         "scenarioName": "Mon scénario",

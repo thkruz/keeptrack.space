@@ -40,6 +40,8 @@ export class SatelliteFixedView extends KeepTrackPlugin {
     return [
       {
         key: '4',
+        // Key 4 only enters the mode (a second press stays), so the guide must not say "Toggle".
+        description: t7e('plugins.SatelliteFixedView.shortcuts.enter'),
         callback: () => this.bottomIconCallback(),
       },
     ];
@@ -49,7 +51,7 @@ export class SatelliteFixedView extends KeepTrackPlugin {
     return [
       {
         id: 'SatelliteFixedView.activate',
-        label: 'Switch to Satellite-Fixed View',
+        label: t7e('plugins.SatelliteFixedView.commandPalette.activate'),
         category: 'View',
         callback: () => this.bottomMenuClicked(),
       },
@@ -66,7 +68,8 @@ export class SatelliteFixedView extends KeepTrackPlugin {
       if (isFixedToSat && !this.isIconDisabled) {
         this.setBottomIconToSelected();
       } else if (!isFixedToSat && this.isMenuButtonActive) {
-        this.setBottomIconToUnselected();
+        // Icon sync only: the camera changed elsewhere, so leave the user's open menu alone.
+        this.setBottomIconToUnselected(false);
       }
     });
   }

@@ -30,10 +30,14 @@
       "external": "Esterna"
     },
     "notAvailable": "N/D",
+    "notAvailableJscVimpel": "N/D (JSC Vimpel)",
     "oemFile": "File OEM",
     "copy": {
       "copied": "Copiato negli appunti",
       "tooltip": "Clicca per copiare"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "Il pannello informazioni del satellite non ha terminato il caricamento, quindi i dettagli non sono stati aggiornati."
     }
   }
 }

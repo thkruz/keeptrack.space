@@ -8,9 +8,9 @@
         "satellite": "Satelita",
         "tvchannel": "Kanał TV",
         "beam": "Wiązka",
-        "freq": "Częstotliwość",
+        "freq": "Częstotliwość (MHz)",
         "system": "System",
-        "SRFEC": "SR/FEC",
+        "SRFEC": "SR (kSym/s) / FEC",
         "video": "Wideo",
         "lang": "Język",
         "encryption": "Szyfrowanie"
@@ -19,7 +19,8 @@
         "NoChannelInfo": "Satelita nie posiada informacji o kanałach",
         "NotSatellite": "Wybrany obiekt nie jest satelitą",
         "FetchFailed": "Nie udało się pobrać informacji o kanałach dla {name} i {altName}",
-        "NoData": "Brak dostępnych danych kanałów"
+        "NoData": "Brak dostępnych danych kanałów",
+        "SaveXlsxFailed": "Błąd podczas zapisywania pliku xlsx!"
       },
       "help": {
         "overview": "Dane transpondera i kanałów pokazują, co geostacjonarny satelita telewizyjny lub komunikacyjny faktycznie nadaje: każdy znany kanał wraz z częstotliwością, wiązką, systemem transmisji i szyfrowaniem. Dane obejmują kilkaset dobrze znanych satelitów nadawczych i są pobierane na żywo po otwarciu menu.",
@@ -41,9 +42,11 @@
         "statusLoading": "Ładowanie kanałów…",
         "statusEmpty": "Brak dostępnych danych o kanałach",
         "statusNoMatch": "Żaden kanał nie pasuje do filtra",
-        "statusError": "Nie można załadować danych o kanałach"
+        "statusError": "Nie można załadować danych o kanałach",
+        "retry": "Ponów"
       },
-      "attribution": "Dane kanałów z API KeepTrack (publiczne wykazy)."
+      "attribution": "Dane kanałów z API KeepTrack (publiczne wykazy).",
+      "searchAliases": "Częstotliwości satelitów,Transponder,Dane kanałów"
     }
   }
 }

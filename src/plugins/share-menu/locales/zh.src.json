@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "链接已复制到剪贴板！",
         "copyFailed": "无法将链接复制到剪贴板。"
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "系统分享失败：{error}"
       }
     }
   }

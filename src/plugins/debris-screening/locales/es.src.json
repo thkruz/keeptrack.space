@@ -5,6 +5,7 @@
       "title": "Detección de Escombros",
       "resultsTitle": "Resultados del Análisis",
       "resultsCount": "{count} conjunciones encontradas",
+      "notScreened": "Aún no analizado",
       "exportCsv": "Exportar CSV",
       "riskLevels": {
         "critical": "Crítico",
@@ -71,6 +72,7 @@
       "ricConvention": "Convención de signos RIC: secundario menos primario, en el marco RIC del primario (+R radial hacia fuera, +I en la dirección de la velocidad del primario, +C = R x I, la normal a la órbita).",
       "pcInputs": "Entradas de Pc: radio de cuerpo rígido {hbr} m ({primary} m primario + {secondary} m secundario) para cada par. Covarianza: estimada a partir del TLE de cada objeto (el modelo de las sigmas del cuadro de información, a {sigma} sigma), no de un CDM.",
       "parentTag": "origen de este satélite de analista",
+      "uncertaintyAssumedFromParent": "Incertidumbre tomada del objeto de origen {name} ({norad})",
       "showParentRows": "Mostrar fila de origen ({count})",
       "notInCatalog": "(no está en el catálogo cargado)",
       "resultsCapped": "Se muestran las {limit} primeras de {total} conjunciones (mayor Pc primero)"

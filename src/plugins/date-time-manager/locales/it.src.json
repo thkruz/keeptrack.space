@@ -48,7 +48,9 @@
         "year": "Anno",
         "goTo": "Vai a (UTC)",
         "goToTooltip": "Digita una data e un'ora UTC (YYYY-MM-DD HH:MM:SS) e premi Invio. Secondi e ora sono facoltativi.",
-        "goToInvalid": "Data non valida. Usa il formato UTC YYYY-MM-DD HH:MM:SS."
+        "goToInvalid": "Data non valida. Usa il formato UTC YYYY-MM-DD HH:MM:SS.",
+        "containerNotFound": "Contenitore con ID {id} non trovato",
+        "timeInvalid": "Formato orario non valido! Previsto HH:MM:SS, HH:MM:SS.s o HHMMSS"
       }
     }
   }

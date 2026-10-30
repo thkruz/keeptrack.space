@@ -8,7 +8,8 @@
         "allData": "Toutes les Données",
         "orbitalOnly": "Orbital Uniquement",
         "allDataDesc": "Remplace l'ensemble du catalogue par les données sélectionnées",
-        "orbitalOnlyDesc": "Met à jour les TLE tout en préservant les métadonnées satellite"
+        "orbitalOnlyDesc": "Met à jour les TLE tout en préservant les métadonnées satellite",
+        "current": "Actuel"
       },
       "categories": {
         "special": "Intérêt Spécial",
@@ -97,6 +98,8 @@
       "errorMsgs": {
         "FetchFailed": "Échec du chargement du catalogue",
         "DefaultFailed": "Échec de la restauration du catalogue par défaut",
+        "CelestrakFailed": "Échec du chargement du catalogue CelesTrak",
+        "VimpelFailed": "Échec du chargement du catalogue JSC Vimpel",
         "Forbidden": "CelesTrak a rejeté la requête (HTTP 403). Il s'agit généralement d'une limitation de débit Cloudflare ; attendez une minute et réessayez.",
         "RateLimited": "Trop de requêtes de catalogue. Veuillez attendre une minute avant de réessayer.",
         "ServerError": "CelesTrak est temporairement indisponible. Veuillez réessayer dans quelques minutes.",

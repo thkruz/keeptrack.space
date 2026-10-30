@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} 已加载",
         "simLoadFailed": "无法加载 {sim}",
-        "missilesActive": "{n} / {max} 枚导弹活动中"
+        "missilesActive": "{n} / {max} 枚导弹活动中",
+        "massRaidLoaded": "大规模导弹袭击加载成功",
+        "missileCreated": "导弹 RV_{n}<br>已创建。",
+        "mirvCreated": "已创建的再入飞行器 (MIRV)：<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "目标纬度无效！",
         "invalidTargetLongitude": "目标经度无效！",
         "invalidLaunchLatitude": "发射纬度无效！",
         "invalidLaunchLongitude": "发射经度无效！",
-        "invalidWarheads": "弹头数量必须是 1 到 12 之间的整数。"
+        "invalidWarheads": "弹头数量必须是 1 到 12 之间的整数。",
+        "maxMissiles": "错误：已达到导弹<br>数量上限。",
+        "launchLatRange": "错误：发射纬度必须<br>在 90 到 -90 度之间",
+        "launchLonRange": "错误：发射经度必须<br>在 180 到 -180 度之间",
+        "targetLatRange": "错误：目标纬度必须<br>在 90 到 -90 度之间",
+        "targetLonRange": "错误：目标经度必须<br>在 180 到 -180 度之间",
+        "minDistance": "错误：此导弹的最小射程为 320 km。",
+        "maxDistance": "错误：此导弹的最大射程为 {km} km。",
+        "tooClose": "错误：对于所选导弹，此距离过近。",
+        "orbitalVelocity": "错误：导弹达到了轨道速度<br>(发动机对此射程而言过大)。",
+        "overshot": "错误：导弹飞越了目标<br>(发动机对此射程而言过大)。",
+        "notGuided": "错误：在此射程下无法将导弹<br>引导至目标。"
       },
       "commands": {
         "open": "打开导弹插件",

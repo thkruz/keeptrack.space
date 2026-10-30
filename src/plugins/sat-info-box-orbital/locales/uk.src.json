@@ -80,6 +80,15 @@
     "meter": "м",
     "kilometer": "км",
     "second": "с",
-    "unknown": "Невідомо"
+    "unknown": "Невідомо",
+    "notAvailable": "Н/Д",
+    "CenterBody": {
+      "label": "Центральне тіло",
+      "tooltip": "Тіло, відносно якого задано положення ефемерид (OEM CENTER_NAME)"
+    },
+    "RefFrame": {
+      "label": "Система відліку",
+      "tooltip": "Система координат ефемерид (OEM REF_FRAME)"
+    }
   }
 }

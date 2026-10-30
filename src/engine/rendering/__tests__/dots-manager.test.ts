@@ -122,6 +122,21 @@ describe('drawManager', () => {
       dotsManagerInstance.updateCruncherBuffers({ satPos: new Float32Array([9, 9, 9]) } as never);
       expect(Array.from(dotsManagerInstance.positionData)).toEqual([9, 9, 9]);
     });
+
+    it('re-applies OEM slots right after a cruncher copy, so a mission never reads (0, 0, 0) between frames', () => {
+      ServiceLocator.getRenderer().isCapturing = false;
+      dotsManagerInstance.positionData = new Float32Array(6);
+      dotsManagerInstance.velocityData = new Float32Array(6);
+      const interpolate = vi.spyOn(dotsManagerInstance, 'interpolatePositionsOfOemSatellites').mockImplementation(() => {
+        dotsManagerInstance.positionData[3] = 123;
+      });
+
+      // The worker knows nothing about the OEM object in slot 1 and sends zeros for it.
+      dotsManagerInstance.updateCruncherBuffers({ satPos: new Float32Array([9, 9, 9, 0, 0, 0]), satVel: new Float32Array(6) } as never);
+
+      expect(interpolate).toHaveBeenCalledTimes(1);
+      expect(dotsManagerInstance.positionData[3]).toBe(123);
+    });
   });
 });
 

@@ -16,7 +16,7 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, ZoomValue } from '@ootk/src/main';
 import sensorPng from '@public/img/icons/sensor.png';
-import { SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
+import { getSensorGroupHeader, getSensorGroupTopLinkName, SensorGroup, sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { keepTrackApi } from './../../keepTrackApi';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
@@ -194,7 +194,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
 
     const groupCommands: ICommandPaletteCommand[] = this.sensorGroups_.map((group) => ({
       id: `SensorListPlugin.setSensorGroup.${group.name}`,
-      label: t7e('plugins.SensorListPlugin.commands.setSensorGroup' as Parameters<typeof t7e>[0]).replace('{name}', group.header),
+      label: t7e('plugins.SensorListPlugin.commands.setSensorGroup' as Parameters<typeof t7e>[0]).replace('{name}', getSensorGroupHeader(group)),
       category,
       callback: () => {
         const sm = ServiceLocator.getSensorManager();
@@ -392,7 +392,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           );
       } catch (e) {
         // TODO: More intentional conditional statement
-        errorManagerInstance.warn(`Error in sensorListContentClick: ${e}`);
+        errorManagerInstance.warn(t7e('plugins.SensorListPlugin.errorMsgs.cameraMoveFailed' as Parameters<typeof t7e>[0]).replace('{error}', String(e)));
         // Multi-sensors break this
       }
     }
@@ -503,13 +503,14 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
 
       const params = {
         name,
-        header: sensorGroup.header,
+        // Display text only; the raw header stays the lineManager marker id.
+        header: getSensorGroupHeader(sensorGroup),
         sensors: sensorGroup.list
           .map((sensorName) => {
             const sensor = sensors[sensorName];
 
             if (!sensor) {
-              errorManagerInstance.warn(`Sensor ${sensorName} listed in sensorGroups was not found in sensors catalog!`);
+              errorManagerInstance.warn(t7e('plugins.SensorListPlugin.errorMsgs.sensorNotInCatalog' as Parameters<typeof t7e>[0]).replace('{sensor}', sensorName));
 
               return null;
             }
@@ -519,7 +520,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
           .filter((sensor) => sensor !== null),
         topLinks: [
           {
-            name: sensorGroup.topLink.name,
+            name: getSensorGroupTopLinkName(sensorGroup),
             badge: sensorGroup.topLink.badge,
           },
         ],
@@ -529,7 +530,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         throw new Error(`No sensors found for group: ${name}`);
       }
 
-      const markLabel = t7e('plugins.SensorListPlugin.buttons.markAll' as Parameters<typeof t7e>[0]).replace('{name}', sensorGroup.topLink.name);
+      const markLabel = t7e('plugins.SensorListPlugin.buttons.markAll' as Parameters<typeof t7e>[0]).replace('{name}', getSensorGroupTopLinkName(sensorGroup));
       const isMarked = ServiceLocator.getLineManager().hasSensorMarkers(sensorGroup.header);
       const renderedTopLink = params.topLinks
         .map(
@@ -561,7 +562,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
         </section>
       `;
     } catch (error) {
-      errorManagerInstance.warn('Error generating HTML:', error);
+      errorManagerInstance.warn(t7e('plugins.SensorListPlugin.errorMsgs.groupRenderFailed' as Parameters<typeof t7e>[0]), error);
 
       return '';
     }

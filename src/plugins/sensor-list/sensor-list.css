@@ -32,12 +32,11 @@
   gap: 8px;
 }
 
+/* Long agency names (ru/uk ESOC) wrap instead of being cut off. */
 #sensor-list-content .sensor-group-header-text {
   flex: 1 1 auto;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 /* Marker toggle. Following the app status palette it reads red when off (markers

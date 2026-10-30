@@ -1,7 +1,11 @@
 {
   "plugins": {
     "FpsView": {
-      "bottomIconLabel": "第一人称视图"
+      "bottomIconLabel": "第一人称视图",
+      "commandPalette": {
+        "switch": "切换第一人称视图"
+      },
+      "firstUseHint": "FPS 视图：W A S D 飞行，Q 和 E 上升和下降，数字键盘 4 6 8 2 转向和环顾，按住 Shift 慢速，按住右 Shift 快速。再次按 8 退出。"
     }
   }
 }

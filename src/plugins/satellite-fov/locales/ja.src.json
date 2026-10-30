@@ -18,7 +18,8 @@
         "activeS2sCones": "アクティブな衛星間コーン",
         "fovDegrees": "視野（度）",
         "opacity": "不透明度",
-        "targetCatalogNumber": "ターゲットのカタログ番号"
+        "targetCatalogNumber": "ターゲットのカタログ番号",
+        "targetCatalogPlaceholder": "例: 25544"
       },
       "tooltips": {
         "fovOfSensor": "センサーの視野",

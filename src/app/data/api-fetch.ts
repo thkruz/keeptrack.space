@@ -1,4 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 
 let hasShown401Warning_ = false;
@@ -38,7 +39,7 @@ export const apiFetch = async (input: RequestInfo | URL, init?: RequestInit): Pr
 
   if (!hasShown401Warning_ && response.status === 401 && url.includes('api.keeptrack.space')) {
     hasShown401Warning_ = true;
-    errorManagerInstance.warnToast('API key required. Get a free key at keeptrack.space and add it to settings/data-settings.ts');
+    errorManagerInstance.warnToast(t7e('errorMsgs.apiKeyRequired'));
   }
 
   return response;

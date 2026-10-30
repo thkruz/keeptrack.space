@@ -108,6 +108,8 @@ export class ColorSchemeManager {
   iSensor = 0;
   isReady = false;
   lastDotColored = 0;
+  /** Legend classes the user hid, persisted under {@link StorageKey.LEGEND_HIDDEN_FLAGS}. */
+  private readonly hiddenLegendFlags_ = new Set<string>();
   objectTypeFlags = {
     starLow: true,
     starMed: true,
@@ -146,6 +148,8 @@ export class ColorSchemeManager {
   private useWorkerMode_ = false;
   private workerReady_ = false; // true once worker has received catalog; useWorkerMode_ can be toggled per-scheme
   private catalogSeqNum_ = 0;
+  /** The out-of-group color last sent to the worker (NaN = never sent). */
+  private readonly lastSentTransparent_: [number, number, number, number] = [Number.NaN, Number.NaN, Number.NaN, Number.NaN];
 
   /** Scheme IDs the color worker knows how to compute. Plugin schemes not in this set fall back to main-thread. */
   private static readonly WORKER_SUPPORTED_SCHEMES_ = new Set([
@@ -232,6 +236,9 @@ export class ColorSchemeManager {
         if (isForceRecolor) {
           this.sendAllStateToWorker_();
           this.colorCruncher_.sendForceRecolor();
+        } else if (this.isTransparentColorStale_()) {
+          // UPDATE_SETTINGS schedules a (debounced) worker recolor on its own
+          this.forwardSettingsToWorker_();
         }
 
         return;
@@ -334,6 +341,7 @@ export class ColorSchemeManager {
         notional: [0.0, 0.0, 0.0, 1.0] as rgbaArray,
       };
 
+    this.loadHiddenLegendFlags_();
     this.resetObjectTypeFlags();
     this.colorBuffer = renderer.gl.createBuffer();
     this.pickableBuffer = renderer.gl.createBuffer();
@@ -632,6 +640,69 @@ export class ColorSchemeManager {
         this.colorSchemeInstances[colorScheme].resetObjectTypeFlags();
       }
     }
+
+    this.applyHiddenLegendFlags_();
+  }
+
+  /** True when the user hid this legend class (it stays hidden in every scheme that has it). */
+  isLegendFlagHidden(flag: string): boolean {
+    return this.hiddenLegendFlags_.has(flag);
+  }
+
+  /** Records a legend hide/show so it survives scheme switches and reloads. */
+  setLegendFlagHidden(flag: string, isHidden: boolean): void {
+    if (isHidden) {
+      this.hiddenLegendFlags_.add(flag);
+    } else {
+      this.hiddenLegendFlags_.delete(flag);
+    }
+
+    PersistenceManager.getInstance().saveItem(StorageKey.LEGEND_HIDDEN_FLAGS, JSON.stringify([...this.hiddenLegendFlags_]));
+  }
+
+  private loadHiddenLegendFlags_(): void {
+    this.hiddenLegendFlags_.clear();
+    const raw = PersistenceManager.getInstance().getItem(StorageKey.LEGEND_HIDDEN_FLAGS);
+
+    if (!raw) {
+      return;
+    }
+
+    try {
+      const parsed: unknown = JSON.parse(raw);
+
+      if (Array.isArray(parsed)) {
+        for (const flag of parsed) {
+          if (typeof flag === 'string' && flag.length > 0) {
+            this.hiddenLegendFlags_.add(flag);
+          }
+        }
+      }
+    } catch {
+      errorManagerInstance.debug('Ignoring unreadable legend hidden flags');
+    }
+  }
+
+  /** Re-applies the user's legend hides to the manager and to every scheme that has the class. */
+  private applyHiddenLegendFlags_(): void {
+    const managerFlags = this.objectTypeFlags as Record<string, boolean>;
+
+    for (const flag of this.hiddenLegendFlags_) {
+      if (Object.hasOwn(managerFlags, flag)) {
+        managerFlags[flag] = false;
+      }
+
+      for (const colorScheme in this.colorSchemeInstances) {
+        if (!Object.hasOwn(this.colorSchemeInstances, colorScheme)) {
+          continue;
+        }
+        const schemeFlags = this.colorSchemeInstances[colorScheme].objectTypeFlags as Record<string, boolean> | undefined;
+
+        if (schemeFlags && Object.hasOwn(schemeFlags, flag)) {
+          schemeFlags[flag] = false;
+        }
+      }
+    }
   }
 
   setColorScheme(scheme: ColorScheme, isForceRecolor?: boolean) {
@@ -695,6 +766,9 @@ export class ColorSchemeManager {
     if (this.useWorkerMode_ && this.colorCruncher_) {
       this.colorCruncher_.sendSchemeChange(this.currentColorScheme.id, true);
       this.forwardGroupToWorker_();
+      if (this.isTransparentColorStale_()) {
+        this.forwardSettingsToWorker_();
+      }
     }
   }
 
@@ -1379,9 +1453,35 @@ export class ColorSchemeManager {
       sensorType: sensorManager?.currentSensors?.[0]?.type ?? 0,
       maxZoomDistance: settingsManager.maxZoomDistance,
       isMissileSimulatorEnabled: !!settingsManager.plugins?.MissileSimulatorPlugin?.enabled,
+      transparent: this.copyTransparentColor_(),
     };
 
     this.colorCruncher_.sendSettingsUpdate(flags);
+  }
+
+  /** Copies `settingsManager.colors.transparent` (the out-of-group color) and remembers it as sent. */
+  private copyTransparentColor_(): [number, number, number, number] {
+    const t = settingsManager.colors?.transparent ?? this.colorTheme?.transparent;
+    const sent = this.lastSentTransparent_;
+
+    sent[0] = t?.[0] ?? 0;
+    sent[1] = t?.[1] ?? 0;
+    sent[2] = t?.[2] ?? 0;
+    sent[3] = t?.[3] ?? 0;
+
+    return [sent[0], sent[1], sent[2], sent[3]];
+  }
+
+  /**
+   * True when `settingsManager.colors.transparent` differs from what the worker last received.
+   * Hide Others and Time Machine change that color and then recolor without forcing (Time Machine)
+   * or before the worker would otherwise hear about it, so non-forced recolors check it too.
+   */
+  private isTransparentColorStale_(): boolean {
+    const t = settingsManager.colors?.transparent ?? this.colorTheme?.transparent;
+    const sent = this.lastSentTransparent_;
+
+    return (t?.[0] ?? 0) !== sent[0] || (t?.[1] ?? 0) !== sent[1] || (t?.[2] ?? 0) !== sent[2] || (t?.[3] ?? 0) !== sent[3];
   }
 
   private forwardObjectTypeFlagsToWorker_(): void {

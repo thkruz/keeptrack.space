@@ -25,7 +25,16 @@
         "mapStyle": "Estilo de mapa",
         "standard": "Estándar",
         "political": "Político",
-        "nightLights": "Luces nocturnas"
+        "nightLights": "Luces nocturnas",
+        "inView": "Visible",
+        "outOfView": "Fuera de vista"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "No se pudo cargar la imagen del logotipo principal.",
+        "secondaryLogoFailed": "No se pudo cargar la imagen del logotipo secundario.",
+        "earthDrawAfterLoadFailed": "No se pudo dibujar la imagen de la Tierra en el lienzo tras cargarla: {error}",
+        "earthLoadFailed": "No se pudo cargar la imagen de la Tierra para el mapa estereográfico.",
+        "earthDrawFailed": "No se pudo dibujar la imagen de la Tierra en el lienzo: {error}"
       }
     }
   }

@@ -110,7 +110,7 @@ function extractPlaceholders(text: string): string[] {
 }
 
 function extractHtmlTags(text: string): string[] {
-  const matches = text.match(/<\/?[a-z][a-z0-9]*[^>]*>/giu);
+  const matches = text.match(/<\/?[a-z][^>]*>/giu);
 
   return matches ? matches.sort() : [];
 }
@@ -318,10 +318,11 @@ function parseLlmResponse(response: string, enMap: Map<string, string>, langMap:
   const issues: Issue[] = [];
 
   for (const line of lines) {
-    const match = (/^ISSUE:\s*(.+?)\s*\|\s*(.+)$/u).exec(line);
+    const match = (/^ISSUE:([^|]+)\|(.+)$/u).exec(line);
 
     if (match) {
-      const [, flaggedKey, reason] = match;
+      const flaggedKey = match[1].trim();
+      const reason = match[2].trim();
       const enVal = enMap.get(flaggedKey) ?? '';
       const langVal = langMap.get(flaggedKey) ?? '';
 

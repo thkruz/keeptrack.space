@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "Impossible de charger des images du futur. Chargement des images les plus récentes."
+        "FuturePictures": "Impossible de charger des images du futur. Chargement des images les plus récentes.",
+        "ImageLoadFailed": "Impossible de charger l'image de {source}"
       },
       "help": {
         "overview": "Imagerie Satellite affiche les photos les plus récentes prises par de vrais satellites météorologiques : vues du disque complet de MeteoSat, Himawari, GOES et Elektro-L en orbite géostationnaire, plus des images de la Terre entière prises par DSCOVR au point L1. Cela relie ce que vous voyez dans la simulation à ce que ces satellites photographient réellement en ce moment.",

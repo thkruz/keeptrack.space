@@ -9,6 +9,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { jday } from '@app/engine/utils/transforms';
+import { t7e } from '@app/locales/keys';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
 import { TimeSlider } from '@app/plugins/time-slider/time-slider';
 import { DEG2RAD, Degrees, ecefRad2rae, eci2ecef, eci2lla, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
@@ -240,7 +241,7 @@ export const MassRaidPre = async (time: number, simFile: string) => {
     missileManager.missileArray = builtMissiles;
   });
 
-  ServiceLocator.getUiManager().toast('Missile Mass Raid Loaded Successfully', ToastMsgType.normal);
+  ServiceLocator.getUiManager().toast(t7e('plugins.MissileSimulatorPlugin.msgs.massRaidLoaded'), ToastMsgType.normal);
   settingsManager.searchLimit = Math.max(settingsManager.searchLimit, settingsManager.maxMissiles);
   SettingsMenuPlugin.syncOnLoad();
 
@@ -338,16 +339,16 @@ export interface MirvLaunchParams {
  */
 const validateLaunchBounds_ = (launchLat: number, launchLon: number, targetLat: number, targetLon: number): string | null => {
   if (launchLat > 90 || launchLat < -90) {
-    return 'Error: Launch Latitude must be<br>between 90 and -90 degrees';
+    return t7e('plugins.MissileSimulatorPlugin.errorMsgs.launchLatRange');
   }
   if (launchLon > 180 || launchLon < -180) {
-    return 'Error: Launch Longitude must be<br>between 180 and -180 degrees';
+    return t7e('plugins.MissileSimulatorPlugin.errorMsgs.launchLonRange');
   }
   if (targetLat > 90 || targetLat < -90) {
-    return 'Error: Target Latitude must be<br>between 90 and -90 degrees';
+    return t7e('plugins.MissileSimulatorPlugin.errorMsgs.targetLatRange');
   }
   if (targetLon > 180 || targetLon < -180) {
-    return 'Error: Target Longitude must be<br>between 180 and -180 degrees';
+    return t7e('plugins.MissileSimulatorPlugin.errorMsgs.targetLonRange');
   }
 
   return null;
@@ -519,7 +520,7 @@ export const Missile = (
 
   if (missileManager.missilesInUse >= settingsManager.maxMissiles) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Maximum number of missiles<br>have been reached.';
+    missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.maxMissiles');
 
     return 0;
   }
@@ -583,7 +584,7 @@ export const Missile = (
   }
   missileManager.missilesInUse++;
   missileManager.lastMissileErrorType = ToastMsgType.normal;
-  missileManager.lastMissileError = `Missile Named RV_${MissileObjectNum}<br>has been created.`;
+  missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.msgs.missileCreated').replace('{n}', MissileObjectNum.toString());
 
   return 1; // Successful Launch
 };
@@ -617,7 +618,7 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
 
   if (missileManager.missilesInUse + count > settingsManager.maxMissiles) {
     missileManager.lastMissileErrorType = ToastMsgType.critical;
-    missileManager.lastMissileError = 'Error: Maximum number of missiles<br>have been reached.';
+    missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.errorMsgs.maxMissiles');
 
     return 0;
   }
@@ -689,7 +690,7 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
   }
 
   missileManager.lastMissileErrorType = ToastMsgType.normal;
-  missileManager.lastMissileError = `${created} reentry vehicle(s) (MIRV)<br>have been created.`;
+  missileManager.lastMissileError = t7e('plugins.MissileSimulatorPlugin.msgs.mirvCreated').replace('{n}', created.toString());
 
   return created;
 };

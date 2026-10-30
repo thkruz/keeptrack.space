@@ -6,7 +6,7 @@
  * the shared, unit-tested core (findSatsAvAGeo/findSatsAvALeo + findRpoPairs)
  * per bin. Progress is streamed after each bin and the loop yields so a CANCEL
  * message can interrupt a long survey - the same pattern the overflight worker
- * uses. The single-satellite mode is fast and stays on the main thread.
+ * uses. The single-satellite mode yields between neighbors the same way.
  */
 
 import { Satellite } from '@ootk/src/main';
@@ -87,25 +87,38 @@ async function surveyLeo_(runId: number, sats: Satellite[], params: RpoSearchPar
   return RPOs;
 }
 
-/** Screen a single primary (sats[0]) against its pre-gathered neighborhood. */
-function surveySingle_(runId: number, sats: Satellite[], params: RpoSearchParams): ProximityOpsEvent[] | null {
-  if (cancelledRunId >= runId) {
-    return null;
-  }
-
-  // Stream progress per screened neighbor, throttled to whole-percent changes so
-  // a dense plane does not flood the main thread with postMessage calls.
+/**
+ * Screen a single primary (sats[0]) against its pre-gathered neighborhood, one
+ * neighbor at a time, yielding between neighbors so a CANCEL stops the run after
+ * the current pair instead of after the whole batch.
+ */
+async function surveySingle_(runId: number, sats: Satellite[], params: RpoSearchParams): Promise<ProximityOpsEvent[] | null> {
+  const [primary, ...secondaries] = sats;
+  const baseDate = new Date(params.baseTimeMs);
+  let events: ProximityOpsEvent[] = [];
+  // Progress is throttled to whole-percent changes so a dense plane does not
+  // flood the main thread with postMessage calls.
   let lastPct = -1;
-  const events = findRpoPairs(sats, params, new Date(params.baseTimeMs), false, undefined, (done, total) => {
-    const pct = total > 0 ? Math.floor((done / total) * 100) : 100;
+
+  for (let idx = 0; idx < secondaries.length; idx++) {
+    if (cancelledRunId >= runId) {
+      return null;
+    }
+
+    events = events.concat(findRpoPairs([primary, secondaries[idx]], params, baseDate, false));
+
+    const done = idx + 1;
+    const pct = Math.floor((done / secondaries.length) * 100);
 
     if (pct !== lastPct) {
       lastPct = pct;
-      postMessage({ typ: RpoWorkerOutMsgType.PROGRESS, runId, done, total });
+      postMessage({ typ: RpoWorkerOutMsgType.PROGRESS, runId, done, total: secondaries.length });
     }
-  });
+    // biome-ignore lint/performance/noAwaitInLoops: sequential await is the yield that lets a queued CANCEL message interrupt the survey between pairs
+    await yieldToLoop_();
+  }
 
-  return events;
+  return cancelledRunId >= runId ? null : events;
 }
 
 /** Run the requested search and post the result (or an error) back. */
@@ -124,7 +137,7 @@ async function handleStart_(msg: RpoMsgStart): Promise<void> {
         events = await surveyGeo_(runId, sats, params);
         break;
       default:
-        events = surveySingle_(runId, sats, params);
+        events = await surveySingle_(runId, sats, params);
         break;
     }
 

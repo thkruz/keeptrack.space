@@ -25,7 +25,16 @@
         "mapStyle": "지도 스타일",
         "standard": "표준",
         "political": "정치 지도",
-        "nightLights": "야간 조명"
+        "nightLights": "야간 조명",
+        "inView": "시야 내",
+        "outOfView": "시야 밖"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "기본 로고 이미지를 불러오지 못했습니다.",
+        "secondaryLogoFailed": "보조 로고 이미지를 불러오지 못했습니다.",
+        "earthDrawAfterLoadFailed": "불러온 후 지구 이미지를 캔버스에 그리지 못했습니다: {error}",
+        "earthLoadFailed": "스테레오 지도용 지구 이미지를 불러오지 못했습니다.",
+        "earthDrawFailed": "지구 이미지를 캔버스에 그리지 못했습니다: {error}"
       }
     }
   }

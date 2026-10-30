@@ -114,25 +114,44 @@ export class RicPlot extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, (obj: BaseObject | null) => {
       if (!obj || this.selectSatManager_.selectedSat === -1) {
-        if (this.isMenuButtonActive) {
-          this.hideSideMenus();
-        }
-        this.setBottomIconToDisabled();
+        this.closeForMissingPair_();
       } else {
         this.setBottomIconToEnabled();
+        this.redrawIfOpen_();
       }
     });
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
       if (!obj || this.selectSatManager_.secondarySat === -1) {
-        if (this.isMenuButtonActive) {
-          this.hideSideMenus();
-        }
-        this.setBottomIconToDisabled();
+        this.closeForMissingPair_();
       } else {
         this.setBottomIconToEnabled();
+        this.redrawIfOpen_();
       }
     });
+  }
+
+  /**
+   * Without a primary and a secondary there is nothing to compare: close the plot and disable the
+   * icon, whose click then explains what is missing ("Select a secondary satellite first!").
+   */
+  private closeForMissingPair_(): void {
+    if (this.isMenuButtonActive) {
+      this.hideSideMenus();
+    }
+    this.setBottomIconToDisabled();
+  }
+
+  /** A new primary or secondary while the plot is open redraws the header and series for the new pair. */
+  private redrawIfOpen_(): void {
+    if (!this.isMenuButtonActive) {
+      return;
+    }
+    const chartDom = getEl(this.plotCanvasId, true);
+
+    if (chartDom) {
+      this.createPlot(this.getPlotData(), chartDom);
+    }
   }
 
   private uiManagerFinal_(): void {
@@ -280,7 +299,7 @@ export class RicPlot extends KeepTrackPlugin {
     const satS = this.selectSatManager_.secondarySatObj;
 
     if (!satP || !satS) {
-      errorManagerInstance.warn('Missing satellite data for RIC plot');
+      errorManagerInstance.warn(t7e('plugins.RicPlot.errorMsgs.missingSatData'));
 
       return [];
     }

@@ -8,10 +8,16 @@ export enum StorageKey {
   SETTINGS_DOT_COLORS = 'v2-keepTrack-settings-dotColors',
   IS_ADVICE_ENABLED = 'v2-isAdviceEnabled',
   LAST_MAP = 'v2-keepTrack-earthTexture',
+  /** Id of the Earth style preset in effect (EarthPresetsPlugin); removed once the look is changed by hand. */
+  EARTH_PRESET = 'v2-keepTrack-earthPreset',
   COLOR_SCHEME = 'v2-keepTrack-colorScheme',
   SETTINGS_DRAW_CAMERA_WIDGET = 'v2-keepTrack-settings-drawCameraWidget',
   SETTINGS_DRAW_ORBITS = 'v2-keepTrack-settings-drawOrbits',
   SETTINGS_DRAW_ECF = 'v2-keepTrack-settings-drawECF',
+  SETTINGS_ECF_ORBIT_COUNT = 'v2-keepTrack-settings-ecfOrbitCount',
+  SETTINGS_SHOW_INFO_ON_HOVER = 'v2-keepTrack-settings-showInfoOnHover',
+  SETTINGS_COMPENSATE_EARTH_ROTATION = 'v2-keepTrack-settings-compensateEarthRotation',
+  SETTINGS_SHOW_NEXT_PASS = 'v2-keepTrack-settings-showNextPass',
   SETTINGS_DRAW_IN_COVERAGE_LINES = 'v2-keepTrack-settings-drawInCoverageLines',
   SETTINGS_DRAW_BLACK_EARTH = 'v2-keepTrack-settings-drawBlackEarth',
   SETTINGS_DRAW_ATMOSPHERE = 'v2-keepTrack-settings-drawAtmosphere',
@@ -19,7 +25,8 @@ export enum StorageKey {
   SETTINGS_DRAW_ASTEROID_BELT = 'v2-keepTrack-settings-drawAsteroidBelt',
   SETTINGS_GRAY_SKYBOX = 'v2-keepTrack-settings-graySkybox',
   SETTINGS_ECI_ON_HOVER = 'v2-keepTrack-settings-eciOnHover',
-  SETTINGS_HOS = 'v2-keepTrack-settings-hos',
+  /** Hide Others toggle state ('true' = others hidden), written only by HideOtherSatellitesPlugin. */
+  SETTINGS_HIDE_OTHER_SATS = 'v2-keepTrack-settings-hideOtherSats',
   SETTINGS_DEMO_MODE = 'v2-keepTrack-settings-demoMode',
   SETTINGS_SAT_LABEL_MODE = 'v2-keepTrack-settings-satLabelMode',
   SETTINGS_SAT_LABEL_MODE_V2 = 'v2-keepTrack-settings-satLabelModeV2',
@@ -36,6 +43,7 @@ export enum StorageKey {
   SETTINGS_DRAW_TRAILING_ORBITS = 'v2-keepTrack-settings-drawTrailingOrbits',
   SETTINGS_DRAW_AURORA = 'v2-keepTrack-settings-drawAurora',
   SETTINGS_DRAW_GRATICULE = 'v2-keepTrack-settings-drawGraticule',
+  SETTINGS_DRAW_NIGHT_AS_DAY = 'v2-keepTrack-settings-drawNightAsDay',
   SETTINGS_DRAW_FLAT_MAP_TERMINATOR = 'v2-keepTrack-settings-drawFlatMapTerminator',
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_DRAW_ORBIT_ECLIPSE = 'v2-keepTrack-settings-drawOrbitEclipse',
@@ -126,6 +134,9 @@ export enum StorageKey {
   // Color Scheme Editor
   COLOR_SCHEME_OVERRIDES = 'v2-keepTrack-colorSchemeOverrides',
 
+  // Layers legend: JSON string[] of object-type flags the user hid (survives scheme switches)
+  LEGEND_HIDDEN_FLAGS = 'v2-keepTrack-legendHiddenFlags',
+
   // Achievement progress counters (mirrors the server-synced app_preferences copy)
   ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
 
@@ -189,6 +200,13 @@ export enum StorageKey {
   // Custom Sensor (user-built sensor definitions and which one was the primary,
   // restored on boot so a custom station survives a reload)
   CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
+
+  // FPS View (the one-time "how to fly" hint was shown on this device)
+  FPS_VIEW_HINT_SEEN = 'v2-keepTrack-fpsViewHintSeen',
+
+  // Plugin API facade (createPluginStorage in src/plugin-api): one JSON object
+  // holding every plugin's namespaced values, Record<configKey, Record<key, string>>.
+  PLUGIN_STORAGE = 'v2-keepTrack-pluginStorage',
 
   // Per-key sync timestamps for account-scoped keys: JSON Record<StorageKey, epochMs>.
   // Maintained by PersistenceManager; wiped on version bumps so a post-wipe login

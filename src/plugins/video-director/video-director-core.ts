@@ -27,6 +27,8 @@
  * if-blocks + switch), and opposite-direction resolution.
  */
 
+import { CameraSettings } from '@app/settings/camera-settings';
+
 /** A camera direction toggle, its backing settings flag, and its mutually-exclusive opposite. */
 export interface DirectionToggle {
   /** Full DOM id of the checkbox. */
@@ -73,12 +75,23 @@ export const DIRECTION_TOGGLES: DirectionToggle[] = [
 /** Subset of {@link DIRECTION_TOGGLES} that control auto-rotate (used to seed a default before starting). */
 export const ROTATE_TOGGLE_IDS = ['video-director-rotateL', 'video-director-rotateR', 'video-director-rotateU', 'video-director-rotateD'];
 
+/**
+ * The camera's own defaults are the one source for the speed fallbacks and the
+ * fields' initial values, so a blank field returns to what the menu opened with.
+ */
+const CAMERA_DEFAULTS_ = new CameraSettings();
+
 /** Every speed field in display order, with NaN-safe defaults and clamp bounds. */
 export const SPEED_CONFIGS: SpeedConfig[] = [
-  { id: 'video-director-rotateSpeed', flag: 'autoRotateSpeed', def: 0.000075, min: 0, max: 1 },
-  { id: 'video-director-panSpeed', flag: 'autoPanSpeed', def: 0.05, min: 0, max: 100 },
-  { id: 'video-director-zoomSpeed', flag: 'autoZoomSpeed', def: 0.0005, min: 0, max: 1 },
+  { id: 'video-director-rotateSpeed', flag: 'autoRotateSpeed', def: CAMERA_DEFAULTS_.autoRotateSpeed, min: 0, max: 1 },
+  { id: 'video-director-panSpeed', flag: 'autoPanSpeed', def: CAMERA_DEFAULTS_.autoPanSpeed, min: 0, max: 100 },
+  { id: 'video-director-zoomSpeed', flag: 'autoZoomSpeed', def: CAMERA_DEFAULTS_.autoZoomSpeed, min: 0, max: 1 },
 ];
+
+/** The fallback for one speed field, looked up by its settings key. */
+export function speedDefault(flag: SpeedConfig['flag']): number {
+  return SPEED_CONFIGS.find((cfg) => cfg.flag === flag)?.def ?? 0;
+}
 
 /**
  * Parse a speed field value into a finite, clamped number. Blank or non-numeric

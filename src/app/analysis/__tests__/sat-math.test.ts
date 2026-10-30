@@ -6,7 +6,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { Sun } from '@app/engine/rendering/draw-manager/sun';
 import { DISTANCE_TO_SUN, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import * as Ootk from '@ootk/src/main';
-import { SatelliteRecord, Sgp4, TemeVec3 } from '@ootk/src/main';
+import { eci2ecef, SatelliteRecord, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { disableConsoleErrors, enableConsoleErrors } from '@test/environment/standard-env';
 
@@ -241,6 +241,49 @@ describe('getEcfOfCurrentOrbit_method', () => {
     const ecfPoints2 = SatMath.getEcfOfCurrentOrbit(sat, points + 1, () => new Date());
 
     expect(ecfPoints1).not.toEqual(ecfPoints2);
+  });
+});
+
+describe('getEcfOfCurrentOrbit is Earth fixed', () => {
+  const start = Date.UTC(2026, 9, 26, 12);
+  const offsetTime = (offset: number) => new Date(start + offset);
+
+  it('each sample is the ECI sample rotated by GMST at its own time (longitude = subpoint longitude)', () => {
+    const sat = defaultSat.clone();
+    const points = 100;
+    const ecf = SatMath.getEcfOfCurrentOrbit(sat, points, offsetTime);
+    const lla = SatMath.getLlaOfCurrentOrbit(sat, points, offsetTime);
+
+    expect(ecf).toHaveLength(points);
+    for (const idx of [0, 25, 50, 99]) {
+      const lonDeg = (Math.atan2(ecf[idx].y, ecf[idx].x) * 180) / Math.PI;
+      const diff = ((lonDeg - lla[idx].lon + 540) % 360) - 180;
+
+      expect(Math.abs(diff)).toBeLessThan(1e-6);
+    }
+  });
+
+  it('keeps the radius and Z of the inertial sample (a rotation about Z)', () => {
+    const sat = defaultSat.clone();
+    const ecf = SatMath.getEcfOfCurrentOrbit(sat, 10, offsetTime);
+    const eci = SatMath.getEciOfCurrentOrbit(sat, 10, offsetTime);
+
+    ecf.forEach((p, idx) => {
+      expect(Math.hypot(p.x, p.y, p.z)).toBeCloseTo(Math.hypot(eci[idx].x, eci[idx].y, eci[idx].z), 6);
+      expect(p.z).toBeCloseTo(eci[idx].z, 9);
+    });
+  });
+
+  it('matches eci2ecef with Sgp4.gstime of the sample time', () => {
+    const sat = defaultSat.clone();
+    const ecf = SatMath.getEcfOfCurrentOrbit(sat, 4, offsetTime);
+    const eci = SatMath.getEciOfCurrentOrbit(sat, 4, offsetTime);
+    const offsetMs = ((2 * sat.period) / 4) * 60 * 1000;
+    const { gmst } = SatMath.calculateTimeVariables(offsetTime(offsetMs));
+    const expected = eci2ecef(eci[2] as TemeVec3, gmst);
+
+    expect(ecf[2].x).toBeCloseTo(expected.x, 9);
+    expect(ecf[2].y).toBeCloseTo(expected.y, 9);
   });
 });
 

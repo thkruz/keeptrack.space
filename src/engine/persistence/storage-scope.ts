@@ -47,7 +47,9 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_DRAW_ASTEROID_BELT]: StorageScope.Account,
   [StorageKey.SETTINGS_GRAY_SKYBOX]: StorageScope.Account,
   [StorageKey.SETTINGS_ECI_ON_HOVER]: StorageScope.Account,
-  [StorageKey.SETTINGS_HOS]: StorageScope.Account,
+  [StorageKey.SETTINGS_HIDE_OTHER_SATS]: StorageScope.Account,
+  [StorageKey.SETTINGS_COMPENSATE_EARTH_ROTATION]: StorageScope.Account,
+  [StorageKey.SETTINGS_ECF_ORBIT_COUNT]: StorageScope.Account,
   [StorageKey.SETTINGS_DEMO_MODE]: StorageScope.Account,
   [StorageKey.SETTINGS_SAT_LABEL_MODE_V2]: StorageScope.Account,
   [StorageKey.SETTINGS_FREEZE_PROP_RATE_ON_DRAG]: StorageScope.Account,
@@ -56,6 +58,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_FOCUS_ON_SAT_WHEN_SELECTED]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_AURORA]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_GRATICULE]: StorageScope.Account,
+  [StorageKey.SETTINGS_DRAW_NIGHT_AS_DAY]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_FLAT_MAP_TERMINATOR]: StorageScope.Account,
   [StorageKey.SETTINGS_DRAW_SUN]: StorageScope.Account,
   [StorageKey.SETTINGS_CONFIDENCE_LEVELS]: StorageScope.Account,
@@ -73,8 +76,10 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
 
   // --- Account: workspace/layout ----------------------------------------------
   [StorageKey.LAST_MAP]: StorageScope.Account,
+  [StorageKey.EARTH_PRESET]: StorageScope.Account,
   [StorageKey.COLOR_SCHEME]: StorageScope.Account,
   [StorageKey.COLOR_SCHEME_OVERRIDES]: StorageScope.Account,
+  [StorageKey.LEGEND_HIDDEN_FLAGS]: StorageScope.Account,
   [StorageKey.SETTINGS_DOT_COLORS]: StorageScope.Account,
   [StorageKey.SYMBOLOGY_CONFIG]: StorageScope.Account,
   [StorageKey.SYMBOLOGY_ENABLED]: StorageScope.Account,
@@ -93,6 +98,9 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_DRAW_FLAG_DECALS]: StorageScope.Device,
   [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,
+  // Phones default hover info off; Next Pass on hover is a fast-CPU option.
+  [StorageKey.SETTINGS_SHOW_INFO_ON_HOVER]: StorageScope.Device,
+  [StorageKey.SETTINGS_SHOW_NEXT_PASS]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_QUALITY_LEVEL]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_SAMPLES]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_DECAY]: StorageScope.Device,
@@ -162,6 +170,8 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_SAT_LABEL_MODE]: StorageScope.Device,
   [StorageKey.ONBOARDING_STATE]: StorageScope.Device,
   [StorageKey.PLUGIN_ENABLE_OVERRIDES]: StorageScope.Device,
+  [StorageKey.FPS_VIEW_HINT_SEEN]: StorageScope.Device,
+  [StorageKey.PLUGIN_STORAGE]: StorageScope.Device,
 
   // --- Device: meta/bookkeeping (never sync) ------------------------------------
   [StorageKey.VERSION]: StorageScope.Device,

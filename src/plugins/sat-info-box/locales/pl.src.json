@@ -30,10 +30,14 @@
       "external": "Zewnętrzna"
     },
     "notAvailable": "B/D",
+    "notAvailableJscVimpel": "B/D (JSC Vimpel)",
     "oemFile": "Plik OEM",
     "copy": {
       "copied": "Skopiowano do schowka",
       "tooltip": "Kliknij, aby skopiować"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "Panel informacji o satelicie nie wczytał się do końca, więc nie można było zaktualizować jego danych."
     }
   }
 }

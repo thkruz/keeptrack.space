@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "Nie udało się utworzyć podpowiedzi: element nie ma atrybutu kt-tooltip.",
+        "missingElement": "Nie udało się utworzyć podpowiedzi: element ma wartość null lub jest niezdefiniowany."
+      }
+    }
+  }
+}

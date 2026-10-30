@@ -35,11 +35,16 @@ npm run plugin -- add https://github.com/YOU/__PLUGIN_PKG__
 npm run build   # or restart `npm start`
 ```
 
-## The two hard rules
+## The three hard rules
 
 1. The entry (`src/plugin.ts`) must have a **named export** matching `className`
    in `keeptrack-plugin.json` (`__CLASS_NAME__`).
 2. The class's `readonly id` must **equal** its `configKey` (`__CONFIG_KEY__`).
+3. Import only from `@keeptrack/plugin-api` (tests: also `@keeptrack/plugin-api/testing`
+   and `vitest`), `ootk`, and your own files. Keep `"pluginApi"` in
+   `keeptrack-plugin.json` at the facade version you build against.
+   `npm run plugin -- doctor __CONFIG_KEY__` checks all three. Reference:
+   [docs/plugin-api.md](https://github.com/thkruz/keeptrack.space/blob/main/docs/plugin-api.md).
 
 ## License
 

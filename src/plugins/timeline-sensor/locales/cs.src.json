@@ -28,7 +28,8 @@
         "inFov": "Ve FOV",
         "atNight": "V noci",
         "clearSkies": "Jasná obloha",
-        "noPasses": "Žádné přelety"
+        "noPasses": "Žádné přelety",
+        "missingUiName": "Senzor bez názvu"
       },
       "help": {
         "overview": "Časová osa senzoru ukazuje, kdy síť senzorů uvidí vybraný satelit v nadcházejících hodinách. Každý řádek je jeden senzor a každý barevný pruh je jeden přelet, takže můžete na první pohled porovnat příležitosti všech stanovišť a vybrat nejlepší senzor pro další pozorování.",
@@ -42,6 +43,10 @@
         "tip1": "Počasí pochází z předpovědi oblačnosti Open-Meteo pro každé optické stanoviště; radary podmínky počasí, slunečního svitu a tmy zcela ignorují.",
         "tip2": "Kliknutí na přelet po změně senzoru a času znovu vybere satelit, takže ostatní otevřená menu se obnoví s novou geometrií.",
         "tip3": "Kratší intervaly výpočtu zachytí i krátké přelety, ale výpočet trvá déle; 30 sekund je dobrý kompromis pro 24hodinové okno."
+      },
+      "errorMsgs": {
+        "sensorListMissing": "Seznam senzorů nebyl nalezen",
+        "invalidSetting": "{setting} musí být číslo větší než nula."
       }
     }
   }

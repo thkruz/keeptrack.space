@@ -14,7 +14,7 @@
         "skipNo": "Keep going",
         "startTour": "Start the tour",
         "exploreOnMyOwn": "Explore on my own",
-        "keepGoing": "Keep going: power tour",
+        "keepGoing": "Show me the power features",
         "finishUp": "I'm good, finish up",
         "createAccount": "Create free account",
         "maybeLater": "Maybe later",
@@ -63,16 +63,21 @@
         }
       },
       "bridge": {
-        "title": "You know the basics",
+        "title": "Basics tour covered",
         "body": "Want the operator toolkit? Sensors, watchlists, and keyboard-speed workflows. About two more minutes.",
-        "recap1": "Found and selected a satellite",
-        "recap2": "Read its live orbit data",
-        "recap3": "Controlled simulation time"
+        "doneLabel": "Done",
+        "tryNextLabel": "Try next",
+        "tasks": {
+          "spin": "Spin the globe",
+          "search": "Search for a satellite",
+          "select": "Select a satellite",
+          "time": "Speed up or slow down time"
+        }
       },
       "account": {
         "title": "Save your progress?",
         "body": "A free account keeps your setup with you on any device.",
-        "bodyPower": "A free account keeps the watchlist and sensor you just set up with you on any device.",
+        "bodyPower": "A free account keeps your watchlist and sensor settings with you on any device.",
         "benefit1": "Sync your settings and watchlist across devices",
         "benefit2": "Remove ads",
         "benefit3": "Unlock the full Pro toolset for free"
@@ -315,7 +320,17 @@
           "body": "A 2D world map with live ground tracks. The classic ops-floor picture of what is overhead where."
         }
       },
-      "stepDone": "Done. Take a look."
+      "stepDone": "Done. Take a look.",
+      "missions": {
+        "login": {
+          "title": "Sign in to continue",
+          "body": "This feature saves to your free KeepTrack account. Sign in or create one and this guide picks up right here."
+        },
+        "addMore": {
+          "title": "One down, two to go",
+          "body": "Select another satellite and add it from the Watchlist menu the same way. This mission checks off at three."
+        }
+      }
     }
   }
 }

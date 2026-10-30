@@ -146,6 +146,36 @@ describe('DopsPlugin behavior', () => {
     expect(() => plugin.onContextMenuAction('dops-24dops-rmb')).not.toThrow();
   });
 
+  it('onContextMenuAction with the menu open recomputes for the newly clicked point', () => {
+    (getEl('dops-lat') as HTMLInputElement).value = '41';
+    (getEl('dops-lon') as HTMLInputElement).value = '-71';
+    (getEl('dops-alt') as HTMLInputElement).value = '2';
+    (getEl('dops-el') as HTMLInputElement).value = '12';
+    ServiceLocator.getInputManager().mouse = { latLon: { lat: -33.5, lon: 151.25 } } as never;
+    plugin.isMenuButtonActive = true;
+    let seen = '';
+    const updateSpy = vi.spyOn(plugin as unknown as { updateSideMenu(): void }, 'updateSideMenu').mockImplementation(() => {
+      seen = `${(getEl('dops-lat') as HTMLInputElement).value},${(getEl('dops-lon') as HTMLInputElement).value}`;
+    });
+
+    vi.spyOn(plugin, 'setBottomIconToEnabled').mockImplementation(() => undefined);
+    vi.useFakeTimers();
+    try {
+      plugin.onContextMenuAction('dops-24dops-rmb');
+      vi.runAllTimers();
+    } finally {
+      vi.useRealTimers();
+    }
+
+    expect((getEl('dops-lat') as HTMLInputElement).value).toBe('-33.500');
+    expect((getEl('dops-lon') as HTMLInputElement).value).toBe('151.250');
+    expect((getEl('dops-alt') as HTMLInputElement).value).toBe('0');
+    // The user's elevation mask is kept while the menu is open.
+    expect((getEl('dops-el') as HTMLInputElement).value).toBe('12');
+    expect(updateSpy).toHaveBeenCalled();
+    expect(seen).toBe('-33.500,151.250');
+  });
+
   it('getGpsSats collects catalog satellites for the GPS group', () => {
     const group = { groupList: { GPSGroup: { ids: [1, 2] } }, createGroup: vi.fn() };
     const catalog = { getSat: (id: number) => (id === 1 ? { sccNum: '1' } : null) };

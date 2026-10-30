@@ -22,7 +22,7 @@
         "setSensorGroup": "Nastavit skupinu senzorů: {name}"
       },
       "help": {
-        "overview": "Menu senzorů je místo, kde vybíráte pozemní stanici, ze které zbytek aplikace počítá. Senzory jsou seskupeny podle sítě, kterou primárně podporují, přičemž každá položka zobrazuje vlevo název senzoru a vpravo zemi nebo organizaci, která jej vlastní. Vybraný senzor řídí úhly pohledu, kužely zorného pole, upozornění na přelety ze seznamu sledování a všechna ostatní menu pracující se senzory.",
+        "overview": "Menu senzorů je místo, kde vybíráte pozemní stanici, ze které zbytek aplikace počítá. Senzory jsou seskupeny podle sítě, kterou primárně podporují, přičemž každá položka zobrazuje vlevo název senzoru a vpravo zemi nebo organizaci, která jej vlastní. Vybraný senzor řídí úhly pohledu, kužely zorného pole, upozornění na přelety ze seznamu sledovaných a všechna ostatní menu pracující se senzory.",
         "imgAlt": "Menu senzorů zobrazující senzory seskupené podle sítí",
         "imgCaption": "Senzory jsou seskupeny podle sítě. Kliknutím na záhlaví skupiny vyberete celou síť najednou.",
         "sensorTypesHeading": "Typy senzorů",
@@ -37,6 +37,11 @@
       },
       "rmbMenu": {
         "useThisSensor": "Použít tento senzor"
+      },
+      "errorMsgs": {
+        "cameraMoveFailed": "Kameru se nepodařilo přesunout na senzor: {error}",
+        "sensorNotInCatalog": "Senzor {sensor} uvedený ve skupinách senzorů nebyl nalezen v katalogu senzorů!",
+        "groupRenderFailed": "Skupinu senzorů se nepodařilo zobrazit."
       }
     }
   }

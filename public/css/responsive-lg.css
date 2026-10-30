@@ -7,6 +7,7 @@
 @media (min-width: 1024px) {
   #sensor-selected-container {
     width: max-content;
+    max-width: none;
     padding: 0px 10px;
   }
 

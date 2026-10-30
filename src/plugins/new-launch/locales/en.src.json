@@ -26,7 +26,7 @@
         "createLaunchAtWindow": "Create Launch at Window"
       },
       "msgs": {
-        "windowFound": "Launch at {time} to match the target plane (ΔRAAN {delta}°)",
+        "windowFound": "Launch at {time} from {site} to match the plane of {target} (ΔRAAN {delta}°)",
         "launchNominalCreated": "Launch Nominal Created!",
         "timeRelativeToLaunch": "Time is now relative to launch time."
       },

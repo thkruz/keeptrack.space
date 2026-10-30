@@ -1,6 +1,9 @@
 import { readFileSync } from 'node:fs';
 import semver from 'semver';
+import { PLUGIN_API_VERSION } from '../../../src/plugin-api/version';
 import { HOST_PACKAGE_JSON_PATH } from './paths';
+
+export { PLUGIN_API_VERSION };
 
 let cachedVersion: string | null = null;
 
@@ -46,4 +49,27 @@ export function classifyCompat(engineRange: string): CompatLevel {
 /** Boolean the generated meta embeds so the browser needs no semver library. */
 export function isCompatible(engineRange: string): boolean {
   return classifyCompat(engineRange) === 'ok';
+}
+
+export type PluginApiCompat = 'ok' | 'missing' | 'unsatisfied' | 'invalid-range';
+
+/**
+ * Classify a plugin's declared `pluginApi` range against the host facade
+ * version (PLUGIN_API_VERSION in src/plugin-api/version.ts).
+ * - ok: the host facade satisfies the range.
+ * - missing: the manifest has no `pluginApi` (older plugin; the field is optional).
+ * - unsatisfied: the host facade is outside the range. Unlike `engine`, there is
+ *   no "same major, warn" tier: a plugin needing a newer minor uses exports this
+ *   host does not have, and a different major means a removed/changed export.
+ * - invalid-range: not a valid semver range.
+ */
+export function classifyPluginApi(range: string | undefined): PluginApiCompat {
+  if (typeof range === 'undefined' || range === null) {
+    return 'missing';
+  }
+  if (typeof range !== 'string' || !semver.validRange(range)) {
+    return 'invalid-range';
+  }
+
+  return semver.satisfies(PLUGIN_API_VERSION, range, { includePrerelease: true }) ? 'ok' : 'unsatisfied';
 }

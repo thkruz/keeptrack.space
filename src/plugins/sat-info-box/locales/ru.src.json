@@ -30,10 +30,14 @@
       "external": "Внешние"
     },
     "notAvailable": "Н/Д",
+    "notAvailableJscVimpel": "Н/Д (JSC Vimpel)",
     "oemFile": "Файл OEM",
     "copy": {
       "copied": "Скопировано в буфер обмена",
       "tooltip": "Нажмите, чтобы скопировать"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "Панель информации о спутнике не загрузилась полностью, поэтому её данные не удалось обновить."
     }
   }
 }

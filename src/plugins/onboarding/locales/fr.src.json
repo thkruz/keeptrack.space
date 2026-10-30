@@ -14,7 +14,7 @@
         "skipNo": "Continuer",
         "startTour": "Commencer la visite",
         "exploreOnMyOwn": "Explorer par moi-même",
-        "keepGoing": "Continuer : visite avancée",
+        "keepGoing": "Voir les fonctions avancées",
         "finishUp": "C'est bon, terminer",
         "createAccount": "Créer un compte gratuit",
         "maybeLater": "Peut-être plus tard",
@@ -63,16 +63,21 @@
         }
       },
       "bridge": {
-        "title": "Vous maîtrisez les bases",
+        "title": "Sujets du parcours de base",
         "body": "Envie du kit opérateur ? Capteurs, listes de suivi et raccourcis clavier. Environ deux minutes de plus.",
-        "recap1": "Trouvé et sélectionné un satellite",
-        "recap2": "Lu ses données orbitales en direct",
-        "recap3": "Contrôlé le temps de la simulation"
+        "doneLabel": "Fait",
+        "tryNextLabel": "À essayer ensuite",
+        "tasks": {
+          "spin": "Faire tourner le globe",
+          "search": "Rechercher un satellite",
+          "select": "Sélectionner un satellite",
+          "time": "Accélérer ou ralentir le temps"
+        }
       },
       "account": {
         "title": "Sauvegarder votre progression ?",
         "body": "Un compte gratuit emporte votre configuration sur tous vos appareils.",
-        "bodyPower": "Un compte gratuit emporte la liste de suivi et le capteur que vous venez de configurer sur tous vos appareils.",
+        "bodyPower": "Un compte gratuit conserve vos listes et paramètres de capteur sur tous vos appareils.",
         "benefit1": "Synchronisez vos paramètres et votre liste entre appareils",
         "benefit2": "Supprimez les publicités",
         "benefit3": "Débloquez gratuitement tous les outils Pro"
@@ -315,7 +320,17 @@
           "body": "Une carte du monde en 2D avec les traces au sol en direct. L'image classique de salle d'opérations de ce qui survole quoi."
         }
       },
-      "stepDone": "C'est fait. Jetez un œil."
+      "stepDone": "C'est fait. Jetez un œil.",
+      "missions": {
+        "login": {
+          "title": "Connectez-vous pour continuer",
+          "body": "Cette fonction enregistre dans votre compte KeepTrack gratuit. Connectez-vous ou créez-en un et ce guide reprendra ici même."
+        },
+        "addMore": {
+          "title": "Un de fait, plus que deux",
+          "body": "Sélectionnez un autre satellite et ajoutez-le de la même façon depuis le menu Liste de suivi. La mission est validée à trois."
+        }
+      }
     }
   }
 }

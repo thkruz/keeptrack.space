@@ -81,13 +81,273 @@
       "errorMsgs": {
         "notSupportedForObject": "選択したオブジェクトではこのレポートを利用できません。",
         "generationFailed": "レポートの生成に失敗しました",
-        "parentNotFound": "親物体 {scc} はカタログにありません"
+        "parentNotFound": "親物体 {scc} はカタログにありません",
+        "reportOverwrite": "ID「{id}」のレポートは既に登録されています。上書きします。"
       },
       "reasons": {
         "selectSecondary": "先に副物体を選択してください",
         "selectAnalyst": "マヌーバツールで作成したアナリスト衛星を選択してください",
         "needTwoRuns": "先に Debris Screening を 2 回以上実行してください",
         "screeningRunsMissing": "スクリーニング比較は利用できません: 同じウィンドウで {parent} と {analyst} の Debris Screening を実行してから、このレポートを再生成してください。"
+      },
+      "doc": {
+        "header": {
+          "date": "日付",
+          "satellite": "衛星",
+          "noradId": "NORAD ID",
+          "altId": "代替ID",
+          "intlDes": "国際標識番号",
+          "none": "なし",
+          "sensor": "センサー",
+          "type": "種類",
+          "latitude": "緯度",
+          "longitude": "経度",
+          "altitude": "高度",
+          "minAz": "最小方位角",
+          "maxAz": "最大方位角",
+          "minEl": "最小仰角",
+          "maxEl": "最大仰角",
+          "minRng": "最小距離",
+          "maxRng": "最大距離",
+          "windowLine": "レポート期間: {start} から {end} UTC、ステップ: {step} 秒",
+          "generatedWallClock": "生成日時 (実時間)",
+          "appVersion": "KeepTrack バージョン",
+          "ricConvention": "RIC 規約"
+        },
+        "titles": {
+          "aer": "方位角・仰角・距離レポート",
+          "lla": "緯度・経度・高度レポート",
+          "eci": "地球中心慣性座標 (TEME) レポート",
+          "coes": "古典軌道要素レポート",
+          "visibility": "可視ウィンドウレポート",
+          "sunEclipse": "太陽/食解析レポート",
+          "conjunction": "接近レポート",
+          "maneuver": "マヌーバレポート",
+          "screeningCompare": "スクリーニング比較レポート"
+        },
+        "cols": {
+          "timeUtc": "時刻 (UTC)",
+          "pass": "パス",
+          "azimuthDeg": "方位角(°)",
+          "elevationDeg": "仰角(°)",
+          "rangeKm": "距離(km)",
+          "latitudeDeg": "緯度(°)",
+          "longitudeDeg": "経度(°)",
+          "altitudeKm": "高度(km)",
+          "posX": "位置 X(km)",
+          "posY": "位置 Y(km)",
+          "posZ": "位置 Z(km)",
+          "velX": "速度 X(km/s)",
+          "velY": "速度 Y(km/s)",
+          "velZ": "速度 Z(km/s)",
+          "element": "要素",
+          "value": "値",
+          "passNum": "パス番号",
+          "riseTime": "出現時刻 (UTC)",
+          "setTime": "消失時刻 (UTC)",
+          "durationMin": "継続時間 (分)",
+          "maxElDeg": "最大仰角(°)",
+          "maxElTime": "最大仰角時刻 (UTC)",
+          "note": "備考",
+          "sunIlluminated": "日照",
+          "eclipseType": "食の種類",
+          "sunAngleDeg": "太陽角(°)",
+          "offsetSec": "オフセット (秒)",
+          "rangeKmSpaced": "距離 (km)",
+          "radialKm": "径方向 (km)",
+          "intrackKm": "軌道方向 (km)",
+          "crosstrackKm": "軌道直交方向 (km)",
+          "relSpeed": "相対速度 (km/s)"
+        },
+        "empty": {
+          "noPasses": "パスが見つかりません!",
+          "noPassesWindow": "レポート期間内にパスが見つかりません!",
+          "noApproach": "検索ウィンドウ内に最接近が見つかりません。",
+          "noScreeningEvents": "どちらの実行にもスクリーニングイベントはありません。"
+        },
+        "passEdge": {
+          "continuous": "連続",
+          "start": "開始時に可視",
+          "end": "終了時に可視"
+        },
+        "illumination": {
+          "sun": "はい",
+          "penumbral": "部分",
+          "umbral": "いいえ",
+          "unknown": "不明"
+        },
+        "eclipse": {
+          "sun": "なし",
+          "penumbral": "半影",
+          "umbral": "本影",
+          "unknown": "不明"
+        },
+        "coes": {
+          "note": "注: 状態エポックにおける接触要素 (J2000)。伝搬した状態ベクトルから算出しています。\nカタログの遠地点/近地点に使われる TLE 平均要素とは異なります。",
+          "elementSet": "要素セット",
+          "osculatingJ2000": "接触要素 (J2000)",
+          "tleEpoch": "TLE エポック (UTC)",
+          "stateEpoch": "状態エポック (接触要素、UTC)",
+          "apogee": "遠地点",
+          "perigee": "近地点",
+          "inclination": "軌道傾斜角",
+          "rightAscension": "赤経",
+          "argOfPerigee": "近地点引数",
+          "trueAnomaly": "真近点角",
+          "eccentricity": "離心率",
+          "period": "周期",
+          "semiMajorAxis": "軌道長半径",
+          "meanMotion": "平均運動"
+        },
+        "objects": {
+          "field": "項目",
+          "name": "名前",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "TLE エポック (UTC)",
+          "gpAge": "GP の経過時間",
+          "sigma": "1シグマ R / I / C (km、自身の RIC 座標系、TLE エポック時点)",
+          "derivedFrom": "派生元",
+          "days": "{days} 日",
+          "assumedFromParent": "(親から仮定)"
+        },
+        "roles": {
+          "primary": "主物体",
+          "secondary": "副物体",
+          "parent": "元物体",
+          "analyst": "解析物体"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "最接近距離",
+          "radial": "径方向 (R)",
+          "intrack": "軌道方向 (I)",
+          "crosstrack": "軌道直交方向 (C)",
+          "relSpeed": "相対速度",
+          "risk": "リスクレベル",
+          "searchWindow": "検索ウィンドウ (UTC)",
+          "searchWindowValue": "{start} から {end} (+/- {hours} 時間)"
+        },
+        "risk": {
+          "critical": "重大",
+          "high": "高",
+          "medium": "中",
+          "low": "低",
+          "unknown": "不明"
+        },
+        "common": {
+          "value": "値",
+          "quantity": "量",
+          "item": "項目"
+        },
+        "pcInputs": {
+          "input": "Pc 入力",
+          "method": "手法",
+          "primaryHbr": "主物体の剛体半径",
+          "secondaryHbr": "副物体の剛体半径",
+          "combinedHbr": "合成剛体半径",
+          "covarianceSource": "共分散の出典",
+          "confidence": "信頼水準 (k)",
+          "sigmaCaps": "1シグマ上限 R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: 遭遇面での2次元 Pc、主物体の RIC 座標系での合成共分散",
+          "covarianceSourceValue": "TLE から導出した合成共分散 (ootk cappedScreeningCovarianceFromTle)。運用者の共分散ではありません。デブリスクリーニングと同じです"
+        },
+        "passes": {
+          "object": "物体",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "最大仰角 (度)"
+        },
+        "diff": {
+          "status": "状態",
+          "secondary": "副物体",
+          "name": "名前",
+          "preTca": "変更前 TCA (UTC)",
+          "preMiss": "変更前の距離 (km)",
+          "prePc": "変更前 Pc",
+          "postTca": "変更後 TCA (UTC)",
+          "postMiss": "変更後の距離 (km)",
+          "postPc": "変更後 Pc",
+          "missChange": "距離の変化 (km)",
+          "noId": "(ID なし)"
+        },
+        "status": {
+          "introduced": "新規",
+          "removed": "解消",
+          "unchanged": "変化なし",
+          "appeared": "出現 (しきい値未満)",
+          "dropped": "消失 (しきい値未満)",
+          "moved": "移動"
+        },
+        "summary": {
+          "range": "{start} から {end}",
+          "preRunPrimary": "変更前の実行の主物体",
+          "preRunWindow": "変更前の実行の期間 (UTC)",
+          "postRunPrimary": "変更後の実行の主物体",
+          "postRunWindow": "変更後の実行の期間 (UTC)",
+          "concernThreshold": "注意しきい値",
+          "concernThresholdValue": "{level} 以上",
+          "excluded": "除外した副物体",
+          "appearedDropped": "出現 / 消失 (しきい値未満)"
+        },
+        "sections": {
+          "objects": "物体",
+          "closestApproach": "最接近",
+          "pcInputs": "衝突確率の入力",
+          "sensorPasses": "センサーのパス ({sensor})",
+          "relativeGeometry": "相対ジオメトリ (TCA +/- 5 分、10 秒)",
+          "burnsTotal": "噴射 (合計 {dv} m/s)",
+          "burns": "噴射",
+          "meanElements": "平均要素の変更前と変更後",
+          "closeApproachTo": "{name} ({id}) への接近の変更前と変更後",
+          "diffSummary": "スクリーニング差分の概要",
+          "diffManeuver": "スクリーニング差分 (変更前の元物体と変更後の解析物体)",
+          "diffCompare": "スクリーニング差分 (古い実行と新しい実行)"
+        },
+        "elements": {
+          "header": "平均要素 (TLE)",
+          "pre": "変更前 (元物体、変更後のエポック)",
+          "post": "変更後 (解析物体)",
+          "change": "変化",
+          "epoch": "エポック (UTC)",
+          "inclinationDeg": "軌道傾斜角 (度)",
+          "raanDeg": "RAAN (度)",
+          "eccentricity": "離心率",
+          "argPerigeeDeg": "近地点引数 (度)",
+          "meanAnomalyDeg": "平均近点角 (度)",
+          "meanMotionRevPerDay": "平均運動 (周/日)",
+          "periodMin": "周期 (分)",
+          "apogeeKm": "遠地点 (km)",
+          "perigeeKm": "近地点 (km)",
+          "semiMajorAxisKm": "軌道長半径 (km)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "エポック (UTC)",
+          "frame": "座標系",
+          "dvInput": "入力デルタV (m/s)",
+          "magnitude": "大きさ (m/s)",
+          "source": "出典",
+          "label": "ラベル",
+          "parameters": "噴射パラメータ",
+          "unavailable": "噴射パラメータは利用できません"
+        },
+        "compare": {
+          "pre": "変更前 (元物体)",
+          "post": "変更後 (解析物体)",
+          "notFound": "見つかりません",
+          "miss": "最接近距離 (km)",
+          "ric": "R / I / C (km)",
+          "relSpeed": "相対速度 (km/s)"
+        },
+        "notes": {
+          "noEncounter": "検索ウィンドウ内に最接近がありません。ウィンドウを広げるか、シミュレーション時刻をイベントに近づけてください。",
+          "windowMismatchManeuver": "変更前と変更後のスクリーニングは期間が異なります。期間の端に近いイベントは誤って分類される可能性があります。",
+          "windowMismatchCompare": "2つのスクリーニングは期間が異なります。期間の端に近いイベントは誤って分類される可能性があります。",
+          "noScreeningRuns": "利用できるスクリーニングの実行がありません。",
+          "noSensor": "センサーが選択されていません。パスウィンドウを表示するにはセンサーを選択してください。",
+          "uncertaintyAssumed": "解析オブジェクトの1シグマ不確かさとGP経過時間は親 ({parent}) から仮定しており、最接近のPcも親の共分散を使用します。マヌーバ実行誤差はモデル化していません。"
+        }
       }
     }
   }

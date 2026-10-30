@@ -1,4 +1,5 @@
 /* eslint-disable complexity */
+
 import { CameraType } from '@app/engine/camera/camera-type';
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -6,6 +7,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendCountry, legendLabel } from './legend-label';
 
 export interface SourceColorSchemeColorMap extends ColorSchemeColorMap {
   sourceUssf: rgbaArray;
@@ -181,28 +183,30 @@ export class CountryColorScheme extends ColorScheme {
     }
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-countries">
     <li>
       <div class="Square-Box layers-countryUS-box"></div>
-      United States
+      ${legendCountry('US', 'United States')}
     </li>
     <li>
       <div class="Square-Box layers-countryCIS-box"></div>
-      Russia
+      ${legendCountry('RU', 'Russia')}
     </li>
     <li>
       <div class="Square-Box layers-countryPRC-box"></div>
-      China
+      ${legendCountry('CN', 'China')}
     </li>
     <li>
       <div class="Square-Box layers-countryOther-box"></div>
-      Other
+      ${legendLabel('other')}
     </li>
     <li>
       <div class="Square-Box layers-facility-box"></div>
-      Launch Site
+      ${legendLabel('launchSite')}
     </li>
   </ul>
   `.trim();
+  }
 }

@@ -44,7 +44,11 @@
         "reasonMaxEl": "Elewacja {{value}} powyżej maks. {{limit}}",
         "reasonMask": "Elewacja {{value}} poniżej maski horyzontu {{limit}}",
         "reasonAzimuth": "Azymut {{value}} poza zakresem {{min}} do {{max}}",
-        "reasonCone": "Poza stożkiem osi celowania sensora"
+        "reasonCone": "Poza stożkiem osi celowania sensora",
+        "unknown": "Nieznane",
+        "notApplicable": "Nie dotyczy",
+        "notApplicableOem": "Nie dotyczy (OEM)",
+        "notInOrbitToast": "Satelita {sccNum} nie jest na orbicie!<br>Czas symulacji to {simTime}.<br>Sprawdź, czy masz właściwy TLE."
       }
     }
   }

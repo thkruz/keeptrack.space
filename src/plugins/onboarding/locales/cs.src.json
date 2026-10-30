@@ -3,7 +3,7 @@
     "OnboardingPlugin": {
       "bottomIconLabel": "Začínáme",
       "title": "Začínáme",
-      "helpBody": "Nabídka Začínáme sleduje vaše první mise v KeepTracku a umožňuje znovu spustit průvodce. Základní prohlídka pokrývá glóbus, vyhledávání a ovládání času. Pokročilá prohlídka je rozcestník krátkých kapitol o senzorech, seznamu sledování, čase, analýze a vizualizaci.",
+      "helpBody": "Nabídka Začínáme sleduje vaše první mise v KeepTracku a umožňuje znovu spustit průvodce. Základní prohlídka pokrývá glóbus, vyhledávání a ovládání času. Pokročilá prohlídka je rozcestník krátkých kapitol o senzorech, seznamu sledovaných, čase, analýze a vizualizaci.",
       "stepLabel": "{current} z {total}",
       "buttons": {
         "next": "Další",
@@ -14,7 +14,7 @@
         "skipNo": "Pokračovat",
         "startTour": "Spustit prohlídku",
         "exploreOnMyOwn": "Prozkoumám sám",
-        "keepGoing": "Pokračovat: pokročilá prohlídka",
+        "keepGoing": "Ukaž mi pokročilé funkce",
         "finishUp": "Stačí, dokončit",
         "createAccount": "Vytvořit účet zdarma",
         "maybeLater": "Možná později",
@@ -63,17 +63,22 @@
         }
       },
       "bridge": {
-        "title": "Základy máte za sebou",
-        "body": "Chcete operátorskou výbavu? Senzory, seznamy sledování a rychlou práci s klávesnicí. Zhruba dvě minuty navíc.",
-        "recap1": "Našli a vybrali jste družici",
-        "recap2": "Přečetli jste její živá orbitální data",
-        "recap3": "Ovládli jste čas simulace"
+        "title": "Témata základní prohlídky",
+        "body": "Chcete operátorskou výbavu? Senzory, seznamy sledovaných a rychlou práci s klávesnicí. Zhruba dvě minuty navíc.",
+        "doneLabel": "Hotovo",
+        "tryNextLabel": "Vyzkoušejte dále",
+        "tasks": {
+          "spin": "Otočte zeměkoulí",
+          "search": "Vyhledejte satelit",
+          "select": "Vyberte satelit",
+          "time": "Zrychlete nebo zpomalte čas"
+        }
       },
       "account": {
         "title": "Uložit váš postup?",
         "body": "Bezplatný účet přenese vaše nastavení na jakékoli zařízení.",
-        "bodyPower": "Bezplatný účet přenese právě nastavený seznam sledování a senzor na jakékoli zařízení.",
-        "benefit1": "Synchronizace nastavení a seznamu sledování mezi zařízeními",
+        "bodyPower": "Bezplatný účet uchová seznamy a nastavení senzorů na všech zařízeních.",
+        "benefit1": "Synchronizace nastavení a seznamu sledovaných mezi zařízeními",
         "benefit2": "Odstranění reklam",
         "benefit3": "Bezplatné odemčení celé sady nástrojů Pro"
       },
@@ -90,7 +95,7 @@
       },
       "checklist": {
         "powerTour": "Dokončete kapitolu pokročilé prohlídky",
-        "watchlist3": "Přidat 3 družice do seznamu sledování",
+        "watchlist3": "Přidat 3 družice do seznamu sledovaných",
         "selectSensor": "Vybrat senzor a zobrazit jeho pokrytí",
         "lookAngles": "Zkontrolovat pozorovací úhly přeletu",
         "colorScheme": "Změnit barevné schéma"
@@ -169,7 +174,7 @@
           }
         },
         "watchlist": {
-          "title": "Seznam sledování a přelety",
+          "title": "Seznam sledovaných a přelety",
           "description": "Sledujte cíle a plánujte jejich další přelety",
           "steps": {
             "pickTarget": {
@@ -177,12 +182,12 @@
               "body": "Vyhledejte satelit, který vás zajímá, třeba ISS, a vyberte ho."
             },
             "addToWatchlist": {
-              "title": "Přidejte ho na seznam sledování",
-              "body": "Zařaďte vybraný satelit na svůj seznam sledování, aby ho KeepTrack hlídal za vás."
+              "title": "Přidejte ho na seznam sledovaných",
+              "body": "Zařaďte vybraný satelit na svůj seznam sledovaných, aby ho KeepTrack hlídal za vás."
             },
             "overlay": {
               "title": "Překryv",
-              "body": "Překryv vypisuje nadcházející přelety vašeho seznamu sledování nad aktuálním senzorem a průběžně se aktualizuje."
+              "body": "Překryv vypisuje nadcházející přelety vašeho seznamu sledovaných nad aktuálním senzorem a průběžně se aktualizuje."
             },
             "lookAngles": {
               "title": "Úhly dalšího přeletu",
@@ -300,7 +305,7 @@
         "signInCta": "Přihlaste se zdarma pro odemčení",
         "bestPass": {
           "title": "Nejlepší přelety (Pro)",
-          "body": "Seřadí každý nadcházející přelet vašeho seznamu sledování nad vybraným senzorem. Naplánujte noc pozorování během vteřin."
+          "body": "Seřadí každý nadcházející přelet vašeho seznamu sledovaných nad vybraným senzorem. Naplánujte noc pozorování během vteřin."
         },
         "dops": {
           "title": "Přesnost GPS (Pro)",
@@ -315,7 +320,17 @@
           "body": "2D mapa světa s pozemními stopami v reálném čase. Klasický operační obraz toho, co kde právě letí."
         }
       },
-      "stepDone": "Hotovo. Podívejte se."
+      "stepDone": "Hotovo. Podívejte se.",
+      "missions": {
+        "login": {
+          "title": "Pro pokračování se přihlaste",
+          "body": "Tato funkce ukládá data do vašeho bezplatného účtu KeepTrack. Přihlaste se nebo si účet vytvořte a tento průvodce bude pokračovat přesně tady."
+        },
+        "addMore": {
+          "title": "Jeden hotový, zbývají dva",
+          "body": "Vyberte další satelit a přidejte ho stejným způsobem z nabídky Seznam sledovaných. Mise se splní při třech."
+        }
+      }
     }
   }
 }

@@ -16,13 +16,13 @@
         "loading": "Loading available plugins…",
         "empty": "No plugins are listed in the registry yet.",
         "error": "Could not load the plugin registry.",
-        "by": "by",
         "install": "Install",
         "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
+        "installed": "Installed. Rebuilding; the app will reload shortly.",
         "installedBtn": "Installed",
         "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "copyCommand": "Copy install command",
+        "byAuthor": "by {author}"
       },
       "develop": {
         "introHeading": "What is a plugin?",
@@ -41,6 +41,7 @@
         "button": "Reload"
       },
       "labels": {
+        "noMatches": "No plugins match this search. Try a plugin name or ID.",
         "search": "Search plugins",
         "builtInSection": "Built-in Plugins",
         "externalSection": "External Plugins",
@@ -48,7 +49,9 @@
         "installSection": "Install a Plugin",
         "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
         "gitUrl": "Git URL",
-        "source": "Source"
+        "source": "Source",
+        "copy": "Copy",
+        "alwaysEnabled": "Always enabled"
       },
       "badge": {
         "compatible": "Compatible",
@@ -67,6 +70,17 @@
         "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
         "externalHeading": "External plugins",
         "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+      },
+      "searchAliases": {
+        "multiView": "Multi-View,Multi View"
+      },
+      "loader": {
+        "proFailed": "The Pro version of the \"{plugin}\" plugin failed to load ({error}). {consequence} This build includes KeepTrack Pro, so the src/plugins-pro files may be missing, out of date, or unreachable. Learn more at {url}.",
+        "consequenceFallback": "Loading the standard version instead.",
+        "consequenceUnavailable": "This feature will be unavailable this session.",
+        "downloadFailed": "The \"{plugin}\" plugin failed to download ({error}) and will be unavailable this session. This is usually a network interruption; reloading the page will retry it.",
+        "initFailed": "The \"{plugin}\" plugin failed to initialize ({error}) and will be unavailable this session.",
+        "stoppedEarly": "Plugin loading stopped early ({error}). Some features may be missing; reloading the page will retry."
       }
     }
   }

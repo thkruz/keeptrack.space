@@ -74,7 +74,8 @@
         "TooManyResults": "显示 {total} 个匹配项中的 {limit} 个。在搜索设置中提高\"搜索最大结果数\"以显示更多; 导出仍会保存所有匹配项。",
         "TryFindingFirst": "请先尝试查找卫星！",
         "SearchFailed": "搜索失败：{error}",
-        "NothingToExport": "没有可导出的带轨道数据的结果"
+        "NothingToExport": "没有可导出的带轨道数据的结果",
+        "NoMatchesToExport": "上次搜索未找到卫星，因此没有可导出的内容。"
       }
     }
   }

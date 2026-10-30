@@ -57,6 +57,30 @@ describe('NewLaunch launch-window matching', () => {
     expect(note.textContent).toContain('ΔRAAN');
   });
 
+  it('renders an imported target name as text, not markup', () => {
+    issSat.name = '<img src=x onerror="alert(1)">';
+
+    p().onMatchTargetPlane_();
+
+    const note = getEl('nl-window-result')!;
+
+    expect(note.querySelector('img')).toBeNull();
+    expect(note.textContent).toContain('<img src=x onerror="alert(1)">');
+  });
+
+  it('shows target and site names with special characters exactly as written', () => {
+    issSat.name = 'ISS & "ZARYA"';
+    (getEl('nl-facility') as HTMLSelectElement).selectedOptions[0].textContent = 'Cape A & B';
+
+    p().onMatchTargetPlane_();
+
+    const text = getEl('nl-window-result')!.textContent ?? '';
+
+    expect(text).toContain('ISS & "ZARYA" (25544)');
+    expect(text).toContain('Cape A & B');
+    expect(text).not.toContain('&amp;');
+  });
+
   it('arms the window without launching and can be cleared via the result note', () => {
     p().onMatchTargetPlane_();
     expect(p().matchedLaunchTime_).not.toBeNull();
@@ -115,18 +139,17 @@ describe('NewLaunch launch-window matching', () => {
     p().matchedLaunchTime_ = matched;
 
     // Short-circuit the launch after the time change: an orbit-fit error path
-    // reverts the offset, so only the FIRST changeStaticOffset call matters.
+    // reverts the offset, so only the time jump (changeSimulationTime) matters.
     vi.spyOn(p(), 'buildLaunchTle_').mockReturnValue(['Error', 'stop']);
     vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (ServiceLocator.getColorSchemeManager() as any).calculateColorBuffers = vi.fn();
-    const offsetSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined as never);
+    vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined as never);
+    const jumpSpy = vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined as never);
 
     p().launchFromSite_(issSat, 5);
 
-    const firstOffset = offsetSpy.mock.calls[0][0] as number;
-
-    // Offset from "now" to the matched time (5 h), not to 0000z.
-    expect(Math.abs(firstOffset - 5 * 3600 * 1000)).toBeLessThan(5000);
+    // Jumps to the matched time itself, not to 0000z.
+    expect(jumpSpy).toHaveBeenCalledWith(matched.getTime());
   });
 });

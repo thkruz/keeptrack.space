@@ -95,32 +95,36 @@ export class PoliticalMapToggle extends KeepTrackPlugin {
     settingsManager.isDrawPoliticalMap = next.borders;
     settingsManager.isDrawPoliticalLabels = next.labels;
 
-    this.syncIconState_();
+    this.syncIconState();
     ServiceLocator.getSoundManager()?.play(next.borders || next.labels ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
     ServiceLocator.getUiManager()?.toast(t7e(`plugins.PoliticalMapToggle.${next.toastKey}` as Parameters<typeof t7e>[0]), ToastMsgType.normal);
   }
 
   toggleBorders(): void {
     settingsManager.isDrawPoliticalMap = !settingsManager.isDrawPoliticalMap;
-    this.syncIconState_();
+    this.syncIconState();
     ServiceLocator.getSoundManager()?.play(settingsManager.isDrawPoliticalMap ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
   }
 
   /** Country name labels are independent of the border overlay so either can be shown alone. */
   toggleCountryLabels(): void {
     settingsManager.isDrawPoliticalLabels = !settingsManager.isDrawPoliticalLabels;
-    this.syncIconState_();
+    this.syncIconState();
     ServiceLocator.getSoundManager()?.play(settingsManager.isDrawPoliticalLabels ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
   }
 
-  private syncIconState_(): void {
+  /**
+   * Light the icon while any part of the overlay is visible, dim it otherwise. Public so code
+   * that writes the political-map settings directly (Earth presets) can keep the icon honest.
+   */
+  syncIconState(): void {
     const isAnyVisible = settingsManager.isDrawPoliticalMap || settingsManager.isDrawPoliticalLabels;
 
-    this.isMenuButtonActive = isAnyVisible;
     if (isAnyVisible) {
       this.setBottomIconToSelected();
     } else {
-      this.setBottomIconToUnselected();
+      // A layer icon going dark must not close whatever side menu is open.
+      this.setBottomIconToUnselected(false);
     }
   }
 }

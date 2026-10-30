@@ -18,7 +18,8 @@
         "activeS2sCones": "Aktywne stożki satelita-satelita",
         "fovDegrees": "Pole widzenia (stopnie)",
         "opacity": "Nieprzezroczystość",
-        "targetCatalogNumber": "Numer katalogowy celu"
+        "targetCatalogNumber": "Numer katalogowy celu",
+        "targetCatalogPlaceholder": "np. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Pole widzenia czujnika",

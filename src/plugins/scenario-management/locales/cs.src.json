@@ -39,7 +39,11 @@
         "endDateInvalid": "Datum konce je neplatné.",
         "savingScenario": "Chyba při ukládání scénáře!",
         "loadingScenarioFile": "Chyba při načítání souboru scénáře!",
-        "decompressingScenarioFile": "Chyba při dekompresi souboru scénáře!"
+        "decompressingScenarioFile": "Chyba při dekompresi souboru scénáře!",
+        "startAfterEnd": "Čas začátku scénáře musí být před časem konce.",
+        "invalidDates": "Čas začátku a konce scénáře musí být platná data.",
+        "bothBoundsRequired": "Musí být nastaven čas začátku i konce scénáře.",
+        "nameTooLong": "Název scénáře může mít nejvýše 30 znaků."
       },
       "defaults": {
         "scenarioName": "Můj scénář",

@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "Вид спутника"
+      "bottomIconLabel": "Вид спутника",
+      "commandPalette": {
+        "activate": "Переключиться на вид спутника"
+      },
+      "shortcuts": {
+        "enter": "Перейти в вид спутника"
+      }
     }
   }
 }

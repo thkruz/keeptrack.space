@@ -1,20 +1,130 @@
 {
   "colorSchemes": {
-    "CelestrakColorScheme": { "label": "Celestrak" },
-    "ConfidenceColorScheme": { "label": "Достоверность" },
-    "CountryColorScheme": { "label": "Страна" },
-    "GpAgeColorScheme": { "label": "Возраст GP" },
-    "MissionColorScheme": { "label": "Миссия" },
-    "ObjectTypeColorScheme": { "label": "Тип объекта" },
-    "OrbitalPlaneDensityColorScheme": { "label": "Плотность орбитальной плоскости" },
-    "RcsColorScheme": { "label": "Эффективная площадь рассеяния" },
-    "ReentryRiskColorScheme": { "label": "Риск входа в атмосферу" },
-    "SmallSatColorScheme": { "label": "Малые спутники" },
-    "SourceColorScheme": { "label": "Источник данных" },
-    "SpatialDensityColorScheme": { "label": "Пространственная плотность" },
-    "StarlinkColorScheme": { "label": "Starlink" },
-    "SunlightColorScheme": { "label": "Статус освещённости" },
-    "VelocityColorScheme": { "label": "Скорость" },
-    "VisualMagnitudeColorScheme": { "label": "Стандартная звёздная величина" }
+    "CelestrakColorScheme": {
+      "label": "Celestrak"
+    },
+    "ConfidenceColorScheme": {
+      "label": "Достоверность"
+    },
+    "CountryColorScheme": {
+      "label": "Страна"
+    },
+    "GpAgeColorScheme": {
+      "label": "Возраст GP"
+    },
+    "MissionColorScheme": {
+      "label": "Миссия"
+    },
+    "ObjectTypeColorScheme": {
+      "label": "Тип объекта"
+    },
+    "OrbitalPlaneDensityColorScheme": {
+      "label": "Плотность орбитальной плоскости"
+    },
+    "RcsColorScheme": {
+      "label": "Эффективная площадь рассеяния"
+    },
+    "ReentryRiskColorScheme": {
+      "label": "Риск входа в атмосферу"
+    },
+    "SmallSatColorScheme": {
+      "label": "Малые спутники"
+    },
+    "SourceColorScheme": {
+      "label": "Источник данных"
+    },
+    "SpatialDensityColorScheme": {
+      "label": "Пространственная плотность"
+    },
+    "StarlinkColorScheme": {
+      "label": "Starlink"
+    },
+    "SunlightColorScheme": {
+      "label": "Статус освещённости"
+    },
+    "VelocityColorScheme": {
+      "label": "Скорость"
+    },
+    "VisualMagnitudeColorScheme": {
+      "label": "Стандартная звёздная величина"
+    },
+    "legend": {
+      "activePayload": "Активная полезная нагрузка",
+      "inactivePayload": "Неактивная полезная нагрузка",
+      "rocketBody": "Ступень ракеты",
+      "debris": "Обломки",
+      "unknown": "Неизвестно",
+      "inFieldOfView": "В поле зрения",
+      "sensor": "Датчик",
+      "launchSite": "Стартовая площадка",
+      "confidenceLow": "3 или ниже",
+      "confidenceMid": "От 3 до 7",
+      "confidenceHigh": "7 или выше",
+      "other": "Прочие",
+      "gpAgeLt05": "Менее 0,5 сут.",
+      "gpAge05to1": "От 0,5 до 1 сут.",
+      "gpAge1to15": "От 1 до 1,5 сут.",
+      "gpAge15to2": "От 1,5 до 2 сут.",
+      "gpAge2to25": "От 2 до 2,5 сут.",
+      "gpAge25to3": "От 2,5 до 3 сут.",
+      "gpAgeGt3": "Более 3 сут.",
+      "military": "Военные",
+      "communications": "Связь",
+      "technology": "Технологии",
+      "earthObservation": "Наблюдение Земли",
+      "science": "Наука",
+      "astronomy": "Астрономия",
+      "navigation": "Навигация",
+      "payload": "Полезная нагрузка",
+      "specialSats": "Особые спутники",
+      "satelliteInView": "Спутник в зоне видимости",
+      "missile": "Ракета",
+      "missileInView": "Ракета в зоне видимости",
+      "highOrbitDensity": "Высокая орбитальная плотность",
+      "medOrbitDensity": "Средняя орбитальная плотность",
+      "lowOrbitDensity": "Низкая орбитальная плотность",
+      "otherDebris": "Прочие обломки",
+      "tiniest": "Мельчайшие",
+      "verySmall": "Очень малые",
+      "rcsSmall": "Малые",
+      "belowAverage": "Ниже среднего",
+      "aboveAverage": "Выше среднего",
+      "rcsLarge": "Крупные",
+      "largest": "Крупнейшие",
+      "noData": "Нет данных",
+      "reentryInfo": "Прогноз риска входа в атмосферу зависит от многих факторов, включая удержание на орбите, атмосферное сопротивление, солнечные циклы и отношение массы спутника к площади. Это грубая оценка на основе перигея и среднего влияния сопротивления.",
+      "reentryImminent": "Неминуемый (в течение дней)",
+      "reentryDays": "Дни",
+      "reentryWeeks": "Недели",
+      "reentryMonths": "Месяцы",
+      "noRisk": "Нет риска",
+      "smallSatellite": "Малый спутник",
+      "sourceCelestrakSup": "Celestrak доп.",
+      "source18Sds": "18 SDS",
+      "sourceOemImport": "Импорт OEM",
+      "otherOrbitDensity": "Прочая орбитальная плотность",
+      "operationalStarlink": "Действующие Starlink",
+      "otherStarlink": "Прочие Starlink",
+      "notStarlink": "Не Starlink",
+      "inUmbral": "В тени",
+      "inPenumbral": "В полутени",
+      "inSunlight": "На солнце",
+      "satelliteInFov": "Спутник в поле зрения",
+      "velocity7": "Скорость ~7 км/с",
+      "velocity4": "Скорость ~4 км/с",
+      "velocity1": "Скорость ~1 км/с",
+      "brightest": "Ярчайшие",
+      "veryBright": "Очень яркие",
+      "bright": "Яркие",
+      "magMedium": "Средние",
+      "dim": "Тусклые",
+      "veryDim": "Очень тусклые",
+      "faintest": "Тусклейшие",
+      "visMagLessThan35": "Видимая звёздная величина менее 3,5",
+      "visMagBetween35And47": "Видимая звёздная величина от 3,5 до 4,7",
+      "visMagGreaterThan47": "Видимая звёздная величина более 4,7",
+      "apogeeBelow2000": "Апогей < 2000 км",
+      "perigeeAbove35000": "Перигей > 35000 км"
+    }
   }
 }

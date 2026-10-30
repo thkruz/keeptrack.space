@@ -3,6 +3,7 @@ import { ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { t7e } from '@app/locales/keys';
 import { SensorFov } from '@app/plugins/sensor-fov/sensor-fov';
 import { SensorSurvFence } from '@app/plugins/sensor-surv/sensor-surv-fence';
 import { SpaceObjectType } from '@ootk/src/main';
@@ -41,18 +42,32 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     });
 
     /*
-     * If we didn't draw anything, we should disable the FOV view plugin
-     * and show a toast message to the user.
-     * This is to prevent the user from being confused when they select a sensor
-     * and nothing happens.
+     * If we didn't draw anything, switch off whichever layer (Sensor FOV or Sensor Fence) asked
+     * for the drawing and tell the user why, so they are not left with a selected icon and an
+     * empty globe.
      */
     if (!didWeDrawSomething) {
-      const sensorFovPlugin = PluginRegistry.getPlugin(SensorFov);
+      this.disableUndrawableLayers_();
+    }
+  }
 
-      if (sensorFovPlugin && sensorFovPlugin.isMenuButtonActive) {
-        ServiceLocator.getUiManager().toast("No valid FOV to draw! We can't draw multiple Deep Space sensors at once.", ToastMsgType.caution);
-        sensorFovPlugin.disableFovView();
-      }
+  private disableUndrawableLayers_(): void {
+    const sensorFovPlugin = PluginRegistry.getPlugin(SensorFov);
+    const sensorSurvFencePlugin = PluginRegistry.getPlugin(SensorSurvFence);
+    const isFovOn = Boolean(sensorFovPlugin?.isMenuButtonActive);
+    const isFenceOn = Boolean(sensorSurvFencePlugin?.isMenuButtonActive);
+
+    if (!isFovOn && !isFenceOn) {
+      return;
+    }
+
+    ServiceLocator.getUiManager().toast(t7e('toasts.noValidFov'), ToastMsgType.caution);
+
+    if (isFovOn) {
+      sensorFovPlugin?.disableFovView();
+    }
+    if (isFenceOn) {
+      sensorSurvFencePlugin?.disableSurvView();
     }
   }
 

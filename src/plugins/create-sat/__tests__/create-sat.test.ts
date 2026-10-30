@@ -20,6 +20,7 @@ describe('CreateSat', () => {
       sccNum2Id: vi.fn().mockReturnValue(12345),
       getObject: vi.fn().mockReturnValue({
         isSatellite: () => true,
+        country: 'ANALSAT',
       }),
       objectCache: [],
       satCruncherThread: {
@@ -73,9 +74,9 @@ describe('CreateSat', () => {
     vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue(mockUiManager as unknown as UiManager);
     vi.spyOn(ServiceLocator, 'getTimeManager').mockReturnValue(mockTimeManager as unknown as TimeManager);
 
-    // Mock the validation CreateSat[validateInputs_] method to always return false
+    // Mock the validation CreateSat[validateInputs_] method to report no invalid fields
     // eslint-disable-next-line dot-notation
-    CreateSat['validateInputs_'] = vi.fn().mockReturnValue(false);
+    CreateSat['validateInputs_'] = vi.fn().mockReturnValue([]);
 
     // Call the method under test
     // eslint-disable-next-line dot-notation
@@ -116,6 +117,7 @@ describe('CreateSat', () => {
       sccNum2Id: vi.fn().mockReturnValue(12345),
       getObject: vi.fn().mockReturnValue({
         isSatellite: () => true,
+        country: 'ANALSAT',
       }),
       objectCache: [],
       satCruncherThread: {

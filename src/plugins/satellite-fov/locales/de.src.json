@@ -18,7 +18,8 @@
         "activeS2sCones": "Aktive Sat-zu-Sat-Kegel",
         "fovDegrees": "Sichtfeld (Grad)",
         "opacity": "Deckkraft",
-        "targetCatalogNumber": "Zielkatalognummer"
+        "targetCatalogNumber": "Zielkatalognummer",
+        "targetCatalogPlaceholder": "z. B. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Sichtfeld des Sensors",

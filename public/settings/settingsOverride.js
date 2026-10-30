@@ -83,7 +83,7 @@ const settingsOverride = {
    *   searchLimit: 150,
    *   plugins: {
    *     DebugMenuPlugin: { enabled: false },
-   *     AboutMenuPlugin: { enabled: false },
+   *     TimeMachine: { enabled: true },
    *     Collisions: { enabled: true },
    *     DopsPlugin: { enabled: false },
    *   },

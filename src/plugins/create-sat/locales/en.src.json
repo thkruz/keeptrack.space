@@ -29,7 +29,7 @@
         "apogeeKm": "Apogee (km)",
         "perigeeKm": "Perigee (km)",
         "smaKm": "Semi-Major Axis (km)",
-        "velocityKms": "Orbital Velocity (km/s)",
+        "velocityKms": "Velocity at Epoch (km/s)",
         "sectionIdentity": "Identity",
         "sectionOrbit": "Orbit",
         "sectionEpoch": "Epoch",
@@ -74,10 +74,21 @@
         "invalidPeriod": "Invalid period. Must be in the format NN.NNNN to NNNN.NNNN (e.g., 90.0000, 9999.9999) with 8 digits total.",
         "invalidSource": "Invalid source. Must not be empty.",
         "invalidName": "Invalid name. Must not be empty.",
-        "slotOccupied": "Overwriting existing satellite {name} in slot {scc}.",
         "noFreeSlots": "No free analyst slots remain (90000-99999 are all in use).",
         "noSatSelected": "Select a satellite to clone first.",
-        "tleChecksumMismatch": "TLE line {line} checksum is {actual} but should be {expected}. This may indicate a typo. Continuing anyway."
+        "tleChecksumMismatch": "TLE line {line} checksum is {actual} but should be {expected}. This may indicate a typo. Continuing anyway.",
+        "periodToMeanMotionFailed": "Error converting period to mean motion",
+        "meanMotionToPeriodFailed": "Error converting mean motion to period: {error}",
+        "satrecFailed": "Error creating satellite record!",
+        "cruncherFailed": "Sat Cruncher message failed",
+        "orbitBufferFailed": "Changing orbit buffer data failed",
+        "createFailed": "Failed to create satellite: {error}",
+        "rangeError": "{field} must be between {min} and {max}.",
+        "rangeErrorDeg": "{field} must be between {min} and {max} degrees.",
+        "meanMotionRange": "{field} must be greater than 0 and at most {max} revolutions per day.",
+        "periodPositive": "{field} must be a positive number of minutes.",
+        "numberRequired": "{field} must be a number.",
+        "noradIdReserved": "NORAD ID {id} is held by a launch trajectory. Choose another ID or remove the trajectory first."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",
@@ -90,7 +101,7 @@
         "tabsHeading": "Basic and Advanced Tabs",
         "tabs": "The <strong>Basic</strong> tab needs only a NORAD ID, name, <strong>Inclination</strong>, <strong>Apogee Altitude</strong>, and <strong>Perigee Altitude</strong>; the rest of the orbit is derived automatically. The <strong>Advanced</strong> tab exposes the full element set: <strong>Object Type</strong>, <strong>Country</strong>, epoch, <strong>Right Ascension</strong>, <strong>Eccentricity</strong>, <strong>Argument of Perigee</strong>, <strong>Mean Anomaly</strong>, and <strong>Mean Motion</strong> or <strong>Period</strong> (editing one recalculates the other). A <strong>Calculated Parameters</strong> readout shows the resulting apogee, perigee, semi major axis, and orbital velocity as you type.",
         "howToUse": "<ol><li>Open the <strong>Create Satellite</strong> menu from the drawer.</li><li>Pick a free NORAD ID between 90000 and 99999 and give the satellite a name.</li><li>On the <strong>Basic</strong> tab enter inclination, apogee, and perigee; or switch to the <strong>Advanced</strong> tab for the full element set.</li><li>Click <strong>Create Satellite</strong>. The new object appears immediately and a confirmation toast shows its name and number.</li><li>Use <strong>Save TLE</strong> to export the created satellite's elements as a file you can reload later.</li></ol>",
-        "tip1": "Every field is validated with a specific error message, so if creation fails the toast tells you exactly which value to fix.",
+        "tip1": "Every invalid field is listed above the Create Satellite button and marked in the form. Each message clears as soon as you fix that field.",
         "tip2": "A perigee below roughly 100 km is rejected because the satellite would decay immediately.",
         "tip3": "Created satellites are session only; export a TLE if you want to keep the object for another day."
       },
@@ -103,6 +114,13 @@
         "gto": "GEO Transfer (GTO)",
         "molniya": "Molniya",
         "polar": "Polar (600 km)"
+      },
+      "confirm": {
+        "title": "Replace satellite?",
+        "message": "Replace {name} in analyst ID {scc}?",
+        "replace": "Replace",
+        "cancel": "Cancel",
+        "changed": "The satellite or form changed. Review it and submit again."
       }
     }
   }

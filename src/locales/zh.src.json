@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "轨道预览",
-    "unknown": "未知"
+    "unknown": "未知",
+    "close": "关闭",
+    "download": "下载",
+    "downloadNamed": "下载 {name}",
+    "loading": "加载中…"
   },
   "help": {
     "overview": "概述",
@@ -35,7 +39,8 @@
       "resetCamera": "将相机重置为默认视图",
       "precisionMode": "按住以缓慢精确地移动相机",
       "moveCamera": "在第一人称模式下移动相机",
-      "rollCamera": "在第一人称模式下滚转相机",
+      "moveCameraUpRoll": "在 FPS 视图中上升；在其他第一人称模式中滚转",
+      "moveCameraDownRoll": "在 FPS 视图中下降；在其他第一人称模式中滚转",
       "numpadRotate": "旋转相机",
       "zoomIn": "放大",
       "zoomOut": "缩小",
@@ -60,9 +65,9 @@
       "oss": "开源软件",
       "celestrak": "CelesTrak",
       "embed": "嵌入式",
-      "offline": "Offline",
+      "offline": "离线版",
       "epfl": "EPFL",
-      "companion": "Companion",
+      "companion": "伴侣版",
       "solar-system": "太阳系"
     }
   },
@@ -88,12 +93,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "更新传感器UI样式时出错。"
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "未能找到所有底部菜单筛选按钮"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset 收到非有限值：{value}",
+      "invalidDate": "synchronize() 生成了无效日期 - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "加载卫星目录时出错。",
+      "usingOfflineCatalog": "无法下载最新目录！正在使用可能已过时的离线目录！",
+      "catalogsLoadFailed": "无法加载 TLE 目录！",
+      "externalTlesBadFormat": "外部 TLE 格式不正确",
+      "externalTlesLoadError": "从 {url} 加载外部 TLE 时出错",
+      "fileLoadError": "加载 {file} 时出错",
+      "usingOfflineVimpel": "无法下载最新的 vimpel.json！正在使用可能已过时的离线 vimpel.json！",
+      "satProcessFailed": "无法处理卫星：{name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "此导出中有 {count} 颗使用扩展 sccNum（7 位以上）的卫星。TLE 格式第 3-7 列只能容纳 5 个字符，因此重新导入此文件会丢失规范 ID。请使用 CSV/OMM 导出以保留扩展 ID。",
+      "noTleData": "没有可导出的 TLE 数据"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec：在 satData 中未找到 satId",
+      "satrecError": "创建卫星记录时出错！",
+      "analystSatInvalid": "新的分析员卫星无效！"
+    },
+    "apiKeyRequired": "需要 API 密钥。请在 keeptrack.space 获取免费密钥并将其添加到 settings/data-settings.ts",
+    "audioLoadFailed": "无法加载音频：{key}",
+    "rmbMenuMissingElements": "右键菜单缺少元素：{ids}",
+    "sgp4BackendFailed": "无法启用 {backend} 推演后端，已回退到 TypeScript SGP4。{error}",
+    "Pwa": {
+      "registrationFailed": "Service Worker 注册失败："
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "精细航天器模型不可用，已回退到通用模型：{error}",
+      "meshVariantsUnavailable": "程序化模型变体不可用，已回退到免费原型：{error}",
+      "colorCruncherUpdateDropped": "ColorCruncher 动态更新已丢弃：{error}",
+      "hoverPickDisabled": "已禁用悬停选取卫星：此浏览器不支持 WebGL readPixels（{error}）。点击选择仍然可用。",
+      "earthInitFailed": "初始化地球时出错：{error}",
+      "textureLoadFailed": "无法加载纹理：{url}",
+      "solarSystemPackUnavailable": "太阳系资源包不可用，已回退到内置天体：{error}",
+      "uniformNotFound": "在程序 {program} 中未找到 uniform {uniform}",
+      "contextLost": "WebGL 上下文丢失",
+      "contextLostRefresh": "WebGL 上下文丢失。请刷新页面以恢复。",
+      "contextRestored": "WebGL 上下文已恢复",
+      "pickingResizeFailed": "resizeCanvas 期间调整拾取帧缓冲区大小失败，将推迟到上下文恢复后。{error}",
+      "godraysResizeFailed": "resizeCanvas 期间调整体积光大小失败，将在下次调整大小时重试。{error}",
+      "bodyInitError": "初始化 {name} 时出错",
+      "bodyTextureError": "更新 {name} 的纹理时出错",
+      "atmosphereInitError": "初始化 {name} 大气时出错",
+      "atmosphereTextureError": "加载 {name} 大气纹理时出错（第 {attempt} 次尝试）",
+      "shaderInitFailed": "无法初始化着色器",
+      "meshModelUndefined": "网格模型未定义。无法应用属性指针。",
+      "shaderAttributeMissing": "在着色器中未找到属性“{attr}”。它是否未在着色器代码中声明或未使用？",
+      "meshesLoadFailed": "3D 模型加载失败！",
+      "flagAtlasLoadFailed": "无法加载旗帜图集",
+      "politicalMapLoadFailed": "无法加载政区地图数据"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] 已显示启动恢复界面（停滞的 worker：{workers}）。",
+      "line": "行：{line}",
+      "optionalWorkersStalled": "[KeepTrack] 可选 worker 未能在 {seconds} 秒内启动，将在没有它们的情况下启动：{workers}。受影响的功能（如轨道线）在本次会话中已禁用。",
+      "essentialWorkersStalled": "[KeepTrack] 核心 Web Worker 在 {seconds} 秒后仍未初始化。停滞的 worker：{workers}。",
+      "selfHealReload": "[KeepTrack] Worker 停滞；将使用全新的 worker 缓存重新加载一次以自动修复。"
+    },
+    "Persistence": {
+      "versionMismatch": "版本不匹配：{saved} < {current}",
+      "clearingStorage": "正在清除本地存储...",
+      "subscriberError": "存储订阅者出错：",
+      "storageError": "LocalStorageProvider 错误：",
+      "enhancedInitFailed": "无法初始化增强持久化：{error}",
+      "corruptSetting": "跳过已损坏的已保存设置“{key}”：{error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "未找到根容器！",
+      "containerNotFound": "未找到 Colorbox 容器！",
+      "loadFailed": "加载失败：{url}",
+      "imageLoadFailed": "无法加载图片：{url}"
+    },
+    "SaveVariable": {
+      "variable": "保存变量时出错！",
+      "csv": "保存 CSV 时出错！",
+      "xlsx": "保存 XLSX 时出错！",
+      "clipboard": "复制到剪贴板时出错！"
+    },
+    "Fatal": {
+      "technicalDetail": "技术细节",
+      "recommendations": "建议",
+      "canvasMissingTitle": "缺少画布元素",
+      "canvasMissingDescription": "KeepTrack 找不到其绘图区域。这通常意味着浏览器扩展、企业防火墙或内容安全策略正在移除页面中的元素。",
+      "webgl2Title": "WebGL 2 不可用",
+      "webgl2Description": "KeepTrack 需要 WebGL 2 来渲染 3D 场景。您的浏览器或设备不支持它，或者它已被禁用。",
+      "recDisableExtensions": "停用浏览器扩展（广告拦截器、隐私工具）后重新加载。",
+      "recManagedNetwork": "处于受管理的网络中？请联系网络或系统管理员将此网站加入白名单。",
+      "recDifferentBrowser": "请尝试其他浏览器（推荐 Chrome、Edge 或 Firefox）。",
+      "recUpdateBrowser": "请将浏览器更新到最新版本。",
+      "recHardwareAcceleration": "请在浏览器设置中启用硬件加速。",
+      "recGraphicsDrivers": "请更新显卡驱动程序。",
+      "recManagedDevice": "使用受管理的设备？请联系系统管理员。"
     }
   },
   "hoverManager": {
     "launched": "发射年份",
     "launchedPlanned": "发射年份待定",
-    "launchedUnknown": "发射年份不详"
+    "launchedUnknown": "发射年份不详",
+    "orbitPeriodDays": "轨道周期：{days} 个地球日",
+    "orbitPeriodYears": "轨道周期：{years} 个地球年",
+    "distanceFromParent": "距 {parent} 的距离：{km} km",
+    "distanceFromSun": "距太阳的距离：{au} AU（{mkm} 百万公里）",
+    "unknownLaunchSite": "未知发射场",
+    "unknownSite": "未知地点",
+    "unknownCountry": "未知国家",
+    "external": "外部",
+    "position": "位置：",
+    "velocity": "速度："
   },
   "darkClouds": {
     "in": "年的",
@@ -153,22 +268,125 @@
     "groupLayerToggles": "图层切换",
     "groupSettingsToggles": "设置切换",
     "groupDevTools": "开发工具",
-    "groupAbout": "关于"
+    "groupAbout": "关于",
+    "modeAll": "全部插件",
+    "openPluginMenu": "打开插件菜单",
+    "openAppLauncher": "打开应用启动器",
+    "appLauncherTooltip": "应用启动器 (Shift+Z)",
+    "appLauncher": "应用启动器",
+    "search": "搜索",
+    "searchEllipsis": "搜索…",
+    "toggleRailMode": "切换窄栏模式",
+    "collapse": "收起",
+    "expand": "展开",
+    "phoneLink": "手机连接",
+    "phoneLinkSignIn": "登录以连接您的手机",
+    "connected": "已连接",
+    "offline": "离线",
+    "footerLinks": {
+      "label": "关于与法律信息",
+      "about": "关于",
+      "data": "数据",
+      "terms": "条款",
+      "privacy": "隐私"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "暂停时钟",
     "resetCamera": "重置相机",
     "clearLines": "清除线条",
-    "clearScreen": "清除屏幕"
+    "clearScreen": "清除屏幕",
+    "startClock": "启动时钟"
   },
   "urlManager": {
     "satNotFound": "未找到卫星\"{val}\"!",
     "intldesNotFound": "未找到国际编号\"{val}\"!",
-    "deepSpaceNoEphemeris": "{name}是深空物体,其星历尚未在 KeepTrack 中提供。"
+    "deepSpaceNoEphemeris": "{name}是深空物体,其星历尚未在 KeepTrack 中提供。",
+    "searchFoundNothing": "搜索“{val}”没有找到任何结果！",
+    "missileLaunched": "导弹已发射！",
+    "dateNotIso": "日期值“{val}”不是有效的 ISO 8601 日期字符串！",
+    "dateNotUnix": "日期值“{val}”不是有效的 Unix 时间戳！",
+    "rateNotFloat": "推演速度“{val}”不是有效的浮点数！",
+    "zoomNotFloat": "缩放值“{val}”不是有效的浮点数！",
+    "zoomOutOfBounds": "缩放值“{val}”超出范围！",
+    "pitchYawNotFloat": "俯仰或偏航值不是有效的浮点数！",
+    "pitchOutOfBounds": "俯仰值超出范围！",
+    "yawOutOfBounds": "偏航值超出范围！",
+    "latLonNotFloat": "纬度或经度值不是有效的浮点数！",
+    "latLonOutOfBounds": "纬度或经度值超出范围！",
+    "unknownSunParam": "未知的太阳参数：{val}",
+    "unknownRegime": "未知的轨道区域筛选器：{val}",
+    "invalidSearchLimit": "无效的搜索上限：{val}"
   },
   "searchManager": {
     "resultCountOne": "1 个结果",
     "resultCount": "{count} 个结果",
-    "resultCountLimited": "显示 {total} 个结果中的 {shown} 个"
+    "resultCountLimited": "显示 {total} 个结果中的 {shown} 个",
+    "noResults": "未找到结果",
+    "decayed": "已陨落",
+    "typeStar": "恒星",
+    "typeSensor": "传感器",
+    "typeLaunchSite": "发射场",
+    "typePlanet": "行星"
+  },
+  "sensorMath": {
+    "withinOneBeam": "同一波束内",
+    "range": "距离：{km} km",
+    "relativeVelocity": "相对速度：{kms} km/s",
+    "noPassesInDays": "{days} 天内无过境",
+    "customLocation": "自定义位置",
+    "customSensorDefaultName": "自定义传感器"
+  },
+  "toasts": {
+    "orbitTailsOnly": "仅显示轨道尾迹",
+    "orbitsOff": "轨道已关闭",
+    "orbitsOn": "轨道已开启",
+    "orbitsInEcf": "轨道以 ECF 显示",
+    "orbitsInEci": "轨道以 ECI 显示",
+    "cameraEarthCentered": "地心相机模式",
+    "cameraFixedLvlh": "卫星固定相机模式 (LVLH)",
+    "cameraFixedEci": "卫星固定相机模式 (ECI)",
+    "cameraFree": "自由相机模式",
+    "cameraPlanetarium": "天象仪相机模式",
+    "cameraSatFirstPerson": "卫星第一人称相机模式",
+    "cameraAstronomy": "天文相机模式",
+    "cameraFlatMap": "平面地图相机模式",
+    "propagationSpeed": "推演速度：{rate}x",
+    "timeSetToRealTime": "时间已设为实时",
+    "noValidFov": "没有可绘制的有效视场！无法同时绘制多个深空传感器。",
+    "colorSchemeChanged": "配色方案已更改为 {scheme}",
+    "mobileFullVersionUnavailable": "KeepTrack 完整版无法在移动设备上使用。请使用桌面浏览器访问完整版。",
+    "objectInsideEarth": "对象位于地球内部！",
+    "propagationRate": "推演速度：{rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "切换图层",
+    "layers": "图层"
+  },
+  "modalConfirm": {
+    "confirmAction": "确认操作",
+    "defaultTitle": "确定吗？",
+    "defaultMessage": "确定要继续执行此操作吗？",
+    "yes": "是",
+    "no": "否",
+    "cancel": "取消",
+    "logoutTitle": "确认退出登录",
+    "logoutMessage": "确定要退出登录吗？您需要重新登录才能访问您的账户。",
+    "logout": "退出登录",
+    "deleteTitle": "确认删除",
+    "deleteNamedMessage": "确定要删除“{name}”吗？此操作无法撤销。",
+    "deleteMessage": "确定要删除此项吗？此操作无法撤销。",
+    "delete": "删除",
+    "clearTitle": "确认清除",
+    "clearTypedMessage": "确定要清除所有{dataType}吗？此操作无法撤销。",
+    "clearMessage": "确定要清除所有数据吗？此操作无法撤销。",
+    "clear": "清除",
+    "input": "输入",
+    "ok": "确定",
+    "removeItem": "移除 {label}"
+  },
+  "colorbox": {
+    "openInNewTab": "在新标签页中打开",
+    "blankPageHint": "页面空白？请在新标签页中打开。"
   }
 }

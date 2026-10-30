@@ -89,7 +89,8 @@
         "ErrorCreatingBreakup": "파편화 생성 오류!",
         "InvalidStartNum": "잘못된 위성 시작 번호입니다! 기본값 90000으로 설정합니다!",
         "InvalidSlotRange": "초기 위성 번호가 범위를 벗어났습니다. {start}에서 {end}까지 사용하세요.",
-        "BreakupGeneratorFailed": "파편화 생성기 실패!"
+        "BreakupGeneratorFailed": "파편화 생성기 실패!",
+        "NoFreeSlots": "파편 {count}개에 필요한 빈 분석가 슬롯이 부족합니다. 다른 객체가 사용 중인 슬롯은 덮어쓰지 않습니다. 개수를 줄이거나 일부 분석가 객체를 제거하세요."
       },
       "stats": {
         "meanSpeed": "예상 평균 속도",

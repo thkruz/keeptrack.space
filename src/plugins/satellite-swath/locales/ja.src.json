@@ -19,7 +19,8 @@
         "daylightOnly": "昼間のみ",
         "nadirReadout": "直下の観測幅 約 {km} km (FOV {fov}°)",
         "nadirReadoutUnknown": "この軌道では直下の観測幅を計算できません",
-        "presetsIllustrative": "プリセットは例示であり、公表された仕様ではありません。"
+        "presetsIllustrative": "プリセットは例示であり、公表された仕様ではありません。",
+        "close": "閉じる"
       },
       "presets": {
         "hrEo": "高分解能光学",

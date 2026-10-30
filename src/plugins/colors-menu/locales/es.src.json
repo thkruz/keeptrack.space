@@ -5,6 +5,9 @@
       "title": "Esquemas de Color",
       "rmbLabel": "Esquema de Color",
       "sectionLabel": "Esquemas",
+      "legend": {
+        "close": "Cerrar leyenda"
+      },
       "help": {
         "overview": "El menú Esquemas de Color cambia cómo se colorea cada objeto de la escena. Cada esquema codifica una propiedad distinta: país de origen, tipo de objeto, régimen orbital, estado de iluminación solar, velocidad y más, de modo que elegir el esquema adecuado convierte la nube de puntos en la respuesta a una pregunta concreta.",
         "imgAlt": "El menú Esquemas de Color con la lista de esquemas disponibles",
@@ -13,6 +16,13 @@
         "tip1": "La leyenda se actualiza con el esquema; si no está seguro de qué significa un color, la leyenda es la referencia.",
         "tip2": "Algunos esquemas requieren muchos datos (como la densidad espacial) y tardan un momento en calcularse la primera vez que se seleccionan.",
         "shortcutToggle": "Alternar el menú Esquemas de Color"
+      },
+      "commandPalette": {
+        "category": "Colores",
+        "setScheme": "Establecer esquema de color: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Esquema de color no encontrado: {name}"
       }
     }
   }

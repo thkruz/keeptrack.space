@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "Impossible de créer l'infobulle : l'élément n'a pas d'attribut kt-tooltip.",
+        "missingElement": "Impossible de créer l'infobulle : l'élément est nul ou non défini."
+      }
+    }
+  }
+}

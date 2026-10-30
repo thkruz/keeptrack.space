@@ -5,12 +5,18 @@
   },
   "plugins": {
     "SelectSatManager": {
-      "sectionLabel": "Satellite Selection",
+      "sectionLabel": "Выбор спутника",
       "settings": {
         "focusOnSatWhenSelected": {
-          "label": "Focus on Satellite When Selected",
-          "helpText": "Zoom in on the satellite when selected."
+          "label": "Фокусироваться на спутнике при выборе",
+          "helpText": "Приближать спутник при его выборе."
         }
+      },
+      "errorMsgs": {
+        "missileSecondaryUnsupported": "Выбор ракеты в качестве вторичного объекта не поддерживается!",
+        "sensorWithoutId": "SelectSatManager.selectSensorObject_: у SensorObject нет sensorId: {sensor}",
+        "invalidCovariance": "{context}: Недопустимая ковариационная матрица",
+        "covarianceFromTleFailed": "{context}: Не удалось вычислить ковариацию по TLE"
       }
     }
   }

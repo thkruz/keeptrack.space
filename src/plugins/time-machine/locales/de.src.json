@@ -4,10 +4,14 @@
       "bottomIconLabel": "Zeitmaschine",
       "settings": {
         "disableToasts": {
-          "label": "Disable Time Machine Toasts",
-          "helpText": "Time Machine stop showing toast messages."
+          "label": "Zeitmaschinen-Meldungen deaktivieren",
+          "helpText": "Die Zeitmaschine zeigt keine Popup-Meldungen mehr an."
         }
-      }
+      },
+      "commandPalette": {
+        "toggle": "Zeitmaschine umschalten"
+      },
+      "yearToast": "Zeitmaschine im Jahr {year}!"
     }
   }
 }

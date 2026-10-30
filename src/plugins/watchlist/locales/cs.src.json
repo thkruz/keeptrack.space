@@ -35,7 +35,10 @@
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} už je v seznamu!",
         "ObjectAlreadyInList": "Objekt {id} už je v seznamu!",
-        "SatNotFound": "Satelit {id} nebyl nalezen!"
+        "SatNotFound": "Satelit {id} nebyl nalezen!",
+        "ListFileFormatIncorrect": "Nesprávný formát souboru seznamu",
+        "ErrorReadingList": "Chyba při čtení seznamu!",
+        "ErrorSavingList": "Chyba při ukládání seznamu!"
       },
       "settings": {
         "satLabelMode": {
@@ -51,13 +54,17 @@
       "rmbMenu": {
         "addToWatchlist": "Přidat do seznamu sledovaných",
         "removeFromWatchlist": "Odebrat ze seznamu sledovaných"
+      },
+      "infoBox": {
+        "addLabel": "Přidat do seznamu sledovaných",
+        "removeLabel": "Odebrat ze seznamu sledovaných"
       }
     },
     "WatchlistOverlay": {
       "bottomIconLabel": "Překryv",
       "title": "Menu překryvu",
       "helpBody": "<p> Překryv seznamu sledovaných zobrazuje čas dalšího průletu pro každý satelit ve vašem seznamu sledovaných. Překryv se aktualizuje každých 10 sekund. </p> <p> Překryv je barevně rozlišen podle času do dalšího průletu. Barvy jsou následující: </p> <ul> <li>Žlutá – v zorném poli</li> <li>Modrá – čas do dalšího průletu je do 30 minut po aktuálním čase nebo 10 minut před aktuálním časem</li> <li>Bílá – jakýkoli budoucí průlet nesplňující výše uvedené požadavky</li> </ul> <p> Kliknutím na satelit v překryvu se mapa vycentruje na daný satelit. </p>",
-      "openOverlayCmd": "Otevřít překryv Watchlist",
+      "openOverlayCmd": "Otevřít překryv seznamu sledovaných",
       "addSatellitesToast": "Nejprve přidejte satelity do seznamu!",
       "noPassesMsg": "Žádné průlety během 60 minut",
       "inFovToast": "Satelit {sccNum} je v zorném poli!",

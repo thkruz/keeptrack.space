@@ -283,5 +283,59 @@
     "ZA": "南非",
     "ZR": "扎伊尔",
     "ZW": "津巴布韦"
+  },
+  "sensorGroups": {
+    "ssn": {
+      "header": "太空监视网络 (SSN) 传感器",
+      "topLink": "所有太空监视网络 (SSN) 传感器"
+    },
+    "mw": {
+      "header": "美国导弹预警传感器",
+      "topLink": "所有导弹预警传感器"
+    },
+    "md": {
+      "header": "美国导弹防御局传感器",
+      "topLink": "所有导弹防御传感器"
+    },
+    "OWL-Net": {
+      "header": "OWL-Net 传感器",
+      "topLink": "所有 OWL-Net 传感器"
+    },
+    "leolabs": {
+      "header": "LeoLabs 传感器",
+      "topLink": "所有 LeoLabs 传感器"
+    },
+    "esoc": {
+      "header": "欧洲空间操作中心传感器",
+      "topLink": "所有 ESOC 传感器"
+    },
+    "rus": {
+      "header": "俄罗斯传感器",
+      "topLink": "所有俄罗斯传感器"
+    },
+    "prc": {
+      "header": "中国传感器",
+      "topLink": "所有中国传感器"
+    },
+    "other": {
+      "header": "其他传感器",
+      "topLink": "其他传感器"
+    },
+    "dsn": {
+      "header": "NASA 深空网络",
+      "topLink": "所有深空网络综合站"
+    },
+    "scn": {
+      "header": "卫星控制网络 (AFSCN)",
+      "topLink": "所有远程跟踪站"
+    },
+    "estrack": {
+      "header": "ESA 跟踪网络 (ESTRACK)",
+      "topLink": "所有 ESTRACK 站"
+    },
+    "galileo": {
+      "header": "伽利略地面段",
+      "topLink": "所有伽利略地面站"
+    }
   }
 }

@@ -4,7 +4,11 @@
       "bottomIconLabel": "Graf inklinace vs výška",
       "title": "Menu grafu inklinace vůči výšce",
       "labels": {
-        "totalLeoPayloads": "Celkový počet LEO nákladů"
+        "totalLeoPayloads": "Celkový počet LEO nákladů",
+        "totalLeoRocketBodies": "Celkový počet LEO raketových stupňů",
+        "totalLeoDebris": "Celkový počet LEO trosek",
+        "totalLeoObjects": "Celkový počet LEO objektů",
+        "noMatches": "Aktuálním filtrům neodpovídají žádné objekty."
       },
       "help": {
         "overview": "Graf inklinace vs výška mapuje populaci LEO: každý náklad je vynesen podle inklinace vůči výšce. Konstelace se zobrazují jako těsné shluky (slupky Starlink, roviny OneWeb) a přeplněná výšková pásma jsou okamžitě patrná.",
@@ -13,6 +17,20 @@
         "howToUse": "<ol><li>Otevřete <strong>Graf inklinace vs výška</strong> z panelu (režim Analýza).</li><li>Graf se vypočítá automaticky; najetím na body zobrazíte názvy satelitů a kliknutím na bod daný satelit vyberete.</li><li>Pomocí legendy můžete skrývat nebo zobrazovat konstelace a země.</li></ol>",
         "tip1": "Kliknutím na položku legendy přepnete celou skupinu; izolování jediné konstelace zviditelní strukturu jejích slupek.",
         "tip2": "Graf vzorkuje katalog v aktuálním čase; po změnách katalogu menu znovu otevřete, aby se obnovil."
+      },
+      "chart": {
+        "title": "Bodový graf sklonu vůči výšce",
+        "xAxis": "Výška (km)",
+        "yAxis": "Sklon (°)",
+        "zAxis": "Perioda (min)",
+        "constellation": "Konstelace",
+        "country": "Země",
+        "altitude": "Výška",
+        "inclination": "Sklon",
+        "period": "Perioda",
+        "eccentricity": "Excentricita",
+        "unknown": "Neznámá",
+        "other": "Ostatní"
       }
     },
     "Inc2LonPlots": {
@@ -29,6 +47,17 @@
         "tip1": "Svislý sloupec bodů na jedné zeměpisné délce je shluk společně umístěných satelitů sdílejících stejnou pozici.",
         "tip2": "Satelity s inklinací nad zhruba 7 stupňů jsou obvykle na hřbitovní dráze nebo na skloněné odkládací dráze; aktivní pás se drží u nuly.",
         "shortcutToggle": "Přepnout graf inklinace vs délka"
+      },
+      "chart": {
+        "loading": "Výpočet poloh družic...",
+        "title": "Bodový graf sklonu vůči zeměpisné délce (GEO)",
+        "xAxis": "Zeměpisná délka (°)",
+        "yAxis": "Sklon (°)",
+        "inclination": "Sklon",
+        "longitude": "Zeměpisná délka",
+        "period": "Perioda",
+        "periodMinutes": "Perioda (minuty)",
+        "other": "Ostatní"
       }
     },
     "Time2LonPlots": {
@@ -47,7 +76,8 @@
         "tooltipLongitude": "Zeměpisná délka",
         "tooltipTime": "Čas od teď",
         "loading": "Výpočet dat o dráze...",
-        "empty": "Žádné objekty neodpovídají aktuálním filtrům"
+        "empty": "Žádné objekty neodpovídají aktuálním filtrům",
+        "other": "Ostatní"
       },
       "help": {
         "overview": "Kaskádový graf sleduje zeměpisnou délku GEO satelitů v čase: každá čára představuje délku satelitu, která ve vykresleném okně driftuje (nebo se drží). Satelity udržující pozici kreslí svislé čáry; driftující satelity se naklánějí; přesuny se projevují jako rozmáchlé křivky.",
@@ -65,6 +95,15 @@
         "overview": "Graf šířka vs délka je plochý snímek toho, kde se satelity právě nacházejí nad Zemí, vynesený jako pozemní pozice. Čte se jako mapa bez mapy: hodí se k hledání mezer v pokrytí a ke studiu geometrie stop ve tvaru osmičky u skloněných satelitů v pásu GEO.",
         "howToUse": "<ol><li>Otevřete <strong>Graf šířka vs délka</strong> z panelu (režim Analýza).</li><li>Graf se vykreslí automaticky; najetím na body zobrazíte názvy a kliknutím satelit vyberete.</li></ol>",
         "tip1": "Skloněné GEO satelity opisují severojižní výkyvy na pevné zeměpisné délce, které se v tomto zobrazení jeví jako svislé rozptyly."
+      },
+      "chart": {
+        "title": "Graf zeměpisné šířky vůči délce",
+        "xAxis": "Zeměpisná délka (°)",
+        "yAxis": "Zeměpisná šířka (°)",
+        "latitude": "Zeměpisná šířka",
+        "longitude": "Zeměpisná délka",
+        "other": "Ostatní",
+        "snapshotTime": "Snímek k {time} UTC"
       }
     },
     "EciPlot": {
@@ -74,15 +113,21 @@
         "overview": "Graf ECI vykresluje dráhu vybraného satelitu jako 3D křivku v inerciální soustavě se středem v Zemi (ECI): soustavě pevně spojené s hvězdami, kde jsou dráhy čisté elipsy. Pokud je vybrán sekundární satelit, vykreslí se obě dráhy společně pro porovnání.",
         "howToUse": "<ol><li>Vyberte satelit; ikona pluginu v panelu je neaktivní, dokud žádný není vybrán.</li><li>Otevřete <strong>Graf ECI</strong> z panelu (režim Analýza).</li><li>Tažením 3D graf otáčejte a kolečkem přibližujte; najetím na křivku zobrazíte hodnoty polohy.</li></ol>",
         "tip1": "Nejprve vyberte sekundární satelit (pravým kliknutím nebo klávesami [ a ]), abyste překryli dvě dráhy a porovnali jejich geometrii."
+      },
+      "chart": {
+        "title": "Graf v soustavě ECI (Earth Centered Inertial)"
       }
     },
     "EcfPlot": {
       "bottomIconLabel": "Graf ECF",
       "title": "Menu grafu ECF",
       "help": {
-        "overview": "Graf ECF vykresluje trajektorii vybraného satelitu v soustavě pevně spojené se Zemí a se středem v Zemi (ECF), která rotuje s planetou. Geosynchronní satelity se smršťují do malých smyček a dráhy s opakující se pozemní stopou se samy uzavírají, takže je to ideální soustava pro studium chování vůči Zemi.",
+        "overview": "Graf ECF vykresluje jednu oběžnou periodu trajektorie vybraného satelitu v soustavě pevně spojené se Zemí a se středem v Zemi (ECF), která rotuje s planetou: každý vzorek je otočen o úhel rotace Země (GMST) v jeho vlastním čase, takže jeho zeměpisná délka odpovídá pozemní stopě. Geosynchronní satelity se smršťují do malých smyček, zatímco nízká dráha vykreslí jeden přelet pozemní stopy ve 3D, takže je to ideální soustava pro studium chování vůči Zemi.",
         "howToUse": "<ol><li>Vyberte satelit; ikona pluginu v panelu je neaktivní, dokud žádný není vybrán.</li><li>Otevřete <strong>Graf ECF</strong> z panelu (režim Analýza).</li><li>Tažením 3D graf otáčejte a kolečkem přibližujte; najetím na křivku zobrazíte hodnoty polohy.</li></ol>",
         "tip1": "Těsná osmička GEO satelitu v ECF je jeho denní cyklus inklinace a excentricity; čím těsnější smyčka, tím lepší udržování pozice."
+      },
+      "chart": {
+        "title": "Graf v soustavě ECF (Earth Centered Fixed)"
       }
     },
     "RicPlot": {
@@ -121,6 +166,9 @@
         "overview": "Graf RIC zobrazuje relativní pohyb dvou satelitů v soustavě radiální, podélné a příčné složky (RIC) se středem v primárním satelitu. Je to standardní pohled pro sbližování, let ve formaci a analýzu blízkých přiblížení: dráha sekundárního satelitu je vykreslena tak, jak ji vidí primární.",
         "howToUse": "<ol><li>Vyberte primární satelit a poté sekundární satelit (pravým kliknutím na satelit nebo klávesami [ a ]).</li><li>Otevřete <strong>Graf RIC</strong> z panelu (režim Analýza).</li><li>Přečtěte si čtyři 2D grafy: radiální, podél dráhy, napříč dráhou a celkovou vzdálenost v čase. Přetažením posuvníku nebo posouváním přibližte časovou osu.</li></ol>",
         "tip1": "Musí být vybrán primární i sekundární satelit, jinak graf nemá co porovnávat; pro čitelné měřítko vybírejte objekty na podobných drahách."
+      },
+      "errorMsgs": {
+        "missingSatData": "Chybí data družic pro graf RIC"
       }
     }
   }

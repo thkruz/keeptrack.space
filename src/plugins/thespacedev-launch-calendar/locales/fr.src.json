@@ -23,15 +23,38 @@
       "msgs": {
         "fetching": "Récupération des prochains lancements...",
         "unknown": "Inconnu",
-        "tbd": "À déterminer"
+        "tbd": "À déterminer",
+        "apiUnavailable": "{url} est indisponible !",
+        "noLaunches": "Aucun lancement à venir reçu.",
+        "rateLimited": "The Space Devs limite actuellement les requêtes. Réessayez dans quelques minutes.",
+        "nothingToExport": "Aucun lancement à exporter. Chargez d'abord la liste des lancements."
       },
       "help": {
-        "overview": "Prochains lancements répertorie les lancements orbitaux à venir dans le monde entier, récupérés en direct depuis la bibliothèque de lancements de The Space Devs : la fenêtre de lancement, la mission, le site de lancement, l'agence et le pays de chacun. Les noms de missions et de sites renvoient vers des informations complémentaires lorsqu'elles sont disponibles.",
-        "imgAlt": "Le tableau Prochains lancements des missions à venir",
+        "overview": "Calendrier des lancements répertorie les 20 prochains lancements orbitaux dans le monde, récupérés en direct depuis la base de lancements de The Space Devs : la fenêtre de lancement, la mission, la fusée, le site de lancement, l'agence et le pays de chacun. Les noms de mission, de fusée, de site et d'agence renvoient vers des informations complémentaires lorsqu'elles existent.",
+        "imgAlt": "Le tableau Calendrier des lancements des prochains lancements",
         "imgCaption": "Chaque ligne est un lancement à venir avec sa fenêtre, sa mission, son site et son agence.",
-        "howToUse": "<ol><li>Ouvrez <strong>Prochains lancements</strong> depuis le tiroir des extensions (mode Événements).</li><li>Cliquez sur le bouton de récupération pour télécharger la liste actuelle des lancements ; une connexion internet est nécessaire.</li><li>Parcourez le tableau ; les noms de missions et de pas de tir liés ouvrent des pages d'information.</li><li>Utilisez le bouton d'export pour enregistrer la liste sous forme de feuille de calcul.</li></ol>",
+        "howToUse": "<ol><li>Ouvrez <strong>Calendrier des lancements</strong> depuis le tiroir. La liste des lancements se télécharge automatiquement à la première ouverture ; une connexion internet est nécessaire. Si ce téléchargement échoue, cliquez sur <strong>Récupérer les données</strong> pour réessayer.</li><li>Parcourez le tableau ; les noms liés ouvrent des pages de référence dans un panneau latéral.</li><li>Cliquez sur <strong>Actualiser</strong> pour obtenir la liste la plus récente. Si la requête échoue, les lignes que vous consultiez restent affichées.</li><li>Cliquez sur <strong>Exporter les informations de lancement</strong> pour enregistrer tous les champs dans une feuille de calcul, avec les heures en UTC.</li></ol>",
         "tip1": "Les fenêtres de lancement sont affichées en UTC ; les entrées datant de plus d'un jour affichent « À déterminer » jusqu'à la récupération de données récentes.",
         "tip2": "Associez cette liste à l'outil Nouveau lancement pour modéliser la trajectoire d'un lancement à venir avant qu'il n'ait lieu."
+      },
+      "export": {
+        "name": "Nom",
+        "updated": "Dernière mise à jour (UTC)",
+        "windowStart": "Début de la fenêtre (UTC)",
+        "windowEnd": "Fin de la fenêtre (UTC)",
+        "location": "Lieu",
+        "locationURL": "URL du lieu",
+        "agency": "Agence",
+        "agencyURL": "URL de l'agence",
+        "country": "Pays",
+        "mission": "Description de la mission",
+        "missionName": "Nom de la mission",
+        "missionType": "Type de mission",
+        "missionURL": "URL de la mission",
+        "rocket": "Fusée",
+        "rocketConfig": "Configuration de la fusée",
+        "rocketFamily": "Famille de la fusée",
+        "rocketURL": "URL de la fusée"
       }
     }
   }

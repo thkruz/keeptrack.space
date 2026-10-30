@@ -7,6 +7,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SatInfoBoxObject } from '@app/plugins/sat-info-box-object/sat-info-box-object';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
+import { Satellite } from '@ootk/src/main';
 import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -36,7 +37,11 @@ describe('SatInfoBoxObject data population', () => {
     // The object/secondary sections hold every element the update methods touch.
     document.body.insertAdjacentHTML('beforeend', p().createObjectSection_());
     document.body.insertAdjacentHTML('beforeend', p().createSecondarySection());
-    // jsdom has no requestIdleCallback; the RCS update is deferred through it.
+    const selection = PluginRegistry.getPlugin(SelectSatManager)!;
+
+    selection.selectedSat = defaultSat.id;
+    selection.primarySatObj = defaultSat;
+    // Keep idle callbacks blocked to verify that current RCS is not deferred.
     vi.stubGlobal('requestIdleCallback', vi.fn());
   });
 
@@ -53,6 +58,21 @@ describe('SatInfoBoxObject data population', () => {
     expect(() => p().updateObjectData_(defaultSat)).not.toThrow();
     // The country correlation row is filled from the satellite metadata.
     expect(document.body.textContent).toBeTruthy();
+  });
+
+  it('updates RCS synchronously with the current identity and ignores stale live updates', () => {
+    settingsManager.plugins.SatInfoBoxObject!.isEstimateRcs = false;
+    const first = new Satellite({ ...defaultSat, rcs: 1 });
+    const next = new Satellite({ ...defaultSat, id: 1, rcs: 9 });
+
+    p().updateObjectData_(first);
+    expect(getEl('sat-rcs')!.textContent).toBe('1 m2');
+    p().updateObjectData_(next);
+    expect(getEl('sat-rcs')!.textContent).toBe('9 m2');
+    const refresh = vi.spyOn(p(), 'refreshApparentMag_');
+
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, next);
+    expect(refresh).not.toHaveBeenCalled();
   });
 
   it('updateObjectData_ returns early after launch data for a missile', () => {

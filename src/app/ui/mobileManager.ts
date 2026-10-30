@@ -10,12 +10,49 @@ import {
   EarthTextureStyle,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
 
 export class MobileManager {
   static readonly MOBILE_ORBIT_LIMIT = 1500;
+
+  /** Plugins that keep their configured state on phones; every other plugin is switched off. */
+  static readonly MOBILE_PLUGINS: readonly (keyof typeof settingsManager.plugins)[] = [
+    'SoundToggle',
+    'SelectSatManager',
+    'SatInfoBoxCore',
+    'SatInfoBoxObject',
+    'SatInfoBoxOrbital',
+    'SatInfoBoxMission',
+    'SatInfoBoxSponsor',
+    'SatInfoBoxLinks',
+    'TopMenu',
+    'DateTimeManager',
+    'ScenarioManagementPlugin',
+    'TimeSlider',
+    'CountriesMenu',
+    'FilterMenuPlugin',
+    'Reentries',
+    'TimeMachine',
+    'NaturalEventsPlugin',
+    'SeismicActivityPlugin',
+    'DeepSpaceMissionsPlugin',
+    'NightToggle',
+    'GraticuleToggle',
+    'CloudsToggle',
+    'TheSpaceDevLaunchCalendarPlugin',
+    // Added for phones 2026-10-30: list and share menus that fit a narrow screen.
+    'ShareMenuPlugin',
+    'SatConstellations',
+    'WatchlistPlugin',
+    'KtocNoticesPlugin',
+    'ColorMenu',
+    'Screenshot',
+    'FindSatPlugin',
+    'SatellitePhotos',
+  ];
 
   static checkMobileMode() {
     try {
@@ -47,32 +84,9 @@ export class MobileManager {
           Object.keys(settingsManager.plugins).forEach((key) => {
             settingsManager.plugins[key] = false;
           });
-          settingsManager.plugins.SoundToggle = cachePlugins.SoundToggle;
-          settingsManager.plugins.SelectSatManager = cachePlugins.SelectSatManager;
-          settingsManager.plugins.SatInfoBoxCore = cachePlugins.SatInfoBoxCore;
-          settingsManager.plugins.SatInfoBoxObject = cachePlugins.SatInfoBoxObject;
-          settingsManager.plugins.TopMenu = cachePlugins.TopMenu;
-          settingsManager.plugins.DateTimeManager = cachePlugins.DateTimeManager;
-          settingsManager.plugins.SatInfoBoxOrbital = cachePlugins.SatInfoBoxOrbital;
-          settingsManager.plugins.SatInfoBoxMission = cachePlugins.SatInfoBoxMission;
-          settingsManager.plugins.SatInfoBoxSponsor = cachePlugins.SatInfoBoxSponsor;
-          settingsManager.plugins.ScenarioManagementPlugin = cachePlugins.ScenarioManagementPlugin;
-          settingsManager.plugins.TimeSlider = cachePlugins.TimeSlider;
-
-          settingsManager.plugins.CountriesMenu = cachePlugins.CountriesMenu;
-          settingsManager.plugins.FilterMenuPlugin = cachePlugins.FilterMenuPlugin;
-          settingsManager.plugins.Reentries = cachePlugins.Reentries;
-          settingsManager.plugins.TimeMachine = cachePlugins.TimeMachine;
-          settingsManager.plugins.NaturalEventsPlugin = cachePlugins.NaturalEventsPlugin;
-          settingsManager.plugins.SeismicActivityPlugin = cachePlugins.SeismicActivityPlugin;
-          settingsManager.plugins.FilterMenuPlugin = cachePlugins.FilterMenuPlugin;
-          settingsManager.plugins.DeepSpaceMissionsPlugin = cachePlugins.DeepSpaceMissionsPlugin;
-          settingsManager.plugins.NightToggle = cachePlugins.NightToggle;
-          settingsManager.plugins.GraticuleToggle = cachePlugins.GraticuleToggle;
-          settingsManager.plugins.CloudsToggle = cachePlugins.CloudsToggle;
-
-          settingsManager.plugins.GunterLaunchCalendar = cachePlugins.GunterLaunchCalendar;
-          settingsManager.plugins.TheSpaceDevLaunchCalendarPlugin = cachePlugins.TheSpaceDevLaunchCalendarPlugin;
+          for (const key of MobileManager.MOBILE_PLUGINS) {
+            (settingsManager.plugins as Record<string, unknown>)[key] = cachePlugins[key];
+          }
 
           settingsManager.defaultColorScheme = 'CelestrakColorScheme';
           settingsManager.isDisablePlanets = true;
@@ -80,14 +94,11 @@ export class MobileManager {
           // Get the size of keeptrack-root
           const keeptrackRoot = getEl('keeptrack-root');
 
-          if (keeptrackRoot?.clientWidth ?? 601 < 600) {
+          if ((keeptrackRoot?.clientWidth ?? 601) < 600) {
             settingsManager.isShowPrimaryLogo = false;
             settingsManager.isShowSecondaryLogo = false;
           } else if (!settingsManager.isMobileModeEnabled) {
-            ServiceLocator.getUiManager().toast(
-              'Full Version of KeepTrack is not available on mobile devices. Please use a desktop browser to access the full version.',
-              ToastMsgType.normal
-            );
+            ServiceLocator.getUiManager().toast(t7e('toasts.mobileFullVersionUnavailable'), ToastMsgType.normal);
           }
 
           Object.assign(settingsManager, {

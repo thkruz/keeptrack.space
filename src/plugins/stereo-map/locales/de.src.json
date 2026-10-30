@@ -25,7 +25,16 @@
         "mapStyle": "Kartenstil",
         "standard": "Standard",
         "political": "Politisch",
-        "nightLights": "Nachtlichter"
+        "nightLights": "Nachtlichter",
+        "inView": "Im Sichtfeld",
+        "outOfView": "Außer Sicht"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Das primäre Logobild konnte nicht geladen werden.",
+        "secondaryLogoFailed": "Das sekundäre Logobild konnte nicht geladen werden.",
+        "earthDrawAfterLoadFailed": "Das Erdbild konnte nach dem Laden nicht auf die Zeichenfläche gezeichnet werden: {error}",
+        "earthLoadFailed": "Das Erdbild für die stereografische Karte konnte nicht geladen werden.",
+        "earthDrawFailed": "Das Erdbild konnte nicht auf die Zeichenfläche gezeichnet werden: {error}"
       }
     }
   }

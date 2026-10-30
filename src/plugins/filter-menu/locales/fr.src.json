@@ -15,6 +15,7 @@
       "resetToDefaults": "Réinitialiser par défaut",
       "defaultTooltip": "Désactiver pour masquer {name}",
       "searchPlaceholder": "Rechercher des filtres...",
+      "noResults": "Aucun filtre ne correspond à votre recherche.",
       "commands": {
         "category": "Filtres",
         "open": "Ouvrir le menu des filtres",

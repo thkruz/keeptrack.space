@@ -32,7 +32,7 @@ describe('TimeSlider behavior', () => {
   beforeEach(() => {
     setupStandardEnvironment([ScenarioManagementPlugin, TopMenu]);
     plugin = new TimeSlider();
-    vi.spyOn(ServiceLocator.getTimeManager(), 'changeStaticOffset').mockImplementation(() => undefined);
+    vi.spyOn(ServiceLocator.getTimeManager(), 'changeSimulationTime').mockImplementation(() => undefined);
   });
 
   afterEach(() => {
@@ -55,10 +55,14 @@ describe('TimeSlider behavior', () => {
 
   it('sliderWithoutBounds shifts the simulation time and emits an update', () => {
     const emit = vi.spyOn(EventBus.getInstance(), 'emit');
+    // 50% of 1439 minutes floors to 719 = 11:59 UTC on the current simulation day
+    const expected = new Date(ServiceLocator.getTimeManager().simulationTimeObj);
+
+    expected.setUTCHours(11, 59, 0, 0);
 
     p().sliderWithoutBounds(50);
 
-    expect(ServiceLocator.getTimeManager().changeStaticOffset).toHaveBeenCalled();
+    expect(ServiceLocator.getTimeManager().changeSimulationTime).toHaveBeenCalledWith(expected.getTime());
     expect(emit).toHaveBeenCalledWith(EventBusEvent.updateDateTime, expect.any(Date));
   });
 
@@ -68,7 +72,7 @@ describe('TimeSlider behavior', () => {
 
     p().sliderWithBounds(25);
 
-    expect(ServiceLocator.getTimeManager().changeStaticOffset).toHaveBeenCalled();
+    expect(ServiceLocator.getTimeManager().changeSimulationTime).toHaveBeenCalledWith(2500);
     expect(emit).toHaveBeenCalledWith(EventBusEvent.updateDateTime, expect.any(Date));
   });
 
@@ -143,6 +147,6 @@ describe('TimeSlider behavior', () => {
     setScenario({ startTime: new Date(0), endTime: new Date(10000) });
     slider.dispatchEvent(new MouseEvent('mousedown', { clientX: 8, bubbles: true }));
 
-    expect(ServiceLocator.getTimeManager().changeStaticOffset).toHaveBeenCalled();
+    expect(ServiceLocator.getTimeManager().changeSimulationTime).toHaveBeenCalled();
   });
 });

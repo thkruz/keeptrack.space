@@ -76,3 +76,12 @@
 .stl-sensor-toggle:hover {
   border-color: var(--color-primary-light, #e01a0e);
 }
+
+/* ===== Settings panel stacking =====
+ * The global rule puts every secondary panel at z-index 4 (behind its primary), but this primary is a full-width
+ * canvas (z-index 5) and the panel opens at x 0 under the drawer rail, so no mouse click could reach it. Lift the
+ * panel above the timeline and start it at the rail's right edge (--drawer-offset tracks the rail width). */
+#sensor-timeline-menu-secondary.side-menu-parent {
+  z-index: 6 !important;
+  left: var(--drawer-offset, 0px) !important;
+}

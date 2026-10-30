@@ -67,6 +67,13 @@ export default defineConfig({
      * 12 forks bounds peak memory; CI runners (2-4 cores) are unaffected.
      */
     maxWorkers: Math.min(12, Math.max(1, os.availableParallelism() - 1)),
+    /*
+     * The CI coverage run is ~8x slower than a local run: plugin smoke tests
+     * that take well under a second here take 4-9 s there and trip the 5 s
+     * default. Keep the defaults locally so a real hang still fails fast.
+     */
+    testTimeout: process.env.CI ? 30_000 : 5_000,
+    hookTimeout: process.env.CI ? 30_000 : 10_000,
     environment: 'jsdom',
     globals: true,
     setupFiles: ['./test/polyfills.js', './test/vitest-setup.ts'],
@@ -113,7 +120,12 @@ export default defineConfig({
     },
     include: ['**/?(*.)+(test).?(m)[jt]s?(x)'],
     exclude: [
+      // Retained private QA workspaces junction the source tree; never rediscover tests there.
+      'docs-local/**',
       'node_modules/**',
+      '**/node_modules/**',
+      // Private MCP harness tests use node:test and run separately.
+      'src/plugins-pro/scripts/browser-agent/*.test.js',
       'offline/**',
       'dist/**',
       'src/admin/**',
@@ -139,6 +151,12 @@ export default defineConfig({
       '@css': path.resolve(__dirname, './public/css'),
       '@test': path.resolve(__dirname, './test'),
       '@wallpapers': path.resolve(__dirname, './src/app/ui/default-wallpapers.ts'),
+      // Public plugin facade (docs/plugin-api.md). The `/testing` entry must come
+      // first: aliases match in order and the bare key also matches `<key>/...`.
+      '@keeptrack/plugin-api/testing': path.resolve(__dirname, './src/plugin-api/testing.ts'),
+      '@keeptrack/plugin-api': path.resolve(__dirname, './src/plugin-api/index.ts'),
+      // Bare `ootk` (used by external plugins) resolves to the in-tree submodule.
+      ootk: path.resolve(__dirname, './src/engine/ootk/src/main.ts'),
     },
   },
 });

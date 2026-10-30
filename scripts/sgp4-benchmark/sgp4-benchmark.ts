@@ -38,7 +38,7 @@ const argValue = (name: string, fallback: number): number => {
     return fallback;
   }
 
-  return parseInt(process.argv[idx + 1], 10) || fallback;
+  return Number.parseInt(process.argv[idx + 1], 10) || fallback;
 };
 
 const LIMIT = argValue('limit', 0);
@@ -313,7 +313,7 @@ const main = async (): Promise<void> => {
       const p = pv.position;
       const v = pv.velocity;
 
-      if (isNaN(p.x) || isNaN(p.y) || isNaN(p.z)) {
+      if (Number.isNaN(p.x) || Number.isNaN(p.y) || Number.isNaN(p.z)) {
         continue;
       }
       const rMag = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);

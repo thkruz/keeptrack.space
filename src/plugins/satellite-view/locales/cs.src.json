@@ -1,7 +1,13 @@
 {
   "plugins": {
     "SatelliteViewPlugin": {
-      "bottomIconLabel": "Pohled ze satelitu"
+      "bottomIconLabel": "Pohled ze satelitu",
+      "commandPalette": {
+        "activate": "Přepnout na pohled ze satelitu"
+      },
+      "shortcuts": {
+        "enter": "Přejít do pohledu ze satelitu"
+      }
     }
   }
 }

@@ -13,7 +13,7 @@ import {
   RadecGeocentric,
   Radians,
   RaeVec3,
-  rae2eci,
+  rae2ecef,
   TEME,
   Vector3D,
 } from '@ootk/src/main';
@@ -54,14 +54,14 @@ export interface ConversionContext {
   sensor?: DetailedSensor | null;
 }
 
-/** A position/velocity readout in a cartesian frame. */
+/** A position/velocity readout in a cartesian frame. Velocity is null when it is unknown (position-only input). */
 export interface CartesianOutput {
   x: number;
   y: number;
   z: number;
-  vx: number;
-  vy: number;
-  vz: number;
+  vx: number | null;
+  vy: number | null;
+  vz: number | null;
 }
 
 /** Structured numeric result of a conversion, one entry per output frame. */
@@ -73,7 +73,10 @@ export interface FrameOutputs {
   /** null when no sensor is available. */
   rae?: { range: number; az: number; el: number; sensorName: string } | null;
   radec?: { ra: number; dec: number; range: number };
-  /** 'needsVelocity' when the state has no usable velocity. */
+  /**
+   * 'needsVelocity' when the input had no velocity. A supplied but degenerate velocity (for example
+   * 0, 0, 0) is computed as given; elements that are undefined for it come back as NaN.
+   */
   classical?:
     | 'needsVelocity'
     | {
@@ -91,16 +94,20 @@ export interface FrameOutputs {
 
 const ZERO_VEL = Vector3D.origin as Vector3D<KilometersPerSecond>;
 
-/** Velocities below this magnitude (km/s) can't define an orbit, so Classical output is skipped. */
-const MIN_ORBITAL_VELOCITY = 0.001;
+/**
+ * Keep only the position of a converted state. A position-only input (Geodetic, RAE, or a
+ * Cartesian frame without velocity) has an unknown velocity; rotating a zero ITRF velocity into
+ * J2000 would add the Earth-rotation term (~0.4 km/s) and invent an orbit.
+ */
+const positionOnly = (sv: J2000): J2000 => new J2000(sv.epoch, sv.position, ZERO_VEL);
 
-const toCartesian = (pos: Vector3D<Kilometers>, vel: Vector3D<KilometersPerSecond>): CartesianOutput => ({
+const toCartesian = (pos: Vector3D<Kilometers>, vel: Vector3D<KilometersPerSecond> | null): CartesianOutput => ({
   x: pos.x,
   y: pos.y,
   z: pos.z,
-  vx: vel.x,
-  vy: vel.y,
-  vz: vel.z,
+  vx: vel ? vel.x : null,
+  vy: vel ? vel.y : null,
+  vz: vel ? vel.z : null,
 });
 
 const vec = (v: FrameInputValues, kx: string, ky: string, kz: string): Vector3D<Kilometers> =>
@@ -129,33 +136,54 @@ export function validateFrameInput(frame: CoordFrame, values: FrameInputValues):
   return null;
 }
 
-/** Convert a parsed input bag (in `frame`) into a J2000 state vector. */
+/**
+ * Whether the user supplied a velocity for this input: a Cartesian frame with the velocity fields
+ * included (even an explicit 0, 0, 0), or Classical elements (which always define one). Every other
+ * input is position-only, so its velocity is unknown.
+ */
+export function inputHasVelocity(frame: CoordFrame, values: FrameInputValues): boolean {
+  return frame === CoordFrame.CLASSICAL || (CARTESIAN_FRAMES.includes(frame) && 'vx' in values);
+}
+
+/**
+ * Convert a parsed input bag (in `frame`) into a J2000 state vector. A position-only input gets a zero
+ * velocity placeholder; pass {@link inputHasVelocity} to {@link j2000ToAllFrames} so it is shown as unknown.
+ */
 export function frameInputToJ2000(frame: CoordFrame, values: FrameInputValues, ctx: ConversionContext): J2000 {
   const { epoch } = ctx;
+  const hasVelocity = inputHasVelocity(frame, values);
   const cartesianVel = (): Vector3D<KilometersPerSecond> =>
-    CARTESIAN_FRAMES.includes(frame) && 'vx' in values
-      ? new Vector3D<KilometersPerSecond>(values.vx as KilometersPerSecond, values.vy as KilometersPerSecond, values.vz as KilometersPerSecond)
-      : ZERO_VEL;
+    hasVelocity ? new Vector3D<KilometersPerSecond>(values.vx as KilometersPerSecond, values.vy as KilometersPerSecond, values.vz as KilometersPerSecond) : ZERO_VEL;
 
   switch (frame) {
     case CoordFrame.J2000:
       return new J2000(epoch, vec(values, 'x', 'y', 'z'), cartesianVel());
-    case CoordFrame.ITRF:
-      return new ITRF(epoch, vec(values, 'x', 'y', 'z'), cartesianVel()).toJ2000();
+    case CoordFrame.ITRF: {
+      const j2000 = new ITRF(epoch, vec(values, 'x', 'y', 'z'), cartesianVel()).toJ2000();
+
+      return hasVelocity ? j2000 : positionOnly(j2000);
+    }
     case CoordFrame.TEME:
       return new TEME(epoch, vec(values, 'x', 'y', 'z'), cartesianVel()).toJ2000();
     case CoordFrame.LLA:
-      return Geodetic.fromDegrees(values.lat as Degrees, values.lon as Degrees, values.alt as Kilometers)
-        .toITRF(epoch)
-        .toJ2000();
+      return positionOnly(
+        Geodetic.fromDegrees(values.lat as Degrees, values.lon as Degrees, values.alt as Kilometers)
+          .toITRF(epoch)
+          .toJ2000()
+      );
     case CoordFrame.RAE: {
       if (!ctx.sensor) {
         throw new Error('noSensorForRae');
       }
+      /*
+       * The topocentric offset is fixed to the Earth, so build the ITRF point and let ootk rotate
+       * it to J2000 (sidereal time, nutation and precession). rae2eci only applies GMST, which
+       * gives an of-date frame, not J2000.
+       */
       const rae = { rng: values.r, az: values.a, el: values.e } as RaeVec3<Kilometers, Degrees>;
-      const eci = rae2eci(rae, ctx.sensor.lla(), ctx.gmst);
+      const ecef = rae2ecef(rae, ctx.sensor.lla());
 
-      return new J2000(epoch, new Vector3D<Kilometers>(eci.x, eci.y, eci.z), ZERO_VEL);
+      return positionOnly(new ITRF(epoch, new Vector3D<Kilometers>(ecef.x, ecef.y, ecef.z), ZERO_VEL).toJ2000());
     }
     case CoordFrame.RADEC: {
       const range = values.range as Kilometers;
@@ -183,21 +211,22 @@ export function frameInputToJ2000(frame: CoordFrame, values: FrameInputValues, c
  * convert a frame back to itself). The result is purely numeric, so callers can re-render
  * it under any {@link OutputFormat} without recomputing time-dependent transforms.
  */
-export function j2000ToAllFrames(j2000: J2000, inputFrame: CoordFrame, ctx: ConversionContext): FrameOutputs {
+export function j2000ToAllFrames(j2000: J2000, inputFrame: CoordFrame, ctx: ConversionContext, hasVelocity: boolean): FrameOutputs {
   const out: FrameOutputs = {};
+  /*
+   * Without a supplied velocity the velocity is unknown: report it as null in every frame, since
+   * neither the zero placeholder nor the Earth-rotation term a frame change would add is real.
+   */
+  const cart = (sv: { position: Vector3D<Kilometers>; velocity: Vector3D<KilometersPerSecond> }): CartesianOutput => toCartesian(sv.position, hasVelocity ? sv.velocity : null);
 
   if (inputFrame !== CoordFrame.J2000) {
-    out.j2000 = toCartesian(j2000.position, j2000.velocity);
+    out.j2000 = cart(j2000);
   }
   if (inputFrame !== CoordFrame.ITRF) {
-    const itrf = j2000.toITRF();
-
-    out.itrf = toCartesian(itrf.position, itrf.velocity);
+    out.itrf = cart(j2000.toITRF());
   }
   if (inputFrame !== CoordFrame.TEME) {
-    const teme = j2000.toTEME();
-
-    out.teme = toCartesian(teme.position, teme.velocity);
+    out.teme = cart(j2000.toTEME());
   }
   if (inputFrame !== CoordFrame.LLA) {
     const geo = j2000.toITRF().toGeodetic();
@@ -213,7 +242,7 @@ export function j2000ToAllFrames(j2000: J2000, inputFrame: CoordFrame, ctx: Conv
     out.radec = { ra: radec.rightAscensionDegrees, dec: radec.declinationDegrees, range: j2000.position.magnitude() };
   }
   if (inputFrame !== CoordFrame.CLASSICAL) {
-    out.classical = computeClassical(j2000);
+    out.classical = computeClassical(j2000, hasVelocity);
   }
 
   return out;
@@ -231,9 +260,9 @@ function computeRae(j2000: J2000, ctx: ConversionContext): FrameOutputs['rae'] {
   return { range: rae.rng, az: rae.az, el: rae.el, sensorName: ctx.sensor.name };
 }
 
-/** Keplerian elements (with period/apogee/perigee), or 'needsVelocity' for a velocity-less state. */
-function computeClassical(j2000: J2000): FrameOutputs['classical'] {
-  if (j2000.velocity.magnitude() < MIN_ORBITAL_VELOCITY) {
+/** Keplerian elements (with period/apogee/perigee), or 'needsVelocity' when no velocity was supplied. */
+function computeClassical(j2000: J2000, hasVelocity: boolean): FrameOutputs['classical'] {
+  if (!hasVelocity) {
     return 'needsVelocity';
   }
 

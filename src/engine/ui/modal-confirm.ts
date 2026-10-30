@@ -1,4 +1,5 @@
 import { SoundNames } from '@app/engine/audio/sounds';
+import { t7e } from '@app/locales/keys';
 import { ServiceLocator } from '../core/service-locator';
 import { html } from '../utils/development/formatter';
 import { DraggableModal } from './draggable-modal';
@@ -27,7 +28,7 @@ export class ModalConfirm extends DraggableModal {
     }
 
     super(ModalConfirm.id, {
-      title: 'Confirm Action',
+      title: t7e('modalConfirm.confirmAction'),
       width: '400px',
     });
   }
@@ -39,7 +40,7 @@ export class ModalConfirm extends DraggableModal {
   }
 
   protected getModalContentHtml(): string {
-    const { message = 'Do you really want to proceed with this action?', confirmText = 'Yes', cancelText = 'No', isDestructive = false } = this.options;
+    const { message = t7e('modalConfirm.defaultMessage'), confirmText = t7e('modalConfirm.yes'), cancelText = t7e('modalConfirm.no'), isDestructive = false } = this.options;
 
     return html`
       <div class="confirm-modal">
@@ -71,6 +72,10 @@ export class ModalConfirm extends DraggableModal {
   protected onOpen(): void {
     super.onOpen();
     this.initializeEventListeners();
+  }
+
+  protected override getInitialFocusElement_(): HTMLElement | null {
+    return this.getElement('cancel-action-btn');
   }
 
   private initializeEventListeners(): void {
@@ -149,10 +154,10 @@ export class ModalConfirm extends DraggableModal {
   open(onConfirm: () => void, options?: ConfirmModalOptions): void {
     this.onConfirm = onConfirm;
     this.options = {
-      title: 'Are you sure?',
-      message: 'Do you really want to proceed with this action?',
-      confirmText: 'Yes',
-      cancelText: 'No',
+      title: t7e('modalConfirm.defaultTitle'),
+      message: t7e('modalConfirm.defaultMessage'),
+      confirmText: t7e('modalConfirm.yes'),
+      cancelText: t7e('modalConfirm.no'),
       isDestructive: false,
       ...options,
     };
@@ -172,40 +177,63 @@ export class ModalConfirm extends DraggableModal {
    */
   openLogoutConfirm(onConfirm: () => void): void {
     this.open(onConfirm, {
-      title: 'Confirm Logout',
-      message: 'Are you sure you want to logout? You will need to sign in again to access your account.',
-      confirmText: 'Logout',
-      cancelText: 'Cancel',
+      title: t7e('modalConfirm.logoutTitle'),
+      message: t7e('modalConfirm.logoutMessage'),
+      confirmText: t7e('modalConfirm.logout'),
+      cancelText: t7e('modalConfirm.cancel'),
       isDestructive: true,
     });
   }
 
   /**
-   * Convenience method for delete confirmation
+   * Convenience method for delete confirmation.
+   *
+   * @param itemName The item's own name (user data or a proper noun), quoted into the
+   * localized message. Pass `{ message }` instead for a fully localized custom message.
    */
-  openDeleteConfirm(onConfirm: () => void, itemName?: string): void {
-    const message = itemName
-      ? `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
-      : 'Are you sure you want to delete this item? This action cannot be undone.';
+  openDeleteConfirm(onConfirm: () => void, itemName?: string | { message: string }): void {
+    let message: string;
+
+    if (typeof itemName === 'object') {
+      message = itemName.message;
+    } else if (itemName) {
+      message = t7e('modalConfirm.deleteNamedMessage').replace('{name}', itemName);
+    } else {
+      message = t7e('modalConfirm.deleteMessage');
+    }
 
     this.open(onConfirm, {
-      title: 'Confirm Delete',
+      title: t7e('modalConfirm.deleteTitle'),
       message,
-      confirmText: 'Delete',
-      cancelText: 'Cancel',
+      confirmText: t7e('modalConfirm.delete'),
+      cancelText: t7e('modalConfirm.cancel'),
       isDestructive: true,
     });
   }
 
   /**
-   * Convenience method for clearing data confirmation
+   * Convenience method for clearing data confirmation.
+   *
+   * @param target Prefer `{ message }` with a fully localized message: a bare noun string
+   * (legacy) is dropped into "clear all {dataType}", which only reads correctly in English.
+   * Omit it for the generic "clear all data" message.
    */
-  openClearConfirm(onConfirm: () => void, dataType: string = 'data'): void {
+  openClearConfirm(onConfirm: () => void, target?: string | { message: string }): void {
+    let message: string;
+
+    if (typeof target === 'object') {
+      message = target.message;
+    } else if (target) {
+      message = t7e('modalConfirm.clearTypedMessage').replace('{dataType}', target);
+    } else {
+      message = t7e('modalConfirm.clearMessage');
+    }
+
     this.open(onConfirm, {
-      title: 'Confirm Clear',
-      message: `Are you sure you want to clear all ${dataType}? This action cannot be undone.`,
-      confirmText: 'Clear',
-      cancelText: 'Cancel',
+      title: t7e('modalConfirm.clearTitle'),
+      message,
+      confirmText: t7e('modalConfirm.clear'),
+      cancelText: t7e('modalConfirm.cancel'),
       isDestructive: true,
     });
   }

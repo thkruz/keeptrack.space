@@ -9,6 +9,11 @@
         "take4k": "截图 (4K)",
         "takeHd": "截图 (HD)",
         "take8k": "截图 (8K)"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "无法加载主徽标图像。",
+        "secondaryLogoFailed": "无法加载副徽标图像。",
+        "noCanvasContext": "无法获取临时画布的 2D 上下文，无法创建截图。"
       }
     }
   }

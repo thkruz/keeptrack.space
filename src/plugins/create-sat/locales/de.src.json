@@ -29,7 +29,7 @@
         "apogeeKm": "Apogäum (km)",
         "perigeeKm": "Perigäum (km)",
         "smaKm": "Große Halbachse (km)",
-        "velocityKms": "Orbitalgeschwindigkeit (km/s)",
+        "velocityKms": "Geschwindigkeit zur Epoche (km/s)",
         "sectionIdentity": "Identität",
         "sectionOrbit": "Orbit",
         "sectionEpoch": "Epoche",
@@ -74,10 +74,21 @@
         "invalidPeriod": "Ungültige Periode. Muss im Format NN.NNNN bis NNNN.NNNN sein (z.B. 90.0000, 9999.9999) mit insgesamt 8 Ziffern.",
         "invalidSource": "Ungültige Quelle. Darf nicht leer sein.",
         "invalidName": "Ungültiger Name. Darf nicht leer sein.",
-        "slotOccupied": "Vorhandener Satellit {name} in Slot {scc} wird überschrieben.",
         "noFreeSlots": "Keine freien Analyst-Slots mehr (90000-99999 sind alle belegt).",
         "noSatSelected": "Wählen Sie zuerst einen Satelliten zum Klonen aus.",
-        "tleChecksumMismatch": "Die Prüfsumme von TLE-Zeile {line} ist {actual}, sollte aber {expected} sein. Dies kann auf einen Tippfehler hinweisen. Es wird trotzdem fortgefahren."
+        "tleChecksumMismatch": "Die Prüfsumme von TLE-Zeile {line} ist {actual}, sollte aber {expected} sein. Dies kann auf einen Tippfehler hinweisen. Es wird trotzdem fortgefahren.",
+        "periodToMeanMotionFailed": "Fehler beim Umrechnen der Periode in die mittlere Bewegung",
+        "meanMotionToPeriodFailed": "Fehler beim Umrechnen der mittleren Bewegung in die Periode: {error}",
+        "satrecFailed": "Fehler beim Erstellen des Satellitendatensatzes!",
+        "cruncherFailed": "Nachricht an den Sat Cruncher fehlgeschlagen",
+        "orbitBufferFailed": "Ändern der Orbit-Pufferdaten fehlgeschlagen",
+        "createFailed": "Satellit konnte nicht erstellt werden: {error}",
+        "rangeError": "{field} muss zwischen {min} und {max} liegen.",
+        "rangeErrorDeg": "{field} muss zwischen {min} und {max} Grad liegen.",
+        "meanMotionRange": "{field} muss größer als 0 und höchstens {max} Umläufe pro Tag sein.",
+        "periodPositive": "{field} muss eine positive Anzahl von Minuten sein.",
+        "numberRequired": "{field} muss eine Zahl sein.",
+        "noradIdReserved": "Die NORAD-ID {id} wird von einer Startbahn belegt. Wählen Sie eine andere ID oder entfernen Sie zuerst die Bahn."
       },
       "successMsgs": {
         "satCreated": "Satellit {name} ({scc}) erfolgreich erstellt",
@@ -90,7 +101,7 @@
         "tabsHeading": "Basis- und Erweitert-Tab",
         "tabs": "Der Tab <strong>Basis</strong> benötigt nur eine NORAD-ID, einen Namen sowie <strong>Inklination</strong>, <strong>Apogäumshöhe</strong> und <strong>Perigäumshöhe</strong>; der Rest der Umlaufbahn wird automatisch abgeleitet. Der Tab <strong>Erweitert</strong> bietet den vollständigen Elementsatz: <strong>Objekttyp</strong>, <strong>Land</strong>, Epoche, <strong>Rektaszension</strong>, <strong>Exzentrizität</strong>, <strong>Argument des Perigäums</strong>, <strong>Mittlere Anomalie</strong> und <strong>Mittlere Bewegung</strong> oder <strong>Periode</strong> (die Bearbeitung des einen berechnet das andere neu). Eine Anzeige <strong>Berechnete Parameter</strong> zeigt während der Eingabe das resultierende Apogäum, das Perigäum, die große Halbachse und die Orbitalgeschwindigkeit.",
         "howToUse": "<ol><li>Öffnen Sie das Menü <strong>Satellit erstellen</strong> über die Plugin-Leiste.</li><li>Wählen Sie eine freie NORAD-ID zwischen 90000 und 99999 und geben Sie dem Satelliten einen Namen.</li><li>Geben Sie im Tab <strong>Basis</strong> Inklination, Apogäum und Perigäum ein; oder wechseln Sie für den vollständigen Elementsatz zum Tab <strong>Erweitert</strong>.</li><li>Klicken Sie auf <strong>Satellit erstellen</strong>. Das neue Objekt erscheint sofort, und eine Bestätigungsmeldung zeigt Namen und Nummer an.</li><li>Mit <strong>TLE speichern</strong> exportieren Sie die Elemente des erstellten Satelliten als Datei, die Sie später wieder laden können.</li></ol>",
-        "tip1": "Jedes Feld wird mit einer spezifischen Fehlermeldung validiert; schlägt die Erstellung fehl, sagt Ihnen die Meldung genau, welcher Wert zu korrigieren ist.",
+        "tip1": "Jedes ungültige Feld wird über der Schaltfläche „Satellit erstellen“ aufgeführt und im Formular markiert. Jede Meldung verschwindet, sobald Sie das Feld korrigieren.",
         "tip2": "Ein Perigäum unter etwa 100 km wird abgelehnt, weil der Satellit sofort verglühen würde.",
         "tip3": "Erstellte Satelliten gelten nur für die Sitzung; exportieren Sie ein TLE, wenn Sie das Objekt für einen anderen Tag behalten möchten."
       },
@@ -103,6 +114,13 @@
         "gto": "GEO-Transfer (GTO)",
         "molniya": "Molniya",
         "polar": "Polar (600 km)"
+      },
+      "confirm": {
+        "title": "Satellit ersetzen?",
+        "message": "{name} mit Analysten-ID {scc} ersetzen?",
+        "replace": "Ersetzen",
+        "cancel": "Abbrechen",
+        "changed": "Satellit oder Formular wurde geändert. Bitte prüfen und erneut senden."
       }
     }
   }

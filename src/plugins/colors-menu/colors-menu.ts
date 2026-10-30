@@ -1,5 +1,4 @@
 import { MenuMode } from '@app/engine/core/interfaces';
-import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -21,7 +20,6 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import palettePng from '@public/img/icons/palette.png';
-import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './colors-menu.css';
 
 export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable {
@@ -130,7 +128,7 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
     }
 
     if (targetId?.includes('colors-')) {
-      errorManagerInstance.info(`Color scheme not found: ${targetId}`);
+      errorManagerInstance.info(t7e('plugins.ColorMenu.errorMsgs.schemeNotFound').replace('{name}', targetId));
       ColorMenu.colorsMenuClick(targetId.slice(7).replace('-rmb', ''));
     }
   }
@@ -149,14 +147,14 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
   }
 
   getCommandPaletteCommands(): ICommandPaletteCommand[] {
-    const category = 'Colors';
+    const category = t7e('plugins.ColorMenu.commandPalette.category');
     const colorSchemes = ServiceLocator.getColorSchemeManager().colorSchemeInstances;
 
     return Object.values(colorSchemes)
       .filter((cs) => cs.isOptionInColorMenu && settingsManager.colorSchemeInstances[cs.id]?.enabled)
       .map((cs) => ({
         id: `ColorMenu.setColorScheme.${cs.id}`,
-        label: `Set Color Scheme: ${cs.label}`,
+        label: t7e('plugins.ColorMenu.commandPalette.setScheme').replace('{name}', cs.label),
         category,
         callback: () => ColorMenu.colorsMenuClick(cs.id),
       }));
@@ -214,8 +212,7 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
   static readonly colorsMenuClick = (colorName: string): void => {
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
-    // If selectSatManager is loaded, clear selected sat
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+    // A scheme pick only recolors the catalog; the current satellite selection is kept.
 
     // Look through the color schemes
     for (const colorScheme in colorSchemeManagerInstance.colorSchemeInstances) {
@@ -236,6 +233,6 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
     }
 
     // If we didn't find it in the color schemes, it's an error
-    errorManagerInstance.warn(`Color scheme not found: ${colorName}`);
+    errorManagerInstance.warn(t7e('plugins.ColorMenu.errorMsgs.schemeNotFound').replace('{name}', colorName));
   };
 }

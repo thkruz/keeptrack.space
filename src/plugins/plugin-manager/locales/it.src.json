@@ -1,72 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "Plugin",
+      "title": "Gestione plugin",
+      "helpBody": "Attiva o disattiva i plugin integrati e controlla i plugin di terze parti installati.",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "Apri la gestione plugin"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "Installati",
+        "browse": "Sfoglia",
+        "develop": "Sviluppa"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "Caricamento dei plugin disponibili…",
+        "empty": "Nel registro non sono ancora elencati plugin.",
+        "error": "Impossibile caricare il registro dei plugin.",
+        "install": "Installa",
+        "installing": "Installazione…",
+        "installed": "Installato. Ricompilazione in corso; l'app si ricaricherà a breve.",
+        "installedBtn": "Installato",
+        "installFailed": "Installazione non riuscita. Consulta il terminale per i dettagli.",
+        "copyCommand": "Copia il comando di installazione",
+        "byAuthor": "di {author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "Che cos'è un plugin?",
+        "intro": "KeepTrack è composto da decine di plugin indipendenti e puoi scriverne di tuoi. Un plugin è un piccolo pacchetto che aggiunge un'icona al pannello, un menu, una sovrapposizione o uno strumento. I plugin si sviluppano e si installano con la CLI dei plugin da una copia del repository KeepTrack.",
+        "createHeading": "1. Crea",
+        "create": "Crea la struttura di un nuovo plugin (interattivo: chiede nome, tipo e descrizione).",
+        "previewHeading": "2. Anteprima",
+        "preview": "Avvia l'app con solo il tuo plugin attivo, con ricaricamento in tempo reale durante le modifiche.",
+        "rulesHeading": "Le due regole",
+        "rule1": "Il file di ingresso deve esportare una classe corrispondente a className in keeptrack-plugin.json.",
+        "rule2": "L'id readonly di quella classe deve essere uguale al suo configKey.",
+        "docsLink": "Apri la guida allo sviluppo dei plugin"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "Modifiche in sospeso: {count}",
+        "button": "Ricarica"
       },
       "labels": {
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
-        "gitUrl": "Git URL",
-        "source": "Source"
+        "noMatches": "Nessun plugin corrispondente. Prova un nome o ID.",
+        "search": "Cerca plugin",
+        "builtInSection": "Plugin integrati",
+        "externalSection": "Plugin esterni",
+        "externalEmpty": "Nessun plugin esterno installato. Aggiungine uno con la CLI dei plugin.",
+        "installSection": "Installa un plugin",
+        "installHint": "L'installazione di un plugin richiede di ricompilare KeepTrack. Copia questo comando ed eseguilo nella tua copia del repository KeepTrack.",
+        "gitUrl": "URL Git",
+        "source": "Sorgente",
+        "copy": "Copia",
+        "alwaysEnabled": "Sempre attivo"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "Compatibile",
+        "incompatible": "Verifica la versione"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "Copia il comando di installazione"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "Comando di installazione copiato negli appunti!",
+        "commandCopied": "Comando copiato negli appunti!"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "La gestione plugin ti permette di attivare o disattivare i plugin integrati di KeepTrack e di vedere quali plugin di terze parti sono installati. Poiché i plugin vengono caricati all'avvio dell'app, le modifiche hanno effetto dopo un ricaricamento.",
+        "togglesHeading": "Attivazione e disattivazione",
+        "toggles": "Usa l'interruttore per attivare o disattivare un plugin, poi fai clic su Ricarica per applicare. I plugin di infrastruttura sempre attivi sono bloccati e non possono essere disattivati.",
+        "externalHeading": "Plugin esterni",
+        "external": "I plugin di terze parti installati tramite la CLI dei plugin compaiono in una sezione dedicata con versione, badge di compatibilità e link al sorgente. Per installarne uno nuovo, copia il comando dalla sezione Installa ed eseguilo nella tua copia del repository KeepTrack."
+      },
+      "searchAliases": {
+        "multiView": "Vista multipla,Multivista"
+      },
+      "loader": {
+        "proFailed": "Impossibile caricare la versione Pro del plugin \"{plugin}\" ({error}). {consequence} Questa build include KeepTrack Pro, quindi i file in src/plugins-pro potrebbero mancare, essere obsoleti o non raggiungibili. Maggiori informazioni su {url}.",
+        "consequenceFallback": "Viene caricata la versione standard.",
+        "consequenceUnavailable": "Questa funzione non sarà disponibile in questa sessione.",
+        "downloadFailed": "Impossibile scaricare il plugin \"{plugin}\" ({error}): non sarà disponibile in questa sessione. Di solito si tratta di un'interruzione di rete; ricaricando la pagina verrà ritentato.",
+        "initFailed": "Impossibile inizializzare il plugin \"{plugin}\" ({error}): non sarà disponibile in questa sessione.",
+        "stoppedEarly": "Il caricamento dei plugin si è interrotto in anticipo ({error}). Alcune funzioni potrebbero mancare; ricaricando la pagina verrà ritentato."
       }
     }
   }

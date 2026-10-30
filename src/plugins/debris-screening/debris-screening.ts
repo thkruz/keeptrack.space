@@ -1,4 +1,5 @@
 import { jumpToTca } from '@app/engine/conjunction/conjunction-row-actions';
+import { covarianceSourceOf, uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -10,6 +11,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import type { DsResultRow } from '@app/webworker/debris-screening-messages';
@@ -37,6 +39,8 @@ interface RiskLevel {
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0]);
+/** English variant for CSV values, which stay English for machine parsing. */
+const lEn = (key: string): string => t7e(`plugins.DebrisScreening.${key}` as Parameters<typeof t7e>[0], { lng: 'en' });
 
 /** Quote a CSV field when it contains a delimiter, quote, or newline. */
 const csvField = (value: string): string => (/[",\n]/u.test(value) ? `"${value.replace(/"/gu, '""')}"` : value);
@@ -99,6 +103,12 @@ export class DebrisScreening extends KeepTrackPlugin {
   protected lineageKeys_ = new Set<string>();
   /** Whether rows for the primary's parent object are shown (hidden by default). */
   protected isParentRowShown_ = false;
+  /**
+   * Root catalog object whose uncertainty (covariance, GP age) the current run's primary assumes,
+   * or null when the primary is not an analyst clone. A clone's own TLE is a fit at the burn epoch,
+   * so its covariance would look better than its parent's; it knows no more than its parent.
+   */
+  protected uncertaintyParent_: Satellite | null = null;
   /** Last rows/count passed to renderRows_, so the parent toggle can re-render. */
   private lastRender_: { rows: DsResultRow[]; countText?: string } = { rows: [] };
   /**
@@ -317,7 +327,7 @@ export class DebrisScreening extends KeepTrackPlugin {
         <section class="kt-section">
           <div class="kt-section-label">${l('sections.results')}</div>
           <div class="ds-header-row">
-            <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('resultsCount').replace('{count}', '0')}</span>
+            <span id="${this.formPrefix_}-results-count" class="ds-results-count">${l('notScreened')}</span>
             <label id="${this.formPrefix_}-parent-toggle" class="ds-parent-toggle" style="display: none;">
               <input id="${this.formPrefix_}-show-parent" type="checkbox" class="filled-in" />
               <span id="${this.formPrefix_}-show-parent-label">${l('showParentRows').replace('{count}', '0')}</span>
@@ -329,6 +339,7 @@ export class DebrisScreening extends KeepTrackPlugin {
           <div class="ds-notes">
             <div id="${this.formPrefix_}-ric-convention" class="kt-note ds-note">${l('ricConvention')}</div>
             <div id="${this.formPrefix_}-pc-inputs" class="kt-note ds-note">${this.pcInputsText_()}</div>
+            <div id="${this.formPrefix_}-uncertainty-note" class="kt-note ds-note" style="display: none;"></div>
           </div>
           <div class="ds-table-container">
             <table id="${this.formPrefix_}-results-table" class="striped highlight">
@@ -540,7 +551,10 @@ export class DebrisScreening extends KeepTrackPlugin {
 
   protected onTargetChanged_(): void {
     this.rows_ = [];
-    this.renderRows_(this.rows_);
+    this.uncertaintyParent_ = null;
+    this.updateUncertaintyNote_();
+    // Nothing has run for the new target yet, so do not claim an empty result.
+    this.renderRows_(this.rows_, l('notScreened'));
   }
 
   /**
@@ -575,12 +589,34 @@ export class DebrisScreening extends KeepTrackPlugin {
     this.secondaryIdMap_ = new Map();
     this.lineageKeys_ = this.getLineageSccNums_(primary);
     this.isParentRowShown_ = false;
+    this.uncertaintyParent_ = uncertaintyParentOf(primary);
+    this.updateUncertaintyNote_();
 
     const toggle = getEl(`${this.formPrefix_}-show-parent`, true) as HTMLInputElement | null;
 
     if (toggle) {
       toggle.checked = false;
     }
+  }
+
+  /** "Uncertainty assumed from parent <name> (<norad>)", or '' when the run's primary is not a clone. */
+  protected uncertaintyNoteText_(): string {
+    const parent = this.uncertaintyParent_;
+
+    return parent ? l('uncertaintyAssumedFromParent').replace('{name}', parent.name).replace('{norad}', DebrisScreening.screeningKey(parent)) : '';
+  }
+
+  /** Show the clone note in the results area while the current run's primary is an analyst clone. */
+  protected updateUncertaintyNote_(): void {
+    const noteEl = getEl(`${this.formPrefix_}-uncertainty-note`, true);
+
+    if (!noteEl) {
+      return;
+    }
+    const text = this.uncertaintyNoteText_();
+
+    noteEl.textContent = text;
+    noteEl.style.display = text ? '' : 'none';
   }
 
   /**
@@ -820,9 +856,12 @@ export class DebrisScreening extends KeepTrackPlugin {
   }
 
   protected calculateCovarianceFromSatellite(sat: Satellite) {
+    // An analyst clone uses its root parent's TLE: it knows no more than the object it came from.
+    const source = covarianceSourceOf(sat);
+
     // Caps radii (radial/cross-track/in-track) so a bad TLE can't produce a huge
     // bubble; shared with the screening worker via ootk to avoid logic drift.
-    return cappedScreeningCovarianceFromTle(sat.tle1, sat.tle2, settingsManager.covarianceConfidenceLevel);
+    return cappedScreeningCovarianceFromTle(source.tle1, source.tle2, settingsManager.covarianceConfidenceLevel);
   }
 
   onDownload(): void {
@@ -846,29 +885,31 @@ export class DebrisScreening extends KeepTrackPlugin {
       'Risk Level',
       'Note',
     ];
-    // Every row is exported, including a hidden parent row (tagged in the Note column).
-    const rows = this.rows_.map((row) => {
-      const pc = row.probabilityOfCollision ?? undefined;
+    // Export what the table shows: a hidden parent row stays out so the CSV matches the count.
+    const rows = this.rows_
+      .filter((row) => this.isParentRowShown_ || !this.isParentRow_(row))
+      .map((row) => {
+        const pc = row.probabilityOfCollision ?? undefined;
 
-      return [
-        csvField(row.secondaryId),
-        csvField(this.secondaryName_(row.secondaryId)),
-        csvField(this.secondaryCospar_(row.secondaryId)),
-        this.formatTcaMs_(row.tcaMs),
-        row.missDistance.toFixed(6),
-        // Signed RIC (secondary minus primary, primary RIC frame), the CCSDS / CDM convention.
-        row.radialDistance.toFixed(6),
-        row.intrackDistance.toFixed(6),
-        row.crosstrackDistance.toFixed(6),
-        row.relativeVelocity.toFixed(6),
-        this.formatPc_(pc),
-        this.getRiskLevel_(pc).label,
-        this.isParentRow_(row) ? csvField(l('parentTag')) : '',
-      ].join(',');
-    });
+        return [
+          csvField(row.secondaryId),
+          csvField(this.secondaryName_(row.secondaryId)),
+          csvField(this.secondaryCospar_(row.secondaryId)),
+          this.formatTcaMs_(row.tcaMs),
+          row.missDistance.toFixed(6),
+          // Signed RIC (secondary minus primary, primary RIC frame), the CCSDS / CDM convention.
+          row.radialDistance.toFixed(6),
+          row.intrackDistance.toFixed(6),
+          row.crosstrackDistance.toFixed(6),
+          row.relativeVelocity.toFixed(6),
+          this.formatPc_(pc),
+          this.getRiskLevel_(pc, true).label,
+          this.isParentRow_(row) ? csvField(lEn('parentTag')) : '',
+        ].join(',');
+      });
 
     const csv = [headers.join(','), ...rows].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+    const blob = createCsvBlob(csv);
     const link = document.createElement('a');
 
     link.href = URL.createObjectURL(blob);
@@ -1029,22 +1070,24 @@ export class DebrisScreening extends KeepTrackPlugin {
     return tr;
   }
 
-  protected getRiskLevel_(pc?: number): RiskLevel {
+  protected getRiskLevel_(pc?: number, isExport = false): RiskLevel {
+    const tr = isExport ? lEn : l;
+
     if (typeof pc !== 'number') {
-      return { label: l('riskLevels.unknown'), className: 'risk-unknown' };
+      return { label: tr('riskLevels.unknown'), className: 'risk-unknown' };
     }
 
     if (pc > 1e-4) {
-      return { label: l('riskLevels.critical'), className: 'risk-critical' };
+      return { label: tr('riskLevels.critical'), className: 'risk-critical' };
     }
     if (pc > 1e-6) {
-      return { label: l('riskLevels.high'), className: 'risk-high' };
+      return { label: tr('riskLevels.high'), className: 'risk-high' };
     }
     if (pc > 1e-8) {
-      return { label: l('riskLevels.medium'), className: 'risk-medium' };
+      return { label: tr('riskLevels.medium'), className: 'risk-medium' };
     }
 
-    return { label: l('riskLevels.low'), className: 'risk-low' };
+    return { label: tr('riskLevels.low'), className: 'risk-low' };
   }
 
   protected formatTcaMs_(tcaMs: number): string {

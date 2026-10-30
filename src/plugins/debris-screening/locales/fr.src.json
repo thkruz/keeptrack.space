@@ -5,6 +5,7 @@
       "title": "Détection de Débris",
       "resultsTitle": "Résultats de l'Analyse",
       "resultsCount": "{count} conjonctions trouvées",
+      "notScreened": "Pas encore analysé",
       "exportCsv": "Exporter CSV",
       "riskLevels": {
         "critical": "Critique",
@@ -71,6 +72,7 @@
       "ricConvention": "Convention de signe RIC : secondaire moins primaire, dans le repère RIC du primaire (+R radial vers l'extérieur, +I dans le sens de la vitesse du primaire, +C = R x I, la normale à l'orbite).",
       "pcInputs": "Entrées du Pc : rayon de corps dur {hbr} m ({primary} m primaire + {secondary} m secondaire) pour chaque paire. Covariance : estimée à partir du TLE de chaque objet (le modèle des sigmas de l'encadré d'informations, à {sigma} sigma), et non d'un CDM.",
       "parentTag": "parent de ce satellite d'analyste",
+      "uncertaintyAssumedFromParent": "Incertitude reprise du parent {name} ({norad})",
       "showParentRows": "Afficher la ligne parente ({count})",
       "notInCatalog": "(absent du catalogue chargé)",
       "resultsCapped": "Affichage des {limit} premières conjonctions sur {total} (Pc la plus élevée d'abord)"

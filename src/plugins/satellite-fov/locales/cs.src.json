@@ -18,7 +18,8 @@
         "activeS2sCones": "Aktivní kužely satelit-satelit",
         "fovDegrees": "Zorné pole (stupně)",
         "opacity": "Neprůhlednost",
-        "targetCatalogNumber": "Katalogové číslo cíle"
+        "targetCatalogNumber": "Katalogové číslo cíle",
+        "targetCatalogPlaceholder": "např. 25544"
       },
       "tooltips": {
         "fovOfSensor": "Zorné pole senzoru",

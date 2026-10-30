@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Nagrywanie niedostępne z powodu problemów z kompatybilnością!",
-    "compatibilityError": "Błąd kompatybilności z nagrywaniem!"
+    "compatibilityError": "Błąd kompatybilności z nagrywaniem!",
+    "requesting": "Oczekiwanie na udostępnienie ekranu…",
+    "recording": "Nagrywanie",
+    "stopping": "Finalizowanie nagrania…",
+    "toggleCommand": "Przełącz nagrywanie ekranu",
+    "saved": "Nagranie zapisane",
+    "tooShort": "Nagranie za krótkie, nic nie zapisano",
+    "cancelled": "Nagrywanie anulowane",
+    "notReadable": "Nie można przechwycić ekranu. Może go blokować inna aplikacja lub ustawienie systemu.",
+    "failed": "Nagrywanie nie powiodło się. Spróbuj ponownie."
   }
 }

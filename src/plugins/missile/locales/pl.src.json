@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "Załadowano {sim}",
         "simLoadFailed": "Nie udało się załadować {sim}",
-        "missilesActive": "{n} / {max} aktywnych pocisków"
+        "missilesActive": "{n} / {max} aktywnych pocisków",
+        "massRaidLoaded": "Zmasowany atak rakietowy wczytany pomyślnie",
+        "missileCreated": "Utworzono pocisk<br>RV_{n}.",
+        "mirvCreated": "Utworzone głowice powrotne (MIRV):<br>{n}"
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Nieprawidłowa szerokość geograficzna celu!",
         "invalidTargetLongitude": "Nieprawidłowa długość geograficzna celu!",
         "invalidLaunchLatitude": "Nieprawidłowa szerokość geograficzna startu!",
         "invalidLaunchLongitude": "Nieprawidłowa długość geograficzna startu!",
-        "invalidWarheads": "Liczba głowic musi być liczbą całkowitą od 1 do 12."
+        "invalidWarheads": "Liczba głowic musi być liczbą całkowitą od 1 do 12.",
+        "maxMissiles": "Błąd: Osiągnięto maksymalną<br>liczbę pocisków.",
+        "launchLatRange": "Błąd: Szerokość geograficzna startu musi być<br>między 90 a -90 stopni",
+        "launchLonRange": "Błąd: Długość geograficzna startu musi być<br>między 180 a -180 stopni",
+        "targetLatRange": "Błąd: Szerokość geograficzna celu musi być<br>między 90 a -90 stopni",
+        "targetLonRange": "Błąd: Długość geograficzna celu musi być<br>między 180 a -180 stopni",
+        "minDistance": "Błąd: Ten pocisk ma minimalny zasięg 320 km.",
+        "maxDistance": "Błąd: Ten pocisk ma maksymalny zasięg {km} km.",
+        "tooClose": "Błąd: Ta odległość jest zbyt mała dla wybranego pocisku.",
+        "orbitalVelocity": "Błąd: Pocisk osiągnął prędkość orbitalną<br>(silnik zbyt mocny dla tego zasięgu).",
+        "overshot": "Błąd: Pocisk minął cel<br>(silnik zbyt mocny dla tego zasięgu).",
+        "notGuided": "Błąd: Nie udało się naprowadzić pocisku<br>na cel z tej odległości."
       },
       "commands": {
         "open": "Otwórz wtyczkę pocisków",

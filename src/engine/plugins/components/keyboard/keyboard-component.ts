@@ -132,6 +132,10 @@ export class KeyboardComponent {
    * - `undefined` → don't care, matches regardless of modifier state
    * - `true` → modifier must be pressed
    * - `false` → modifier must NOT be pressed
+   *
+   * Exception: on a letter key an omitted Ctrl/Alt means "not pressed", so a
+   * plain `f` never fires on Ctrl+F. Resolved by the registry so the conflict
+   * detector and this matcher share one rule.
    */
   private matchesShortcut_(shortcut: IKeyboardShortcut, key: string, code: string, isShift: boolean, isCtrl: boolean, isAlt: boolean): boolean {
     // Match by key or code
@@ -142,9 +146,10 @@ export class KeyboardComponent {
     }
 
     // Match modifiers (undefined = don't care)
-    const shiftMatch = shortcut.shift === undefined || shortcut.shift === isShift;
-    const ctrlMatch = shortcut.ctrl === undefined || shortcut.ctrl === isCtrl;
-    const altMatch = shortcut.alt === undefined || shortcut.alt === isAlt;
+    const mods = KeyboardShortcutRegistry.resolveModifiers(shortcut);
+    const shiftMatch = mods.shift === undefined || mods.shift === isShift;
+    const ctrlMatch = mods.ctrl === undefined || mods.ctrl === isCtrl;
+    const altMatch = mods.alt === undefined || mods.alt === isAlt;
 
     return shiftMatch && ctrlMatch && altMatch;
   }

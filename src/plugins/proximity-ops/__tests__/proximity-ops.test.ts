@@ -124,7 +124,7 @@ describe('ProximityOps_class', () => {
   });
 
   describe('convertRPOsToCSV_', () => {
-    it('should produce CSV with 15 headers matching 15 data columns', () => {
+    it('should produce CSV with 16 headers matching 16 data columns', () => {
       const plugin = new ProximityOps();
       const mockRPOs = [
         {
@@ -149,8 +149,8 @@ describe('ProximityOps_class', () => {
       const headerCount = lines[0].split(',').length;
       const dataCount = lines[1].split(',').length;
 
-      expect(headerCount).toBe(15);
-      expect(dataCount).toBe(15);
+      expect(headerCount).toBe(16);
+      expect(dataCount).toBe(16);
     });
 
     it('should handle satellite names with commas', () => {

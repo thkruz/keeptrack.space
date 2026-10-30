@@ -1,7 +1,11 @@
 {
   "Common": {
     "orbitPreview": "Náhled dráhy",
-    "unknown": "Neznámý"
+    "unknown": "Neznámý",
+    "close": "Zavřít",
+    "download": "Stáhnout",
+    "downloadNamed": "Stáhnout {name}",
+    "loading": "Načítání…"
   },
   "help": {
     "overview": "Přehled",
@@ -35,7 +39,8 @@
       "resetCamera": "Vrátit kameru do výchozího pohledu",
       "precisionMode": "Podržte pro pomalý, přesný pohyb kamery",
       "moveCamera": "Pohyb kamery v režimech první osoby",
-      "rollCamera": "Naklonit kameru v režimech první osoby",
+      "moveCameraUpRoll": "Pohyb nahoru v pohledu FPS; náklon v ostatních režimech první osoby",
+      "moveCameraDownRoll": "Pohyb dolů v pohledu FPS; náklon v ostatních režimech první osoby",
       "numpadRotate": "Otočit kameru",
       "zoomIn": "Přiblížit",
       "zoomOut": "Oddálit",
@@ -62,7 +67,7 @@
       "embed": "Vložené",
       "offline": "Offline",
       "epfl": "EPFL",
-      "companion": "Companion",
+      "companion": "Doprovodná aplikace",
       "solar-system": "Sluneční soustava"
     }
   },
@@ -88,12 +93,122 @@
     },
     "SensorManager": {
       "errorUpdatingUi": "Chyba při aktualizaci stylování UI senzoru."
+    },
+    "BottomMenu": {
+      "filterButtonsMissing": "Nepodařilo se najít všechna tlačítka filtrů spodní nabídky"
+    },
+    "TimeManager": {
+      "nonFiniteOffset": "changeStaticOffset obdržel nekonečnou nebo neplatnou hodnotu: {value}",
+      "invalidDate": "synchronize() vytvořil neplatné datum - epoch={epoch}, offset={offset}"
+    },
+    "CatalogLoader": {
+      "catalogLoadError": "Chyba při načítání katalogu družic.",
+      "usingOfflineCatalog": "Nepodařilo se stáhnout nejnovější katalog! Používá se offline katalog, který může být zastaralý!",
+      "catalogsLoadFailed": "Nepodařilo se načíst katalog(y) TLE!",
+      "externalTlesBadFormat": "Externí TLE nejsou ve správném formátu",
+      "externalTlesLoadError": "Chyba při načítání externích TLE z {url}",
+      "fileLoadError": "Chyba při načítání {file}",
+      "usingOfflineVimpel": "Nepodařilo se stáhnout nejnovější vimpel.json! Používá se offline vimpel.json, který může být zastaralý!",
+      "satProcessFailed": "Nepodařilo se zpracovat družici: {name} ({scc})"
+    },
+    "CatalogExporter": {
+      "extendedIdsInTle": "Tento export obsahuje {count} družic s rozšířeným sccNum (7+ číslic). Sloupce 3-7 formátu TLE pojmou jen 5 znaků, takže při opětovném importu tohoto souboru se kanonické ID ztratí. Pro zachování rozšířených ID použijte export CSV/OMM.",
+      "noTleData": "Žádná data TLE k exportu"
+    },
+    "CatalogManager": {
+      "satIdNotFound": "calcSatrec: satId nebylo nalezeno v satData",
+      "satrecError": "Chyba při vytváření záznamu družice!",
+      "analystSatInvalid": "Nová analytická družice je neplatná!"
+    },
+    "apiKeyRequired": "Je vyžadován klíč API. Získejte bezplatný klíč na keeptrack.space a přidejte ho do settings/data-settings.ts",
+    "audioLoadFailed": "Nepodařilo se načíst zvuk: {key}",
+    "rmbMenuMissingElements": "Chybějící prvky kontextové nabídky: {ids}",
+    "sgp4BackendFailed": "Nepodařilo se aktivovat propagátor {backend}; používá se SGP4 v TypeScriptu. {error}",
+    "Pwa": {
+      "registrationFailed": "Registrace service workeru se nezdařila:"
+    },
+    "Rendering": {
+      "heroMeshesUnavailable": "Detailní modely kosmických lodí nejsou k dispozici, používají se obecné modely: {error}",
+      "meshVariantsUnavailable": "Procedurální varianty modelů nejsou k dispozici, používají se bezplatné základní modely: {error}",
+      "colorCruncherUpdateDropped": "Dynamická aktualizace ColorCruncher byla zahozena: {error}",
+      "hoverPickDisabled": "Výběr družic najetím myši je vypnut: tento prohlížeč nepodporuje WebGL readPixels ({error}). Výběr kliknutím stále funguje.",
+      "earthInitFailed": "Chyba při inicializaci Země: {error}",
+      "textureLoadFailed": "Nepodařilo se načíst texturu: {url}",
+      "solarSystemPackUnavailable": "Balíček Sluneční soustavy není k dispozici, používají se vestavěná tělesa: {error}",
+      "uniformNotFound": "Uniform {uniform} nebyl v programu {program} nalezen",
+      "contextLost": "Kontext WebGL ztracen",
+      "contextLostRefresh": "Kontext WebGL byl ztracen. Obnovte stránku.",
+      "contextRestored": "Kontext WebGL obnoven",
+      "pickingResizeFailed": "Změna velikosti framebufferu pro výběr v resizeCanvas selhala; odkládá se do obnovení kontextu. {error}",
+      "godraysResizeFailed": "Změna velikosti efektu paprsků v resizeCanvas selhala; zopakuje se při další změně velikosti. {error}",
+      "bodyInitError": "Chyba při inicializaci tělesa {name}",
+      "bodyTextureError": "Chyba při aktualizaci textury tělesa {name}",
+      "atmosphereInitError": "Chyba při inicializaci atmosféry tělesa {name}",
+      "atmosphereTextureError": "Chyba při načítání textury atmosféry tělesa {name} (pokus {attempt})",
+      "shaderInitFailed": "Nepodařilo se inicializovat shadery",
+      "meshModelUndefined": "Model sítě není definován. Nelze použít ukazatele atributů.",
+      "shaderAttributeMissing": "Atribut „{attr}“ nebyl v shaderu nalezen. Není v kódu shaderu nedeklarovaný nebo nepoužitý?",
+      "meshesLoadFailed": "Nepodařilo se načíst 3D modely!",
+      "flagAtlasLoadFailed": "Nepodařilo se načíst atlas vlajek",
+      "politicalMapLoadFailed": "Nepodařilo se načíst data politické mapy"
+    },
+    "Boot": {
+      "recoveryShown": "[KeepTrack] Zobrazeno rozhraní obnovy po neúspěšném spuštění (zaseknuté workery: {workers}).",
+      "line": "Řádek: {line}",
+      "optionalWorkersStalled": "[KeepTrack] Volitelné workery se nespustily do {seconds} s; spouští se bez nich: {workers}. Dotčené funkce (např. čáry drah) jsou pro tuto relaci vypnuty.",
+      "essentialWorkersStalled": "[KeepTrack] Nezbytné webové workery se nepodařilo inicializovat ani po {seconds} s. Zaseknuté workery: {workers}.",
+      "selfHealReload": "[KeepTrack] Workery se zasekly; stránka se jednou znovu načte s čerstvou mezipamětí workerů."
+    },
+    "Persistence": {
+      "versionMismatch": "Neshoda verzí: {saved} < {current}",
+      "clearingStorage": "Mazání místního úložiště...",
+      "subscriberError": "Chyba v odběrateli úložiště:",
+      "storageError": "Chyba LocalStorageProvider:",
+      "enhancedInitFailed": "Nepodařilo se inicializovat rozšířené ukládání: {error}",
+      "corruptSetting": "Přeskakuje se poškozené uložené nastavení „{key}“: {error}"
+    },
+    "Colorbox": {
+      "containerRootNotFound": "Kořenový kontejner nebyl nalezen!",
+      "containerNotFound": "Kontejner Colorbox nebyl nalezen!",
+      "loadFailed": "Nepodařilo se načíst: {url}",
+      "imageLoadFailed": "Nepodařilo se načíst obrázek: {url}"
+    },
+    "SaveVariable": {
+      "variable": "Chyba při ukládání proměnné!",
+      "csv": "Chyba při ukládání CSV!",
+      "xlsx": "Chyba při ukládání XLSX!",
+      "clipboard": "Chyba při kopírování do schránky!"
+    },
+    "Fatal": {
+      "technicalDetail": "Technické podrobnosti",
+      "recommendations": "Doporučení",
+      "canvasMissingTitle": "Chybí prvek plátna",
+      "canvasMissingDescription": "KeepTrack nenašel svou kreslicí plochu. Obvykle to znamená, že rozšíření prohlížeče, firemní firewall nebo zásady zabezpečení obsahu odstraňují prvky ze stránky.",
+      "webgl2Title": "WebGL 2 není k dispozici",
+      "webgl2Description": "KeepTrack potřebuje k vykreslení 3D scény WebGL 2. Váš prohlížeč nebo zařízení jej nepodporuje, nebo je vypnutý.",
+      "recDisableExtensions": "Vypněte rozšíření prohlížeče (blokátory reklam, nástroje pro ochranu soukromí) a stránku znovu načtěte.",
+      "recManagedNetwork": "Jste ve spravované síti? Požádejte správce sítě nebo systému o povolení tohoto webu.",
+      "recDifferentBrowser": "Zkuste jiný prohlížeč (doporučujeme Chrome, Edge nebo Firefox).",
+      "recUpdateBrowser": "Aktualizujte prohlížeč na nejnovější verzi.",
+      "recHardwareAcceleration": "Zapněte v nastavení prohlížeče hardwarovou akceleraci.",
+      "recGraphicsDrivers": "Aktualizujte ovladače grafické karty.",
+      "recManagedDevice": "Používáte spravované zařízení? Obraťte se na správce systému."
     }
   },
   "hoverManager": {
     "launched": "Vypuštěno",
     "launchedPlanned": "Vypuštění: Plánováno",
-    "launchedUnknown": "Vypuštění: Neznámé"
+    "launchedUnknown": "Vypuštění: Neznámé",
+    "orbitPeriodDays": "Oběžná doba: {days} pozemských dnů",
+    "orbitPeriodYears": "Oběžná doba: {years} pozemských let",
+    "distanceFromParent": "Vzdálenost od {parent}: {km} km",
+    "distanceFromSun": "Vzdálenost od Slunce: {au} AU ({mkm} milionů km)",
+    "unknownLaunchSite": "Neznámé místo startu",
+    "unknownSite": "Neznámé místo",
+    "unknownCountry": "Neznámá země",
+    "external": "Externí",
+    "position": "Poloha:",
+    "velocity": "Rychlost:"
   },
   "darkClouds": {
     "in": "V",
@@ -153,22 +268,125 @@
     "groupLayerToggles": "Přepínače vrstev",
     "groupSettingsToggles": "Přepínače nastavení",
     "groupDevTools": "Vývojářské nástroje",
-    "groupAbout": "O aplikaci"
+    "groupAbout": "O aplikaci",
+    "modeAll": "Všechny pluginy",
+    "openPluginMenu": "Otevřít nabídku pluginů",
+    "openAppLauncher": "Otevřít spouštěč aplikací",
+    "appLauncherTooltip": "Spouštěč aplikací (Shift+Z)",
+    "appLauncher": "Spouštěč aplikací",
+    "search": "Hledat",
+    "searchEllipsis": "Hledat…",
+    "toggleRailMode": "Přepnout zúžený režim",
+    "collapse": "Sbalit",
+    "expand": "Rozbalit",
+    "phoneLink": "Propojení s telefonem",
+    "phoneLinkSignIn": "Přihlaste se a propojte svůj telefon",
+    "connected": "Připojeno",
+    "offline": "Offline",
+    "footerLinks": {
+      "label": "O aplikaci a právní informace",
+      "about": "O aplikaci",
+      "data": "Data",
+      "terms": "Podmínky",
+      "privacy": "Soukromí"
+    }
   },
   "rightClickMenu": {
     "pauseClock": "Pozastavit hodiny",
     "resetCamera": "Obnovit kameru",
     "clearLines": "Vymazat čáry",
-    "clearScreen": "Vymazat obrazovku"
+    "clearScreen": "Vymazat obrazovku",
+    "startClock": "Spustit hodiny"
   },
   "urlManager": {
     "satNotFound": "Družice \"{val}\" nebyla nalezena!",
     "intldesNotFound": "Mezinárodní označení \"{val}\" nebylo nalezeno!",
-    "deepSpaceNoEphemeris": "{name} je objekt v hlubokém vesmíru. Jeho efemeridy zatím nejsou v KeepTrack k dispozici."
+    "deepSpaceNoEphemeris": "{name} je objekt v hlubokém vesmíru. Jeho efemeridy zatím nejsou v KeepTrack k dispozici.",
+    "searchFoundNothing": "Hledání „{val}“ nic nenašlo!",
+    "missileLaunched": "Raketa odpálena!",
+    "dateNotIso": "Hodnota data „{val}“ není platný řetězec data ISO 8601!",
+    "dateNotUnix": "Hodnota data „{val}“ není platné unixové časové razítko!",
+    "rateNotFloat": "Rychlost propagace „{val}“ není platné desetinné číslo!",
+    "zoomNotFloat": "Hodnota přiblížení „{val}“ není platné desetinné číslo!",
+    "zoomOutOfBounds": "Hodnota přiblížení „{val}“ je mimo povolený rozsah!",
+    "pitchYawNotFloat": "Hodnota sklonu nebo natočení není platné desetinné číslo!",
+    "pitchOutOfBounds": "Hodnota sklonu je mimo povolený rozsah!",
+    "yawOutOfBounds": "Hodnota natočení je mimo povolený rozsah!",
+    "latLonNotFloat": "Hodnota zeměpisné šířky nebo délky není platné desetinné číslo!",
+    "latLonOutOfBounds": "Hodnota zeměpisné šířky nebo délky je mimo povolený rozsah!",
+    "unknownSunParam": "Neznámý parametr slunce: {val}",
+    "unknownRegime": "Neznámý filtr orbitálního režimu: {val}",
+    "invalidSearchLimit": "Neplatný limit vyhledávání: {val}"
   },
   "searchManager": {
     "resultCountOne": "1 výsledek",
     "resultCount": "Výsledků: {count}",
-    "resultCountLimited": "Zobrazeno {shown} z {total} výsledků"
+    "resultCountLimited": "Zobrazeno {shown} z {total} výsledků",
+    "noResults": "Nebyly nalezeny žádné výsledky",
+    "decayed": "Zaniklý",
+    "typeStar": "Hvězda",
+    "typeSensor": "Senzor",
+    "typeLaunchSite": "Místo startu",
+    "typePlanet": "Planeta"
+  },
+  "sensorMath": {
+    "withinOneBeam": "V rámci jednoho svazku",
+    "range": "Vzdálenost: {km} km",
+    "relativeVelocity": "Relativní rychlost: {kms} km/s",
+    "noPassesInDays": "Žádné přelety za {days} dní",
+    "customLocation": "Vlastní poloha",
+    "customSensorDefaultName": "Vlastní senzor"
+  },
+  "toasts": {
+    "orbitTailsOnly": "Pouze konce drah",
+    "orbitsOff": "Dráhy vypnuty",
+    "orbitsOn": "Dráhy zapnuty",
+    "orbitsInEcf": "Dráhy zobrazeny v ECF",
+    "orbitsInEci": "Dráhy zobrazeny v ECI",
+    "cameraEarthCentered": "Režim kamery se středem v Zemi",
+    "cameraFixedLvlh": "Režim kamery upevněné na družici (LVLH)",
+    "cameraFixedEci": "Režim kamery upevněné na družici (ECI)",
+    "cameraFree": "Režim volné kamery",
+    "cameraPlanetarium": "Režim kamery planetárium",
+    "cameraSatFirstPerson": "Režim kamery z pohledu družice",
+    "cameraAstronomy": "Astronomický režim kamery",
+    "cameraFlatMap": "Režim kamery ploché mapy",
+    "propagationSpeed": "Rychlost propagace: {rate}x",
+    "timeSetToRealTime": "Čas nastaven na reálný čas",
+    "noValidFov": "Žádné platné zorné pole k vykreslení! Nelze vykreslit více senzorů hlubokého vesmíru najednou.",
+    "colorSchemeChanged": "Barevné schéma změněno na {scheme}",
+    "mobileFullVersionUnavailable": "Plná verze KeepTrack není na mobilních zařízeních k dispozici. Pro přístup k plné verzi použijte prosím prohlížeč na počítači.",
+    "objectInsideEarth": "Objekt je uvnitř Země!",
+    "propagationRate": "Rychlost propagace: {rate}x"
+  },
+  "layersManager": {
+    "toggleLayers": "Přepnout vrstvy",
+    "layers": "Vrstvy"
+  },
+  "modalConfirm": {
+    "confirmAction": "Potvrdit akci",
+    "defaultTitle": "Jste si jisti?",
+    "defaultMessage": "Opravdu chcete pokračovat v této akci?",
+    "yes": "Ano",
+    "no": "Ne",
+    "cancel": "Zrušit",
+    "logoutTitle": "Potvrdit odhlášení",
+    "logoutMessage": "Opravdu se chcete odhlásit? Pro přístup ke svému účtu se budete muset znovu přihlásit.",
+    "logout": "Odhlásit",
+    "deleteTitle": "Potvrdit smazání",
+    "deleteNamedMessage": "Opravdu chcete smazat „{name}“? Tuto akci nelze vrátit zpět.",
+    "deleteMessage": "Opravdu chcete tuto položku smazat? Tuto akci nelze vrátit zpět.",
+    "delete": "Smazat",
+    "clearTitle": "Potvrdit vymazání",
+    "clearTypedMessage": "Opravdu chcete vymazat vše: {dataType}? Tuto akci nelze vrátit zpět.",
+    "clearMessage": "Opravdu chcete vymazat všechna data? Tuto akci nelze vrátit zpět.",
+    "clear": "Vymazat",
+    "input": "Zadání",
+    "ok": "OK",
+    "removeItem": "Odebrat {label}"
+  },
+  "colorbox": {
+    "openInNewTab": "Otevřít na nové kartě",
+    "blankPageHint": "Prázdná stránka? Otevřete ji na nové kartě."
   }
 }

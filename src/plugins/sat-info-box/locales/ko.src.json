@@ -30,10 +30,14 @@
       "external": "외부"
     },
     "notAvailable": "해당 없음",
+    "notAvailableJscVimpel": "해당 없음 (JSC Vimpel)",
     "oemFile": "OEM 파일",
     "copy": {
       "copied": "클립보드에 복사되었습니다",
       "tooltip": "클릭하여 복사"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "위성 정보 패널이 로드를 완료하지 못해 세부 정보를 업데이트할 수 없습니다."
     }
   }
 }

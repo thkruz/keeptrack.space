@@ -236,6 +236,16 @@
   }
 }
 
+/*
+ * Too short for even the 90px band to clear the start button: hide the ad
+ * rather than cover "Click to Begin". !important beats showEl's inline display.
+ */
+@media (max-height: 600px) {
+  #adsense-placeholder {
+    display: none !important;
+  }
+}
+
 #mobile-start-button {
   display: none;
   margin-top: 10px;

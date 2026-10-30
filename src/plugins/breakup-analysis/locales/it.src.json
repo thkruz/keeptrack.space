@@ -49,6 +49,9 @@
         "estimatedTotal": "Totale stimato",
         "trackingRatio": "Rapporto di tracciamento",
         "typeBreakdown": "Carichi utili / Corpi di razzo / Detriti",
+        "likelyDecayed": "Probabilmente rientrati",
+        "likelyDecayedNote": "Inclusi nei conteggi sopra. Un oggetto viene segnalato quando il suo perigeo è inferiore a {perigee} km o il suo set di elementi è anteriore di oltre {days} giorni al {date}.",
+        "likelyDecayedTag": "probabilmente rientrato",
         "parameter": "Parametro",
         "min": "Min",
         "max": "Max",
@@ -72,6 +75,68 @@
       "errorMsgs": {
         "parentNotFound": "L'oggetto principale non è nel catalogo attuale.",
         "noDataToExport": "Nessun frammento tracciato da esportare."
+      },
+      "events": {
+        "fengyun1c": {
+          "name": "Test ASAT Fengyun-1C",
+          "cause": "Test ASAT intenzionale",
+          "orbitType": "LEO eliosincrona",
+          "description": "Test cinese di missile antisatellite che distrusse il satellite meteorologico Fengyun-1C, creando la più grande nube di detriti tracciata della storia."
+        },
+        "cosmos2251": {
+          "name": "Collisione Cosmos 2251 / Iridium 33",
+          "cause": "Collisione accidentale",
+          "orbitType": "LEO",
+          "description": "Prima collisione accidentale ad altissima velocità tra due satelliti integri. Cosmos 2251 si scontrò con il satellite per comunicazioni operativo Iridium 33."
+        },
+        "iridium33": {
+          "name": "Iridium 33 (dalla collisione)",
+          "cause": "Collisione accidentale",
+          "orbitType": "LEO",
+          "description": "Campo di detriti del satellite operativo Iridium 33 dopo la collisione con il dismesso Cosmos 2251."
+        },
+        "cosmos1408": {
+          "name": "Test ASAT Cosmos 1408",
+          "cause": "Test ASAT intenzionale",
+          "orbitType": "LEO",
+          "description": "Test ASAT russo ad ascesa diretta che distrusse il satellite ELINT dismesso Cosmos 1408, generando detriti che minacciarono l'equipaggio della ISS."
+        },
+        "microsatr": {
+          "name": "Test ASAT Microsat-R (Missione Shakti)",
+          "cause": "Test ASAT intenzionale",
+          "orbitType": "LEO",
+          "description": "Test ASAT indiano ad ascesa diretta (Missione Shakti) contro il satellite Microsat-R. La bassa quota di intercettazione limitò la popolazione di detriti di lunga durata, anche se alcuni frammenti furono lanciati sopra la ISS."
+        },
+        "breezem": {
+          "name": "Esplosione dello stadio superiore Briz-M",
+          "cause": "Esplosione accidentale",
+          "orbitType": "GTO",
+          "description": "Lo stadio superiore Briz-M esplose dopo la fallita missione Arabsat-4A, probabilmente a causa di propellente residuo. Generò detriti su un ampio intervallo di quote."
+        },
+        "cz6a": {
+          "name": "Frammentazione dello stadio superiore CZ-6A",
+          "cause": "Esplosione accidentale",
+          "orbitType": "LEO eliosincrona",
+          "description": "Un secondo stadio cinese Lunga Marcia 6A si frammentò poco dopo aver rilasciato Yunhai-3, disperdendo centinaia di frammenti in quote eliosincrone molto utilizzate."
+        },
+        "noaa16": {
+          "name": "Frammentazione di NOAA-16",
+          "cause": "Guasto batteria / termico",
+          "orbitType": "LEO eliosincrona",
+          "description": "Il satellite meteorologico dismesso NOAA-16 si frammentò in orbita, a causa di un guasto alla batteria o termico, aggiungendo detriti di lunga durata a una quota polare congestionata."
+        },
+        "dmspf13": {
+          "name": "Frammentazione di DMSP-F13",
+          "cause": "Esplosione della batteria",
+          "orbitType": "LEO eliosincrona",
+          "description": "Un veicolo del Defense Meteorological Satellite Program statunitense si ruppe dopo un sovraccarico e un surriscaldamento della batteria, un modo di guasto poi riscontrato in diversi satelliti DMSP e NOAA dello stesso progetto."
+        },
+        "usa193": {
+          "name": "Abbattimento di USA-193",
+          "cause": "Abbattimento intenzionale",
+          "orbitType": "LEO",
+          "description": "Un missile SM-3 della US Navy distrusse il satellite malfunzionante dell'NRO USA-193 (NROL-21). La frammentazione a bassa quota fece rientrare la maggior parte dei detriti entro poche settimane."
+        }
       }
     }
   }

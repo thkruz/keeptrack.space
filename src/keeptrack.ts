@@ -1,3 +1,4 @@
+import { t7e } from '@app/locales/keys';
 import { registerMeshPacks } from './app/rendering/mesh/mesh-packs';
 import { ServiceLocator } from './engine/core/service-locator';
 import { registerSolarSystemContent } from './engine/rendering/draw-manager/celestial-bodies/solar-system-content';
@@ -164,7 +165,7 @@ export class KeepTrack {
     PersistenceManager.getInstance()
       .initialize()
       .catch((e) => {
-        errorManagerInstance.warn(`Failed to initialize enhanced persistence: ${e.message}`);
+        errorManagerInstance.warn(t7e('errorMsgs.Persistence.enhancedInitFailed').replace('{error}', e.message));
       });
   }
 
@@ -205,8 +206,8 @@ export class KeepTrack {
           </div>
         </div>
         <figcaption id="info-overlays">
-          <div id="camera-status-box" class="start-hidden status-box">Earth Centered Camera Mode</div>
-          <div id="propRate-status-box" class="start-hidden status-box">Propagation Rate: 1.00x</div>
+          <div id="camera-status-box" class="start-hidden status-box">${t7e('toasts.cameraEarthCentered')}</div>
+          <div id="propRate-status-box" class="start-hidden status-box">${t7e('toasts.propagationRate').replace('{rate}', '1.00')}</div>
         </figcaption>
       </main>
       <footer id="nav-footer" class="page-footer resizable">
@@ -332,7 +333,7 @@ theodore.kruczek at gmail dot com.
     let errorHtml = '';
 
     errorHtml += error?.message ? `${error.message}<br>` : '';
-    errorHtml += error?.lineNumber ? `Line: ${error.lineNumber}<br>` : '';
+    errorHtml += error?.lineNumber ? `${t7e('errorMsgs.Boot.line').replace('{line}', String(error.lineNumber))}<br>` : '';
     errorHtml += error?.stack ? `${error.stack}<br>` : '';
     const LoaderText = getEl('loader-text');
 
@@ -533,9 +534,9 @@ theodore.kruczek at gmail dot com.
             t.disableDueToStall();
           }
           errorManagerInstance.warn(
-            `[KeepTrack] Optional worker(s) failed to start within ${KeepTrack.OPTIONAL_WORKER_GRACE_MS_ / 1000}s; booting without them: ${stalled
-              .map((t) => t.WEB_WORKER_CODE)
-              .join(', ')}. The affected features (e.g. orbit lines) are disabled for this session.`
+            t7e('errorMsgs.Boot.optionalWorkersStalled')
+              .replace('{seconds}', String(KeepTrack.OPTIONAL_WORKER_GRACE_MS_ / 1000))
+              .replace('{workers}', stalled.map((t) => t.WEB_WORKER_CODE).join(', '))
           );
           KeepTrack.reportWorkerBootFailure_('degraded', stalled, this.postStartElapsed_);
         }
@@ -556,7 +557,9 @@ theodore.kruczek at gmail dot com.
         const notReady = stalled.map((t) => t.WEB_WORKER_CODE);
 
         errorManagerInstance.warn(
-          `[KeepTrack] Essential web workers failed to initialize after ${KeepTrack.POST_START_TIMEOUT_MS_ / 1000}s. Stalled workers: ${notReady.join(', ')}.`
+          t7e('errorMsgs.Boot.essentialWorkersStalled')
+            .replace('{seconds}', String(KeepTrack.POST_START_TIMEOUT_MS_ / 1000))
+            .replace('{workers}', notReady.join(', '))
         );
 
         // Peek (without mutating the guard flag) whether a self-heal reload is still
@@ -649,7 +652,7 @@ theodore.kruczek at gmail dot com.
       }
       storage.setItem(KeepTrack.WORKER_SELF_HEAL_FLAG_, '1');
       storage.setItem(WORKER_CACHE_BUST_KEY, String(Date.now()));
-      errorManagerInstance.info('[KeepTrack] Workers stalled; reloading once with a fresh worker cache to self-heal.');
+      errorManagerInstance.info(t7e('errorMsgs.Boot.selfHealReload'));
       globalThis.location.reload();
 
       return true;

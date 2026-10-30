@@ -58,7 +58,7 @@ export function applyTleToSat(satId: number, tle1: TleLine1, tle2: TleLine2, cou
   try {
     satrec = Sgp4.createSatrec(tle1, tle2);
   } catch (e) {
-    errorManagerInstance.error(e as Error, 'edit-sat-actions.ts', 'Error creating satellite record!');
+    errorManagerInstance.error(e as Error, 'edit-sat-actions.ts', t7e('plugins.EditSat.errorMsgs.satrecFailed'));
 
     return 'satrec-error';
   }

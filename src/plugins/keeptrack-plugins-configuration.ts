@@ -31,7 +31,6 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxActions?: PluginConfiguration;
   SatInfoBoxLinks?: PluginConfiguration;
   SatInfoBoxOrbital?: SatInfoBoxOrbitalConfiguration;
-  SatInfoBoxManeuver?: PluginConfiguration;
   SatInfoBoxObject?: SatInfoBoxObjectConfiguration;
   SatInfoBoxMission?: PluginConfiguration;
   SatInfoBoxSponsor?: PluginConfiguration;
@@ -40,7 +39,6 @@ export type KeepTrackPluginsConfiguration = {
   SatInfoBoxDoppler?: PluginConfiguration;
   DateTimeManager?: PluginConfiguration;
   GithubLinkPlugin?: PluginConfiguration;
-  LinkedInLinkPlugin?: PluginConfiguration;
   ClassificationBar?: PluginConfiguration;
   EpochAge?: PluginConfiguration;
   SoundManager?: PluginConfiguration;
@@ -72,7 +70,7 @@ export type KeepTrackPluginsConfiguration = {
   Collisions?: PluginConfiguration;
   TocaPocaPlugin?: PluginConfiguration;
   NeighborhoodWatch?: PluginConfiguration;
-  OrbitGuardMenuPlugin?: PluginConfiguration;
+  KtocNoticesPlugin?: PluginConfiguration;
   Reentries?: PluginConfiguration;
   Breakup?: PluginConfiguration;
   BreakupAnalysis?: PluginConfiguration;
@@ -119,7 +117,6 @@ export type KeepTrackPluginsConfiguration = {
   PlanetsMenuPlugin?: PluginConfiguration;
   DeepSpaceMissionsPlugin?: PluginConfiguration;
   Screenshot?: PluginConfiguration;
-  GunterLaunchCalendar?: PluginConfiguration;
   TimeMachine?: PluginConfiguration;
   SatellitePhotos?: PluginConfiguration;
   ScreenRecorder?: PluginConfiguration;
@@ -132,6 +129,7 @@ export type KeepTrackPluginsConfiguration = {
   BestPassPlugin?: PluginConfiguration;
   OverflightPlugin?: PluginConfiguration;
   TransitFinderPlugin?: PluginConfiguration;
+  ObservabilityPlanner?: PluginConfiguration;
   TipAndCuePlanner?: PluginConfiguration;
   EclipseSolarAnalysis?: PluginConfiguration;
   CoverageAnalysis?: PluginConfiguration;
@@ -157,7 +155,6 @@ export type KeepTrackPluginsConfiguration = {
   GraphicsMenuPlugin?: PluginConfiguration;
   GamepadPlugin?: PluginConfiguration;
   VideoDirectorPlugin?: PluginConfiguration;
-  AboutMenuPlugin?: PluginConfiguration;
   EarthPresetsPlugin?: PluginConfiguration;
   DrawLinesPlugin?: PluginConfiguration;
   ViewInfoRmbPlugin?: PluginConfiguration;

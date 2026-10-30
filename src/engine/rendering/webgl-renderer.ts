@@ -1,6 +1,7 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrack } from '@app/keeptrack';
+import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { WatchlistPlugin } from '@app/plugins/watchlist/watchlist';
 import { BaseObject, CatalogSource, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Satellite, TemeVec3 } from '@ootk/src/main';
@@ -156,7 +157,7 @@ export class WebGLRenderer {
 
   private onContextLost_(e: WebGLContextEvent) {
     e.preventDefault(); // allows the context to be restored
-    errorManagerInstance.info('WebGL Context Lost');
+    errorManagerInstance.info(t7e('errorMsgs.Rendering.contextLost'));
     this.isContextLost = true;
 
     // The browser owns context restoration — there's no API to force it. If `webglcontextrestored`
@@ -171,13 +172,13 @@ export class WebGLRenderer {
         // We avoid errorManagerInstance.error() because it auto-opens a GitHub issue URL, which is
         // too invasive for a "please refresh" prompt triggered by a GPU/driver event.
         EventBus.getInstance().emit(EventBusEvent.error, new Error('WebGL context lost — refresh the page to recover.'), 'WebGLRenderer.onContextLost_');
-        errorManagerInstance.warn('WebGL context lost — refresh the page to recover.');
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.contextLostRefresh'));
       }
     }, WebGLRenderer.CONTEXT_LOST_RECOVERY_TIMEOUT_MS);
   }
 
   private onContextRestore_() {
-    errorManagerInstance.info('WebGL Context Restored');
+    errorManagerInstance.info(t7e('errorMsgs.Rendering.contextRestored'));
     this.resetGLState_();
     this.isContextLost = false;
 
@@ -199,14 +200,9 @@ export class WebGLRenderer {
 
     if (!this.domElement) {
       showFatalError({
-        title: 'Canvas Element Missing',
-        description:
-          'KeepTrack could not find its drawing surface. This usually means a browser extension, corporate firewall, or content-security policy is stripping elements from the page.',
-        recommendations: [
-          'Disable browser extensions (ad-blockers, privacy tools) and reload.',
-          'On a managed network? Contact your LAN Office or System Administrator to whitelist this site.',
-          'Try a different browser (Chrome, Edge, or Firefox recommended).',
-        ],
+        title: t7e('errorMsgs.Fatal.canvasMissingTitle'),
+        description: t7e('errorMsgs.Fatal.canvasMissingDescription'),
+        recommendations: [t7e('errorMsgs.Fatal.recDisableExtensions'), t7e('errorMsgs.Fatal.recManagedNetwork'), t7e('errorMsgs.Fatal.recDifferentBrowser')],
         technicalDetail: 'document.getElementById("keeptrack-canvas") returned null.',
       });
     }
@@ -248,14 +244,14 @@ export class WebGLRenderer {
     // Check for WebGL Issues
     if (gl === null) {
       showFatalError({
-        title: 'WebGL 2 Not Available',
-        description: 'KeepTrack requires WebGL 2 to render the 3D scene. Your browser or device does not support it, or it has been disabled.',
+        title: t7e('errorMsgs.Fatal.webgl2Title'),
+        description: t7e('errorMsgs.Fatal.webgl2Description'),
         recommendations: [
-          'Update your browser to the latest version.',
-          'Enable hardware acceleration in your browser settings.',
-          'Update your graphics drivers.',
-          'Try a different browser (Chrome, Edge, or Firefox recommended).',
-          'On a managed device? Contact your System Administrator.',
+          t7e('errorMsgs.Fatal.recUpdateBrowser'),
+          t7e('errorMsgs.Fatal.recHardwareAcceleration'),
+          t7e('errorMsgs.Fatal.recGraphicsDrivers'),
+          t7e('errorMsgs.Fatal.recDifferentBrowser'),
+          t7e('errorMsgs.Fatal.recManagedDevice'),
         ],
         technicalDetail: 'canvas.getContext("webgl2") returned null.',
       });
@@ -628,7 +624,7 @@ export class WebGLRenderer {
       try {
         dotsManagerInstance.resizePickingFramebuffer();
       } catch (error) {
-        errorManagerInstance.warn(`Picking framebuffer resize failed during resizeCanvas; deferring until context restore. ${error instanceof Error ? error.message : error}`);
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.pickingResizeFailed').replace('{error}', error instanceof Error ? error.message : String(error)));
         this.isResizePendingAfterContextRestore_ = true;
       }
     }
@@ -646,7 +642,7 @@ export class WebGLRenderer {
     try {
       scene.godrays?.resize();
     } catch (error) {
-      errorManagerInstance.warn(`Godrays resize failed during resizeCanvas; retrying on next resize. ${error instanceof Error ? error.message : error}`);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.godraysResizeFailed').replace('{error}', error instanceof Error ? error.message : String(error)));
     }
   }
 

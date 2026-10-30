@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Aufnahme aufgrund von Kompatibilitätsproblemen nicht verfügbar!",
-    "compatibilityError": "Kompatibilitätsfehler bei der Aufnahme!"
+    "compatibilityError": "Kompatibilitätsfehler bei der Aufnahme!",
+    "requesting": "Bildschirmfreigabe wird angefordert…",
+    "recording": "Aufnahme",
+    "stopping": "Aufnahme wird abgeschlossen…",
+    "toggleCommand": "Bildschirmaufnahme umschalten",
+    "saved": "Aufnahme gespeichert",
+    "tooShort": "Aufnahme zu kurz, nichts gespeichert",
+    "cancelled": "Aufnahme abgebrochen",
+    "notReadable": "Der Bildschirm konnte nicht aufgenommen werden. Eine andere App oder eine Systemeinstellung blockiert ihn möglicherweise.",
+    "failed": "Aufnahme fehlgeschlagen. Bitte erneut versuchen."
   }
 }

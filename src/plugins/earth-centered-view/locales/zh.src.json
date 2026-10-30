@@ -1,7 +1,10 @@
 {
   "plugins": {
     "EarthCenteredView": {
-      "bottomIconLabel": "地球视图"
+      "bottomIconLabel": "地球视图",
+      "commandPalette": {
+        "switch": "切换到地心视图"
+      }
     }
   }
 }

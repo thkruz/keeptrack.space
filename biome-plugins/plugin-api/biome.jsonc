@@ -1,0 +1,19 @@
+// Import-policy check for external plugins (src/plugins-external/<name>).
+// Run by `npm run plugin -- doctor|add|update` (scripts/plugin/lib/import-policy.ts);
+// not part of `npm run lint`, which excludes third-party plugin code. Only the
+// plugin-api-imports grit rule runs; every built-in rule is off.
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+  "root": true,
+  "vcs": { "enabled": false },
+  "files": {
+    "includes": ["**/*.{ts,tsx,js,jsx,mjs,mts,cjs,cts}", "!**/node_modules/**", "!**/dist/**", "!**/*.d.ts"]
+  },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": { "recommended": false }
+  },
+  "plugins": ["../plugin-api-imports.grit"]
+}

@@ -1,9 +1,11 @@
 /* eslint-disable complexity */
+
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import { ColorScheme, ColorSchemeColorMap } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export interface MissionColorSchemeColorMap extends ColorSchemeColorMap {
   missionMilitary: rgbaArray;
@@ -377,40 +379,42 @@ export class MissionColorScheme extends ColorScheme {
     return highestScore >= 2 ? bestCategory : null;
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-countries">
     <li>
       <div class="Square-Box layers-missionMilitary-box"></div>
-      Military
+      ${legendLabel('military')}
     </li>
     <li>
       <div class="Square-Box layers-missionCommunications-box"></div>
-      Communications
+      ${legendLabel('communications')}
     </li>
     <li>
       <div class="Square-Box layers-missionTechnology-box"></div>
-      Technology
+      ${legendLabel('technology')}
     </li>
     <li>
       <div class="Square-Box layers-missionEarthObservation-box"></div>
-      Earth Observation
+      ${legendLabel('earthObservation')}
     </li>
     <li>
       <div class="Square-Box layers-missionScience-box"></div>
-      Science
+      ${legendLabel('science')}
     </li>
     <li>
       <div class="Square-Box layers-missionAstronomy-box"></div>
-      Astronomy
+      ${legendLabel('astronomy')}
     </li>
     <li>
       <div class="Square-Box layers-missionNavigation-box"></div>
-      Navigation
+      ${legendLabel('navigation')}
     </li>
     <li>
       <div class="Square-Box layers-missionOther-box"></div>
-      Other
+      ${legendLabel('other')}
     </li>
   </ul>
   `.trim();
+  }
 }

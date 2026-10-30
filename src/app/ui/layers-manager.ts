@@ -7,6 +7,7 @@ import type { ColorSchemeManager } from '@app/engine/rendering/color-scheme-mana
 import { ObjectTypeColorScheme } from '@app/engine/rendering/color-schemes/object-type-color-scheme';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getClass } from '@app/engine/utils/get-class';
+import { t7e } from '@app/locales/keys';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import layersPng from '@public/img/icons/layers.png';
 import { getEl, hideEl, showEl } from '../../engine/utils/get-el';
@@ -25,7 +26,11 @@ export class LayersManager {
     '.layers-satGEO-box',
   ];
 
-  static menuOptions = {
+  /**
+   * Legend HTML per layer. Values may be builder functions so labels translate on
+   * use (after localization init) rather than when this module is parsed.
+   */
+  static menuOptions: Record<string, string | (() => string)> = {
     near: nearDiv,
     deep: deepDiv,
     planetarium: planetariumDiv,
@@ -38,11 +43,11 @@ export class LayersManager {
   layersPopupBox: LayersPopupBox = new LayersPopupBox();
 
   static {
-    const addonLayers = {};
+    const addonLayers: Record<string, () => string> = {};
     const addonLayersClassList = [] as string[];
 
     for (const ColorSchemeClass of addonColorSchemes) {
-      addonLayers[ColorSchemeClass.id] = ColorSchemeClass.layersHtml;
+      addonLayers[ColorSchemeClass.id] = () => ColorSchemeClass.layersHtml;
 
       for (const flag in ColorSchemeClass.uniqueObjectTypeFlags) {
         if (flag) {
@@ -114,7 +119,7 @@ export class LayersManager {
       order: 2,
       classInner: 'top-menu-icons__blue-img',
       icon: layersPng,
-      tooltip: 'Toggle Layers',
+      tooltip: t7e('layersManager.toggleLayers'),
     });
 
     eventBus.on(EventBusEvent.uiManagerFinal, () => {
@@ -155,6 +160,8 @@ export class LayersManager {
     }
 
     colorSchemeManagerInstance.objectTypeFlags[slug] = isFlagOn;
+    // Remember the choice so it survives a scheme switch (where the class exists) and a reload.
+    colorSchemeManagerInstance.setLegendFlagHidden(slug, !isFlagOn);
     if (colorSchemeInstance) {
       colorSchemeInstance.objectTypeFlags[slug] = colorSchemeManagerInstance.objectTypeFlags[slug];
     }
@@ -173,16 +180,18 @@ export class LayersManager {
       layersHoverDom = getEl('layers-hover-menu-popup', true);
     }
 
-    if (!layersHoverDom) {
-      return;
-    }
+    // The legend popup is only built once it has been opened. Without it there is no legend to rewrite, but the
+    // flag reset and the layerUpdated event must still happen: listeners (e.g. Symbology turning itself off) rely
+    // on hearing every scheme change, and each of them tolerates a missing legend DOM.
+    if (layersHoverDom) {
+      // TODO there should be a setting that determines the defaults (Celestrak Rebase)
+      const option = LayersManager.menuOptions[menu];
+      const selectedOption = typeof option === 'function' ? option() : (option ?? ObjectTypeColorScheme.layersHtml);
 
-    // TODO there should be a setting that determines the defaults (Celestrak Rebase)
-    const selectedOption = LayersManager.menuOptions[menu] ?? ObjectTypeColorScheme.layersHtml;
-
-    layersHoverDom.innerHTML = selectedOption;
-    if (menu === 'clear') {
-      layersHoverDom.style.display = 'none';
+      layersHoverDom.innerHTML = selectedOption;
+      if (menu === 'clear') {
+        layersHoverDom.style.display = 'none';
+      }
     }
 
     // Update Layers Colors
@@ -204,17 +213,20 @@ export class LayersManager {
 
   private static setColors_(colorSchemeManagerInstance: ColorSchemeManager) {
     LayersManager.layersClassList.forEach((selector) => {
+      const flag = selector.split('-')[1];
+      const isHidden = colorSchemeManagerInstance.isLegendFlagHidden(flag);
       const elementFromClass = document.querySelector(selector);
 
       if (elementFromClass && settingsManager.colors) {
-        const rgba = settingsManager.colors[selector.split('-')[1]];
+        const rgba = settingsManager.colors[flag];
 
         if (!rgba) {
           return;
         }
-        (<HTMLElement>elementFromClass).style.background = rgbCss(rgba);
+        // A class the user hid keeps its black swatch after the legend rebuilds.
+        (<HTMLElement>elementFromClass).style.background = isHidden ? 'black' : rgbCss(rgba);
       }
-      colorSchemeManagerInstance.objectTypeFlags[selector.split('-')[1]] = true;
+      colorSchemeManagerInstance.objectTypeFlags[flag] = !isHidden;
     });
   }
 }

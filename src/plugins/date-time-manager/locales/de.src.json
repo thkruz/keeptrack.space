@@ -48,7 +48,9 @@
         "year": "Jahr",
         "goTo": "Gehe zu (UTC)",
         "goToTooltip": "UTC-Datum und -Uhrzeit eingeben (YYYY-MM-DD HH:MM:SS) und Enter drücken. Sekunden und Uhrzeit sind optional.",
-        "goToInvalid": "Ungültiges Datum. UTC-Format YYYY-MM-DD HH:MM:SS verwenden."
+        "goToInvalid": "Ungültiges Datum. UTC-Format YYYY-MM-DD HH:MM:SS verwenden.",
+        "containerNotFound": "Container mit der ID {id} nicht gefunden",
+        "timeInvalid": "Ungültiges Zeitformat! Erwartet wird HH:MM:SS, HH:MM:SS.s oder HHMMSS"
       }
     }
   }

@@ -6,6 +6,7 @@ import { ShaderMaterial } from '@app/engine/rendering/shader-material';
 import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
 import { DEG2RAD } from '@ootk/src/main';
 import { mat3, mat4 } from 'gl-matrix';
@@ -181,7 +182,7 @@ export class SkyBoxSphere {
           this.isTexturesReady_ = true;
         })
         .catch((err) => {
-          errorManagerInstance.warn(`Failed to load milkyway texture: ${milkyWayUrl}`, err);
+          errorManagerInstance.warn(t7e('errorMsgs.Rendering.textureLoadFailed').replace('{url}', milkyWayUrl), err);
         });
     }
     if (sm.isGraySkybox && !this.isReadyGraySkybox_) {
@@ -194,7 +195,7 @@ export class SkyBoxSphere {
           this.isTexturesReady_ = true;
         })
         .catch((err) => {
-          errorManagerInstance.warn(`Failed to load gray skybox texture: ${graySkyboxUrl}`, err);
+          errorManagerInstance.warn(t7e('errorMsgs.Rendering.textureLoadFailed').replace('{url}', graySkyboxUrl), err);
         });
     }
   }

@@ -81,13 +81,273 @@
       "errorMsgs": {
         "notSupportedForObject": "This report is not available for the selected object.",
         "generationFailed": "Report generation failed",
-        "parentNotFound": "Parent object {scc} is not in the catalog"
+        "parentNotFound": "Parent object {scc} is not in the catalog",
+        "reportOverwrite": "Report with id \"{id}\" is already registered. Overwriting."
       },
       "reasons": {
         "selectSecondary": "Select a secondary object first",
         "selectAnalyst": "Select an analyst satellite created by the Maneuver tool",
         "needTwoRuns": "Run Debris Screening at least twice first",
         "screeningRunsMissing": "Screening diff unavailable: run Debris Screening for {parent} and for {analyst} over the same window, then generate this report again."
+      },
+      "doc": {
+        "header": {
+          "date": "Date",
+          "satellite": "Satellite",
+          "noradId": "NORAD ID",
+          "altId": "Alternate ID",
+          "intlDes": "International Designator",
+          "none": "None",
+          "sensor": "Sensor",
+          "type": "Type",
+          "latitude": "Latitude",
+          "longitude": "Longitude",
+          "altitude": "Altitude",
+          "minAz": "Min Azimuth",
+          "maxAz": "Max Azimuth",
+          "minEl": "Min Elevation",
+          "maxEl": "Max Elevation",
+          "minRng": "Min Range",
+          "maxRng": "Max Range",
+          "windowLine": "Report Window: {start} to {end} UTC, Step: {step} s",
+          "generatedWallClock": "Generated (wall clock)",
+          "appVersion": "KeepTrack version",
+          "ricConvention": "RIC convention"
+        },
+        "titles": {
+          "aer": "Azimuth Elevation Range Report",
+          "lla": "Latitude Longitude Altitude Report",
+          "eci": "Earth Centered Inertial (TEME) Report",
+          "coes": "Classical Orbital Elements Report",
+          "visibility": "Visibility Windows Report",
+          "sunEclipse": "Sun/Eclipse Analysis Report",
+          "conjunction": "Conjunction Report",
+          "maneuver": "Maneuver Report",
+          "screeningCompare": "Screening Comparison Report"
+        },
+        "cols": {
+          "timeUtc": "Time (UTC)",
+          "pass": "Pass",
+          "azimuthDeg": "Azimuth(°)",
+          "elevationDeg": "Elevation(°)",
+          "rangeKm": "Range(km)",
+          "latitudeDeg": "Latitude(°)",
+          "longitudeDeg": "Longitude(°)",
+          "altitudeKm": "Altitude(km)",
+          "posX": "Position X(km)",
+          "posY": "Position Y(km)",
+          "posZ": "Position Z(km)",
+          "velX": "Velocity X(km/s)",
+          "velY": "Velocity Y(km/s)",
+          "velZ": "Velocity Z(km/s)",
+          "element": "Element",
+          "value": "Value",
+          "passNum": "Pass #",
+          "riseTime": "Rise Time (UTC)",
+          "setTime": "Set Time (UTC)",
+          "durationMin": "Duration (min)",
+          "maxElDeg": "Max Elevation(°)",
+          "maxElTime": "Max Elevation Time (UTC)",
+          "note": "Note",
+          "sunIlluminated": "Sun Illuminated",
+          "eclipseType": "Eclipse Type",
+          "sunAngleDeg": "Sun Angle(°)",
+          "offsetSec": "Offset (s)",
+          "rangeKmSpaced": "Range (km)",
+          "radialKm": "Radial (km)",
+          "intrackKm": "In-Track (km)",
+          "crosstrackKm": "Cross-Track (km)",
+          "relSpeed": "Rel Speed (km/s)"
+        },
+        "empty": {
+          "noPasses": "No passes found!",
+          "noPassesWindow": "No passes found in the report window!",
+          "noApproach": "No closest approach found in the search window.",
+          "noScreeningEvents": "No screening events in either run."
+        },
+        "passEdge": {
+          "continuous": "continuous",
+          "start": "in view at start",
+          "end": "in view at end"
+        },
+        "illumination": {
+          "sun": "Yes",
+          "penumbral": "Partial",
+          "umbral": "No",
+          "unknown": "Unknown"
+        },
+        "eclipse": {
+          "sun": "None",
+          "penumbral": "Penumbral",
+          "umbral": "Umbral",
+          "unknown": "Unknown"
+        },
+        "coes": {
+          "note": "Note: osculating elements (J2000) at the state epoch, derived from the propagated state vector.\nThey differ from the TLE mean elements used for catalog apogee/perigee.",
+          "elementSet": "Element Set",
+          "osculatingJ2000": "Osculating (J2000)",
+          "tleEpoch": "TLE Epoch (UTC)",
+          "stateEpoch": "State Epoch (osculating, UTC)",
+          "apogee": "Apogee",
+          "perigee": "Perigee",
+          "inclination": "Inclination",
+          "rightAscension": "Right Ascension",
+          "argOfPerigee": "Argument of Perigee",
+          "trueAnomaly": "True Anomaly",
+          "eccentricity": "Eccentricity",
+          "period": "Period",
+          "semiMajorAxis": "Semi-Major Axis",
+          "meanMotion": "Mean Motion"
+        },
+        "objects": {
+          "field": "Field",
+          "name": "Name",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "TLE Epoch (UTC)",
+          "gpAge": "GP Age",
+          "sigma": "1-sigma R / I / C (km, own RIC frame, at TLE epoch)",
+          "derivedFrom": "Derived From",
+          "days": "{days} days",
+          "assumedFromParent": "(assumed from parent)"
+        },
+        "roles": {
+          "primary": "Primary",
+          "secondary": "Secondary",
+          "parent": "Parent",
+          "analyst": "Analyst"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "Miss Distance",
+          "radial": "Radial (R)",
+          "intrack": "In-Track (I)",
+          "crosstrack": "Cross-Track (C)",
+          "relSpeed": "Relative Speed",
+          "risk": "Risk Level",
+          "searchWindow": "Search Window (UTC)",
+          "searchWindowValue": "{start} to {end} (+/- {hours} h)"
+        },
+        "risk": {
+          "critical": "critical",
+          "high": "high",
+          "medium": "medium",
+          "low": "low",
+          "unknown": "unknown"
+        },
+        "common": {
+          "value": "Value",
+          "quantity": "Quantity",
+          "item": "Item"
+        },
+        "pcInputs": {
+          "input": "Pc Input",
+          "method": "Method",
+          "primaryHbr": "Primary Hard-Body Radius",
+          "secondaryHbr": "Secondary Hard-Body Radius",
+          "combinedHbr": "Combined Hard-Body Radius",
+          "covarianceSource": "Covariance Source",
+          "confidence": "Confidence Level (k)",
+          "sigmaCaps": "1-sigma Caps R / I / C",
+          "methodValue": "ootk ConjunctionAssessment: 2D Pc in the encounter plane, combined covariance in the primary RIC frame",
+          "covarianceSourceValue": "Synthetic TLE-derived covariance (ootk cappedScreeningCovarianceFromTle), not an operator covariance; same as Debris Screening"
+        },
+        "passes": {
+          "object": "Object",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "Max El (deg)"
+        },
+        "diff": {
+          "status": "Status",
+          "secondary": "Secondary",
+          "name": "Name",
+          "preTca": "Pre TCA (UTC)",
+          "preMiss": "Pre Miss (km)",
+          "prePc": "Pre Pc",
+          "postTca": "Post TCA (UTC)",
+          "postMiss": "Post Miss (km)",
+          "postPc": "Post Pc",
+          "missChange": "Miss Change (km)",
+          "noId": "(no id)"
+        },
+        "status": {
+          "introduced": "Introduced",
+          "removed": "Removed",
+          "unchanged": "Unchanged",
+          "appeared": "Appeared (below threshold)",
+          "dropped": "Dropped (below threshold)",
+          "moved": "Moved"
+        },
+        "summary": {
+          "range": "{start} to {end}",
+          "preRunPrimary": "Pre Run Primary",
+          "preRunWindow": "Pre Run Window (UTC)",
+          "postRunPrimary": "Post Run Primary",
+          "postRunWindow": "Post Run Window (UTC)",
+          "concernThreshold": "Concern Threshold",
+          "concernThresholdValue": "{level} and above",
+          "excluded": "Excluded Secondaries",
+          "appearedDropped": "Appeared / Dropped (below threshold)"
+        },
+        "sections": {
+          "objects": "Objects",
+          "closestApproach": "Closest Approach",
+          "pcInputs": "Probability of Collision Inputs",
+          "sensorPasses": "Sensor Passes ({sensor})",
+          "relativeGeometry": "Relative Geometry (TCA +/- 5 min, 10 s)",
+          "burnsTotal": "Burns (total {dv} m/s)",
+          "burns": "Burns",
+          "meanElements": "Mean Elements, Pre vs Post",
+          "closeApproachTo": "Close Approach to {name} ({id}), Pre vs Post",
+          "diffSummary": "Screening Diff Summary",
+          "diffManeuver": "Screening Diff (parent before vs analyst after)",
+          "diffCompare": "Screening Diff (older run vs newer run)"
+        },
+        "elements": {
+          "header": "Mean Element (TLE)",
+          "pre": "Pre (parent, at Post epoch)",
+          "post": "Post (analyst)",
+          "change": "Change",
+          "epoch": "Epoch (UTC)",
+          "inclinationDeg": "Inclination (deg)",
+          "raanDeg": "RAAN (deg)",
+          "eccentricity": "Eccentricity",
+          "argPerigeeDeg": "Arg of Perigee (deg)",
+          "meanAnomalyDeg": "Mean Anomaly (deg)",
+          "meanMotionRevPerDay": "Mean Motion (rev/day)",
+          "periodMin": "Period (min)",
+          "apogeeKm": "Apogee (km)",
+          "perigeeKm": "Perigee (km)",
+          "semiMajorAxisKm": "Semi-Major Axis (km)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "Epoch (UTC)",
+          "frame": "Frame",
+          "dvInput": "Delta-V Input (m/s)",
+          "magnitude": "Magnitude (m/s)",
+          "source": "Source",
+          "label": "Label",
+          "parameters": "Burn Parameters",
+          "unavailable": "Burn parameters unavailable"
+        },
+        "compare": {
+          "pre": "Pre (parent)",
+          "post": "Post (analyst)",
+          "notFound": "Not found",
+          "miss": "Miss Distance (km)",
+          "ric": "R / I / C (km)",
+          "relSpeed": "Relative Speed (km/s)"
+        },
+        "notes": {
+          "noEncounter": "No closest approach inside the search window; widen the window or move the sim time closer to the event.",
+          "windowMismatchManeuver": "The pre and post screening runs cover different windows; events near the window edges may be classified wrongly.",
+          "windowMismatchCompare": "The two screening runs cover different windows; events near the window edges may be classified wrongly.",
+          "noScreeningRuns": "No screening runs available.",
+          "noSensor": "No sensor selected; select a sensor to list pass windows.",
+          "uncertaintyAssumed": "The analyst object's 1-sigma uncertainty and GP age are assumed from its parent ({parent}), and the close-approach Pc uses the parent's covariance. Burn execution error is not modelled."
+        }
       }
     }
   }

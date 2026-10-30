@@ -20,6 +20,9 @@
       "toasts": {
         "copied": "Link skopiowany do schowka!",
         "copyFailed": "Nie udało się skopiować linku do schowka."
+      },
+      "errorMsgs": {
+        "nativeShareFailed": "Natywne udostępnianie nie powiodło się: {error}"
       }
     }
   }

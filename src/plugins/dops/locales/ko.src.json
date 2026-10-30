@@ -31,7 +31,7 @@
         "twentyFourHourGpsDops": "24시간 GPS DOP"
       },
       "toast": {
-        "dopValues": "HDOP: {hdop}<br/>VDOP: {vdop}<br/>PDOP: {pdop}<br/>GDOP: {gdop}<br/>TDOP: {tdop}"
+        "dopValues": "HDOP: {hdop} | VDOP: {vdop} | PDOP: {pdop} | GDOP: {gdop} | TDOP: {tdop}"
       },
       "errorMsgs": {
         "invalidLocation": "24시간 DOP를 위해 지구의 유효한 위치를 선택하세요!"

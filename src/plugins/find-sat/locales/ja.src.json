@@ -74,7 +74,8 @@
         "TooManyResults": "{total} 件中 {limit} 件を表示しています。さらに表示するには検索設定の「検索の最大結果数」を増やしてください。エクスポートはすべての一致を保存します。",
         "TryFindingFirst": "まず衛星を検索してください！",
         "SearchFailed": "検索に失敗しました: {error}",
-        "NothingToExport": "エクスポートできる軌道データ付きの結果がありません"
+        "NothingToExport": "エクスポートできる軌道データ付きの結果がありません",
+        "NoMatchesToExport": "前回の検索では衛星が見つからなかったため、エクスポートするものがありません。"
       }
     }
   }

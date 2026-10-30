@@ -17,6 +17,7 @@ import { KeepTrack } from '@app/keeptrack';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { Kilometers, Milliseconds } from '@ootk/src/main';
 import { SettingsManager } from '../settings';
+import { buildTimeMachineOverlay } from './time-machine-overlay';
 
 export class SettingsPresets {
   static loadPresetMillionYear(settings: SettingsManager) {
@@ -51,18 +52,11 @@ export class SettingsPresets {
 
     settings.timeMachineString = (yearStr) => {
       ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
-      const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
-      const english = `In ${yearPrefix}${yearStr}`;
-      /*
-       * const french = `En ${yearPrefix}${yearStr}`;
-       * const german = `Im ${yearPrefix}${yearStr}`;
-       */
-      const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
-      const debrisSpan = '<span style="color: rgb(150, 150, 150);">Debris </span>';
+      const overlay = buildTimeMachineOverlay(yearStr, 'rgb(35, 255, 35)', 'rgb(150, 150, 150)');
 
-      document.getElementById('textOverlay')!.innerHTML = `${satellitesSpan} and ${debrisSpan} ${english}`;
+      document.getElementById('textOverlay')!.innerHTML = overlay.html;
 
-      return `${english}`;
+      return overlay.inYear;
     };
     settings.onLoadCb = () => {
       // Create div for textOverlay
@@ -179,18 +173,11 @@ export class SettingsPresets {
 
     settings.timeMachineString = (yearStr) => {
       ServiceLocator.getUiManager().dismissAllToasts(); // Dismiss All Toast Messages (workaround to avoid animations)
-      const yearPrefix = parseInt(yearStr) < 57 ? '20' : '19';
-      const english = `In ${yearPrefix}${yearStr}`;
-      /*
-       * const french = `En ${yearPrefix}${yearStr}`;
-       * const german = `Im ${yearPrefix}${yearStr}`;
-       */
-      const satellitesSpan = '<span style="color: rgb(35, 255, 35);">Satellites </span>';
-      const debrisSpan = '<span style="color: rgb(150, 150, 150);">Debris </span>';
+      const overlay = buildTimeMachineOverlay(yearStr, 'rgb(35, 255, 35)', 'rgb(150, 150, 150)');
 
-      setInnerHtml('textOverlay', `${satellitesSpan} and ${debrisSpan} ${english}`);
+      setInnerHtml('textOverlay', overlay.html);
 
-      return `${english}`;
+      return overlay.inYear;
     };
     settings.onLoadCb = () => {
       // Create div for textOverlay

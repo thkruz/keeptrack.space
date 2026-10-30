@@ -137,7 +137,7 @@ const settingsOverride = {
       enabled: false,
       order: 90,
     },
-    OrbitGuardMenuPlugin: {
+    KtocNoticesPlugin: {
       enabled: false,
       order: 91,
     },
@@ -228,10 +228,6 @@ const settingsOverride = {
       enabled: false,
       order: 350,
     },
-    GunterLaunchCalendar: {
-      enabled: false,
-      order: 351,
-    },
     Calculator: {
       enabled: false,
       order: 400,
@@ -280,10 +276,6 @@ const settingsOverride = {
       enabled: false,
       order: 592,
     },
-    AboutMenuPlugin: {
-      enabled: false,
-      order: 601,
-    },
     VcrPlugin: {
       enabled: false, // Disabled by default
       order: 1000,
@@ -315,9 +307,6 @@ const settingsOverride = {
       enabled: false,
     },
     SatInfoBoxMission: {
-      enabled: false,
-    },
-    SatInfoBoxManeuver: {
       enabled: false,
     },
     SatInfoBoxOrbital: {

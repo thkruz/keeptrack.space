@@ -65,6 +65,7 @@
         "plannedFuture": "将来のアップデートで予定。"
       },
       "filterPlaceholder": "天体を絞り込む…",
+      "filterNoMatches": "一致する天体はありません",
       "commands": {
         "toggleMenu": "惑星メニューの切り替え",
         "centerOn": "{body} にカメラを合わせる"
@@ -75,7 +76,6 @@
         "imgCaption": "任意の天体をクリックすると、カメラがその天体を中心に表示します。",
         "howToUse": "<ol><li>ドロワーから<strong>惑星</strong>メニューを開くか、<strong>P</strong>キーを押します。</li><li>天体（例えば<strong>火星</strong>や<strong>月</strong>）をクリックします。カメラがその天体を中心に再配置され、ズーム制限が新しいスケールに合わせて調整されます。</li><li><strong>Home</strong>キーで地球に戻るか、<strong>Shift</strong>+<strong>Home</strong>で地球を画面中央に戻します。</li></ol>",
         "tip1": "衛星の軌道は、その惑星の系の内側からのみ描画されます。まず木星や土星を中心に設定してください。",
-        "tip2": "何もない空間を右クリックして、コンテキストメニューから天体を選ぶこともできます。",
         "shortcutToggle": "惑星メニューを切り替える",
         "shortcutHome": "地球を中心天体に設定する",
         "shortcutCenterEarth": "カメラを地球に合わせる"

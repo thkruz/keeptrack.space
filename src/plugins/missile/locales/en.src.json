@@ -143,14 +143,28 @@
       "msgs": {
         "simLoaded": "{sim} Loaded",
         "simLoadFailed": "Failed to load {sim}",
-        "missilesActive": "{n} / {max} missiles active"
+        "missilesActive": "{n} / {max} missiles active",
+        "massRaidLoaded": "Missile Mass Raid Loaded Successfully",
+        "missileCreated": "Missile Named RV_{n}<br>has been created.",
+        "mirvCreated": "{n} reentry vehicle(s) (MIRV)<br>have been created."
       },
       "errorMsgs": {
         "invalidTargetLatitude": "Invalid Target Latitude!",
         "invalidTargetLongitude": "Invalid Target Longitude!",
         "invalidLaunchLatitude": "Invalid Launch Latitude!",
         "invalidLaunchLongitude": "Invalid Launch Longitude!",
-        "invalidWarheads": "Warheads must be a whole number from 1 to 12."
+        "invalidWarheads": "Warheads must be a whole number from 1 to 12.",
+        "maxMissiles": "Error: Maximum number of missiles<br>have been reached.",
+        "launchLatRange": "Error: Launch Latitude must be<br>between 90 and -90 degrees",
+        "launchLonRange": "Error: Launch Longitude must be<br>between 180 and -180 degrees",
+        "targetLatRange": "Error: Target Latitude must be<br>between 90 and -90 degrees",
+        "targetLonRange": "Error: Target Longitude must be<br>between 180 and -180 degrees",
+        "minDistance": "Error: This missile has a minimum distance of 320 km.",
+        "maxDistance": "Error: This missile has a maximum distance of {km} km.",
+        "tooClose": "Error: This distance is too close for the selected missile.",
+        "orbitalVelocity": "Error: The missile reached orbital velocity<br>(motor too large for this range).",
+        "overshot": "Error: The missile overshot its target<br>(motor too large for this range).",
+        "notGuided": "Error: The missile could not be guided<br>to its target at this range."
       },
       "commands": {
         "open": "Open Missile Plugin",

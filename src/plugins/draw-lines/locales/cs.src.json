@@ -48,7 +48,8 @@
       },
       "errorMsgs": {
         "noPrimarySat": "Nebyl vybrán primární satelit pro linii satelit–satelit.",
-        "noSatSelected": "Nejprve vyberte satelit."
+        "noSatSelected": "Nejprve vyberte satelit.",
+        "noSensorSelected": "Nejprve vyberte senzor."
       }
     }
   }

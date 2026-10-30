@@ -10,9 +10,10 @@
       "labels": {
         "dropzone": "Trascina qui un file .tce, .tle o .txt per caricare il catalogo",
         "keepSatInfo": "Mantieni informazioni satelliti",
-        "keepSatInfoTooltip": "Aggiorna i TLE dei satelliti esistenti preservandone nome, paese e dati di missione. I satelliti non presenti nel file importato vengono rimossi.",
+        "keepSatInfoTooltip": "Aggiorna i TLE dei satelliti esistenti preservandone nome, paese e dati di missione. I satelliti non presenti nel file importato vengono rimossi, compresi gli oggetti JSC Vimpel senza numero NORAD.",
         "importNewOnly": "Importa solo i nuovi satelliti",
         "importNewOnlyTooltip": "Aggiunge solo i satelliti non ancora presenti nel catalogo corrente. I satelliti esistenti rimangono invariati.",
+        "replaceCatalogTooltip": "Con entrambi gli interruttori disattivati, il file sostituisce l'intero catalogo: restano solo gli oggetti del file, quindi gli oggetti JSC Vimpel senza numero NORAD vengono rimossi.",
         "orbitalElements": "Elementi orbitali",
         "tabularStk": "Tabellare e STK",
         "selectedSatellite": "Satellite selezionato",
@@ -45,6 +46,7 @@
         "loadedCatalog": "Catalogo caricato da {file}",
         "failedToLoad": "Impossibile caricare {file}",
         "noSatelliteSelected": "Nessun satellite selezionato!",
+        "noSensorSelected": "Nessun sensore selezionato!",
         "exportTooLarge": "Esportazione troppo grande. Riduci l'intervallo di tempo o aumenta la dimensione del passo.",
         "failedToPropagate": "Impossibile propagare il satellite!"
       },

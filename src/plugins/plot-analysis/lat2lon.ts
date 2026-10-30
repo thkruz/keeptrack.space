@@ -1,15 +1,16 @@
+import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
-import { Satellite, SpaceObjectType } from '@ootk/src/main';
+import { eci2lla, RAD2DEG, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import scatterPlot4Png from '@public/img/icons/scatter-plot4.png';
 import * as echarts from 'echarts';
 import 'echarts-gl';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { t7e } from '@app/locales/keys';
+import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './lat2lon.css';
@@ -40,8 +41,10 @@ export class Lat2LonPlots extends KeepTrackPlugin {
   bottomIconImg = scatterPlot4Png;
   bottomIconCallback = () => {
     const chartDom = getEl(this.plotCanvasId)!;
+    // The plot is a snapshot: take one sim time and use it for both the positions and the subtitle.
+    const snapshotTime = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
 
-    this.createPlot(Lat2LonPlots.getPlotData(), chartDom);
+    this.createPlot(Lat2LonPlots.getPlotData(snapshotTime), chartDom, snapshotTime);
   };
 
   plotCanvasId = 'plot-analysis-chart-lat2lon';
@@ -76,7 +79,14 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     super.addHtml();
   }
 
-  createPlot(data: Record<string, SatPoint[]>, chartDom: HTMLElement) {
+  /** Chart subtitle naming the snapshot sim time in UTC, e.g. "Snapshot at 2026-10-26 12:00:00 UTC". */
+  static snapshotSubtitle(snapshotTime: Date): string {
+    const utc = snapshotTime.toISOString().replace('T', ' ').slice(0, 19);
+
+    return t7e('plugins.Lat2LonPlots.chart.snapshotTime').replace('{time}', utc);
+  }
+
+  createPlot(data: Record<string, SatPoint[]>, chartDom: HTMLElement, snapshotTime: Date = ServiceLocator.getTimeManager().getOffsetTimeObj(0)) {
     // Dont Load Anything if the Chart is Closed
     if (!this.isMenuButtonActive) {
       return;
@@ -99,10 +109,14 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     this.chart.setOption({
       animation: false,
       title: {
-        text: 'Latitude vs Longitude Plot',
+        text: t7e('plugins.Lat2LonPlots.chart.title'),
+        subtext: Lat2LonPlots.snapshotSubtitle(snapshotTime),
         textStyle: {
           fontSize: 16,
           color: '#fff',
+        },
+        subtextStyle: {
+          color: '#ccc',
         },
       },
       legend: {
@@ -122,19 +136,19 @@ export class Lat2LonPlots extends KeepTrackPlugin {
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
                 <div style="font-weight: bold;"> ${point.name}</div>
               </div>
-              <div><bold>Latitude:</bold> ${point.value[1].toFixed(3)}°</div>
-              <div><bold>Longitude:</bold> ${point.value[0].toFixed(3)}°</div>
+              <div><bold>${t7e('plugins.Lat2LonPlots.chart.latitude')}:</bold> ${point.value[1].toFixed(3)}°</div>
+              <div><bold>${t7e('plugins.Lat2LonPlots.chart.longitude')}:</bold> ${point.value[0].toFixed(3)}°</div>
             </div>
           `;
         },
       },
       xAxis: {
-        name: 'Longitude (°)',
+        name: t7e('plugins.Lat2LonPlots.chart.xAxis'),
         type: 'value',
         position: 'bottom',
       },
       yAxis: {
-        name: 'Latitude (°)',
+        name: t7e('plugins.Lat2LonPlots.chart.yAxis'),
         type: 'value',
         position: 'left',
       },
@@ -182,9 +196,56 @@ export class Lat2LonPlots extends KeepTrackPlugin {
     });
   }
 
-  static getPlotData(): Record<string, SatPoint[]> {
+  /** Localized country name for an ISO 3166 region code, falling back to English when Intl lacks it. */
+  private static regionNameResolver_(): (isoCode: string, fallback: string) => string {
+    let displayNames: Intl.DisplayNames | null = null;
+
+    try {
+      displayNames = new Intl.DisplayNames([i18next.language || 'en'], { type: 'region' });
+    } catch {
+      displayNames = null;
+    }
+
+    return (isoCode, fallback) => displayNames?.of(isoCode) ?? fallback;
+  }
+
+  /**
+   * Subpoint and osculating inclination of a satellite at one time, both from the same SGP4 state.
+   * Null when there is no Earth-orbit state to plot: a failed propagation (SatMath.getEci returns a
+   * zero vector), a deep-space probe without a TLE, or any non-finite result.
+   */
+  static propagatedSubpoint(sat: Satellite, now: Date): { lat: number; lon: number; inclinationDeg: number } | null {
+    const { position, velocity } = SatMath.getEci(sat, now);
+
+    if (!position || !velocity) {
+      return null;
+    }
+    const isZero = position.x === 0 && position.y === 0 && position.z === 0;
+
+    if (isZero || ![position.x, position.y, position.z, velocity.x, velocity.y, velocity.z].every(Number.isFinite)) {
+      return null;
+    }
+
+    const { gmst } = SatMath.calculateTimeVariables(now);
+    const lla = eci2lla(position as TemeVec3, gmst);
+    // Inclination of the propagated orbit plane: h = r x v, i = acos(h_z / |h|).
+    const hx = position.y * velocity.z - position.z * velocity.y;
+    const hy = position.z * velocity.x - position.x * velocity.z;
+    const hz = position.x * velocity.y - position.y * velocity.x;
+    const inclinationDeg = Math.atan2(Math.hypot(hx, hy), hz) * RAD2DEG;
+
+    if (!Number.isFinite(lla.lat) || !Number.isFinite(lla.lon) || !Number.isFinite(inclinationDeg)) {
+      return null;
+    }
+
+    return { lat: lla.lat, lon: lla.lon, inclinationDeg };
+  }
+
+  static getPlotData(now: Date = ServiceLocator.getTimeManager().getOffsetTimeObj(0)): Record<string, SatPoint[]> {
     const catalogManager = ServiceLocator.getCatalogManager();
     const countryData: Record<string, SatPoint[]> = {};
+    const regionName = Lat2LonPlots.regionNameResolver_();
+    const otherLabel = t7e('plugins.Lat2LonPlots.chart.other');
 
     catalogManager.objectCache.forEach((obj) => {
       if (obj.type !== SpaceObjectType.PAYLOAD) {
@@ -208,37 +269,46 @@ export class Lat2LonPlots extends KeepTrackPlugin {
 
       // Get current position (single orbit point)
       sat = catalogManager.getObject(sat.id, GetSatType.POSITION_ONLY) as Satellite;
-      const llaPoints = SatMathApi.getLlaOfCurrentOrbit(sat, 1);
+      const lla = sat ? Lat2LonPlots.propagatedSubpoint(sat, now) : null;
 
-      if (!llaPoints || llaPoints.length === 0) {
+      // No finite subpoint (deep-space probes, failed propagation): nothing to plot.
+      if (!lla) {
         return;
       }
-      const lla = llaPoints[0];
+
+      /*
+       * The TLE inclination above is the mean value at the TLE epoch. A stale GEO TLE (EKRAN 5: epoch
+       * 1994, i = 11.3 deg) propagated decades forward has a very different plane, so re-check the
+       * inclination of the same propagated state that gives the plotted subpoint.
+       */
+      if (lla.inclinationDeg > Lat2LonPlots.maxInclination_) {
+        return;
+      }
 
       let country = '';
 
       switch (sat.country) {
         case 'US':
-          country = 'USA';
+          country = regionName('US', 'USA');
           break;
         case 'F':
-          country = 'France';
+          country = regionName('FR', 'France');
           break;
         case 'RU':
         case 'USSR':
-          country = 'Russia';
+          country = regionName('RU', 'Russia');
           break;
         case 'CN':
-          country = 'China';
+          country = regionName('CN', 'China');
           break;
         case 'IN':
-          country = 'India';
+          country = regionName('IN', 'India');
           break;
         case 'J':
-          country = 'Japan';
+          country = regionName('JP', 'Japan');
           break;
         default:
-          country = 'Other';
+          country = otherLabel;
           break;
       }
 

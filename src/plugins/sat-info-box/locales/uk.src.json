@@ -30,10 +30,14 @@
       "external": "Зовнішні"
     },
     "notAvailable": "Н/Д",
+    "notAvailableJscVimpel": "Н/Д (JSC Vimpel)",
     "oemFile": "Файл OEM",
     "copy": {
       "copied": "Скопійовано в буфер обміну",
       "tooltip": "Натисніть, щоб скопіювати"
+    },
+    "errorMsgs": {
+      "htmlNotReady": "Панель інформації про супутник не завантажилася повністю, тому її дані не вдалося оновити."
     }
   }
 }

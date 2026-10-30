@@ -1,0 +1,10 @@
+{
+  "plugins": {
+    "Tooltips": {
+      "errorMsgs": {
+        "missingAttribute": "Не удалось создать подсказку: у элемента нет атрибута kt-tooltip.",
+        "missingElement": "Не удалось создать подсказку: элемент равен null или не определён."
+      }
+    }
+  }
+}

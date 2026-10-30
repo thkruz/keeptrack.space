@@ -1,15 +1,16 @@
 /* eslint-disable complexity */
+
 import { ColorInformation, Pickable, rgbaArray } from '@app/engine/core/interfaces';
 import { html } from '@app/engine/utils/development/formatter';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { ColorScheme } from './color-scheme';
+import { legendLabel } from './legend-label';
 
 export class SmallSatColorScheme extends ColorScheme {
   readonly label = t7e('colorSchemes.SmallSatColorScheme.label' as Parameters<typeof t7e>[0]);
   readonly id = 'SmallSatColorScheme';
   static readonly id = 'SmallSatColorScheme';
-  isOptionInRmbMenu = false;
 
   static readonly uniqueObjectTypeFlags = {
     satSmall: true,
@@ -55,12 +56,14 @@ export class SmallSatColorScheme extends ColorScheme {
     };
   }
 
-  static readonly layersHtml = html`
+  static get layersHtml(): string {
+    return html`
   <ul id="layers-list-small">
     <li>
       <div class="Square-Box layers-satSmall-box"></div>
-      Small Satellite
+      ${legendLabel('smallSatellite')}
     </li>
   </ul>
   `.trim();
+  }
 }

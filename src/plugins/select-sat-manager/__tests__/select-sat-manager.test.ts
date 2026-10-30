@@ -116,6 +116,16 @@ describe('SelectSatManager_class', () => {
     expect(selectSatManager.selectedSat).toBe(-1);
   });
 
+  it('clears primary identity when the requested object is inactive', () => {
+    selectSatManager.selectSat(0);
+    const inactive = ServiceLocator.getCatalogManager().objectCache[1];
+
+    inactive.active = false;
+    selectSatManager.selectSat(1);
+    expect(selectSatManager.selectedSat).toBe(-1);
+    expect(selectSatManager.primarySatObj.id).toBe(-1);
+  });
+
   it('should switch primary and secondary satellites', () => {
     selectSatManager.selectSat(0);
     selectSatManager.setSecondarySat(1);
@@ -308,6 +318,7 @@ describe('SelectSatManager_class', () => {
     selectSatManager.setSecondarySat(1);
 
     expect(selectSatManager.selectedSat).toBe(-1);
+    expect(selectSatManager.primarySatObj.id).toBe(-1);
   });
 
   it('should clear the secondary orbit when the secondary is cleared', () => {
@@ -471,6 +482,27 @@ describe('SelectSatManager_planetViewCleanup', () => {
 
     expect(settingsManager.centerBody).toBe(SolarBody.Earth);
     expect(clearSpy).toHaveBeenCalled();
+  });
+
+  it('recolours the catalog at Earth scale after a pick from a planet view', () => {
+    vi.spyOn(planetsMenu, 'clearHeliocentricOrbits').mockImplementation(() => undefined);
+    const colorSchemeManager = ServiceLocator.getColorSchemeManager();
+    const zoomAtForcedRecolour: number[] = [];
+
+    vi.spyOn(colorSchemeManager, 'calculateColorBuffers').mockImplementation((isForceRecolor?: boolean) => {
+      if (isForceRecolor) {
+        zoomAtForcedRecolour.push(settingsManager.maxZoomDistance);
+      }
+    });
+
+    settingsManager.centerBody = SolarBody.Jupiter;
+    settingsManager.maxZoomDistance = 13e9 as Kilometers;
+
+    selectSatManager.selectSat(0);
+
+    // The forced recolour has to run after the ceiling drops back under 2e6 km, or the color
+    // schemes keep blanking every GP/TLE object (the planet-view rule).
+    expect(zoomAtForcedRecolour.some((zoom) => zoom <= 2e6)).toBe(true);
   });
 
   it('leaves lines alone when the camera was already Earth-centered', () => {

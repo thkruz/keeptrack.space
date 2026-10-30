@@ -81,13 +81,273 @@
       "errorMsgs": {
         "notSupportedForObject": "所选对象不支持此报告。",
         "generationFailed": "报告生成失败",
-        "parentNotFound": "父目标 {scc} 不在目录中"
+        "parentNotFound": "父目标 {scc} 不在目录中",
+        "reportOverwrite": "ID 为“{id}”的报告已注册，将被覆盖。"
       },
       "reasons": {
         "selectSecondary": "请先选择次目标",
         "selectAnalyst": "请选择由机动工具创建的分析卫星",
         "needTwoRuns": "请先至少运行两次 Debris Screening",
         "screeningRunsMissing": "筛查比较不可用:请在同一窗口内分别对 {parent} 和 {analyst} 运行 Debris Screening,然后重新生成此报告。"
+      },
+      "doc": {
+        "header": {
+          "date": "日期",
+          "satellite": "卫星",
+          "noradId": "NORAD ID",
+          "altId": "备用 ID",
+          "intlDes": "国际编号",
+          "none": "无",
+          "sensor": "传感器",
+          "type": "类型",
+          "latitude": "纬度",
+          "longitude": "经度",
+          "altitude": "高度",
+          "minAz": "最小方位角",
+          "maxAz": "最大方位角",
+          "minEl": "最小仰角",
+          "maxEl": "最大仰角",
+          "minRng": "最小距离",
+          "maxRng": "最大距离",
+          "windowLine": "报告时段：{start} 至 {end} UTC，步长：{step} 秒",
+          "generatedWallClock": "生成时间（实际时间）",
+          "appVersion": "KeepTrack 版本",
+          "ricConvention": "RIC 约定"
+        },
+        "titles": {
+          "aer": "方位角、仰角、距离报告",
+          "lla": "纬度、经度、高度报告",
+          "eci": "地心惯性坐标 (TEME) 报告",
+          "coes": "经典轨道根数报告",
+          "visibility": "可见窗口报告",
+          "sunEclipse": "日照/阴影分析报告",
+          "conjunction": "交会报告",
+          "maneuver": "机动报告",
+          "screeningCompare": "筛查对比报告"
+        },
+        "cols": {
+          "timeUtc": "时间 (UTC)",
+          "pass": "过境",
+          "azimuthDeg": "方位角(°)",
+          "elevationDeg": "仰角(°)",
+          "rangeKm": "距离(km)",
+          "latitudeDeg": "纬度(°)",
+          "longitudeDeg": "经度(°)",
+          "altitudeKm": "高度(km)",
+          "posX": "位置 X(km)",
+          "posY": "位置 Y(km)",
+          "posZ": "位置 Z(km)",
+          "velX": "速度 X(km/s)",
+          "velY": "速度 Y(km/s)",
+          "velZ": "速度 Z(km/s)",
+          "element": "根数",
+          "value": "数值",
+          "passNum": "过境编号",
+          "riseTime": "升起时间 (UTC)",
+          "setTime": "落下时间 (UTC)",
+          "durationMin": "持续时间（分钟）",
+          "maxElDeg": "最大仰角(°)",
+          "maxElTime": "最大仰角时间 (UTC)",
+          "note": "备注",
+          "sunIlluminated": "日照",
+          "eclipseType": "阴影类型",
+          "sunAngleDeg": "太阳角(°)",
+          "offsetSec": "偏移（秒）",
+          "rangeKmSpaced": "距离 (km)",
+          "radialKm": "径向 (km)",
+          "intrackKm": "沿迹 (km)",
+          "crosstrackKm": "横迹 (km)",
+          "relSpeed": "相对速度 (km/s)"
+        },
+        "empty": {
+          "noPasses": "未找到过境！",
+          "noPassesWindow": "报告时段内未找到过境！",
+          "noApproach": "搜索窗口内未找到最近接近点。",
+          "noScreeningEvents": "两次运行中均无筛查事件。"
+        },
+        "passEdge": {
+          "continuous": "持续可见",
+          "start": "开始时可见",
+          "end": "结束时可见"
+        },
+        "illumination": {
+          "sun": "是",
+          "penumbral": "部分",
+          "umbral": "否",
+          "unknown": "未知"
+        },
+        "eclipse": {
+          "sun": "无",
+          "penumbral": "半影",
+          "umbral": "本影",
+          "unknown": "未知"
+        },
+        "coes": {
+          "note": "注：状态历元的密切根数 (J2000)，由传播后的状态向量推导。\n它们与目录中用于远地点/近地点的 TLE 平均根数不同。",
+          "elementSet": "根数集",
+          "osculatingJ2000": "密切根数 (J2000)",
+          "tleEpoch": "TLE 历元 (UTC)",
+          "stateEpoch": "状态历元（密切，UTC）",
+          "apogee": "远地点",
+          "perigee": "近地点",
+          "inclination": "轨道倾角",
+          "rightAscension": "升交点赤经",
+          "argOfPerigee": "近地点幅角",
+          "trueAnomaly": "真近点角",
+          "eccentricity": "偏心率",
+          "period": "周期",
+          "semiMajorAxis": "半长轴",
+          "meanMotion": "平均运动"
+        },
+        "objects": {
+          "field": "字段",
+          "name": "名称",
+          "noradId": "NORAD ID",
+          "cosparId": "COSPAR ID",
+          "tleEpoch": "TLE 历元 (UTC)",
+          "gpAge": "GP 时效",
+          "sigma": "1-sigma R / I / C（km，自身 RIC 坐标系，TLE 历元时）",
+          "derivedFrom": "派生自",
+          "days": "{days} 天",
+          "assumedFromParent": "(沿用父对象)"
+        },
+        "roles": {
+          "primary": "主目标",
+          "secondary": "次目标",
+          "parent": "原目标",
+          "analyst": "分析目标"
+        },
+        "encounter": {
+          "tca": "TCA (UTC)",
+          "miss": "最近距离",
+          "radial": "径向 (R)",
+          "intrack": "沿迹 (I)",
+          "crosstrack": "横迹 (C)",
+          "relSpeed": "相对速度",
+          "risk": "风险等级",
+          "searchWindow": "搜索窗口 (UTC)",
+          "searchWindowValue": "{start} 至 {end}（+/- {hours} 小时）"
+        },
+        "risk": {
+          "critical": "严重",
+          "high": "高",
+          "medium": "中",
+          "low": "低",
+          "unknown": "未知"
+        },
+        "common": {
+          "value": "数值",
+          "quantity": "量",
+          "item": "项目"
+        },
+        "pcInputs": {
+          "input": "Pc 输入",
+          "method": "方法",
+          "primaryHbr": "主目标硬体半径",
+          "secondaryHbr": "次目标硬体半径",
+          "combinedHbr": "组合硬体半径",
+          "covarianceSource": "协方差来源",
+          "confidence": "置信水平 (k)",
+          "sigmaCaps": "1-sigma 上限 R / I / C",
+          "methodValue": "ootk ConjunctionAssessment：交会平面内的二维 Pc，主目标 RIC 坐标系中的组合协方差",
+          "covarianceSourceValue": "由 TLE 推导的合成协方差 (ootk cappedScreeningCovarianceFromTle)，并非运营方协方差；与碎片筛查相同"
+        },
+        "passes": {
+          "object": "目标",
+          "aos": "AOS (UTC)",
+          "los": "LOS (UTC)",
+          "maxEl": "最大仰角（度）"
+        },
+        "diff": {
+          "status": "状态",
+          "secondary": "次目标",
+          "name": "名称",
+          "preTca": "之前 TCA (UTC)",
+          "preMiss": "之前距离 (km)",
+          "prePc": "之前 Pc",
+          "postTca": "之后 TCA (UTC)",
+          "postMiss": "之后距离 (km)",
+          "postPc": "之后 Pc",
+          "missChange": "距离变化 (km)",
+          "noId": "（无 ID）"
+        },
+        "status": {
+          "introduced": "新增",
+          "removed": "消除",
+          "unchanged": "未变",
+          "appeared": "出现（低于阈值）",
+          "dropped": "消失（低于阈值）",
+          "moved": "已移动"
+        },
+        "summary": {
+          "range": "{start} 至 {end}",
+          "preRunPrimary": "之前运行的主目标",
+          "preRunWindow": "之前运行的窗口 (UTC)",
+          "postRunPrimary": "之后运行的主目标",
+          "postRunWindow": "之后运行的窗口 (UTC)",
+          "concernThreshold": "关注阈值",
+          "concernThresholdValue": "{level} 及以上",
+          "excluded": "排除的次目标",
+          "appearedDropped": "出现 / 消失（低于阈值）"
+        },
+        "sections": {
+          "objects": "目标",
+          "closestApproach": "最近接近",
+          "pcInputs": "碰撞概率输入",
+          "sensorPasses": "传感器过境（{sensor}）",
+          "relativeGeometry": "相对几何（TCA +/- 5 分钟，10 秒）",
+          "burnsTotal": "点火（共 {dv} m/s）",
+          "burns": "点火",
+          "meanElements": "平均根数，之前与之后",
+          "closeApproachTo": "接近 {name} ({id})，之前与之后",
+          "diffSummary": "筛查对比摘要",
+          "diffManeuver": "筛查对比（原目标之前，分析目标之后）",
+          "diffCompare": "筛查对比（较早运行与较新运行）"
+        },
+        "elements": {
+          "header": "平均根数 (TLE)",
+          "pre": "之前（原目标，按之后历元）",
+          "post": "之后（分析目标）",
+          "change": "变化",
+          "epoch": "历元 (UTC)",
+          "inclinationDeg": "轨道倾角（度）",
+          "raanDeg": "RAAN（度）",
+          "eccentricity": "偏心率",
+          "argPerigeeDeg": "近地点幅角（度）",
+          "meanAnomalyDeg": "平近点角（度）",
+          "meanMotionRevPerDay": "平均运动（圈/天）",
+          "periodMin": "周期（分钟）",
+          "apogeeKm": "远地点 (km)",
+          "perigeeKm": "近地点 (km)",
+          "semiMajorAxisKm": "半长轴 (km)",
+          "bstar": "B*"
+        },
+        "burns": {
+          "epoch": "历元 (UTC)",
+          "frame": "坐标系",
+          "dvInput": "输入 Delta-V (m/s)",
+          "magnitude": "大小 (m/s)",
+          "source": "来源",
+          "label": "标签",
+          "parameters": "点火参数",
+          "unavailable": "点火参数不可用"
+        },
+        "compare": {
+          "pre": "之前（原目标）",
+          "post": "之后（分析目标）",
+          "notFound": "未找到",
+          "miss": "最近距离 (km)",
+          "ric": "R / I / C (km)",
+          "relSpeed": "相对速度 (km/s)"
+        },
+        "notes": {
+          "noEncounter": "搜索窗口内没有最近接近点；请扩大窗口或将仿真时间移近该事件。",
+          "windowMismatchManeuver": "之前与之后的筛查运行覆盖的窗口不同；靠近窗口边缘的事件可能被错误分类。",
+          "windowMismatchCompare": "两次筛查运行覆盖的窗口不同；靠近窗口边缘的事件可能被错误分类。",
+          "noScreeningRuns": "没有可用的筛查运行。",
+          "noSensor": "未选择传感器；请选择传感器以列出过境窗口。",
+          "uncertaintyAssumed": "分析对象的 1-sigma 不确定度和 GP 时长沿用其父对象 ({parent})，最接近点的 Pc 也使用父对象的协方差。未对机动执行误差建模。"
+        }
       }
     }
   }

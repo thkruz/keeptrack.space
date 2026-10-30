@@ -1,4 +1,5 @@
-import { openColorbox } from '@app/engine/utils/colorbox';
+import { createColorbox, openColorbox } from '@app/engine/utils/colorbox';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getElAll from '@app/engine/utils/get-el';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
@@ -122,6 +123,31 @@ describe('openColorbox_function', () => {
     expect(colorboxImg.style.display).toBe('none');
   });
 
+  // Image load failures toast the caller's message (e.g. naming the source) and keep the URL for the console
+  it('test_image_error_uses_custom_message', () => {
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    openColorbox('https://www.example.com/a.jpg', { image: true, imageErrorMessage: 'Could not load the Example image' });
+    vi.advanceTimersByTime(2000);
+    (<HTMLImageElement>getEl('colorbox-img')).onerror!(new Event('error'));
+
+    expect(warn).toHaveBeenCalledWith('Could not load the Example image', 'https://www.example.com/a.jpg');
+    warn.mockRestore();
+  });
+
+  // Without a custom message the generic text names the URL
+  it('test_image_error_default_message', () => {
+    const warn = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+    openColorbox('https://www.example.com/b.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    (<HTMLImageElement>getEl('colorbox-img')).onerror!(new Event('error'));
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('https://www.example.com/b.jpg');
+    warn.mockRestore();
+  });
+
   // Tests that colorbox is closed when clicked
   it('test_close_colorbox', () => {
     // Create a spyon
@@ -137,5 +163,104 @@ describe('openColorbox_function', () => {
     vi.advanceTimersByTime(1000);
 
     expect(cb).toHaveBeenCalled();
+  });
+});
+
+describe('colorbox new tab and blank-page hint', () => {
+  beforeEach(() => {
+    KeepTrack.getInstance().containerRoot = document.body as HTMLDivElement;
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+    createColorbox();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const hint = () => <HTMLElement>getEl('colorbox-hint');
+  const openButton = () => <HTMLButtonElement>getEl('colorbox-open-button');
+
+  it('opens the iframe source in a new tab with noopener,noreferrer', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    openButton().click();
+
+    expect(open).toHaveBeenCalledWith('https://www.example.com/page.htm', '_blank', 'noopener,noreferrer');
+  });
+
+  it('opens an image source in a new tab with noopener,noreferrer', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    openColorbox('https://www.example.com/a.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    openButton().click();
+
+    expect(open).toHaveBeenCalledWith('https://www.example.com/a.jpg', '_blank', 'noopener,noreferrer');
+  });
+
+  it('the new-tab button follows the iframe again after an image colorbox', () => {
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+
+    openColorbox('https://www.example.com/a.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    openButton().click();
+
+    expect(open).toHaveBeenLastCalledWith('https://www.example.com/page.htm', '_blank', 'noopener,noreferrer');
+  });
+
+  it('shows the blank-page hint for an external iframe', () => {
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+
+    expect(hint().style.display).toBe('inline');
+    expect(hint().textContent).toBe('Page blank? Open it in a new tab.');
+  });
+
+  it('hides the hint for a same-origin iframe and for images', () => {
+    openColorbox(`${window.location.origin}/local.html`);
+    vi.advanceTimersByTime(2000);
+    expect(hint().style.display).toBe('none');
+
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    openColorbox('https://www.example.com/a.jpg', { image: true });
+    vi.advanceTimersByTime(2000);
+    expect(hint().style.display).toBe('none');
+  });
+
+  it('a click on the hint does not close the colorbox', () => {
+    openColorbox('https://www.example.com/page.htm');
+    vi.advanceTimersByTime(2000);
+    hint().click();
+    vi.advanceTimersByTime(1000);
+
+    expect((<HTMLElement>getEl('colorbox-div')).style.display).toBe('block');
+  });
+});
+
+describe('colorbox rebuild after the DOM is replaced', () => {
+  beforeEach(() => {
+    KeepTrack.getInstance().containerRoot = document.body as HTMLDivElement;
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+  });
+
+  it('rebuilds the colorbox when its element is gone after the first open', () => {
+    openColorbox('https://www.example.com/first');
+    vi.advanceTimersByTime(1000);
+    expect(getEl('colorbox-div', true)).not.toBeNull();
+
+    // A fresh DOM (re-rendered root, or the next test's environment) drops the colorbox.
+    KeepTrack.getInstance().containerRoot.innerHTML = '';
+    expect(getEl('colorbox-div', true)).toBeNull();
+
+    expect(() => openColorbox('https://www.example.com/second')).not.toThrow();
+    vi.advanceTimersByTime(1000);
+
+    expect(getEl('colorbox-div', true)).not.toBeNull();
+    expect((<HTMLIFrameElement>getEl('colorbox-iframe')).src).toBe('https://www.example.com/second');
   });
 });

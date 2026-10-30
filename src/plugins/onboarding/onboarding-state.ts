@@ -12,6 +12,14 @@ export const CHAPTER_IDS = ['essentials', 'sensors', 'watchlist', 'time', 'analy
 
 export type ChapterId = (typeof CHAPTER_IDS)[number];
 
+/**
+ * Create-account card lifecycle (anonymous Pro only): 'none' = not offered
+ * yet (offered at tour end); 'later' = "Maybe later" at tour end, offered once
+ * more at the start of the next visit; 'shown' = done for good (second
+ * showing happened, or the user signed up / in).
+ */
+export type AccountPromptStatus = 'none' | 'later' | 'shown';
+
 export type ChapterStatus = 'not-started' | 'in-progress' | 'done' | 'skipped';
 
 export interface ChapterProgress {
@@ -33,6 +41,13 @@ export interface OnboardingState {
   };
   /** Per-chapter power-tour progress (v2 chapter hub). */
   powerChapters: Record<ChapterId, ChapterProgress>;
+  /**
+   * Basics task steps the user performed themselves (step ids). Pressing Next
+   * or "Do it for me" does not count; the bridge recap checks these off and
+   * lists the rest as "try next".
+   */
+  basicsDone: string[];
+  accountPrompt: AccountPromptStatus;
   /** Mission id -> completed */
   checklist: Record<string, boolean>;
   isCardDismissed: boolean;
@@ -70,6 +85,8 @@ export const createDefaultOnboardingState = (): OnboardingState => ({
     power: 'not-started',
   },
   powerChapters: createDefaultPowerChapters(),
+  basicsDone: [],
+  accountPrompt: 'none',
   checklist: {},
   isCardDismissed: false,
   updatedAt: 0,
@@ -136,6 +153,15 @@ const normalizeChapters = (partial: Partial<Record<ChapterId, ChapterProgress>> 
   return chapters;
 };
 
+/** Unknown values fall back to 'none'; 'due' (a short-lived dev build) meant "show next visit", now 'later'. */
+const normalizeAccountPrompt = (value: unknown): AccountPromptStatus => {
+  if (value === 'later' || value === 'due') {
+    return 'later';
+  }
+
+  return value === 'shown' ? 'shown' : 'none';
+};
+
 /**
  * Loads the persisted onboarding state. Returns the default state when nothing
  * is stored, the blob is corrupt, or persistence is blocked. v1 blobs are
@@ -167,6 +193,8 @@ export const loadOnboardingState = (): OnboardingState => {
         ...parsed.tiers,
       },
       powerChapters: normalizeChapters(parsed.powerChapters),
+      basicsDone: Array.isArray(parsed.basicsDone) ? parsed.basicsDone.filter((id) => typeof id === 'string') : [],
+      accountPrompt: normalizeAccountPrompt(parsed.accountPrompt),
       checklist: parsed.checklist ?? {},
     };
   } catch {

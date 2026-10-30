@@ -227,6 +227,12 @@ export class WebpackManager {
           '@css/loading-screen.css': `${dirName}/../${this.config.loadingScreenCssPath}`,
           '@css': `${dirName}/../public/css`,
           '@wallpapers': `${dirName}/../${this.config.wallpapersPath}`,
+          // Public plugin facade (docs/plugin-api.md). Exact match only: the
+          // `/testing` kit is test-only and must never resolve in a bundle.
+          '@keeptrack/plugin-api$': `${dirName}/../src/plugin-api/index.ts`,
+          // Bare `ootk` (used by external plugins) resolves to the in-tree
+          // submodule so the bundle carries one ootk instance.
+          ootk$: `${dirName}/../src/engine/ootk/src/main.ts`,
         },
       },
       module: {
@@ -455,6 +461,7 @@ export class WebpackManager {
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
       entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
       entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];
+      entry.observabilityWorker = ['./src/plugins-pro/observability-planner/observabilityWorker.ts'];
     }
 
     return ({

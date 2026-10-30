@@ -263,6 +263,7 @@ src/engine/rendering/draw-manager/celestial-bodies/vesta*.ts
 src/engine/rendering/draw-manager/celestial-bodies/horizons/asteroids/
 
 # Tier 0 generators — these move to src/plugins-pro/scripts/ and never ship publicly.
+scripts/browser-agent/
 scripts/moons/
 scripts/asteroids/
 scripts/video/
@@ -287,6 +288,11 @@ src/plugins-pro/data/optical/
 # Belt and braces: the media drop moved into the submodule with its tooling, but
 # a stray render at the old path must never be committable either.
 /scripts/mesh-viewer/media-drop/
+/docs-local/browser-agent/
 
 # Local MCP server config (machine-specific paths, points at QA secrets outside the repo)
 .mcp.json
+# Playwright MCP output (page snapshots, console logs, test downloads)
+/.playwright-mcp/
+/.codex/config.toml
+/.agents/

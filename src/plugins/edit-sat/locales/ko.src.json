@@ -23,6 +23,7 @@
         "actions": "작업"
       },
       "labels": {
+        "modifiedData": "이 세션에서 궤도 수정됨",
         "apogeeKm": "원지점 (km)",
         "perigeeKm": "근지점 (km)",
         "periodMin": "주기 (분)",
@@ -56,7 +57,8 @@
         "satelliteNotFound": "위성 {sccNum}을(를) 찾을 수 없습니다!",
         "failedToPropagate": "위성 전파에 실패했습니다. 다른 매개변수를 시도하거나, 올바르다고 확신하는 경우 이 문제를 보고해 주세요.",
         "cannotCalculateDirection": "위성 방향을 계산할 수 없습니다. 나중에 다시 시도해 주세요.",
-        "notRealSatellite": "실제 위성이 아닙니다"
+        "notRealSatellite": "실제 위성이 아닙니다",
+        "satrecFailed": "위성 레코드를 만드는 중 오류가 발생했습니다!"
       }
     }
   }

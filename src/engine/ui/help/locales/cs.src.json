@@ -4,7 +4,7 @@
     "overview": "Není otevřena žádná nabídka ani zobrazení, proto se zobrazuje obecná nápověda KeepTrack. Každá nabídka a každé zobrazení má vlastní nápovědu.",
     "howToUse": "Otevřete zásuvku a vyberte nástroj pro otevření jeho nabídky, nebo přepněte na zobrazení, například plochou mapu nebo polární pohled. Potom stiskněte Shift+F1 a zobrazí se nápověda k dané nabídce nebo zobrazení. Kliknutím na objekt na glóbu jej vyberete a uvidíte jeho podrobnosti.",
     "tip1": "Zapnuté vrstvy (například elipsoidy kovariance) nemají vlastní nabídku, takže dokud jsou aktivní jen vrstvy, Shift+F1 dál zobrazuje tuto obecnou nápovědu.",
-    "tip2": "Kliknutím kamkoli na tento panel jej zavřete.",
+    "tip2": "Panel zavřete tlačítkem Zavřít, klávesou Escape nebo kliknutím mimo panel.",
     "shortcutClose": "Zavřít nápovědu"
   }
 }

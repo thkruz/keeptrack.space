@@ -104,7 +104,8 @@ export interface StkEphemerisRow {
   /** Seconds from the ScenarioEpoch. */
   offsetSec: number;
   position: { x: number; y: number; z: number };
-  velocity: { x: number; y: number; z: number };
+  /** Required unless the export is position-only. */
+  velocity?: { x: number; y: number; z: number };
 }
 
 /** Header fields for {@link formatStkEphemeris}; all but the epoch have STK-typical defaults. */
@@ -118,6 +119,13 @@ export interface StkEphemerisExportOptions {
   interpolationMethod?: string;
   /** STK InterpolationOrder keyword. @default 7 */
   interpolationOrder?: number;
+  /**
+   * Write EphemerisTimePos (positions only) instead of EphemerisTimePosVel. Use it when the
+   * source had no velocities, so estimated values are never passed off as supplied data.
+   */
+  positionOnly?: boolean;
+  /** Lines written as STK `#` comments after the version line. */
+  comments?: string[];
 }
 
 /** Format a Date as an STK epoch string: "DD Mon YYYY HH:MM:SS.sss" (UTC). */
@@ -134,16 +142,25 @@ export function formatStkEpoch(date: Date): string {
   return `${day} ${mon} ${year} ${hrs}:${min}:${sec}.${ms}`;
 }
 
-/** Build the full text of an STK .e (EphemerisTimePosVel, EpSec) file. */
+/** Build the full text of an STK .e (EphemerisTimePosVel or EphemerisTimePos, EpSec) file. */
 export function formatStkEphemeris(rows: StkEphemerisRow[], opts: StkEphemerisExportOptions): string {
-  const dataLines = rows.map(
-    (r) =>
-      `${r.offsetSec.toFixed(6)}  ${r.position.x.toFixed(6)}  ${r.position.y.toFixed(6)}  ${r.position.z.toFixed(6)}  ` +
-      `${r.velocity.x.toFixed(6)}  ${r.velocity.y.toFixed(6)}  ${r.velocity.z.toFixed(6)}`
-  );
+  const positionOnly = opts.positionOnly ?? false;
+  const dataLines = rows.map((r) => {
+    const pos = `${r.offsetSec.toFixed(6)}  ${r.position.x.toFixed(6)}  ${r.position.y.toFixed(6)}  ${r.position.z.toFixed(6)}`;
+
+    if (positionOnly) {
+      return pos;
+    }
+    if (!r.velocity) {
+      throw new Error('formatStkEphemeris: a row without velocity needs positionOnly');
+    }
+
+    return `${pos}  ${r.velocity.x.toFixed(6)}  ${r.velocity.y.toFixed(6)}  ${r.velocity.z.toFixed(6)}`;
+  });
 
   return [
     'stk.v.11.0',
+    ...(opts.comments ?? []).map((comment) => `# ${comment.replace(/[\r\n]+/gu, ' ')}`),
     'BEGIN Ephemeris',
     `NumberOfEphemerisPoints ${rows.length}`,
     `ScenarioEpoch ${formatStkEpoch(opts.scenarioEpoch)}`,
@@ -152,7 +169,7 @@ export function formatStkEphemeris(rows: StkEphemerisRow[], opts: StkEphemerisEx
     `CentralBody ${opts.centralBody ?? 'Earth'}`,
     `CoordinateSystem ${opts.coordinateSystem ?? 'TEME'}`,
     'DistanceUnit Kilometers',
-    'EphemerisTimePosVel',
+    positionOnly ? 'EphemerisTimePos' : 'EphemerisTimePosVel',
     '',
     ...dataLines,
     '',

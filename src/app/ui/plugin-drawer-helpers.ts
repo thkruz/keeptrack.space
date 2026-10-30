@@ -2,11 +2,13 @@ import { MenuMode } from '@app/engine/core/interfaces';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { migrateLegacyBottomIconId } from '@app/engine/plugins/bottom-icon-id';
 import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
 import { TopMenuPlugin } from '@app/engine/plugins/top-menu-plugin';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
-import { t7e } from '@app/locales/keys';
+import { shake } from '@app/engine/utils/shake';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { settingsManager } from '@app/settings/settings';
 
@@ -27,6 +29,8 @@ export interface DrawerItemData {
   isLoginRequired?: boolean;
   order: number;
   shortcutHint?: string;
+  /** Kept out of the Recent group (see KeepTrackPlugin.isExcludedFromDrawerRecent). */
+  isExcludedFromRecent?: boolean;
 }
 
 export interface DrawerGroup {
@@ -35,6 +39,35 @@ export interface DrawerGroup {
 }
 
 const MAX_RECENT_PLUGINS_ = 8;
+
+/**
+ * Every plugin row in the drawer content. Rows in a plugin's own group carry
+ * data-plugin-id; the copies in the Recent group carry data-recent-plugin-id and the
+ * copies in the Pro Favorites group carry data-favorite-plugin-id, so a
+ * `.drawer-item[data-plugin-id="x"]` selector matches exactly one row per plugin.
+ */
+export const ALL_DRAWER_PLUGIN_ITEMS_SELECTOR = '.drawer-item[data-plugin-id], .drawer-item[data-recent-plugin-id], .drawer-item[data-favorite-plugin-id]';
+
+/** Selector for every row (own group, Recent and Favorites) of one plugin. */
+export function drawerItemsForPluginSelector(pluginId: string): string {
+  return `.drawer-item[data-plugin-id="${pluginId}"], .drawer-item[data-recent-plugin-id="${pluginId}"], .drawer-item[data-favorite-plugin-id="${pluginId}"]`;
+}
+
+/** The plugin (bottom-icon element) id behind a drawer row, from any of the three attributes. */
+export function drawerItemPluginId(el: HTMLElement): string | undefined {
+  return el.dataset.pluginId ?? el.dataset.recentPluginId ?? el.dataset.favoritePluginId;
+}
+
+/** Mirror the live bottom-icon selected/disabled classes onto a drawer row. */
+export function syncDrawerItemState(el: HTMLElement): void {
+  const pluginId = drawerItemPluginId(el);
+  const bottomIcon = pluginId ? getEl(pluginId, true) : null;
+  const isSelected = bottomIcon?.classList.contains('bmenu-item-selected') ?? false;
+  const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
+
+  el.classList.toggle('active', isSelected);
+  el.classList.toggle('disabled', isDisabled);
+}
 
 // ---- Shared Item Collection ----
 
@@ -196,6 +229,7 @@ export function collectDrawerItems(): CollectedDrawerItems {
         isLoginRequired: plugin.isLoginRequired,
         order,
         shortcutHint: getShortcutHint(plugin.id),
+        isExcludedFromRecent: plugin.isExcludedFromDrawerRecent,
       });
     }
   }
@@ -280,6 +314,14 @@ function isCompanionSignedIn_(): boolean {
   return Boolean(userPlugin?.cachedUser?.id);
 }
 
+function phoneLinkTooltip_(signedIn: boolean): string {
+  return signedIn ? t7e('pluginDrawer.phoneLink' as TranslationKey) : t7e('pluginDrawer.phoneLinkSignIn' as TranslationKey);
+}
+
+function connectivityLabel_(isOnline: boolean): string {
+  return isOnline ? t7e('pluginDrawer.connected' as TranslationKey) : t7e('pluginDrawer.offline' as TranslationKey);
+}
+
 /**
  * Reflect the current sign-in state on the phone-link icon: yellow + disabled
  * when signed out, red (active) when signed in. Safe to call repeatedly.
@@ -295,10 +337,29 @@ export function updatePhoneLinkState(): void {
 
   phoneLinkEl.classList.toggle('drawer-phone-link--disabled', !signedIn);
   phoneLinkEl.setAttribute('aria-disabled', String(!signedIn));
-  phoneLinkEl.setAttribute('kt-tooltip', signedIn ? 'Phone Link' : 'Sign in to link your phone');
+  phoneLinkEl.setAttribute('kt-tooltip', phoneLinkTooltip_(signedIn));
 }
 
-/** Render the status footer showing connectivity and version. */
+/** Site pages linked from the status footer (credits and legal), opened in a new tab. */
+const FOOTER_LINKS_ = [
+  { key: 'about', href: 'https://keeptrack.space/about' },
+  { key: 'data', href: 'https://keeptrack.space/data' },
+  { key: 'terms', href: 'https://keeptrack.space/terms' },
+  { key: 'privacy', href: 'https://keeptrack.space/privacy' },
+] as const;
+
+/** The About / Data / Terms / Privacy row. Plain links, so they are reachable signed out. */
+function footerLinksHtml_(): string {
+  const links = FOOTER_LINKS_.map(
+    ({ key, href }) =>
+      `<a class="drawer-footer-link" data-footer-link="${key}" href="${href}" target="_blank" rel="noopener noreferrer">${t7e(`pluginDrawer.footerLinks.${key}` as TranslationKey)}</a>`
+  ).join('<span class="drawer-footer-links__sep" aria-hidden="true">·</span>');
+
+  // A div with the navigation role, not <nav>: the global nav styles (materialize) take <nav> out of the flow.
+  return `  <div class="drawer-footer-links" role="navigation" aria-label="${t7e('pluginDrawer.footerLinks.label' as TranslationKey)}">${links}</div>`;
+}
+
+/** Render the status footer showing connectivity, version and the site links. */
 export function renderStatusFooter(): void {
   const footerEl = getEl('drawer-status-footer', true);
 
@@ -313,7 +374,7 @@ export function renderStatusFooter(): void {
     ? [
         `    <div class="drawer-phone-link${signedIn ? '' : ' drawer-phone-link--disabled'}" id="drawer-phone-link"`,
         `      role="button" tabindex="0" aria-disabled="${String(!signedIn)}"`,
-        `      kt-tooltip="${signedIn ? 'Phone Link' : 'Sign in to link your phone'}">`,
+        `      kt-tooltip="${phoneLinkTooltip_(signedIn)}">`,
         '      <svg class="drawer-phone-link-icon" viewBox="0 0 24 24" aria-hidden="true">',
         '        <path fill="currentColor" d="M7 18v-8H3v8zm-4.5 2q-.625 0-1.062-.437T1 18.5v-9q0-.625.438-1.062T2.5 8h5q.625 0 1.063.438T9 9.5v9q0 .625-.437 1.063T7.5 20zM5 12.5q.325 0 .538-.225t.212-.525q0-.325-.213-.537T5 11q-.3 0-.525.213t-.225.537q0 .3.225.525T5 12.5M15.75 22v-5q-.225-.2-.363-.462T15.25 16q0-.525.375-.888t.875-.362q.525 0 .888.363t.362.887q0 .275-.112.55t-.388.45v5zm-2.075-3.175q-.55-.575-.862-1.3T12.5 16q0-1.675 1.175-2.838T16.5 12q1.675 0 2.838 1.163T20.5 16q0 .775-.288 1.5t-.862 1.3l-1.075-1.05q.35-.35.538-.8T19 16q0-1.05-.725-1.775T16.5 13.5t-1.775.725T14 16q0 .5.2.95t.55.8zM11.9 20.6q-.875-.95-1.388-2.138T10 16q0-2.725 1.9-4.612T16.5 9.5q2.725 0 4.613 1.888T23 16q0 1.275-.475 2.463t-1.4 2.112L20.05 19.5q.725-.725 1.088-1.625T21.5 16q0-2.1-1.45-3.55T16.5 11q-2.075 0-3.537 1.45T11.5 16q0 .975.388 1.888t1.087 1.637zM2 6q0-.825.588-1.412T4 4h15q.825 0 1.413.588T21 6v2.8q-.475-.275-.975-.513T19 7.876V6zm3 8"></path>',
         '      </svg>',
@@ -325,10 +386,11 @@ export function renderStatusFooter(): void {
     '<div class="drawer-status-footer">',
     '  <div class="drawer-status-connectivity">',
     `    <span class="drawer-status-dot${isOnline ? '' : ' drawer-status-dot--offline'}"></span>`,
-    `    <span class="drawer-status-connectivity-label${isOnline ? '' : ' drawer-status-connectivity-label--offline'}">${isOnline ? 'Connected' : 'Offline'}</span>`,
+    `    <span class="drawer-status-connectivity-label${isOnline ? '' : ' drawer-status-connectivity-label--offline'}">${connectivityLabel_(isOnline)}</span>`,
     phoneLinkIcon,
     '  </div>',
     `  <span class="drawer-status-version">KeepTrack v${__VERSION__}</span>`,
+    footerLinksHtml_(),
     '</div>',
   ].join('');
 }
@@ -344,7 +406,7 @@ export function updateConnectivityStatus(_drawerEl: HTMLElement | null, isOnline
   }
   if (label) {
     label.classList.toggle('drawer-status-connectivity-label--offline', !isOnline);
-    label.textContent = isOnline ? 'Connected' : 'Offline';
+    label.textContent = connectivityLabel_(isOnline);
   }
 }
 
@@ -358,17 +420,19 @@ export function renderBadge(pluginId: string, badges: Map<string, DrawerBadge>):
     return;
   }
 
-  contentEl.querySelectorAll(`.drawer-item[data-plugin-id="${pluginId}"] .drawer-item-badge`).forEach((badgeEl) => {
-    const badge = badges.get(pluginId);
+  const badge = badges.get(pluginId);
+
+  contentEl.querySelectorAll(drawerItemsForPluginSelector(pluginId)).forEach((itemEl) => {
+    const badgeEl = itemEl.querySelector('.drawer-item-badge');
+
+    if (!badgeEl) {
+      return;
+    }
 
     if (!badge) {
       badgeEl.className = 'drawer-item-badge';
       badgeEl.textContent = '';
-
-      return;
-    }
-
-    if (badge.type === 'active') {
+    } else if (badge.type === 'active') {
       badgeEl.className = 'drawer-item-badge drawer-item-badge--active';
       badgeEl.textContent = '';
     } else {
@@ -393,6 +457,38 @@ export function syncBadgesFromEvents(updateBadgeFn: (id: string, badge: DrawerBa
   }
 }
 
+// ---- Disabled Utility Icons ----
+
+/**
+ * Explain a click on a disabled utility icon instead of swallowing it.
+ *
+ * The icon shakes, and its plugin explains why it is disabled
+ * (KeepTrackPlugin.explainDisabledIcon): the matching "Select a ... first!"
+ * toast when it needs a selection, else the plugin's own getDisabledReason().
+ * Nothing is emitted, so the action itself never runs from a disabled icon.
+ * @returns true when a message was shown.
+ */
+export function explainDisabledUtilityIcon(iconEl: HTMLElement): boolean {
+  shake(iconEl);
+
+  const bottomIconId = iconEl.dataset.pluginId;
+
+  return bottomIconId ? (findPluginByBottomIcon_(bottomIconId)?.explainDisabledIcon() ?? false) : false;
+}
+
+function findPluginByBottomIcon_(bottomIconId: string) {
+  return PluginRegistry.plugins.find((p) => p.bottomIconElementName === bottomIconId);
+}
+
+/**
+ * Toasts the plugin's own reason for its disabled state (getDisabledReason),
+ * without the sensor/satellite checks the base click handler already makes.
+ * @returns true when a message was shown.
+ */
+export function explainDisabledPluginReason(bottomIconId: string): boolean {
+  return findPluginByBottomIcon_(bottomIconId)?.explainDisabledReason() ?? false;
+}
+
 // ---- Utility Footer Sync ----
 
 /** Sync utility footer icon selection state with bottom menu. */
@@ -412,14 +508,36 @@ export function syncUtilityFooterState(): void {
   });
 
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {
-    const topMenuId = (el as HTMLElement).dataset.topMenuId;
-    const navBtn = topMenuId ? getEl(topMenuId, true) : null;
-    const isSelected = navBtn?.classList.contains('bmenu-item-selected') ?? false;
-    const isDisabled = navBtn?.classList.contains('bmenu-item-disabled') ?? false;
-
-    el.classList.toggle('bmenu-item-selected', isSelected);
-    el.classList.toggle('bmenu-item-disabled', isDisabled);
+    syncTopMenuUtilityIcon_(el as HTMLElement);
   });
+}
+
+/**
+ * Mirror a top-menu nav button onto its utility footer copy: the selected,
+ * disabled and error classes plus the button image. Top-menu plugins (sound,
+ * night, ...) change their nav button from shortcuts and other code paths, so
+ * the footer copy must follow the nav button rather than its own clicks.
+ */
+function syncTopMenuUtilityIcon_(el: HTMLElement): void {
+  const topMenuId = el.dataset.topMenuId;
+  const navBtn = topMenuId ? getEl(topMenuId, true) : null;
+
+  if (!navBtn) {
+    return;
+  }
+
+  const isSelected = navBtn.classList.contains('bmenu-item-selected') || !!navBtn.querySelector('.bmenu-item-selected');
+
+  el.classList.toggle('bmenu-item-selected', isSelected);
+  el.classList.toggle('bmenu-item-disabled', navBtn.classList.contains('bmenu-item-disabled'));
+  el.classList.toggle('bmenu-item-error', navBtn.classList.contains('bmenu-item-error'));
+
+  const navSrc = navBtn.querySelector('img')?.getAttribute('src');
+  const footerImg = el.querySelector('img');
+
+  if (navSrc && footerImg && footerImg.getAttribute('src') !== navSrc) {
+    footerImg.setAttribute('src', navSrc);
+  }
 }
 
 /** Set initial selected/disabled state on utility footer icons. */
@@ -441,11 +559,7 @@ export function syncInitialUtilityState(): void {
   const footerEl = getEl('drawer-utility-footer', true);
 
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {
-    const topMenuId = (el as HTMLElement).dataset.topMenuId;
-    const navBtn = topMenuId ? getEl(topMenuId, true) : null;
-    const isSelected = navBtn?.classList.contains('bmenu-item-selected') || !!navBtn?.querySelector('.bmenu-item-selected');
-
-    el.classList.toggle('bmenu-item-selected', !!isSelected);
+    syncTopMenuUtilityIcon_(el as HTMLElement);
   });
 }
 
@@ -484,10 +598,10 @@ export function loadRecents(): RecentEntry[] {
       .map((entry): RecentEntry | null => {
         // Legacy format: a bare string[] of plugin ids with no timestamps.
         if (typeof entry === 'string') {
-          return { id: entry, t: 0 };
+          return { id: migrateLegacyBottomIconId(entry), t: 0 };
         }
         if (typeof entry === 'object' && entry !== null && typeof (entry as RecentEntry).id === 'string' && typeof (entry as RecentEntry).t === 'number') {
-          return { id: (entry as RecentEntry).id, t: (entry as RecentEntry).t };
+          return { id: migrateLegacyBottomIconId((entry as RecentEntry).id), t: (entry as RecentEntry).t };
         }
 
         return null;
@@ -527,7 +641,7 @@ export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<str
   for (const pluginId of recentIds) {
     const item = allItems.get(pluginId);
 
-    if (item) {
+    if (item && !item.isExcludedFromRecent) {
       recentItems.push({ ...item, order: recentItems.length });
     }
     if (recentItems.length >= maxItems) {

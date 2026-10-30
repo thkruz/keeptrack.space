@@ -6,6 +6,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, ICommandPaletteCommand, IconPlacement, IKeyboardShortcut, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import globePng from '@public/img/icons/globe.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
@@ -36,7 +37,7 @@ export class EarthCenteredView extends KeepTrackPlugin {
     return [
       {
         id: 'EarthCenteredView.activate',
-        label: 'Switch to Earth-Centered View',
+        label: t7e('plugins.EarthCenteredView.commandPalette.switch'),
         category: 'View',
         callback: () => this.bottomMenuClicked(),
       },
@@ -53,7 +54,8 @@ export class EarthCenteredView extends KeepTrackPlugin {
       if (isFixedToEarth && !this.isMenuButtonActive) {
         this.setBottomIconToSelected();
       } else if (!isFixedToEarth && this.isMenuButtonActive) {
-        this.setBottomIconToUnselected();
+        // Icon sync only: the camera changed elsewhere, so leave the user's open menu alone.
+        this.setBottomIconToUnselected(false);
       }
     });
   }

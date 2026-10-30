@@ -1,4 +1,5 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 
 /** One country from the slimmed Natural Earth data (see scripts/slim-natural-earth.ts). */
@@ -176,7 +177,7 @@ export class PoliticalMap {
       this.labelRevision++;
     } catch (err) {
       this.isFailed_ = true;
-      errorManagerInstance.warn('Failed to load political map data', err);
+      errorManagerInstance.warn(t7e('errorMsgs.Rendering.politicalMapLoadFailed'), err);
     } finally {
       this.isFetching_ = false;
     }

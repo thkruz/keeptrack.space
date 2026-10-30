@@ -1,7 +1,10 @@
+import { CatalogManager } from '@app/app/data/catalog-manager';
 import { GroupType } from '@app/app/data/object-group';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { ICommandPaletteCommand, ISettingsContribution, ISettingsContributor } from '@app/engine/plugins/core/plugin-capabilities';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import historyPng from '@public/img/icons/history.png';
@@ -18,7 +21,7 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
     const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
     if (this.isMenuButtonActive) {
-      ServiceLocator.getUiManager().searchManager.hideResults();
+      this.clearSearch_();
       this.setBottomIconToSelected();
       this.historyOfSatellitesPlay();
     } else {
@@ -30,6 +33,9 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
     }
   };
 
+  /** Number of analyst placeholder slots reserved from {@link CatalogManager.ANALYST_START_ID}. */
+  private static readonly ANALYST_SLOT_COUNT_ = 10000;
+
   bottomIconImg = historyPng;
   bottomIconLabel = 'Time Machine';
 
@@ -37,7 +43,7 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
     return [
       {
         id: 'TimeMachine.toggle',
-        label: 'Toggle Time Machine',
+        label: t7e('plugins.TimeMachine.commandPalette.toggle'),
         category: 'Playback',
         callback: () => this.bottomMenuClicked(),
       },
@@ -111,6 +117,10 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
       return;
     }
     const yearGroup = groupManagerInstance.createGroup(GroupType.YEAR_OR_LESS, year);
+    const objectCache = ServiceLocator.getCatalogManager().objectCache;
+
+    // Unfilled analyst slots carry a placeholder 1958 designator: they are not history.
+    yearGroup.ids = yearGroup.ids.filter((id) => !TimeMachine.isInactiveAnalystSlot_(objectCache[id]));
 
     groupManagerInstance.selectGroup(yearGroup);
     yearGroup.updateOrbits();
@@ -119,12 +129,12 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
 
     if (!settingsManager.isDisableTimeMachineToasts) {
       if (year >= 57 && year < 100) {
-        const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || `Time Machine In Year 19${year}!`);
+        const timeMachineString = <string>(settingsManager.timeMachineString(year.toString()) || t7e('plugins.TimeMachine.yearToast').replace('{year}', `19${year}`));
 
         ServiceLocator.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       } else {
         const yearStr = year < 10 ? `0${year}` : `${year}`;
-        const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || `Time Machine In Year 20${yearStr}!`);
+        const timeMachineString = <string>(settingsManager.timeMachineString(yearStr) || t7e('plugins.TimeMachine.yearToast').replace('{year}', `20${yearStr}`));
 
         ServiceLocator.getUiManager().toast(timeMachineString, ToastMsgType.normal, settingsManager.timeMachineLongToast);
       }
@@ -155,9 +165,38 @@ export class TimeMachine extends KeepTrackPlugin implements ISettingsContributor
       return;
     }
     settingsManager.colors.transparent = orbitManagerInstance.tempTransColor;
-    this.isMenuButtonActive = false;
     this.isTimeMachineRunning = false;
+    // A natural end must un-light the rail item too; keep any side menu the user opened meanwhile.
+    this.setBottomIconToUnselected(false);
     groupManagerInstance.clearSelect();
     colorSchemeManagerInstance.calculateColorBuffers(true);
+  }
+
+  /**
+   * Drops the search filter and empties `#search` with it, so the box never claims a filter the run removed.
+   */
+  private clearSearch_(): void {
+    const searchInput = getEl('search', true) as HTMLInputElement | null;
+
+    if (searchInput) {
+      searchInput.value = '';
+    }
+
+    try {
+      // doSearch('') hides the results, clears the group and tells listeners (URL bar) the search is gone.
+      ServiceLocator.getUiManager().searchManager.doSearch('');
+    } catch (error) {
+      errorManagerInstance.log(error);
+    }
+  }
+
+  /** An analyst placeholder slot (NORAD 90000-99999) that nothing has filled yet. */
+  private static isInactiveAnalystSlot_(obj: { active?: boolean; sccNum?: string } | null | undefined): boolean {
+    if (!obj || obj.active || typeof obj.sccNum !== 'string') {
+      return false;
+    }
+    const sccNum = Number(obj.sccNum);
+
+    return Number.isInteger(sccNum) && sccNum >= CatalogManager.ANALYST_START_ID && sccNum < CatalogManager.ANALYST_START_ID + TimeMachine.ANALYST_SLOT_COUNT_;
   }
 }

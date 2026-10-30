@@ -58,6 +58,11 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
    */
   private isIncludeTime_ = false;
 
+  /** Minimum gap between link rebuilds driven by sim-time changes (a running or scrubbed clock fires often). */
+  static readonly TIME_REFRESH_THROTTLE_MS = 1000;
+  private lastTimeRefreshMs_ = 0;
+  private pendingTimeRefresh_: ReturnType<typeof setTimeout> | null = null;
+
   // Bridge to onBottomIconClick until base class wires up component callbacks.
   bottomIconCallback = (): void => {
     this.onBottomIconClick();
@@ -147,6 +152,66 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
+
+    /*
+     * Keep the link current while the menu stays open. UrlManager registers its own listeners for these events
+     * when its module loads (before this plugin), so its cached selection/search are already updated here.
+     */
+    const eventBus = EventBus.getInstance();
+    const refreshNow = () => this.refreshIfOpen_();
+    const refreshThrottled = () => this.refreshForTimeChange_();
+
+    eventBus.on(EventBusEvent.selectSatData, refreshNow);
+    eventBus.on(EventBusEvent.propRateChanged, refreshNow);
+    eventBus.on(EventBusEvent.searchUpdated, refreshNow);
+    eventBus.on(EventBusEvent.updateDateTime, refreshThrottled);
+    eventBus.on(EventBusEvent.staticOffsetChange, refreshThrottled);
+  }
+
+  /** Rebuilds the displayed link when the menu is open; a no-op while it is closed. */
+  private refreshIfOpen_(): void {
+    if (!this.isMenuButtonActive) {
+      this.clearPendingTimeRefresh_();
+
+      return;
+    }
+    this.refreshShareUrl_();
+  }
+
+  /**
+   * Sim-time changes arrive in bursts (time slider drags, jumps, a running clock), so rebuild at most once per
+   * TIME_REFRESH_THROTTLE_MS, with one trailing rebuild so the link ends on the latest time.
+   */
+  private refreshForTimeChange_(): void {
+    if (!this.isMenuButtonActive) {
+      this.clearPendingTimeRefresh_();
+
+      return;
+    }
+
+    const now = Date.now();
+    const elapsed = now - this.lastTimeRefreshMs_;
+
+    if (elapsed >= ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS) {
+      this.clearPendingTimeRefresh_();
+      this.lastTimeRefreshMs_ = now;
+      this.refreshShareUrl_();
+
+      return;
+    }
+
+    this.pendingTimeRefresh_ ??= setTimeout(() => {
+      this.pendingTimeRefresh_ = null;
+      this.lastTimeRefreshMs_ = Date.now();
+      this.refreshIfOpen_();
+    }, ShareMenuPlugin.TIME_REFRESH_THROTTLE_MS - elapsed);
+  }
+
+  private clearPendingTimeRefresh_(): void {
+    if (this.pendingTimeRefresh_ !== null) {
+      clearTimeout(this.pendingTimeRefresh_);
+      this.pendingTimeRefresh_ = null;
+    }
   }
 
   protected uiManagerFinal_(): void {
@@ -208,7 +273,7 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
       .catch((err: Error) => {
         // AbortError is the user dismissing the share sheet — not a real failure.
         if (err?.name !== 'AbortError') {
-          errorManagerInstance.debug(`Native share failed: ${err?.message ?? err}`);
+          errorManagerInstance.debug(l('errorMsgs.nativeShareFailed').replace('{error}', String(err?.message ?? err)));
         }
       });
   }

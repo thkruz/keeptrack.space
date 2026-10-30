@@ -25,6 +25,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
+import { t7e } from '@app/locales/keys';
 import fovPng from '@public/img/icons/fov.png';
 import { SensorListPlugin } from '../sensor-list/sensor-list';
 import { SensorSurvFence } from '../sensor-surv/sensor-surv-fence';
@@ -44,7 +45,7 @@ export class SensorFov extends KeepTrackPlugin {
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'sensor-fov-bottom-icon',
-      label: 'Sensor FOV',
+      label: t7e('plugins.SensorFov.bottomIconLabel' as Parameters<typeof t7e>[0]),
       image: fovPng,
       menuMode: [MenuMode.SENSORS, MenuMode.ALL],
       isDisabledOnLoad: true,

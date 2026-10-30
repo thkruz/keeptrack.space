@@ -413,7 +413,15 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
     // The breakup happens at the parent's exact position/velocity at the current sim
     // time. The catalog-facing orchestration lives in runBreakup so other plugins
     // (e.g. the interceptor) can trigger a breakup at an arbitrary epoch too.
-    const result = runBreakup(mainsat, variation, simulationTimeObj);
+    // The previous breakup's pieces may be overwritten (a re-run replaces them); any other
+    // active analyst object, or an id another tool reserved, is skipped.
+    const result = runBreakup(mainsat, variation, simulationTimeObj, undefined, { reusableIds: this.lastBreakup_?.pieceIds });
+
+    if (result.error === 'noFreeSlots') {
+      errorManagerInstance.warn(t7e('plugins.Breakup.errorMsgs.NoFreeSlots' as Parameters<typeof t7e>[0]).replace('{count}', breakupCount.toString()));
+
+      return;
+    }
 
     if (result.error === 'invalidSlotRange') {
       errorManagerInstance.warn(

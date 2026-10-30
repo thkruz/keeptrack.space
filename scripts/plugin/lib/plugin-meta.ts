@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import semver from 'semver';
 import { CliError } from './log';
 import type { KeepTrackPluginManifest, PluginEntry } from './types';
 
@@ -59,6 +60,16 @@ export function validateManifest(
   }
   if (typeof manifest.engine !== 'string' || manifest.engine.length === 0) {
     errors.push('engine is required (semver range, e.g. ">=13.0.0 <14.0.0")');
+  }
+  // pluginApi is optional. Its shape is validated here; whether the host facade
+  // satisfies it is a separate policy (classifyPluginApi): strict in add/update,
+  // reported by doctor, ignored by codegen so a mismatch never bricks the build.
+  if (typeof manifest.pluginApi !== 'undefined') {
+    if (typeof manifest.pluginApi !== 'string' || manifest.pluginApi.length === 0) {
+      errors.push('pluginApi must be a semver range string when present (e.g. "^1.0.0")');
+    } else if (!semver.validRange(manifest.pluginApi)) {
+      warnings.push(`pluginApi "${manifest.pluginApi}" is not a valid semver range`);
+    }
   }
   if (Array.isArray(manifest.workers) && manifest.workers.length > 0) {
     errors.push('workers are not supported in this format version (must be empty or omitted)');

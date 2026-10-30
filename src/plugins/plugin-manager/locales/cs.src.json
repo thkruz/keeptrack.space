@@ -1,72 +1,86 @@
 {
   "plugins": {
     "PluginManagerPlugin": {
-      "bottomIconLabel": "Plugins",
-      "title": "Plugin Manager",
-      "helpBody": "Enable or disable built-in plugins and review installed third-party plugins.",
+      "bottomIconLabel": "Pluginy",
+      "title": "Správce pluginů",
+      "helpBody": "Zapínejte a vypínejte vestavěné pluginy a prohlížejte nainstalované pluginy třetích stran.",
       "commandPalette": {
-        "open": "Open Plugin Manager"
+        "open": "Otevřít správce pluginů"
       },
       "tabs": {
-        "installed": "Installed",
-        "browse": "Browse",
-        "develop": "Develop"
+        "installed": "Nainstalované",
+        "browse": "Procházet",
+        "develop": "Vývoj"
       },
       "browse": {
-        "loading": "Loading available plugins…",
-        "empty": "No plugins are listed in the registry yet.",
-        "error": "Could not load the plugin registry.",
-        "by": "by",
-        "install": "Install",
-        "installing": "Installing…",
-        "installed": "Installed. Rebuilding — the app will reload shortly.",
-        "installedBtn": "Installed",
-        "installFailed": "Install failed. See the terminal for details.",
-        "copyCommand": "Copy install command"
+        "loading": "Načítání dostupných pluginů…",
+        "empty": "V registru zatím nejsou žádné pluginy.",
+        "error": "Registr pluginů se nepodařilo načíst.",
+        "install": "Instalovat",
+        "installing": "Instalace…",
+        "installed": "Nainstalováno. Probíhá nové sestavení; aplikace se brzy znovu načte.",
+        "installedBtn": "Nainstalováno",
+        "installFailed": "Instalace selhala. Podrobnosti najdete v terminálu.",
+        "copyCommand": "Kopírovat instalační příkaz",
+        "byAuthor": "autor: {author}"
       },
       "develop": {
-        "introHeading": "What is a plugin?",
-        "intro": "KeepTrack is built from dozens of standalone plugins, and you can write your own. A plugin is a small package that adds a drawer icon, menu, overlay, or tool. Plugins are developed and installed with the plugin CLI from a KeepTrack checkout.",
-        "createHeading": "1. Create",
-        "create": "Scaffold a new plugin (interactive: it asks for a name, kind, and description).",
-        "previewHeading": "2. Preview",
-        "preview": "Boot the app with only your plugin enabled, with live reload as you edit.",
-        "rulesHeading": "The two rules",
-        "rule1": "Your entry file must export a class matching className in keeptrack-plugin.json.",
-        "rule2": "That class's readonly id must equal its configKey.",
-        "docsLink": "Open the plugin development guide"
+        "introHeading": "Co je plugin?",
+        "intro": "KeepTrack se skládá z desítek samostatných pluginů a můžete napsat i vlastní. Plugin je malý balíček, který přidává ikonu do panelu, nabídku, překryvnou vrstvu nebo nástroj. Pluginy se vyvíjejí a instalují pomocí plugin CLI z kopie repozitáře KeepTrack.",
+        "createHeading": "1. Vytvoření",
+        "create": "Vytvořte kostru nového pluginu (interaktivně: zeptá se na název, druh a popis).",
+        "previewHeading": "2. Náhled",
+        "preview": "Spusťte aplikaci jen s vaším pluginem a s živým načítáním změn při úpravách.",
+        "rulesHeading": "Dvě pravidla",
+        "rule1": "Vstupní soubor musí exportovat třídu odpovídající className v keeptrack-plugin.json.",
+        "rule2": "Vlastnost readonly id této třídy se musí rovnat jejímu configKey.",
+        "docsLink": "Otevřít průvodce vývojem pluginů"
       },
       "reload": {
-        "pending": "{count} change(s) pending",
-        "button": "Reload"
+        "pending": "Čekající změny: {count}",
+        "button": "Znovu načíst"
       },
       "labels": {
-        "search": "Search plugins",
-        "builtInSection": "Built-in Plugins",
-        "externalSection": "External Plugins",
-        "externalEmpty": "No external plugins installed. Add one with the plugin CLI.",
-        "installSection": "Install a Plugin",
-        "installHint": "Installing a plugin requires rebuilding KeepTrack. Copy this command and run it in your KeepTrack checkout.",
+        "noMatches": "Žádný plugin neodpovídá. Zkuste název nebo ID pluginu.",
+        "search": "Hledat pluginy",
+        "builtInSection": "Vestavěné pluginy",
+        "externalSection": "Externí pluginy",
+        "externalEmpty": "Nejsou nainstalovány žádné externí pluginy. Přidejte je pomocí plugin CLI.",
+        "installSection": "Instalace pluginu",
+        "installHint": "Instalace pluginu vyžaduje nové sestavení KeepTrack. Zkopírujte tento příkaz a spusťte jej ve své kopii repozitáře KeepTrack.",
         "gitUrl": "Git URL",
-        "source": "Source"
+        "source": "Zdroj",
+        "copy": "Kopírovat",
+        "alwaysEnabled": "Vždy zapnuto"
       },
       "badge": {
-        "compatible": "Compatible",
-        "incompatible": "Check version"
+        "compatible": "Kompatibilní",
+        "incompatible": "Zkontrolujte verzi"
       },
       "buttons": {
-        "copyInstall": "Copy Install Command"
+        "copyInstall": "Kopírovat instalační příkaz"
       },
       "toasts": {
-        "installCopied": "Install command copied to clipboard!",
-        "commandCopied": "Command copied to clipboard!"
+        "installCopied": "Instalační příkaz zkopírován do schránky!",
+        "commandCopied": "Příkaz zkopírován do schránky!"
       },
       "help": {
-        "overview": "The Plugin Manager lets you turn KeepTrack's built-in plugins on or off and see which third-party plugins are installed. Because plugins load when the app starts, changes take effect after a reload.",
-        "togglesHeading": "Enabling and disabling",
-        "toggles": "Flip a switch to enable or disable a plugin, then click Reload to apply. Always-on infrastructure plugins are locked and cannot be disabled.",
-        "externalHeading": "External plugins",
-        "external": "Third-party plugins installed via the plugin CLI appear in their own section with their version, a compatibility badge, and a link to their source. To install a new one, copy the command from the Install section and run it in your KeepTrack checkout."
+        "overview": "Správce pluginů umožňuje zapínat a vypínat vestavěné pluginy KeepTrack a zjistit, které pluginy třetích stran jsou nainstalovány. Pluginy se načítají při spuštění aplikace, proto se změny projeví až po opětovném načtení.",
+        "togglesHeading": "Zapínání a vypínání",
+        "toggles": "Přepnutím přepínače plugin zapnete nebo vypnete; změny použijete kliknutím na Znovu načíst. Infrastrukturní pluginy, které jsou vždy zapnuté, jsou uzamčené a nelze je vypnout.",
+        "externalHeading": "Externí pluginy",
+        "external": "Pluginy třetích stran nainstalované pomocí plugin CLI se zobrazují ve vlastní sekci s verzí, odznakem kompatibility a odkazem na zdroj. Nový nainstalujete tak, že zkopírujete příkaz ze sekce Instalace a spustíte jej ve své kopii repozitáře KeepTrack."
+      },
+      "searchAliases": {
+        "multiView": "Více pohledů,Vícenásobné zobrazení"
+      },
+      "loader": {
+        "proFailed": "Verzi Pro pluginu „{plugin}“ se nepodařilo načíst ({error}). {consequence} Toto sestavení obsahuje KeepTrack Pro, takže soubory src/plugins-pro mohou chybět, být zastaralé nebo nedostupné. Více informací na {url}.",
+        "consequenceFallback": "Místo toho se načítá standardní verze.",
+        "consequenceUnavailable": "Tato funkce nebude v této relaci dostupná.",
+        "downloadFailed": "Plugin „{plugin}“ se nepodařilo stáhnout ({error}) a v této relaci nebude dostupný. Obvykle jde o přerušení sítě; opětovné načtení stránky to zkusí znovu.",
+        "initFailed": "Plugin „{plugin}“ se nepodařilo inicializovat ({error}) a v této relaci nebude dostupný.",
+        "stoppedEarly": "Načítání pluginů se předčasně zastavilo ({error}). Některé funkce mohou chybět; opětovné načtení stránky to zkusí znovu."
       }
     }
   }

@@ -55,14 +55,14 @@ export class Screenshot extends KeepTrackPlugin {
     try {
       this.logo = new Image();
       this.logo.onerror = () => {
-        errorManagerInstance.warn('Failed to load primary logo image.');
+        errorManagerInstance.warn(this.t_('errorMsgs.primaryLogoFailed'));
       };
       this.logo.src = `${settingsManager.installDirectory}img/logo-primary.png`;
 
       if (settingsManager.isShowSecondaryLogo) {
         this.secondaryLogo = new Image();
         this.secondaryLogo.onerror = () => {
-          errorManagerInstance.warn('Failed to load secondary logo image.');
+          errorManagerInstance.warn(this.t_('errorMsgs.secondaryLogoFailed'));
         };
         this.secondaryLogo.src = `${settingsManager.installDirectory}img/logo-secondary.png`;
       }
@@ -183,7 +183,7 @@ export class Screenshot extends KeepTrackPlugin {
     const srcCtx = srcCanvas.getContext('2d');
 
     if (!srcCtx) {
-      errorManagerInstance.warn('Failed to get 2D context for temporary canvas. Unable to create screenshot.');
+      errorManagerInstance.warn(this.t_('errorMsgs.noCanvasContext'));
 
       return '';
     }

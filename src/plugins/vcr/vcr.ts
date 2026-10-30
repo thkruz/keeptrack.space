@@ -32,7 +32,6 @@ export class VcrPlugin extends KeepTrackPlugin {
   private rewindBtn_: HTMLElement | null = null;
   private playPauseBtn_: HTMLElement | null = null;
   private fastForwardBtn_: HTMLElement | null = null;
-  private scenario_: ScenarioData | null = null;
 
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
@@ -56,13 +55,13 @@ export class VcrPlugin extends KeepTrackPlugin {
         vcrEl.id = 'vcr-container';
         vcrEl.className = 'vcr-container';
         vcrEl.innerHTML = html`
-              <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Rewind">
+              <div id="vcr-rewind-btn" class="vcr-btn top-menu-icons" kt-tooltip="${t7e('VcrPlugin.clickToRewind')}">
                 <img class="top-menu-icons__blue-img" src="${rewindPng}">
               </div>
-              <div id="vcr-play-pause-btn" class="vcr-btn top-menu-icons bmenu-item-selected" kt-tooltip="Click to Pause">
+              <div id="vcr-play-pause-btn" class="vcr-btn top-menu-icons bmenu-item-selected" kt-tooltip="${t7e('VcrPlugin.clickToPause')}">
                 <img class="top-menu-icons__blue-img" src="${pausePng}">
               </div>
-              <div id="vcr-fast-forward-btn" class="vcr-btn top-menu-icons" kt-tooltip="Click to Fast Forward">
+              <div id="vcr-fast-forward-btn" class="vcr-btn top-menu-icons" kt-tooltip="${t7e('VcrPlugin.clickToFastForward')}">
                 <img class="top-menu-icons__blue-img" src="${fastForwardPng}">
               </div>
           `;
@@ -77,10 +76,17 @@ export class VcrPlugin extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * The live scenario. ScenarioManagementPlugin.updateScenario() replaces its scenario object,
+   * so a reference cached at addJs() time goes stale after the first bounds change.
+   */
+  private get scenario_(): ScenarioData | null {
+    return PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
+  }
+
   addJs(): void {
     super.addJs();
 
-    this.scenario_ = PluginRegistry.getPlugin(ScenarioManagementPlugin)?.scenario ?? null;
     this.forwardRewindSpeed = (settingsManager.plugins?.[this.id] as { forwardRewindSpeed?: number })?.forwardRewindSpeed ?? VcrPlugin.DEFAULT_FORWARD_REWIND_SPEED_;
 
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {

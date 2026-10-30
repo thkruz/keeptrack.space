@@ -16,7 +16,8 @@
         "dscovr": "DSCOVR (L1)"
       },
       "errorMsgs": {
-        "FuturePictures": "미래의 영상을 불러올 수 없습니다. 가장 최근 영상을 불러오고 있습니다."
+        "FuturePictures": "미래의 영상을 불러올 수 없습니다. 가장 최근 영상을 불러오고 있습니다.",
+        "ImageLoadFailed": "{source} 이미지를 불러오지 못했습니다"
       },
       "help": {
         "overview": "위성 영상은 실제 기상위성이 촬영한 최신 사진을 보여줍니다. 정지궤도의 MeteoSat, Himawari, GOES, Elektro-L이 촬영한 전체 디스크 영상과 L1 지점의 DSCOVR이 촬영한 지구 전체 영상이 포함됩니다. 시뮬레이션에서 보는 것과 그 위성들이 지금 실제로 촬영하고 있는 것을 연결해 줍니다.",

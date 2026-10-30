@@ -35,7 +35,10 @@
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} は既にリストにあります！",
         "ObjectAlreadyInList": "オブジェクト {id} は既にリストにあります！",
-        "SatNotFound": "衛星 {id} が見つかりません！"
+        "SatNotFound": "衛星 {id} が見つかりません！",
+        "ListFileFormatIncorrect": "リストファイルの形式が正しくありません",
+        "ErrorReadingList": "リストの読み込みエラー！",
+        "ErrorSavingList": "リストの保存エラー！"
       },
       "settings": {
         "satLabelMode": {
@@ -51,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "ウォッチリストに追加",
         "removeFromWatchlist": "ウォッチリストから削除"
+      },
+      "infoBox": {
+        "addLabel": "ウォッチリストに追加",
+        "removeLabel": "ウォッチリストから削除"
       }
     },
     "WatchlistOverlay": {

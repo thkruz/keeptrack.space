@@ -1,6 +1,15 @@
 {
   "ScreenRecorder": {
     "recordingUnavailable": "Enregistrement indisponible en raison de problèmes de compatibilité !",
-    "compatibilityError": "Erreur de compatibilité avec l'enregistrement !"
+    "compatibilityError": "Erreur de compatibilité avec l'enregistrement !",
+    "requesting": "Demande de partage d’écran…",
+    "recording": "Enregistrement",
+    "stopping": "Finalisation de l’enregistrement…",
+    "toggleCommand": "Activer/désactiver l'enregistrement d'écran",
+    "saved": "Enregistrement sauvegardé",
+    "tooShort": "Enregistrement trop court, rien n'a été sauvegardé",
+    "cancelled": "Enregistrement annulé",
+    "notReadable": "Impossible de capturer l'écran. Une autre application ou un réglage du système le bloque peut-être.",
+    "failed": "L'enregistrement a échoué. Veuillez réessayer."
   }
 }

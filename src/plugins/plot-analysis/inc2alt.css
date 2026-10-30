@@ -33,3 +33,24 @@
 #inc2alt-constellation-counts span {
   margin-right: 10px;
 }
+
+/* "Nothing matched" message centred over the blank chart (the .side-menu is position: relative). */
+#inc2alt-plots-menu .inc2alt-empty-message {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 80%;
+  padding: 12px 20px;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 60%);
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  pointer-events: none;
+  z-index: 2;
+}
+
+#inc2alt-plots-menu .inc2alt-empty-message[hidden] {
+  display: none;
+}

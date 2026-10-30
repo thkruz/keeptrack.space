@@ -35,7 +35,10 @@
       "errorMsgs": {
         "NoradAlreadyInList": "NORAD: {sccNum} уже в списке!",
         "ObjectAlreadyInList": "Объект {id} уже в списке!",
-        "SatNotFound": "Спутник {id} не найден!"
+        "SatNotFound": "Спутник {id} не найден!",
+        "ListFileFormatIncorrect": "Неверный формат файла списка",
+        "ErrorReadingList": "Ошибка чтения списка!",
+        "ErrorSavingList": "Ошибка сохранения списка!"
       },
       "settings": {
         "satLabelMode": {
@@ -51,6 +54,10 @@
       "rmbMenu": {
         "addToWatchlist": "Добавить в список наблюдения",
         "removeFromWatchlist": "Удалить из списка наблюдения"
+      },
+      "infoBox": {
+        "addLabel": "Добавить в список наблюдения",
+        "removeLabel": "Удалить из списка наблюдения"
       }
     },
     "WatchlistOverlay": {

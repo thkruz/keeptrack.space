@@ -25,7 +25,16 @@
         "mapStyle": "Stile mappa",
         "standard": "Standard",
         "political": "Politica",
-        "nightLights": "Luci notturne"
+        "nightLights": "Luci notturne",
+        "inView": "Visibile",
+        "outOfView": "Fuori vista"
+      },
+      "errorMsgs": {
+        "primaryLogoFailed": "Impossibile caricare l'immagine del logo principale.",
+        "secondaryLogoFailed": "Impossibile caricare l'immagine del logo secondario.",
+        "earthDrawAfterLoadFailed": "Impossibile disegnare l'immagine della Terra sulla tela dopo il caricamento: {error}",
+        "earthLoadFailed": "Impossibile caricare l'immagine della Terra per la mappa stereografica.",
+        "earthDrawFailed": "Impossibile disegnare l'immagine della Terra sulla tela: {error}"
       }
     }
   }

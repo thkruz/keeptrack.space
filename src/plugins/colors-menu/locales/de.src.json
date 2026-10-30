@@ -5,6 +5,9 @@
       "title": "Farbschemata",
       "rmbLabel": "Farbschema",
       "sectionLabel": "Schemata",
+      "legend": {
+        "close": "Legende schließen"
+      },
       "help": {
         "overview": "Das Menü Farbschemata ändert, wie jedes Objekt in der Szene eingefärbt wird. Jedes Schema kodiert eine andere Eigenschaft: Herkunftsland, Objekttyp, Orbitalregime, Sonnenlichtstatus, Geschwindigkeit und mehr. Mit dem richtigen Schema wird die Punktwolke zur Antwort auf eine konkrete Frage.",
         "imgAlt": "Das Menü Farbschemata mit den verfügbaren Schemata",
@@ -13,6 +16,13 @@
         "tip1": "Die Legende wird mit dem Schema aktualisiert; wenn Sie unsicher sind, was eine Farbe bedeutet, ist die Legende maßgeblich.",
         "tip2": "Einige Schemata sind datenintensiv (wie die räumliche Dichte) und brauchen beim ersten Auswählen einen Moment zur Berechnung.",
         "shortcutToggle": "Menü Farbschemata umschalten"
+      },
+      "commandPalette": {
+        "category": "Farben",
+        "setScheme": "Farbschema festlegen: {name}"
+      },
+      "errorMsgs": {
+        "schemeNotFound": "Farbschema nicht gefunden: {name}"
       }
     }
   }

@@ -219,7 +219,9 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
           <section class="kt-section">
             <div class="kt-section-label">${l('sections.notices')}</div>
             <div id="${KTOC_MENU_IDS.STATUS_MSG}" class="ktoc-status-msg" role="status" style="display:none;"></div>
-            <table id="${KTOC_MENU_IDS.TABLE}" class="ktoc-notices-table"></table>
+            <div class="ktoc-table-scroll">
+              <table id="${KTOC_MENU_IDS.TABLE}" class="ktoc-notices-table"></table>
+            </div>
             <div class="ktoc-pagination">
               <button id="${KTOC_MENU_IDS.PREV_PAGE}" class="ktoc-pagination-btn" type="button" disabled>${l('labels.previous')}</button>
               <span id="${KTOC_MENU_IDS.PAGE_TEXT}" class="ktoc-pagination-text">${KtocNoticesPlugin.pageText_(1, 1)}</span>

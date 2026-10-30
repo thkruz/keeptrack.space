@@ -80,6 +80,11 @@
 }
 
 /* ===== Table ===== */
+/* Long translated headers (ru, pl, uk) make the table wider than the menu; scroll it inside the card. */
+.ktoc-table-scroll {
+  overflow-x: auto;
+}
+
 #ktoc-notices-table {
   width: 100%;
   margin: 4px 0 0;
@@ -258,4 +263,10 @@
 #ktoc-notices-sat-info.collapsed .ktoc-sat-info-list,
 #ktoc-notices-sat-info.collapsed .ktoc-sat-info-show-all {
   display: none !important;
+}
+
+/* Phones: drop the event id column; the rest scrolls sideways in .ktoc-table-scroll. */
+body.is-mobile-mode #ktoc-notices-table th:nth-child(1),
+body.is-mobile-mode #ktoc-notices-table td:nth-child(1) {
+  display: none;
 }

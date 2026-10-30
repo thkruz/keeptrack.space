@@ -414,7 +414,7 @@ export class TimeManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const simDate = new Date(this.dynamicOffsetEpoch + this.staticOffset);
 
-    if (isNaN(simDate.getTime())) {
+    if (Number.isNaN(simDate.getTime())) {
       errorManagerInstance.warn(t7e('errorMsgs.TimeManager.invalidDate').replace('{epoch}', String(this.dynamicOffsetEpoch)).replace('{offset}', String(this.staticOffset)));
 
       return;

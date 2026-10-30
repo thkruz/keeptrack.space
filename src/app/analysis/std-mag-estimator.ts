@@ -262,7 +262,7 @@ export const lookupKnownVmag = (sat: Satellite): number | null => {
  * the UI render the existing "Unknown" string instead of a fabricated number.
  */
 export const estimateStdMagWithSource = (sat: Satellite): StdMagWithSource | null => {
-  if (typeof sat.vmag === 'number' && !isNaN(sat.vmag)) {
+  if (typeof sat.vmag === 'number' && !Number.isNaN(sat.vmag)) {
     // A back-fill that flagged its value as estimated (e.g. the VMag database
     // RCS fallback) keeps its 'estimate' provenance so the UI still renders the
     // `(est.)` suffix rather than presenting a coarse value as catalog-grade.

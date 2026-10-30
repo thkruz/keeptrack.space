@@ -256,7 +256,7 @@ export class TouchInput {
       // Two-finger gesture: pinch zoom + twist roll (no pitch/yaw to prevent jerk on finger release)
       const pinch = this.measurePinch_(touches);
 
-      if (!isNaN(pinch.pinchDistance) && pinch.pinchDistance > this.tapMovementThreshold) {
+      if (!Number.isNaN(pinch.pinchDistance) && pinch.pinchDistance > this.tapMovementThreshold) {
         this.pinchMove(pinch);
       }
     } else if (!this.isPinching) {

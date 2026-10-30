@@ -229,7 +229,7 @@ export class InputManager {
     if (typeof x === 'undefined' || typeof y === 'undefined') {
       throw new Error('x and y must be defined');
     }
-    if (isNaN(x) || isNaN(y)) {
+    if (Number.isNaN(x) || Number.isNaN(y)) {
       throw new Error('x and y must be numbers');
     }
 

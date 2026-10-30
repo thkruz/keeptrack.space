@@ -136,7 +136,7 @@ export abstract class DeepSpaceDesignators {
   private static normalizeSccNum_(val: string): string {
     const trimmed = val.trim();
 
-    return /^\d+$/u.test(trimmed) ? String(parseInt(trimmed, 10)) : trimmed.toUpperCase();
+    return /^\d+$/u.test(trimmed) ? String(Number.parseInt(trimmed, 10)) : trimmed.toUpperCase();
   }
 }
 

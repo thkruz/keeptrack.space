@@ -235,9 +235,9 @@ const main = async (): Promise<void> => {
         return 'n/a';
       }
       const sorted = [...a].sort((p, q) => p - q);
-      const med = sorted[(sorted.length / 2) | 0];
+      const med = sorted[Math.floor(sorted.length / 2)];
       const absSorted = a.map(Math.abs).sort((p, q) => p - q);
-      const p95 = absSorted[Math.min(absSorted.length - 1, (absSorted.length * 0.95) | 0)];
+      const p95 = absSorted[Math.min(absSorted.length - 1, Math.floor(absSorted.length * 0.95))];
 
       return `med=${med.toFixed(2)} p95|dx|=${p95.toFixed(2)} n=${a.length}`;
     };

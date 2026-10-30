@@ -68,7 +68,7 @@ const report = await page.evaluate(() => {
     isStrictPluginList: wo.isStrictPluginList === true,
     noCatalogOnLoad: sm.noCatalogOnLoad === true,
     isAutoStart: sm.isAutoStart === true,
-    enabled: Object.entries(plugins).filter(([, v]) => v?.enabled).map(([k]) => k).sort(),
+    enabled: Object.entries(plugins).filter(([, v]) => v?.enabled).map(([k]) => k).sort((a, b) => a.localeCompare(b)),
     scene: {
       moons: Object.keys((scene.moons ?? {}) as object).length,
       asteroids: Object.keys((scene.asteroids ?? {}) as object).length,

@@ -59,7 +59,7 @@ if (process.argv.includes('--list')) {
 }
 
 const outDir = resolve(REPO_ROOT, getArg('--out') ?? join('public', 'simulation'));
-const seedOffset = getArg('--seed') !== undefined ? parseInt(getArg('--seed')!, 10) : 0;
+const seedOffset = getArg('--seed') !== undefined ? Number.parseInt(getArg('--seed')!, 10) : 0;
 
 let selected: Scenario[];
 

@@ -6,6 +6,7 @@ import { readLockfile } from './lockfile';
 import { CliError, log } from './log';
 import { EXTERNAL_DIR, pluginDir } from './paths';
 import { readManifest, validateManifest } from './plugin-meta';
+import { trimChar } from './render-template';
 import { existingConfigKeys } from './existing-keys';
 
 const GIT_URL = /^(?:https?:\/\/|git@|ssh:\/\/|git:\/\/)/u;
@@ -17,8 +18,8 @@ export function isGitUrl(source: string): boolean {
 
 /** Derive a sanitized, kebab-case install name from a git URL's basename. */
 export function deriveName(url: string): string {
-  const raw = basename(url.replace(/\/+$/u, '')).replace(/\.git$/u, '');
-  const name = raw.toLowerCase().replaceAll(/[^a-z0-9]+/gu, '-').replace(/^-+|-+$/gu, '');
+  const raw = basename(trimChar(url, '/', { start: false })).replace(/\.git$/u, '');
+  const name = trimChar(raw.toLowerCase().replaceAll(/[^a-z0-9]+/gu, '-'), '-');
 
   if (!name) {
     throw new CliError(`Could not derive a plugin name from "${url}" — pass --name <name>.`);

@@ -120,7 +120,7 @@ export class VersionManager {
     }
 
     const citationContent = this.fileManager.readFile(citationPath);
-    const currentVersion = (/^version:\s*(.*)$/mu).exec(citationContent)?.[1]?.trim();
+    const currentVersion = (/^version:(.*)$/mu).exec(citationContent)?.[1]?.trim();
 
     // Nothing to do if the version already matches. Avoids rewriting date-released
     // on every build and the resulting working-tree churn.

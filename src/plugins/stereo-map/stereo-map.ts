@@ -71,6 +71,16 @@ interface GroundTracePoint {
   inView: boolean;
 }
 
+/** Grid label for a latitude/longitude line: `0°` on the equator/prime meridian, otherwise `20°N`, `120°W`, ... */
+export const gridDegreeLabel = (value: number, positive: string, negative: string): string => {
+  if (value === 0) {
+    return '0°';
+  }
+  const hemisphere = value > 0 ? positive : negative;
+
+  return `${Math.abs(value)}°${hemisphere}`;
+};
+
 export class StereoMap extends KeepTrackPlugin {
   readonly id = 'StereoMap';
   dependencies_ = [SelectSatManager.name];
@@ -938,16 +948,8 @@ export class StereoMap extends KeepTrackPlugin {
     ctx.lineWidth = 3;
     ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
 
-    const degLabel = (value: number, positive: string, negative: string): string => {
-      if (value === 0) {
-        return '0\u00B0';
-      }
-      const hemisphere = value > 0 ? positive : negative;
-
-      return `${Math.abs(value)}\u00B0${hemisphere}`;
-    };
-    const latLabel = (lat: number): string => degLabel(lat, 'N', 'S');
-    const lonLabel = (lon: number): string => degLabel(lon, 'E', 'W');
+    const latLabel = (lat: number): string => gridDegreeLabel(lat, 'N', 'S');
+    const lonLabel = (lon: number): string => gridDegreeLabel(lon, 'E', 'W');
     // Label steps follow the drawn map size, not a fixed 20 deg: the widest
     // label ("160\u00B0W") must fit between neighbours with a gap.
     const lonStep = StereoMap.pickLabelStep(w / 360, ctx.measureText(lonLabel(-160)).width, StereoMap.LON_LABEL_STEPS_);

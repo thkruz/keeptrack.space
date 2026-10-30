@@ -2,7 +2,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { StereoMap } from '@app/plugins/stereo-map/stereo-map';
+import { gridDegreeLabel, StereoMap } from '@app/plugins/stereo-map/stereo-map';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -155,5 +155,18 @@ describe('StereoMap input synchronization', () => {
 
       expect(p().orbitMultiplier_).toBe(20);
     });
+  });
+});
+
+describe('gridDegreeLabel', () => {
+  it.each([
+    [0, 'N', 'S', '0°'],
+    [20, 'N', 'S', '20°N'],
+    [-40, 'N', 'S', '40°S'],
+    [60, 'E', 'W', '60°E'],
+    [-120, 'E', 'W', '120°W'],
+    [180, 'E', 'W', '180°E'],
+  ])('%d with %s/%s -> %s', (value, positive, negative, expected) => {
+    expect(gridDegreeLabel(value, positive, negative)).toBe(expected);
   });
 });

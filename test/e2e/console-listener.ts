@@ -27,6 +27,7 @@ export interface ListenerHandle {
 export const DEFAULT_ALLOWLIST: AllowlistEntry[] = [
   { pattern: /geo3D exists\./u, reason: 'echarts-gl harmless re-registration on hot reload' },
   { pattern: /googleads\.g\.doubleclick\.net|googlesyndication\.com|adservice\.google/u, reason: 'Google ad provider 403/blocked requests in test env are not application bugs' },
+  { pattern: /googletagmanager\.com/u, reason: 'analytics tag blocked by DNS filters or locked-down test networks is not an application bug' },
   { pattern: /GPU stall due to ReadPixels/u, reason: 'Chromium WebGL driver perf hint, hardware-dependent and not actionable from app code' },
 ];
 

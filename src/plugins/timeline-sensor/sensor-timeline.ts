@@ -602,7 +602,7 @@ export class SensorTimeline extends KeepTrackPlugin {
 
         trackObservable(canObserve && weather === WeatherStatus.CLEAR, now, isLastSample);
 
-        const leftFov = trackInFov(isSatInFov, now, isLastSample);
+        trackInFov(isSatInFov, now, isLastSample);
 
         if (isOptical && this.detailedPlot) {
           trackNight(SensorTimeline.checkStationInNight(now, sensor), now, isLastSample);
@@ -611,11 +611,7 @@ export class SensorTimeline extends KeepTrackPlugin {
             trackClear(weather === WeatherStatus.CLEAR, now, isLastSample);
           }
         }
-
-        // Once the satellite leaves the field of view it cannot be back before most of an orbit has passed
-        if (leftFov && !this.detailedPlot) {
-          i += satellite.semiMajorAxis > 30000 ? satellite.period * 60 * 0.5 : satellite.period * 60 * 0.75;
-        }
+        // No skip-ahead after leaving the FOV: MEO/HEO objects over wide sensors can return within part of a period
       }
 
       pushRecords();

@@ -355,9 +355,15 @@ export class Calendar {
             this.simulationDate.getUTCFullYear() === this.calendarDate.getUTCFullYear() &&
             this.simulationDate.getUTCMonth() === this.calendarDate.getUTCMonth() &&
             this.simulationDate.getUTCDate() === dayCount;
-          const classes = [j === 0 || j === 6 ? 'ui-datepicker-week-end' : '', isToday ? 'ui-datepicker-today' : '', isSelected ? 'ui-datepicker-current-day' : '']
-            .filter(Boolean)
-            .join(' ');
+          const isWeekend = j === 0 || j === 6;
+          let classes = isWeekend ? 'ui-datepicker-week-end' : '';
+
+          if (isToday) {
+            classes = `${classes} ui-datepicker-today`.trim();
+          }
+          if (isSelected) {
+            classes = `${classes} ui-datepicker-current-day`.trim();
+          }
 
           const jday = ServiceLocator.getTimeManager().getUTCDayOfYear(new Date(Date.UTC(this.calendarDate.getUTCFullYear(), this.calendarDate.getUTCMonth(), dayCount)));
 

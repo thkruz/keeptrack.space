@@ -637,7 +637,12 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     if (!this.watchlistList) {
       return;
     }
-    this.isWatchlistChanged = this.isWatchlistChanged !== null;
+    // A null flag means "never touched"; any earlier value counts as a change
+    if (this.isWatchlistChanged === null) {
+      this.isWatchlistChanged = false;
+    } else {
+      this.isWatchlistChanged = true;
+    }
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // Drop entries whose satellite is no longer in the catalog. Filtering up

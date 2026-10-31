@@ -11,6 +11,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -19,10 +20,12 @@ import { readPositiveNumberInput } from '@app/engine/utils/positive-number-input
 import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import {
+  angularVelocityOfEarth,
   BaseObject,
   calcGmst,
   DEG2RAD,
   Degrees,
+  earthGravityParam,
   Hours,
   Kilometers,
   lla2eci,
@@ -571,6 +574,9 @@ export class SensorTimeline extends KeepTrackPlugin {
       const trackInFov = SensorTimeline.createIntervalTracker_(inFov.passes);
       const trackNight = SensorTimeline.createIntervalTracker_(night.passes);
       const trackClear = SensorTimeline.createIntervalTracker_(clear.passes);
+      // Detailed Plot also tracks night and clear skies, which change while the satellite is out of view
+      const canSkip = !this.detailedPlot;
+      const reach = SensorTimeline.visibilityReach_(satellite, sensor);
 
       // Radar and other non-optical sites do not care about daylight or clouds: those rows span the whole window
       if (!isOptical) {
@@ -584,7 +590,8 @@ export class SensorTimeline extends KeepTrackPlugin {
       for (let i = 0; i < durationInSeconds; i += interval) {
         const now = new Date(startDate.getTime() + i * 1000);
         const isLastSample = i + interval >= durationInSeconds;
-        const isSatInFov = SensorTimeline.checkSatInFOV(now, satellite.satrec!, sensor);
+        const rae = SatMath.getRae(now, satellite.satrec!, sensor) as { rng: Kilometers; el: Degrees; az: Degrees };
+        const isSatInFov = SensorTimeline.isRaeInFov_(rae, sensor);
         let weather = WeatherStatus.UNKOWN;
 
         // Weather only matters while the satellite is in view
@@ -611,13 +618,55 @@ export class SensorTimeline extends KeepTrackPlugin {
             trackClear(weather === WeatherStatus.CLEAR, now, isLastSample);
           }
         }
-        // No skip-ahead after leaving the FOV: MEO/HEO objects over wide sensors can return within part of a period
+
+        // Jump over samples the satellite cannot reach the sensor's view in; whole intervals keep the sample grid
+        if (canSkip && !isSatInFov) {
+          i += Math.floor(SensorTimeline.secondsUntilPossibleView_(rae, sensor, reach) / interval) * interval;
+        }
       }
 
       pushRecords();
     }
 
     return [AllPasses, AllSatInFoVs, AllSatinSuns, AllSensorNights, AllClearSkies];
+  }
+
+  /**
+   * Bounds for the pass search jump. maxAngle: the largest Earth-central angle between site and satellite at which the
+   * satellite can be above the sensor's lowest elevation (taken at apogee, where that angle is widest). maxRate: the
+   * fastest that angle can shrink (satellite angular rate at perigee plus Earth rotation, with a 10% margin).
+   */
+  private static visibilityReach_(satellite: Satellite, sensor: DetailedSensor): { maxAngle: Radians; maxRate: number } {
+    const siteRadius = RADIUS_OF_EARTH + sensor.alt;
+    const lowestEl = Math.min(sensor.minEl, sensor.minEl2 ?? sensor.minEl) * DEG2RAD;
+    const a = satellite.semiMajorAxis;
+    const e = satellite.eccentricity;
+    const apogeeRadius = a * (1 + e);
+    const perigeeRadius = a * (1 - e);
+    const maxAngle = Math.acos(Math.min(1, (siteRadius * Math.cos(lowestEl)) / apogeeRadius)) - lowestEl;
+    const angularMomentum = Math.sqrt(earthGravityParam * a * (1 - e * e));
+    const maxRate = (angularMomentum / (perigeeRadius * perigeeRadius) + angularVelocityOfEarth) * 1.1;
+
+    return { maxAngle: maxAngle as Radians, maxRate };
+  }
+
+  /**
+   * Lower bound on the seconds before an out-of-view satellite could enter the sensor's view: the Earth-central angle
+   * it must still close (less a 2 degree margin for the spherical Earth used here) divided by the fastest closing rate.
+   * Azimuth and range limits only shrink the view, so ignoring them keeps the bound safe for every FOV shape.
+   */
+  private static secondsUntilPossibleView_(rae: { rng: Kilometers; el: Degrees }, sensor: DetailedSensor, reach: { maxAngle: Radians; maxRate: number }): number {
+    if (!rae.rng) {
+      return 0;
+    }
+    const siteRadius = RADIUS_OF_EARTH + sensor.alt;
+    const elRad = rae.el * DEG2RAD;
+    const up = siteRadius + rae.rng * Math.sin(elRad);
+    const satRadius = Math.sqrt(siteRadius * siteRadius + rae.rng * rae.rng + 2 * siteRadius * rae.rng * Math.sin(elRad));
+    const centralAngle = Math.acos(Math.max(-1, Math.min(1, up / satRadius)));
+    const angleToClose = centralAngle - reach.maxAngle - 2 * DEG2RAD;
+
+    return angleToClose > 0 ? angleToClose / reach.maxRate : 0;
   }
 
   /**
@@ -649,8 +698,10 @@ export class SensorTimeline extends KeepTrackPlugin {
   }
 
   static checkSatInFOV(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): boolean {
-    const rae = SatMath.getRae(now, satrec, sensor) as { rng: Kilometers; el: Degrees; az: Degrees };
+    return SensorTimeline.isRaeInFov_(SatMath.getRae(now, satrec, sensor) as { rng: Kilometers; el: Degrees; az: Degrees }, sensor);
+  }
 
+  private static isRaeInFov_(rae: { rng: Kilometers; el: Degrees; az: Degrees }, sensor: DetailedSensor): boolean {
     if (!rae.az || !rae.el || !rae.rng) {
       return false;
     }

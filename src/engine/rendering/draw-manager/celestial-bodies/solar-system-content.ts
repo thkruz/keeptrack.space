@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { isProContentAllowed } from '@app/engine/core/pro-content-gate';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 import { registerMarsMoons } from './mars-moon-catalog';
@@ -50,7 +51,7 @@ export async function registerSolarSystemContent(): Promise<void> {
    * catch is for a pro build whose submodule is missing or failed to compile: the app should
    * come up with the free roster rather than not at all.
    */
-  if (__IS_PRO__) {
+  if (__IS_PRO__ && isProContentAllowed()) {
     try {
       const pack = await import(/* @vite-ignore */ '@plugins-pro/solar-system-pack/solar-system-pack');
 

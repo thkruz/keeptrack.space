@@ -1,3 +1,4 @@
+import { setProContentAllowed } from '../engine/core/pro-content-gate';
 import type { PluginDescriptor } from '../plugins/plugin-descriptor';
 import { pluginManifest } from '../plugins/plugin-manifest';
 import { KeepTrackEmbed } from './embed-api';
@@ -34,6 +35,7 @@ export interface PrepareEmbedDeps {
   isProBuild?: boolean;
   hostname?: string;
   warn?: (message: string) => void;
+  setProContent?: (allowed: boolean) => void;
 }
 
 export interface PreparedEmbed {
@@ -83,6 +85,8 @@ export function prepareEmbed(baseOverride: SettingsOverrideLike | undefined, dep
     license = status;
     if (status.edition !== 'pro' && isProBuild) {
       stripProPlugins(deps.manifest ?? pluginManifest);
+      // The hero-mesh and solar-system packs load outside the manifest; gate them the same way
+      (deps.setProContent ?? setProContentAllowed)(false);
     }
     const warning = licenseWarning(result);
 

@@ -43,7 +43,8 @@ const READY_POLL_MS = 100;
 const FORWARDED_METHODS = [
   'whenReady', 'getLicense', 'select', 'getSelected', 'setCamera', 'getTime', 'setTime', 'setRate',
   'pause', 'play', 'upsertObjects', 'removeObjects', 'getObject', 'listHostObjects', 'upsertSensors',
-  'removeSensors', 'setActiveSensors', 'addOverlay', 'removeOverlay', 'clearOverlays', 'setUi',
+  'removeSensors', 'setActiveSensors', 'addOverlay', 'removeOverlay', 'clearOverlays', 'setGroundTracks', 'setUi',
+  'setObjectStyle', 'setLayers', 'setPositionStream',
   'getPosition', 'getLookAngles', 'getAccessWindows', 'screenshot', 'execute',
 ] as const satisfies readonly (keyof KeepTrackEmbedApi)[];
 

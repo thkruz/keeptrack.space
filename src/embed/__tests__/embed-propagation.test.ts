@@ -125,8 +125,8 @@ describe('data out uses the display propagation entry (Sgp4.propagate)', () => {
     const gate = new EmbedPropagation(probe('sgp4-xp-wasm', { v: false }, { v: 0 }));
     const data = new EmbedData({} as never, {} as never, {} as EmbedSensors, gate);
 
-    expect(() => data.getPosition({ hostId: 'a' })).toThrow(/still loading/);
-    expect(() => data.getLookAngles('s', { hostId: 'a' })).toThrow(/still loading/);
-    expect(() => data.getAccessWindows('s', { hostId: 'a' }, 0, 1)).toThrow(/still loading/);
+    expect(() => data.getPosition({ hostId: 'a' })).toThrow(/still loading/u);
+    expect(() => data.getLookAngles('s', { hostId: 'a' })).toThrow(/still loading/u);
+    expect(() => data.getAccessWindows('s', { hostId: 'a' }, 0, 1)).toThrow(/still loading/u);
   });
 });

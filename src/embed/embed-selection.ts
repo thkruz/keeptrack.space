@@ -60,9 +60,11 @@ export class EmbedSelection {
 
   select(ref: ObjectRef | null): Promise<boolean> {
     this.cancelPending_?.();
+    // Keeps the caller origin (host or remote) for the retry timers below
+    const runAs = this.ctx_.captureRunner();
 
     if (ref === null) {
-      return Promise.resolve(this.ctx_.runAsHost(() => this.engine_.selectById(-1)));
+      return Promise.resolve(runAs(() => this.engine_.selectById(-1)));
     }
     const id = this.catalog_.resolveRef(ref);
 
@@ -81,7 +83,7 @@ export class EmbedSelection {
         resolve(ok);
       };
       const attempt = (): void => {
-        if (this.ctx_.runAsHost(() => this.engine_.selectById(id))) {
+        if (runAs(() => this.engine_.selectById(id))) {
           finish(true);
         } else if (Date.now() - startedAt >= SELECT_TIMEOUT_MS) {
           finish(false);

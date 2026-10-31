@@ -9,6 +9,9 @@ type Listener<E extends EmbedEventName> = (payload: EmbedEventMap[E]) => void;
 export class EmbedContext {
   private readonly listeners_ = new Map<EmbedEventName, Set<Listener<EmbedEventName>>>();
   private hostDepth_ = 0;
+  /** Origin applied to runAsHost() scopes: 'remote' while a relay command executes synchronously. */
+  private callerOrigin_: 'host' | 'remote' = 'host';
+  private activeOrigin_: 'host' | 'remote' = 'host';
 
   constructor(private readonly ownership_: Partial<Record<EmbedDomain, DomainOwner>> = {}) {}
 
@@ -23,18 +26,45 @@ export class EmbedContext {
     }
   }
 
-  /** Runs fn marking every engine change it causes as source 'host'. */
+  /** Runs fn marking every engine change it causes as source 'host' (or 'remote' inside runAsRemote). */
   runAsHost<T>(fn: () => T): T {
+    return this.runAsOrigin_(this.callerOrigin_, fn);
+  }
+
+  /** Runs fn (the synchronous part of a relay command) so that runAsHost() scopes inside it report source 'remote'. */
+  runAsRemote<T>(fn: () => T): T {
+    const previous = this.callerOrigin_;
+
+    this.callerOrigin_ = 'remote';
+    try {
+      return fn();
+    } finally {
+      this.callerOrigin_ = previous;
+    }
+  }
+
+  /** Captures the current caller origin so later (async) runAsHost-style scopes keep it. */
+  captureRunner(): <T>(fn: () => T) => T {
+    const origin = this.callerOrigin_;
+
+    return <T>(fn: () => T): T => this.runAsOrigin_(origin, fn);
+  }
+
+  private runAsOrigin_<T>(origin: 'host' | 'remote', fn: () => T): T {
+    const previous = this.activeOrigin_;
+
+    this.activeOrigin_ = origin;
     this.hostDepth_++;
     try {
       return fn();
     } finally {
       this.hostDepth_--;
+      this.activeOrigin_ = previous;
     }
   }
 
   get source(): ChangeSource {
-    return this.hostDepth_ > 0 ? 'host' : 'user';
+    return this.hostDepth_ > 0 ? this.activeOrigin_ : 'user';
   }
 
   on<E extends EmbedEventName>(event: E, listener: Listener<E>): () => void {

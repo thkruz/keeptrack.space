@@ -1,0 +1,25 @@
+{
+  "name": "@keeptrack/embed-client",
+  "version": "0.1.0",
+  "description": "TypeScript client for driving a KeepTrack embed through a relay (Node >= 24 and browsers).",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "import": "./dist/index.js" }
+  },
+  "files": ["dist", "LICENSE", "README.md"],
+  "sideEffects": false,
+  "devDependencies": { "@types/node": "^24.0.0", "@types/ws": "^8.5.0", "ws": "^8.18.0" },
+  "scripts": {
+    "sync-contract": "node scripts/sync-contract.mjs",
+    "check-contract": "node scripts/sync-contract.mjs --check",
+    "build": "node scripts/sync-contract.mjs && tsc -p tsconfig.build.json",
+    "typecheck": "node scripts/sync-contract.mjs && tsc --noEmit -p tsconfig.json",
+    "example": "node scripts/sync-contract.mjs && tsc -p tsconfig.example.json && node dist-example/examples/drive.js",
+    "test": "node scripts/sync-contract.mjs && vitest run"
+  }
+}

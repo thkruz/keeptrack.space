@@ -15,7 +15,7 @@
  * Licensed under the MIT License (unlike the AGPL engine) so hosts can vendor it.
  */
 
-export const EMBED_API_VERSION = '1.0.0';
+export const EMBED_API_VERSION = '1.1.0';
 
 // ---------------------------------------------------------------------------
 // Boot configuration
@@ -92,6 +92,23 @@ export interface EmbedConfig {
    * meaning between KeepTrack releases.
    */
   settings?: Record<string, unknown>;
+  /**
+   * Remote control channel. When set, the engine dials out to a relay over WebSocket after `ready` and
+   * accepts EmbedCommands from relay clients (scripts, backends). Host-configured only: there is no URL
+   * parameter for it, so a third-party link can never attach someone's KeepTrack to a foreign relay.
+   */
+  remote?: EmbedRemoteConfig;
+}
+
+export interface EmbedRemoteConfig {
+  /** ws:// or wss:// URL of the relay. */
+  url: string;
+  /** Session name clients use to address this engine on the relay. */
+  session: string;
+  /** Shared secret checked by the relay (sent in the hello message, never in the URL). */
+  token?: string;
+  /** Reconnect with backoff after a dropped connection. Default true. */
+  reconnect?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -226,8 +243,11 @@ export interface EmbedLicenseStatus {
 // Events
 // ---------------------------------------------------------------------------
 
-/** 'host' = caused by an API call, 'user' = caused by interaction inside KeepTrack. */
-export type ChangeSource = 'host' | 'user';
+/**
+ * 'host' = caused by an in-page API call, 'remote' = caused by a command from the relay channel,
+ * 'user' = caused by interaction inside KeepTrack. Remote commands obey host ownership rules.
+ */
+export type ChangeSource = 'host' | 'remote' | 'user';
 
 export interface EmbedEventMap {
   ready: { version: string; license: EmbedLicenseStatus };
@@ -237,6 +257,7 @@ export interface EmbedEventMap {
   /** The user tried to change a host-owned domain. `value` is what they asked for. */
   changeRequested: { domain: 'selection'; value: EmbedObjectInfo | null } | { domain: 'time'; value: Partial<EmbedTimeState> } | { domain: EmbedDomain; value: unknown };
   error: { code: EmbedErrorCode; message: string };
+  remoteStatus: { state: 'connecting' | 'connected' | 'disconnected' | 'rejected'; detail?: string };
 }
 
 export type EmbedEventName = keyof EmbedEventMap;
@@ -366,3 +387,63 @@ export type EmbedCommandResult = { id?: string; ok: true; result: unknown } | { 
 export const EMBED_CONFIG_PROPERTY = '__keepTrackEmbedConfig';
 /** CustomEvent dispatched on the <iframe> element (detail: EmbedEventMap['ready']) when the facade is ready. */
 export const EMBED_READY_EVENT = 'keeptrack-embed:ready';
+
+// ---------------------------------------------------------------------------
+// Remote relay wire protocol (WebSocket, one JSON object per text frame)
+// ---------------------------------------------------------------------------
+
+export const RELAY_PROTOCOL_VERSION = 1;
+
+/** First frame on every connection. The relay closes the socket (code 4401) on a bad token. */
+export interface RelayHello {
+  type: 'hello';
+  protocol: number;
+  role: 'engine' | 'client';
+  session: string;
+  token?: string;
+  /** Engine only: EMBED_API_VERSION of the engine. */
+  apiVersion?: string;
+}
+
+/** Relay reply to a hello. `engineOnline` tells a client whether the session currently has an engine. */
+export interface RelayWelcome {
+  type: 'welcome';
+  protocol: number;
+  session: string;
+  engineOnline: boolean;
+  apiVersion?: string;
+}
+
+/** Client -> relay -> engine. The relay prefixes `id` with a per-client tag and restores it on the way back. */
+export interface RelayCommand {
+  type: 'command';
+  command: EmbedCommand;
+}
+
+/** Engine -> relay -> the client that sent the command. */
+export interface RelayResult {
+  type: 'result';
+  result: EmbedCommandResult;
+}
+
+/** Engine -> relay -> every client subscribed to the event (all events by default). */
+export interface RelayEvent {
+  type: 'event';
+  name: EmbedEventName;
+  payload: unknown;
+}
+
+/** Client -> relay: limit which events this client receives. Empty array = none. */
+export interface RelaySubscribe {
+  type: 'subscribe';
+  events: EmbedEventName[] | '*';
+}
+
+/** Relay -> client when the session's engine connects or drops. */
+export interface RelayEngineStatus {
+  type: 'engine-status';
+  online: boolean;
+  apiVersion?: string;
+}
+
+export type RelayMessage = RelayHello | RelayWelcome | RelayCommand | RelayResult | RelayEvent | RelaySubscribe | RelayEngineStatus;

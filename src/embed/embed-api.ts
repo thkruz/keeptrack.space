@@ -4,6 +4,7 @@ import { EmbedContext } from './embed-context';
 import { EmbedData } from './embed-data';
 import type { EmbedEngine } from './embed-engine';
 import { EmbedOverlays } from './embed-overlays';
+import { EmbedRemote } from './embed-remote';
 import { EmbedSelection } from './embed-selection';
 import { EmbedSensors } from './embed-sensors';
 import { EmbedTime } from './embed-time';
@@ -112,6 +113,7 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
   private readonly overlays_: EmbedOverlays;
   private readonly data_: EmbedData;
   private readonly ui_: EmbedUi;
+  private remote_: EmbedRemote | null = null;
 
   constructor(
     private readonly engine_: EmbedEngine,
@@ -185,6 +187,7 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.dispatchReadyEvent_(readyPayload);
     this.ctx_.emit('ready', readyPayload);
     this.resolveReady_();
+    this.startRemote_();
     if (mismatch) {
       // Deferred so hosts that subscribe in their whenReady() continuation still receive it
       setTimeout(() => {
@@ -194,6 +197,20 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
         });
       }, 0);
     }
+  }
+
+  /** Dial the relay when the host configured one. There is deliberately no other way to enable it. */
+  private startRemote_(): void {
+    if (!this.config_.remote) {
+      return;
+    }
+    this.remote_ = new EmbedRemote(this.config_.remote, {
+      execute: (command) => this.execute(command, 'remote'),
+      on: (event, listener) => this.on(event, listener),
+      emitStatus: (status) => this.ctx_.emit('remoteStatus', status),
+      apiVersion: this.version,
+    });
+    this.remote_.start();
   }
 
   private dispatchReadyEvent_(payload: EmbedEventMap['ready']): void {
@@ -400,7 +417,8 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
 
   // ---- JSON channel -------------------------------------------------------
 
-  async execute(command: EmbedCommand): Promise<EmbedCommandResult> {
+  /** `source` is 'host' for in-page callers and 'remote' for relay commands (attributes the resulting *Changed events). */
+  async execute(command: EmbedCommand, source: 'host' | 'remote' = 'host'): Promise<EmbedCommandResult> {
     const id = command?.id;
 
     try {
@@ -414,7 +432,7 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
       }
       const args = Array.isArray(command.args) ? command.args : [];
       const method = (this as unknown as Record<string, (...a: unknown[]) => unknown>)[cmd];
-      let result = await method.apply(this, args);
+      let result = await (source === 'remote' ? this.ctx_.runAsRemote(() => method.apply(this, args)) : method.apply(this, args));
 
       if (typeof Blob !== 'undefined' && result instanceof Blob) {
         result = await blobToBase64(result);

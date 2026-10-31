@@ -27,7 +27,8 @@
         "satellitesHeader": "Satelliti",
         "actionsHeader": "Azioni",
         "displayHeader": "Visualizzazione",
-        "labelsHeader": "Etichette"
+        "labelsHeader": "Etichette",
+        "reportList": "Rapporto sulla lista di controllo"
       },
       "msgs": {
         "watchlistLoaded": "Lista di osservazione caricata con {count} satelliti"

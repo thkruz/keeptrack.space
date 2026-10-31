@@ -348,6 +348,21 @@
           "noSensor": "Nessun sensore selezionato; seleziona un sensore per elencare le finestre di passaggio.",
           "uncertaintyAssumed": "L'incertezza 1-sigma e l'età GP dell'oggetto analista sono assunte dal genitore ({parent}) e la Pc dell'avvicinamento usa la covarianza del genitore. L'errore di esecuzione della manovra non è modellato."
         }
+      },
+      "batch": {
+        "source": "Origine",
+        "selected": "Oggetto selezionato",
+        "search": "Risultati di ricerca ({count})",
+        "watchlist": "Lista di controllo ({count})",
+        "note": "Modalità batch: un unico CSV combinato con le colonne NORAD e Nome. I rapporti di congiunzione e di manovra richiedono un solo oggetto.",
+        "progress": "Generazione {done} di {total}...",
+        "cancel": "Annulla",
+        "confirmLarge": "Questo batch comprende {count} oggetti e può richiedere tempo. Continuare?",
+        "truncated": "Vengono usati solo i primi {max} di {count} oggetti.",
+        "empty": "L'origine scelta non contiene oggetti.",
+        "done": "Rapporto batch salvato: {rows} righe da {objects} oggetti ({empty} senza dati, {failed} saltati).",
+        "rowsTruncated": "Output troncato a {max} righe.",
+        "unavailable": "Non disponibile per un rapporto batch"
       }
     }
   }

@@ -348,6 +348,21 @@
           "noSensor": "Nie wybrano sensora; wybierz sensor, aby wyświetlić okna przelotów.",
           "uncertaintyAssumed": "Niepewność 1-sigma i wiek GP obiektu analitycznego przyjęto od jego rodzica ({parent}), a Pc zbliżenia używa kowariancji rodzica. Błąd wykonania manewru nie jest modelowany."
         }
+      },
+      "batch": {
+        "source": "Źródło",
+        "selected": "Wybrany obiekt",
+        "search": "Wyniki wyszukiwania ({count})",
+        "watchlist": "Lista obserwowanych ({count})",
+        "note": "Tryb wsadowy: jeden wspólny plik CSV z kolumnami NORAD i Nazwa. Raporty zbliżeń i manewrów wymagają pojedynczego obiektu.",
+        "progress": "Generowanie {done} z {total}...",
+        "cancel": "Anuluj",
+        "confirmLarge": "Ta partia obejmuje {count} obiektów i może potrwać. Kontynuować?",
+        "truncated": "Użyto tylko pierwszych {max} z {count} obiektów.",
+        "empty": "Wybrane źródło nie zawiera obiektów.",
+        "done": "Zapisano raport wsadowy: {rows} wierszy z {objects} obiektów ({empty} bez danych, {failed} pominięto).",
+        "rowsTruncated": "Wynik obcięto do {max} wierszy.",
+        "unavailable": "Niedostępne dla raportu wsadowego"
       }
     }
   }

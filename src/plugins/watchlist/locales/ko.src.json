@@ -27,7 +27,8 @@
         "satellitesHeader": "위성",
         "actionsHeader": "작업",
         "displayHeader": "표시",
-        "labelsHeader": "레이블"
+        "labelsHeader": "레이블",
+        "reportList": "관심 목록 보고서"
       },
       "msgs": {
         "watchlistLoaded": "{count}개의 위성으로 관심 목록을 불러왔습니다"

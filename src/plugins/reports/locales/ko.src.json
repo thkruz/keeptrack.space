@@ -348,6 +348,21 @@
           "noSensor": "선택된 센서가 없습니다. 통과 구간을 보려면 센서를 선택하세요.",
           "uncertaintyAssumed": "분석 객체의 1-시그마 불확도와 GP 경과 시간은 부모({parent})에서 가정하며, 근접 접근 Pc도 부모의 공분산을 사용합니다. 기동 실행 오차는 모델링하지 않습니다."
         }
+      },
+      "batch": {
+        "source": "소스",
+        "selected": "선택한 객체",
+        "search": "검색 결과 ({count})",
+        "watchlist": "관심 목록 ({count})",
+        "note": "일괄 모드: NORAD와 이름 열이 있는 하나의 CSV로 합칩니다. 접근 및 기동 보고서는 단일 객체가 필요합니다.",
+        "progress": "{total}개 중 {done}개 생성 중...",
+        "cancel": "취소",
+        "confirmLarge": "이 일괄 작업은 객체 {count}개를 대상으로 하며 시간이 걸릴 수 있습니다. 계속할까요?",
+        "truncated": "{count}개 중 처음 {max}개만 사용합니다.",
+        "empty": "선택한 소스에 객체가 없습니다.",
+        "done": "일괄 보고서 저장됨: 객체 {objects}개에서 {rows}행 (데이터 없음 {empty}, 건너뜀 {failed}).",
+        "rowsTruncated": "출력이 {max}행에서 잘렸습니다.",
+        "unavailable": "일괄 보고서에서는 사용할 수 없음"
       }
     }
   }

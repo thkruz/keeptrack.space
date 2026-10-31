@@ -27,7 +27,8 @@
         "satellitesHeader": "Satellites",
         "actionsHeader": "Actions",
         "displayHeader": "Display",
-        "labelsHeader": "Labels"
+        "labelsHeader": "Labels",
+        "reportList": "Report on Watchlist"
       },
       "msgs": {
         "watchlistLoaded": "Watchlist Loaded with {count} Satellites"

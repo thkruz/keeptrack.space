@@ -348,6 +348,21 @@
           "noSensor": "Aucun capteur sélectionné ; sélectionnez un capteur pour lister les fenêtres de passage.",
           "uncertaintyAssumed": "L'incertitude à 1 sigma et l'âge GP de l'objet analyste sont repris de son parent ({parent}), et la Pc du rapprochement utilise la covariance du parent. L'erreur d'exécution de la manœuvre n'est pas modélisée."
         }
+      },
+      "batch": {
+        "source": "Source",
+        "selected": "Objet sélectionné",
+        "search": "Résultats de recherche ({count})",
+        "watchlist": "Liste de suivi ({count})",
+        "note": "Mode par lot : un seul CSV combiné avec les colonnes NORAD et Nom. Les rapports de conjonction et de manœuvre exigent un seul objet.",
+        "progress": "Génération {done} sur {total}...",
+        "cancel": "Annuler",
+        "confirmLarge": "Ce lot couvre {count} objets et peut être long. Continuer ?",
+        "truncated": "Seuls les {max} premiers objets sur {count} sont utilisés.",
+        "empty": "La source choisie ne contient aucun objet.",
+        "done": "Rapport par lot enregistré : {rows} lignes pour {objects} objets ({empty} sans données, {failed} ignorés).",
+        "rowsTruncated": "Sortie coupée à {max} lignes.",
+        "unavailable": "Indisponible pour un rapport par lot"
       }
     }
   }

@@ -209,6 +209,9 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
           <button id="watchlist-open" type="button" class="kt-action waves-effect">
             <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.loadList' as Parameters<typeof t7e>[0])}</span>
           </button>
+          <button id="watchlist-report" type="button" class="kt-action waves-effect">
+            <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.reportList' as Parameters<typeof t7e>[0])}</span>
+          </button>
           <button id="watchlist-clear" type="button" class="kt-action waves-effect">
             <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.clearList' as Parameters<typeof t7e>[0])}</span>
           </button>
@@ -594,6 +597,11 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     getEl('watchlist-save')?.addEventListener('click', (evt: Event) => {
       this.onSaveClicked_(evt);
+    });
+
+    getEl('watchlist-report')?.addEventListener('click', () => {
+      ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+      PluginRegistry.getPluginByName<KeepTrackPlugin & { openForBatch?: (source: 'watchlist') => void }>('ReportsPlugin')?.openForBatch?.('watchlist');
     });
 
     getEl('watchlist-clear')?.addEventListener('click', () => {

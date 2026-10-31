@@ -27,7 +27,8 @@
         "satellitesHeader": "Satelliten",
         "actionsHeader": "Aktionen",
         "displayHeader": "Anzeige",
-        "labelsHeader": "Beschriftungen"
+        "labelsHeader": "Beschriftungen",
+        "reportList": "Bericht zur Beobachtungsliste"
       },
       "msgs": {
         "watchlistLoaded": "Beobachtungsliste mit {count} Satelliten geladen"

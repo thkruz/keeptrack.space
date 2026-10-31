@@ -27,7 +27,8 @@
         "satellitesHeader": "Satelity",
         "actionsHeader": "Akce",
         "displayHeader": "Zobrazení",
-        "labelsHeader": "Popisky"
+        "labelsHeader": "Popisky",
+        "reportList": "Zpráva o seznamu sledování"
       },
       "msgs": {
         "watchlistLoaded": "Seznam sledovaných načten s {count} satelity"

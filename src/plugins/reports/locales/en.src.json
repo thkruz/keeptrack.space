@@ -348,6 +348,21 @@
           "noSensor": "No sensor selected; select a sensor to list pass windows.",
           "uncertaintyAssumed": "The analyst object's 1-sigma uncertainty and GP age are assumed from its parent ({parent}), and the close-approach Pc uses the parent's covariance. Burn execution error is not modelled."
         }
+      },
+      "batch": {
+        "source": "Source",
+        "selected": "Selected object",
+        "search": "Search results ({count})",
+        "watchlist": "Watchlist ({count})",
+        "note": "Batch mode: one combined CSV with NORAD and Name columns. Conjunction and maneuver reports need a single selected object.",
+        "progress": "Generating {done} of {total}...",
+        "cancel": "Cancel",
+        "confirmLarge": "This batch covers {count} objects and may take a while. Continue?",
+        "truncated": "Only the first {max} of {count} objects are used.",
+        "empty": "There are no objects in the chosen source.",
+        "done": "Batch report saved: {rows} rows from {objects} objects ({empty} without data, {failed} skipped).",
+        "rowsTruncated": "Output cut at {max} rows.",
+        "unavailable": "Not available for a batch report"
       }
     }
   }

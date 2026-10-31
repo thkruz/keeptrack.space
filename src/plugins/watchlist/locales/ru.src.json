@@ -27,7 +27,8 @@
         "satellitesHeader": "Спутники",
         "actionsHeader": "Действия",
         "displayHeader": "Отображение",
-        "labelsHeader": "Метки"
+        "labelsHeader": "Метки",
+        "reportList": "Отчёт по списку наблюдения"
       },
       "msgs": {
         "watchlistLoaded": "Список наблюдения загружен: {count} спутников"

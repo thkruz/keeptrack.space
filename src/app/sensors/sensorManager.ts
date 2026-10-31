@@ -606,22 +606,22 @@ export class SensorManager {
     if (!sensor) {
       throw new Error(t7e('errorMsgs.SensorNotFound'));
     }
-    // Station Lat Lon Alt vector for further ECI transformation
-    const lla = {
+
+    // Station geodetic position (radians) for the ECI transformation
+    const geodetic = {
       lat: (sensor.lat * DEG2RAD) as Radians,
       lon: (sensor.lon * DEG2RAD) as Radians,
       alt: sensor.alt,
     };
     const { gmst } = calcGmst(now);
     const sunPos = Sun.eci(now);
-    const sensorPos = lla2eci(lla, gmst);
+    const sensorPos = lla2eci(geodetic, gmst);
 
     sensor.position = sensorPos;
+
     const sunStatus = SatMath.calculateGroundSiteSunStatus(sensorPos, sunPos);
 
-    return {
-      sunStatus,
-    };
+    return { sunStatus };
   }
 
   private canStationObserve_(now: Date, sensor: DetailedSensor): boolean {

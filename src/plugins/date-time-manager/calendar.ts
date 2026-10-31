@@ -17,11 +17,13 @@ export class Calendar {
   private readonly containerId: string;
   private calendarDate: Date;
   private simulationDate: Date;
-  private propagationRate: number = 1;
   private isVisible: boolean = false;
   private isEscapeCancel_ = false;
   /** attachEvents() runs after every render; the container persists, so only bind its click once */
   private isContainerClickBound_ = false;
+
+  /** Current time-warp multiplier; 1 is real time, 0 is paused */
+  private propagationRate = 1;
 
   // PropRate Slider limits
   private readonly propRateLimitMin = -20;
@@ -158,13 +160,17 @@ export class Calendar {
     if (nowButton) {
       nowButton.addEventListener('click', this.setToNow.bind(this));
     }
+
     if (pauseButton) {
-      if (this.propagationRate === 0) {
-        pauseButton.addEventListener('click', this.playProp.bind(this));
-      } else {
-        pauseButton.addEventListener('click', this.pauseProp.bind(this));
-      }
+      pauseButton.addEventListener('click', () => {
+        if (this.propagationRate === 0) {
+          this.playProp();
+        } else {
+          this.pauseProp();
+        }
+      });
     }
+
     if (doneButton) {
       doneButton.addEventListener('click', this.hideDatePicker.bind(this));
     }
@@ -321,8 +327,7 @@ export class Calendar {
 
     return daysOfWeek
       .map(
-        (day, index) =>
-          `<th scope="col" class="${index === 0 || index === 6 ? 'ui-datepicker-week-end' : ''}">
+        (day, index) => `<th scope="col" class="${index === 0 || index === 6 ? 'ui-datepicker-week-end' : ''}">
         <span title="${this.getUTCDayFullName(index)}">${day}</span>
       </th>`
       )
@@ -346,7 +351,7 @@ export class Calendar {
           const isToday =
             this.calendarDate.getUTCFullYear() === today.getUTCFullYear() && this.calendarDate.getUTCMonth() === today.getUTCMonth() && dayCount === today.getUTCDate();
           const isSelected =
-            this.simulationDate &&
+            !!this.simulationDate &&
             this.simulationDate.getUTCFullYear() === this.calendarDate.getUTCFullYear() &&
             this.simulationDate.getUTCMonth() === this.calendarDate.getUTCMonth() &&
             this.simulationDate.getUTCDate() === dayCount;
@@ -609,13 +614,13 @@ export class Calendar {
       const jdayElement: HTMLElement | null | undefined = target.parentElement?.querySelector('.ui-datepicker-jday');
 
       // If we pick the calendar day, find the parent, then get the second span (class === ui-datepicker-jday)
-      dayOfYear = parseInt(jdayElement?.innerText ?? '-1');
+      dayOfYear = jdayElement ? parseInt(jdayElement.innerText, 10) : -1;
     } else if (target.tagName === 'A') {
       const jdayElement: HTMLElement | null = target.querySelector('.ui-datepicker-jday');
 
-      dayOfYear = parseInt(jdayElement?.innerText ?? '-1');
+      dayOfYear = jdayElement ? parseInt(jdayElement.innerText, 10) : -1;
     } else if (target.classList.contains('ui-datepicker-jday')) {
-      dayOfYear = parseInt(target.innerText);
+      dayOfYear = parseInt(target.innerText, 10);
     }
 
     if (dayOfYear === -1) {
@@ -750,7 +755,7 @@ export class Calendar {
     this.updateSliderPosition('ui_tpicker_second_slider', second, 59);
   }
 
-  private updateSliderPosition(sliderId: string, value: number, range: number, min: number = 0): void {
+  private updateSliderPosition(sliderId: string, value: number, range: number, min = 0): void {
     const slider = document.getElementById(sliderId);
 
     if (slider) {

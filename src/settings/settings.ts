@@ -953,22 +953,20 @@ export class SettingsManager {
 }
 
 // Create a type based on the parameters of SettingsManager (ignore methods)
-export type SettingsManagerOverride = Partial<
-  Omit<
-    SettingsManager,
-    | 'exportSettingsToJSON'
-    | 'loadOverridesFromUrl_'
-    | 'loadLastMapTexture_'
-    | 'setEmbedOverrides_'
-    | 'setMobileSettings_'
-    | 'setInstallDirectory_'
-    | 'setColorSettings_'
-    | 'checkIfIframe_'
-    | 'initParseFromGETVariables_'
-    | 'loadOverrides_'
-    | 'createPropertyAccessors_'
-  >
->;
+type NonSettingMembers =
+  | 'exportSettingsToJSON'
+  | 'loadOverridesFromUrl_'
+  | 'loadLastMapTexture_'
+  | 'setEmbedOverrides_'
+  | 'setMobileSettings_'
+  | 'setInstallDirectory_'
+  | 'setColorSettings_'
+  | 'checkIfIframe_'
+  | 'initParseFromGETVariables_'
+  | 'loadOverrides_'
+  | 'createPropertyAccessors_';
+
+export type SettingsManagerOverride = Partial<Omit<SettingsManager, NonSettingMembers>>;
 
 // Export the settings manager instance
 

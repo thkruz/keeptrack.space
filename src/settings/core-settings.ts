@@ -111,8 +111,10 @@ export class CoreSettings {
   /** The initial time */
   simulationTime: Date | null = null;
   propRate = 1.0;
-  changeTimeWithKeyboardAmountBig = (1000 * 60 * 60) as Milliseconds; // 1 hour
-  changeTimeWithKeyboardAmountSmall = (1000 * 60) as Milliseconds; // 1 minute
+  /** Large step, in ms, for the keyboard time-change shortcuts (default 1 hour) */
+  changeTimeWithKeyboardAmountBig = <Milliseconds>3600000;
+  /** Small step, in ms, for the keyboard time-change shortcuts (default 1 minute) */
+  changeTimeWithKeyboardAmountSmall = <Milliseconds>60000;
 
   // Time Machine
   /**

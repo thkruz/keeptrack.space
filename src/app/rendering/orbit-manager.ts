@@ -417,6 +417,7 @@ export class OrbitManager {
 
   private toggleEciToEcf_() {
     settingsManager.isOrbitCruncherInEcf = !settingsManager.isOrbitCruncherInEcf;
+
     if (settingsManager.isOrbitCruncherInEcf) {
       ServiceLocator.getUiManager().toast(t7e('toasts.orbitsInEcf' as TranslationKey), ToastMsgType.normal);
     } else {

@@ -570,16 +570,18 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     // Remove button selected on watchlist menu
     getEl('watchlist-list')?.addEventListener('click', (evt: Event) => {
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-      if ((<HTMLElement>evt.target).classList.contains('sat-name')) {
-        const satName = (<HTMLElement>evt.target).dataset.satName;
+      const target = <HTMLElement>evt.target;
+
+      if (target.classList.contains('sat-name')) {
+        const satName = target.dataset.satName;
 
         if (satName) {
           this.selectSat(parseInt(satName, 10));
         } else {
           errorManagerInstance.debug('sat-name is null');
         }
-      } else if ((<HTMLElement>evt.target).classList.contains('watchlist-remove')) {
-        const satId = (<HTMLElement>evt.target).dataset.satId;
+      } else if (target.classList.contains('watchlist-remove')) {
+        const satId = target.dataset.satId;
 
         if (satId) {
           this.removeSat(parseInt(satId, 10));
@@ -651,7 +653,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
-             <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
+            <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
           </div>
           <div class="col s7 m7 l7">
              <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name || t7e('Common.unknown')}</span>
@@ -688,6 +690,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, this.serialize());
   }
 
+  /** Selects a satellite on the globe by catalog id. */
   selectSat(id: number) {
     const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 

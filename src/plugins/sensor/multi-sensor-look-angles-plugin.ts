@@ -42,7 +42,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
   // Settings
   private readonly lengthOfLookAngles_ = 1; // Days
-  private readonly angleCalculationInterval_ = <Seconds>30;
+  private readonly angleCalculationInterval_ = 30 as Seconds;
   private readonly disabledSensors_: DetailedSensor[] = [];
 
   constructor() {
@@ -358,10 +358,10 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
           multiSitePass = MultiSensorLookAnglesPlugin.propagateMultiSite_(now, satrec!, sensor);
         }
 
-        let canStationObserve = true;
-
         if (multiSitePass.time !== '') {
-          // Check visibility and add to multiSitePass
+          // Only optical sensors need darkness and illumination checks
+          let canStationObserve = true;
+
           if (sensor.type === SpaceObjectType.OPTICAL) {
             canStationObserve = SensorMath.checkIfVisibleForOptical(sat, sensor, now);
           }

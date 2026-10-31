@@ -55,17 +55,15 @@ interface CreateRequest {
   /** Shows a field error the composer or parser found after validation passed. */
   onFieldError: (error: FormFieldError) => void;
 }
-
 /**
  * CreateSat plugin for creating and editing satellites
  */
 export class CreateSat extends KeepTrackPlugin {
   readonly id = 'CreateSat';
-  dependencies_ = [SelectSatManager.name];
-
-  isRequireSatelliteSelected = false;
-
   static readonly elementPrefix = 'createSat';
+  dependencies_ = [SelectSatManager.name];
+  /** The menu button works with no satellite selected */
+  isRequireSatelliteSelected = false;
 
   /** Live "ghost orbit" preview drawn while the user edits the element set. */
   protected readonly orbitPreview_ = new OrbitPreview();
@@ -181,7 +179,7 @@ export class CreateSat extends KeepTrackPlugin {
         </div>
       </div>
     </div>
-  `;
+    `;
   }
 
   /**
@@ -241,12 +239,12 @@ export class CreateSat extends KeepTrackPlugin {
     // Defer so isMenuButtonActive has settled before drawing the preview orbit.
     setTimeout(() => this.updatePreview_(), 0);
   }
-
   /**
    * Add HTML and register events
    */
   addHtml(): void {
     super.addHtml();
+
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
     // Drop the preview orbit whenever the side menu closes.
     EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => this.orbitPreview_.clear());
@@ -267,7 +265,6 @@ export class CreateSat extends KeepTrackPlugin {
     // Submit and save buttons for Advanced tab (wrapped so the click event is not taken as a confirmed object)
     getEl('createSat-submit')!.addEventListener('click', () => CreateSat.createSatSubmit_());
     getEl('createSat-save')!.addEventListener('click', CreateSat.exportTLE_);
-
     // Submit button for Basic tab
     getEl('createSat-basic-submit')!.addEventListener('click', () => this.createSatBasicSubmit_());
 
@@ -545,7 +542,6 @@ export class CreateSat extends KeepTrackPlugin {
 
       try {
         const per = (1440 / parseFloat(meanmo)).toFixed(4);
-
         (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per.padStart(8, '0');
 
         /*
@@ -589,7 +585,6 @@ export class CreateSat extends KeepTrackPlugin {
       period: (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value,
     };
   }
-
   /**
    * Populate the form with default values
    */
@@ -597,13 +592,10 @@ export class CreateSat extends KeepTrackPlugin {
     // Set default inclination
     const defaultInc = 0;
     const inc = defaultInc.toFixed(4).padStart(8, '0');
-
     (getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement).value = inc;
-
     // The default epoch is "automatic": it follows the simulation clock until the user (or an import) sets one.
     getEl(`${CreateSat.elementPrefix}-day`, true)?.removeAttribute(CreateSat.AUTO_EPOCH_ATTR_);
     CreateSat.syncAutoEpoch_();
-
     // Set orbital parameters with reasonable defaults
     (getEl(`${CreateSat.elementPrefix}-rasc`) as HTMLInputElement).value = '000.0000';
     (getEl(`${CreateSat.elementPrefix}-ecen`) as HTMLInputElement).value = '0000000';
@@ -611,7 +603,6 @@ export class CreateSat extends KeepTrackPlugin {
     (getEl(`${CreateSat.elementPrefix}-argPe`) as HTMLInputElement).value = '000.0000';
     (getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement).value = '16.00000';
     (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = '90.00000';
-
     // Set metadata
     (getEl(`${CreateSat.elementPrefix}-src`) as HTMLInputElement).value = 'User Created';
     (getEl(`${CreateSat.elementPrefix}-name`) as HTMLInputElement).value = 'New Satellite';
@@ -806,13 +797,10 @@ export class CreateSat extends KeepTrackPlugin {
   protected static createSatSubmit_(confirmedObject?: Satellite): void {
     // An untouched epoch means "now": take the simulation time at submit.
     CreateSat.syncAutoEpoch_();
-
     // Attempt to fix formatting issues
     CreateSat.fixInputFormatting_();
-
     // Get all input values
     const inputParams = CreateSat.getTleInputs_();
-
     // Validate inputs: every invalid field is reported at once, inline.
     const errors = CreateSat.validateInputs_(inputParams);
 
@@ -942,7 +930,6 @@ export class CreateSat extends KeepTrackPlugin {
       // Check if TLE generation failed
       if (tle1 === 'Error') {
         errorManagerInstance.warn(t7e('plugins.CreateSat.errorMsgs.errorCreatingSat'));
-
         return;
       }
 
@@ -986,7 +973,6 @@ export class CreateSat extends KeepTrackPlugin {
         tle2,
         name: inputParams.name,
       };
-
       const newSat = new Satellite({
         ...info,
         ...{
@@ -995,6 +981,8 @@ export class CreateSat extends KeepTrackPlugin {
           source: inputParams.source,
         },
       });
+
+      newSat.active = true;
 
       // Add to catalog
       catalogManagerInstance.objectCache[satId] = newSat;
@@ -1073,9 +1061,7 @@ export class CreateSat extends KeepTrackPlugin {
 
       // Format TLE data
       const tleText = `${sat.tle1}\n${sat.tle2}`;
-      const blob = new Blob([tleText], {
-        type: 'text/plain;charset=utf-8',
-      });
+      const blob = new Blob([tleText], { type: 'text/plain;charset=utf-8' });
 
       saveAs(blob, `${scc}.tle`);
       ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.successMsgs.tleExported' as T7eKey), ToastMsgType.normal, true);

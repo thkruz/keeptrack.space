@@ -236,7 +236,7 @@ export class CameraSettings {
   /** Allows local rotation of the camera (roll, yaw, pitch) when in satellite view. */
   isLocalRotateEnabled = true;
 
-  /** Enables the camera widget */
+  /** Show the on-screen camera control widget */
   drawCameraWidget = false;
 
   /** Compensate for Earth rotation so the camera stays fixed to geographic coordinates */

@@ -174,8 +174,8 @@ export class StereoMap extends KeepTrackPlugin {
     const innerHtml = html`
       <div id="map-menu-canvas-wrap" style="position: relative;">
        <canvas id="map-2d" style="display: block;"></canvas>
-       <img id="map-sat" class="map-item map-look" src=${satellite2} width="40px" height="40px"/>
-       <img id="map-sensor" class="map-item map-look start-hidden" src=${radar1} width="40px" height="40px"/>
+       <img id="map-sat" class="map-item map-look" src="${satellite2}" width="40" height="40" />
+       <img id="map-sensor" class="map-item map-look start-hidden" src="${radar1}" width="40" height="40" />
        ${StereoMap.generateMapLooks_(50)}
       </div>
     `;
@@ -394,7 +394,7 @@ export class StereoMap extends KeepTrackPlugin {
 
   private static getMapPoints_(now: Date, sat: Satellite, sensorList: DetailedSensor[]): { lla: LlaVec3<Degrees, Kilometers>; overallView: boolean; time: string } {
     const time = dateFormat(now, 'isoDateTime', true);
-    let overallView: boolean = false;
+    let overallView = false;
     const { gmst } = calcGmst(now);
     const eci = sat.eci(now);
 
@@ -404,11 +404,8 @@ export class StereoMap extends KeepTrackPlugin {
 
     const lla = eci2lla(eci.position, gmst);
 
-    for (const sensor of sensorList) {
-      if (sensor.isSatInFov(sat, now)) {
-        overallView = true;
-      }
-    }
+    // In view when at least one selected sensor can currently see the satellite
+    overallView = sensorList.some((sensor) => sensor.isSatInFov(sat, now));
 
     return { lla, overallView, time };
   }
@@ -456,9 +453,9 @@ export class StereoMap extends KeepTrackPlugin {
         const dotDom = getEl(`map-look${selectableIdx}`) as HTMLImageElement | null;
 
         if (dotDom) {
-          dotDom.src = mapPoints.overallView ? yellowSquare : redSquare;
           dotDom.style.left = `${groundTracePoints[i - 1].x - this.halfDotSize_}px`;
           dotDom.style.top = `${groundTracePoints[i - 1].y - this.halfDotSize_}px`;
+          dotDom.src = mapPoints.overallView ? yellowSquare : redSquare;
           dotDom.dataset.time = mapPoints.time;
           dotDom.alt = `${sat.name} (${sat.sccNum}) — ${mapPoints.time} UTC — ${t7e(`plugins.StereoMap.labels.${mapPoints.overallView ? 'inView' : 'outOfView'}` as Parameters<typeof t7e>[0])}`;
           dotDom.setAttribute('role', 'button');
@@ -741,38 +738,36 @@ export class StereoMap extends KeepTrackPlugin {
 
   private static updateSensorPosition_() {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
-    const sensorDom = getEl('map-sensor') as HTMLImageElement | null;
-    let selectableIdx = 1;
+    const templateDom = getEl('map-sensor') as HTMLImageElement | null;
+    let markerNumber = 1;
 
-    // Reset all sensor elements
-    document.querySelectorAll('[id^="map-sensor-"]').forEach((sensor) => {
-      sensor.remove();
+    // Markers are rebuilt from scratch on every call
+    document.querySelectorAll('[id^="map-sensor-"]').forEach((marker) => {
+      marker.remove();
     });
 
-    if (!sensorDom || !sensorManagerInstance.isSensorSelected()) {
+    if (!templateDom || !sensorManagerInstance.isSensorSelected()) {
       return;
     }
 
     for (const sensor of sensorManagerInstance.currentSensors) {
-      const map = {
+      const px = {
         x: ((sensor.lon + 180) / 360) * settingsManager.mapWidth,
         y: settingsManager.mapHeight - ((sensor.lat + 90) / 180) * settingsManager.mapHeight,
       };
+      const marker = document.createElement('img');
 
-      // Add new sensor dynamically
-      const newSensor = document.createElement('img');
-
-      newSensor.id = `map-sensor-${selectableIdx}`;
-      newSensor.className = 'map-item map-look start-hidden';
-      newSensor.src = radar1;
-      newSensor.alt = sensor.name;
-      newSensor.style.left = `${map.x - sensorDom.width / 2}px`;
-      newSensor.style.top = `${map.y - sensorDom.height / 2}px`;
-      newSensor.style.width = `${sensorDom.width}px`;
-      newSensor.style.height = `${sensorDom.height}px`;
-      getEl('map-menu-canvas-wrap')?.appendChild(newSensor);
-      showEl(`map-sensor-${selectableIdx}`);
-      selectableIdx++;
+      marker.id = `map-sensor-${markerNumber}`;
+      marker.className = 'map-item map-look start-hidden';
+      marker.src = radar1;
+      marker.alt = sensor.name;
+      marker.style.left = `${px.x - templateDom.width / 2}px`;
+      marker.style.top = `${px.y - templateDom.height / 2}px`;
+      marker.style.width = `${templateDom.width}px`;
+      marker.style.height = `${templateDom.height}px`;
+      getEl('map-menu-canvas-wrap')?.appendChild(marker);
+      showEl(marker.id);
+      markerNumber++;
     }
   }
 

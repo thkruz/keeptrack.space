@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "在新标签页中打开",
     "blankPageHint": "页面空白？请在新标签页中打开。"
+  },
+  "simulationCleaners": {
+    "confirmTitle": "清除所有模拟",
+    "confirmMessage": "这将移除以下全部内容，且无法撤销。",
+    "confirmButton": "全部清除",
+    "commandLabel": "清除所有模拟",
+    "buttonLabel": "清除所有模拟",
+    "nothingToClear": "没有可清除的活动模拟。",
+    "cleared": "已清除 {count} 个模拟对象。",
+    "categories": {
+      "missiles": "导弹",
+      "breakup": "解体碎片",
+      "created": "已创建的卫星"
+    }
   }
 }

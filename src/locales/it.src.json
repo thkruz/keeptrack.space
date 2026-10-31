@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "Apri in una nuova scheda",
     "blankPageHint": "Pagina vuota? Aprila in una nuova scheda."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Cancella tutte le simulazioni",
+    "confirmMessage": "Questo rimuove tutto quanto segue. Non può essere annullato.",
+    "confirmButton": "Cancella tutto",
+    "commandLabel": "Cancella tutte le simulazioni",
+    "buttonLabel": "Cancella tutte le simulazioni",
+    "nothingToClear": "Nessuna simulazione attiva da cancellare.",
+    "cleared": "Cancellati {count} oggetti di simulazione.",
+    "categories": {
+      "missiles": "Missili",
+      "breakup": "Detriti da frammentazione",
+      "created": "Satelliti creati"
+    }
   }
 }

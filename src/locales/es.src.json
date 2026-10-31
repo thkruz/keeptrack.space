@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "Abrir en una pestaña nueva",
     "blankPageHint": "¿Página en blanco? Ábrala en una pestaña nueva."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Borrar todas las simulaciones",
+    "confirmMessage": "Esto elimina todo lo siguiente. No se puede deshacer.",
+    "confirmButton": "Borrar todo",
+    "commandLabel": "Borrar todas las simulaciones",
+    "buttonLabel": "Borrar todas las simulaciones",
+    "nothingToClear": "No hay simulaciones activas que borrar.",
+    "cleared": "Se borraron {count} objetos de simulación.",
+    "categories": {
+      "missiles": "Misiles",
+      "breakup": "Restos de fragmentación",
+      "created": "Satélites creados"
+    }
   }
 }

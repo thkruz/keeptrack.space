@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "Ouvrir dans un nouvel onglet",
     "blankPageHint": "Page vide ? Ouvrez-la dans un nouvel onglet."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Effacer toutes les simulations",
+    "confirmMessage": "Ceci supprime tout ce qui suit. Action irréversible.",
+    "confirmButton": "Tout effacer",
+    "commandLabel": "Effacer toutes les simulations",
+    "buttonLabel": "Effacer toutes les simulations",
+    "nothingToClear": "Aucune simulation active à effacer.",
+    "cleared": "{count} objets de simulation effacés.",
+    "categories": {
+      "missiles": "Missiles",
+      "breakup": "Débris de fragmentation",
+      "created": "Satellites créés"
+    }
   }
 }

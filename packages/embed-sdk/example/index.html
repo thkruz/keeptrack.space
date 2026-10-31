@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KeepTrack embed host example</title>
+  <style>
+    body { margin: 0; font: 14px system-ui, sans-serif; display: grid; grid-template-columns: 280px 1fr; height: 100vh; }
+    aside { padding: 12px; overflow: auto; border-right: 1px solid #ccc; }
+    #sats button { display: block; width: 100%; margin-bottom: 6px; padding: 8px; }
+    #time { width: 100%; }
+    #log { white-space: pre-wrap; font: 12px monospace; }
+    #kt { min-width: 0; }
+  </style>
+</head>
+<body>
+  <aside>
+    <h3>Satellites</h3>
+    <div id="sats"></div>
+    <h3>Time (minutes from start)</h3>
+    <input id="time" type="range" min="0" max="180" value="0">
+    <h3>Events</h3>
+    <div id="log"></div>
+  </aside>
+  <div id="kt"></div>
+  <script type="module" src="./sdk/example/host.js"></script>
+</body>
+</html>

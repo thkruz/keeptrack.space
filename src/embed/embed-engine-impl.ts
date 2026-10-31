@@ -1,0 +1,541 @@
+/**
+ * Real EmbedEngine adapter. All the engine quirks live here:
+ *  - selectSat is gated by settingsManager.isDisableSelectSat, which is lifted only around our calls
+ *  - a newly added or edited analyst object needs the cruncher edit, orbit buffer, editTle and a dot seed
+ *  - the engine snap-to-sat resets the camera standoff, so camera writes are re-asserted after a delay
+ */
+
+import { SatMath } from '@app/app/analysis/sat-math';
+import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { CameraType } from '@app/engine/camera/camera-type';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import type { Line } from '@app/engine/rendering/line-manager/line';
+import { findPassesForSat } from '@app/plugins/best-pass/best-pass-calculator';
+import { type Degrees, eci2lla, type Kilometers, type Satellite, Sgp4, SpaceObjectType, ZoomValue } from '@ootk/src/main';
+import type { EmbedEngine, EngineGuards, EngineLine, EngineLineSpec, EngineObjectData, EngineRuntimeUi, EngineSensor, EngineSlot, EngineTle } from './embed-engine';
+import { type EmbedAccessWindow, type EmbedCameraMode, type EmbedCatalogMode, EmbedError, type EmbedLookAngles, type EmbedPosition, type EmbedSensor } from './embed-types';
+
+interface SelectManagerLike {
+  selectSat(id: number): void;
+  selectedSat: number;
+}
+
+const CAMERA_TYPES: Record<EmbedCameraMode, CameraType> = {
+  earth: CameraType.FIXED_TO_EARTH,
+  orbit: CameraType.FIXED_TO_SAT_LVLH,
+  'flat-map': CameraType.FLAT_MAP,
+  polar: CameraType.POLAR_VIEW,
+};
+
+/** Delayed camera re-asserts (ms); the selection snap can reset the standoff mid-ease. */
+const CAMERA_REASSERT_MS = [1200, 2500, 6000];
+/** Analyst offsets below this are left to the engine's own tools in full mode. */
+const FULL_MODE_SLOT_START = 500;
+
+export class KeepTrackEmbedEngine implements EmbedEngine {
+  private selfDepth_ = 0;
+  private cameraTimers_: ReturnType<typeof setTimeout>[] = [];
+  private guardsInstalled_ = false;
+
+  constructor(readonly catalogMode: EmbedCatalogMode) {}
+
+  isEngineReady(): boolean {
+    const objectCount = ServiceLocator.getCatalogManager()?.objectCache?.length ?? 0;
+
+    return window.keepTrack?.isReady === true && objectCount > 0;
+  }
+
+  // ---- Selection ----------------------------------------------------------
+
+  private getSelectManager_(): SelectManagerLike | null {
+    return PluginRegistry.getPluginByName<never>('SelectSatManager') as unknown as SelectManagerLike | null;
+  }
+
+  getSelectedId(): number {
+    return this.getSelectManager_()?.selectedSat ?? -1;
+  }
+
+  selectById(id: number): boolean {
+    const mgr = this.getSelectManager_();
+
+    if (!mgr) {
+      return false;
+    }
+    const previous = settingsManager.isDisableSelectSat;
+
+    settingsManager.isDisableSelectSat = false;
+    this.selfDepth_++;
+    try {
+      mgr.selectSat(id);
+    } finally {
+      this.selfDepth_--;
+      settingsManager.isDisableSelectSat = previous;
+    }
+
+    return mgr.selectedSat === id;
+  }
+
+  // ---- Catalog ------------------------------------------------------------
+
+  getObjectData(id: number): EngineObjectData | null {
+    const obj = ServiceLocator.getCatalogManager().getObject(id) as Satellite | null;
+
+    if (!obj?.isSatellite?.()) {
+      return null;
+    }
+
+    return { id, name: obj.name, norad: obj.sccNum, tle1: obj.tle1, tle2: obj.tle2 };
+  }
+
+  findIdByNorad(norad: string): number | null {
+    return ServiceLocator.getCatalogManager().sccNum2Id(norad, false);
+  }
+
+  allocateSlot(): EngineSlot | null {
+    const cat = ServiceLocator.getCatalogManager();
+    const start = this.catalogMode === 'scenario' ? 0 : FULL_MODE_SLOT_START;
+    const slot = cat.getNextAvailableAnalystSat(start, settingsManager.maxAnalystSats);
+
+    return slot ? { id: slot.id, sccNum: slot.sccNum } : null;
+  }
+
+  activateSlot(id: number, tle: EngineTle): boolean {
+    const cat = ServiceLocator.getCatalogManager();
+    let sat: Satellite | null = null;
+
+    try {
+      sat = cat.addAnalystSat(tle.tle1, tle.tle2, id, tle.sccNum);
+    } catch {
+      return false;
+    }
+    if (!sat) {
+      return false;
+    }
+    sat.name = tle.name;
+    // Operational payloads hold a nadir-stable attitude in the mesh renderer; anything else tumbles
+    sat.status = '+' as never;
+    this.notifyObjectsChanged();
+
+    return true;
+  }
+
+  editObject(id: number, tle: EngineTle): void {
+    const cat = ServiceLocator.getCatalogManager();
+
+    cat.satCruncherThread.sendSatEdit(id, tle.tle1, tle.tle2, true);
+    ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle.tle1, tle.tle2);
+    const obj = cat.objectCache[id] as Satellite | undefined;
+
+    if (obj) {
+      obj.editTle(tle.tle1 as never, tle.tle2 as never);
+      obj.name = tle.name;
+    }
+    cat.seedDotPosition(id);
+  }
+
+  releaseSlot(id: number): void {
+    const cat = ServiceLocator.getCatalogManager();
+    const obj = cat.objectCache[id] as Satellite | undefined;
+
+    if (!obj) {
+      return;
+    }
+    obj.active = false;
+    cat.satCruncherThread.sendSatEdit(id, obj.tle1, obj.tle2, false);
+    this.notifyObjectsChanged();
+  }
+
+  notifyObjectsChanged(): void {
+    ServiceLocator.getColorSchemeManager()?.notifyObjectsChanged?.();
+  }
+
+  // ---- Camera -------------------------------------------------------------
+
+  setCamera(mode: EmbedCameraMode | undefined, distanceKm: number | undefined): void {
+    const apply = (): void => {
+      const cam = ServiceLocator.getMainCamera();
+
+      // Writing cameraType resets snap state, so only write on change
+      if (mode && cam.cameraType !== CAMERA_TYPES[mode]) {
+        cam.cameraType = CAMERA_TYPES[mode];
+      }
+      if (typeof distanceKm !== 'number') {
+        return;
+      }
+      const state = cam.state;
+
+      // Widen the clamps first: the camDistBuffer setter clamps against them
+      if (typeof state.maxDistanceFromTarget === 'number' && state.maxDistanceFromTarget < distanceKm) {
+        state.maxDistanceFromTarget = distanceKm as never;
+      }
+      if (typeof state.minDistanceFromTarget === 'number' && state.minDistanceFromTarget > distanceKm) {
+        state.minDistanceFromTarget = distanceKm as never;
+      }
+      state.isZoomIn = distanceKm < state.camDistBuffer;
+      state.camDistBuffer = distanceKm as never;
+      // While snapped on a satellite the engine converts camDistBuffer to zoom every frame
+      state.camZoomSnappedOnSat = true;
+    };
+
+    for (const t of this.cameraTimers_) {
+      clearTimeout(t);
+    }
+    apply();
+    this.cameraTimers_ = typeof distanceKm === 'number' ? CAMERA_REASSERT_MS.map((ms) => setTimeout(apply, ms)) : [];
+  }
+
+  // ---- Time ---------------------------------------------------------------
+
+  getTimeMs(): number {
+    return ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+  }
+
+  getRate(): number {
+    return ServiceLocator.getTimeManager().propRate;
+  }
+
+  setTimeMs(timeMs: number): void {
+    this.selfDepth_++;
+    try {
+      ServiceLocator.getTimeManager().changeSimulationTime(timeMs);
+    } finally {
+      this.selfDepth_--;
+    }
+  }
+
+  setRate(rate: number): void {
+    this.selfDepth_++;
+    try {
+      ServiceLocator.getTimeManager().changePropRate(rate, false);
+    } finally {
+      this.selfDepth_--;
+    }
+  }
+
+  // ---- Events -------------------------------------------------------------
+
+  onSelectionChanged(cb: (id: number) => void): void {
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (_sat, id) => cb(typeof id === 'number' ? id : -1));
+  }
+
+  onTimeChanged(cb: () => void): void {
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => cb());
+    EventBus.getInstance().on(EventBusEvent.propRateChanged, () => cb());
+  }
+
+  onHoverChanged(cb: (id: number) => void): void {
+    let last = -1;
+
+    EventBus.getInstance().on(EventBusEvent.updateLoop, () => {
+      const hovering = ServiceLocator.getHoverManager()?.hoveringSat ?? -1;
+
+      if (hovering !== last) {
+        last = hovering;
+        cb(hovering);
+      }
+    });
+  }
+
+  // ---- Guards -------------------------------------------------------------
+
+  installGuards(guards: EngineGuards): void {
+    if (this.guardsInstalled_) {
+      return;
+    }
+    this.guardsInstalled_ = true;
+
+    const mgr = this.getSelectManager_();
+
+    if (guards.selection && mgr) {
+      const original = mgr.selectSat.bind(mgr);
+      const report = guards.selection;
+
+      mgr.selectSat = (id: number): void => {
+        if (this.selfDepth_ === 0) {
+          report(id);
+        }
+        original(id);
+      };
+    }
+
+    const time = ServiceLocator.getTimeManager();
+
+    if (guards.time && time) {
+      const report = guards.time;
+      const originalRate = time.changePropRate.bind(time);
+      const originalOffset = time.changeStaticOffset.bind(time);
+
+      // Host-owned clock: user attempts are reported and dropped, host calls pass through
+      time.changePropRate = (rate: number, isShowToast?: boolean): void => {
+        if (this.selfDepth_ === 0) {
+          report({ rate });
+
+          return;
+        }
+        originalRate(rate, isShowToast);
+      };
+      time.changeStaticOffset = (offset: number, now?: number): void => {
+        if (this.selfDepth_ === 0) {
+          report({ timeMs: (now ?? Date.now()) + offset });
+
+          return;
+        }
+        originalOffset(offset, now);
+      };
+    }
+  }
+
+  // ---- Sensors ------------------------------------------------------------
+
+  createSensor(sensor: EmbedSensor, objName: string): EngineSensor {
+    const GEO_ZOOM_KM = 40_000;
+
+    return new DetailedSensor({
+      lat: sensor.lat as Degrees,
+      lon: sensor.lon as Degrees,
+      alt: sensor.altKm as Kilometers,
+      minAz: sensor.minAz as Degrees,
+      maxAz: sensor.maxAz as Degrees,
+      minEl: sensor.minEl as Degrees,
+      maxEl: sensor.maxEl as Degrees,
+      minRng: sensor.minRngKm as Kilometers,
+      maxRng: sensor.maxRngKm as Kilometers,
+      type: SpaceObjectType.OBSERVER,
+      name: sensor.name,
+      uiName: sensor.name,
+      system: 'Host',
+      country: 'Host',
+      objName,
+      operator: 'Host',
+      isCustomSensor: true,
+      zoom: sensor.maxRngKm > GEO_ZOOM_KM ? ZoomValue.GEO : ZoomValue.LEO,
+      volume: false,
+    }) as unknown as EngineSensor;
+  }
+
+  /** addSecondarySensor frames every new sensor with the camera; put the view back afterwards. */
+  private withCameraPreserved_(fn: () => void): void {
+    const camera = ServiceLocator.getMainCamera();
+    const state = camera?.state;
+
+    if (!state) {
+      fn();
+
+      return;
+    }
+    const zoomTarget = state.zoomTarget;
+    const pan = {
+      camPitchTarget: state.camPitchTarget,
+      camYawTarget: state.camYawTarget,
+      earthCenteredPitch: state.earthCenteredPitch,
+      earthCenteredYaw: state.earthCenteredYaw,
+      isAutoPitchYawToTarget: state.isAutoPitchYawToTarget,
+    };
+
+    fn();
+    Object.assign(state, pan);
+    if (zoomTarget >= 0 && zoomTarget <= 1) {
+      camera.changeZoom(zoomTarget);
+    }
+  }
+
+  setActiveSensorSet(sensors: EngineSensor[]): void {
+    const manager = ServiceLocator.getSensorManager();
+    const list = sensors as unknown as DetailedSensor[];
+
+    this.withCameraPreserved_(() => {
+      for (const active of [...manager.getAllActiveSensors()]) {
+        manager.removeSensor(active);
+      }
+      list.forEach((sensor, i) => {
+        if (i === 0) {
+          manager.addSecondarySensor(sensor, true);
+        } else {
+          manager.addSecondarySensor(sensor);
+        }
+      });
+    });
+  }
+
+  isSensorActive(sensor: EngineSensor): boolean {
+    return ServiceLocator.getSensorManager()
+      .getAllActiveSensors()
+      .includes(sensor as unknown as DetailedSensor);
+  }
+
+  // ---- Overlays -----------------------------------------------------------
+
+  addLine(spec: EngineLineSpec): EngineLine | null {
+    const catalog = ServiceLocator.getCatalogManager();
+    const lines = lineManagerInstance.lines;
+    const color = spec.color as unknown as Parameters<typeof lineManagerInstance.createObjToObj>[2];
+
+    if (spec.kind === 'objToObj') {
+      const line = lineManagerInstance.createObjToObj(catalog.getObject(spec.fromId) as never, catalog.getObject(spec.toId) as never, color);
+
+      return line ?? null;
+    }
+    const before = lines.length;
+    const sat = catalog.getObject(spec.objectId) as never;
+    const sensor = spec.sensor as unknown as DetailedSensor;
+
+    if (spec.fovOnly) {
+      lineManagerInstance.createSensorToSatFovOnly(sensor, sat, color);
+    } else {
+      lineManagerInstance.createSensorToSat(sensor, sat, color);
+    }
+
+    return lines.length > before ? (lines[lines.length - 1] as EngineLine) : null;
+  }
+
+  removeLine(line: EngineLine): void {
+    lineManagerInstance.removeLine(line as Line);
+  }
+
+  isLineAlive(line: EngineLine): boolean {
+    return lineManagerInstance.lines.includes(line as Line);
+  }
+
+  // ---- UI -----------------------------------------------------------------
+
+  applyRuntimeUi(flags: EngineRuntimeUi): void {
+    const s = settingsManager as unknown as Record<string, boolean>;
+
+    if (typeof flags.keyboard === 'boolean') {
+      s.isDisableKeyboard = !flags.keyboard;
+    }
+    if (typeof flags.contextMenu === 'boolean') {
+      s.isAllowRightClick = flags.contextMenu;
+    }
+    if (typeof flags.toasts === 'boolean') {
+      s.isDisableToasts = !flags.toasts;
+    }
+  }
+
+  // ---- Data out -----------------------------------------------------------
+  // Main-thread JS SGP4 on the object's satrec (the same path the engine's look-angle and pass tools
+  // use). The display cruncher worker and SGP4-XP wasm are not involved.
+
+  private getSatellite_(id: number): Satellite | null {
+    const obj = ServiceLocator.getCatalogManager().getObject(id) as Satellite | null;
+
+    return obj?.satrec ? obj : null;
+  }
+
+  getPosition(id: number, timeMs: number): EmbedPosition | null {
+    const sat = this.getSatellite_(id);
+
+    if (!sat) {
+      return null;
+    }
+    const date = new Date(timeMs);
+    const { gmst, m } = SatMath.calculateTimeVariables(date, sat.satrec);
+    const pos = Sgp4.propagate(sat.satrec, m as number).position;
+
+    if (!pos) {
+      return null;
+    }
+    const lla = eci2lla(pos, gmst);
+
+    return {
+      timeMs,
+      eci: { x: pos.x, y: pos.y, z: pos.z },
+      lla: { lat: lla.lat as number, lon: lla.lon as number, altKm: lla.alt as number },
+    };
+  }
+
+  getLookAngles(sensor: EngineSensor, id: number, timeMs: number): EmbedLookAngles | null {
+    const sat = this.getSatellite_(id);
+
+    if (!sat) {
+      return null;
+    }
+    const det = sensor as unknown as DetailedSensor;
+    const rae = SatMath.getRae(new Date(timeMs), sat.satrec, det, true);
+
+    if (rae.az === null || rae.el === null || rae.rng === null) {
+      return null;
+    }
+
+    return { timeMs, azDeg: rae.az, elDeg: rae.el, rngKm: rae.rng, inFov: SatMath.checkIsInView(det, rae) };
+  }
+
+  findAccessWindows(sensor: EngineSensor, id: number, startMs: number, endMs: number): EmbedAccessWindow[] {
+    const sat = this.getSatellite_(id);
+
+    if (!sat) {
+      throw new EmbedError('OBJECT_NOT_FOUND', 'Object has no orbital elements');
+    }
+    const result = findPassesForSat(
+      String(id),
+      sat.satrec,
+      sensor as unknown as DetailedSensor,
+      { lengthDays: (endMs - startMs) / 86_400_000, intervalSec: 30 },
+      {
+        baseTimeMs: startMs,
+        getRae: (date, satrec, s) => SatMath.getRae(date, satrec, s, true),
+        checkIsInView: (s, rae) => SatMath.checkIsInView(s, rae as Parameters<typeof SatMath.checkIsInView>[1]),
+        sunEciKm: () => ({ x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers }),
+      }
+    );
+
+    return result.passes
+      .filter((p) => typeof p.START_DTG === 'number' && p.STOP_DATE instanceof Date)
+      .map((p) => ({
+        startMs: p.START_DTG as number,
+        endMs: (p.STOP_DATE as Date).getTime(),
+        maxElDeg: Number.parseFloat(String(p.MAXIMUM_ELEVATION)),
+      }))
+      .filter((w) => w.startMs <= endMs && Number.isFinite(w.maxElDeg));
+  }
+
+  private frameWaiters_: Array<() => void> = [];
+  private frameHooked_ = false;
+
+  captureFrame(): Promise<Blob> {
+    if (!this.frameHooked_) {
+      this.frameHooked_ = true;
+      EventBus.getInstance().on(EventBusEvent.endOfDraw, () => {
+        const waiters = this.frameWaiters_;
+
+        this.frameWaiters_ = [];
+        for (const w of waiters) {
+          w();
+        }
+      });
+    }
+
+    return new Promise<Blob>((resolve, reject) => {
+      let done = false;
+      const grab = (): void => {
+        if (done) {
+          return;
+        }
+        done = true;
+        const src = ServiceLocator.getRenderer().domElement;
+        const out = document.createElement('canvas');
+
+        out.width = src.width;
+        out.height = src.height;
+        const ctx = out.getContext('2d');
+
+        if (!ctx) {
+          reject(new EmbedError('INTERNAL', 'Could not create a 2D canvas for the screenshot'));
+
+          return;
+        }
+        ctx.drawImage(src, 0, 0);
+        EventBus.getInstance().emit(EventBusEvent.screenshotComposite, ctx, out.width, out.height);
+        out.toBlob((blob) => (blob ? resolve(blob) : reject(new EmbedError('INTERNAL', 'Screenshot encoding failed'))), 'image/png');
+      };
+
+      this.frameWaiters_.push(grab);
+      // The render loop may be paused (hidden tab); fall back to the last drawn buffer
+      setTimeout(grab, 2000);
+    });
+  }
+}

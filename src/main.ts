@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { prepareEmbed } from './embed/embed-install';
 import { KeepTrack } from './keeptrack';
 import { registerServiceWorker } from './pwa/service-worker-registration';
 
@@ -34,20 +35,40 @@ document.documentElement.setAttribute('theme', 'dark');
 
 const keepTrackInstance = KeepTrack.getInstance();
 
-// Load the main website class
-keepTrackInstance.init(window.settingsOverride);
+// Embed API: when hosted in an iframe by the SDK, merge the host's boot config into the settings override
+const embed = prepareEmbed(window.settingsOverride as Record<string, unknown> | undefined);
 
-// Expose to window for debugging
-window.keepTrack = keepTrackInstance;
+window.settingsOverride = embed.settingsOverride as typeof window.settingsOverride;
 
-// window.__ktQaState(): read-only state snapshot for automated playtesters (Pro builds only)
-if (__IS_PRO__) {
-  import(/* @vite-ignore */ '@plugins-pro/qa-state/qa-state').then((m) => m.installQaState());
+/**
+ * Everything from init() on. Synchronous for the normal site; the embedded path awaits license
+ * verification first (it must settle before plugins load) and then runs this same function.
+ */
+const boot = (): void => {
+  // Load the main website class
+  keepTrackInstance.init(window.settingsOverride);
+
+  // Expose to window for debugging
+  window.keepTrack = keepTrackInstance;
+
+  // window.keepTrackEmbed: the embed facade (every build, embedded or not)
+  embed.install();
+
+  // window.__ktQaState(): read-only state snapshot for automated playtesters (Pro builds only, never in an embed)
+  if (__IS_PRO__ && !embed.isEmbedded) {
+    import(/* @vite-ignore */ '@plugins-pro/qa-state/qa-state').then((m) => m.installQaState());
+  }
+
+  // Initialize the website
+  KeepTrack.initCss().then(() => {
+    keepTrackInstance.run();
+  });
+};
+
+if (embed.isEmbedded) {
+  embed.resolveLicense().then(boot);
+} else {
+  boot();
 }
-
-// Initialize the website
-KeepTrack.initCss().then(() => {
-  keepTrackInstance.run();
-});
 
 registerServiceWorker();

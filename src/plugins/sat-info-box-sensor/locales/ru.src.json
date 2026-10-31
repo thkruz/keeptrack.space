@@ -48,7 +48,10 @@
         "unknown": "Неизвестно",
         "notApplicable": "Н/Д",
         "notApplicableOem": "Н/Д (OEM)",
-        "notInOrbitToast": "Спутник {sccNum} не на орбите!<br>Время симуляции: {simTime}.<br>Убедитесь, что используете правильный TLE."
+        "notInOrbitToast": "Спутник {sccNum} не на орбите!<br>Время симуляции: {simTime}.<br>Убедитесь, что используете правильный TLE.",
+        "categoryKinematic": "Кинематика",
+        "categorySensor": "Сенсор",
+        "kinematicOk": "В пределах ограничений сенсора"
       }
     }
   }

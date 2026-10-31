@@ -10,6 +10,7 @@ describe('Locales', () => {
       ['unsupported', 'en'],
       ['en', 'en'],
     ]) {
+      // biome-ignore lint/performance/noAwaitInLoops: each language switch must finish before the next assertion
       await i18next.changeLanguage(requested);
       expect(document.documentElement.lang).toBe(expected);
     }

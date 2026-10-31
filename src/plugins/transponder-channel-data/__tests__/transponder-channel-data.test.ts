@@ -251,6 +251,7 @@ describe('channel request identity regression', () => {
     requests.push(plugin['loadChannelData_']());
     for (const index of [first, second, third]) {
       finish[index]({ ok: true, json: async () => [{ ...mockChannelData[0], tvchannel: `request-${index}` }] } as Response);
+      // biome-ignore lint/performance/noAwaitInLoops: requests are resolved in a fixed order on purpose
       await requests[index];
     }
     plugin['toggleSort_']('tvchannel');

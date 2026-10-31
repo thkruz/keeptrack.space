@@ -16,10 +16,39 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import type { Line } from '@app/engine/rendering/line-manager/line';
+import { SensorMarkerLine } from '@app/engine/rendering/line-manager/sensor-marker-line';
+import { SurfaceLine } from '@app/engine/rendering/line-manager/surface-line';
+import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { findPassesForSat } from '@app/plugins/best-pass/best-pass-calculator';
+import { SatLabelMode } from '@app/settings/ui-settings';
 import { type Degrees, eci2lla, type Kilometers, type Satellite, Sgp4, SpaceObjectType, ZoomValue } from '@ootk/src/main';
-import type { EmbedEngine, EngineGuards, EngineLine, EngineLineSpec, EngineObjectData, EngineRuntimeUi, EngineSensor, EngineSlot, EngineTle } from './embed-engine';
-import { type EmbedAccessWindow, type EmbedCameraMode, type EmbedCatalogMode, EmbedError, type EmbedLookAngles, type EmbedPosition, type EmbedSensor } from './embed-types';
+import type { vec4 } from 'gl-matrix';
+import type {
+  EmbedEngine,
+  EngineGuards,
+  EngineLabel,
+  EngineLayerState,
+  EngineLine,
+  EngineLineSpec,
+  EngineObjectData,
+  EngineRuntimeUi,
+  EngineSensor,
+  EngineSlot,
+  EngineSurfaceSpec,
+  EngineTle,
+} from './embed-engine';
+import { EmbedLabelLayer } from './embed-label-layer';
+import {
+  type EmbedAccessWindow,
+  type EmbedCameraMode,
+  type EmbedCatalogMode,
+  type EmbedColor,
+  EmbedError,
+  type EmbedLatLon,
+  type EmbedLookAngles,
+  type EmbedPosition,
+  type EmbedSensor,
+} from './embed-types';
 
 interface SelectManagerLike {
   selectSat(id: number): void;
@@ -41,6 +70,10 @@ const FULL_MODE_SLOT_START = 500;
 export class KeepTrackEmbedEngine implements EmbedEngine {
   private cameraTimers_: ReturnType<typeof setTimeout>[] = [];
   private guardsInstalled_ = false;
+  private readonly labelLayer_ = new EmbedLabelLayer();
+  private readonly sensorMarkers_ = new Map<string, Line>();
+  private orbitIds_: number[] = [];
+  private orbitsHooked_ = false;
 
   constructor(readonly catalogMode: EmbedCatalogMode) {}
 
@@ -154,7 +187,7 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
 
   // ---- Camera -------------------------------------------------------------
 
-  setCamera(mode: EmbedCameraMode | undefined, distanceKm: number | undefined): void {
+  setCamera(mode: EmbedCameraMode | undefined, distanceKm: number | undefined, view?: { center?: EmbedLatLon; zoom?: number }): void {
     const apply = (): void => {
       const cam = ServiceLocator.getMainCamera();
 
@@ -184,7 +217,30 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
       clearTimeout(t);
     }
     apply();
+    if (view) {
+      this.applyView_(view);
+    }
     this.cameraTimers_ = typeof distanceKm === 'number' ? CAMERA_REASSERT_MS.map((ms) => setTimeout(apply, ms)) : [];
+  }
+
+  /** Ground-point centering: globe camSnap, or flat-map pan/zoom (the flat-map delegate clamps latitude). */
+  private applyView_(view: { center?: EmbedLatLon; zoom?: number }): void {
+    const cam = ServiceLocator.getMainCamera();
+    const { center, zoom } = view;
+
+    if (cam.cameraType === CameraType.FIXED_TO_EARTH && center) {
+      cam.lookAtLatLon(center.lat as Degrees, center.lon as Degrees, undefined, ServiceLocator.getTimeManager().simulationTimeObj);
+    } else if (cam.cameraType === CameraType.FLAT_MAP) {
+      if (typeof zoom === 'number') {
+        cam.flatMapZoom = zoom;
+      }
+      if (center) {
+        const lon = ((((center.lon + 180) % 360) + 360) % 360) - 180;
+
+        cam.flatMapPanX = (lon * Math.PI * RADIUS_OF_EARTH) / 180;
+        cam.flatMapPanY = (center.lat * Math.PI * RADIUS_OF_EARTH) / 180;
+      }
+    }
   }
 
   // ---- Time ---------------------------------------------------------------
@@ -360,6 +416,21 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     return lines.length > before ? (lines[lines.length - 1] as EngineLine) : null;
   }
 
+  addSurfaceLine(spec: EngineSurfaceSpec): EngineLine | null {
+    const line = new SurfaceLine(spec.strips, spec.color as never, spec.dashed);
+
+    lineManagerInstance.add(line);
+
+    return line;
+  }
+
+  updateSurfaceLine(line: EngineLine, spec: EngineSurfaceSpec): void {
+    if (line instanceof SurfaceLine) {
+      line.setColor(spec.color as never);
+      line.setStrips(spec.strips, spec.dashed);
+    }
+  }
+
   removeLine(line: EngineLine): void {
     lineManagerInstance.removeLine(line as Line);
   }
@@ -382,6 +453,82 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     if (typeof flags.toasts === 'boolean') {
       s.isDisableToasts = !flags.toasts;
     }
+  }
+
+  // ---- Styling, layers, labels (1.2) --------------------------------------
+
+  setObjectColor(id: number, color: EmbedColor | null): void {
+    ServiceLocator.getColorSchemeManager()?.setObjectColorOverride(id, color);
+  }
+
+  setObjectHighlight(id: number, highlighted: boolean): void {
+    ServiceLocator.getDotsManager()?.setDotHighlighted(id, highlighted);
+  }
+
+  setObjectLabels(labels: EngineLabel[]): void {
+    this.labelLayer_.set(labels);
+  }
+
+  setSensorStyle(sensor: EngineSensor, style: { color?: EmbedColor; label?: string }): void {
+    const previous = this.sensorMarkers_.get(sensor.objName);
+
+    if (previous) {
+      lineManagerInstance.removeLine(previous);
+      this.sensorMarkers_.delete(sensor.objName);
+    }
+    if (style.color) {
+      const marker = new SensorMarkerLine(sensor as unknown as DetailedSensor, 'embed', style.color as unknown as vec4);
+
+      lineManagerInstance.add(marker);
+      this.sensorMarkers_.set(sensor.objName, marker);
+    }
+  }
+
+  applyLayers(layers: EngineLayerState): void {
+    const s = settingsManager as unknown as Record<string, unknown>;
+
+    if (layers.dayNight !== undefined) {
+      s.isDrawNightAsDay = !layers.dayNight;
+    }
+    if (layers.graticule !== undefined) {
+      s.isDrawGraticule = layers.graticule;
+    }
+    if (layers.allLabels !== undefined) {
+      s.satLabelMode = layers.allLabels ? SatLabelMode.ALL : SatLabelMode.OFF;
+    }
+    if (layers.orbitIds !== undefined) {
+      const orbits = ServiceLocator.getOrbitManager();
+
+      for (const id of this.orbitIds_) {
+        if (!layers.orbitIds.includes(id)) {
+          orbits.removeInViewOrbit(id);
+        }
+      }
+      this.orbitIds_ = [...layers.orbitIds];
+      if (this.orbitIds_.length > 0) {
+        s.isDrawOrbits = true;
+        orbits.drawOrbitsSettingChanged();
+        this.keepOrbitsAlive_();
+      }
+    }
+  }
+
+  /** The label-mode pass clears the in-view orbit list now and then; put the host objects back every frame. */
+  private keepOrbitsAlive_(): void {
+    if (this.orbitsHooked_) {
+      return;
+    }
+    this.orbitsHooked_ = true;
+    EventBus.getInstance().on(EventBusEvent.updateLoop, () => {
+      if (this.orbitIds_.length === 0) {
+        return;
+      }
+      const orbits = ServiceLocator.getOrbitManager();
+
+      for (const id of this.orbitIds_) {
+        orbits.addInViewOrbit(id);
+      }
+    });
   }
 
   // ---- Data out -----------------------------------------------------------

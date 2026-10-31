@@ -7,7 +7,10 @@ import { EmbedOverlays } from './embed-overlays';
 import { EmbedRemote } from './embed-remote';
 import { EmbedSelection } from './embed-selection';
 import { EmbedSensors } from './embed-sensors';
+import { EmbedStream } from './embed-stream';
+import { EmbedStyle } from './embed-style';
 import { EmbedTime } from './embed-time';
+import { EmbedTracks } from './embed-tracks';
 import {
   EMBED_API_VERSION,
   EMBED_READY_EVENT,
@@ -21,10 +24,13 @@ import {
   type EmbedErrorCode,
   type EmbedEventMap,
   type EmbedEventName,
+  type EmbedGroundTrackOptions,
+  type EmbedLayers,
   type EmbedLicenseStatus,
   type EmbedLookAngles,
   type EmbedObject,
   type EmbedObjectInfo,
+  type EmbedObjectStyle,
   type EmbedOverlay,
   type EmbedPosition,
   type EmbedSensor,
@@ -59,7 +65,11 @@ const COMMANDS: readonly EmbedCommandName[] = [
   'addOverlay',
   'removeOverlay',
   'clearOverlays',
+  'setGroundTracks',
   'setUi',
+  'setObjectStyle',
+  'setLayers',
+  'setPositionStream',
   'getPosition',
   'getLookAngles',
   'getAccessWindows',
@@ -111,7 +121,10 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
   private pollTimer_: ReturnType<typeof setInterval> | null = null;
   private readonly sensors_: EmbedSensors;
   private readonly overlays_: EmbedOverlays;
+  private readonly tracks_: EmbedTracks;
   private readonly data_: EmbedData;
+  private readonly style_: EmbedStyle;
+  private readonly stream_: EmbedStream;
   private readonly ui_: EmbedUi;
   private remote_: EmbedRemote | null = null;
 
@@ -126,8 +139,12 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.time_ = new EmbedTime(this.ctx_, engine_);
     this.sensors_ = new EmbedSensors(this.ctx_, engine_);
     this.overlays_ = new EmbedOverlays(engine_, this.catalog_, this.sensors_);
+    this.tracks_ = new EmbedTracks(engine_, this.catalog_);
     this.data_ = new EmbedData(engine_, this.catalog_, this.sensors_);
     this.ui_ = new EmbedUi(this.ctx_, engine_);
+    this.style_ = new EmbedStyle(engine_, this.catalog_, this.sensors_);
+    this.tracks_.colorFor = (id) => this.style_.colorFor(id);
+    this.stream_ = new EmbedStream(this.ctx_, engine_, this.catalog_, this.data_);
     this.readyPromise_ = new Promise<void>((resolve) => {
       this.resolveReady_ = resolve;
     });
@@ -139,16 +156,21 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     if (this.pollTimer_ !== null || this.ready_) {
       return;
     }
-    if (this.engine_.isEngineReady()) {
+    if (this.isFullyReady_()) {
       this.becomeReady_();
 
       return;
     }
     this.pollTimer_ = setInterval(() => {
-      if (this.engine_.isEngineReady()) {
+      if (this.isFullyReady_()) {
         this.becomeReady_();
       }
     }, READY_POLL_MS);
+  }
+
+  /** Engine up and the propagator settled (loaded, failed or past its grace period). */
+  private isFullyReady_(): boolean {
+    return this.engine_.isEngineReady() && !this.data_.propagator.isLoading();
   }
 
   private becomeReady_(): void {
@@ -159,9 +181,10 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.selection_.start();
     this.time_.start();
     this.overlays_.start();
+    this.tracks_.start();
 
     const mismatch = checkApiVersion(this.config_);
-    const { ownership, time, catalog } = this.config_;
+    const { ownership, time, catalog, layers } = this.config_;
 
     this.ctx_.runAsHost(() => {
       if (catalog?.objects?.length) {
@@ -172,6 +195,9 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
       }
       if (typeof time?.rate === 'number') {
         this.time_.setRate(time.rate);
+      }
+      if (layers) {
+        this.style_.setLayers(layers);
       }
     });
 
@@ -311,7 +337,14 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.requireReady_();
     this.ctx_.assertHostMaySet('catalog');
 
-    return this.ctx_.runAsHost(() => this.catalog_.upsert(objects));
+    const results = this.ctx_.runAsHost(() => this.catalog_.upsert(objects));
+
+    this.tracks_.invalidate();
+    this.style_.refreshOrbits();
+    this.stream_.invalidate();
+    this.overlays_.surface.tick(true);
+
+    return results;
   }
 
   removeObjects(hostIds: string[]): void {
@@ -324,6 +357,10 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
 
     this.selection_.deselectIfSelected(freed);
     this.overlays_.dropForObjectIds(freed);
+    this.tracks_.dropForObjectIds(freed);
+    this.style_.dropForObjectIds(freed);
+    this.style_.refreshOrbits();
+    this.stream_.invalidate();
   }
 
   getObject(ref: ObjectRef): EmbedObjectInfo | null {
@@ -343,14 +380,19 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
   upsertSensors(sensors: EmbedSensor[]): void {
     this.requireReady_();
     this.ctx_.assertHostMaySet('sensors');
+    this.style_.validateSensors(sensors);
     this.sensors_.upsert(sensors);
+    this.style_.applySensors(sensors);
     this.overlays_.reconcile();
   }
 
   removeSensors(hostIds: string[]): void {
     this.requireReady_();
     this.ctx_.assertHostMaySet('sensors');
-    this.overlays_.dropForSensors(this.sensors_.remove(hostIds));
+    const removed = this.sensors_.remove(hostIds);
+
+    this.style_.dropSensors(hostIds);
+    this.overlays_.dropForSensors(removed);
   }
 
   setActiveSensors(hostIds: string[]): void {
@@ -378,11 +420,36 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.overlays_.clear();
   }
 
+  // ---- Ground tracks ------------------------------------------------------
+
+  setGroundTracks(refs: ObjectRef[] | 'host' | null, options?: EmbedGroundTrackOptions): void {
+    this.requireReady_();
+    this.tracks_.set(refs, options);
+  }
+
   // ---- UI -----------------------------------------------------------------
 
   setUi(flags: Partial<EmbedUiFlags>): void {
     this.requireReady_();
     this.ui_.apply(flags);
+  }
+
+  // ---- Style, layers, stream ----------------------------------------------
+
+  setObjectStyle(ref: ObjectRef, style: EmbedObjectStyle | null): void {
+    this.requireReady_();
+    this.style_.setObjectStyle(ref, style);
+    this.tracks_.invalidate();
+  }
+
+  setLayers(layers: Partial<EmbedLayers>): void {
+    this.requireReady_();
+    this.style_.setLayers(layers);
+  }
+
+  setPositionStream(stream: { refs: ObjectRef[] | 'host'; hz: number } | null): void {
+    this.requireReady_();
+    this.stream_.set(stream);
   }
 
   // ---- Data out -----------------------------------------------------------

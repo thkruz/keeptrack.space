@@ -1,6 +1,7 @@
 import type { EmbedCatalog } from './embed-catalog';
 import type { EmbedEngine, EngineLine, EngineLineSpec } from './embed-engine';
 import type { EmbedSensors } from './embed-sensors';
+import { EmbedSurfaceOverlays, isSurfaceOverlay } from './embed-surface';
 import { type EmbedColor, EmbedError, type EmbedOverlay, type ObjectRef, type OverlayEndpoint } from './embed-types';
 
 /** How often garbage-collected lines are re-created. */
@@ -33,17 +34,22 @@ export class EmbedOverlays {
   private readonly overlays_ = new Map<string, OverlayRecord>();
   private nextId_ = 1;
   private timer_: ReturnType<typeof setInterval> | null = null;
+  /** Footprint, circle, marker, ellipse and polyline overlays (surface geometry). */
+  readonly surface: EmbedSurfaceOverlays;
 
   constructor(
     private readonly engine_: EmbedEngine,
     private readonly catalog_: EmbedCatalog,
     private readonly sensors_: EmbedSensors
-  ) {}
+  ) {
+    this.surface = new EmbedSurfaceOverlays(engine_, catalog_, sensors_, () => `ov-${this.nextId_++}`);
+  }
 
   start(): void {
     if (this.timer_ === null) {
       this.timer_ = setInterval(() => this.reconcile(), OVERLAY_RECONCILE_MS);
     }
+    this.surface.start();
   }
 
   stop(): void {
@@ -51,11 +57,15 @@ export class EmbedOverlays {
       clearInterval(this.timer_);
       this.timer_ = null;
     }
+    this.surface.stop();
   }
 
   add(overlay: EmbedOverlay): string {
+    if (overlay && isSurfaceOverlay(overlay)) {
+      return this.surface.add(overlay);
+    }
     if (!overlay || overlay.type !== 'line') {
-      throw new EmbedError('INVALID_ARGUMENT', "Only overlays of type 'line' are supported");
+      throw new EmbedError('INVALID_ARGUMENT', "Overlay type must be 'line', 'footprint', 'circle', 'marker', 'ellipse' or 'polyline'");
     }
     if (overlay.color !== undefined && !isColor(overlay.color)) {
       throw new EmbedError('INVALID_ARGUMENT', 'color must be [r, g, b, a] with each channel 0..1');
@@ -124,6 +134,9 @@ export class EmbedOverlays {
   }
 
   remove(id: string): void {
+    if (this.surface.remove(id)) {
+      return;
+    }
     const rec = this.overlays_.get(id);
 
     if (!rec) {
@@ -136,17 +149,19 @@ export class EmbedOverlays {
   }
 
   clear(): void {
+    this.surface.clear();
     for (const id of [...this.overlays_.keys()]) {
       this.remove(id);
     }
   }
 
   list(): string[] {
-    return [...this.overlays_.keys()];
+    return [...this.overlays_.keys(), ...this.surface.list()];
   }
 
   /** Drop overlays touching removed engine objects. */
   dropForObjectIds(ids: number[]): void {
+    this.surface.dropForObjectIds(ids);
     for (const rec of [...this.overlays_.values()]) {
       if ((rec.from.kind === 'object' && ids.includes(rec.from.id)) || (rec.to.kind === 'object' && ids.includes(rec.to.id))) {
         this.remove(rec.id);
@@ -156,6 +171,7 @@ export class EmbedOverlays {
 
   /** Drop overlays touching removed host sensors. */
   dropForSensors(hostIds: string[]): void {
+    this.surface.dropForSensors(hostIds);
     for (const rec of [...this.overlays_.values()]) {
       if ((rec.from.kind === 'sensor' && hostIds.includes(rec.from.hostId)) || (rec.to.kind === 'sensor' && hostIds.includes(rec.to.hostId))) {
         this.remove(rec.id);

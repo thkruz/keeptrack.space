@@ -1217,7 +1217,56 @@ export class ColorSchemeManager {
     return [orbitColor[0], orbitColor[1], orbitColor[2], 1.0];
   }
 
+  /**
+   * Per-object color overrides (embed API setObjectStyle). Applied after the active scheme has written colorData, in
+   * the same per-frame stage as the selected/hover colors, so they survive every scheme update in main-thread and
+   * worker mode. Selected, secondary and hover colors still win.
+   */
+  private readonly objectColorOverrides_ = new Map<number, rgbaArray>();
+
+  /** Pins one object to a color regardless of the active scheme; null removes the override. */
+  setObjectColorOverride(id: number, color: rgbaArray | null): void {
+    if (color) {
+      this.objectColorOverrides_.set(id, [color[0], color[1], color[2], color[3]]);
+      this.isColorBufferDirty_ = true;
+
+      return;
+    }
+    if (this.objectColorOverrides_.delete(id)) {
+      this.restoreSchemeColor_(id);
+      this.isColorBufferDirty_ = true;
+    }
+  }
+
+  /** Whether an override is pinned for this object. */
+  hasObjectColorOverride(id: number): boolean {
+    return this.objectColorOverrides_.has(id);
+  }
+
+  private applyObjectColorOverrides_(): void {
+    if (this.objectColorOverrides_.size === 0) {
+      return;
+    }
+    const dotCount = this.colorData.length / 4;
+
+    for (const [id, color] of this.objectColorOverrides_) {
+      if (id < 0 || id >= dotCount) {
+        continue;
+      }
+      const o = id * 4;
+
+      if (this.colorData[o] !== color[0] || this.colorData[o + 1] !== color[1] || this.colorData[o + 2] !== color[2] || this.colorData[o + 3] !== color[3]) {
+        this.colorData[o] = color[0];
+        this.colorData[o + 1] = color[1];
+        this.colorData[o + 2] = color[2];
+        this.colorData[o + 3] = color[3];
+        this.isColorBufferDirty_ = true;
+      }
+    }
+  }
+
   private setSelectedAndHoverBuffer_() {
+    this.applyObjectColorOverrides_();
     const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
     const selSat = selectSatManager?.selectedSat ?? -1;
     const secSat = selectSatManager?.secondarySat ?? -1;

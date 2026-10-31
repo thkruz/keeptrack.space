@@ -114,6 +114,11 @@ export class EmbedSensors {
     return this.sensors_.get(hostId)?.engineSensor ?? null;
   }
 
+  /** The host's definition of a sensor, or null. */
+  getDef(hostId: string): EmbedSensor | null {
+    return this.sensors_.get(hostId)?.def ?? null;
+  }
+
   /** Engine sensor or SENSOR_NOT_FOUND. */
   require(hostId: string): EngineSensor {
     const s = typeof hostId === 'string' ? this.getEngineSensor(hostId) : null;

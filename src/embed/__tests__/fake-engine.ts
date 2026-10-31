@@ -1,4 +1,15 @@
-import type { EmbedEngine, EngineGuards, EngineLine, EngineLineSpec, EngineObjectData, EngineRuntimeUi, EngineSensor, EngineSlot, EngineTle } from '../embed-engine';
+import type {
+  EmbedEngine,
+  EngineGuards,
+  EngineLine,
+  EngineLineSpec,
+  EngineObjectData,
+  EngineRuntimeUi,
+  EngineSensor,
+  EngineSlot,
+  EngineSurfaceSpec,
+  EngineTle,
+} from '../embed-engine';
 import type { EmbedAccessWindow, EmbedCatalogMode, EmbedLookAngles, EmbedPosition, EmbedSensor } from '../embed-types';
 
 const TLE1 = '1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9006';
@@ -130,6 +141,41 @@ export class FakeEngine implements EmbedEngine {
     this.cameraCalls.push(args);
   }
 
+  // ---- Styling, layers, camera view (1.2) ----
+  objectColors = new Map<number, unknown>();
+  highlighted = new Set<number>();
+  labelSets: unknown[][] = [];
+  layerCalls: unknown[] = [];
+  sensorStyles: { sensor: EngineSensor; style: unknown }[] = [];
+
+  setObjectColor(id: number, color: unknown): void {
+    if (color === null) {
+      this.objectColors.delete(id);
+    } else {
+      this.objectColors.set(id, color);
+    }
+  }
+
+  setObjectHighlight(id: number, on: boolean): void {
+    if (on) {
+      this.highlighted.add(id);
+    } else {
+      this.highlighted.delete(id);
+    }
+  }
+
+  setObjectLabels(labels: unknown[]): void {
+    this.labelSets.push(labels);
+  }
+
+  applyLayers(layers: unknown): void {
+    this.layerCalls.push(layers);
+  }
+
+  setSensorStyle(sensor: EngineSensor, style: unknown): void {
+    this.sensorStyles.push({ sensor, style });
+  }
+
   getTimeMs(): number {
     return this.timeMs;
   }
@@ -189,7 +235,33 @@ export class FakeEngine implements EmbedEngine {
     return handle;
   }
 
+  /** Surface lines by handle, with the latest spec (updates replace it). */
+  surfaceLines = new Map<EngineLine, EngineSurfaceSpec>();
+  surfaceAdds = 0;
+  surfaceUpdates = 0;
+  /** Scripted positions; default is a fixed point. */
+  positionFn: ((id: number, timeMs: number) => EmbedPosition | null) | null = null;
+
+  addSurfaceLine(spec: EngineSurfaceSpec): EngineLine | null {
+    if (this.rejectLines) {
+      return null;
+    }
+    const handle: EngineLine = {};
+
+    this.surfaceAdds++;
+    this.surfaceLines.set(handle, spec);
+    this.lines.push({ spec: spec as unknown as EngineLineSpec, handle });
+
+    return handle;
+  }
+
+  updateSurfaceLine(line: EngineLine, spec: EngineSurfaceSpec): void {
+    this.surfaceUpdates++;
+    this.surfaceLines.set(line, spec);
+  }
+
   removeLine(line: EngineLine): void {
+    this.surfaceLines.delete(line);
     this.deadLines.add(line);
     this.lines = this.lines.filter((l) => l.handle !== line);
   }
@@ -209,6 +281,9 @@ export class FakeEngine implements EmbedEngine {
   }
 
   getPosition(id: number, timeMs: number): EmbedPosition | null {
+    if (this.positionFn) {
+      return this.positionFn(id, timeMs);
+    }
     return this.objects.has(id) ? { timeMs, eci: { x: 7000, y: 0, z: 0 }, lla: { lat: 0, lon: 0, altKm: 620 } } : null;
   }
 

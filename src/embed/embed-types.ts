@@ -15,7 +15,7 @@
  * Licensed under the MIT License (unlike the AGPL engine) so hosts can vendor it.
  */
 
-export const EMBED_API_VERSION = '1.1.0';
+export const EMBED_API_VERSION = '1.2.0';
 
 // ---------------------------------------------------------------------------
 // Boot configuration
@@ -81,6 +81,8 @@ export interface EmbedConfig {
     allow?: string[];
   };
   ui?: Partial<EmbedUiFlags>;
+  /** Initial scene layers. (1.2) */
+  layers?: Partial<EmbedLayers>;
   time?: {
     /** ISO-8601 string or epoch ms. */
     start?: string | number;
@@ -167,6 +169,47 @@ export interface EmbedSensor {
   maxEl: number;
   minRngKm: number;
   maxRngKm: number;
+  /** Marker color. Defaults to the engine's sensor color. (1.2) */
+  color?: EmbedColor;
+  /** Draw the sensor name next to its marker. Default false. (1.2) */
+  label?: boolean;
+}
+
+/** How a host object is drawn. Unset fields fall back to the active color scheme. (1.2) */
+export interface EmbedObjectStyle {
+  color?: EmbedColor;
+  /** Emphasize the object: larger dot, thicker ground track, bold label. */
+  highlight?: boolean;
+  /** true = draw the object's name, string = draw this text instead, false/omitted = no label. */
+  label?: boolean | string;
+}
+
+export interface EmbedLineStyle {
+  color?: EmbedColor;
+  dashed?: boolean;
+}
+
+/**
+ * Sub-satellite ground tracks, drawn on the globe surface and in flat-map mode. (1.2)
+ * Tracks follow the object's current elements and redraw after upserts, time jumps (including backwards)
+ * and rate changes.
+ */
+export interface EmbedGroundTrackOptions {
+  /** Minutes of track behind the object. */
+  pastMin: number;
+  /** Minutes of track ahead of the object. */
+  futureMin: number;
+  /** Sample spacing. Default 30 s. */
+  stepSec?: number;
+  /** Default solid, object color. */
+  past?: EmbedLineStyle;
+  /** Default dashed, object color. */
+  future?: EmbedLineStyle;
+}
+
+export interface EmbedLatLon {
+  lat: number;
+  lon: number;
 }
 
 export type OverlayEndpoint = { object: ObjectRef } | { sensor: string };
@@ -180,7 +223,65 @@ export interface EmbedLineOverlay {
   fovOnly?: boolean;
 }
 
-export type EmbedOverlay = EmbedLineOverlay;
+/** Coverage footprint: the ground area that sees the object above minElDeg. Moves with the object. (1.2) */
+export interface EmbedFootprintOverlay extends EmbedLineStyle {
+  type: 'footprint';
+  object: ObjectRef;
+  minElDeg: number;
+  /** Translucent fill (alpha taken from color). Default false. */
+  fill?: boolean;
+}
+
+/**
+ * Small circle on the ground. `radius` is a fixed great-circle angle, or the access radius for an object:
+ * the circle of ground points that see that object above minElDeg (follows its altitude). (1.2)
+ */
+export interface EmbedCircleOverlay extends EmbedLineStyle {
+  type: 'circle';
+  center: { sensor: string } | EmbedLatLon;
+  radius: { deg: number } | { accessOf: ObjectRef; minElDeg: number };
+  fill?: boolean;
+}
+
+/** Fixed point on the ground. (1.2) */
+export interface EmbedMarkerOverlay {
+  type: 'marker';
+  position: EmbedLatLon;
+  shape?: 'dot' | 'diamond' | 'ring' | 'cross';
+  label?: string;
+  color?: EmbedColor;
+}
+
+/** Error ellipse on the ground. Bearing of the semi-major axis in degrees from north. (1.2) */
+export interface EmbedEllipseOverlay extends EmbedLineStyle {
+  type: 'ellipse';
+  center: EmbedLatLon;
+  semiMajorKm: number;
+  semiMinorKm: number;
+  bearingDeg: number;
+  fill?: boolean;
+}
+
+/** Polyline on the ground following great circles between points. (1.2) */
+export interface EmbedPolylineOverlay extends EmbedLineStyle {
+  type: 'polyline';
+  points: EmbedLatLon[];
+  closed?: boolean;
+}
+
+export type EmbedOverlay = EmbedLineOverlay | EmbedFootprintOverlay | EmbedCircleOverlay | EmbedMarkerOverlay | EmbedEllipseOverlay | EmbedPolylineOverlay;
+
+/** Scene layers the host can toggle. (1.2) */
+export interface EmbedLayers {
+  /** Day/night shading with city lights on the night side. */
+  dayNight: boolean;
+  /** Latitude/longitude grid. */
+  graticule: boolean;
+  /** Orbit lines for host objects (3D, not ground tracks). */
+  orbits: boolean;
+  /** Names next to objects. 'host' = only host objects with a label style. */
+  labels: 'all' | 'host' | 'none';
+}
 
 // ---------------------------------------------------------------------------
 // Camera, time, data out
@@ -198,6 +299,10 @@ export interface EmbedCameraOptions {
   mode?: EmbedCameraMode;
   /** Standoff from the selected object, or from Earth center in 'earth' mode without a selection. */
   distanceKm?: number;
+  /** Point the view at this ground location ('earth' and 'flat-map' modes, ignored while an object is selected). (1.2) */
+  center?: EmbedLatLon;
+  /** 'flat-map' only: 1 = whole world visible, larger values zoom in. (1.2) */
+  zoom?: number;
 }
 
 export interface EmbedTimeState {
@@ -258,6 +363,8 @@ export interface EmbedEventMap {
   changeRequested: { domain: 'selection'; value: EmbedObjectInfo | null } | { domain: 'time'; value: Partial<EmbedTimeState> } | { domain: EmbedDomain; value: unknown };
   error: { code: EmbedErrorCode; message: string };
   remoteStatus: { state: 'connecting' | 'connected' | 'disconnected' | 'rejected'; detail?: string };
+  /** Periodic positions while a stream is active (see setPositionStream). (1.2) */
+  positions: { timeMs: number; objects: Array<{ hostId?: string; norad?: string; lla: EmbedPosition['lla'] }> };
 }
 
 export type EmbedEventName = keyof EmbedEventMap;
@@ -347,8 +454,20 @@ export interface KeepTrackEmbedApi {
   removeOverlay(id: string): void;
   clearOverlays(): void;
 
+  // Styling and tracks (1.2)
+  /** null resets the object to the color scheme's default. */
+  setObjectStyle(ref: ObjectRef, style: EmbedObjectStyle | null): void;
+  /** 'host' = every host object. null removes all ground tracks. */
+  setGroundTracks(refs: ObjectRef[] | 'host' | null, options?: EmbedGroundTrackOptions): void;
+
   // UI
   setUi(flags: Partial<EmbedUiFlags>): void;
+  setLayers(layers: Partial<EmbedLayers>): void;
+  /**
+   * Emit `positions` events for the given objects ('host' = every host object) at `hz` (simulation-time
+   * driven, max 10). null stops the stream. (1.2)
+   */
+  setPositionStream(stream: { refs: ObjectRef[] | 'host'; hz: number } | null): void;
 
   // Data out
   /** Defaults to the current simulation time. */

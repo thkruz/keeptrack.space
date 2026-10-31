@@ -1,4 +1,4 @@
-import type { EmbedAccessWindow, EmbedCameraMode, EmbedCatalogMode, EmbedColor, EmbedLookAngles, EmbedPosition, EmbedSensor } from './embed-types';
+import type { EmbedAccessWindow, EmbedCameraMode, EmbedCatalogMode, EmbedColor, EmbedLatLon, EmbedLookAngles, EmbedPosition, EmbedSensor } from './embed-types';
 
 /** What the facade knows about one engine object. */
 export interface EngineObjectData {
@@ -33,6 +33,13 @@ export type EngineLine = object;
 export type EngineLineSpec =
   | { kind: 'objToObj'; fromId: number; toId: number; color?: EmbedColor }
   | { kind: 'sensorToObj'; sensor: EngineSensor; objectId: number; fovOnly: boolean; color?: EmbedColor };
+
+/** Earth-fixed polylines on the surface (degrees). Each strip is one connected polyline. */
+export interface EngineSurfaceSpec {
+  strips: { lat: number; lon: number }[][];
+  color: EmbedColor;
+  dashed: boolean;
+}
 
 /** Runtime-toggleable UI flags (the engine reads these on every use). */
 export interface EngineRuntimeUi {
@@ -81,7 +88,7 @@ export interface EmbedEngine {
   notifyObjectsChanged(): void;
 
   // Camera
-  setCamera(mode: EmbedCameraMode | undefined, distanceKm: number | undefined): void;
+  setCamera(mode: EmbedCameraMode | undefined, distanceKm: number | undefined, view?: { center?: EmbedLatLon; zoom?: number }): void;
 
   // Time
   getTimeMs(): number;
@@ -107,6 +114,10 @@ export interface EmbedEngine {
   // Overlays (lines)
   /** Add a line. Null when the engine cannot draw it (object missing or not a satellite). */
   addLine(spec: EngineLineSpec): EngineLine | null;
+  /** Add an Earth-fixed surface polyline (globe and flat map). Null when the engine cannot draw it. */
+  addSurfaceLine(spec: EngineSurfaceSpec): EngineLine | null;
+  /** Replace the geometry/style of a surface line made by addSurfaceLine. */
+  updateSurfaceLine(line: EngineLine, spec: EngineSurfaceSpec): void;
   removeLine(line: EngineLine): void;
   /** False once the engine garbage-collected the line (inactive sensor, left the FOV, object gone). */
   isLineAlive(line: EngineLine): boolean;
@@ -120,4 +131,34 @@ export interface EmbedEngine {
   findAccessWindows(sensor: EngineSensor, id: number, startMs: number, endMs: number): EmbedAccessWindow[];
   /** PNG of a freshly rendered frame. */
   captureFrame(): Promise<Blob>;
+
+  // Styling, layers and camera view (1.2)
+  /** Pin an object's dot color past every color-scheme update; null restores the scheme color. */
+  setObjectColor(id: number, color: EmbedColor | null): void;
+  /** Draw an object's dot at the large size. */
+  setObjectHighlight(id: number, highlighted: boolean): void;
+  /** Persistent names next to objects (replaces the previous set). Empty clears. */
+  setObjectLabels(labels: EngineLabel[]): void;
+  /** Apply scene layers. Unset fields are left alone. `orbitIds` are the objects whose orbit line is drawn. */
+  applyLayers(layers: EngineLayerState): void;
+  /** Color/label of a host sensor's ground marker. */
+  setSensorStyle(sensor: EngineSensor, style: { color?: EmbedColor; label?: string }): void;
+}
+
+/** One name tag. `id` is an object id; `sensor` anchors it to a sensor's ground position instead. */
+export interface EngineLabel {
+  id?: number;
+  sensor?: EngineSensor;
+  text: string;
+  bold: boolean;
+  color?: EmbedColor;
+}
+
+export interface EngineLayerState {
+  dayNight?: boolean;
+  graticule?: boolean;
+  /** Draw orbit lines for exactly these object ids (empty = none). */
+  orbitIds?: number[];
+  /** Engine-wide sat labels (digits): true for the 'all' labels mode. */
+  allLabels?: boolean;
 }

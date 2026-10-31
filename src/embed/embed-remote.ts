@@ -22,7 +22,7 @@ export const REMOTE_BACKOFF_MAX_MS = 30_000;
 export const REMOTE_HOVER_THROTTLE_MS = 100;
 
 /** Events relayed to clients. remoteStatus is local plumbing and is not forwarded. */
-const FORWARDED_EVENTS: readonly EmbedEventName[] = ['ready', 'selectionChanged', 'hover', 'timeChanged', 'changeRequested', 'error'];
+const FORWARDED_EVENTS: readonly EmbedEventName[] = ['ready', 'selectionChanged', 'hover', 'timeChanged', 'changeRequested', 'positions', 'error'];
 
 /** The subset of the browser WebSocket the channel uses (so tests can fake it). */
 export interface RemoteSocket {

@@ -1,7 +1,7 @@
 import type { EmbedCatalog } from './embed-catalog';
 import type { EmbedContext } from './embed-context';
 import type { EmbedEngine } from './embed-engine';
-import { type EmbedCameraOptions, EmbedError, type EmbedObjectInfo, type ObjectRef } from './embed-types';
+import { type EmbedCameraOptions, EmbedError, type EmbedLatLon, type EmbedObjectInfo, type ObjectRef } from './embed-types';
 
 export const SELECT_RETRY_MS = 500;
 export const SELECT_TIMEOUT_MS = 30_000;
@@ -107,6 +107,34 @@ export class EmbedSelection {
     if (distanceKm !== undefined && (typeof distanceKm !== 'number' || !Number.isFinite(distanceKm) || distanceKm <= 0)) {
       throw new EmbedError('INVALID_ARGUMENT', 'distanceKm must be a positive number');
     }
-    this.engine_.setCamera(mode, distanceKm);
+    const { center, zoom } = options ?? {};
+
+    if (center !== undefined) {
+      const c = center as Partial<EmbedLatLon> | null;
+
+      if (
+        !c ||
+        typeof c.lat !== 'number' ||
+        typeof c.lon !== 'number' ||
+        !Number.isFinite(c.lat) ||
+        !Number.isFinite(c.lon) ||
+        Math.abs(c.lat) > 90 ||
+        c.lon < -180 ||
+        c.lon > 360
+      ) {
+        throw new EmbedError('INVALID_ARGUMENT', 'center must be { lat: -90..90, lon: -180..360 }');
+      }
+    }
+    if (zoom !== undefined && (typeof zoom !== 'number' || !Number.isFinite(zoom) || zoom < 1)) {
+      throw new EmbedError('INVALID_ARGUMENT', 'zoom must be a number >= 1');
+    }
+    // center and zoom follow the selected object while one is selected
+    const view = (center !== undefined || zoom !== undefined) && this.engine_.getSelectedId() < 0 ? { center, zoom } : undefined;
+
+    if (view) {
+      this.engine_.setCamera(mode, distanceKm, view);
+    } else {
+      this.engine_.setCamera(mode, distanceKm);
+    }
   }
 }

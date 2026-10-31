@@ -286,3 +286,15 @@ describe('DotsManager logic', () => {
     });
   });
 });
+
+describe('DotsManager highlight', () => {
+  it('reports Big for a highlighted dot and clears it again', () => {
+    setupStandardEnvironment();
+    const dots = new DotsManager();
+
+    dots.setDotHighlighted(7, true);
+    expect(dots.getSize(7)).toBe(DotStatus.Big);
+    dots.setDotHighlighted(7, false);
+    expect(dots.getSize(7)).toBe(DotStatus.None);
+  });
+});

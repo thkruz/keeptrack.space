@@ -12,6 +12,7 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { eci2lla, Kilometers } from '@ootk/src/main';
+import { userActionGate } from '../../core/user-action-gate';
 import { closeColorbox } from '../../utils/colorbox';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
@@ -370,9 +371,11 @@ export class MouseInput {
         } else if (inputCamera.cameraType === CameraType.SATELLITE_FIRST_PERSON) {
           // Left Mouse Button Clicked
           if (this.clickedSat !== -1 && !catalogManagerInstance.getObject(this.clickedSat, GetSatType.EXTRA_ONLY)?.isStatic()) {
-            selectSatManagerInstance?.selectSat(this.clickedSat);
+            if (userActionGate.allowSelection(this.clickedSat)) {
+              selectSatManagerInstance?.selectSat(this.clickedSat);
+            }
           }
-        } else {
+        } else if (userActionGate.allowSelection(this.clickedSat)) {
           selectSatManagerInstance?.selectSat(this.clickedSat);
         }
       }
@@ -481,7 +484,9 @@ export class MouseInput {
         // Clear Screen is a full reset, so drop the secondary (reference) object too -
         // deselecting only the primary left the secondary object and its orbit on screen.
         PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
-        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+        if (userActionGate.allowSelection(-1)) {
+          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+        }
         break;
       default:
         EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);

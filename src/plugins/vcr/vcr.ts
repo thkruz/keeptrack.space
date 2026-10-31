@@ -1,6 +1,7 @@
 import { ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { userActionGate } from '@app/engine/core/user-action-gate';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
@@ -129,11 +130,12 @@ export class VcrPlugin extends KeepTrackPlugin {
       return;
     }
 
-    if (timeManager.propRate === 1) {
-      timeManager.changePropRate(0);
-    } else {
-      timeManager.changePropRate(1);
+    const nextRate = timeManager.propRate === 1 ? 0 : 1;
+
+    if (!userActionGate.allowTime({ rate: nextRate })) {
+      return;
     }
+    timeManager.changePropRate(nextRate);
 
     this.updatePausePlayBtn_();
     this.stopRewind_();
@@ -147,6 +149,9 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     const timeManager = ServiceLocator.getTimeManager();
 
+    if (!userActionGate.allowTime({ rate: this.isRewinding ? 1 : -this.forwardRewindSpeed })) {
+      return;
+    }
     if (this.isRewinding) {
       this.stopRewind_();
       timeManager.changePropRate(1);
@@ -168,6 +173,9 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     const timeManager = ServiceLocator.getTimeManager();
 
+    if (!userActionGate.allowTime({ rate: this.isFastForwarding ? 1 : this.forwardRewindSpeed })) {
+      return;
+    }
     if (this.isFastForwarding) {
       this.stopFastForward_();
       timeManager.changePropRate(1);

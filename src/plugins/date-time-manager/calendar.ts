@@ -8,6 +8,7 @@ import { t7e } from '@app/locales/keys';
 import { ScenarioManagementPlugin } from '../scenario-management/scenario-management';
 import { WatchlistOverlay } from '../watchlist/watchlist-overlay';
 import './date-time-manager.css';
+import { userActionGate } from '@app/engine/core/user-action-gate';
 import { formatUtcDateTime, parseUtcDateTime } from './parse-utc-date-time';
 
 const dt = (key: string) => t7e(`plugins.DateTimeManager.${key}` as Parameters<typeof t7e>[0]);
@@ -718,6 +719,9 @@ export class Calendar {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
     propRate = Math.max(this.propRateLimitMin, Math.min(propRate, this.propRateLimitMax));
+    if (!userActionGate.allowTime({ rate: propRate })) {
+      return;
+    }
     timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.changePropRate(propRate);
     this.propagationRate = propRate;
@@ -834,6 +838,9 @@ export class Calendar {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const colorSchemeManagerInstance = ServiceLocator.getColorSchemeManager();
 
+    if (!userActionGate.allowTime({ timeMs: this.simulationDate.getTime() })) {
+      return;
+    }
     timeManagerInstance.changeSimulationTime(this.simulationDate.getTime());
     timeManagerInstance.lastBoxUpdateTime = timeManagerInstance.realTime;
 

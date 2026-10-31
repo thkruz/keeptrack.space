@@ -7,6 +7,7 @@ import { normalizeAngle } from '@app/engine/utils/transforms';
 import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { eci2lla, Radians } from '@ootk/src/main';
+import { userActionGate } from '../../core/user-action-gate';
 import { InputManager } from '../input-manager';
 import { MouseInput } from './mouse-input';
 
@@ -339,7 +340,9 @@ export class TouchInput {
     // Try to select satellite
     const satId = inputManager.getSatIdFromCoord(evt.x, evt.y);
 
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    if (userActionGate.allowSelection(satId)) {
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    }
   }
 
   private tapDebug_(evt: TapTouchEvent, inputManager: ReturnType<typeof ServiceLocator.getInputManager>): void {
@@ -396,7 +399,9 @@ export class TouchInput {
     this.showTapMarker_(evt.x, evt.y, rectCorrX, rectCorrY);
 
     // Use rect-corrected ID for selection (fix probe)
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(rectId);
+    if (userActionGate.allowSelection(rectId)) {
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(rectId);
+    }
   }
 
   pan(evt: PanTouchEvent) {

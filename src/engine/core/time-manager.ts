@@ -10,6 +10,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { getEl } from '../utils/get-el';
 import { PluginRegistry } from './plugin-registry';
 import { ServiceLocator } from './service-locator';
+import { userActionGate } from './user-action-gate';
 
 export class TimeManager {
   datetimeInputDOM: HTMLInputElement | null = null;
@@ -230,7 +231,7 @@ export class TimeManager {
         key: 't',
         description: d('realTime'),
         callback: () => {
-          if (!this.guardTimeChange_()) {
+          if (!this.guardTimeChange_({ timeMs: Date.now() })) {
             return;
           }
           ServiceLocator.getUiManager().toast(t7e('toasts.timeSetToRealTime'), ToastMsgType.normal);
@@ -292,7 +293,7 @@ export class TimeManager {
         key: '<',
         description: d('jumpBack'),
         callback: () => {
-          if (!this.guardTimeChange_()) {
+          if (!this.guardTimeChange_({ timeMs: Date.now() + this.staticOffset - settingsManager.changeTimeWithKeyboardAmountBig })) {
             return;
           }
           this.calculateSimulationTime();
@@ -303,7 +304,7 @@ export class TimeManager {
         key: '>',
         description: d('jumpForward'),
         callback: () => {
-          if (!this.guardTimeChange_()) {
+          if (!this.guardTimeChange_({ timeMs: Date.now() + this.staticOffset + settingsManager.changeTimeWithKeyboardAmountBig })) {
             return;
           }
           this.calculateSimulationTime();
@@ -328,7 +329,7 @@ export class TimeManager {
         code: 'Equal',
         description: d('stepForward'),
         callback: () => {
-          if (!this.guardTimeChange_()) {
+          if (!this.guardTimeChange_({ timeMs: Date.now() + this.staticOffset + settingsManager.changeTimeWithKeyboardAmountSmall })) {
             return;
           }
           this.calculateSimulationTime();
@@ -340,7 +341,7 @@ export class TimeManager {
         code: 'Minus',
         description: d('stepBack'),
         callback: () => {
-          if (!this.guardTimeChange_()) {
+          if (!this.guardTimeChange_({ timeMs: Date.now() + this.staticOffset - settingsManager.changeTimeWithKeyboardAmountSmall })) {
             return;
           }
           this.calculateSimulationTime();
@@ -352,22 +353,25 @@ export class TimeManager {
     this.isKeyboardBindingsInitialized_ = true;
   }
 
-  private guardTimeChange_(): boolean {
+  /** Keyboard time keys call this first. `change` is what the key would do, reported to user-action interceptors. */
+  private guardTimeChange_(change?: { timeMs?: number; rate?: number }): boolean {
     if (!this.isTimeChangingEnabled) {
       ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);
 
       return false;
     }
 
-    return true;
+    // Rate keys (change undefined) are gated in applyPropRate_, once the new rate is known
+    return change === undefined || userActionGate.allowTime(change);
   }
 
   private applyPropRate_(newPropRate: number): void {
     const calendarInstance = PluginRegistry.getPlugin(DateTimeManager)?.calendar;
 
     if (calendarInstance) {
+      // updatePropRate consults the user-action gate itself
       calendarInstance.updatePropRate(newPropRate);
-    } else {
+    } else if (userActionGate.allowTime({ rate: newPropRate })) {
       this.changePropRate(newPropRate);
     }
   }
@@ -379,7 +383,11 @@ export class TimeManager {
     this.calculateSimulationTime();
   }
 
+  /** User-initiated (middle click) pause/resume. */
   toggleTime() {
+    if (!userActionGate.allowTime({ rate: this.propRate === 0 ? this.lastPropRate : 0 })) {
+      return;
+    }
     if (this.propRate === 0) {
       this.changePropRate(this.lastPropRate);
     } else {

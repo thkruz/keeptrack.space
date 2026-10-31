@@ -1,6 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { userActionGate } from '@app/engine/core/user-action-gate';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
@@ -286,6 +287,9 @@ export class TimeSlider extends KeepTrackPlugin {
 
     newDate.setUTCHours(newHours, newMinutes, 0, 0);
 
+    if (!userActionGate.allowTime({ timeMs: newDate.getTime() })) {
+      return;
+    }
     timeManager.changeSimulationTime(newDate.getTime());
 
     // Notify other components of the time change
@@ -302,6 +306,9 @@ export class TimeSlider extends KeepTrackPlugin {
 
     const newDate = new Date(newTimeInMs);
 
+    if (!userActionGate.allowTime({ timeMs: newDate.getTime() })) {
+      return;
+    }
     timeManager.changeSimulationTime(newDate.getTime());
 
     // Notify other components of the time change

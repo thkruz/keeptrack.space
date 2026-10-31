@@ -1,6 +1,7 @@
 /**
  * Real EmbedEngine adapter. All the engine quirks live here:
  *  - selectSat is gated by settingsManager.isDisableSelectSat, which is lifted only around our calls
+ *  - user actions on host-owned domains are reported and blocked through the engine's userActionGate
  *  - a newly added or edited analyst object needs the cruncher edit, orbit buffer, editTle and a dot seed
  *  - the engine snap-to-sat resets the camera standoff, so camera writes are re-asserted after a delay
  */
@@ -10,6 +11,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { userActionGate } from '@app/engine/core/user-action-gate';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
@@ -37,7 +39,6 @@ const CAMERA_REASSERT_MS = [1200, 2500, 6000];
 const FULL_MODE_SLOT_START = 500;
 
 export class KeepTrackEmbedEngine implements EmbedEngine {
-  private selfDepth_ = 0;
   private cameraTimers_: ReturnType<typeof setTimeout>[] = [];
   private guardsInstalled_ = false;
 
@@ -68,11 +69,9 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     const previous = settingsManager.isDisableSelectSat;
 
     settingsManager.isDisableSelectSat = false;
-    this.selfDepth_++;
     try {
       mgr.selectSat(id);
     } finally {
-      this.selfDepth_--;
       settingsManager.isDisableSelectSat = previous;
     }
 
@@ -199,21 +198,11 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
   }
 
   setTimeMs(timeMs: number): void {
-    this.selfDepth_++;
-    try {
-      ServiceLocator.getTimeManager().changeSimulationTime(timeMs);
-    } finally {
-      this.selfDepth_--;
-    }
+    ServiceLocator.getTimeManager().changeSimulationTime(timeMs);
   }
 
   setRate(rate: number): void {
-    this.selfDepth_++;
-    try {
-      ServiceLocator.getTimeManager().changePropRate(rate, false);
-    } finally {
-      this.selfDepth_--;
-    }
+    ServiceLocator.getTimeManager().changePropRate(rate, false);
   }
 
   // ---- Events -------------------------------------------------------------
@@ -248,44 +237,23 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     }
     this.guardsInstalled_ = true;
 
-    const mgr = this.getSelectManager_();
+    // User entry points (click, touch, search, keyboard time keys, time UI) consult the gate; host and
+    // engine-internal calls never do, so no flag or call-depth bookkeeping is needed here.
+    const { selection, time } = guards;
 
-    if (guards.selection && mgr) {
-      const original = mgr.selectSat.bind(mgr);
-      const report = guards.selection;
+    if (selection) {
+      userActionGate.intercept('selection', (request) => {
+        selection(request.satId);
 
-      mgr.selectSat = (id: number): void => {
-        if (this.selfDepth_ === 0) {
-          report(id);
-        }
-        original(id);
-      };
+        return false;
+      });
     }
+    if (time) {
+      userActionGate.intercept('time', (request) => {
+        time({ ...(request.timeMs !== undefined && { timeMs: request.timeMs }), ...(request.rate !== undefined && { rate: request.rate }) });
 
-    const time = ServiceLocator.getTimeManager();
-
-    if (guards.time && time) {
-      const report = guards.time;
-      const originalRate = time.changePropRate.bind(time);
-      const originalOffset = time.changeStaticOffset.bind(time);
-
-      // Host-owned clock: user attempts are reported and dropped, host calls pass through
-      time.changePropRate = (rate: number, isShowToast?: boolean): void => {
-        if (this.selfDepth_ === 0) {
-          report({ rate });
-
-          return;
-        }
-        originalRate(rate, isShowToast);
-      };
-      time.changeStaticOffset = (offset: number, now?: number): void => {
-        if (this.selfDepth_ === 0) {
-          report({ timeMs: (now ?? Date.now()) + offset });
-
-          return;
-        }
-        originalOffset(offset, now);
-      };
+        return false;
+      });
     }
   }
 

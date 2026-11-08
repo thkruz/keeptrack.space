@@ -1,20 +1,21 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { isProBuild, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('BestPassPlugin', () => {
-  test('icon pro-gated (login gate), drawer item visible, form elements in DOM', async ({ page }) => {
+  test('icon gated (Pro: login gate, OSS: needs a sensor), drawer item visible, form elements in DOM', async ({ page }) => {
     await waitForAppReady(page, {
       plugins: { BestPassPlugin: { enabled: true } },
       settings: { isMobileModeEnabled: true },
     });
 
+    const isPro = await isProBuild(page);
     const bottomIcon = page.locator('#best-pass-icon');
     const sideMenu = page.locator('#best-pass-menu');
 
-    // In the Pro build best-pass is a login-gated plugin. With the login gate
-    // active (default), the icon is marked pro-gated rather than sensor-disabled.
+    // Pro: best-pass is login-gated, so with the gate active (default) the icon is
+    // marked pro-gated. OSS: no login gate, the icon is disabled until a sensor is picked.
     await expect(bottomIcon).toBeAttached();
-    await expect(bottomIcon).toHaveClass(/bmenu-item-pro/u);
+    await expect(bottomIcon).toHaveClass(isPro ? /bmenu-item-pro/u : /bmenu-item-disabled/u);
 
     // Side menu HTML should exist in DOM but be hidden
     await expect(sideMenu).toBeAttached();
@@ -34,7 +35,7 @@ test.describe('BestPassPlugin', () => {
 
     await expect(drawerItem).toBeVisible();
 
-    // Clicking a login-gated plugin's drawer item should NOT open the side menu
+    // Clicking a gated drawer item should NOT open the side menu
     await drawerItem.scrollIntoViewIfNeeded();
     await drawerItem.click();
     await expect(sideMenu).toBeHidden({ timeout: 2_000 });
@@ -44,7 +45,7 @@ test.describe('BestPassPlugin', () => {
     // Pro form uses chip pickers (sensor selector + satellite input) rather than
     // the OSS #bp-sats text field.
     await expect(page.locator('form#best-pass-menu-form')).toBeAttached();
-    await expect(page.locator('#bp-sat-input')).toBeAttached();
+    await expect(page.locator(isPro ? '#bp-sat-input' : '#bp-sats')).toBeAttached();
     await expect(page.locator('#bp-submit')).toBeAttached();
   });
 });

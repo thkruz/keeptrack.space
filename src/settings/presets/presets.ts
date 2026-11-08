@@ -109,7 +109,6 @@ export class SettingsPresets {
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
     // settings.isNotionalDebris = true;
-    settings.isEnableExtendedCatalog = false;
     settings.searchLimit = 6500;
     settings.isDisableExtraCatalog = true;
     settings.isDisableAsciiCatalog = true;
@@ -138,7 +137,6 @@ export class SettingsPresets {
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
     // settings.isNotionalDebris = true;
-    settings.isEnableExtendedCatalog = true;
     settings.isDisableLaunchSites = true;
     settings.isDisableControlSites = true;
     settings.isDisableSensors = true;

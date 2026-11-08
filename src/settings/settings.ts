@@ -266,7 +266,6 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   db: 'data',
   isDisableExtraCatalog: 'data',
   isUseDebrisCatalog: 'data',
-  isEnableExtendedCatalog: 'data',
   isEnableJscCatalog: 'data',
   isDisableControlSites: 'data',
   isDisableLaunchSites: 'data',

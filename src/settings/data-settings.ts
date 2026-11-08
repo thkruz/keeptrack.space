@@ -86,11 +86,6 @@ export class DataSettings {
    * /tle/TLEdebris.json
    */
   isUseDebrisCatalog = false;
-  /**
-   * Enables the old extended catalog including JSC Vimpel data
-   * @deprecated Use isEnableJscCatalog instead
-   */
-  isEnableExtendedCatalog = false;
   /*
    * Enables the new JSC Vimpel catalog
    */

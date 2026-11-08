@@ -15,6 +15,7 @@ import {
   linearDistance,
   lla2eci,
   MINUTES_PER_DAY,
+  relativeVelocity,
   Satellite,
   SatelliteRecord,
   Sensor,
@@ -307,7 +308,7 @@ export class SensorMath {
       return '';
     }
 
-    const velApart = SatMath.velocity(hoverVel, secondaryVel).toFixed(3);
+    const velApart = relativeVelocity(hoverVel, secondaryVel).toFixed(3);
 
     return `<br />${t7e('sensorMath.relativeVelocity').replace('{kms}', velApart)}`;
   }

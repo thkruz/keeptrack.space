@@ -43,7 +43,6 @@ import {
   Earth as OotkEarth,
   Sun as OotkSun,
   pow2db as ootkPow2db,
-  relativeVelocity as ootkRelativeVelocity,
   PosVel,
   RAD2DEG,
   Radians,
@@ -410,17 +409,6 @@ export abstract class SatMath {
    */
   static distance(obj1: TemeVec3, obj2: TemeVec3): Kilometers {
     return linearDistance(obj1, obj2);
-  }
-
-  /**
-   * Relative speed of two objects given their ECI velocity vectors.
-   * @param obj1 The first object's velocity in ECI coordinates.
-   * @param obj2 The second object's velocity in ECI coordinates.
-   * @returns Relative speed in km/s.
-   * @deprecated Use relativeVelocity() from ootk instead.
-   */
-  static velocity(obj1: TemeVec3<KilometersPerSecond>, obj2: TemeVec3<KilometersPerSecond>): KilometersPerSecond {
-    return ootkRelativeVelocity(obj1, obj2);
   }
 
   /**

@@ -1,5 +1,5 @@
 import type { EmbedCatalog } from './embed-catalog';
-import type { EmbedEngine, EngineLabel } from './embed-engine';
+import type { EmbedEngine, EngineLabel, EngineSensor } from './embed-engine';
 import type { EmbedSensors } from './embed-sensors';
 import { type EmbedColor, EmbedError, type EmbedLayers, type EmbedObjectStyle, type EmbedSensor, type ObjectRef } from './embed-types';
 
@@ -128,10 +128,15 @@ export class EmbedStyle {
     this.pushLabels_();
   }
 
-  /** Sensors were removed. */
-  dropSensors(hostIds: string[]): void {
+  /** Sensors were removed. `engineSensors` are their engine objects, looked up before removal, so the markers come down. */
+  dropSensors(hostIds: string[], engineSensors: (EngineSensor | null)[] = []): void {
     for (const id of hostIds) {
       this.sensorDefs_.delete(id);
+    }
+    for (const sensor of engineSensors) {
+      if (sensor) {
+        this.engine_.setSensorStyle(sensor, {});
+      }
     }
     this.pushLabels_();
   }

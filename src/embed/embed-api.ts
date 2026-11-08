@@ -389,9 +389,11 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
   removeSensors(hostIds: string[]): void {
     this.requireReady_();
     this.ctx_.assertHostMaySet('sensors');
+    // Looked up before remove(): the style layer needs the engine sensors to take their markers down
+    const engineSensors = Array.isArray(hostIds) ? hostIds.map((id) => this.sensors_.getEngineSensor(id)) : [];
     const removed = this.sensors_.remove(hostIds);
 
-    this.style_.dropSensors(hostIds);
+    this.style_.dropSensors(hostIds, engineSensors);
     this.overlays_.dropForSensors(removed);
   }
 

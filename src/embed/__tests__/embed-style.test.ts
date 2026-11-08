@@ -205,6 +205,8 @@ describe('sensor style', () => {
     expect(engine.labelSets.at(-1)).toHaveLength(1);
     api.removeSensors(['s1']);
     expect(engine.labelSets.at(-1)).toEqual([]);
+    // the marker is taken down with the sensor (an empty style removes it)
+    expect(engine.sensorStyles.at(-1)?.style).toEqual({});
   });
 
   it('rejects an invalid sensor color', () => {

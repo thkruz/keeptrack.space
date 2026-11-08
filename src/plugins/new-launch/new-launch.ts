@@ -869,7 +869,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const currentEpoch = TimeManager.currentEpoch(ServiceLocator.getTimeManager().simulationTimeObj);
 
-    const tle1 = (tle1_.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + tle1_.substr(32)) as TleLine1;
+    const tle1 = (tle1_.slice(0, 18) + currentEpoch[0] + currentEpoch[1] + tle1_.slice(32)) as TleLine1;
 
     // Create satellite record from TLE
     let satrec: SatelliteRecord;

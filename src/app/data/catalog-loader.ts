@@ -1306,7 +1306,7 @@ export class CatalogLoader {
 
     notionalSatNum++;
 
-    meanAnom = Number.parseFloat(debris.tle2.substr(43, 51)) + meanAnom;
+    meanAnom = Number.parseFloat(debris.tle2.slice(43, 51)) + meanAnom;
     if (meanAnom > 360) {
       meanAnom -= 360;
     }
@@ -1314,11 +1314,11 @@ export class CatalogLoader {
       meanAnom += 360;
     }
 
-    debris.tle2 = (debris.tle2.substr(0, 17) + // Columns 1-18
+    debris.tle2 = (debris.tle2.slice(0, 17) + // Columns 1-18
       StringPad.pad0((Math.random() * 360).toFixed(4), 8) + // New RAAN
-      debris.tle2.substr(25, 18) + // Columns 25-44
+      debris.tle2.slice(25, 43) + // Columns 25-44
       StringPad.pad0(meanAnom.toFixed(4), 8) + // New Mean Anomaly
-      debris.tle2.substr(51)) as TleLine2; // Columns 51-69
+      debris.tle2.slice(51)) as TleLine2; // Columns 51-69
 
     const debrisObj = new Satellite(debris);
 

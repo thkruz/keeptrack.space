@@ -7,7 +7,6 @@ import {
   EarthCloudTextureQuality,
   EarthDayTextureQuality,
   EarthNightTextureQuality,
-  EarthPoliticalTextureQuality,
   EarthSpecTextureQuality,
   EarthTextureStyle,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
@@ -364,7 +363,6 @@ export class SettingsPresets {
     settings.isDrawBumpMap = true;
     settings.earthCloudTextureQuality = EarthCloudTextureQuality.HIGH;
     settings.isDrawCloudsMap = true;
-    settings.earthPoliticalTextureQuality = EarthPoliticalTextureQuality.HIGH;
     settings.isDrawPoliticalMap = true;
     settings.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
     settings.isDisableSkybox = false;

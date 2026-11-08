@@ -1,8 +1,9 @@
 import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { SimulationCleaners } from '@app/engine/simulation/simulation-cleaners';
 import { missileManager } from '@app/plugins/missile/missile-manager';
-import { classifyAnalystSat, getActiveAnalystSats } from '@app/plugins/simulation-cleaners/analyst-slots';
+import { classifyAnalystSat, clearAnalystSats, getActiveAnalystSats } from '@app/plugins/simulation-cleaners/analyst-slots';
 import { BREAKUP_CLEANER_ID, CREATED_SATS_CLEANER_ID, MISSILE_CLEANER_ID, registerBuiltInSimulationCleaners } from '@app/plugins/simulation-cleaners/builtin-cleaners';
 import { Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -84,6 +85,25 @@ describe('built-in simulation cleaners', () => {
     expect((catalog.objectCache[2] as Satellite).active).toBe(false);
     expect(catalog.satCruncherThread.sendSatEdit).toHaveBeenCalled();
     expect(ServiceLocator.getColorSchemeManager().notifyObjectsChanged).toHaveBeenCalled();
+  });
+
+  it('clears the secondary selection when it points at a removed analyst sat', () => {
+    const selectSatManager = { selectedSat: -1, secondarySat: 1, selectSat: vi.fn(), setSecondarySat: vi.fn() };
+
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue(selectSatManager as never);
+    clearAnalystSats([1, 2]);
+
+    expect(selectSatManager.setSecondarySat).toHaveBeenCalledWith(-1, true);
+    expect(selectSatManager.selectSat).not.toHaveBeenCalled();
+  });
+
+  it('leaves a secondary selection outside the cleared ids alone', () => {
+    const selectSatManager = { selectedSat: -1, secondarySat: 7, selectSat: vi.fn(), setSecondarySat: vi.fn() };
+
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue(selectSatManager as never);
+    clearAnalystSats([1, 2]);
+
+    expect(selectSatManager.setSecondarySat).not.toHaveBeenCalled();
   });
 
   it('missile cleaner counts missilesInUse and clears through the missile manager', () => {

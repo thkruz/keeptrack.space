@@ -60,6 +60,9 @@ export const clearAnalystSats = (ids: number[]): void => {
 
   const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
 
+  if (selectSatManager && ids.includes(selectSatManager.secondarySat)) {
+    selectSatManager.setSecondarySat(-1, true);
+  }
   if (selectSatManager && ids.includes(selectSatManager.selectedSat)) {
     selectSatManager.selectSat(-1);
   }

@@ -8,6 +8,7 @@ import {
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorManager } from '@app/app/sensors/sensorManager';
 import { KeepTrack } from '@app/keeptrack';
+import { loadLocale } from '@app/locales/locales';
 import { buildCustomSensorParams, CustomSensorFormValues } from '@app/plugins/sensor/custom-sensor-core';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -101,7 +102,9 @@ describe('custom sensor display name', () => {
     expect(isCustomSensor(null)).toBe(false);
   });
 
-  it('recognises the default name in any UI language, not just the current one', () => {
+  it('recognises the default name in any UI language, not just the current one', async () => {
+    await loadLocale('de');
+    await loadLocale('ja');
     const germanDefault = i18next.t('sensorMath.customSensorDefaultName', { lng: 'de' });
     const japaneseDefault = i18next.t('sensorMath.customSensorDefaultName', { lng: 'ja' });
 

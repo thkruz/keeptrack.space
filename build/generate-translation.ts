@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { reporter } from './lib/reporter';
+import { generateCrossLocaleFile } from './utils/generate-cross-locale';
 import { mergeAllLocales } from './utils/generate-translation-json';
 import { generateKeysFile } from './utils/generate-translation-keys';
 
@@ -20,6 +21,12 @@ let __dirname = path.dirname(new URL(import.meta.url).pathname).replace(/^\/+/u,
 if (!(/^[a-zA-Z]:/u).test(__dirname)) {
   __dirname = `/${__dirname}`;
 }
+
+reporter.phase(
+  'Cross-locale table',
+  () => generateCrossLocaleFile(`${__dirname}/../src/locales`),
+  (result) => `${result.languages} languages, ${result.legacyIds} legacy icon ids`,
+);
 
 reporter.phase(
   'Generate translation keys',

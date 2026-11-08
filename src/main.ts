@@ -22,6 +22,7 @@
 
 import { prepareEmbed } from './embed/embed-install';
 import { KeepTrack } from './keeptrack';
+import { localesReady } from './locales/locales';
 import { registerServiceWorker } from './pwa/service-worker-registration';
 
 /*
@@ -44,7 +45,10 @@ window.settingsOverride = embed.settingsOverride as typeof window.settingsOverri
  * Everything from init() on. Synchronous for the normal site; the embedded path awaits license
  * verification first (it must settle before plugins load) and then runs this same function.
  */
-const boot = (): void => {
+const boot = async (): Promise<void> => {
+  // The detected language is lazy-loaded; it must be in place before any t7e() call renders UI
+  await localesReady;
+
   // Load the main website class
   keepTrackInstance.init(window.settingsOverride);
 

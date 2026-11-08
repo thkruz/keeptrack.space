@@ -1,5 +1,5 @@
+import crossLocale from '@app/locales/cross-locale.json';
 import { t7e } from '@app/locales/keys';
-import i18next from 'i18next';
 
 /**
  * Custom sensor identity helpers.
@@ -35,7 +35,7 @@ export function isCustomSensor(sensor: CustomSensorLike | null | undefined): boo
 }
 
 /**
- * True when `name` is the default custom-sensor name in English or in any loaded UI
+ * True when `name` is the default custom-sensor name in English or in any bundled UI
  * language. The displayed default is localized (`sensorMath.customSensorDefaultName`),
  * so identity must never depend on the current language's wording alone.
  */
@@ -47,9 +47,9 @@ export function isDefaultCustomSensorName(name: string | null | undefined): bool
     return true;
   }
 
-  const languages = Object.keys(i18next.options?.resources ?? {});
-
-  return languages.some((lng) => i18next.t('sensorMath.customSensorDefaultName', { lng }) === name);
+  // Generated at build time from every bundled language; only English and the active language are
+  // loaded at runtime, so i18next alone cannot answer this.
+  return crossLocale.customSensorDefaultNames.includes(name);
 }
 
 /** The localized default custom-sensor name for display. */

@@ -1,12 +1,13 @@
-import '@app/locales/locales';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { migrateLegacyBottomIconId } from '@app/engine/plugins/bottom-icon-id';
+import { loadLocale } from '@app/locales/locales';
 import i18next from 'i18next';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 describe('KeepTrackPlugin.defaultBottomIconElementName', () => {
   describe('in German', () => {
     beforeAll(async () => {
+      await loadLocale('de');
       await i18next.changeLanguage('de');
     });
 
@@ -30,7 +31,10 @@ describe('KeepTrackPlugin.defaultBottomIconElementName', () => {
 
 describe('migrateLegacyBottomIconId', () => {
   // Ids as GA4 recorded them before the fix.
-  it('maps translated ids saved by earlier builds to the English id', () => {
+  it('maps translated ids saved by earlier builds to the English id (for loaded locales)', async () => {
+    // Locales are lazy-loaded; the legacy map only covers bundles that are loaded
+    await Promise.all(['de', 'pl'].map(loadLocale));
+
     expect(migrateLegacyBottomIconId('sensoren-bottom-icon')).toBe('sensors-bottom-icon');
     expect(migrateLegacyBottomIconId('czujniki-bottom-icon')).toBe('sensors-bottom-icon');
     expect(migrateLegacyBottomIconId('własny-czujnik-bottom-icon')).toBe('custom-sensor-bottom-icon');

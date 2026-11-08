@@ -17,8 +17,10 @@ test.describe('EarthCenteredView Plugin', () => {
     // update loop, so it should already be selected
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
 
+    await expect(utilityIcon).toBeVisible();
+
     // Click the icon - should remain in earth-centered mode (re-activates)
-    await utilityIcon.click({ force: true });
+    await utilityIcon.click();
 
     // Icon should still be selected after clicking
     await expect(utilityIcon).toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });

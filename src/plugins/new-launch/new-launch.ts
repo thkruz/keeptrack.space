@@ -631,7 +631,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     waitForCruncher({
-      cruncher: catalogManagerInstance.satCruncher,
+      cruncher: catalogManagerInstance.satCruncherThread?.worker as Worker,
       cb: () => {
         this.isDoingCalculations_ = false;
         hideLoading();

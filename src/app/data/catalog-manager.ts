@@ -152,10 +152,6 @@ export class CatalogManager {
   orbitalPlaneDensityMax = 0;
   orbitalSats: number;
   satCruncherThread: SatCruncherThreadManager;
-  /** @deprecated Use satCruncherThread instead */
-  get satCruncher(): Worker {
-    return this.satCruncherThread?.worker as Worker;
-  }
 
   objectCache: BaseObject[];
   satExtraData;

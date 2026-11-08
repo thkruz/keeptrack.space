@@ -128,7 +128,7 @@ export class SensorManager {
 
       // Wait for position cruncher to process new sensor data, then force full recolor
       waitForCruncher({
-        cruncher: ServiceLocator.getCatalogManager().satCruncher,
+        cruncher: ServiceLocator.getCatalogManager().satCruncherThread?.worker as Worker,
         cb: () => {
           ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
         },
@@ -508,7 +508,7 @@ export class SensorManager {
     this.updatePositionCruncher_();
 
     waitForCruncher({
-      cruncher: ServiceLocator.getCatalogManager().satCruncher,
+      cruncher: ServiceLocator.getCatalogManager().satCruncherThread?.worker as Worker,
       cb: () => {
         ServiceLocator.getColorSchemeManager().calculateColorBuffers(true);
       },

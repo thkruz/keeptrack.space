@@ -497,7 +497,7 @@ describe('ColorSchemeManager Block 2', () => {
     const mockRenderer = { gl: { createBuffer: vi.fn().mockReturnValue({}), bindBuffer: vi.fn(), bufferData: vi.fn(), bufferSubData: vi.fn() } };
     const mockDotsManager = { buffers: { color: null, pickability: null } };
     const mockUiManager = { colorSchemeChangeAlert: vi.fn() };
-    const mockCatalogManager = { numObjects: 10, satCruncher: { postMessage: vi.fn() } };
+    const mockCatalogManager = { numObjects: 10, satCruncherThread: { worker: { postMessage: vi.fn() } } };
 
     vi.spyOn(ServiceLocator, 'getRenderer').mockReturnValue(mockRenderer as unknown as WebGLRenderer);
     vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue(mockDotsManager as unknown as DotsManager);
@@ -538,7 +538,7 @@ describe('ColorSchemeManager Block 2', () => {
     const mockRenderer = { gl: { createBuffer: vi.fn().mockReturnValue({}), bindBuffer: vi.fn(), bufferData: vi.fn(), bufferSubData: vi.fn() } };
     const mockDotsManager = { buffers: { color: null, pickability: null } };
     const mockUiManager = { colorSchemeChangeAlert: vi.fn() };
-    const mockCatalogManager = { numObjects: 10, satCruncher: { postMessage: vi.fn() } };
+    const mockCatalogManager = { numObjects: 10, satCruncherThread: { worker: { postMessage: vi.fn() } } };
 
     vi.spyOn(ServiceLocator, 'getRenderer').mockReturnValue(mockRenderer as unknown as WebGLRenderer);
     vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue(mockDotsManager as unknown as DotsManager);
@@ -577,7 +577,7 @@ describe('ColorSchemeManager Block 2', () => {
     // Arrange
     const mockRenderer = { gl: { createBuffer: vi.fn().mockReturnValue({}), bindBuffer: vi.fn(), bufferData: vi.fn(), bufferSubData: vi.fn() } };
     const mockDotsManager = { buffers: { color: null, pickability: null }, inViewData: {} };
-    const mockCatalogManager = { numObjects: 10, objectCache: new Array(10).fill({}), satCruncher: { postMessage: vi.fn() } };
+    const mockCatalogManager = { numObjects: 10, objectCache: new Array(10).fill({}), satCruncherThread: { worker: { postMessage: vi.fn() } } };
     const mockSettingsManager = { dotsOnScreen: 10, dotsPerColor: 5, defaultColorScheme: 'DefaultColorScheme' };
 
     vi.spyOn(ServiceLocator, 'getRenderer').mockReturnValue(mockRenderer as unknown as WebGLRenderer);
@@ -645,7 +645,7 @@ describe('ColorSchemeManager Block 2', () => {
     };
     const mockDotsManager = { buffers: { color: null, pickability: null } };
     const mockUiManager = { colorSchemeChangeAlert: vi.fn() };
-    const mockCatalogManager = { numObjects: 10, satCruncher: { postMessage: vi.fn() } };
+    const mockCatalogManager = { numObjects: 10, satCruncherThread: { worker: { postMessage: vi.fn() } } };
 
     vi.spyOn(ServiceLocator, 'getRenderer').mockReturnValue(mockRenderer as unknown as WebGLRenderer);
     vi.spyOn(ServiceLocator, 'getDotsManager').mockReturnValue(mockDotsManager as unknown as DotsManager);
@@ -710,7 +710,7 @@ describe('ColorSchemeManager Block 2', () => {
     const mockRenderer = { gl: { createBuffer: vi.fn().mockReturnValue({}), bindBuffer: vi.fn(), bufferData: vi.fn(), bufferSubData: vi.fn() } };
     const mockDotsManager = { buffers: { color: null, pickability: null } };
     const mockUiManager = { searchManager: { getCurrentSearch: vi.fn().mockReturnValue('') } };
-    const mockCatalogManager = { numObjects: 10, satCruncher: { postMessage: vi.fn() } };
+    const mockCatalogManager = { numObjects: 10, satCruncherThread: { worker: { postMessage: vi.fn() } } };
     const mockWatchlistMenu = { style: { transform: 'translateX(-100px)' } };
 
     vi.spyOn(ServiceLocator, 'getRenderer').mockReturnValue(mockRenderer as unknown as WebGLRenderer);

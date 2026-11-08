@@ -300,26 +300,24 @@ export function startRelay(options: RelayOptions): Promise<RunningRelay> {
         }, options.heartbeatMs ?? 30_000)
       : null;
 
+  const close = (): Promise<void> =>
+    new Promise<void>((done) => {
+      if (heartbeat) {
+        clearInterval(heartbeat);
+      }
+      for (const client of wss.clients) {
+        client.terminate();
+      }
+      wss.close(() => done());
+    });
+
   return new Promise<RunningRelay>((resolve, reject) => {
     wss.once('error', reject);
     wss.once('listening', () => {
       const port = (wss.address() as AddressInfo).port;
 
       log(`relay listening on ${host}:${port}`);
-      resolve({
-        port,
-        host,
-        close: () =>
-          new Promise<void>((done) => {
-            if (heartbeat) {
-              clearInterval(heartbeat);
-            }
-            for (const client of wss.clients) {
-              client.terminate();
-            }
-            wss.close(() => done());
-          }),
-      });
+      resolve({ port, host, close });
     });
   });
 }

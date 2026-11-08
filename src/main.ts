@@ -52,6 +52,10 @@ const boot = async (): Promise<void> => {
   // Load the main website class
   keepTrackInstance.init(window.settingsOverride);
 
+  // After init(): the opt-out reads settingsManager.isDisableServiceWorker, which only reflects
+  // settingsOverride (e.g. an embed's) once init() has applied it
+  registerServiceWorker();
+
   // Expose to window for debugging
   window.keepTrack = keepTrackInstance;
 
@@ -74,5 +78,3 @@ if (embed.isEmbedded) {
 } else {
   boot();
 }
-
-registerServiceWorker();

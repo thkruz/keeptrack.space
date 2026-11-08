@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-import { readFileSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { parseArgs } from 'node:util';
 import { startRelay } from './server.js';
 
@@ -18,7 +19,22 @@ if (values.help) {
   process.exit(0);
 }
 
-const token = (values['token-file'] ? readFileSync(values['token-file'], 'utf8') : (process.env.KT_RELAY_TOKEN ?? '')).trim();
+/** A token file is a small regular file; refuse directories, devices, FIFOs and anything large. */
+const MAX_TOKEN_FILE_BYTES = 4096;
+
+const readTokenFile = (path: string): string => {
+  const resolved = resolve(path);
+  const info = statSync(resolved);
+
+  if (!info.isFile() || info.size > MAX_TOKEN_FILE_BYTES) {
+    console.error(`--token-file must be a regular file of at most ${MAX_TOKEN_FILE_BYTES} bytes.`);
+    process.exit(2);
+  }
+
+  return readFileSync(resolved, 'utf8');
+};
+
+const token = (values['token-file'] ? readTokenFile(values['token-file']) : (process.env.KT_RELAY_TOKEN ?? '')).trim();
 
 if (!token) {
   console.error('No token: pass --token-file <path> or set KT_RELAY_TOKEN.');

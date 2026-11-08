@@ -411,7 +411,7 @@ body.drawer-mode {
     min-width: 18px;
     height: 18px;
     border-radius: 9px;
-    background: var(--color-primary, #1e88e5);
+    background: var(--color-primary, #1976d2);
     color: white;
     font-size: 10px;
     font-weight: 600;

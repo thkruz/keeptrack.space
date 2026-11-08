@@ -74,7 +74,7 @@
     "start:solar-system": "tsx ./build/dev-server.ts --profile=solar-system",
     "start:ci": "tsx ./build/dev-server.ts --static",
     "test": "vitest run",
-    "test:packages": "vitest run --root packages/embed-sdk && vitest run --root packages/embed-client && vitest run --root packages/embed-relay",
+    "test:packages": "npm test --prefix packages/embed-sdk && npm test --prefix packages/embed-client && npm test --prefix packages/embed-relay",
     "test:coverage": "vitest run --coverage",
     "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test",

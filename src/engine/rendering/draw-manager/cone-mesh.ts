@@ -13,12 +13,6 @@ export interface ConeSettings {
   fieldOfView: Degrees;
   /** The color of the cone, default is [0.2, 1.0, 1.0, 1.0] */
   color?: [number, number, number, number];
-  /**
-   * @deprecated
-   * The range of the cone in kilometers, default is the distance to Earth from the attachmentPoint
-   * This is not implemented yet
-   */
-  range?: Kilometers;
   /** When set, the cone points toward this target satellite instead of Earth center */
   targetObj?: BaseObject;
 }
@@ -41,7 +35,6 @@ export class ConeMesh extends CustomMesh {
   /** The angle of the cone mesh. Tied to the object's FOV */
   fieldOfView: number;
   color: [number, number, number, number] = [0.2, 1.0, 1.0, 1.0];
-  range: Kilometers = 0 as Kilometers;
   pos: vec3 = vec3.create();
   offsetDistance: number = (RADIUS_OF_EARTH + settingsManager.coneDistanceFromEarth) as Kilometers;
   obj: BaseObject;
@@ -52,7 +45,6 @@ export class ConeMesh extends CustomMesh {
     this.obj = obj;
     this.fieldOfView = settings.fieldOfView;
     this.color = settings.color || this.color;
-    this.range = settings.range || this.range;
     this.targetObj = settings.targetObj ?? null;
 
     this.updatePosition_();
@@ -61,7 +53,6 @@ export class ConeMesh extends CustomMesh {
   editSettings(settings: ConeSettings) {
     this.fieldOfView = settings.fieldOfView;
     this.color = settings.color || this.color;
-    this.range = settings.range || this.range;
     this.targetObj = settings.targetObj ?? this.targetObj;
   }
 

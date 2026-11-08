@@ -42,7 +42,6 @@ import {
   MINUTES_PER_DAY,
   Earth as OotkEarth,
   Sun as OotkSun,
-  estimateRcs as ootkEstimateRcs,
   pow2db as ootkPow2db,
   relativeVelocity as ootkRelativeVelocity,
   PosVel,
@@ -88,14 +87,6 @@ export abstract class SatMath {
     }
 
     return ootkPow2db(power);
-  }
-
-  /**
-   * Estimates the Radar Cross Section (RCS) of an object based on its dimensions and shape.
-   * @deprecated Use estimateRcs() from ootk instead.
-   */
-  static estimateRcs(length: number, width: number, height: number, shape: string): number {
-    return ootkEstimateRcs(length, width, height, shape);
   }
 
   /**
@@ -895,13 +886,6 @@ export abstract class SatMath {
    * @param now - The current date used to calculate the number of days since the satellite's epoch.
    * @returns The normalized RAAN value within the 0-360 degree range.
    */
-  /**
-   * @deprecated Use sat.normalizeRaan() instead.
-   */
-  static normalizeRaan(sat: Satellite, now: Date): number {
-    return sat.normalizeRaan(now);
-  }
-
   /**
    * @deprecated Use sat.getNodalPrecessionRate() instead.
    */

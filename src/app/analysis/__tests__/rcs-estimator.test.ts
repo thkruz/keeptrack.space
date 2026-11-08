@@ -123,7 +123,7 @@ describe('mineRcsFromCatalog', () => {
 });
 
 describe('estimateRcsFromGeometry', () => {
-  it('uses SatMath.estimateRcs when length, diameter, and span are all present', () => {
+  it('uses ootk estimateRcs when length, diameter, and span are all present', () => {
     const sat = makeSat({ length: '3.0 m', diameter: '1.5 m', span: '8 m', shape: 'box' });
     const rcs = estimateRcsFromGeometry(sat);
 

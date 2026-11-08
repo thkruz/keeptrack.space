@@ -1,4 +1,3 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { ProximityOpsThreadManager } from '@app/app/threads/proximity-ops-thread-manager';
 import { drawPairLine, jumpToTca, RemovableLine } from '@app/engine/conjunction/conjunction-row-actions';
 import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
@@ -965,7 +964,7 @@ export class ProximityOps extends KeepTrackPlugin {
    * Finds the satellites related to a primary satellite based on the orbit type
    * and duration, with the primary as the first element. GEO filters on longitude
    * proximity and orbital period; LEO filters on inclination and RAAN proximity.
-   * Stays on the main thread because it uses `SatMath.normalizeRaan` and the live
+   * Stays on the main thread because it uses `Satellite.normalizeRaan` and the live
    * catalog. Every position is evaluated at `searchDate` (the sim time the search
    * starts at), never the wall clock, so a search at a chosen time screens the sky
    * at that time.
@@ -1004,10 +1003,10 @@ export class ProximityOps extends KeepTrackPlugin {
         );
       });
     } else if (type === RPOType.LEO) {
-      const raan1 = SatMath.normalizeRaan(primarySat, searchDate);
+      const raan1 = primarySat.normalizeRaan(searchDate);
 
       sats = allSats.filter((sat) => {
-        const raan2 = SatMath.normalizeRaan(sat, searchDate);
+        const raan2 = sat.normalizeRaan(searchDate);
 
         return (
           sat.tle1 &&

@@ -10,7 +10,6 @@ import { StringPad } from '@app/engine/utils/stringPad';
  *Methods:
  *- pad(val: string, len = 2): pads the input string with zeros to a specified length (default is 2)
  *- padEmpty(num: string, size: number): pads the input string with spaces to a specified size plus the length of the input string
- *- pad0(str: string, max: number): pads the input string with zeros to a maximum length
  *- trail0(str: string, max: number): adds trailing zeros to the input string up to a maximum length
  *
  *Fields:
@@ -41,10 +40,5 @@ describe('StringPad_class', () => {
   // Tests that pad() returns the original string when given a length less than the string value length
   it('test_pad_with_length_less_than_string_value_length', () => {
     expect(StringPad.pad('1234', 3)).toBe('1234');
-  });
-
-  // Tests that pad0() returns the original string when given a max less than the string value length
-  it('test_pad0_with_max_less_than_string_value_length', () => {
-    expect(StringPad.pad0('1234', 3)).toBe('1234');
   });
 });

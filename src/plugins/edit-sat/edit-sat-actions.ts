@@ -10,7 +10,6 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
 import { Earth, FormatTle, rv2tle, Satellite, SatelliteRecord, Sgp4, Tle, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
 
@@ -177,7 +176,7 @@ export function parseLoadedTle(text: string): { sccNum: string; tle1: TleLine1; 
     return null;
   }
 
-  const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number' ? String(object.sccNum) : StringPad.pad0(object.tle1.slice(2, 7).trim(), 5);
+  const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number' ? String(object.sccNum) : object.tle1.slice(2, 7).trim().padStart(5, '0');
 
   return { sccNum, tle1: object.tle1 as TleLine1, tle2: object.tle2 as TleLine2 };
 }

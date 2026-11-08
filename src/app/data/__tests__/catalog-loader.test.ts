@@ -181,7 +181,7 @@ describe('Catalog Loader', () => {
 
     // Short (≤4-char) satnums in cols 3-7 need padding to 5 chars to look
     // like a valid TLE on the downstream side. This is a regression guard
-    // for the StringPad.pad0 call inside parseAsciiTLE_.
+    // for the padStart call inside parseAsciiTLE_.
     it('zero-pads a short numeric satnum to 5 chars in SCC', () => {
       const content = ['1     5U 58067A   24001.00000000  .00000000  00000-0  00000-0 0  0000', '2     5  51.6400 000.0000 0000000   0.0000   0.0000 15.50000000000000'].join('\n');
 

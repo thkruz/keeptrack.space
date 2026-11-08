@@ -2,11 +2,9 @@ import { FormatTle, Kilometers, Meters, MINUTES_PER_DAY, RAD2DEG, TAU, TemeVec3 
 import { StringifiedNumber } from '../../app/analysis/sat-math';
 import { TimeManager } from '../core/time-manager';
 import { EARTHS_GRAV_CONST, MASS_OF_EARTH } from '../utils/constants';
-import { StringPad } from '../utils/stringPad';
 
 export abstract class OrbitMath {
   public static stateVector2Tle(sv: { position: TemeVec3; velocity: TemeVec3; date: Date }): { tle1: string; tle2: string } {
-    const pad0 = StringPad.pad0;
     const pos = [sv.position.x, sv.position.y, sv.position.z];
     const vel = [sv.velocity.x, sv.velocity.y, sv.velocity.z];
 
@@ -14,12 +12,12 @@ export abstract class OrbitMath {
     // 8 character international designator
     const intl = '58001A  ';
     const scc = '00001';
-    const inc = <StringifiedNumber>pad0(OrbitMath.calculateInclination(pos, vel).toFixed(4), 8);
-    const rasc = <StringifiedNumber>pad0(OrbitMath.calculateRAAN(pos, vel).toFixed(4), 8);
+    const inc = <StringifiedNumber>OrbitMath.calculateInclination(pos, vel).toFixed(4).padStart(8, '0');
+    const rasc = <StringifiedNumber>OrbitMath.calculateRAAN(pos, vel).toFixed(4).padStart(8, '0');
     const ecen = OrbitMath.calculateEccentricity(pos, vel).toFixed(7).split('.')[1];
-    const argPe = <StringifiedNumber>pad0(OrbitMath.calculateArgumentOfPerigee(pos, vel).toFixed(4), 8);
-    const meana = <StringifiedNumber>pad0(OrbitMath.calculateMeanAnomaly(pos, vel).toFixed(4), 8);
-    const meanmo = <StringifiedNumber>pad0(OrbitMath.calculateMeanMotion(pos, vel).toFixed(8), 11);
+    const argPe = <StringifiedNumber>OrbitMath.calculateArgumentOfPerigee(pos, vel).toFixed(4).padStart(8, '0');
+    const meana = <StringifiedNumber>OrbitMath.calculateMeanAnomaly(pos, vel).toFixed(4).padStart(8, '0');
+    const meanmo = <StringifiedNumber>OrbitMath.calculateMeanMotion(pos, vel).toFixed(8).padStart(11, '0');
 
     return FormatTle.createTle({ inc, meanmo, rasc, argPe, meana, ecen, epochyr, epochday, intl, scc });
   }

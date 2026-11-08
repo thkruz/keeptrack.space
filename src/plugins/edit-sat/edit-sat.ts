@@ -10,7 +10,6 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { showLoading } from '@app/engine/utils/showLoading';
-import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import editSatellitePng from '@public/img/icons/edit-satellite.png';
@@ -269,7 +268,7 @@ export class EditSat extends KeepTrackPlugin {
 
     const inc = sat.inclination.toFixed(4).padStart(8, '0');
 
-    (<HTMLInputElement>getEl(`${p}-inc`)).value = StringPad.pad0(inc, 8);
+    (<HTMLInputElement>getEl(`${p}-inc`)).value = inc.padStart(8, '0');
     (<HTMLInputElement>getEl(`${p}-year`)).value = sat.tle1.slice(18, 20);
     (<HTMLInputElement>getEl(`${p}-day`)).value = sat.tle1.slice(20, 32);
     (<HTMLInputElement>getEl(`${p}-meanmo`)).value = sat.tle2.slice(52, 63);
@@ -282,7 +281,7 @@ export class EditSat extends KeepTrackPlugin {
 
     const argPe = sat.argOfPerigee.toFixed(4).padStart(8, '0');
 
-    (<HTMLInputElement>getEl(`${p}-argPe`)).value = StringPad.pad0(argPe, 8);
+    (<HTMLInputElement>getEl(`${p}-argPe`)).value = argPe.padStart(8, '0');
     // Mean anomaly occupies TLE2 columns 44-51 (0-indexed 43, length 8).
     (<HTMLInputElement>getEl(`${p}-meana`)).value = sat.tle2.slice(43, 51);
 

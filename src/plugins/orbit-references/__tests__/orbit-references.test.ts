@@ -34,20 +34,6 @@ describe('OrbitReferences', () => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
   standardPluginSuite(OrbitReferences, 'OrbitReferences');
-
-  it.skip('should_not_throw_error', () => {
-    const orbitReferences = new OrbitReferences();
-
-    expect(() => orbitReferences.init()).not.toThrow();
-    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
-    EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
-    expect(() => EventBus.getInstance().emit(EventBusEvent.selectSatData, defaultSat, 0)).not.toThrow();
-
-    ServiceLocator.getCatalogManager().analSatSet = [defaultSat];
-    PluginRegistry.getPlugin(SelectSatManager)!.selectSat(0);
-    ServiceLocator.getCatalogManager().addAnalystSat = () => defaultSat;
-    getEl('orbit-references-link')!.click();
-  });
 });
 
 describe('OrbitReferences behavior', () => {

@@ -363,7 +363,7 @@ export class ErrorManager {
      * object, and undelivered resize notifications are retried on the next frame (#1455). The
      * prefix also covers the older "ResizeObserver loop limit exceeded" wording.
      */
-    if (!ctx.error && /^ResizeObserver loop /u.test(err.message)) {
+    if (!ctx.error && err.message.startsWith('ResizeObserver loop ')) {
       return true;
     }
 

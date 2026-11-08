@@ -38,7 +38,7 @@ function validateStyle(style: unknown): asserts style is EmbedObjectStyle {
 export class EmbedStyle {
   private readonly styles_ = new Map<number, EmbedObjectStyle>();
   private layers_: Partial<EmbedLayers> = {};
-  private sensorDefs_ = new Map<string, EmbedSensor>();
+  private readonly sensorDefs_ = new Map<string, EmbedSensor>();
 
   constructor(
     private readonly engine_: EmbedEngine,

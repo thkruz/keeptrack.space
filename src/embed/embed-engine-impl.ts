@@ -19,10 +19,10 @@ import type { Line } from '@app/engine/rendering/line-manager/line';
 import { SensorMarkerLine } from '@app/engine/rendering/line-manager/sensor-marker-line';
 import { SurfaceLine } from '@app/engine/rendering/line-manager/surface-line';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { findPassesForSat } from '@app/plugins/best-pass/best-pass-calculator';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import { type Degrees, eci2lla, type Kilometers, type Satellite, Sgp4, SpaceObjectType, ZoomValue } from '@ootk/src/main';
 import type { vec4 } from 'gl-matrix';
+import { sampleAccessWindows } from './embed-access-windows';
 import type {
   EmbedEngine,
   EngineGuards,
@@ -585,27 +585,18 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     if (!sat) {
       throw new EmbedError('OBJECT_NOT_FOUND', 'Object has no orbital elements');
     }
-    const result = findPassesForSat(
-      String(id),
-      sat.satrec,
-      sensor as unknown as DetailedSensor,
-      { lengthDays: (endMs - startMs) / 86_400_000, intervalSec: 30 },
-      {
-        baseTimeMs: startMs,
-        getRae: (date, satrec, s) => SatMath.getRae(date, satrec, s, true),
-        checkIsInView: (s, rae) => SatMath.checkIsInView(s, rae as Parameters<typeof SatMath.checkIsInView>[1]),
-        sunEciKm: () => ({ x: 0 as Kilometers, y: 0 as Kilometers, z: 0 as Kilometers }),
-      }
-    );
+    const det = sensor as unknown as DetailedSensor;
 
-    return result.passes
-      .filter((p) => typeof p.START_DTG === 'number' && p.STOP_DATE instanceof Date)
-      .map((p) => ({
-        startMs: p.START_DTG as number,
-        endMs: (p.STOP_DATE as Date).getTime(),
-        maxElDeg: Number.parseFloat(String(p.MAXIMUM_ELEVATION)),
-      }))
-      .filter((w) => w.startMs <= endMs && Number.isFinite(w.maxElDeg));
+    // Boundary-aware sampling: a contact already running at startMs or endMs is clipped, not dropped
+    return sampleAccessWindows(startMs, endMs, 30_000, (timeMs) => {
+      const rae = SatMath.getRae(new Date(timeMs), sat.satrec, det, true);
+
+      if (rae.az === null || rae.el === null || rae.rng === null) {
+        return null;
+      }
+
+      return { inView: SatMath.checkIsInView(det, rae), elDeg: rae.el };
+    }).filter((w) => Number.isFinite(w.maxElDeg));
   }
 
   private frameWaiters_: Array<() => void> = [];

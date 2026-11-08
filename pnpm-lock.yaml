@@ -178,8 +178,8 @@ importers:
         specifier: ^8.0.1
         version: 8.0.3
       imports-loader:
-        specifier: ^4.0.1
-        version: 4.0.1(webpack@5.107.1(esbuild@0.28.1)(postcss@8.5.23))
+        specifier: ^5.0.0
+        version: 5.0.0(webpack@5.107.1(esbuild@0.28.1)(postcss@8.5.23))
       jsdom:
         specifier: ^28.1.0
         version: 28.1.0
@@ -2211,9 +2211,9 @@ packages:
   import-meta-resolve@4.2.0:
     resolution: {integrity: sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg==}
 
-  imports-loader@4.0.1:
-    resolution: {integrity: sha512-ZiY+1xH5fqAJ1Qu1CFv+zw54rvPCC92DdYRDe0IIUboOhbJPLfOPbF/paA2iipelvMwjQUKWydcFOJ7f1+ZFcA==}
-    engines: {node: '>= 14.15.0'}
+  imports-loader@5.0.0:
+    resolution: {integrity: sha512-tXgL8xxZFjOjQLLiE7my00UUQfktg4G8fdpXcZphL0bJWbk9eCxKKFaCwmFRcwyRJQl95GXBL1DoE1rCS/tcPw==}
+    engines: {node: '>= 18.12.0'}
     peerDependencies:
       webpack: ^5.0.0
 
@@ -5810,9 +5810,9 @@ snapshots:
 
   import-meta-resolve@4.2.0: {}
 
-  imports-loader@4.0.1(webpack@5.107.1(esbuild@0.28.1)(postcss@8.5.23)):
+  imports-loader@5.0.0(webpack@5.107.1(esbuild@0.28.1)(postcss@8.5.23)):
     dependencies:
-      source-map: 0.6.1
+      source-map-js: 1.2.1
       strip-comments: 2.0.1
       webpack: 5.107.1(esbuild@0.28.1)(postcss@8.5.23)
 

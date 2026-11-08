@@ -143,7 +143,7 @@
     "dotenv-webpack": "^9.0.0",
     "happy-dom": "^20.5.0",
     "husky": "^8.0.1",
-    "imports-loader": "^4.0.1",
+    "imports-loader": "^5.0.0",
     "jsdom": "^28.1.0",
     "jsdom-worker": "^0.3.0",
     "mini-css-extract-plugin": "^2.7.6",

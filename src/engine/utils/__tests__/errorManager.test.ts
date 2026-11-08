@@ -562,4 +562,53 @@ describe('ErrorManager translation-proxy SecurityError (#1437)', () => {
     expect(() => errorManager.reportEvent({ error: 'plain string reason', funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).toThrow();
     expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
   });
+
+  it.each([null, undefined])('tags a bare reject(%s) as unactionable (#1453)', (reason) => {
+    expect(() => errorManager.reportEvent({ error: reason, funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).not.toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBe(true);
+    // eslint-disable-next-line no-console
+    expect(console.warn).toHaveBeenCalled();
+  });
+
+  it.each(['ResizeObserver loop completed with undelivered notifications.', 'ResizeObserver loop limit exceeded'])(
+    'tags the window-level "%s" notice as unactionable (#1455)',
+    (message) => {
+      expect(() => errorManager.reportEvent({ error: null, funcName: 'Global Error Trapper', message, source: 'https://app.keeptrack.space/', line: 0, col: 0 })).not.toThrow();
+      expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBe(true);
+    }
+  );
+
+  it('leaves a real thrown Error that quotes the ResizeObserver text actionable', () => {
+    const err = new Error('ResizeObserver loop completed with undelivered notifications.');
+
+    expect(() => errorManager.reportEvent({ error: err, funcName: 'fn' })).toThrow();
+    expect((captured[0] as { isUnactionable?: boolean }).isUnactionable).toBeUndefined();
+  });
+
+  it('names a getter-only host object instead of reporting "{}" (#1451)', () => {
+    class FakePositionError {
+      get code(): number {
+        return 1;
+      }
+
+      get message(): string {
+        return 'User denied Geolocation';
+      }
+
+      get [Symbol.toStringTag](): string {
+        return 'GeolocationPositionError';
+      }
+    }
+
+    expect(() => errorManager.reportEvent({ error: new FakePositionError(), funcName: 'Unhandled Promise Rejection', isUnhandledRejection: true })).toThrow();
+    const msg = captured[0].message;
+
+    expect(msg).toContain('[object GeolocationPositionError]');
+    expect(msg).toContain('"code":1');
+    expect(msg).toContain('User denied Geolocation');
+  });
+
+  it('still reports a field-less object with its type tag', () => {
+    expect(() => errorManager.error({} as unknown as Error, 'fn')).toThrow(/\[object Object\]/u);
+  });
 });

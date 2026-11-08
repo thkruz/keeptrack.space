@@ -1227,7 +1227,8 @@ export class ColorSchemeManager {
   /** Pins one object to a color regardless of the active scheme; null removes the override. */
   setObjectColorOverride(id: number, color: rgbaArray | null): void {
     if (color) {
-      this.objectColorOverrides_.set(id, [color[0], color[1], color[2], color[3]]);
+      // Rounded to float32 so the per-frame equality check against colorData (Float32Array) holds once written
+      this.objectColorOverrides_.set(id, [Math.fround(color[0]), Math.fround(color[1]), Math.fround(color[2]), Math.fround(color[3])]);
       this.isColorBufferDirty_ = true;
 
       return;

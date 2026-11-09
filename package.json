@@ -158,7 +158,7 @@
     "tsx": "^4.19.0",
     "typedoc": "^0.28.17",
     "typedoc-plugin-merge-modules": "^7.0.0",
-    "typescript": "^5.9.3",
+    "typescript": "^7.0.2",
     "vitest": "^4.0.18",
     "vitest-canvas-mock": "^0.3.3",
     "webgl-lint": "^1.11.3",

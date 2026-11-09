@@ -154,7 +154,7 @@
     "source-map-loader": "^4.0.2",
     "style-loader": "^4.0.0",
     "ts-loader": "^9.4.4",
-    "tsup": "^8.5.1",
+    "tsup": "^9.0.0",
     "tsx": "^4.19.0",
     "typedoc": "^0.28.17",
     "typedoc-plugin-merge-modules": "^7.0.0",

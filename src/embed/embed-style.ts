@@ -1,7 +1,46 @@
 import type { EmbedCatalog } from './embed-catalog';
 import type { EmbedEngine, EngineLabel, EngineSensor } from './embed-engine';
 import type { EmbedSensors } from './embed-sensors';
-import { type EmbedColor, EmbedError, type EmbedLayers, type EmbedObjectStyle, type EmbedSensor, type ObjectRef } from './embed-types';
+import {
+  EMBED_DEFAULT_LABEL_BUDGET,
+  type EmbedColor,
+  EmbedError,
+  type EmbedGroupDef,
+  type EmbedGroupInfo,
+  type EmbedGroupStyle,
+  type EmbedLayers,
+  type EmbedObject,
+  type EmbedObjectStyle,
+  type EmbedObjectStyleEntry,
+  type EmbedSensor,
+  type EmbedUpsertResult,
+  type ObjectRef,
+} from './embed-types';
+
+function sameColor(a: EmbedColor | null, b: EmbedColor | null): boolean {
+  if (a === null || b === null) {
+    return a === b;
+  }
+
+  return a[0] === b[0] && a[1] === b[1] && a[2] === b[2] && a[3] === b[3];
+}
+
+function validateGroup(def: unknown): asserts def is EmbedGroupDef {
+  const d = def as Partial<EmbedGroupDef> | null;
+
+  if (!d || typeof d !== 'object' || typeof d.id !== 'string' || d.id === '') {
+    throw new EmbedError('INVALID_ARGUMENT', 'A group needs a non-empty string id');
+  }
+  if (d.color !== undefined) {
+    validateColor(d.color, `Group '${d.id}' color`);
+  }
+  if (d.visible !== undefined && typeof d.visible !== 'boolean') {
+    throw new EmbedError('INVALID_ARGUMENT', 'group.visible must be a boolean');
+  }
+  if (d.highlight !== undefined && typeof d.highlight !== 'boolean') {
+    throw new EmbedError('INVALID_ARGUMENT', 'group.highlight must be a boolean');
+  }
+}
 
 const LABEL_MODES: readonly EmbedLayers['labels'][] = ['all', 'host', 'none'];
 
@@ -39,6 +78,10 @@ export class EmbedStyle {
   private readonly styles_ = new Map<number, EmbedObjectStyle>();
   private layers_: Partial<EmbedLayers> = {};
   private readonly sensorDefs_ = new Map<string, EmbedSensor>();
+  private readonly groups_ = new Map<string, EmbedGroupDef>();
+  private readonly groupOf_ = new Map<number, string>();
+  /** What was last pushed to the engine per object. */
+  private readonly applied_ = new Map<number, { color: EmbedColor | null; highlight: boolean }>();
 
   constructor(
     private readonly engine_: EmbedEngine,
@@ -48,9 +91,59 @@ export class EmbedStyle {
 
   // ---- Object styles --------------------------------------------------------
 
-  /** The color set through setObjectStyle for an object, if any. */
+  /** The color set through setObjectStyle or the object's group for an object, if any (ignores group visibility). */
   colorFor(id: number): EmbedColor | undefined {
-    return this.styles_.get(id)?.color;
+    return this.styles_.get(id)?.color ?? this.groupDefFor_(id)?.color;
+  }
+
+  private groupDefFor_(id: number): EmbedGroupDef | undefined {
+    const gid = this.groupOf_.get(id);
+
+    return gid === undefined ? undefined : this.groups_.get(gid);
+  }
+
+  private effective_(id: number): { color: EmbedColor | null; highlight: boolean } {
+    const own = this.styles_.get(id);
+    const group = this.groupDefFor_(id);
+    let color: EmbedColor | null = own?.color ?? group?.color ?? null;
+    const highlight = own?.highlight ?? group?.highlight ?? false;
+
+    if (group?.visible === false) {
+      const c = color ?? [1, 1, 1, 1];
+
+      color = [c[0], c[1], c[2], 0];
+    }
+
+    return { color, highlight };
+  }
+
+  /** Recompute these objects' effective style and push only the differences, in bulk. */
+  private reapply_(ids: Iterable<number>): void {
+    const colors: [number, EmbedColor | null][] = [];
+    const highlights: [number, boolean][] = [];
+
+    for (const id of ids) {
+      const next = this.effective_(id);
+      const prev = this.applied_.get(id) ?? { color: null, highlight: false };
+
+      if (!sameColor(prev.color, next.color)) {
+        colors.push([id, next.color]);
+      }
+      if (prev.highlight !== next.highlight) {
+        highlights.push([id, next.highlight]);
+      }
+      if (next.color === null && !next.highlight) {
+        this.applied_.delete(id);
+      } else {
+        this.applied_.set(id, next);
+      }
+    }
+    if (colors.length > 0) {
+      this.engine_.setObjectColors(colors);
+    }
+    if (highlights.length > 0) {
+      this.engine_.setObjectHighlights(highlights);
+    }
   }
 
   setObjectStyle(ref: ObjectRef, style: EmbedObjectStyle | null): void {
@@ -60,45 +153,194 @@ export class EmbedStyle {
       throw new EmbedError('OBJECT_NOT_FOUND', `No object matches ${JSON.stringify(ref)}`);
     }
     if (style === null) {
-      this.clearId_(id);
-      this.pushLabels_();
-
-      return;
+      this.styles_.delete(id);
+    } else {
+      validateStyle(style);
+      this.styles_.set(id, { ...style });
     }
-    validateStyle(style);
-    const prev = this.styles_.get(id);
-    const next: EmbedObjectStyle = { ...style };
-
-    this.styles_.set(id, next);
-    if (next.color) {
-      this.engine_.setObjectColor(id, next.color);
-    } else if (prev?.color) {
-      this.engine_.setObjectColor(id, null);
-    }
-    this.engine_.setObjectHighlight(id, next.highlight === true);
-    this.pushLabels_();
+    this.reapply_([id]);
+    this.refreshLabels();
   }
 
-  private clearId_(id: number): void {
-    if (this.styles_.delete(id)) {
-      this.engine_.setObjectColor(id, null);
-      this.engine_.setObjectHighlight(id, false);
+  /** Apply a style to many objects in one pass. Entries with an unknown ref are skipped. All styles are validated first. */
+  setObjectStyles(entries: EmbedObjectStyleEntry[]): void {
+    if (!Array.isArray(entries)) {
+      throw new EmbedError('INVALID_ARGUMENT', 'setObjectStyles expects an array');
     }
+    for (const e of entries) {
+      if (e?.style !== null) {
+        validateStyle(e?.style);
+      }
+    }
+    const touched: number[] = [];
+
+    for (const e of entries) {
+      const id = this.catalog_.resolveRef(e.ref);
+
+      if (id === null) {
+        continue;
+      }
+      if (e.style === null) {
+        this.styles_.delete(id);
+      } else {
+        this.styles_.set(id, { ...e.style });
+      }
+      touched.push(id);
+    }
+    this.reapply_(touched);
+    this.refreshLabels();
   }
 
-  /** Objects were removed from the catalog: forget their styles. */
+  setStyleForObjects(refs: ObjectRef[], style: EmbedObjectStyle | null): void {
+    if (!Array.isArray(refs)) {
+      throw new EmbedError('INVALID_ARGUMENT', 'setStyleForObjects expects an array of refs');
+    }
+    this.setObjectStyles(refs.map((ref) => ({ ref, style })));
+  }
+
+  clearObjectStyles(): void {
+    const ids = [...this.styles_.keys()];
+
+    this.styles_.clear();
+    this.reapply_(ids);
+    this.refreshLabels();
+  }
+
+  /** Objects were removed from the catalog: forget their styles and group membership. */
   dropForObjectIds(ids: number[]): void {
     let changed = false;
 
     for (const id of ids) {
-      if (this.styles_.has(id)) {
-        this.clearId_(id);
+      if (this.styles_.delete(id)) {
         changed = true;
       }
+      this.groupOf_.delete(id);
     }
+    this.reapply_(ids);
     if (changed) {
-      this.pushLabels_();
+      this.refreshLabels();
     }
+  }
+
+  // ---- Groups -------------------------------------------------------------------
+
+  defineGroups(defs: EmbedGroupDef[]): void {
+    if (!Array.isArray(defs)) {
+      throw new EmbedError('INVALID_ARGUMENT', 'defineGroups expects an array');
+    }
+    for (const d of defs) {
+      validateGroup(d);
+    }
+    const ids = new Set<string>();
+
+    for (const d of defs) {
+      this.groups_.set(d.id, { id: d.id, color: d.color, visible: d.visible, highlight: d.highlight });
+      ids.add(d.id);
+    }
+    this.reapplyGroups_(ids);
+  }
+
+  setGroupStyle(id: string, style: EmbedGroupStyle): void {
+    const def = this.groups_.get(id);
+
+    if (!def) {
+      throw new EmbedError('INVALID_ARGUMENT', `Unknown group '${String(id)}'. Call defineGroups first.`);
+    }
+    validateGroup({ ...style, id });
+    this.groups_.set(id, { ...def, ...style, id });
+    this.reapplyGroups_(new Set([id]));
+  }
+
+  /** Assign objects to a group (null: leave any group). Refs that match no object are skipped. */
+  assignToGroup(groupId: string | null, refs: ObjectRef[]): void {
+    if (groupId !== null && (typeof groupId !== 'string' || groupId === '')) {
+      throw new EmbedError('INVALID_ARGUMENT', 'assignToGroup expects a group id string or null');
+    }
+    if (!Array.isArray(refs)) {
+      throw new EmbedError('INVALID_ARGUMENT', 'assignToGroup expects an array of refs');
+    }
+    const touched: number[] = [];
+
+    for (const ref of refs) {
+      const id = this.catalog_.resolveRef(ref);
+
+      if (id === null) {
+        continue;
+      }
+      if (groupId === null) {
+        this.groupOf_.delete(id);
+      } else {
+        this.groupOf_.set(id, groupId);
+      }
+      touched.push(id);
+    }
+    this.reapply_(touched);
+  }
+
+  /** After upsertObjects: objects that carry `group` join it. */
+  assignFromUpsert(objects: EmbedObject[], results: EmbedUpsertResult[]): void {
+    const touched: number[] = [];
+
+    for (let i = 0; i < results.length; i++) {
+      const group = objects[i]?.group;
+
+      if (!results[i].ok || typeof group !== 'string' || group === '') {
+        continue;
+      }
+      const id = this.catalog_.resolveRef({ hostId: results[i].hostId });
+
+      if (id !== null) {
+        this.groupOf_.set(id, group);
+        touched.push(id);
+      }
+    }
+    if (touched.length > 0) {
+      this.reapply_(touched);
+    }
+  }
+
+  /** Delete the definition and membership; returns the former member ids so the caller can remove the objects. */
+  removeGroup(id: string): number[] {
+    const members: number[] = [];
+
+    for (const [objId, gid] of this.groupOf_) {
+      if (gid === id) {
+        members.push(objId);
+      }
+    }
+    this.groups_.delete(id);
+    for (const objId of members) {
+      this.groupOf_.delete(objId);
+    }
+    this.reapply_(members);
+
+    return members;
+  }
+
+  getGroups(): EmbedGroupInfo[] {
+    const counts = new Map<string, number>();
+
+    for (const gid of this.groupOf_.values()) {
+      counts.set(gid, (counts.get(gid) ?? 0) + 1);
+    }
+    const ids = new Set<string>([...this.groups_.keys(), ...counts.keys()]);
+
+    return [...ids].map((id) => {
+      const d = this.groups_.get(id);
+
+      return { id, color: d?.color, visible: d?.visible !== false, highlight: d?.highlight === true, count: counts.get(id) ?? 0 };
+    });
+  }
+
+  private reapplyGroups_(groupIds: Set<string>): void {
+    const members: number[] = [];
+
+    for (const [objId, gid] of this.groupOf_) {
+      if (groupIds.has(gid)) {
+        members.push(objId);
+      }
+    }
+    this.reapply_(members);
   }
 
   // ---- Sensors ----------------------------------------------------------------
@@ -125,7 +367,7 @@ export class EmbedStyle {
         this.engine_.setSensorStyle(engineSensor, { color: def.color, label: def.label ? def.name : undefined });
       }
     }
-    this.pushLabels_();
+    this.refreshLabels();
   }
 
   /** Sensors were removed. `engineSensors` are their engine objects, looked up before removal, so the markers come down. */
@@ -138,7 +380,7 @@ export class EmbedStyle {
         this.engine_.setSensorStyle(sensor, {});
       }
     }
-    this.pushLabels_();
+    this.refreshLabels();
   }
 
   // ---- Layers -----------------------------------------------------------------
@@ -150,6 +392,12 @@ export class EmbedStyle {
     }
     const clean: Partial<EmbedLayers> = {};
 
+    if (layers.labelBudget !== undefined) {
+      if (!Number.isInteger(layers.labelBudget) || layers.labelBudget < 0) {
+        throw new EmbedError('INVALID_ARGUMENT', 'layers.labelBudget must be an integer >= 0');
+      }
+      clean.labelBudget = layers.labelBudget;
+    }
     for (const key of ['dayNight', 'graticule', 'orbits'] as const) {
       if (layers[key] !== undefined) {
         if (typeof layers[key] !== 'boolean') {
@@ -166,8 +414,8 @@ export class EmbedStyle {
     }
     this.layers_ = { ...this.layers_, ...clean };
     this.pushLayers_(clean);
-    if (clean.labels !== undefined) {
-      this.pushLabels_();
+    if (clean.labels !== undefined || clean.labelBudget !== undefined) {
+      this.refreshLabels();
     }
   }
 
@@ -212,22 +460,39 @@ export class EmbedStyle {
 
   // ---- Labels -----------------------------------------------------------------
 
-  private pushLabels_(): void {
+  /** Push the label set, applying the budget: selected first, then highlighted, then style order. */
+  refreshLabels(): void {
     if (this.layers_.labels === 'none') {
       this.engine_.setObjectLabels([]);
 
       return;
     }
-    const labels: EngineLabel[] = [];
+    const budget = this.layers_.labelBudget ?? EMBED_DEFAULT_LABEL_BUDGET;
+    const selected = this.engine_.getSelectedId();
+    const first: number[] = [];
+    const second: number[] = [];
+    const rest: number[] = [];
 
     for (const [id, style] of this.styles_) {
       if (!style.label) {
         continue;
       }
+      if (id === selected) {
+        first.push(id);
+      } else if (this.effective_(id).highlight) {
+        second.push(id);
+      } else {
+        rest.push(id);
+      }
+    }
+    const labels: EngineLabel[] = [];
+
+    for (const id of [...first, ...second, ...rest].slice(0, budget)) {
+      const style = this.styles_.get(id) as EmbedObjectStyle;
       const name = typeof style.label === 'string' ? style.label : (this.catalog_.infoForId(id)?.name ?? '');
 
       if (name) {
-        labels.push({ id, text: name, bold: style.highlight === true, color: style.color });
+        labels.push({ id, text: name, bold: this.effective_(id).highlight, color: style.color ?? this.groupDefFor_(id)?.color });
       }
     }
     for (const def of this.sensorDefs_.values()) {

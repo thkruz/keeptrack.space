@@ -155,6 +155,82 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     return true;
   }
 
+  allocateSlots(count: number): EngineSlot[] {
+    const cat = ServiceLocator.getCatalogManager();
+    const start = this.catalogMode === 'scenario' ? 0 : FULL_MODE_SLOT_START;
+
+    return cat.getAvailableAnalystSats(count, start, settingsManager.maxAnalystSats).map((s) => ({ id: s.id, sccNum: s.sccNum }));
+  }
+
+  activateSlots(items: { id: number; tle: EngineTle }[]): boolean[] {
+    const cat = ServiceLocator.getCatalogManager();
+    const made = cat.addAnalystSats(
+      items.map((i) => ({ id: i.id, tle1: i.tle.tle1, tle2: i.tle.tle2, sccNum: i.tle.sccNum })),
+      (sat, index) => {
+        sat.name = items[index].tle.name;
+        // Operational payloads hold a nadir-stable attitude in the mesh renderer; anything else tumbles
+        sat.status = '+' as never;
+      }
+    );
+
+    return made.map((s) => s !== null);
+  }
+
+  editObjects(items: { id: number; tle: EngineTle }[]): void {
+    if (items.length === 0) {
+      return;
+    }
+    const cat = ServiceLocator.getCatalogManager();
+
+    cat.satCruncherThread.sendSatEditBatch(
+      items.map((i) => i.id),
+      items.map((i) => i.tle.tle1),
+      items.map((i) => i.tle.tle2)
+    );
+    ServiceLocator.getOrbitManager().changeOrbitBuffersFor(
+      items.map((i) => i.id),
+      items.map((i) => i.tle.tle1),
+      items.map((i) => i.tle.tle2)
+    );
+    for (const { id, tle } of items) {
+      const obj = cat.objectCache[id] as Satellite | undefined;
+
+      if (obj) {
+        obj.editTle(tle.tle1 as never, tle.tle2 as never);
+        obj.name = tle.name;
+      }
+    }
+    cat.seedDotPositions(items.map((i) => i.id));
+  }
+
+  releaseSlots(ids: number[]): void {
+    if (ids.length === 0) {
+      return;
+    }
+    const cat = ServiceLocator.getCatalogManager();
+    const live: number[] = [];
+
+    for (const id of ids) {
+      const obj = cat.objectCache[id] as Satellite | undefined;
+
+      if (obj) {
+        obj.active = false;
+        live.push(id);
+      }
+    }
+    cat.satCruncherThread.sendSatEditBatch(
+      live,
+      live.map((id) => (cat.objectCache[id] as Satellite).tle1),
+      live.map((id) => (cat.objectCache[id] as Satellite).tle2),
+      live.map(() => false)
+    );
+    this.notifyObjectsChanged();
+  }
+
+  getSlotCapacity(): number {
+    return settingsManager.maxAnalystSats;
+  }
+
   editObject(id: number, tle: EngineTle): void {
     const cat = ServiceLocator.getCatalogManager();
 
@@ -473,6 +549,18 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
 
   setObjectHighlight(id: number, highlighted: boolean): void {
     ServiceLocator.getDotsManager()?.setDotHighlighted(id, highlighted);
+  }
+
+  setObjectColors(entries: [number, EmbedColor | null][]): void {
+    const colors = ServiceLocator.getColorSchemeManager();
+
+    for (const [id, color] of entries) {
+      colors?.setObjectColorOverride(id, color);
+    }
+  }
+
+  setObjectHighlights(entries: [number, boolean][]): void {
+    ServiceLocator.getDotsManager()?.setDotsHighlighted(entries);
   }
 
   /**

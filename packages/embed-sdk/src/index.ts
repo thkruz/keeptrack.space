@@ -45,6 +45,7 @@ const FORWARDED_METHODS = [
   'pause', 'play', 'suspend', 'resume', 'upsertObjects', 'removeObjects', 'getObject', 'listHostObjects', 'upsertSensors',
   'removeSensors', 'setActiveSensors', 'addOverlay', 'removeOverlay', 'clearOverlays', 'setGroundTracks', 'setUi',
   'setObjectStyle', 'setLayers', 'setPositionStream',
+  'defineGroups', 'setGroupStyle', 'assignToGroup', 'removeGroup', 'getGroups', 'setObjectStyles', 'setStyleForObjects', 'clearObjectStyles',
   'getPosition', 'getLookAngles', 'getAccessWindows', 'screenshot', 'execute',
 ] as const satisfies readonly (keyof KeepTrackEmbedApi)[];
 

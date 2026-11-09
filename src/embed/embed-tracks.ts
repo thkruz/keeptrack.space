@@ -1,6 +1,6 @@
 import type { EmbedCatalog } from './embed-catalog';
 import type { EmbedEngine, EngineLine, EngineSurfaceSpec } from './embed-engine';
-import { type EmbedColor, EmbedError, type EmbedGroundTrackOptions, type EmbedLatLon, type ObjectRef } from './embed-types';
+import { EMBED_MAX_TRACK_SAMPLES, type EmbedColor, EmbedError, type EmbedGroundTrackOptions, type EmbedLatLon, type ObjectRef } from './embed-types';
 
 /** How often tracks check whether they need recomputing. */
 export const TRACK_TICK_MS = 250;
@@ -31,6 +31,11 @@ interface TrackEntry {
 
 interface ResolvedOptions extends EmbedGroundTrackOptions {
   stepSec: number;
+}
+
+/** Samples one object's track takes (past plus future window at the step). */
+function samplesPerObject(pastMin: number, futureMin: number, stepSec: number): number {
+  return Math.max(1, Math.ceil(((pastMin + futureMin) * 60) / stepSec));
 }
 
 function isColor(c: unknown): c is EmbedColor {
@@ -96,10 +101,21 @@ export class EmbedTracks {
       if (!Array.isArray(refs)) {
         throw new EmbedError('INVALID_ARGUMENT', "setGroundTracks expects an array of object refs, 'host' or null");
       }
+      const unique = new Set<number>();
+
       for (const ref of refs) {
-        if (this.catalog_.resolveRef(ref) === null) {
+        const id = this.catalog_.resolveRef(ref);
+
+        if (id === null) {
           throw new EmbedError('OBJECT_NOT_FOUND', 'Ground track object not found');
         }
+        unique.add(id);
+      }
+      if (unique.size * samplesPerObject(options.pastMin, options.futureMin, stepSec) > EMBED_MAX_TRACK_SAMPLES) {
+        throw new EmbedError(
+          'INVALID_ARGUMENT',
+          `${unique.size} tracks would exceed the ${EMBED_MAX_TRACK_SAMPLES} total sample cap; track fewer objects, raise stepSec or shorten the window`
+        );
       }
       target = { refs: [...refs] };
     }
@@ -172,7 +188,11 @@ export class EmbedTracks {
       }
     }
 
-    return [...ids];
+    // Total sample cap: only as many objects as fit are tracked (always satisfied for validated explicit lists)
+    const maxObjects = Math.max(1, Math.floor(EMBED_MAX_TRACK_SAMPLES / samplesPerObject(this.options_.pastMin, this.options_.futureMin, this.options_.stepSec)));
+    const all = [...ids];
+
+    return all.length > maxObjects ? all.slice(0, maxObjects) : all;
   }
 
   /** One scheduling pass. `force` ignores the wall-clock cap (used on set and after upserts). */
@@ -181,9 +201,10 @@ export class EmbedTracks {
       return;
     }
     const wanted = this.targetIds_();
+    const wantedSet = new Set(wanted);
 
     for (const id of [...this.entries_.keys()]) {
-      if (!wanted.includes(id)) {
+      if (!wantedSet.has(id)) {
         this.drop_(id);
       }
     }

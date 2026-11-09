@@ -89,6 +89,18 @@ export interface EmbedEngine {
   releaseSlot(id: number): void;
   notifyObjectsChanged(): void;
 
+  // Bulk catalog (1.4): one engine message / one recolor per call instead of per object
+  /** Up to `count` free analyst slots from one scan (fewer when the pool is short). */
+  allocateSlots(count: number): EngineSlot[];
+  /** Activate many slots; one cruncher message and one recolor. Result is parallel to `items`. */
+  activateSlots(items: { id: number; tle: EngineTle }[]): boolean[];
+  /** Swap the elements of many live objects; one cruncher message and one recolor. */
+  editObjects(items: { id: number; tle: EngineTle }[]): void;
+  /** Deactivate many slots; one cruncher message and one recolor. */
+  releaseSlots(ids: number[]): void;
+  /** Slot capacity the engine was booted with. */
+  getSlotCapacity(): number;
+
   // Camera
   setCamera(mode: EmbedCameraMode | undefined, distanceKm: number | undefined, view?: { center?: EmbedLatLon; zoom?: number }): void;
 
@@ -142,6 +154,10 @@ export interface EmbedEngine {
   setObjectColor(id: number, color: EmbedColor | null): void;
   /** Draw an object's dot at the large size. */
   setObjectHighlight(id: number, highlighted: boolean): void;
+  /** Bulk setObjectColor: every entry applied, one buffer refresh. */
+  setObjectColors(entries: [id: number, color: EmbedColor | null][]): void;
+  /** Bulk setObjectHighlight: every entry applied, one size-buffer refresh. */
+  setObjectHighlights(entries: [id: number, highlighted: boolean][]): void;
   /** Persistent names next to objects (replaces the previous set). Empty clears. */
   setObjectLabels(labels: EngineLabel[]): void;
   /** Text next to fixed ground points (marker overlays; replaces the previous set). Empty clears. */

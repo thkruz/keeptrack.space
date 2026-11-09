@@ -25,12 +25,16 @@ import {
   type EmbedEventMap,
   type EmbedEventName,
   type EmbedGroundTrackOptions,
+  type EmbedGroupDef,
+  type EmbedGroupInfo,
+  type EmbedGroupStyle,
   type EmbedLayers,
   type EmbedLicenseStatus,
   type EmbedLookAngles,
   type EmbedObject,
   type EmbedObjectInfo,
   type EmbedObjectStyle,
+  type EmbedObjectStyleEntry,
   type EmbedOverlay,
   type EmbedPosition,
   type EmbedSensor,
@@ -55,6 +59,8 @@ const COMMANDS: readonly EmbedCommandName[] = [
   'setRate',
   'pause',
   'play',
+  'suspend',
+  'resume',
   'upsertObjects',
   'removeObjects',
   'getObject',
@@ -68,6 +74,14 @@ const COMMANDS: readonly EmbedCommandName[] = [
   'setGroundTracks',
   'setUi',
   'setObjectStyle',
+  'defineGroups',
+  'setGroupStyle',
+  'assignToGroup',
+  'removeGroup',
+  'getGroups',
+  'setObjectStyles',
+  'setStyleForObjects',
+  'clearObjectStyles',
   'setLayers',
   'setPositionStream',
   'getPosition',
@@ -136,6 +150,7 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.ctx_ = new EmbedContext(this.config_.ownership);
     this.catalog_ = new EmbedCatalog(engine_);
     this.selection_ = new EmbedSelection(this.ctx_, engine_, this.catalog_);
+    this.selection_.onChanged = () => this.style_?.refreshLabels();
     this.time_ = new EmbedTime(this.ctx_, engine_);
     this.sensors_ = new EmbedSensors(this.ctx_, engine_);
     this.overlays_ = new EmbedOverlays(engine_, this.catalog_, this.sensors_);
@@ -351,6 +366,7 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
 
     const results = this.ctx_.runAsHost(() => this.catalog_.upsert(objects));
 
+    this.style_.assignFromUpsert(objects, results);
     this.tracks_.invalidate();
     this.style_.refreshOrbits();
     this.stream_.invalidate();
@@ -458,6 +474,59 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     if (id !== null) {
       this.tracks_.restyle(id);
     }
+    this.tracks_.invalidate();
+  }
+
+  defineGroups(groups: EmbedGroupDef[]): void {
+    this.requireReady_();
+    this.style_.defineGroups(groups);
+    this.tracks_.invalidate();
+  }
+
+  setGroupStyle(id: string, style: EmbedGroupStyle): void {
+    this.requireReady_();
+    this.style_.setGroupStyle(id, style);
+    this.tracks_.invalidate();
+  }
+
+  assignToGroup(id: string | null, refs: ObjectRef[]): void {
+    this.requireReady_();
+    this.style_.assignToGroup(id, refs);
+    this.tracks_.invalidate();
+  }
+
+  removeGroup(id: string, options?: { keepObjects?: boolean }): void {
+    this.requireReady_();
+    const members = this.style_.removeGroup(id);
+
+    if (options?.keepObjects !== true && members.length > 0) {
+      const hostIds = members.map((m) => this.catalog_.infoForId(m)?.hostId).filter((h): h is string => typeof h === 'string');
+
+      this.removeObjects(hostIds);
+    }
+  }
+
+  getGroups(): EmbedGroupInfo[] {
+    this.requireReady_();
+
+    return this.style_.getGroups();
+  }
+
+  setObjectStyles(entries: EmbedObjectStyleEntry[]): void {
+    this.requireReady_();
+    this.style_.setObjectStyles(entries);
+    this.tracks_.invalidate();
+  }
+
+  setStyleForObjects(refs: ObjectRef[], style: EmbedObjectStyle | null): void {
+    this.requireReady_();
+    this.style_.setStyleForObjects(refs, style);
+    this.tracks_.invalidate();
+  }
+
+  clearObjectStyles(): void {
+    this.requireReady_();
+    this.style_.clearObjectStyles();
     this.tracks_.invalidate();
   }
 

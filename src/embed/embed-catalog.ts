@@ -1,7 +1,14 @@
-import type { EmbedEngine } from './embed-engine';
+import type { EmbedEngine, EngineTle } from './embed-engine';
 import { EmbedError, type EmbedObject, type EmbedObjectInfo, type EmbedUpsertResult, type ObjectRef } from './embed-types';
 
 type HostedKind = 'slot' | 'override';
+
+interface PendingAdd {
+  index: number;
+  hostId: string;
+  norad: string | undefined;
+  obj: EmbedObject;
+}
 
 interface HostedEntry {
   hostId: string;
@@ -45,53 +52,83 @@ export function isValidTlePair(tle1: unknown, tle2: unknown): boolean {
 export class EmbedCatalog {
   private readonly byHostId_ = new Map<string, HostedEntry>();
   private readonly byEngineId_ = new Map<number, HostedEntry>();
+  /** NORAD -> host entries carrying it, in insertion order (resolveRef by norad is then O(1)). */
+  private readonly byNorad_ = new Map<string, HostedEntry[]>();
 
   constructor(private readonly engine_: EmbedEngine) {}
 
+  /**
+   * One pass for the whole array: objects are validated first, then new ones take slots together (one scan,
+   * one cruncher message, one recolor) and updates go to the engine as one batch. Results keep input order.
+   * A hostId repeated inside the call behaves as before: the first is 'added', later ones 'updated' (last wins).
+   */
   upsert(objects: EmbedObject[]): EmbedUpsertResult[] {
     if (!Array.isArray(objects)) {
       throw new EmbedError('INVALID_ARGUMENT', 'upsertObjects expects an array');
     }
-    const results = objects.map((o) => this.upsertOne_(o));
+    const results: EmbedUpsertResult[] = new Array(objects.length);
+    const adds: PendingAdd[] = [];
+    const pendingAdd = new Map<string, number>();
+    const edits = new Map<number, { id: number; tle: EngineTle }>();
+    let needsNotify = false;
 
-    if (results.some((r) => r.ok)) {
+    for (let index = 0; index < objects.length; index++) {
+      const obj = objects[index];
+      const hostId = typeof obj?.hostId === 'string' ? obj.hostId : '';
+
+      if (!hostId || typeof obj.name !== 'string') {
+        results[index] = { hostId, ok: false, error: 'INVALID_ARGUMENT' };
+        continue;
+      }
+      if (!isValidTlePair(obj.tle1, obj.tle2)) {
+        results[index] = { hostId, ok: false, error: 'INVALID_TLE' };
+        continue;
+      }
+      const norad = typeof obj.norad === 'string' && obj.norad.trim() !== '' ? obj.norad.trim() : undefined;
+      const queued = pendingAdd.get(hostId);
+
+      if (queued !== undefined) {
+        // Same hostId earlier in this call: the later elements win
+        adds[queued].obj = obj;
+        results[index] = { hostId, ok: true, action: 'updated' };
+        continue;
+      }
+      const existing = this.byHostId_.get(hostId);
+
+      if (existing && existing.norad === norad) {
+        edits.set(existing.id, { id: existing.id, tle: { tle1: obj.tle1, tle2: obj.tle2, name: obj.name } });
+        results[index] = { hostId, ok: true, action: 'updated' };
+        continue;
+      }
+      if (existing) {
+        // Identity changed (override <-> fictional, or another NORAD): drop the old binding first
+        this.removeOne_(hostId);
+        needsNotify = true;
+      }
+      if (this.engine_.catalogMode === 'full' && norad) {
+        const catalogId = this.engine_.findIdByNorad(norad);
+
+        if (catalogId !== null) {
+          results[index] = this.override_(hostId, catalogId, norad, obj);
+          needsNotify = needsNotify || results[index].ok;
+          continue;
+        }
+      }
+      pendingAdd.set(hostId, adds.length);
+      adds.push({ index, hostId, norad, obj });
+    }
+
+    if (edits.size > 0) {
+      this.engine_.editObjects([...edits.values()]);
+    }
+    if (adds.length > 0) {
+      this.addToSlots_(adds, results);
+    }
+    if (needsNotify) {
       this.engine_.notifyObjectsChanged();
     }
 
     return results;
-  }
-
-  private upsertOne_(obj: EmbedObject): EmbedUpsertResult {
-    const hostId = typeof obj?.hostId === 'string' ? obj.hostId : '';
-
-    if (!hostId || typeof obj.name !== 'string') {
-      return { hostId, ok: false, error: 'INVALID_ARGUMENT' };
-    }
-    if (!isValidTlePair(obj.tle1, obj.tle2)) {
-      return { hostId, ok: false, error: 'INVALID_TLE' };
-    }
-    const norad = typeof obj.norad === 'string' && obj.norad.trim() !== '' ? obj.norad.trim() : undefined;
-    const existing = this.byHostId_.get(hostId);
-
-    if (existing && existing.norad === norad) {
-      this.engine_.editObject(existing.id, { tle1: obj.tle1, tle2: obj.tle2, name: obj.name });
-
-      return { hostId, ok: true, action: 'updated' };
-    }
-    if (existing) {
-      // Identity changed (override <-> fictional, or another NORAD): drop the old binding first
-      this.removeOne_(hostId);
-    }
-
-    if (this.engine_.catalogMode === 'full' && norad) {
-      const catalogId = this.engine_.findIdByNorad(norad);
-
-      if (catalogId !== null) {
-        return this.override_(hostId, catalogId, norad, obj);
-      }
-    }
-
-    return this.addToSlot_(hostId, norad, obj);
   }
 
   private override_(hostId: string, catalogId: number, norad: string, obj: EmbedObject): EmbedUpsertResult {
@@ -118,47 +155,88 @@ export class EmbedCatalog {
     return { hostId, ok: true, action: 'overrode-catalog' };
   }
 
-  private addToSlot_(hostId: string, norad: string | undefined, obj: EmbedObject): EmbedUpsertResult {
-    const slot = this.engine_.allocateSlot();
+  /** Claim slots for all new objects at once. Objects beyond the free slots get NO_FREE_SLOT. */
+  private addToSlots_(adds: PendingAdd[], results: EmbedUpsertResult[]): void {
+    const slots = this.engine_.allocateSlots(adds.length);
+    const items = slots.map((slot, k) => {
+      const { norad, obj } = adds[k];
 
-    if (!slot) {
-      return { hostId, ok: false, error: 'NO_FREE_SLOT' };
-    }
-    // Real NORAD identity gives the right mesh; fictional objects keep the slot's own analyst number
-    const sccNum = norad ?? slot.sccNum;
-    const ok = this.engine_.activateSlot(slot.id, { tle1: obj.tle1, tle2: obj.tle2, name: obj.name, sccNum });
+      // Real NORAD identity gives the right mesh; fictional objects keep the slot's own analyst number
+      return { id: slot.id, tle: { tle1: obj.tle1, tle2: obj.tle2, name: obj.name, sccNum: norad ?? slot.sccNum } };
+    });
+    const activated = items.length > 0 ? this.engine_.activateSlots(items) : [];
 
-    if (!ok) {
-      return { hostId, ok: false, error: 'INVALID_TLE' };
-    }
-    this.register_({ hostId, id: slot.id, kind: 'slot', norad });
-
-    return { hostId, ok: true, action: 'added' };
+    adds.forEach((add, k) => {
+      if (k >= slots.length) {
+        results[add.index] = { hostId: add.hostId, ok: false, error: 'NO_FREE_SLOT' };
+      } else if (!activated[k]) {
+        results[add.index] = { hostId: add.hostId, ok: false, error: 'INVALID_TLE' };
+      } else {
+        this.register_({ hostId: add.hostId, id: slots[k].id, kind: 'slot', norad: add.norad });
+        results[add.index] = { hostId: add.hostId, ok: true, action: 'added' };
+      }
+    });
   }
 
   private register_(entry: HostedEntry): void {
     this.byHostId_.set(entry.hostId, entry);
     this.byEngineId_.set(entry.id, entry);
+    if (entry.norad) {
+      const list = this.byNorad_.get(entry.norad);
+
+      if (list) {
+        list.push(entry);
+      } else {
+        this.byNorad_.set(entry.norad, [entry]);
+      }
+    }
   }
 
   /** Returns the engine ids that were freed or reverted (so the caller can deselect them). */
   remove(hostIds: string[]): number[] {
     const ids: number[] = [];
+    const slotIds: number[] = [];
+    let reverted = false;
 
     for (const hostId of hostIds) {
-      const id = this.removeOne_(hostId);
+      const entry = this.byHostId_.get(hostId);
 
-      if (id !== null) {
-        ids.push(id);
+      if (!entry) {
+        continue;
       }
+      if (entry.kind === 'override' && entry.original) {
+        this.engine_.editObject(entry.id, entry.original);
+        reverted = true;
+      } else {
+        slotIds.push(entry.id);
+      }
+      this.unregister_(entry);
+      ids.push(entry.id);
     }
-    if (ids.length > 0) {
+    // One cruncher message and one recolor for every freed slot
+    this.engine_.releaseSlots(slotIds);
+    if (reverted) {
       this.engine_.notifyObjectsChanged();
     }
 
     return ids;
   }
 
+  private unregister_(entry: HostedEntry): void {
+    this.byHostId_.delete(entry.hostId);
+    this.byEngineId_.delete(entry.id);
+    if (entry.norad) {
+      const list = this.byNorad_.get(entry.norad)?.filter((e) => e !== entry);
+
+      if (list && list.length > 0) {
+        this.byNorad_.set(entry.norad, list);
+      } else {
+        this.byNorad_.delete(entry.norad);
+      }
+    }
+  }
+
+  /** Single-object removal used when an upsert changes an object's identity. */
   private removeOne_(hostId: string): number | null {
     const entry = this.byHostId_.get(hostId);
 
@@ -168,10 +246,9 @@ export class EmbedCatalog {
     if (entry.kind === 'override' && entry.original) {
       this.engine_.editObject(entry.id, entry.original);
     } else {
-      this.engine_.releaseSlot(entry.id);
+      this.engine_.releaseSlots([entry.id]);
     }
-    this.byHostId_.delete(hostId);
-    this.byEngineId_.delete(entry.id);
+    this.unregister_(entry);
 
     return entry.id;
   }
@@ -182,13 +259,7 @@ export class EmbedCatalog {
       return this.byHostId_.get(ref.hostId)?.id ?? null;
     }
     if (ref && 'norad' in ref && typeof ref.norad === 'string') {
-      for (const entry of this.byHostId_.values()) {
-        if (entry.norad === ref.norad) {
-          return entry.id;
-        }
-      }
-
-      return this.engine_.findIdByNorad(ref.norad);
+      return this.byNorad_.get(ref.norad)?.[0]?.id ?? this.engine_.findIdByNorad(ref.norad);
     }
 
     return null;

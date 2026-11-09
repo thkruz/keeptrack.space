@@ -1,4 +1,4 @@
-import { EMBED_API_VERSION, EMBED_CONFIG_PROPERTY, type EmbedCatalogMode, type EmbedConfig, type EmbedErrorCode, type EmbedUiFlags } from './embed-types';
+import { EMBED_API_VERSION, EMBED_CONFIG_PROPERTY, EMBED_MAX_CAPACITY, type EmbedCatalogMode, type EmbedConfig, type EmbedErrorCode, type EmbedUiFlags } from './embed-types';
 
 export type SettingsOverrideLike = Record<string, unknown>;
 
@@ -56,7 +56,7 @@ export function resolveUiFlags(config: EmbedConfig): Partial<EmbedUiFlags> {
  *  - always: isEmbedMode, isAutoStart, isDisableServiceWorker, isDisableTelemetry, isDisableOnboarding,
  *    isBlockPersistence, isDisableLoginGate, isShowSplashScreen=false, isShowLoadingHints=false,
  *    isShowSecondaryLogo=false, isDisableUrlBar
- *  - catalog.mode 'scenario': noCatalogOnLoad, maxAnalystSats (>= 1024), isEnableJscCatalog=false,
+ *  - catalog.mode 'scenario': noCatalogOnLoad, maxAnalystSats (>= 1024, objects + 256, or catalog.capacity up to EMBED_MAX_CAPACITY), isEnableJscCatalog=false,
  *    isDisableLaunchSites, isDisableControlSites, isDisablePlanets (also drops deep-space probes)
  *    and StarsPlugin disabled (no star-catalog / constellations fetch)
  *  - ownership.sensors 'host': isDisableSensors (built-in sensor list never loads)
@@ -87,7 +87,9 @@ export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: Sett
     const baseSlots = typeof baseOverride.maxAnalystSats === 'number' ? baseOverride.maxAnalystSats : 0;
 
     out.noCatalogOnLoad = true;
-    out.maxAnalystSats = Math.max(baseSlots, SCENARIO_MIN_ANALYST_SLOTS, (config.catalog.objects?.length ?? 0) + 256);
+    const capacity = Number.isInteger(config.catalog.capacity) ? Math.min(Math.max(config.catalog.capacity as number, 0), EMBED_MAX_CAPACITY) : 0;
+
+    out.maxAnalystSats = Math.max(baseSlots, SCENARIO_MIN_ANALYST_SLOTS, (config.catalog.objects?.length ?? 0) + 256, capacity);
     out.isEnableJscCatalog = false;
     out.isDisableLaunchSites = true;
     out.isDisableControlSites = true;

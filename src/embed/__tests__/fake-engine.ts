@@ -133,6 +133,64 @@ export class FakeEngine implements EmbedEngine {
     this.objects.delete(id);
   }
 
+  // ---- Bulk (1.4) ----
+  bulkCalls: { fn: string; n: number }[] = [];
+  slotCapacity = 100000;
+
+  allocateSlots(count: number): EngineSlot[] {
+    const out: EngineSlot[] = [];
+
+    for (let i = 0; i < count; i++) {
+      const slot = this.allocateSlot();
+
+      if (!slot) {
+        break;
+      }
+      out.push(slot);
+    }
+    this.bulkCalls.push({ fn: 'allocateSlots', n: count });
+
+    return out;
+  }
+
+  activateSlots(items: { id: number; tle: EngineTle }[]): boolean[] {
+    this.bulkCalls.push({ fn: 'activateSlots', n: items.length });
+
+    return items.map((it) => this.activateSlot(it.id, it.tle));
+  }
+
+  editObjects(items: { id: number; tle: EngineTle }[]): void {
+    this.bulkCalls.push({ fn: 'editObjects', n: items.length });
+    for (const it of items) {
+      this.editObject(it.id, it.tle);
+    }
+  }
+
+  releaseSlots(ids: number[]): void {
+    this.bulkCalls.push({ fn: 'releaseSlots', n: ids.length });
+    for (const id of ids) {
+      this.releaseSlot(id);
+    }
+  }
+
+  getSlotCapacity(): number {
+    return this.slotCapacity;
+  }
+
+  setObjectColors(entries: [number, unknown][]): void {
+    this.bulkCalls.push({ fn: 'setObjectColors', n: entries.length });
+    for (const [id, c] of entries) {
+      this.setObjectColor(id, c);
+    }
+  }
+
+  setObjectHighlights(entries: [number, boolean][]): void {
+    this.bulkCalls.push({ fn: 'setObjectHighlights', n: entries.length });
+    for (const [id, on] of entries) {
+      this.setObjectHighlight(id, on);
+    }
+  }
+
   notifyObjectsChanged(): void {
     // no-op
   }

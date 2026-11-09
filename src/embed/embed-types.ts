@@ -15,7 +15,14 @@
  * Licensed under the MIT License (unlike the AGPL engine) so hosts can vendor it.
  */
 
-export const EMBED_API_VERSION = '1.3.0';
+export const EMBED_API_VERSION = '1.4.0';
+
+/** Largest `catalog.capacity` the engine accepts (analyst slot block). (1.4) */
+export const EMBED_MAX_CAPACITY = 100_000;
+/** Ceiling on ground-track samples summed over every tracked object. (1.4) */
+export const EMBED_MAX_TRACK_SAMPLES = 60_000;
+/** Default for `layers.labelBudget`. (1.4) */
+export const EMBED_DEFAULT_LABEL_BUDGET = 300;
 
 // ---------------------------------------------------------------------------
 // Boot configuration
@@ -70,6 +77,13 @@ export interface EmbedConfig {
     mode: EmbedCatalogMode;
     /** Objects to load at boot. Equivalent to calling upsertObjects() right after ready. */
     objects?: EmbedObject[];
+    /**
+     * Object slots to reserve at boot. Hosts that upsert after boot (or in bulk) must ask for the most they will
+     * hold at once; the default is the boot objects plus 256, at least 1024, and KeepTrack's own 10,000 for 'full'
+     * mode. Objects beyond the capacity come back from upsertObjects with NO_FREE_SLOT. Fixed for the page's
+     * lifetime; each slot costs roughly 1 KB of heap and a few GPU buffer bytes. Max EMBED_MAX_CAPACITY. (1.4)
+     */
+    capacity?: number;
   };
   /** Unlisted domains default to 'shared'. */
   ownership?: Partial<Record<EmbedDomain, DomainOwner>>;
@@ -135,6 +149,11 @@ export interface EmbedObject {
    * it and get an analyst slot.
    */
   norad?: string;
+  /**
+   * Group this object belongs to (see defineGroups). The group need not be defined yet; its style applies as soon
+   * as it is. Re-upserting without `group` leaves the current membership alone. (1.4)
+   */
+  group?: string;
 }
 
 export type ObjectRef = { hostId: string } | { norad: string };
@@ -182,6 +201,35 @@ export interface EmbedObjectStyle {
   highlight?: boolean;
   /** true = draw the object's name, string = draw this text instead, false/omitted = no label. */
   label?: boolean | string;
+}
+
+/** A named set of objects drawn alike and toggled together as a map layer. (1.4) */
+export interface EmbedGroupDef {
+  id: string;
+  /** Dot color for every member without its own style.color. */
+  color?: EmbedColor;
+  /** false hides every member's dot (a layer toggle). Default true. Selected and hovered objects still draw. */
+  visible?: boolean;
+  /** Draw every member at the large dot size. Default false. */
+  highlight?: boolean;
+}
+
+export type EmbedGroupStyle = Partial<Omit<EmbedGroupDef, 'id'>>;
+
+export interface EmbedGroupInfo {
+  id: string;
+  color?: EmbedColor;
+  visible: boolean;
+  highlight: boolean;
+  /** Number of host objects currently assigned. */
+  count: number;
+}
+
+/** One entry of setObjectStyles. */
+export interface EmbedObjectStyleEntry {
+  ref: ObjectRef;
+  /** null resets the object to its group style or the color scheme. */
+  style: EmbedObjectStyle | null;
 }
 
 export interface EmbedLineStyle {
@@ -283,6 +331,11 @@ export interface EmbedLayers {
   orbits: boolean;
   /** Names next to objects. 'host' = only host objects with a label style. */
   labels: 'all' | 'host' | 'none';
+  /**
+   * At most this many host labels are drawn (integer >= 0). Over budget, the selected object comes first, then
+   * highlighted ones, then the rest in the order their style was set. Default EMBED_DEFAULT_LABEL_BUDGET. (1.4)
+   */
+  labelBudget: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -447,8 +500,12 @@ export interface KeepTrackEmbedApi {
   resume(): void;
 
   // Catalog
+  /**
+   * Add or update host objects. One call is one engine pass whatever its size: one cruncher message and one
+   * recolor, so pass the whole set at once (12,376 objects take about 0.2 s of main-thread time on a desktop GPU machine; one call per object is far slower). (1.4)
+   */
   upsertObjects(objects: EmbedObject[]): EmbedUpsertResult[];
-  /** Removes host objects. Catalog overrides revert to the catalog's own elements. */
+  /** Removes host objects (one engine pass for any number). Catalog overrides revert to the catalog's own elements. */
   removeObjects(hostIds: string[]): void;
   getObject(ref: ObjectRef): EmbedObjectInfo | null;
   listHostObjects(): EmbedObjectInfo[];
@@ -466,10 +523,31 @@ export interface KeepTrackEmbedApi {
   clearOverlays(): void;
 
   // Styling and tracks (1.2)
-  /** null resets the object to the color scheme's default. */
+  /** null resets the object to its group style, else the color scheme's default. */
   setObjectStyle(ref: ObjectRef, style: EmbedObjectStyle | null): void;
-  /** 'host' = every host object. null removes all ground tracks. */
+  /**
+   * 'host' = every host object. null removes all ground tracks. Samples summed over every tracked object may not
+   * exceed EMBED_MAX_TRACK_SAMPLES: an explicit ref list that would exceed it throws INVALID_ARGUMENT, and 'host'
+   * tracks only as many objects as fit. Pass explicit refs at constellation scale. (cap: 1.4)
+   */
   setGroundTracks(refs: ObjectRef[] | 'host' | null, options?: EmbedGroundTrackOptions): void;
+
+  // Groups and bulk styles (1.4)
+  /** Create groups or update their definition (new color/visible/highlight is applied to members at once). */
+  defineGroups(groups: EmbedGroupDef[]): void;
+  /** Change a defined group's color, visibility or highlight. One recolor for all members. */
+  setGroupStyle(id: string, style: EmbedGroupStyle): void;
+  /** Put objects in a group (null takes them out of whichever group they are in). One pass for any number. */
+  assignToGroup(id: string | null, refs: ObjectRef[]): void;
+  /** Delete a group. Its member objects are removed too unless `keepObjects` is true (then they just leave the group). */
+  removeGroup(id: string, options?: { keepObjects?: boolean }): void;
+  getGroups(): EmbedGroupInfo[];
+  /** Style many objects in one pass. Refs that match no object are skipped, not thrown. */
+  setObjectStyles(entries: EmbedObjectStyleEntry[]): void;
+  /** Apply one style to many objects in one pass (null resets them). Refs that match no object are skipped. */
+  setStyleForObjects(refs: ObjectRef[], style: EmbedObjectStyle | null): void;
+  /** Drop every per-object style (group styles stay). */
+  clearObjectStyles(): void;
 
   // UI
   setUi(flags: Partial<EmbedUiFlags>): void;

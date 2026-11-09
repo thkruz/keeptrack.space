@@ -153,6 +153,25 @@ describe('createKeepTrackEmbed', () => {
     expect(() => embed.getTime()).toThrow(expect.objectContaining({ code: 'NOT_READY' }));
   });
 
+  it('forwards the 1.4 group and bulk-style methods', async () => {
+    const facade = makeFacade(true) as Record<string, unknown>;
+    const names = ['defineGroups', 'setGroupStyle', 'assignToGroup', 'removeGroup', 'getGroups', 'setObjectStyles', 'setStyleForObjects', 'clearObjectStyles'];
+
+    for (const n of names) {
+      facade[n] = vi.fn(() => n);
+    }
+    currentWindow!.keepTrackEmbed = facade as unknown as FakeFacade;
+    const p = createKeepTrackEmbed({ container: document.body, src });
+
+    await vi.advanceTimersByTimeAsync(200);
+    const embed = (await p) as unknown as Record<string, (...a: unknown[]) => unknown>;
+
+    for (const n of names) {
+      expect(embed[n]('x', 1)).toBe(n);
+      expect(facade[n]).toHaveBeenCalledWith('x', 1);
+    }
+  });
+
   it('maps a missing build (HTTP 404) to ASSETS_MISSING', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, status: 404, text: () => Promise.resolve('') }));
     await expect(createKeepTrackEmbed({ container: document.body, src })).rejects.toMatchObject({ code: 'ASSETS_MISSING' });

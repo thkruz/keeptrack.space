@@ -13,6 +13,8 @@ export class EmbedSelection {
   private retryTimer_: ReturnType<typeof setTimeout> | null = null;
   private cancelPending_: (() => void) | null = null;
   private lastSelectedId_ = -1;
+  /** Called after a real selection change (label budget puts the selected object first). */
+  onChanged: (() => void) | null = null;
 
   constructor(
     private readonly ctx_: EmbedContext,
@@ -29,6 +31,7 @@ export class EmbedSelection {
         return;
       }
       this.lastSelectedId_ = id;
+      this.onChanged?.();
       this.ctx_.emit('selectionChanged', { object: this.infoOrNull_(id), source: this.ctx_.source });
     });
     this.engine_.onHoverChanged((id) => {

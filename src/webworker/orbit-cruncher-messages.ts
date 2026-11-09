@@ -18,6 +18,8 @@ export const enum OrbitCruncherMsgType {
   SETTINGS_UPDATE = 4,
   /** Worker → Main: orbit points calculated */
   RESPONSE_DATA = 5,
+  /** Main -> Worker: replace satrecs for many objects without computing any orbit (embed bulk upsert). */
+  SATELLITE_TLE_BATCH = 6,
 }
 
 export enum OrbitDrawTypes {
@@ -34,6 +36,14 @@ export interface OrbitCruncherInMsgInit {
   numSegs: number;
   numberOfOrbitsToDraw?: number;
   /** Catalog-swap sequence number. Worker rejects update messages older than the last INIT. */
+  seqNum?: number;
+}
+
+export interface OrbitCruncherInMsgSatelliteTleBatch {
+  typ: OrbitCruncherMsgType.SATELLITE_TLE_BATCH;
+  ids: number[];
+  tle1s: string[];
+  tle2s: string[];
   seqNum?: number;
 }
 
@@ -96,6 +106,7 @@ export interface OrbitCruncherInMsgSettingsUpdate {
 export type OrbitCruncherInMsgs =
   | OrbitCruncherInMsgInit
   | OrbitCruncherInMsgSatelliteUpdate
+  | OrbitCruncherInMsgSatelliteTleBatch
   | OrbitCruncherInMsgMissileUpdate
   | OrbitCruncherInMsgChangeOrbitType
   | OrbitCruncherInMsgSettingsUpdate;

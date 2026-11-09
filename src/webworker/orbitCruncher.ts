@@ -76,6 +76,22 @@ export const onMessage = (m: { data: OrbitCruncherInMsgs }) => {
       setEclipseInputs_(msg);
       updateOrbitData_(msg);
       break;
+    case OrbitCruncherMsgType.SATELLITE_TLE_BATCH:
+      if (isStaleUpdate_(msg.seqNum)) {
+        break;
+      }
+      for (let k = 0; k < msg.ids.length; k++) {
+        const id = msg.ids[k];
+
+        if (id >= 0 && id < objCache.length && objCache[id]) {
+          try {
+            (objCache[id] as OrbitCruncherSatelliteObject).satrec = Sgp4.createSatrec(msg.tle1s[k], msg.tle2s[k]);
+          } catch {
+            // Bad elements: keep the previous satrec; the orbit line for this object stays as it was
+          }
+        }
+      }
+      break;
     case OrbitCruncherMsgType.MISSILE_UPDATE:
       if (isStaleUpdate_(msg.seqNum)) {
         break;

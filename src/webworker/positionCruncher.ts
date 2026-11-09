@@ -363,6 +363,47 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
   requestImmediatePropagation_();
 };
 
+/**
+ * Handles SAT_EDIT_BATCH: the bulk form of SAT_EDIT. Replaces satrecs for many objects, posts nothing per
+ * object (the main thread ignores the derived extra data for host objects) and requests one propagation.
+ */
+const handleSatEditBatchMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  const { ids, tle1s, tle2s, actives } = m.data;
+
+  if (!ids || !tle1s || !tle2s) {
+    return;
+  }
+  for (let k = 0; k < ids.length; k++) {
+    const id = ids[k];
+    const entry = id >= 0 && id < objCache.length ? objCache[id] : undefined;
+
+    if (!entry) {
+      continue;
+    }
+    if (actives && actives[k] === false) {
+      entry.active = false;
+      continue;
+    }
+    try {
+      const satrec = Sgp4.createSatrec(tle1s[k], tle2s[k]);
+      const meanMotion = (satrec.no * 60 * 24) / TAU;
+      const semiMajorAxis = (8681663.653 / meanMotion) ** (2 / 3);
+
+      entry.satrec = satrec;
+      entry.active = true;
+      entry.apogee = (semiMajorAxis * (1 + satrec.ecco) - RADIUS_OF_EARTH) as Kilometers;
+      entry.perigee = (semiMajorAxis * (1 - satrec.ecco) - RADIUS_OF_EARTH) as Kilometers;
+      entry.isUpdated = true;
+    } catch {
+      entry.active = false;
+    }
+  }
+  if (!isThisJest) {
+    // istanbul ignore next
+    requestImmediatePropagation_();
+  }
+};
+
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
   if (isSgp4WasmBackendMsg(m.data)) {
     handleSgp4WasmBackendMsg(m.data);
@@ -380,6 +421,9 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
       break;
     case PosCruncherMsgType.SAT_EDIT:
       handleSatEditMsg_(m);
+      break;
+    case PosCruncherMsgType.SAT_EDIT_BATCH:
+      handleSatEditBatchMsg_(m);
       break;
     case PosCruncherMsgType.NEW_MISSILE:
       if (m.data.id !== undefined && m.data.id < objCache.length) {

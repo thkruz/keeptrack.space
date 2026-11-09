@@ -46,6 +46,17 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
+  /** Bulk SAT_EDIT: one message for many objects. `actives[i] === false` deactivates ids[i]. */
+  sendSatEditBatch(ids: number[], tle1s: string[], tle2s: string[], actives?: boolean[]): void {
+    this.postMessage({
+      typ: PosCruncherMsgType.SAT_EDIT_BATCH,
+      ids,
+      tle1s,
+      tle2s,
+      actives,
+    });
+  }
+
   sendNewMissile(data: { id: number; active: boolean; type?: number; latList: Degrees[]; lonList: Degrees[]; altList: Kilometers[]; startTime: number }): void {
     this.postMessage({
       typ: PosCruncherMsgType.NEW_MISSILE,

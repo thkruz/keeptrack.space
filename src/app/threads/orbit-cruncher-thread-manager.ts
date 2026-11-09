@@ -57,6 +57,17 @@ export class OrbitCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
+  /** Replace the worker's satrecs for many objects with one message; no orbit is computed until one is requested. */
+  sendSatelliteTleBatch(ids: number[], tle1s: string[], tle2s: string[]): void {
+    this.postMessage({
+      typ: OrbitCruncherMsgType.SATELLITE_TLE_BATCH,
+      ids,
+      tle1s,
+      tle2s,
+      seqNum: this.currentSeqNum_,
+    });
+  }
+
   sendMissileUpdate(
     id: number,
     simulationTime: number,

@@ -1569,6 +1569,25 @@ export class DotsManager {
     }
   }
 
+  /** Bulk setDotHighlighted: applies every change, then refreshes the GPU size buffer once. */
+  setDotsHighlighted(changes: [id: number, isHighlighted: boolean][]): void {
+    let changed = false;
+
+    for (const [id, isHighlighted] of changes) {
+      if (isHighlighted ? !this.highlightedDots_.has(id) : this.highlightedDots_.has(id)) {
+        if (isHighlighted) {
+          this.highlightedDots_.add(id);
+        } else {
+          this.highlightedDots_.delete(id);
+        }
+        changed = true;
+      }
+    }
+    if (changed && this.sizeData) {
+      this.updateSizeBuffer(this.sizeData.length);
+    }
+  }
+
   /**
    * Updates the size buffer used for rendering the dots.
    * @param bufferLen The length of the buffer.

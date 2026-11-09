@@ -87,6 +87,10 @@ export interface PositionCruncherIncomingMsg {
     dynamicOffsetEpoch?: number;
     propRate?: number;
     id?: number;
+    ids?: number[];
+    tle1s?: string[];
+    tle2s?: string[];
+    actives?: boolean[];
     satelliteSelected?: number[];
     selectedSatFOV?: number;
     isSunlightView?: boolean;

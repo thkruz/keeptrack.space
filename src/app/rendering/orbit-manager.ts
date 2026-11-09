@@ -25,6 +25,8 @@ import { CounterStage, FrameProfiler } from '../../engine/utils/frame-profiler';
 import { HoverManager } from '../ui/hover-manager';
 
 export class OrbitManager {
+  /** Element sets larger than this skip the eager per-object orbit build (see changeOrbitBuffersFor). */
+  static readonly BULK_ORBIT_THRESHOLD = 32;
   private currentHoverId_ = -1;
   private currentInView_ = <number[]>[];
   private currentSelectId_ = -1;
@@ -505,6 +507,26 @@ export class OrbitManager {
       tle2,
       this.getEclipseParams_(simTime)
     );
+  }
+
+  /**
+   * New elements for a set of objects. A handful (the usual interactive case) builds each orbit now like
+   * changeOrbitBufferData; a large set sends the elements in one worker message and builds orbits on demand.
+   */
+  changeOrbitBuffersFor(ids: number[], tle1s: string[], tle2s: string[]): void {
+    if (ids.length <= OrbitManager.BULK_ORBIT_THRESHOLD) {
+      for (let k = 0; k < ids.length; k++) {
+        this.changeOrbitBufferData(ids[k], tle1s[k], tle2s[k]);
+      }
+
+      return;
+    }
+    this.changeOrbitBufferDataBatch(ids, tle1s, tle2s);
+  }
+
+  /** Bulk form of changeOrbitBufferData: new elements for many objects, one worker message, no orbit built yet. */
+  changeOrbitBufferDataBatch(ids: number[], tle1s: string[], tle2s: string[]): void {
+    this.orbitThreadMgr.sendSatelliteTleBatch(ids, tle1s, tle2s);
   }
 
   /**

@@ -21,6 +21,8 @@ export const enum PosCruncherMsgType {
   SUNLIGHT_VIEW = 6,
   SATELLITE_SELECTED = 7,
   CAMERA_DATA = 8,
+  /** Many SAT_EDITs in one message (embed bulk upsert). */
+  SAT_EDIT_BATCH = 9,
 }
 
 export enum MarkerMode {
@@ -50,6 +52,15 @@ export interface PosCruncherMsgSatEdit {
   tle1: string;
   tle2: string;
   active?: boolean;
+}
+
+export interface PosCruncherMsgSatEditBatch {
+  typ: PosCruncherMsgType.SAT_EDIT_BATCH;
+  ids: number[];
+  tle1s: string[];
+  tle2s: string[];
+  /** Parallel to ids. false deactivates the object. Omitted = all active. */
+  actives?: boolean[];
 }
 
 export interface PosCruncherMsgNewMissile {
@@ -95,6 +106,7 @@ export type PosCruncherInMsg =
   | PosCruncherMsgObjData
   | PosCruncherMsgOffset
   | PosCruncherMsgSatEdit
+  | PosCruncherMsgSatEditBatch
   | PosCruncherMsgNewMissile
   | PosCruncherMsgSensor
   | PosCruncherMsgUpdateMarkers

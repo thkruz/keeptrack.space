@@ -362,6 +362,27 @@ export class CatalogManager {
   }
 
   /**
+   * Bulk form of {@link getNextAvailableAnalystSat}: up to `count` free analyst slots from one scan, so claiming
+   * thousands of slots is O(slots) instead of O(slots^2). The returned slots stay inactive until activated.
+   */
+  getAvailableAnalystSats(count: number, startOffset = 0, endOffset = settingsManager.maxAnalystSats): Satellite[] {
+    const out: Satellite[] = [];
+
+    for (let offset = startOffset; offset < endOffset && out.length < count; offset++) {
+      // By slot id, not by sccNum: a slot activated under a real NORAD no longer answers to its analyst sccNum
+      const slotId = this.analSatSet[offset]?.id;
+      const obj = typeof slotId === 'number' ? this.getObject(slotId) : null;
+      const sat = obj?.isSatellite() ? (obj as Satellite) : null;
+
+      if (sat && !sat.active && !AnalystSlotReservations.isReserved(sat.sccNum)) {
+        out.push(sat);
+      }
+    }
+
+    return out;
+  }
+
+  /**
    * @deprecated - Stars are not currently working
    *
    * Converts a star name to its corresponding ID within a given range.
@@ -611,6 +632,62 @@ export class CatalogManager {
    *   reads the trailing 5 chars and will silently lose precision otherwise.
    */
   addAnalystSat(tle1: string, tle2: string, id: number, sccNum?: string): Satellite | null {
+    const sat = this.buildAnalystSat_(tle1, tle2, id, sccNum);
+
+    if (!sat) {
+      return null;
+    }
+
+    this.satCruncherThread.sendSatEdit(id, tle1, tle2, true);
+    ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
+    if (!sat.isSatellite()) {
+      throw new Error(`Object ${id} is not a satellite!`);
+    }
+
+    this.seedDotPosition(id);
+
+    return sat;
+  }
+
+  /**
+   * Bulk addAnalystSat for many slots: the same per-object validation and construction, but ONE position-cruncher
+   * message, ONE orbit-cruncher message and ONE color refresh for the whole batch. Entries that fail validation
+   * (bad length, bad elements, sub-surface orbit) come back null; the rest are live. `configure` runs on each new
+   * satellite before the color refresh, so name and status are in the snapshot the color worker receives.
+   */
+  addAnalystSats(items: { id: number; tle1: string; tle2: string; sccNum?: string }[], configure?: (sat: Satellite, index: number) => void): (Satellite | null)[] {
+    const out: (Satellite | null)[] = [];
+    const ids: number[] = [];
+    const tle1s: string[] = [];
+    const tle2s: string[] = [];
+
+    for (const item of items) {
+      let sat: Satellite | null = null;
+
+      try {
+        sat = this.buildAnalystSat_(item.tle1, item.tle2, item.id, item.sccNum);
+      } catch {
+        sat = null;
+      }
+      out.push(sat);
+      if (sat) {
+        configure?.(sat, out.length - 1);
+        ids.push(item.id);
+        tle1s.push(item.tle1);
+        tle2s.push(item.tle2);
+      }
+    }
+    if (ids.length > 0) {
+      this.satCruncherThread.sendSatEditBatch(ids, tle1s, tle2s);
+      ServiceLocator.getOrbitManager().changeOrbitBuffersFor(ids, tle1s, tle2s);
+      this.seedDotPositions(ids);
+    }
+
+    return out;
+  }
+
+  /** Validate the elements and build the analyst Satellite into objectCache[id]. No worker messages. */
+  private buildAnalystSat_(tle1: string, tle2: string, id: number, sccNum?: string): Satellite | null {
     if (tle1.length !== 69) {
       throw new Error(`Invalid TLE1: length is not 69 - ${tle1}`);
     }
@@ -645,17 +722,7 @@ export class CatalogManager {
         id,
       });
 
-      this.satCruncherThread.sendSatEdit(id, tle1, tle2, true);
-      ServiceLocator.getOrbitManager().changeOrbitBufferData(id, tle1, tle2);
-      const sat = this.objectCache[id] as Satellite;
-
-      if (!sat.isSatellite()) {
-        throw new Error(`Object ${id} is not a satellite!`);
-      }
-
-      this.seedDotPosition(id);
-
-      return sat;
+      return this.objectCache[id] as Satellite;
     }
     errorManagerInstance.debug(tle1);
     errorManagerInstance.debug(tle2);
@@ -678,30 +745,45 @@ export class CatalogManager {
   seedDotPosition(id: number): void {
     // Best effort: render managers may not be registered yet (startup, tests)
     try {
-      const sat = this.objectCache[id] as Satellite | undefined;
-
-      if (!sat?.isSatellite?.()) {
-        return;
-      }
-
-      const { position, velocity } = SatMath.getEci(sat, ServiceLocator.getTimeManager().simulationTimeObj);
-      const dotsManagerInstance = ServiceLocator.getDotsManager();
-
-      if (dotsManagerInstance?.positionData && (position.x !== 0 || position.y !== 0 || position.z !== 0)) {
-        dotsManagerInstance.positionData[id * 3] = position.x;
-        dotsManagerInstance.positionData[id * 3 + 1] = position.y;
-        dotsManagerInstance.positionData[id * 3 + 2] = position.z;
-
-        if (dotsManagerInstance.velocityData) {
-          dotsManagerInstance.velocityData[id * 3] = velocity.x;
-          dotsManagerInstance.velocityData[id * 3 + 1] = velocity.y;
-          dotsManagerInstance.velocityData[id * 3 + 2] = velocity.z;
-        }
-      }
-
+      this.seedDotPositionOnly_(id);
       ServiceLocator.getColorSchemeManager()?.notifyObjectsChanged?.();
     } catch (e) {
       errorManagerInstance.debug(`seedDotPosition skipped: ${(e as Error).message}`);
+    }
+  }
+
+  /** Bulk seedDotPosition: seeds every id, then refreshes the color worker once. */
+  seedDotPositions(ids: number[]): void {
+    try {
+      for (const id of ids) {
+        this.seedDotPositionOnly_(id);
+      }
+      ServiceLocator.getColorSchemeManager()?.notifyObjectsChanged?.();
+    } catch (e) {
+      errorManagerInstance.debug(`seedDotPositions skipped: ${(e as Error).message}`);
+    }
+  }
+
+  private seedDotPositionOnly_(id: number): void {
+    const sat = this.objectCache[id] as Satellite | undefined;
+
+    if (!sat?.isSatellite?.()) {
+      return;
+    }
+
+    const { position, velocity } = SatMath.getEci(sat, ServiceLocator.getTimeManager().simulationTimeObj);
+    const dotsManagerInstance = ServiceLocator.getDotsManager();
+
+    if (dotsManagerInstance?.positionData && (position.x !== 0 || position.y !== 0 || position.z !== 0)) {
+      dotsManagerInstance.positionData[id * 3] = position.x;
+      dotsManagerInstance.positionData[id * 3 + 1] = position.y;
+      dotsManagerInstance.positionData[id * 3 + 2] = position.z;
+
+      if (dotsManagerInstance.velocityData) {
+        dotsManagerInstance.velocityData[id * 3] = velocity.x;
+        dotsManagerInstance.velocityData[id * 3 + 1] = velocity.y;
+        dotsManagerInstance.velocityData[id * 3 + 2] = velocity.z;
+      }
     }
   }
 

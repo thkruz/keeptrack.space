@@ -99,6 +99,20 @@ describe('SatCruncherThreadManager', () => {
       });
     });
 
+    it('sendSatEditBatch posts one SAT_EDIT_BATCH with parallel arrays', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendSatEditBatch([7, 8], ['a1', 'b1'], ['a2', 'b2'], [true, false]);
+
+      expect(lastMsg(worker)).toEqual({
+        typ: PosCruncherMsgType.SAT_EDIT_BATCH,
+        ids: [7, 8],
+        tle1s: ['a1', 'b1'],
+        tle2s: ['a2', 'b2'],
+        actives: [true, false],
+      });
+    });
+
     it('sendNewMissile spreads the missile payload under NEW_MISSILE', () => {
       const { mgr, worker } = makeMgr();
       const data = {

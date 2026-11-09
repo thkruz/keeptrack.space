@@ -63,6 +63,7 @@ export class SoundToggle extends KeepTrackPlugin {
     }
 
     soundManager.toggleMute();
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   private onMuteChanged_(isMuted: boolean): void {

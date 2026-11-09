@@ -40,6 +40,7 @@ const SIZE_PRESETS: SizePreset[] = [
 
 export class PolarPlotPlugin extends KeepTrackPlugin {
   readonly id = 'PolarPlotPlugin';
+  private lastActionKey_ = '';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
 
@@ -231,6 +232,25 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     this.passes_ = this.computePasses_();
     this.currentIndex_ = 0;
     this.renderCurrent_();
+    this.emitActionUsed_();
+  }
+
+  /** Achievement signal: a pass was plotted for the selected sat/sensor. Once per sat+sensor pair. */
+  private emitActionUsed_(): void {
+    const sensor = ServiceLocator.getSensorManager().getSensor();
+    const sat = this.selectSatManager_.getSelectedSat();
+    const sensorId = sensor?.objName ?? sensor?.name;
+
+    if (this.passes_.length === 0 || !sensorId || !sat) {
+      return;
+    }
+    const key = `${sat.id}|${sensorId}`;
+
+    if (key === this.lastActionKey_) {
+      return;
+    }
+    this.lastActionKey_ = key;
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id, sensorId });
   }
 
   /** Finds the current and upcoming passes for the selected satellite/sensor. */

@@ -226,6 +226,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
 
     if (preset) {
       EarthPresetsPlugin.applyPreset(preset.id);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     }
   }
 
@@ -236,7 +237,10 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
       id: `EarthPresetsPlugin.preset.${preset.id}`,
       label: EarthPresetsPlugin.presetLabel(preset),
       category,
-      callback: () => EarthPresetsPlugin.applyPreset(preset.id),
+      callback: () => {
+        EarthPresetsPlugin.applyPreset(preset.id);
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
+      },
     }));
   }
 }

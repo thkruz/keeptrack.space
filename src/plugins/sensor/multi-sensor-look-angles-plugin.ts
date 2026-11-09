@@ -31,6 +31,7 @@ const l = (key: string): string => t7e(`plugins.MultiSensorLookAnglesPlugin.${ke
 
 export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSensorLookAnglesPlugin';
+  private lastActionKey_ = '';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
@@ -389,6 +390,14 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     }
 
     this.populateMultiSiteTable_(multiSiteArray, sensors);
+
+    // Achievement signal: multi-site look angles computed. Once per sat + sensor set.
+    const key = `${sat.id}|${sensors.map((s) => s.objName).join(',')}`;
+
+    if (key !== this.lastActionKey_) {
+      this.lastActionKey_ = key;
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
+    }
   }
 
   private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): TearrData {

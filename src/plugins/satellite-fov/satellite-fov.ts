@@ -382,6 +382,7 @@ export class SatelliteFov extends KeepTrackPlugin {
       } else {
         ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
         coneFactory.generateMesh(currentSat);
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: currentSat.id });
       }
     }
   }
@@ -408,6 +409,7 @@ export class SatelliteFov extends KeepTrackPlugin {
         targetObj: secondarySat,
       });
       ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: currentSat.id, secondaryId: secondarySat.id });
     }
   }
 
@@ -493,6 +495,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     });
 
     ServiceLocator.getSoundManager()?.play(SoundNames.TOGGLE_ON);
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: currentSat.id, secondaryId: targetObj.id });
   }
 
   protected readS2sColor_(): [number, number, number, number] {

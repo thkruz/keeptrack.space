@@ -25,6 +25,7 @@
  */
 
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -36,6 +37,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import externalPng from '@public/img/icons/external.png';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './share-menu.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -250,10 +252,18 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
       .then(() => {
         uiManagerInstance.toast(l('toasts.copied'), ToastMsgType.normal);
         EventBus.getInstance().emit(EventBusEvent.shareAction, 'copy');
+        this.emitActionUsed_();
       })
       .catch(() => {
         uiManagerInstance.toast(l('toasts.copyFailed'), ToastMsgType.caution);
       });
+  }
+
+  /** A link was shared: the subject is the satellite selected at that moment, if any. */
+  private emitActionUsed_(): void {
+    const satId = PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1;
+
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, satId > -1 ? { satId } : undefined);
   }
 
   private shareNative_(): void {
@@ -269,6 +279,7 @@ export class ShareMenuPlugin extends KeepTrackPlugin {
       .share({ title: document.title, url })
       .then(() => {
         EventBus.getInstance().emit(EventBusEvent.shareAction, 'native');
+        this.emitActionUsed_();
       })
       .catch((err: Error) => {
         // AbortError is the user dismissing the share sheet — not a real failure.

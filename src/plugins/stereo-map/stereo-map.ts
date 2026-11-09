@@ -1064,6 +1064,10 @@ export class StereoMap extends KeepTrackPlugin {
       const timeObj = new Date(`${timeArr[0]}T${timeArr[1]}Z`);
 
       timeManagerInstance.changeSimulationTime(timeObj.getTime());
+      // Jumping to a ground-track pass time is the analyst action that counts as using the plugin
+      const mapSatId = this.selectSatManager_?.selectedSat ?? -1;
+
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, mapSatId > -1 ? { satId: mapSatId } : undefined);
     }
   }
 

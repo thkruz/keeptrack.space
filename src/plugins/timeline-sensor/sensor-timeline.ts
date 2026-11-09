@@ -85,6 +85,7 @@ type WeatherDataInput = {
 
 export class SensorTimeline extends KeepTrackPlugin {
   readonly id = 'SensorTimeline';
+  private lastActionKey_ = '';
   dependencies_ = [SelectSatManager.name];
 
   /** Translated display label for a pass type drawn on the canvas. */
@@ -439,6 +440,7 @@ export class SensorTimeline extends KeepTrackPlugin {
        */
 
       this.drawTimeline_(Passes, SatInFoVs, SatInSuns, StationInNights, ClearSkies);
+      this.emitActionUsed_();
     } catch (e) {
       errorManagerInstance.info(e);
     }
@@ -489,6 +491,22 @@ export class SensorTimeline extends KeepTrackPlugin {
 
   //
   // eslint-disable-next-line complexity
+  /** Achievement signal: timeline drawn for the selected sat. Once per sat + enabled-sensor set. */
+  private emitActionUsed_(): void {
+    const satId = PluginRegistry.getPlugin(SelectSatManager)!.selectedSat;
+    // Prefer the user's chosen sensor when it is enabled in the timeline
+    const current = ServiceLocator.getSensorManager().getSensor();
+    const shown = this.enabledSensors_.find((s) => s.objName === current?.objName) ?? this.enabledSensors_[0];
+    const sensorId = shown?.objName ?? shown?.name;
+    const key = `${satId}|${this.enabledSensors_.map((s) => s.objName).join(',')}`;
+
+    if (satId < 0 || key === this.lastActionKey_) {
+      return;
+    }
+    this.lastActionKey_ = key;
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, sensorId ? { satId, sensorId } : { satId });
+  }
+
   private async calculatePasses_(): Promise<Passes[][]> {
     const AllPasses: Passes[] = [];
     const AllSatInFoVs: Passes[] = [];

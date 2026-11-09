@@ -619,6 +619,7 @@ export class NewLaunch extends KeepTrackPlugin {
       };
 
       catalogManagerInstance.satCruncherThread.sendSatEdit(id, tle1, tle2, true);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: id });
 
       const orbitManagerInstance = ServiceLocator.getOrbitManager();
 

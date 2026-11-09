@@ -136,6 +136,7 @@ export class VcrPlugin extends KeepTrackPlugin {
       return;
     }
     timeManager.changePropRate(nextRate);
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
 
     this.updatePausePlayBtn_();
     this.stopRewind_();
@@ -164,6 +165,7 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     this.stopFastForward_();
     this.updatePausePlayBtn_();
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   handleFastForward(): void {
@@ -188,6 +190,7 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     this.stopRewind_();
     this.updatePausePlayBtn_();
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   private isAtScenarioEnd_(timeManager: ReturnType<typeof ServiceLocator.getTimeManager>): boolean {

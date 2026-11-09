@@ -778,6 +778,9 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       });
       this.updateWatchlist();
       EventBus.getInstance().emit(EventBusEvent.onWatchlistAdd, this.watchlistList);
+      if (!isDuplicate) {
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: id });
+      }
     }
   }
 

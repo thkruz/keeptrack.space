@@ -580,6 +580,8 @@ export class Reentries extends KeepTrackPlugin {
         this.setTipList_(tipList);
         this.createTipTable_();
         this.fetchMissingTipDetails_();
+        // The list is now showing: the first watch-officer step (no subject, matched by order and time)
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
 
         if (this.tipList_.length === 0) {
           errorManagerInstance.warn(t7e('plugins.Reentries.errorMsgs.noTipData' as Parameters<typeof t7e>[0]));
@@ -687,6 +689,7 @@ export class Reentries extends KeepTrackPlugin {
 
     ServiceLocator.getTimeManager().changeSimulationTime(decayEpoch.getTime());
     ServiceLocator.getMainCamera().state.isAutoPitchYawToTarget = false;
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
 
     if (this.isFlyToCorridor_) {
       this.flyToCorridor_(this.tipList_[row], decayEpoch, sat.id);
@@ -1070,6 +1073,7 @@ export class Reentries extends KeepTrackPlugin {
     }
 
     this.selectSatIdOnCruncher_ = sat.id;
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
   }
 
   // =========================================================================

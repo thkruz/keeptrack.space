@@ -773,6 +773,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     try {
       this.lastResults_ = this.searchSats_(searchParams);
       this.onSearchComplete_(this.lastResults_);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     } catch (e) {
       // A failed or invalid search must not leave the previous result on screen.
       this.clearSearchResults_();

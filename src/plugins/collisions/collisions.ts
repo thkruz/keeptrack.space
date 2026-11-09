@@ -321,6 +321,16 @@ export class Collisions extends KeepTrackPlugin {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     this.selectSatIdOnCruncher_ = catalogManagerInstance.sccNum2Id(parseInt(sat1));
+
+    // Achievement signal: a conjunction event was opened (primary = SAT1, secondary = SAT2)
+    const satId = this.selectSatIdOnCruncher_;
+    const secondaryId = catalogManagerInstance.sccNum2Id(parseInt(sat2));
+
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, {
+      ...(typeof satId === 'number' ? { satId } : {}),
+      ...(typeof secondaryId === 'number' ? { secondaryId } : {}),
+      eventId: `${this.collisionList_[row].ID}`,
+    });
   }
 
   protected createTable_(): void {

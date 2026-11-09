@@ -2,6 +2,8 @@ import { getCountryMapList } from '@app/app/data/catalogs/countries';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IDragOptions, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { html } from '@app/engine/utils/development/formatter';
@@ -204,6 +206,8 @@ export class Inc2LonPlots extends KeepTrackPlugin {
 
       if (typeof eventData?.id === 'number') {
         this.selectSatManager_.selectSat(eventData.id);
+        // Drilling into a plotted satellite is the analyst action that counts as using the plugin
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
       }
     });
 

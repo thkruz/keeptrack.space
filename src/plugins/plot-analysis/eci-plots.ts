@@ -1,5 +1,7 @@
 import { EChartsData, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
@@ -224,6 +226,13 @@ export class EciPlot extends KeepTrackPlugin {
           },
         })),
     });
+
+    // Achievement signal: ECI plot drawn for the selected object
+    const satId = this.selectSatManager_.selectedSat;
+
+    if (satId !== -1) {
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId });
+    }
   }
 
   private static updateAppObject_(X_AXIS: string, Y_AXIS: string, Z_AXIS: string) {

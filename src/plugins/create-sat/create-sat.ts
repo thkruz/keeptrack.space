@@ -1024,6 +1024,7 @@ export class CreateSat extends KeepTrackPlugin {
         ToastMsgType.normal,
         true
       );
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'CreateSat', { satId });
     } catch (error) {
       // ootk rejects an out-of-range element with a ParseError; name the field and its range instead.
       const fieldError = fieldErrorFromException(error);

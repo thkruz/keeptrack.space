@@ -227,6 +227,8 @@ export class ColorMenu extends KeepTrackPlugin implements ICommandPaletteCapable
         colorSchemeManagerInstance.isUseGroupColorScheme = ServiceLocator.getGroupsManager().selectedGroup !== null;
         colorSchemeManagerInstance.setColorScheme(colorSchemeInstance, true);
         ServiceLocator.getUiManager().hideSideMenus();
+        // Briefing step: a color scheme was applied (no catalog subject, matched by order and time)
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'ColorMenu');
 
         return;
       }

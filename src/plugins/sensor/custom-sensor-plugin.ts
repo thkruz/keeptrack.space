@@ -328,6 +328,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     if (result === 'added') {
       // Usage signal for telemetry: only a sensor that was actually created counts
       EventBus.getInstance().emit(EventBusEvent.pluginFormSubmitted, this.id);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { sensorId: CustomSensorPlugin.lastCreatedSensorId_ });
     }
   }
 
@@ -588,6 +589,9 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
    * replaced the primary), `rejected` when validation failed, and `duplicate` when the same
    * values were just submitted (a double-click), in which case nothing happens.
    */
+  /** Identity (objName) of the sensor the last successful submit created; the action subject. */
+  private static lastCreatedSensorId_: string | undefined;
+
   private static processCustomSensorSubmit_(isReplaceSensor = false): 'added' | 'rejected' | 'duplicate' {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const values = CustomSensorPlugin.readForm_();
@@ -622,6 +626,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     }
 
     const sensor = new DetailedSensor(buildCustomSensorParams(values, randomUUID));
+
+    CustomSensorPlugin.lastCreatedSensorId_ = sensor.objName ?? sensor.name;
 
     // Pan to the new sensor like the sensor list does, but keep the user's zoom
     CustomSensorPlugin.withCameraPreserved_(() => sensorManagerInstance.addSecondarySensor(sensor, isReplaceSensor));

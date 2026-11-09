@@ -153,6 +153,7 @@ export class CloseObjectsPlugin extends KeepTrackPlugin {
     const searchStr = this.findCloseObjects_();
 
     ServiceLocator.getUiManager().doSearch(searchStr);
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   protected findCloseObjects_(): string {

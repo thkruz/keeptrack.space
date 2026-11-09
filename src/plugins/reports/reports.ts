@@ -438,6 +438,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const stamp = generatedAt.toISOString().replace(/[-:]/gu, '').slice(0, 15);
 
     saveAs(createCsvBlob(batchTableToCsv(merged.table)), `${report.id}-batch-${stamp}.csv`);
+    // Batch report over several objects has no single subject (matched by order and time)
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     let message = l('batch.done')
       .replace('{rows}', merged.table.rows.length.toString())
       .replace('{objects}', merged.objectsWithRows.toString())
@@ -936,6 +938,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
 
     this.writeReport_(reportData);
+    // Single-object report produced: the subject is the object it was generated for
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
   }
 
   /** Assembles the report context: time window, injected dependencies, and report epoch. */

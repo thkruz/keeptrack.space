@@ -497,6 +497,7 @@ export class EditSat extends KeepTrackPlugin {
     this.orbitPreview_.clear();
     ServiceLocator.getMainCamera().state.zoomTarget = pickZoomForApogee(sat.apogee);
     this.populateFormFields_(sat);
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
   }
 
   // =========================================================================

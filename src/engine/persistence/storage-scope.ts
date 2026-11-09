@@ -177,6 +177,8 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   // --- Device: meta/bookkeeping (never sync) ------------------------------------
   [StorageKey.VERSION]: StorageScope.Device,
   [StorageKey.USER_LAST_SYNCED]: StorageScope.Device,
+  [StorageKey.ACHIEVEMENT_TOAST_STYLE]: StorageScope.Device,
+  [StorageKey.ACHIEVEMENT_WORKFLOW_PROGRESS]: StorageScope.Device,
   [StorageKey.SYNC_META]: StorageScope.Device,
 };
 

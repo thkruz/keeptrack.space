@@ -1,4 +1,15 @@
 /**
+ * What a plugin action was about. Feeds workflow achievements that chain tools on one subject.
+ * satId is the catalog index as used by selectSatData.
+ */
+export interface PluginActionSubject {
+  satId?: number;
+  secondaryId?: number;
+  sensorId?: string;
+  eventId?: string;
+}
+
+/**
  * Enum containing the registrable events used in the KeepTrack API.
  */
 export enum EventBusEvent {
@@ -249,6 +260,13 @@ export enum EventBusEvent {
    * Parameters: (pluginId: string)
    */
   pluginFormSubmitted = 'pluginFormSubmitted',
+  /**
+   * Emitted when a user completes a plugin's main action outside the auto-wired
+   * form (custom submit handlers, toggles without a bottom icon, exports, runs).
+   * Feeds per-plugin achievements and usage telemetry. Emit once per action.
+   * Parameters: (pluginId: string, subject?: PluginActionSubject)
+   */
+  pluginActionUsed = 'pluginActionUsed',
   /**
    * Emitted when a command palette command executes (excluding palette-internal
    * navigation like "Browse all commands").

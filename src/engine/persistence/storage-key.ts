@@ -141,6 +141,12 @@ export enum StorageKey {
   // Achievement progress counters (mirrors the server-synced app_preferences copy)
   ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
 
+  // In-flight workflow achievement progress ({subject, startedAt, stepsDone} per workflow); device only
+  ACHIEVEMENT_WORKFLOW_PROGRESS = 'v2-keepTrack-achievementWorkflowProgress',
+
+  // Achievement unlock toast style: 'compact' | 'card'
+  ACHIEVEMENT_TOAST_STYLE = 'v2-keepTrack-achievementToastStyle',
+
   // Best Pass Pro (column visibility + propagation settings)
   BEST_PASS_SETTINGS = 'v2-keepTrack-bestPassSettings',
 

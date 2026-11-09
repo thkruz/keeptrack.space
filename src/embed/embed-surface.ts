@@ -1,5 +1,5 @@
 import type { EmbedCatalog } from './embed-catalog';
-import type { EmbedEngine, EngineLine, EngineSurfaceSpec } from './embed-engine';
+import type { EmbedEngine, EngineLine, EngineMarkerLabel, EngineSurfaceSpec } from './embed-engine';
 import { accessAngleDeg, circleRing, ellipseRing, greatCirclePath, markerStrips } from './embed-geo';
 import type { EmbedSensors } from './embed-sensors';
 import {
@@ -63,13 +63,14 @@ function checkLatLon(p: unknown, what: string): asserts p is EmbedLatLon {
 
 /**
  * Footprint, circle, marker, ellipse and polyline overlays, drawn as Earth-fixed surface lines.
- * Fill is not supported: shapes are always outlines (a one-time console warning is logged when fill is requested).
- * Labels on markers are not drawn (the engine has no surface text facility).
+ * `fill: true` on footprint, circle and ellipse adds a translucent fill under the outline (engine fan of rings).
+ * Marker labels go to the engine's GPU label pass.
  */
 export class EmbedSurfaceOverlays {
   private readonly records_ = new Map<string, SurfaceRecord>();
   private timer_: ReturnType<typeof setInterval> | null = null;
-  private warnedFill_ = false;
+  private hadMarkerLabels_ = false;
+  private labelsHidden_ = false;
   now_: () => number = () => Date.now();
 
   constructor(
@@ -118,18 +119,15 @@ export class EmbedSurfaceOverlays {
     };
 
     this.validate_(rec);
-    if ('fill' in overlay && overlay.fill && !this.warnedFill_) {
-      this.warnedFill_ = true;
-      console.warn('KeepTrack embed: overlay fill is not supported; drawing the outline only');
-    }
-    const strips = this.strips_(rec);
+    const geo = this.geometry_(rec);
 
-    rec.line = this.engine_.addSurfaceLine({ strips: strips ?? [], color: rec.color, dashed: rec.dashed });
+    rec.line = this.engine_.addSurfaceLine({ strips: geo?.strips ?? [], color: rec.color, dashed: rec.dashed, fillCenter: geo?.fillCenter });
     if (!rec.line) {
       throw new EmbedError('INVALID_ARGUMENT', 'The engine cannot draw surface overlays');
     }
     this.markDrawn_(rec);
     this.records_.set(rec.id, rec);
+    this.pushMarkerLabels_();
 
     return rec.id;
   }
@@ -192,6 +190,43 @@ export class EmbedSurfaceOverlays {
       default:
         break;
     }
+  }
+
+  /** Strips plus the fill center (set only when the overlay asks for a fill and has a ring). */
+  private geometry_(rec: SurfaceRecord): { strips: EmbedLatLon[][]; fillCenter?: EmbedLatLon } | null {
+    const o = rec.overlay;
+    const wantsFill = 'fill' in o && o.fill === true;
+    const strips = this.strips_(rec);
+
+    if (!strips) {
+      return null;
+    }
+    if (!wantsFill) {
+      return { strips };
+    }
+    switch (o.type) {
+      case 'footprint': {
+        const pos = this.engine_.getPosition(rec.objectId as number, this.engine_.getTimeMs());
+
+        return { strips, fillCenter: pos ? { lat: pos.lla.lat, lon: pos.lla.lon } : undefined };
+      }
+      case 'circle':
+        return { strips, fillCenter: this.circleCenter_(o.center) ?? undefined };
+      case 'ellipse':
+        return { strips, fillCenter: o.center };
+      default:
+        return { strips };
+    }
+  }
+
+  private circleCenter_(center: EmbedCircleOverlay['center']): EmbedLatLon | null {
+    if ('sensor' in center) {
+      const def = this.sensors_.getDef(center.sensor);
+
+      return def ? { lat: def.lat, lon: def.lon } : null;
+    }
+
+    return center;
   }
 
   /** Geometry for a record; null when a moving overlay cannot be placed right now. */
@@ -273,8 +308,8 @@ export class EmbedSurfaceOverlays {
       if (!sigChanged && !force && wall - rec.drawnWall < SURFACE_MIN_REDRAW_MS) {
         continue;
       }
-      const strips = this.strips_(rec) ?? [];
-      const spec: EngineSurfaceSpec = { strips, color: rec.color, dashed: rec.dashed };
+      const geo = this.geometry_(rec);
+      const spec: EngineSurfaceSpec = { strips: geo?.strips ?? [], color: rec.color, dashed: rec.dashed, fillCenter: geo?.fillCenter };
 
       if (rec.line && this.engine_.isLineAlive(rec.line)) {
         this.engine_.updateSurfaceLine(rec.line, spec);
@@ -295,8 +330,34 @@ export class EmbedSurfaceOverlays {
       this.engine_.removeLine(rec.line);
     }
     this.records_.delete(id);
+    this.pushMarkerLabels_();
 
     return true;
+  }
+
+  /** layers.labels 'none' hides marker text; any other mode shows it. */
+  setLabelsHidden(hidden: boolean): void {
+    if (hidden !== this.labelsHidden_) {
+      this.labelsHidden_ = hidden;
+      this.pushMarkerLabels_();
+    }
+  }
+
+  /** Text of every marker overlay that has one, anchored to the marker's lat/lon (none while labels are hidden). */
+  private pushMarkerLabels_(): void {
+    const labels: EngineMarkerLabel[] = [];
+
+    for (const rec of this.labelsHidden_ ? [] : this.records_.values()) {
+      const o = rec.overlay;
+
+      if (o.type === 'marker' && o.label) {
+        labels.push({ key: rec.id, text: o.label, latDeg: o.position.lat, lonDeg: o.position.lon, color: rec.color });
+      }
+    }
+    if (labels.length > 0 || this.hadMarkerLabels_) {
+      this.engine_.setMarkerLabels(labels);
+    }
+    this.hadMarkerLabels_ = labels.length > 0;
   }
 
   clear(): void {

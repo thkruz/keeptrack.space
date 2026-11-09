@@ -197,7 +197,7 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
         this.time_.setRate(time.rate);
       }
       if (layers) {
-        this.style_.setLayers(layers);
+        this.applyLayers_(layers);
       }
     });
 
@@ -331,6 +331,18 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
     this.time_.play();
   }
 
+  // ---- Render parking ---------------------------------------------------
+
+  suspend(): void {
+    this.requireReady_();
+    this.engine_.setRenderSuspended(true);
+  }
+
+  resume(): void {
+    this.requireReady_();
+    this.engine_.setRenderSuspended(false);
+  }
+
   // ---- Catalog ------------------------------------------------------------
 
   upsertObjects(objects: EmbedObject[]): EmbedUpsertResult[] {
@@ -441,12 +453,25 @@ export class KeepTrackEmbed implements KeepTrackEmbedApi {
   setObjectStyle(ref: ObjectRef, style: EmbedObjectStyle | null): void {
     this.requireReady_();
     this.style_.setObjectStyle(ref, style);
+    const id = this.catalog_.resolveRef(ref);
+
+    if (id !== null) {
+      this.tracks_.restyle(id);
+    }
     this.tracks_.invalidate();
   }
 
   setLayers(layers: Partial<EmbedLayers>): void {
     this.requireReady_();
+    this.applyLayers_(layers);
+  }
+
+  /** Style layers plus the marker-label switch (marker overlay text follows layers.labels 'none'). */
+  private applyLayers_(layers: Partial<EmbedLayers>): void {
     this.style_.setLayers(layers);
+    if (layers.labels !== undefined) {
+      this.overlays_.surface.setLabelsHidden(layers.labels === 'none');
+    }
   }
 
   setPositionStream(stream: { refs: ObjectRef[] | 'host'; hz: number } | null): void {

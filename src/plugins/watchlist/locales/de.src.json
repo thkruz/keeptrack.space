@@ -50,6 +50,10 @@
             "fovOnly": "Nur FOV",
             "all": "Gesamte Beobachtungsliste"
           }
+        },
+        "showSensorLabels": {
+          "label": "Sensorbeschriftungen anzeigen",
+          "helpText": "Zeigt den Sensornamen neben seiner Markierung auf dem Globus und der flachen Karte."
         }
       },
       "rmbMenu": {

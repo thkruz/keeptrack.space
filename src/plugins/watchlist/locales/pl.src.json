@@ -50,6 +50,10 @@
             "fovOnly": "Tylko FOV",
             "all": "Cała lista obserwowanych"
           }
+        },
+        "showSensorLabels": {
+          "label": "Pokaż etykiety czujników",
+          "helpText": "Rysuje nazwę czujnika obok jego znacznika na globie i mapie płaskiej."
         }
       },
       "rmbMenu": {

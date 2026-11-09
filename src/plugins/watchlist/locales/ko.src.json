@@ -50,6 +50,10 @@
             "fovOnly": "FOV만",
             "all": "전체 관심 목록"
           }
+        },
+        "showSensorLabels": {
+          "label": "센서 라벨 표시",
+          "helpText": "지구본과 평면 지도의 센서 마커 옆에 센서 이름을 표시합니다."
         }
       },
       "rmbMenu": {

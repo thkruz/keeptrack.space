@@ -50,6 +50,10 @@
             "fovOnly": "仅FOV",
             "all": "全部关注列表"
           }
+        },
+        "showSensorLabels": {
+          "label": "显示传感器标签",
+          "helpText": "在地球仪和平面地图上的传感器标记旁绘制传感器名称。"
         }
       },
       "rmbMenu": {

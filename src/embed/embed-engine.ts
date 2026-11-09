@@ -39,6 +39,8 @@ export interface EngineSurfaceSpec {
   strips: { lat: number; lon: number }[][];
   color: EmbedColor;
   dashed: boolean;
+  /** Translucent fill of the ring in strips[0], fanned from this center. Omit for outline only. */
+  fillCenter?: { lat: number; lon: number };
 }
 
 /** Runtime-toggleable UI flags (the engine reads these on every use). */
@@ -96,6 +98,9 @@ export interface EmbedEngine {
   setTimeMs(timeMs: number): void;
   setRate(rate: number): void;
 
+  /** Park (true) or restart (false) the render/update loop. */
+  setRenderSuspended(suspended: boolean): void;
+
   // Events (subscriptions live for the page's lifetime)
   onSelectionChanged(cb: (id: number) => void): void;
   onTimeChanged(cb: () => void): void;
@@ -139,6 +144,8 @@ export interface EmbedEngine {
   setObjectHighlight(id: number, highlighted: boolean): void;
   /** Persistent names next to objects (replaces the previous set). Empty clears. */
   setObjectLabels(labels: EngineLabel[]): void;
+  /** Text next to fixed ground points (marker overlays; replaces the previous set). Empty clears. */
+  setMarkerLabels(labels: EngineMarkerLabel[]): void;
   /** Apply scene layers. Unset fields are left alone. `orbitIds` are the objects whose orbit line is drawn. */
   applyLayers(layers: EngineLayerState): void;
   /** Color/label of a host sensor's ground marker. */
@@ -151,6 +158,15 @@ export interface EngineLabel {
   sensor?: EngineSensor;
   text: string;
   bold: boolean;
+  color?: EmbedColor;
+}
+
+/** One marker-overlay text: anchored to a fixed lat/lon on the ground. */
+export interface EngineMarkerLabel {
+  key: string;
+  text: string;
+  latDeg: number;
+  lonDeg: number;
   color?: EmbedColor;
 }
 

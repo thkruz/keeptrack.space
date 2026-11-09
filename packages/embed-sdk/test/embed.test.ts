@@ -7,6 +7,8 @@ interface FakeFacade {
   isReady: boolean;
   version: string;
   select: ReturnType<typeof vi.fn>;
+  suspend: ReturnType<typeof vi.fn>;
+  resume: ReturnType<typeof vi.fn>;
   on: ReturnType<typeof vi.fn>;
   offs: ReturnType<typeof vi.fn>[];
 }
@@ -17,6 +19,8 @@ function makeFacade(isReady: boolean): FakeFacade {
     isReady,
     version: '1.0.0',
     select: vi.fn(async () => true),
+    suspend: vi.fn(),
+    resume: vi.fn(),
     on: vi.fn(() => {
       const off = vi.fn();
 
@@ -196,7 +200,9 @@ describe('createKeepTrackEmbed', () => {
     expect(facade.offs[1]).toHaveBeenCalledTimes(1);
     embed.hide();
     expect(embed.iframe.style.display).toBe('none');
+    expect(facade.suspend).toHaveBeenCalledTimes(1);
     embed.show();
+    expect(facade.resume).toHaveBeenCalledTimes(1);
     embed.destroy();
     embed.destroy();
     expect(facade.offs[0]).toHaveBeenCalledTimes(1);

@@ -1,5 +1,6 @@
 /* eslint-disable max-lines-per-function */
 
+import { CameraType } from '@app/engine/camera/camera-type';
 import { SolarBody } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -105,6 +106,23 @@ describe('line-manager subclasses', () => {
           [7121, 0, 0],
         ],
       ]);
+    });
+
+    it('points north along the surface in the flat map, where altitude is invisible', () => {
+      const line = new SensorMarkerLine(sensorWithEci(6371, 0, 0));
+      const calls = capture(line);
+      const spy = vi.spyOn(ServiceLocator, 'getMainCamera').mockReturnValue({ cameraType: CameraType.FLAT_MAP } as never);
+
+      line.update();
+      spy.mockRestore();
+
+      const [base, tip] = calls[0];
+
+      expect(base).toEqual([6371, 0, 0]);
+      // Same radius, displaced toward +z (north), no east/west component
+      expect(Math.hypot(...(tip as [number, number, number]))).toBeCloseTo(6371, 3);
+      expect(tip[2]).toBeGreaterThan(700);
+      expect(tip[1]).toBeCloseTo(0, 6);
     });
 
     it('describes itself with the sensorMarker kind and the group detail', () => {

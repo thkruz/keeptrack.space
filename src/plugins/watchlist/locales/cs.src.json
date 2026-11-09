@@ -50,6 +50,10 @@
             "fovOnly": "Pouze FOV",
             "all": "Celý seznam sledovaných"
           }
+        },
+        "showSensorLabels": {
+          "label": "Zobrazit popisky senzorů",
+          "helpText": "Vykreslí název senzoru vedle jeho značky na globu a ploché mapě."
         }
       },
       "rmbMenu": {

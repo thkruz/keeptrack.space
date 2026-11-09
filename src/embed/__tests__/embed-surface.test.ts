@@ -176,6 +176,31 @@ describe('ground tracks', () => {
     expect(future.dashed).toBe(false);
   });
 
+  it('recolors a track right away when its object style changes, and keeps the color across overlay rebuilds', () => {
+    const { api, engine } = make();
+
+    api.setGroundTracks([{ hostId: 'iss' }], opts);
+    const calls = engine.surfaceUpdates;
+
+    api.setObjectStyle({ hostId: 'iss' }, { color: [0.1, 0.2, 0.9, 1] });
+    expect(engine.surfaceUpdates).toBeGreaterThan(calls);
+    expect([...engine.surfaceLines.values()].map((s) => s.color)).toEqual([
+      [0.1, 0.2, 0.9, 1],
+      [0.1, 0.2, 0.9, 1],
+    ]);
+    api.addOverlay({ type: 'circle', center: { lat: 0, lon: 0 }, radius: { deg: 5 } });
+    api.clearOverlays();
+    api.addOverlay({ type: 'circle', center: { lat: 0, lon: 0 }, radius: { deg: 5 } });
+    api.setObjectStyle({ hostId: 'iss' }, { color: [0.9, 0.2, 0.1, 1] });
+    const tracks = [...engine.surfaceLines.values()].filter((s) => s.strips[0]?.length === 91);
+
+    expect(tracks.map((s) => s.color)).toEqual([
+      [0.9, 0.2, 0.1, 1],
+      [0.9, 0.2, 0.1, 1],
+    ]);
+    expect(engine.objectColors.size).toBe(1);
+  });
+
   it('validates options and refs', () => {
     const { api } = make();
 
@@ -329,6 +354,18 @@ describe('surface overlays', () => {
     expect(poly.strips[0].length).toBe(21);
   });
 
+  it('sends marker overlay labels to the engine and clears them when the marker goes', () => {
+    const { api, engine } = make();
+
+    const id = api.addOverlay({ type: 'marker', position: { lat: 10, lon: 20 }, label: 'Target A', color: [1, 0, 0, 1] });
+    const sent = engine.markerLabelSets.at(-1) as { text: string; latDeg: number; lonDeg: number }[];
+
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).toMatchObject({ text: 'Target A', latDeg: 10, lonDeg: 20 });
+    api.removeOverlay(id);
+    expect(engine.markerLabelSets.at(-1)).toEqual([]);
+  });
+
   it('validates input', () => {
     const { api } = make();
 
@@ -360,13 +397,32 @@ describe('surface overlays', () => {
     expect(engine.surfaceLines.size).toBe(0);
   });
 
-  it('warns once that fill is outline-only', () => {
-    const { api } = make();
+  it('hides marker labels while layers.labels is none and restores them after', () => {
+    const { api, engine } = make();
+
+    api.addOverlay({ type: 'marker', position: { lat: 5, lon: 6 }, label: 'GW' });
+    expect((engine.markerLabelSets.at(-1) as unknown[]).length).toBe(1);
+    api.setLayers({ labels: 'none' });
+    expect(engine.markerLabelSets.at(-1)).toEqual([]);
+    api.addOverlay({ type: 'marker', position: { lat: 7, lon: 8 }, label: 'X' });
+    expect(engine.markerLabelSets.at(-1)).toEqual([]);
+    api.setLayers({ labels: 'host' });
+    expect((engine.markerLabelSets.at(-1) as unknown[]).length).toBe(2);
+  });
+
+  it('passes the fill center for circle and ellipse with fill, and none without', () => {
+    const { api, engine } = make();
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    api.addOverlay({ type: 'circle', center: { lat: 0, lon: 0 }, radius: { deg: 5 }, fill: true });
-    api.addOverlay({ type: 'circle', center: { lat: 0, lon: 0 }, radius: { deg: 6 }, fill: true });
-    expect(warn).toHaveBeenCalledTimes(1);
+    api.addOverlay({ type: 'circle', center: { lat: 10, lon: 20 }, radius: { deg: 5 }, fill: true });
+    api.addOverlay({ type: 'circle', center: { lat: 1, lon: 2 }, radius: { deg: 6 } });
+    api.addOverlay({ type: 'ellipse', center: { lat: 30, lon: 40 }, semiMajorKm: 100, semiMinorKm: 50, bearingDeg: 0, fill: true });
+    const specs = [...engine.surfaceLines.values()];
+
+    expect(specs[0].fillCenter).toEqual({ lat: 10, lon: 20 });
+    expect(specs[1].fillCenter).toBeUndefined();
+    expect(specs[2].fillCenter).toEqual({ lat: 30, lon: 40 });
+    expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
 });

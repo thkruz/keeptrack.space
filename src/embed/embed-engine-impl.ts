@@ -18,6 +18,7 @@ import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import type { Line } from '@app/engine/rendering/line-manager/line';
 import { SensorMarkerLine } from '@app/engine/rendering/line-manager/sensor-marker-line';
 import { SurfaceLine } from '@app/engine/rendering/line-manager/surface-line';
+import type { ExtraLabelSpec } from '@app/engine/rendering/sat-label-manager';
 import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { SatLabelMode } from '@app/settings/ui-settings';
 import { type Degrees, eci2lla, type Kilometers, type Satellite, Sgp4, SpaceObjectType, ZoomValue } from '@ootk/src/main';
@@ -30,6 +31,7 @@ import type {
   EngineLayerState,
   EngineLine,
   EngineLineSpec,
+  EngineMarkerLabel,
   EngineObjectData,
   EngineRuntimeUi,
   EngineSensor,
@@ -37,7 +39,6 @@ import type {
   EngineSurfaceSpec,
   EngineTle,
 } from './embed-engine';
-import { EmbedLabelLayer } from './embed-label-layer';
 import {
   type EmbedAccessWindow,
   type EmbedCameraMode,
@@ -70,7 +71,6 @@ const FULL_MODE_SLOT_START = 500;
 export class KeepTrackEmbedEngine implements EmbedEngine {
   private cameraTimers_: ReturnType<typeof setTimeout>[] = [];
   private guardsInstalled_ = false;
-  private readonly labelLayer_ = new EmbedLabelLayer();
   private readonly sensorMarkers_ = new Map<string, Line>();
   private orbitIds_: number[] = [];
   private orbitsHooked_ = false;
@@ -261,6 +261,16 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     ServiceLocator.getTimeManager().changePropRate(rate, false);
   }
 
+  setRenderSuspended(suspended: boolean): void {
+    const engine = window.keepTrack?.engine;
+
+    if (suspended) {
+      engine?.suspendLoop();
+    } else {
+      engine?.resumeLoop();
+    }
+  }
+
   // ---- Events -------------------------------------------------------------
 
   onSelectionChanged(cb: (id: number) => void): void {
@@ -417,7 +427,7 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
   }
 
   addSurfaceLine(spec: EngineSurfaceSpec): EngineLine | null {
-    const line = new SurfaceLine(spec.strips, spec.color as never, spec.dashed);
+    const line = new SurfaceLine(spec.strips, spec.color as never, spec.dashed, spec.fillCenter ? { center: spec.fillCenter } : undefined);
 
     lineManagerInstance.add(line);
 
@@ -427,7 +437,7 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
   updateSurfaceLine(line: EngineLine, spec: EngineSurfaceSpec): void {
     if (line instanceof SurfaceLine) {
       line.setColor(spec.color as never);
-      line.setStrips(spec.strips, spec.dashed);
+      line.setStrips(spec.strips, spec.dashed, spec.fillCenter ? { center: spec.fillCenter } : undefined);
     }
   }
 
@@ -465,8 +475,38 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     ServiceLocator.getDotsManager()?.setDotHighlighted(id, highlighted);
   }
 
+  /**
+   * Host names are drawn by the engine's GPU label pass (SatLabelManager), which projects in the draw pass with the
+   * matrix of that frame, so they stay on their dot or marker in every camera mode.
+   */
   setObjectLabels(labels: EngineLabel[]): void {
-    this.labelLayer_.set(labels);
+    const specs: ExtraLabelSpec[] = [];
+
+    for (const label of labels) {
+      const color = label.color ? ([label.color[0], label.color[1], label.color[2]] as [number, number, number]) : undefined;
+
+      if (label.sensor) {
+        const det = label.sensor as unknown as DetailedSensor;
+
+        if (typeof det.lat === 'number' && typeof det.lon === 'number') {
+          specs.push({ key: `sensor:${det.objName}`, text: label.text, ground: { latDeg: det.lat, lonDeg: det.lon, altKm: det.alt ?? 0 }, color });
+        }
+      } else if (label.id !== undefined) {
+        specs.push({ key: `host:${label.id}`, text: label.text, satId: label.id, color });
+      }
+    }
+    ServiceLocator.getSatLabelManager()?.setHostLabels(specs);
+  }
+
+  setMarkerLabels(labels: EngineMarkerLabel[]): void {
+    ServiceLocator.getSatLabelManager()?.setMarkerLabels(
+      labels.map((m) => ({
+        key: `marker:${m.key}`,
+        text: m.text,
+        ground: { latDeg: m.latDeg, lonDeg: m.lonDeg, altKm: 0 },
+        color: m.color ? ([m.color[0], m.color[1], m.color[2]] as [number, number, number]) : undefined,
+      }))
+    );
   }
 
   setSensorStyle(sensor: EngineSensor, style: { color?: EmbedColor; label?: string }): void {

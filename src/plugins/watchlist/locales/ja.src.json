@@ -50,6 +50,10 @@
             "fovOnly": "FOV内のみ",
             "all": "ウォッチリスト全体"
           }
+        },
+        "showSensorLabels": {
+          "label": "センサーラベルを表示",
+          "helpText": "地球儀と平面地図のセンサーマーカーの横にセンサー名を描画します。"
         }
       },
       "rmbMenu": {

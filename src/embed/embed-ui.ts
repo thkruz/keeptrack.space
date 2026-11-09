@@ -6,7 +6,8 @@ const STYLE_ID = 'keeptrack-embed-ui';
 
 /** Elements with no engine setting to switch them off are hidden with CSS. */
 const HIDE_SELECTORS: Partial<Record<keyof EmbedUiFlags, string[]>> = {
-  bottomMenu: ['#nav-footer'],
+  // The v13 plugin drawer replaced the old bottom bar; hide both generations of menu chrome
+  bottomMenu: ['#nav-footer', '#plugin-drawer', '#drawer-hamburger', '#drawer-utility-footer', '#drawer-overlay'],
   topMenu: ['#nav-wrapper'],
   search: ['#search-holder', '#search-results'],
   timeControls: ['#datetime-text', '#datetime-input', '#time-slider-container'],

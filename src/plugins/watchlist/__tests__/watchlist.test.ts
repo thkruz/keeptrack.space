@@ -1,6 +1,6 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { hasSettingsContribution, ISettingSelectControl } from '@app/engine/plugins/core/plugin-capabilities';
+import { hasSettingsContribution, ISettingSelectControl, ISettingToggleControl } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { KeepTrack } from '@app/keeptrack';
@@ -308,16 +308,33 @@ describe('WatchlistPlugin settings contribution', () => {
     expect(hasSettingsContribution(plugin)).toBe(true);
   });
 
-  it('contributes a single select with three options spanning every SatLabelMode value', () => {
+  it('contributes the label-mode select and the sensor label toggle', () => {
     const contribution = plugin.getSettingsContribution();
 
     expect(contribution.sectionId).toBe('WatchlistPlugin');
-    expect(contribution.controls).toHaveLength(1);
+    expect(contribution.controls).toHaveLength(2);
     const control = contribution.controls[0] as ISettingSelectControl;
 
     expect(control.type).toBe('select');
     expect(control.id).toBe('satLabelMode');
     expect(control.options.map((o) => o.value)).toEqual([String(SatLabelMode.OFF), String(SatLabelMode.FOV_ONLY), String(SatLabelMode.ALL)]);
+  });
+
+  it('sensor label toggle reads and writes the setting (default off) and persists it', () => {
+    const toggle = plugin.getSettingsContribution().controls[1] as ISettingToggleControl;
+    const saveSpy = vi.spyOn(PersistenceManager.getInstance(), 'saveItem').mockImplementation(() => undefined);
+
+    expect(toggle.type).toBe('toggle');
+    expect(toggle.id).toBe('showSensorLabels');
+    settingsManager.isShowSensorLabels = false;
+    expect(toggle.get()).toBe(false);
+
+    toggle.set(true);
+    expect(settingsManager.isShowSensorLabels).toBe(true);
+    expect(saveSpy).toHaveBeenCalledWith(StorageKey.SETTINGS_SHOW_SENSOR_LABELS, 'true');
+
+    toggle.set(false);
+    expect(settingsManager.isShowSensorLabels).toBe(false);
   });
 
   it('get() returns the current satLabelMode serialized to the matching option value', () => {

@@ -1,3 +1,4 @@
+import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { MeshManager } from '@app/engine/rendering/mesh-manager';
 import { Degrees, Kilometers } from '@ootk/src/main';
@@ -84,6 +85,23 @@ describe('WebGLRenderer accessors', () => {
       expect(result).toHaveProperty('x');
       expect(result).toHaveProperty('y');
       expect(typeof result.error).toBe('boolean');
+    });
+
+    it('never mutates the object position, even with a non-zero worldShift', () => {
+      const renderer = ServiceLocator.getRenderer();
+      const scene = Scene.getInstance();
+      const savedShift = scene.worldShift;
+      const obj = { id: 1, position: { x: 7000 as Kilometers, y: 100 as Kilometers, z: 200 as Kilometers } };
+
+      scene.worldShift = [500, -300, 20];
+      try {
+        renderer.getScreenCoords(obj as never);
+        renderer.getScreenCoords(obj as never);
+      } finally {
+        scene.worldShift = savedShift;
+      }
+
+      expect(obj.position).toStrictEqual({ x: 7000, y: 100, z: 200 });
     });
   });
 });

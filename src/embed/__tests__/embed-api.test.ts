@@ -275,3 +275,26 @@ describe('time', () => {
     expect(fn).not.toHaveBeenCalled();
   });
 });
+
+describe('render parking', () => {
+  it('suspend and resume drive the engine loop and require readiness', async () => {
+    const { api, engine } = make();
+
+    await api.whenReady();
+    api.suspend();
+    expect(engine.renderSuspended).toBe(true);
+    api.resume();
+    expect(engine.renderSuspended).toBe(false);
+  });
+
+  it('keeps host time control working across a suspend', async () => {
+    const { api, engine } = make({ ownership: { time: 'host' } });
+
+    await api.whenReady();
+    api.suspend();
+    api.setTime(9000);
+    api.resume();
+    expect(engine.timeMs).toBe(9000);
+    expect(api.getTime().timeMs).toBe(9000);
+  });
+});

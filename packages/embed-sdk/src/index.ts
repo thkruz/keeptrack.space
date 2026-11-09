@@ -32,7 +32,7 @@ export type KeepTrackEmbed = Omit<KeepTrackEmbedApi, 'on'> & {
   readonly iframe: HTMLIFrameElement;
   /** Subscribe to an engine event. The listener is removed by destroy() if not unsubscribed earlier. */
   on<E extends EmbedEventName>(event: E, listener: (payload: EmbedEventMap[E]) => void): () => void;
-  /** display:none; browsers stop requestAnimationFrame in hidden iframes, which parks the render loop. */
+  /** display:none plus suspend(): the engine cancels its animation frames, so a parked embed costs no CPU. */
   hide(): void;
   show(): void;
   destroy(): void;
@@ -42,7 +42,7 @@ const READY_POLL_MS = 100;
 
 const FORWARDED_METHODS = [
   'whenReady', 'getLicense', 'select', 'getSelected', 'setCamera', 'getTime', 'setTime', 'setRate',
-  'pause', 'play', 'upsertObjects', 'removeObjects', 'getObject', 'listHostObjects', 'upsertSensors',
+  'pause', 'play', 'suspend', 'resume', 'upsertObjects', 'removeObjects', 'getObject', 'listHostObjects', 'upsertSensors',
   'removeSensors', 'setActiveSensors', 'addOverlay', 'removeOverlay', 'clearOverlays', 'setGroundTracks', 'setUi',
   'setObjectStyle', 'setLayers', 'setPositionStream',
   'getPosition', 'getLookAngles', 'getAccessWindows', 'screenshot', 'execute',
@@ -188,9 +188,12 @@ export async function createKeepTrackEmbed(options: CreateKeepTrackEmbedOptions)
     iframe,
     hide: () => {
       iframe.style.display = 'none';
+      // Chromium keeps requestAnimationFrame running in a display:none iframe, so park the engine loop too.
+      facadeOf(iframe)?.suspend?.();
     },
     show: () => {
       iframe.style.display = 'block';
+      facadeOf(iframe)?.resume?.();
     },
     destroy,
     on<E extends EmbedEventName>(event: E, listener: (payload: EmbedEventMap[E]) => void): () => void {

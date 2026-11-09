@@ -24,6 +24,9 @@ interface TrackEntry {
   lastComputeWall: number;
   past: EngineLine | null;
   future: EngineLine | null;
+  /** Last computed geometry, kept so a style change can recolor without propagating again. */
+  pastStrips: EmbedLatLon[][];
+  futureStrips: EmbedLatLon[][];
 }
 
 interface ResolvedOptions extends EmbedGroundTrackOptions {
@@ -194,7 +197,7 @@ export class EmbedTracks {
       let entry = this.entries_.get(id);
 
       if (!entry) {
-        entry = { id, sig: '', centerMs: Number.NaN, lastComputeWall: -Infinity, past: null, future: null };
+        entry = { id, sig: '', centerMs: Number.NaN, lastComputeWall: -Infinity, past: null, future: null, pastStrips: [], futureStrips: [] };
         this.entries_.set(id, entry);
       }
       const sigChanged = sig !== entry.sig || Number.isNaN(entry.centerMs);
@@ -240,15 +243,30 @@ export class EmbedTracks {
         future[future.length - 1].push(pt);
       }
     }
-    const base = this.colorFor(entry.id) ?? DEFAULT_COLOR;
-    const pastSpec: EngineSurfaceSpec = { strips: past, color: this.options_.past?.color ?? base, dashed: this.options_.past?.dashed ?? false };
-    const futureSpec: EngineSurfaceSpec = { strips: future, color: this.options_.future?.color ?? base, dashed: this.options_.future?.dashed ?? true };
-
-    entry.past = this.upsertLine_(entry.past, pastSpec);
-    entry.future = this.upsertLine_(entry.future, futureSpec);
+    entry.pastStrips = past;
+    entry.futureStrips = future;
+    this.draw_(entry);
     entry.centerMs = nowMs;
     entry.sig = sig;
     entry.lastComputeWall = wall;
+  }
+
+  private draw_(entry: TrackEntry): void {
+    const base = this.colorFor(entry.id) ?? DEFAULT_COLOR;
+    const pastSpec: EngineSurfaceSpec = { strips: entry.pastStrips, color: this.options_.past?.color ?? base, dashed: this.options_.past?.dashed ?? false };
+    const futureSpec: EngineSurfaceSpec = { strips: entry.futureStrips, color: this.options_.future?.color ?? base, dashed: this.options_.future?.dashed ?? true };
+
+    entry.past = this.upsertLine_(entry.past, pastSpec);
+    entry.future = this.upsertLine_(entry.future, futureSpec);
+  }
+
+  /** An object's style color changed: redraw its track in the new color from the cached geometry. */
+  restyle(id: number): void {
+    const entry = this.entries_.get(id);
+
+    if (entry && !Number.isNaN(entry.centerMs)) {
+      this.draw_(entry);
+    }
   }
 
   private upsertLine_(line: EngineLine | null, spec: EngineSurfaceSpec): EngineLine | null {

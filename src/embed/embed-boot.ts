@@ -57,11 +57,14 @@ export function resolveUiFlags(config: EmbedConfig): Partial<EmbedUiFlags> {
  *    isBlockPersistence, isDisableLoginGate, isShowSplashScreen=false, isShowLoadingHints=false,
  *    isShowSecondaryLogo=false, isDisableUrlBar
  *  - catalog.mode 'scenario': noCatalogOnLoad, maxAnalystSats (>= 1024), isEnableJscCatalog=false,
- *    isDisableLaunchSites, isDisableControlSites
+ *    isDisableLaunchSites, isDisableControlSites, isDisablePlanets (also drops deep-space probes)
+ *    and StarsPlugin disabled (no star-catalog / constellations fetch)
+ *  - ownership.sensors 'host': isDisableSensors (built-in sensor list never loads)
  *  - plugins.allow: plugins {id: {enabled: true}} + isStrictPluginList
  *  - ui.bottomMenu/search/keyboard/contextMenu/toasts: isDisableBottomMenu / isDisableSearchBox /
- *    isDisableKeyboard / isAllowRightClick / isDisableToasts. topMenu, timeControls and infoBox have no
- *    setting; they are hidden with CSS (embed-ui.ts).
+ *    isDisableKeyboard / isAllowRightClick / isDisableToasts. topMenu and timeControls have no setting; they
+ *    are hidden with CSS (embed-ui.ts). infoBox false is hidden with CSS and also sets enableHoverOverlay /
+ *    enableHoverOrbits false (no hover tooltip).
  *  - ownership.selection 'host': isDisableSelectSat (the facade lifts it around host calls)
  */
 export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: SettingsOverrideLike = {}): SettingsOverrideLike {
@@ -88,6 +91,15 @@ export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: Sett
     out.isEnableJscCatalog = false;
     out.isDisableLaunchSites = true;
     out.isDisableControlSites = true;
+    // Scenario embeds show only host content: no planets and no deep-space probes (they load together).
+    out.isDisablePlanets = true;
+    // No star catalog or constellation figures: the Stars plugin would fetch both from the CDN at init.
+    out.plugins = { ...(baseOverride.plugins as Record<string, unknown> | undefined), StarsPlugin: { enabled: false } };
+  }
+
+  // A host that owns sensors supplies the whole list; KeepTrack's built-in sensors never load.
+  if (config.ownership?.sensors === 'host') {
+    out.isDisableSensors = true;
   }
 
   const allow = config.plugins?.allow;
@@ -98,7 +110,7 @@ export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: Sett
     for (const id of allow) {
       plugins[id] = { enabled: true };
     }
-    out.plugins = { ...(baseOverride.plugins as Record<string, unknown> | undefined), ...plugins };
+    out.plugins = { ...((out.plugins ?? baseOverride.plugins) as Record<string, unknown> | undefined), ...plugins };
     out.isStrictPluginList = true;
   }
 
@@ -118,6 +130,11 @@ export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: Sett
   }
   if (ui.toasts === false) {
     out.isDisableToasts = true;
+  }
+  if (ui.infoBox === false) {
+    // The hover tooltip is the same info card; hosts that turn the info box off do not want it on hover either.
+    out.enableHoverOverlay = false;
+    out.enableHoverOrbits = false;
   }
 
   if (config.ownership?.selection === 'host') {

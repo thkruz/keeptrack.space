@@ -485,13 +485,12 @@ export class WebGLRenderer {
       }
 
       // We need to account for Scene.getInstance().worldShift and modify x, y, z accordingly
-      pos.x = (pos.x + Scene.getInstance().worldShift[0]) as Kilometers;
-      pos.y = (pos.y + Scene.getInstance().worldShift[1]) as Kilometers;
-      pos.z = (pos.z + Scene.getInstance().worldShift[2]) as Kilometers;
-
-      let px = pos.x as number;
-      let py = pos.y as number;
-      let pz = pos.z as number;
+      // Work on local copies: writing the shift back into obj.position corrupts catalog objects
+      // (it accumulates every call whenever worldShift is non-zero).
+      const worldShift = Scene.getInstance().worldShift;
+      let px = (pos.x as number) + worldShift[0];
+      let py = (pos.y as number) + worldShift[1];
+      let pz = (pos.z as number) + worldShift[2];
 
       // In flat map mode, convert ECI to flat map coordinates (must match the shader)
       if (mainCamera.cameraType === CameraType.FLAT_MAP) {
@@ -564,6 +563,14 @@ export class WebGLRenderer {
     }
 
     const { vw, vh } = WebGLRenderer.getCanvasInfo();
+
+    /*
+     * A hidden container (display:none, e.g. a parked embed iframe) reports 0 x 0. Keep the last good
+     * size instead of collapsing the canvas, which nothing would grow back once it is shown again.
+     */
+    if (vw <= 0 || vh <= 0) {
+      return;
+    }
     /*
      * Backing-store scale (settingsManager.canvasPixelRatio): 1 = historical
      * CSS-pixel rendering; 0 = auto min(devicePixelRatio, 2); >1 used as-is

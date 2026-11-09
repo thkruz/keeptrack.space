@@ -168,12 +168,24 @@ export class FakeEngine implements EmbedEngine {
     this.labelSets.push(labels);
   }
 
+  markerLabelSets: unknown[][] = [];
+
+  setMarkerLabels(labels: unknown[]): void {
+    this.markerLabelSets.push(labels);
+  }
+
   applyLayers(layers: unknown): void {
     this.layerCalls.push(layers);
   }
 
   setSensorStyle(sensor: EngineSensor, style: unknown): void {
     this.sensorStyles.push({ sensor, style });
+  }
+
+  renderSuspended = false;
+
+  setRenderSuspended(suspended: boolean): void {
+    this.renderSuspended = suspended;
   }
 
   getTimeMs(): number {

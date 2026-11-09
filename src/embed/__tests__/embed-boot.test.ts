@@ -50,11 +50,36 @@ describe('mapEmbedConfigToSettings', () => {
     expect(out.noCatalogOnLoad).toBeUndefined();
   });
 
+  it('drops planets and deep-space probes in scenario mode only', () => {
+    expect(mapEmbedConfigToSettings({ catalog: { mode: 'scenario' } }).isDisablePlanets).toBe(true);
+    expect(mapEmbedConfigToSettings({ catalog: { mode: 'full' } }).isDisablePlanets).toBeUndefined();
+  });
+
+  it('skips the built-in sensor list when the host owns sensors', () => {
+    expect(mapEmbedConfigToSettings({ ownership: { sensors: 'host' } }).isDisableSensors).toBe(true);
+    expect(mapEmbedConfigToSettings({ ownership: { sensors: 'shared' } }).isDisableSensors).toBeUndefined();
+    expect(mapEmbedConfigToSettings({}).isDisableSensors).toBeUndefined();
+  });
+
   it('turns plugins.allow into a strict allowlist', () => {
     const out = mapEmbedConfigToSettings({ plugins: { allow: ['StarsPlugin'] } }, { plugins: { Other: { enabled: true } } });
 
     expect(out.isStrictPluginList).toBe(true);
     expect(out.plugins).toEqual({ Other: { enabled: true }, StarsPlugin: { enabled: true } });
+  });
+
+  it('scenario mode disables the Stars plugin (no star-catalog or constellations fetch), allow list included', () => {
+    expect(mapEmbedConfigToSettings({ catalog: { mode: 'scenario' } }).plugins).toEqual({ StarsPlugin: { enabled: false } });
+    expect(mapEmbedConfigToSettings({ catalog: { mode: 'full' } }).plugins).toBeUndefined();
+    const out = mapEmbedConfigToSettings({ catalog: { mode: 'scenario' }, plugins: { allow: ['FlatMapView'] } }, { plugins: { Other: { enabled: true } } });
+
+    expect(out.plugins).toEqual({ Other: { enabled: true }, StarsPlugin: { enabled: false }, FlatMapView: { enabled: true } });
+  });
+
+  it('infoBox false also turns off the hover tooltip', () => {
+    expect(mapEmbedConfigToSettings({ ui: { infoBox: false } })).toMatchObject({ enableHoverOverlay: false, enableHoverOrbits: false });
+    expect(mapEmbedConfigToSettings({ ui: { infoBox: true } }).enableHoverOverlay).toBeUndefined();
+    expect(mapEmbedConfigToSettings({}).enableHoverOverlay).toBeUndefined();
   });
 
   it('maps ui flags to existing settings', () => {

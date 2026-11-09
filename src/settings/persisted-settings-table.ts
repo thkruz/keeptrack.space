@@ -154,6 +154,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_SHOW_SENSOR_LABELS,
+    serialize: (sm) => String(sm.isShowSensorLabels),
+    deserialize: (sm, raw) => {
+      sm.isShowSensorLabels = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_SHOW_EPOCH_AGE,
     serialize: (sm) => String(sm.isShowEpochAge),
     deserialize: (sm, raw) => {

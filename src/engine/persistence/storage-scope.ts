@@ -98,6 +98,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_DRAW_FLAG_DECALS]: StorageScope.Device,
   [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,
+  [StorageKey.SETTINGS_SHOW_SENSOR_LABELS]: StorageScope.Device,
   // Phones default hover info off; Next Pass on hover is a fast-CPU option.
   [StorageKey.SETTINGS_SHOW_INFO_ON_HOVER]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_NEXT_PASS]: StorageScope.Device,

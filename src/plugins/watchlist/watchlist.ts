@@ -150,6 +150,17 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
             PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, parsed.toString());
           },
         },
+        {
+          type: 'toggle',
+          id: 'showSensorLabels',
+          label: t7e('plugins.WatchlistPlugin.settings.showSensorLabels.label'),
+          helpText: t7e('plugins.WatchlistPlugin.settings.showSensorLabels.helpText'),
+          get: () => settingsManager.isShowSensorLabels,
+          set: (next: boolean) => {
+            settingsManager.isShowSensorLabels = next;
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_SENSOR_LABELS, next.toString());
+          },
+        },
       ],
     };
   }

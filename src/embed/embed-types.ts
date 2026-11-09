@@ -15,7 +15,7 @@
  * Licensed under the MIT License (unlike the AGPL engine) so hosts can vendor it.
  */
 
-export const EMBED_API_VERSION = '1.2.0';
+export const EMBED_API_VERSION = '1.3.0';
 
 // ---------------------------------------------------------------------------
 // Boot configuration
@@ -228,7 +228,7 @@ export interface EmbedFootprintOverlay extends EmbedLineStyle {
   type: 'footprint';
   object: ObjectRef;
   minElDeg: number;
-  /** Translucent fill (alpha taken from color). Default false. */
+  /** Translucent fill under the outline (a quarter of the color's alpha). Default false. */
   fill?: boolean;
 }
 
@@ -240,6 +240,7 @@ export interface EmbedCircleOverlay extends EmbedLineStyle {
   type: 'circle';
   center: { sensor: string } | EmbedLatLon;
   radius: { deg: number } | { accessOf: ObjectRef; minElDeg: number };
+  /** Translucent fill under the outline (a quarter of the color's alpha). Default false. */
   fill?: boolean;
 }
 
@@ -259,6 +260,7 @@ export interface EmbedEllipseOverlay extends EmbedLineStyle {
   semiMajorKm: number;
   semiMinorKm: number;
   bearingDeg: number;
+  /** Translucent fill under the outline (a quarter of the color's alpha). Default false. */
   fill?: boolean;
 }
 
@@ -434,6 +436,15 @@ export interface KeepTrackEmbedApi {
   setRate(rate: number): void;
   pause(): void;
   play(): void;
+
+  // Render parking (1.3)
+  /**
+   * Stop the render/update loop (cancels requestAnimationFrame) so a parked embed costs no CPU. Simulation
+   * time keeps following the clock; no events or position streams fire while suspended.
+   */
+  suspend(): void;
+  /** Restart a suspended loop; forces a canvas resize and a redraw. */
+  resume(): void;
 
   // Catalog
   upsertObjects(objects: EmbedObject[]): EmbedUpsertResult[];

@@ -59,6 +59,7 @@ import {
 } from './earth-quality-enums';
 import { PoliticalMap } from './political-map';
 import { OcclusionProgram } from './post-processing';
+import { RELIEF_NORMAL_GLSL } from './relief-shading';
 
 export class Earth {
   private gl_: WebGL2RenderingContext;
@@ -385,6 +386,7 @@ export class Earth {
             uRawZoomLevel: <WebGLUniformLocation>(<unknown>null),
             uisDrawNightAsDay: <WebGLUniformLocation>(<unknown>null),
             uNightBrightness: <WebGLUniformLocation>(<unknown>null),
+            uReliefExaggeration: <WebGLUniformLocation>(<unknown>null),
           },
           vertexShader: this.shaders.surfaceVert,
           fragmentShader: this.shaders.surfaceFrag,
@@ -828,6 +830,7 @@ export class Earth {
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisDrawNightAsDay, settingsManager.isDrawNightAsDay ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uNightBrightness, settingsManager.earthNightBrightness ?? 1.0);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uReliefExaggeration, settingsManager.terrainReliefExaggeration ?? 2.5);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uShowGraticule, settingsManager.isDrawGraticule ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageEnabled, this.isDrawCoverageOverlay ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageOpacity, this.coverageOverlayOpacity);
@@ -1140,6 +1143,7 @@ export class Earth {
     uniform float uisGrayScale;
     uniform float uisDrawNightAsDay;
     uniform float uNightBrightness;
+    uniform float uReliefExaggeration;
 
     in vec2 vUv;
     in vec3 vNormal;
@@ -1176,6 +1180,12 @@ export class Earth {
       return mix(yellow, red, (t - 0.66) / 0.34);
     }
 
+    // Terrain relief from the bump map (0 = sea level, 1 = ~8.8 km), scaled by
+    // uReliefExaggeration (settingsManager.terrainReliefExaggeration; 0 = off).
+    const float RELIEF_HEIGHT_KM = 8.8;
+
+    ${RELIEF_NORMAL_GLSL}
+
     void main(void) {
       float fragToLightAngle = dot( vNormal, uLightDirection ) * 0.5 + 0.5; //Remake -1 > 1 to 0 > 1
       vec3 fragToCamera = normalize(vVertToCamera);
@@ -1199,8 +1209,16 @@ export class Earth {
       }
 
       //.................................................
-      // Bump mapping
-      vec3 bumpTexColor = texture(uBumpMap, vUv).rgb * diffuse * 0.4;
+      // Relief shading: the sunlit surface uses the terrain normal, while the
+      // terminator, night lights and clouds keep the smooth sphere normal so
+      // city lights and cloud shading do not flicker with the terrain.
+      float reliefDiffuse = diffuse;
+      vec3 reliefN = normalize(vNormal);
+      if (uIsAmbientLighting > 0.5) {
+        reliefN = reliefNormal(normalize(vNormal), vWorldPos, vUv, uBumpMap, RELIEF_HEIGHT_KM * uReliefExaggeration);
+        // Keep relief inside the lit hemisphere so it cannot light the night side.
+        reliefDiffuse = max(dot(reliefN, uLightDirection), 0.0) * smoothstep(0.0, 0.05, diffuse);
+      }
 
       //................................................
       // Specular lighting
@@ -1208,20 +1226,28 @@ export class Earth {
 
       //................................................
       // Final color
-      vec3 dayColor = (ambientLightColor + directionalLightColor) * diffuse;
-      vec3 dayTexColor = texture(uDayMap, vUv).rgb * dayColor;
-      vec3 nightColor = vec3(0.0);
+      vec3 surfaceColor;
 
       if (uisDrawNightAsDay < 0.5) {
+        vec3 dayColor = (ambientLightColor + directionalLightColor) * reliefDiffuse;
+        vec3 dayTexColor = texture(uDayMap, vUv).rgb * dayColor;
         // uNightBrightness gains up the night (city-lights) texture on the unlit side
         // so the dark limb is readable on dim mobile screens (1.0 = stock brightness).
-        nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * texture(uNightMap, vUv).rgb * pow(1.0 - diffuse, 2.0) * uNightBrightness;
+        vec3 nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * texture(uNightMap, vUv).rgb * pow(1.0 - diffuse, 2.0) * uNightBrightness;
+        surfaceColor = dayTexColor + nightColor + specLightColor;
       } else {
-        // If day night toggle is on, the nightColor should be bright like the day texture
-        nightColor = texture(uDayMap, vUv).rgb * pow(1.0 - diffuse, 2.0);
+        // Night-as-day: the whole globe is evenly lit. Relief uses a virtual sun
+        // 45 degrees above every point's horizon, keeping the real sun's azimuth
+        // so the shading direction stays consistent across the terminator.
+        float reliefShade = 1.0;
+        vec3 smoothN = normalize(vNormal);
+        vec3 sunTangent = uLightDirection - smoothN * dot(smoothN, uLightDirection);
+        if (uIsAmbientLighting > 0.5 && dot(sunTangent, sunTangent) > 1.0e-6) {
+          vec3 virtualSun = normalize(smoothN + normalize(sunTangent));
+          reliefShade = clamp(dot(reliefN, virtualSun) / dot(smoothN, virtualSun), 0.0, 1.6);
+        }
+        surfaceColor = texture(uDayMap, vUv).rgb * reliefShade + specLightColor;
       }
-
-      vec3 surfaceColor = dayTexColor + nightColor + bumpTexColor + specLightColor;
 
       // ................................................
       // Clouds — alpha-blend over surface (clouds occlude what's beneath)

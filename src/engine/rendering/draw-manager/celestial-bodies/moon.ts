@@ -51,6 +51,13 @@ export class Moon extends CelestialBody {
     return `${settingsManager.installDirectory}textures/moonmap${this.textureQuality}.jpg`;
   }
 
+  /** Calibrated by eye at the default 2.5x: the bump map is contrast-stretched, not true LOLA heights. */
+  protected readonly reliefHeightKm_ = 2.5;
+
+  protected getBumpTexturePath_(): string {
+    return `${settingsManager.installDirectory}textures/moonbump4k.jpg`;
+  }
+
   getName(): SolarBody {
     return SolarBody.Moon;
   }

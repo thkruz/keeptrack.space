@@ -64,6 +64,7 @@ export enum StorageKey {
   GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'v2-keepTrack-graphicsSettings-godraysIlluminationDecay',
   GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthDayResolution',
   GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthNightResolution',
+  GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION = 'v2-keepTrack-graphicsSettings-terrainReliefExaggeration',
   FILTER_SETTINGS_OPERATIONAL_PAYLOADS = 'v2-filter-settings-operational-payloads',
   FILTER_SETTINGS_NON_OPERATIONAL_PAYLOADS = 'v2-filter-settings-non-operational-payloads',
   FILTER_SETTINGS_ROCKET_BODIES = 'v2-filter-settings-rocket-bodies',

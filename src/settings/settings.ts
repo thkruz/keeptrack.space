@@ -55,6 +55,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   earthNightTextureQuality: 'graphics',
   earthSpecTextureQuality: 'graphics',
   earthBumpTextureQuality: 'graphics',
+  terrainReliefExaggeration: 'graphics',
   earthCloudTextureQuality: 'graphics',
   earthPoliticalTextureQuality: 'graphics',
   sunTextureQuality: 'graphics',

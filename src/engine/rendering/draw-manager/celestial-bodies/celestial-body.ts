@@ -27,6 +27,7 @@ import { DepthManager } from '../../depth-manager';
 import { GlUtils } from '../../gl-utils';
 import { OrbitPathLine } from '../../line-manager/orbit-path';
 import { OcclusionProgram } from '../post-processing';
+import { RELIEF_NORMAL_GLSL } from '../relief-shading';
 
 export const PlanetColors = {
   MERCURY: [0.59, 0.4, 0.6, 0.95] as rgbaArray,
@@ -133,6 +134,19 @@ export abstract class CelestialBody {
   abstract getName(): SolarBody;
   abstract getTexturePath(): string;
 
+  /**
+   * Equirectangular height map for terrain relief shading, or null for none
+   * (the default). Must share the color map's UV layout.
+   */
+  protected getBumpTexturePath_(): string | null {
+    return null;
+  }
+
+  /** Height in km that a bump-map value of 1.0 represents (before exaggeration). */
+  protected readonly reliefHeightKm_: number = 0;
+  /** Loaded asynchronously after init; relief shading stays off until it arrives. */
+  protected bumpTexture_: WebGLTexture | null = null;
+
   typeToString(): string {
     switch (this.type) {
       case SpaceObjectType.TERRESTRIAL_PLANET:
@@ -172,6 +186,9 @@ export abstract class CelestialBody {
           sampler: null as unknown as WebGLUniformLocation,
           sunPos: null as unknown as WebGLUniformLocation,
           tintColor: null as unknown as WebGLUniformLocation,
+          bumpMap: null as unknown as WebGLUniformLocation,
+          uReliefScale: null as unknown as WebGLUniformLocation,
+          uBodyRadius: null as unknown as WebGLUniformLocation,
         },
         map: texture,
         vertexShader: this.shaders.vert,
@@ -197,6 +214,7 @@ export abstract class CelestialBody {
       });
 
       this.isLoaded_ = true;
+      this.loadBumpTexture_(gl);
     } catch (e) {
       errorManagerInstance.warn(t7e('errorMsgs.Rendering.bodyInitError').replace('{name}', this.getName()), e);
     }
@@ -208,6 +226,23 @@ export abstract class CelestialBody {
     GlUtils.initTexture(gl, this.getTexturePath())
       .then((texture) => {
         this.mesh.material.map = texture;
+      })
+      .catch((e) => {
+        errorManagerInstance.warn(t7e('errorMsgs.Rendering.bodyTextureError').replace('{name}', this.getName()), e);
+      });
+  }
+
+  /** Non-blocking: the body draws without relief until the height map arrives. */
+  private loadBumpTexture_(gl: WebGL2RenderingContext): void {
+    const bumpPath = this.getBumpTexturePath_();
+
+    if (!bumpPath) {
+      return;
+    }
+
+    GlUtils.initTexture(gl, bumpPath)
+      .then((texture) => {
+        this.bumpTexture_ = texture;
       })
       .catch((e) => {
         errorManagerInstance.warn(t7e('errorMsgs.Rendering.bodyTextureError').replace('{name}', this.getName()), e);
@@ -320,6 +355,10 @@ export abstract class CelestialBody {
     this.setUniforms_(gl, sunPosition);
     gl.enable(gl.DEPTH_TEST);
     gl.depthMask(true);
+    if (this.bumpTexture_) {
+      gl.activeTexture(gl.TEXTURE1);
+      gl.bindTexture(gl.TEXTURE_2D, this.bumpTexture_);
+    }
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.mesh.material.map);
     gl.bindVertexArray(this.mesh.geometry.vao);
@@ -364,6 +403,13 @@ export abstract class CelestialBody {
     gl.uniform3fv(this.mesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
     gl.uniform1f(this.mesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
     gl.uniform3fv(this.mesh.material.uniforms.tintColor, this.tintColor);
+    if (this.mesh.material.uniforms.uReliefScale) {
+      const reliefScale = this.bumpTexture_ ? this.reliefHeightKm_ * (settingsManager.terrainReliefExaggeration ?? 2.5) : 0;
+
+      gl.uniform1i(this.mesh.material.uniforms.bumpMap, 1);
+      gl.uniform1f(this.mesh.material.uniforms.uReliefScale, reliefScale);
+      gl.uniform1f(this.mesh.material.uniforms.uBodyRadius, this.RADIUS);
+    }
   }
 
   update(simTime: Date) {
@@ -488,10 +534,17 @@ export abstract class CelestialBody {
       uniform sampler2D sampler;
       uniform vec3 sunPos;
       uniform vec3 tintColor;
+      uniform sampler2D bumpMap;
+      // Height (scene km) of a bump value of 1.0 with exaggeration; 0 = no relief.
+      uniform float uReliefScale;
+      uniform float uBodyRadius;
       in vec2 v_texcoord;
       in vec3 v_normal;
       in vec3 vVertToCamera;
       out vec4 fragColor;
+
+      ${RELIEF_NORMAL_GLSL}
+
       void main(void) {
         vec3 fragToCamera = normalize(vVertToCamera);
         if (dot(fragToCamera, v_normal) < 0.0) {
@@ -500,6 +553,21 @@ export abstract class CelestialBody {
         vec3 lightDirection = sunPos - vec3(0.0,0.0,0.0);
         lightDirection = normalize(lightDirection);
         float lightFromBody = max(dot(v_normal, lightDirection), 0.0) * 1.0;
+
+        if (uReliefScale > 0.0) {
+          // Bump maps may be non-power-of-two (no mipmaps), so fade relief out
+          // as the map is minified instead of letting point samples shimmer.
+          vec2 bumpSize = vec2(textureSize(bumpMap, 0));
+          float texelsPerPixel = max(fwidth(v_texcoord.x) * bumpSize.x, fwidth(v_texcoord.y) * bumpSize.y);
+          float reliefFade = 1.0 - smoothstep(2.0, 6.0, texelsPerPixel);
+          // Sphere point rebuilt from the unit normal, not vViewPos: bodies sit far from
+          // the origin, where float32 positions step in ~0.03 km and their screen
+          // derivatives turn into row-aligned stripes at close zoom.
+          vec3 smoothN = normalize(v_normal);
+          vec3 reliefN = reliefNormal(smoothN, smoothN * uBodyRadius, v_texcoord, bumpMap, uReliefScale * reliefFade);
+          // Smooth normal still owns the terminator so relief cannot light the night side.
+          lightFromBody = max(dot(reliefN, lightDirection), 0.0) * smoothstep(0.0, 0.05, lightFromBody);
+        }
         vec3 litTexColor = texture(sampler, v_texcoord).rgb * tintColor * (vec3(0.0025, 0.0025, 0.0025) + lightFromBody);
         fragColor = vec4(litTexColor, 1.0);
         ${DepthManager.getLogDepthFragCode()}

@@ -1,0 +1,25 @@
+{
+  "name": "@keeptrack/embed-sdk",
+  "version": "0.1.0",
+  "description": "Host SDK for embedding a self-hosted KeepTrack build in a same-origin iframe.",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "LICENSE", "README.md"],
+  "sideEffects": false,
+  "scripts": {
+    "sync-contract": "node scripts/sync-contract.mjs",
+    "check-contract": "node scripts/sync-contract.mjs --check",
+    "build": "node scripts/sync-contract.mjs && tsc -p tsconfig.json",
+    "example": "node scripts/sync-contract.mjs && tsc -p tsconfig.example.json",
+    "test": "node scripts/sync-contract.mjs && vitest run"
+  }
+}

@@ -27,7 +27,8 @@
         "satellitesHeader": "Супутники",
         "actionsHeader": "Дії",
         "displayHeader": "Відображення",
-        "labelsHeader": "Мітки"
+        "labelsHeader": "Мітки",
+        "reportList": "Звіт за списком спостереження"
       },
       "msgs": {
         "watchlistLoaded": "Список спостереження завантажено: {count} супутників"
@@ -49,6 +50,10 @@
             "fovOnly": "Лише FOV",
             "all": "Увесь список спостереження"
           }
+        },
+        "showSensorLabels": {
+          "label": "Показувати підписи датчиків",
+          "helpText": "Малює назву датчика поруч із його маркером на глобусі та пласкій карті."
         }
       },
       "rmbMenu": {

@@ -69,6 +69,21 @@ export interface NextPassCache {
   resultMs: number | null;
 }
 
+/** One extra reason an object is not usable from the selected sensor, supplied by an add-on through {@link SatInfoBoxSensor.registerReasonProvider}. */
+export interface FovReasonLine {
+  /** Kinematic: look-angle geometry. Sensor: what the sensor itself needs (lighting, brightness, ...). */
+  category: 'kinematic' | 'sensor';
+  text: string;
+}
+
+export interface FovReasonContext {
+  sensor: DetailedSensor;
+  obj: BaseObject;
+  time: Date;
+}
+
+export type FovReasonProvider = (ctx: FovReasonContext) => FovReasonLine[];
+
 export class SatInfoBoxSensor extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxSensor';
   dependencies_: string[] = [SatInfoBox.name];
@@ -76,6 +91,14 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   // Starting values of the collapsable sections
   private readonly isSensorSectionCollapsed_ = true;
   private nextPassCache_: NextPassCache | null = null;
+  private static readonly reasonProviders_: FovReasonProvider[] = [];
+
+  /** Lets an add-on contribute reasons to the Not in View row. Registering the same provider twice is a no-op. */
+  static registerReasonProvider(provider: FovReasonProvider): void {
+    if (!SatInfoBoxSensor.reasonProviders_.includes(provider)) {
+      SatInfoBoxSensor.reasonProviders_.push(provider);
+    }
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -543,6 +566,49 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
   }
 
+  /**
+   * Asks the registered providers for extra reasons and, when there are any, regroups the row by category.
+   * When the object is inside the sensor limits only the providers' lines are shown (the row stays hidden if there are none).
+   */
+  private static appendReasonExtras_(inFov: boolean): void {
+    if (SatInfoBoxSensor.reasonProviders_.length === 0) {
+      return;
+    }
+
+    const reasonEl = getEl(EL.REASON, true);
+    const sensor = ServiceLocator.getSensorManager().currentSensors[0];
+    const obj = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
+
+    if (!reasonEl || !sensor || !obj) {
+      return;
+    }
+
+    const time = ServiceLocator.getTimeManager().simulationTimeObj;
+    const lines: FovReasonLine[] = [];
+
+    for (const provider of SatInfoBoxSensor.reasonProviders_) {
+      try {
+        lines.push(...provider({ sensor, obj, time }));
+      } catch (e) {
+        errorManagerInstance.debug(String(e));
+      }
+    }
+
+    if (lines.length === 0 || (inFov && !lines.some((x) => x.category === 'sensor'))) {
+      return;
+    }
+
+    const kinematic = inFov ? [l('values.kinematicOk')] : [reasonEl.innerHTML, ...lines.filter((x) => x.category === 'kinematic').map((x) => x.text)];
+    const sensorLines = lines.filter((x) => x.category === 'sensor').map((x) => x.text);
+    const parts = [`<b>${l('values.categoryKinematic')}:</b> ${kinematic.join('; ')}`];
+
+    if (sensorLines.length > 0) {
+      parts.push(`<b>${l('values.categorySensor')}:</b> ${sensorLines.join('; ')}`);
+    }
+
+    SatInfoBoxSensor.setReasonRow_(parts.join('<br>'));
+  }
+
   private updateSatelliteTearrData_(obj: BaseObject, sensorManagerInstance: SensorManager, timeManagerInstance: TimeManager) {
     const elements = {
       az: getEl('sat-azimuth'),
@@ -600,6 +666,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
 
     SatInfoBoxSensor.setReasonRow_(tearr.fovReason ?? l('values.outOfFov'));
+    SatInfoBoxSensor.appendReasonExtras_(false);
 
     if (elements.ra) {
       elements.ra.innerHTML = l('values.outOfFov');
@@ -690,6 +757,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     timeManagerInstance: TimeManager
   ) {
     SatInfoBoxSensor.setReasonRow_(null);
+
+    SatInfoBoxSensor.appendReasonExtras_(true);
 
     if (elements.az) {
       const az = ServiceLocator.getSensorManager().currentTEARR.az;

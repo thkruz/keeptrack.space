@@ -29,7 +29,7 @@ test.describe('PolarPlotPlugin', () => {
     await expect(drawerItem).toBeVisible();
 
     // Clicking disabled drawer item should NOT open the side menu
-    await drawerItem.click({ force: true });
+    await drawerItem.click();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 2_000 });
 
     // Verify side menu elements exist in DOM (hidden)

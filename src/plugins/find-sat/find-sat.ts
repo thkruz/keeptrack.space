@@ -54,8 +54,6 @@ export interface SearchSatParams {
   payload: string;
   period: Minutes;
   periodMarg: Minutes;
-  tleAge: Hours;
-  tleAgeMarg: Hours;
   raan: Degrees;
   raanMarg: Degrees;
   rcs: number;
@@ -64,6 +62,8 @@ export interface SearchSatParams {
   rngMarg: Kilometers;
   shape: string;
   source: string;
+  tleAge: Hours;
+  tleAgeMarg: Hours;
   /** Perigee altitude in km (optional; NaN or absent = not filtered) */
   perigee?: Kilometers;
   perigeeMarg?: Kilometers;
@@ -540,11 +540,11 @@ export class FindSatPlugin extends KeepTrackPlugin {
       });
 
     getUnique(satData.filter((obj: BaseObject) => (obj as Satellite)?.source).map((obj) => (obj as Satellite).source))
-      // Sort using lower case
       .sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
       .forEach((source) => {
         getEl('fbl-source')!.insertAdjacentHTML('beforeend', `<option value="${source}">${source}</option>`);
       });
+
     const payloadPartials = satData
       .filter((obj: BaseObject) => (obj as Satellite)?.payload)
       .map((obj) =>
@@ -567,8 +567,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
       });
     FindSatPlugin.addSelectFilter_('fbl-payload-filter', 'fbl-payload');
 
-    // Export data
-    getEl('findByLooks-export')?.addEventListener('click', () => {
+    getEl('findByLooks-export', true)?.addEventListener('click', () => {
       this.onDownload();
     });
 
@@ -676,14 +675,12 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const rng = parseFloat((<HTMLInputElement>getEl('fbl-range')).value);
     const inc = parseFloat((<HTMLInputElement>getEl('fbl-inc')).value);
     const period = parseFloat((<HTMLInputElement>getEl('fbl-period')).value);
-    const tleAge = parseFloat((<HTMLInputElement>getEl('fbl-tleAge')).value);
     const rcs = parseFloat((<HTMLInputElement>getEl('fbl-rcs')).value);
     const azMarg = parseFloat((<HTMLInputElement>getEl('fbl-azimuth-margin')).value);
     const elMarg = parseFloat((<HTMLInputElement>getEl('fbl-elevation-margin')).value);
     const rngMarg = parseFloat((<HTMLInputElement>getEl('fbl-range-margin')).value);
     const incMarg = parseFloat((<HTMLInputElement>getEl('fbl-inc-margin')).value);
     const periodMarg = parseFloat((<HTMLInputElement>getEl('fbl-period-margin')).value);
-    const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
     const rcsMarg = parseFloat((<HTMLInputElement>getEl('fbl-rcs-margin')).value);
     const typeValues = FindSatPlugin.readMultiSelect_('fbl-type')
       .map(Number)
@@ -700,6 +697,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
     const payload = (<HTMLInputElement>getEl('fbl-payload')).value;
     const shape = (<HTMLInputElement>getEl('fbl-shape')).value;
     const source = (<HTMLInputElement>getEl('fbl-source')).value;
+    const tleAge = parseFloat((<HTMLInputElement>getEl('fbl-tleAge')).value);
+    const tleAgeMarg = parseFloat((<HTMLInputElement>getEl('fbl-tleAge-margin')).value);
     const perigee = parseFloat((<HTMLInputElement | null>getEl('fbl-perigee', true))?.value ?? '');
     const perigeeMarg = parseFloat((<HTMLInputElement | null>getEl('fbl-perigee-margin', true))?.value ?? '');
     const apogee = parseFloat((<HTMLInputElement | null>getEl('fbl-apogee', true))?.value ?? '');
@@ -718,8 +717,6 @@ export class FindSatPlugin extends KeepTrackPlugin {
       incMarg,
       period,
       periodMarg,
-      tleAge,
-      tleAgeMarg,
       rcs,
       rcsMarg,
       objType,
@@ -732,6 +729,8 @@ export class FindSatPlugin extends KeepTrackPlugin {
       payload,
       shape,
       source,
+      tleAge,
+      tleAgeMarg,
       perigee,
       perigeeMarg,
       apogee,
@@ -774,6 +773,7 @@ export class FindSatPlugin extends KeepTrackPlugin {
     try {
       this.lastResults_ = this.searchSats_(searchParams);
       this.onSearchComplete_(this.lastResults_);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     } catch (e) {
       // A failed or invalid search must not leave the previous result on screen.
       this.clearSearchResults_();

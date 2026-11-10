@@ -1,4 +1,5 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
 import { SensorListPlugin } from '@app/plugins/sensor-list/sensor-list';
@@ -50,13 +51,17 @@ describe('SensorListPlugin', () => {
     expect(plugin.sideMenuElementHtml).toContain('<div id="list-of-sensors">');
   });
 
-  it.skip('should handle sensorListContentClick with valid sensor group', () => {
+  it('should handle sensorListContentClick with valid sensor group', () => {
     const mockSetSensor = vi.fn();
 
-    vi.spyOn(keepTrackApi, 'getSensorManager').mockReturnValue({
+    vi.spyOn(ServiceLocator, 'getSensorManager').mockReturnValue({
       clearSecondarySensors: vi.fn(),
       setSensor: mockSetSensor,
+      currentSensors: [],
     } as any);
+    plugin.isMenuButtonActive = true;
+    (plugin as any).sensorGroups_ = [{ name: 'validSensorGroup' }];
+    vi.spyOn(keepTrackApi, 'getMainCamera').mockReturnValue({ lookAtLatLon: vi.fn() } as any);
 
     plugin.sensorListContentClick('validSensorGroup');
 
@@ -76,9 +81,9 @@ describe('SensorListPlugin', () => {
     expect(mockSetSensor).not.toHaveBeenCalled();
   });
 
-  it.skip('should throw error if no sensors are found in createSensorRow_', () => {
-    expect(() => {
-      (SensorListPlugin as unknown as { createSensorRow_: (sensor: DetailedSensor) => void }).createSensorRow_({} as DetailedSensor);
-    }).toThrow('No sensors found');
+  it('should render placeholder text for a sensor with no data in createSensorRow_', () => {
+    const html = (SensorListPlugin as unknown as { createSensorRow_: (sensor: DetailedSensor) => string }).createSensorRow_({} as DetailedSensor);
+
+    expect(html).toContain('data-sensor="Missing Data"');
   });
 });

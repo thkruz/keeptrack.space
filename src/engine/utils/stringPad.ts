@@ -49,19 +49,6 @@ export class StringPad {
   }
 
   /**
-   * Pads a string with zeros to a specified length.
-   *
-   * @deprecated use built-in padStart instead
-   *
-   * @param str The string to pad.
-   * @param max The maximum length of the padded string.
-   * @returns The padded string.
-   */
-  static pad0(str: string, max: number): string {
-    return str.padStart(max, '0');
-  }
-
-  /**
    * Pads a string with trailing zeros up to a specified length.
    *
    * @deprecated use built-in padEnd instead

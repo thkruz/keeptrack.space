@@ -35,7 +35,7 @@ test.describe('Breakup Plugin', () => {
     await expect(drawerItem).toBeVisible();
 
     // Clicking a disabled plugin's drawer item should NOT open the side menu
-    await drawerItem.click({ force: true });
+    await drawerItem.click();
     await expect(sideMenu).toBeHidden({ timeout: 2_000 });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u);
 

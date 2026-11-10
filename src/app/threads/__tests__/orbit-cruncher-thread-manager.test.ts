@@ -86,6 +86,23 @@ describe('OrbitCruncherThreadManager', () => {
       });
     });
 
+    it('sendSatelliteTleBatch posts one SATELLITE_TLE_BATCH with parallel arrays and the current seqNum', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendInit('o', 1); // seqNum -> 1
+      worker.postMessage.mockClear();
+      mgr.sendSatelliteTleBatch([7, 8], ['a1', 'b1'], ['a2', 'b2']);
+
+      expect(worker.postMessage).toHaveBeenCalledTimes(1);
+      expect(lastMsg(worker)).toEqual({
+        typ: OrbitCruncherMsgType.SATELLITE_TLE_BATCH,
+        ids: [7, 8],
+        tle1s: ['a1', 'b1'],
+        tle2s: ['a2', 'b2'],
+        seqNum: 1,
+      });
+    });
+
     it('sendSatelliteUpdate carries the current seqNum and orbit fields', () => {
       const { mgr, worker } = makeMgr();
 

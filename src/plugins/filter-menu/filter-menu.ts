@@ -509,6 +509,8 @@ export class FilterMenuPlugin extends KeepTrackPlugin {
     ServiceLocator.getSoundManager()?.play(checkbox.checked ? SoundNames.TOGGLE_ON : SoundNames.TOGGLE_OFF);
     this.saveSettings_();
     this.updateFilterUI_();
+    // Briefing step: a filter was changed (no catalog subject, matched by order and time)
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   private onSearchInput_(e: Event): void {

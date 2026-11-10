@@ -132,6 +132,9 @@ export default defineConfig({
       'src/engine/ootk/**',
       // External plugin tests run in the plugin's own repo CI, not the host suite.
       'src/plugins-external/**',
+      // Standalone MIT packages (embed-sdk, -client, -relay) carry their own vitest config and
+      // environment; run them with `npm run test:packages`, not under the app's setup.
+      'packages/**',
       // Bare "test.ts" files are CLI commands/tooling (e.g. the plugin CLI's
       // `test` command), not vitest suites. Real tests are named "*.test.ts".
       '**/test.ts',

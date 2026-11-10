@@ -15,6 +15,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { settingsManager } from '@app/settings/settings';
 import { BaseObject, Satellite, SpaceObjectType, Star, ZoomValue } from '@ootk/src/main';
 import searchPng from '@public/img/icons/search.png';
+import { userActionGate } from '../../engine/core/user-action-gate';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';
@@ -380,12 +381,16 @@ export class SearchManager {
 
       camera.lookAtLatLon(ground.lat, ground.lon, ground.zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
       // Sensors carry selection side-effects (menus, FOV); launch sites no-op harmlessly.
-      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+      if (userActionGate.allowSelection(satId)) {
+        PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+      }
 
       return;
     }
 
-    PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    if (userActionGate.allowSelection(satId)) {
+      PluginRegistry.getPlugin(SelectSatManager)?.selectSat(satId);
+    }
   }
 
   /**

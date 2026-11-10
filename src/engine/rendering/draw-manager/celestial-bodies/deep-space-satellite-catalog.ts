@@ -5,6 +5,7 @@
  */
 import { DeepSpaceDesignators } from '@app/app/data/deep-space-designators';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { settingsManager } from '@app/settings/settings';
 import { Kilometers, Seconds } from '@ootk/src/main';
 import { KM_PER_AU } from 'astronomy-engine';
 import { PlanetColors } from './celestial-body';
@@ -98,8 +99,27 @@ export function createDeepSpaceSatellites(): Record<string, DeepSpaceSatellite> 
   return result;
 }
 
-/** Fetches coefficient data for all deep-space satellites and sets their interpolators. */
+/**
+ * Embedded scenario mode (no catalog) runs on third-party hosts, where the r2.keeptrack.space
+ * ephemeris files are blocked by CORS. Skip the fetch entirely there.
+ */
+export function isRemoteEphemerisDisabled(): boolean {
+  return settingsManager.isEmbedMode === true && settingsManager.noCatalogOnLoad === true;
+}
+
+/**
+ * Fetches coefficient data for all deep-space satellites and sets their interpolators. Never rejects.
+ * In an embed a failed load is silent (console only): a host page should not see error toasts for it.
+ */
 export async function loadDeepSpaceSatelliteData(satellites: Record<string, DeepSpaceSatellite>): Promise<void> {
+  if (isRemoteEphemerisDisabled()) {
+    for (const config of DEEP_SPACE_SATELLITE_CONFIGS) {
+      delete satellites[config.name];
+    }
+
+    return;
+  }
+
   await Promise.all(
     DEEP_SPACE_SATELLITE_CONFIGS.map(async (config) => {
       try {
@@ -107,7 +127,12 @@ export async function loadDeepSpaceSatelliteData(satellites: Record<string, Deep
 
         satellites[config.name].setCoefficients(coefficients);
       } catch {
-        errorManagerInstance.log(`Failed to load ephemeris for ${config.name}, skipping`);
+        if (settingsManager.isEmbedMode) {
+          // eslint-disable-next-line no-console
+          console.debug(`[keepTrackEmbed] ephemeris for ${config.name} unavailable, skipping`);
+        } else {
+          errorManagerInstance.log(`Failed to load ephemeris for ${config.name}, skipping`);
+        }
         delete satellites[config.name];
       }
     })

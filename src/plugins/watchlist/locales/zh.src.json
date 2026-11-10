@@ -27,7 +27,8 @@
         "satellitesHeader": "卫星",
         "actionsHeader": "操作",
         "displayHeader": "显示",
-        "labelsHeader": "标签"
+        "labelsHeader": "标签",
+        "reportList": "关注列表报告"
       },
       "msgs": {
         "watchlistLoaded": "关注列表已加载 {count} 颗卫星"
@@ -49,6 +50,10 @@
             "fovOnly": "仅FOV",
             "all": "全部关注列表"
           }
+        },
+        "showSensorLabels": {
+          "label": "显示传感器标签",
+          "helpText": "在地球仪和平面地图上的传感器标记旁绘制传感器名称。"
         }
       },
       "rmbMenu": {

@@ -7,7 +7,6 @@ import {
   EarthCloudTextureQuality,
   EarthDayTextureQuality,
   EarthNightTextureQuality,
-  EarthPoliticalTextureQuality,
   EarthSpecTextureQuality,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { getEl } from '@app/engine/utils/get-el';
@@ -50,7 +49,6 @@ export const stemEnvironment = (settingsManager: SettingsManager) => {
   settingsManager.earthNightTextureQuality = '16k' as EarthNightTextureQuality;
   settingsManager.earthSpecTextureQuality = '8k' as EarthSpecTextureQuality;
   settingsManager.earthBumpTextureQuality = '8k' as EarthBumpTextureQuality;
-  settingsManager.earthPoliticalTextureQuality = 'off' as EarthPoliticalTextureQuality;
   settingsManager.earthCloudTextureQuality = '8k' as EarthCloudTextureQuality;
 
   settingsManager.disableCameraControls = true;

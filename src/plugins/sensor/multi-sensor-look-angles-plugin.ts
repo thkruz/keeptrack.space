@@ -31,6 +31,7 @@ const l = (key: string): string => t7e(`plugins.MultiSensorLookAnglesPlugin.${ke
 
 export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'MultiSensorLookAnglesPlugin';
+  private lastActionKey_ = '';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
   // combine sensorListSsn, sesnorListLeoLabs, and SensorListRus
@@ -42,7 +43,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
   // Settings
   private readonly lengthOfLookAngles_ = 1; // Days
-  private readonly angleCalculationInterval_ = <Seconds>30;
+  private readonly angleCalculationInterval_ = 30 as Seconds;
   private readonly disabledSensors_: DetailedSensor[] = [];
 
   constructor() {
@@ -358,10 +359,10 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
           multiSitePass = MultiSensorLookAnglesPlugin.propagateMultiSite_(now, satrec!, sensor);
         }
 
-        let canStationObserve = true;
-
         if (multiSitePass.time !== '') {
-          // Check visibility and add to multiSitePass
+          // Only optical sensors need darkness and illumination checks
+          let canStationObserve = true;
+
           if (sensor.type === SpaceObjectType.OPTICAL) {
             canStationObserve = SensorMath.checkIfVisibleForOptical(sat, sensor, now);
           }
@@ -389,6 +390,14 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     }
 
     this.populateMultiSiteTable_(multiSiteArray, sensors);
+
+    // Achievement signal: multi-site look angles computed. Once per sat + sensor set.
+    const key = `${sat.id}|${sensors.map((s) => s.objName).join(',')}`;
+
+    if (key !== this.lastActionKey_) {
+      this.lastActionKey_ = key;
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
+    }
   }
 
   private static propagateMultiSite_(now: Date, satrec: SatelliteRecord, sensor: DetailedSensor): TearrData {

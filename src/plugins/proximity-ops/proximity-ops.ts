@@ -1,4 +1,3 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { ProximityOpsThreadManager } from '@app/app/threads/proximity-ops-thread-manager';
 import { drawPairLine, jumpToTca, RemovableLine } from '@app/engine/conjunction/conjunction-row-actions';
 import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
@@ -113,6 +112,7 @@ export class ProximityOps extends KeepTrackPlugin {
   private sortAsc_ = DEFAULT_SORT_ASC;
   /** Root parents of the analyst clones in the last search, by catalog id: their Pc uses the parent's covariance. */
   private uncertaintyParents_ = new Map<number, Satellite>();
+  private lastSearchPrimaryId_: number | null = null;
 
   // Wide enough for the two-line title plus the title-bar icons.
   dragOptions: ClickDragOptions = {
@@ -562,6 +562,8 @@ export class ProximityOps extends KeepTrackPlugin {
     const type = (<HTMLInputElement>getEl('proximity-ops-type')).value as RPOType;
     const params = this.buildParams_();
 
+    this.lastSearchPrimaryId_ = null;
+
     if (isAva) {
       return {
         mode: type === RPOType.LEO ? 'ava-leo' : 'ava-geo',
@@ -585,6 +587,8 @@ export class ProximityOps extends KeepTrackPlugin {
 
       return null;
     }
+
+    this.lastSearchPrimaryId_ = satelliteId;
 
     return {
       mode: 'single',
@@ -781,6 +785,9 @@ export class ProximityOps extends KeepTrackPlugin {
       ServiceLocator.getUiManager().toast(this.emptyResultMessage_(), ToastMsgType.caution, true);
     }
 
+    // Achievement signal: RPO search completed; the subject is the primary (none for all-vs-all searches)
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, this.lastSearchPrimaryId_ === null ? undefined : { satId: this.lastSearchPrimaryId_ });
+
     // Keep the results panel open on completion so the count / empty-state shows.
     if (!this.isSideMenuSettingsOpen) {
       this.openSecondaryMenu();
@@ -965,7 +972,7 @@ export class ProximityOps extends KeepTrackPlugin {
    * Finds the satellites related to a primary satellite based on the orbit type
    * and duration, with the primary as the first element. GEO filters on longitude
    * proximity and orbital period; LEO filters on inclination and RAAN proximity.
-   * Stays on the main thread because it uses `SatMath.normalizeRaan` and the live
+   * Stays on the main thread because it uses `Satellite.normalizeRaan` and the live
    * catalog. Every position is evaluated at `searchDate` (the sim time the search
    * starts at), never the wall clock, so a search at a chosen time screens the sky
    * at that time.
@@ -1004,10 +1011,10 @@ export class ProximityOps extends KeepTrackPlugin {
         );
       });
     } else if (type === RPOType.LEO) {
-      const raan1 = SatMath.normalizeRaan(primarySat, searchDate);
+      const raan1 = primarySat.normalizeRaan(searchDate);
 
       sats = allSats.filter((sat) => {
-        const raan2 = SatMath.normalizeRaan(sat, searchDate);
+        const raan2 = sat.normalizeRaan(searchDate);
 
         return (
           sat.tle1 &&

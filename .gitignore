@@ -269,6 +269,8 @@ scripts/asteroids/
 scripts/video/
 scripts/missile-mesh/
 scripts/article-shots/
+embed-bundle/
+embed-bundle.tar.gz
 scripts/generate-mmt-migration.ts
 scripts/generate-sdlcd-migration.ts
 
@@ -296,3 +298,7 @@ src/plugins-pro/data/optical/
 /.playwright-mcp/
 /.codex/config.toml
 /.agents/
+
+# Codex bridge (local agent config)
+.codex/
+AGENTS.md

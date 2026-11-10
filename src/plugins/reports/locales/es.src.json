@@ -348,6 +348,21 @@
           "noSensor": "No hay ningún sensor seleccionado; seleccione un sensor para listar las ventanas de pase.",
           "uncertaintyAssumed": "La incertidumbre 1-sigma y la antigüedad GP del objeto de analista se asumen de su padre ({parent}), y la Pc del acercamiento usa la covarianza del padre. El error de ejecución de la maniobra no se modela."
         }
+      },
+      "batch": {
+        "source": "Origen",
+        "selected": "Objeto seleccionado",
+        "search": "Resultados de búsqueda ({count})",
+        "watchlist": "Lista de seguimiento ({count})",
+        "note": "Modo por lotes: un único CSV combinado con las columnas NORAD y Nombre. Los informes de conjunción y de maniobra requieren un solo objeto.",
+        "progress": "Generando {done} de {total}...",
+        "cancel": "Cancelar",
+        "confirmLarge": "Este lote abarca {count} objetos y puede tardar. ¿Continuar?",
+        "truncated": "Solo se usan los primeros {max} de {count} objetos.",
+        "empty": "No hay objetos en el origen elegido.",
+        "done": "Informe por lotes guardado: {rows} filas de {objects} objetos ({empty} sin datos, {failed} omitidos).",
+        "rowsTruncated": "Salida cortada en {max} filas.",
+        "unavailable": "No disponible para un informe por lotes"
       }
     }
   }

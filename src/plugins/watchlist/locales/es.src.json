@@ -27,7 +27,8 @@
         "satellitesHeader": "Satélites",
         "actionsHeader": "Acciones",
         "displayHeader": "Visualización",
-        "labelsHeader": "Etiquetas"
+        "labelsHeader": "Etiquetas",
+        "reportList": "Informe de la lista de seguimiento"
       },
       "msgs": {
         "watchlistLoaded": "Lista de seguimiento cargada con {count} satélites"
@@ -49,6 +50,10 @@
             "fovOnly": "Solo FOV",
             "all": "Toda la lista de seguimiento"
           }
+        },
+        "showSensorLabels": {
+          "label": "Mostrar etiquetas de sensores",
+          "helpText": "Dibuja el nombre del sensor junto a su marcador en el globo y en el mapa plano."
         }
       },
       "rmbMenu": {

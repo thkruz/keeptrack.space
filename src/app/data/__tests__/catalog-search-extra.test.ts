@@ -1,4 +1,3 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { CatalogSearch } from '@app/app/data/catalog-search';
 import { CatalogSource, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { vi } from 'vitest';
@@ -18,13 +17,9 @@ describe('CatalogSearch.findObjsByOrbit', () => {
       period: 90,
       isStatic: () => false,
       testRaan: raan,
+      normalizeRaan: () => raan,
       ...over,
     }) as unknown as Satellite;
-
-  beforeEach(() => {
-    // Return the per-stub RAAN we tagged on each object.
-    vi.spyOn(SatMath, 'normalizeRaan').mockImplementation((s: Satellite) => (s as unknown as { testRaan: number }).testRaan);
-  });
 
   afterEach(() => vi.restoreAllMocks());
 

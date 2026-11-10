@@ -100,7 +100,6 @@ export const starTalk = (settingsManager: SettingsManager) => {
                   `;
     const style = document.createElement('style');
 
-    style.type = 'text/css';
     style.appendChild(document.createTextNode(toastCss));
     document.head.appendChild(style);
 

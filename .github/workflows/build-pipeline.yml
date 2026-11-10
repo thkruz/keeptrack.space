@@ -22,7 +22,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
       - name: YAML Lint
-        uses: ibiqlik/action-yamllint@v3.1.1
+        uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c # v3.1.1
         with:
           file_or_dir: .github/workflows/build-pipeline.yml
         continue-on-error: true
@@ -38,7 +38,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v6
       - name: NPM Audit Action
-        uses: oke-py/npm-audit-action@main
+        uses: oke-py/npm-audit-action@da53d502b06a0bc95f9ce3c0ebab0c4c713fae4a # v5.5.2
         with:
           issue_assignees: thkruz
           issue_labels: Security
@@ -69,7 +69,7 @@ jobs:
           cache: 'pnpm'
 
       - name: Set up SSH
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Update submodules
@@ -80,7 +80,7 @@ jobs:
 
       - name: Set Timezone (only for tests)
         if: matrix.task == 'unit-test'
-        uses: szenius/set-timezone@v1.2
+        uses: szenius/set-timezone@ce9c440bc3af4f51b28d7ef7e5c47ee8f26c8dcb # v1.2
         with:
           timezoneLinux: 'America/New_York'
 
@@ -159,7 +159,7 @@ jobs:
 
       - name: Set Timezone (only for tests)
         if: matrix.task == 'unit-test'
-        uses: szenius/set-timezone@v1.2
+        uses: szenius/set-timezone@ce9c440bc3af4f51b28d7ef7e5c47ee8f26c8dcb # v1.2
         with:
           timezoneLinux: 'America/New_York'
 
@@ -226,7 +226,7 @@ jobs:
       # Non-OSS profiles: SSH + full submodules (pro included).
       - name: Set up SSH
         if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Update submodules
@@ -324,7 +324,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run TruffleHog
-        uses: trufflesecurity/trufflehog@v3.82.6
+        uses: trufflesecurity/trufflehog@0328a19a9d3877c9f04d0dbee5717aabff5b575d # v3.82.6
 
   pipeline-complete:
     if: always()

@@ -21,42 +21,6 @@ describe('SatInfoBoxCore_class', () => {
 
   standardPluginSuite(SatInfoBox, 'SatInfoBoxCore');
 
-  describe('Clicking Orbit Data Links', () => {
-    beforeEach(() => {
-      ServiceLocator.getColorSchemeManager().colorData = new Float32Array(new Array(100).fill(0));
-      ServiceLocator.getDotsManager().sizeData = new Int8Array(new Array(100).fill(0));
-      ServiceLocator.getDotsManager().positionData = new Float32Array(new Array(100).fill(0));
-      ServiceLocator.getCatalogManager().objectCache = [defaultSat];
-      PluginRegistry.getPlugin(SelectSatManager)!.selectSat(0);
-      vi.advanceTimersByTime(1000);
-    });
-
-    it.skip('should work when I click all-objects-link', () => {
-      expect(() => getEl('all-objects-link')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click near-orbits-link', () => {
-      expect(() => getEl('near-orbits-link')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click near-objects-link1', () => {
-      expect(() => getEl('near-objects-link1')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click near-objects-link2', () => {
-      expect(() => getEl('near-objects-link2')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click near-objects-link4', () => {
-      expect(() => getEl('near-objects-link4')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click sun-angle-link', () => {
-      expect(() => getEl('sun-angle-link')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click nadir-angle-link', () => {
-      expect(() => getEl('nadir-angle-link')!.click()).not.toThrow();
-    });
-    it.skip('should work when I click sec-angle-link', () => {
-      expect(() => getEl('sec-angle-link')!.click()).not.toThrow();
-    });
-  });
-
   describe('Various Types of Objects', () => {
     beforeEach(() => {
       setupStandardEnvironment([SelectSatManager, SatInfoBox, SatInfoBoxObject]);

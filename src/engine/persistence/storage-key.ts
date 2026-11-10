@@ -30,6 +30,7 @@ export enum StorageKey {
   SETTINGS_DEMO_MODE = 'v2-keepTrack-settings-demoMode',
   SETTINGS_SAT_LABEL_MODE = 'v2-keepTrack-settings-satLabelMode',
   SETTINGS_SAT_LABEL_MODE_V2 = 'v2-keepTrack-settings-satLabelModeV2',
+  SETTINGS_SHOW_SENSOR_LABELS = 'v2-keepTrack-settings-showSensorLabels',
   SETTINGS_FREEZE_PROP_RATE_ON_DRAG = 'v2-keepTrack-settings-freezePropRateOnDrag',
   SETTINGS_DISABLE_TIME_MACHINE_TOASTS = 'v2-keepTrack-settings-disableTimeMachineToasts',
   SETTINGS_DISABLE_TOASTS = 'v2-keepTrack-settings-disableToasts',
@@ -63,6 +64,7 @@ export enum StorageKey {
   GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'v2-keepTrack-graphicsSettings-godraysIlluminationDecay',
   GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthDayResolution',
   GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthNightResolution',
+  GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION = 'v2-keepTrack-graphicsSettings-terrainReliefExaggeration',
   FILTER_SETTINGS_OPERATIONAL_PAYLOADS = 'v2-filter-settings-operational-payloads',
   FILTER_SETTINGS_NON_OPERATIONAL_PAYLOADS = 'v2-filter-settings-non-operational-payloads',
   FILTER_SETTINGS_ROCKET_BODIES = 'v2-filter-settings-rocket-bodies',
@@ -139,6 +141,12 @@ export enum StorageKey {
 
   // Achievement progress counters (mirrors the server-synced app_preferences copy)
   ACHIEVEMENT_COUNTERS = 'v2-keepTrack-achievementCounters',
+
+  // In-flight workflow achievement progress ({subject, startedAt, stepsDone} per workflow); device only
+  ACHIEVEMENT_WORKFLOW_PROGRESS = 'v2-keepTrack-achievementWorkflowProgress',
+
+  // Achievement unlock toast style: 'compact' | 'card'
+  ACHIEVEMENT_TOAST_STYLE = 'v2-keepTrack-achievementToastStyle',
 
   // Best Pass Pro (column visibility + propagation settings)
   BEST_PASS_SETTINGS = 'v2-keepTrack-bestPassSettings',

@@ -51,6 +51,7 @@ import {
   Vector3D,
 } from '@ootk/src/main';
 import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../engine/utils/constants';
+import { toCacheIndex } from './cache-index';
 import { PosCruncherCachedObject, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from './constants';
 import { MarkerMode, PosCruncherMsgType } from './position-cruncher-messages';
 import { setupTimeVariables } from './positionCruncher/calculations';
@@ -111,6 +112,8 @@ const sensorMarkerArray = [0]; // Array of Markers used to show sensor fence and
 
 /** Handle of the pending propagation cycle, so a time change can pull it forward instead of waiting it out. */
 let propagationTimer_: ReturnType<typeof setTimeout> | null = null;
+/** True while the host has parked the view (PAUSE message): no cycles are scheduled until it is cleared. */
+let isPaused_ = false;
 
 /** TIME VARIABLES */
 const PROPAGATION_INTERVAL = 1000 as Milliseconds; // Limits how often the propagation loop runs
@@ -208,6 +211,10 @@ export interface ExtraDataMessage {
 const scheduleNextPropagation_ = (delayMs: number): void => {
   if (propagationTimer_ !== null) {
     clearTimeout(propagationTimer_);
+    propagationTimer_ = null;
+  }
+  if (isPaused_) {
+    return;
   }
   propagationTimer_ = setTimeout(() => {
     propagationTimer_ = null;
@@ -252,6 +259,36 @@ const handleOffsetMsg_ = (m: PositionCruncherIncomingMsg): void => {
 
   requestImmediatePropagation_();
 };
+
+/**
+ * Handles the PAUSE message. Pausing drops the pending cycle so the worker sits idle; time messages that
+ * arrive meanwhile only update the time variables. Resuming treats the gap like a time jump (every object
+ * propagates, no velocity extrapolation across the pause) and runs a cycle right away.
+ */
+const handlePauseMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  const isPaused = m.data.isPaused === true;
+
+  if (isPaused === isPaused_) {
+    return;
+  }
+  isPaused_ = isPaused;
+
+  if (isPaused) {
+    scheduleNextPropagation_(0); // clears the pending timer and schedules nothing while paused
+
+    return;
+  }
+
+  if (isOnScreen_.length > 0) {
+    isOnScreen_.fill(1);
+  }
+  skipNextVisibilityUpdate_ = true;
+  lastPropSimTime_ = 0;
+  requestImmediatePropagation_();
+};
+
+/** Test hook: whether a propagation cycle is pending. */
+export const isPropagationScheduled = (): boolean => propagationTimer_ !== null;
 
 /**
  * Builds and pushes a single objCache entry from one incoming satData record.
@@ -313,13 +350,13 @@ const handleObjDataMsg_ = (m: PositionCruncherIncomingMsg): void => {
  * keplerian/extra data back to the main thread.
  */
 const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
-  if (m.data.id === undefined) {
-    return;
-  }
   // Discard edits for ids outside the current catalog (e.g. in-flight after a swap to a smaller catalog).
-  if (m.data.id >= objCache.length || !objCache[m.data.id]) {
+  const index = toCacheIndex(m.data.id, objCache.length);
+
+  if (index === null || !objCache[index]) {
     return;
   }
+  const entry = objCache[index];
   // replace old TLEs
   const satrec = Sgp4.createSatrec(m.data.tle1, m.data.tle2);
   const meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
@@ -345,11 +382,11 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
   };
 
   // Update the object cache
-  objCache[m.data.id].satrec = satrec;
-  objCache[m.data.id].active = true;
-  objCache[m.data.id].apogee = extra.apogee;
-  objCache[m.data.id].perigee = extra.perigee;
-  objCache[m.data.id].isUpdated = true;
+  entry.satrec = satrec;
+  entry.active = true;
+  entry.apogee = extra.apogee;
+  entry.perigee = extra.perigee;
+  entry.isUpdated = true;
 
   if (isThisJest) {
     return;
@@ -361,6 +398,47 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
     satId: m.data.id,
   });
   requestImmediatePropagation_();
+};
+
+/**
+ * Handles SAT_EDIT_BATCH: the bulk form of SAT_EDIT. Replaces satrecs for many objects, posts nothing per
+ * object (the main thread ignores the derived extra data for host objects) and requests one propagation.
+ */
+const handleSatEditBatchMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  const { ids, tle1s, tle2s, actives } = m.data;
+
+  if (!ids || !tle1s || !tle2s) {
+    return;
+  }
+  for (let k = 0; k < ids.length; k++) {
+    const index = toCacheIndex(ids[k], objCache.length);
+    const entry = index === null ? undefined : objCache[index];
+
+    if (!entry) {
+      continue;
+    }
+    if (actives && actives[k] === false) {
+      entry.active = false;
+      continue;
+    }
+    try {
+      const satrec = Sgp4.createSatrec(tle1s[k], tle2s[k]);
+      const meanMotion = (satrec.no * 60 * 24) / TAU;
+      const semiMajorAxis = (8681663.653 / meanMotion) ** (2 / 3);
+
+      entry.satrec = satrec;
+      entry.active = true;
+      entry.apogee = (semiMajorAxis * (1 + satrec.ecco) - RADIUS_OF_EARTH) as Kilometers;
+      entry.perigee = (semiMajorAxis * (1 - satrec.ecco) - RADIUS_OF_EARTH) as Kilometers;
+      entry.isUpdated = true;
+    } catch {
+      entry.active = false;
+    }
+  }
+  if (!isThisJest) {
+    // istanbul ignore next
+    requestImmediatePropagation_();
+  }
 };
 
 export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
@@ -375,17 +453,27 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
       handleOffsetMsg_(m);
 
       return;
+    case PosCruncherMsgType.PAUSE:
+      handlePauseMsg_(m);
+
+      return;
     case PosCruncherMsgType.OBJ_DATA:
       handleObjDataMsg_(m);
       break;
     case PosCruncherMsgType.SAT_EDIT:
       handleSatEditMsg_(m);
       break;
-    case PosCruncherMsgType.NEW_MISSILE:
-      if (m.data.id !== undefined && m.data.id < objCache.length) {
-        objCache[m.data.id] = <PosCruncherCachedObject>(<unknown>m.data);
+    case PosCruncherMsgType.SAT_EDIT_BATCH:
+      handleSatEditBatchMsg_(m);
+      break;
+    case PosCruncherMsgType.NEW_MISSILE: {
+      const index = toCacheIndex(m.data.id, objCache.length);
+
+      if (index !== null) {
+        objCache[index] = <PosCruncherCachedObject>(<unknown>m.data);
       }
       break;
+    }
     case PosCruncherMsgType.SATELLITE_SELECTED:
       {
         const ids = m.data.satelliteSelected ?? [-1];

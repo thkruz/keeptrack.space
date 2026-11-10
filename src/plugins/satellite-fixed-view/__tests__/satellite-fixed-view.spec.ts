@@ -10,9 +10,11 @@ test.describe('SatelliteFixedView', () => {
     const utilityIcon = page.locator('#SatelliteFixedView-utility-icon');
 
     await expect(utilityIcon).toBeAttached();
+
+    await expect(utilityIcon).toBeVisible();
     await expect(utilityIcon).toHaveClass(/bmenu-item-disabled/u);
 
-    await utilityIcon.click({ force: true });
+    await utilityIcon.click();
     await expect(utilityIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 2_000 });
   });
 });

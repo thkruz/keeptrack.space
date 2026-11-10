@@ -48,7 +48,10 @@
         "unknown": "不明",
         "notApplicable": "該当なし",
         "notApplicableOem": "該当なし (OEM)",
-        "notInOrbitToast": "衛星 {sccNum} は軌道上にありません!<br>シミュレーション時刻は {simTime} です。<br>正しい TLE を使用しているか確認してください。"
+        "notInOrbitToast": "衛星 {sccNum} は軌道上にありません!<br>シミュレーション時刻は {simTime} です。<br>正しい TLE を使用しているか確認してください。",
+        "categoryKinematic": "運動学",
+        "categorySensor": "センサー",
+        "kinematicOk": "センサーの制限内"
       }
     }
   }

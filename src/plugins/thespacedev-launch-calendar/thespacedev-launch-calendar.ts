@@ -275,6 +275,10 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
         // Replace the list (and the table) only once a new list has arrived.
         this.processData({ results: Array.isArray(data?.results) ? data.results : [] });
         this.renderTable_();
+        if (this.launchList.length > 0) {
+          // The launch list is showing: first launch-analyst step (no catalog subject)
+          EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
+        }
       })
       .catch((e: unknown) => {
         if (e instanceof Error && e.message === RATE_LIMITED) {

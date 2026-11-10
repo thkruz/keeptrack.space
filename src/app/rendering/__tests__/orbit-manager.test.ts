@@ -40,6 +40,7 @@ describe('OrbitManager', () => {
     vi.spyOn(om.orbitThreadMgr, 'init').mockImplementation(() => undefined);
     vi.spyOn(om.orbitThreadMgr, 'sendInit').mockImplementation(() => undefined);
     vi.spyOn(om.orbitThreadMgr, 'sendSatelliteUpdate').mockImplementation(() => undefined);
+    vi.spyOn(om.orbitThreadMgr, 'sendSatelliteTleBatch').mockImplementation(() => undefined);
     vi.spyOn(om.orbitThreadMgr, 'sendMissileUpdate').mockImplementation(() => undefined);
     vi.spyOn(om.orbitThreadMgr, 'sendChangeOrbitType').mockImplementation(() => undefined);
 
@@ -282,6 +283,34 @@ describe('OrbitManager', () => {
       om.changeOrbitBufferData(2, 'tle1', 'tle2');
 
       expect(om.orbitThreadMgr.sendSatelliteUpdate).toHaveBeenCalled();
+    });
+
+    it('changeOrbitBufferDataBatch forwards all elements to the thread manager in one call', () => {
+      om.changeOrbitBufferDataBatch([1, 2, 3], ['a1', 'b1', 'c1'], ['a2', 'b2', 'c2']);
+
+      expect(om.orbitThreadMgr.sendSatelliteTleBatch).toHaveBeenCalledTimes(1);
+      expect(om.orbitThreadMgr.sendSatelliteTleBatch).toHaveBeenCalledWith([1, 2, 3], ['a1', 'b1', 'c1'], ['a2', 'b2', 'c2']);
+      expect(om.orbitThreadMgr.sendSatelliteUpdate).not.toHaveBeenCalled();
+    });
+
+    it('changeOrbitBuffersFor builds each orbit now for a small set', () => {
+      om.changeOrbitBuffersFor([1, 2], ['a1', 'b1'], ['a2', 'b2']);
+
+      expect(om.orbitThreadMgr.sendSatelliteTleBatch).not.toHaveBeenCalled();
+      expect(om.orbitThreadMgr.sendSatelliteUpdate).toHaveBeenCalledTimes(2);
+    });
+
+    it('changeOrbitBuffersFor sends one batch message for a set above BULK_ORBIT_THRESHOLD', () => {
+      const n = OrbitManager.BULK_ORBIT_THRESHOLD + 1;
+      const ids = Array.from({ length: n }, (_, i) => i);
+      const tle1s = ids.map((i) => `l1-${i}`);
+      const tle2s = ids.map((i) => `l2-${i}`);
+
+      om.changeOrbitBuffersFor(ids, tle1s, tle2s);
+
+      expect(om.orbitThreadMgr.sendSatelliteTleBatch).toHaveBeenCalledTimes(1);
+      expect(om.orbitThreadMgr.sendSatelliteTleBatch).toHaveBeenCalledWith(ids, tle1s, tle2s);
+      expect(om.orbitThreadMgr.sendSatelliteUpdate).not.toHaveBeenCalled();
     });
 
     it('toggleEciToEcf_ flips the ECF flag and clears the cache', () => {

@@ -99,5 +99,6 @@ export class WatchlistFilterPlugin extends KeepTrackPlugin {
 
     // Delegate to centralized filter management (syncs checkbox + applies/clears filter)
     watchlistPlugin.setFilterActive(this.isMenuButtonActive);
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 }

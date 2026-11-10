@@ -36,6 +36,14 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
+  /** Stop (true) or restart (false) the worker's propagation loop. Used while an embed is parked. */
+  sendPause(isPaused: boolean): void {
+    this.postMessage({
+      typ: PosCruncherMsgType.PAUSE,
+      isPaused,
+    });
+  }
+
   sendSatEdit(id: number, tle1: string, tle2: string, active?: boolean): void {
     this.postMessage({
       typ: PosCruncherMsgType.SAT_EDIT,
@@ -43,6 +51,17 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
       tle1,
       tle2,
       active,
+    });
+  }
+
+  /** Bulk SAT_EDIT: one message for many objects. `actives[i] === false` deactivates ids[i]. */
+  sendSatEditBatch(ids: number[], tle1s: string[], tle2s: string[], actives?: boolean[]): void {
+    this.postMessage({
+      typ: PosCruncherMsgType.SAT_EDIT_BATCH,
+      ids,
+      tle1s,
+      tle2s,
+      actives,
     });
   }
 

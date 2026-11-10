@@ -381,6 +381,7 @@ export class ShortTermFences extends KeepTrackPlugin {
     sensorManager.addStf(stfSensor);
     this.refreshActiveFences_();
     this.openActiveFencesPanel_();
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   /** Open the secondary (Active Fences) panel if it is not already showing. */

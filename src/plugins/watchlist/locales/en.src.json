@@ -27,7 +27,8 @@
         "satellitesHeader": "Satellites",
         "actionsHeader": "Actions",
         "displayHeader": "Display",
-        "labelsHeader": "Labels"
+        "labelsHeader": "Labels",
+        "reportList": "Report on Watchlist"
       },
       "msgs": {
         "watchlistLoaded": "Watchlist Loaded with {count} Satellites"
@@ -49,6 +50,10 @@
             "fovOnly": "FOV Only",
             "all": "All Watchlist"
           }
+        },
+        "showSensorLabels": {
+          "label": "Show Sensor Labels",
+          "helpText": "Draw the sensor name next to its marker on the globe and the flat map."
         }
       },
       "rmbMenu": {

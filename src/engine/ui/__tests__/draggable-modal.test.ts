@@ -130,3 +130,30 @@ describe('DraggableModal keyboard ownership', () => {
     window.removeEventListener('keydown', leaked);
   });
 });
+
+describe('DraggableModal viewport resize', () => {
+  it('clamps an open modal back inside the viewport on window resize and stops after close', () => {
+    setupStandardEnvironment();
+    const dialog = new InputDialog();
+
+    dialog.open();
+    const el = document.getElementById('qa-input-dialog') as HTMLElement;
+
+    Object.defineProperty(el, 'offsetWidth', { configurable: true, value: 300 });
+    Object.defineProperty(el, 'offsetHeight', { configurable: true, value: 200 });
+    el.style.left = '700px';
+    el.style.top = '900px';
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 600 });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 800 });
+    window.dispatchEvent(new Event('resize'));
+    expect(el.style.left).toBe('300px');
+    expect(el.style.top).toBe('600px');
+
+    dialog.close();
+    el.style.left = '700px';
+    window.dispatchEvent(new Event('resize'));
+    expect(el.style.left).toBe('700px');
+    Reflect.deleteProperty(window, 'innerWidth');
+    Reflect.deleteProperty(window, 'innerHeight');
+  });
+});

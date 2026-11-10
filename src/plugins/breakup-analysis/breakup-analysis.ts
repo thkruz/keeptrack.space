@@ -339,6 +339,11 @@ export class BreakupAnalysis extends KeepTrackPlugin implements ICommandPaletteC
     this.renderEventDetail_(event);
     this.filterDebrisOnGlobe_();
     this.showDetailView_();
+
+    // Achievement signal: a historical breakup event was opened; satId is the parent when it is in the catalog
+    const parentId = ServiceLocator.getCatalogManager().sccNum2Id(event.parentNoradId.toString());
+
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { ...(parentId === null ? {} : { satId: parentId }), eventId: event.id });
   }
 
   /** Swap the menu from the event list to the (already rendered) detail view. */

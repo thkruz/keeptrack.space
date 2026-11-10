@@ -9,7 +9,7 @@ import type { RmbMenuContext } from '../plugins/core/plugin-capabilities';
 import type { LineManager } from '../rendering/line-manager';
 import type { TextureStatus } from '../rendering/texture-load-registry';
 import { errorManagerInstance } from '../utils/errorManager';
-import { EventBusEvent } from './event-bus-events';
+import { EventBusEvent, PluginActionSubject } from './event-bus-events';
 
 export interface EngineEventMap {
   [EventBusEvent.update]: [number];
@@ -102,6 +102,7 @@ export interface EngineEventMap {
   [EventBusEvent.splashScreenHidden]: [];
   [EventBusEvent.keyboardShortcutUsed]: [string, string]; // pluginId, key
   [EventBusEvent.pluginFormSubmitted]: [string]; // pluginId
+  [EventBusEvent.pluginActionUsed]: [string, PluginActionSubject?]; // pluginId, what the action was about
   [EventBusEvent.commandPaletteAction]: [string]; // command id
   [EventBusEvent.performanceDowngrade]: [string]; // disabled feature name
   [EventBusEvent.celestialBodySelected]: [string]; // body name

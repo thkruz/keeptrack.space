@@ -300,6 +300,7 @@ export class DopsPlugin extends KeepTrackPlugin {
       getEl('dops-form')!.addEventListener('submit', (e: Event) => {
         e.preventDefault();
         this.updateSideMenu();
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
       });
     });
   }

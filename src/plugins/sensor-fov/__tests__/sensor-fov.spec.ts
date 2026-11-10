@@ -10,10 +10,12 @@ test.describe('SensorFov', () => {
     const utilityIcon = page.locator('#SensorFov-utility-icon');
 
     await expect(utilityIcon).toBeAttached();
+
+    await expect(utilityIcon).toBeVisible();
     await expect(utilityIcon).toHaveClass(/bmenu-item-disabled/u);
 
     // Clicking a disabled utility icon should have no effect
-    await utilityIcon.click({ force: true });
+    await utilityIcon.click();
     await expect(utilityIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 2_000 });
   });
 });

@@ -44,6 +44,21 @@ describe('positionCruncher worker', () => {
     expect(first.satPos).toBeInstanceOf(Float32Array);
   });
 
+  it('SAT_EDIT_BATCH edits many satellites without posting per-object messages', () => {
+    send({
+      typ: MSG.OBJ_DATA,
+      dat: JSON.stringify([
+        { tle1: TLE1, tle2: TLE2, active: true },
+        { tle1: TLE1, tle2: TLE2, active: true },
+      ]),
+      seqNum: 1,
+      fieldOfViewSetLength: 0,
+    });
+    posted = [];
+    expect(() => send({ typ: 9, ids: [0, 1], tle1s: [TLE1, TLE1], tle2s: [TLE2, TLE2], actives: [true, false] })).not.toThrow();
+    expect(posted.filter((p) => (p as { extraUpdate?: boolean }).extraUpdate)).toHaveLength(0);
+  });
+
   it('processes OFFSET without throwing and returns undefined', () => {
     const result = send({
       typ: MSG.OFFSET,

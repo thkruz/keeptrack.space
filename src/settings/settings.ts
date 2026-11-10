@@ -55,6 +55,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   earthNightTextureQuality: 'graphics',
   earthSpecTextureQuality: 'graphics',
   earthBumpTextureQuality: 'graphics',
+  terrainReliefExaggeration: 'graphics',
   earthCloudTextureQuality: 'graphics',
   earthPoliticalTextureQuality: 'graphics',
   sunTextureQuality: 'graphics',
@@ -154,6 +155,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isEciOnHover: 'ui',
   isSatLabelModeOn: 'ui',
   satLabelMode: 'ui',
+  isShowSensorLabels: 'ui',
   desktopMaxLabels: 'ui',
   mobileMaxLabels: 'ui',
   minTimeBetweenSatLabels: 'ui',
@@ -266,7 +268,6 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   db: 'data',
   isDisableExtraCatalog: 'data',
   isUseDebrisCatalog: 'data',
-  isEnableExtendedCatalog: 'data',
   isEnableJscCatalog: 'data',
   isDisableControlSites: 'data',
   isDisableLaunchSites: 'data',
@@ -953,22 +954,20 @@ export class SettingsManager {
 }
 
 // Create a type based on the parameters of SettingsManager (ignore methods)
-export type SettingsManagerOverride = Partial<
-  Omit<
-    SettingsManager,
-    | 'exportSettingsToJSON'
-    | 'loadOverridesFromUrl_'
-    | 'loadLastMapTexture_'
-    | 'setEmbedOverrides_'
-    | 'setMobileSettings_'
-    | 'setInstallDirectory_'
-    | 'setColorSettings_'
-    | 'checkIfIframe_'
-    | 'initParseFromGETVariables_'
-    | 'loadOverrides_'
-    | 'createPropertyAccessors_'
-  >
->;
+type NonSettingMembers =
+  | 'exportSettingsToJSON'
+  | 'loadOverridesFromUrl_'
+  | 'loadLastMapTexture_'
+  | 'setEmbedOverrides_'
+  | 'setMobileSettings_'
+  | 'setInstallDirectory_'
+  | 'setColorSettings_'
+  | 'checkIfIframe_'
+  | 'initParseFromGETVariables_'
+  | 'loadOverrides_'
+  | 'createPropertyAccessors_';
+
+export type SettingsManagerOverride = Partial<Omit<SettingsManager, NonSettingMembers>>;
 
 // Export the settings manager instance
 

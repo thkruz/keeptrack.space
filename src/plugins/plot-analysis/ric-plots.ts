@@ -209,6 +209,14 @@ export class RicPlot extends KeepTrackPlugin {
 
     this.updateInfo_(points);
     this.chart.setOption(buildRicChartOption(points, this.getChartLabels_()));
+
+    // A RIC plot for a real primary/secondary pair is the analyst result that counts as using the plugin
+    if (points.length > 0 && this.selectSatManager_.selectedSat !== -1 && this.selectSatManager_.secondarySat !== -1) {
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, {
+        satId: this.selectSatManager_.selectedSat,
+        secondaryId: this.selectSatManager_.secondarySat,
+      });
+    }
   }
 
   /** Fill the header with the two satellite numbers and the relationship badge. */

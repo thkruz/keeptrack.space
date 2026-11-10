@@ -64,6 +64,7 @@ export class ScreenRecorder extends KeepTrackPlugin {
     } else {
       try {
         this.streamManagerInstance_.start();
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
       } catch {
         errorManagerInstance.warn(t7e('ScreenRecorder.compatibilityError'));
         this.setBottomIconToUnselected();

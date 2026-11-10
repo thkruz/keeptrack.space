@@ -619,6 +619,7 @@ export class NewLaunch extends KeepTrackPlugin {
       };
 
       catalogManagerInstance.satCruncherThread.sendSatEdit(id, tle1, tle2, true);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: id });
 
       const orbitManagerInstance = ServiceLocator.getOrbitManager();
 
@@ -631,7 +632,7 @@ export class NewLaunch extends KeepTrackPlugin {
     }
 
     waitForCruncher({
-      cruncher: catalogManagerInstance.satCruncher,
+      cruncher: catalogManagerInstance.satCruncherThread?.worker as Worker,
       cb: () => {
         this.isDoingCalculations_ = false;
         hideLoading();
@@ -869,7 +870,7 @@ export class NewLaunch extends KeepTrackPlugin {
 
     const currentEpoch = TimeManager.currentEpoch(ServiceLocator.getTimeManager().simulationTimeObj);
 
-    const tle1 = (tle1_.substr(0, 18) + currentEpoch[0] + currentEpoch[1] + tle1_.substr(32)) as TleLine1;
+    const tle1 = (tle1_.slice(0, 18) + currentEpoch[0] + currentEpoch[1] + tle1_.slice(32)) as TleLine1;
 
     // Create satellite record from TLE
     let satrec: SatelliteRecord;

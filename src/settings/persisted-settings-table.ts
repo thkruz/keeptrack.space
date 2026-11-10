@@ -154,6 +154,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_SHOW_SENSOR_LABELS,
+    serialize: (sm) => String(sm.isShowSensorLabels),
+    deserialize: (sm, raw) => {
+      sm.isShowSensorLabels = bool(raw);
+    },
+  },
+  {
     key: StorageKey.SETTINGS_SHOW_EPOCH_AGE,
     serialize: (sm) => String(sm.isShowEpochAge),
     deserialize: (sm, raw) => {
@@ -377,6 +384,17 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     serialize: (sm) => sm.earthNightTextureQuality?.toString() ?? null,
     deserialize: (sm, raw) => {
       sm.earthNightTextureQuality = raw as EarthNightTextureQuality;
+    },
+  },
+  {
+    key: StorageKey.GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION,
+    serialize: (sm) => sm.terrainReliefExaggeration?.toString() ?? null,
+    deserialize: (sm, raw) => {
+      const value = parseFloat(raw);
+
+      if (Number.isFinite(value) && value >= 0 && value <= 10) {
+        sm.terrainReliefExaggeration = value;
+      }
     },
   },
 ];

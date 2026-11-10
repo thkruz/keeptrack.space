@@ -36,6 +36,7 @@ test.describe('PlanetsMenuPlugin', () => {
 
     // Verify the v13 section labels of the Sun-outward tour (exact text avoids matching the title)
     for (const label of [/^Star$/u, /^Terrestrial Planets$/u, /^Asteroid Belt$/u, /^Gas Giants$/u, /^Ice Giants$/u, /^Trans-Neptunian Objects$/u]) {
+      // biome-ignore lint/performance/noAwaitInLoops: sequential Playwright assertions
       await expect(sideMenu.locator('.kt-section-label', { hasText: label })).toBeAttached();
     }
 

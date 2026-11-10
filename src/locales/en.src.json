@@ -383,5 +383,19 @@
   "colorbox": {
     "openInNewTab": "Open in new tab",
     "blankPageHint": "Page blank? Open it in a new tab."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Clear All Simulations",
+    "confirmMessage": "This removes all of the following. It cannot be undone.",
+    "confirmButton": "Clear All",
+    "commandLabel": "Clear All Simulations",
+    "buttonLabel": "Clear All Simulations",
+    "nothingToClear": "No active simulations to clear.",
+    "cleared": "Cleared {count} simulation objects.",
+    "categories": {
+      "missiles": "Missiles",
+      "breakup": "Breakup debris",
+      "created": "Created satellites"
+    }
   }
 }

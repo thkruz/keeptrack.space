@@ -130,5 +130,6 @@ export class OrbitReferences extends KeepTrackPlugin {
     uiManagerInstance.doSearch(searchStr);
 
     this.isReferenceSatsActive = true;
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 }

@@ -30,6 +30,9 @@ export class Engine {
 
   private readonly application_: Application;
   private isPaused: boolean = false;
+  /** Render parking: the rAF chain is cancelled (not just skipped), so a hidden iframe costs no CPU. */
+  private isSuspended_ = false;
+  private rafId_ = 0;
   private isUpdateTimeThrottle_: boolean;
   private lastFrameTime_ = <Milliseconds>0;
   private lastCameraDataSendTime_ = 0;
@@ -132,7 +135,12 @@ export class Engine {
   }
 
   private gameLoop_(timestamp = 0 as Milliseconds): void {
-    requestAnimationFrame(this.gameLoop_.bind(this));
+    if (this.isSuspended_) {
+      this.rafId_ = 0;
+
+      return;
+    }
+    this.rafId_ = requestAnimationFrame(this.gameLoop_.bind(this));
     const dt = <Milliseconds>(timestamp - this.lastFrameTime_);
 
     this.lastFrameTime_ = timestamp;
@@ -219,7 +227,7 @@ export class Engine {
       return; // CatalogManager not yet registered
     }
 
-    if (!catalogManager?.satCruncher) {
+    if (!catalogManager?.satCruncherThread?.worker) {
       return;
     }
 
@@ -229,7 +237,7 @@ export class Engine {
     const isMultiView = ViewportManager.getInstance().isMultiViewActive();
     const camPos = mainCamera.getCamPosEarthCentered();
 
-    catalogManager.satCruncher.postMessage({
+    catalogManager.satCruncherThread.worker.postMessage({
       typ: PosCruncherMsgType.CAMERA_DATA,
       vpMatrix: new Float32Array(this.renderer.projectionCameraMatrix),
       camPosEci: new Float32Array([camPos[0], camPos[1], camPos[2]]),
@@ -247,6 +255,41 @@ export class Engine {
 
   stop() {
     this.isRunning_ = false;
+  }
+
+  get isSuspended(): boolean {
+    return this.isSuspended_;
+  }
+
+  /**
+   * Park the render/update loop: cancels the pending animation frame so nothing runs until resumeLoop().
+   * Simulation time is derived from the wall clock and offsets, so it stays correct across a suspend.
+   */
+  suspendLoop(): void {
+    if (this.isSuspended_) {
+      return;
+    }
+    this.isSuspended_ = true;
+    if (this.rafId_) {
+      cancelAnimationFrame(this.rafId_);
+      this.rafId_ = 0;
+    }
+  }
+
+  /** Restart a suspended loop: refreshes the clock, forces a canvas resize and schedules a redraw. */
+  resumeLoop(): void {
+    if (!this.isSuspended_) {
+      return;
+    }
+    this.isSuspended_ = false;
+    if (!this.isRunning_ || this.rafId_) {
+      return;
+    }
+    this.lastFrameTime_ = <Milliseconds>performance.now();
+    this.timeManager.setNow(<Milliseconds>Date.now());
+    // The iframe may have been resized while parked; resizeCanvas also rebuilds the projection matrix.
+    this.renderer.resizeCanvas(true);
+    this.rafId_ = requestAnimationFrame(this.gameLoop_.bind(this));
   }
 
   /** Check if the FPS is above a certain threshold */

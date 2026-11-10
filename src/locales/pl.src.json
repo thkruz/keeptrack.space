@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "Otwórz w nowej karcie",
     "blankPageHint": "Pusta strona? Otwórz ją w nowej karcie."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Wyczyść wszystkie symulacje",
+    "confirmMessage": "Spowoduje to usunięcie wszystkiego poniżej. Nie można tego cofnąć.",
+    "confirmButton": "Wyczyść wszystko",
+    "commandLabel": "Wyczyść wszystkie symulacje",
+    "buttonLabel": "Wyczyść wszystkie symulacje",
+    "nothingToClear": "Brak aktywnych symulacji do wyczyszczenia.",
+    "cleared": "Usunięto obiekty symulacji: {count}.",
+    "categories": {
+      "missiles": "Pociski",
+      "breakup": "Szczątki z rozpadu",
+      "created": "Utworzone satelity"
+    }
   }
 }

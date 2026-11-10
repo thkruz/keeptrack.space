@@ -53,6 +53,7 @@ export const roundOrNull = (value: number | null | undefined, decimals: number):
 
 export class LookAnglesPlugin extends KeepTrackPlugin {
   readonly id = 'LookAnglesPlugin';
+  private lastActionKey_ = '';
   dependencies_ = [SelectSatManager.name];
   private readonly selectSatManager_: SelectSatManager;
 
@@ -368,8 +369,25 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     // Populate the Side Menu
     this.populateSideMenuTable_(looksArray, timeManagerInstance);
+    this.emitActionUsed_(sat, sensors);
 
     return looksArray;
+  }
+
+  /** Achievement signal: look angles computed for a sat from a sensor. Once per sat+sensor pair until either changes. */
+  private emitActionUsed_(sat: Satellite, sensors: DetailedSensor[]): void {
+    const sensorId = sensors[0]?.objName ?? sensors[0]?.name;
+
+    if (!sensorId) {
+      return;
+    }
+    const key = `${sat.id}|${sensorId}`;
+
+    if (key === this.lastActionKey_) {
+      return;
+    }
+    this.lastActionKey_ = key;
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id, sensorId });
   }
 
   private populateSideMenuTable_(lookAngleData: LookAngleData[], timeManagerInstance: TimeManager) {

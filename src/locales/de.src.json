@@ -671,5 +671,19 @@
   "colorbox": {
     "openInNewTab": "In neuem Tab öffnen",
     "blankPageHint": "Seite leer? In neuem Tab öffnen."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Alle Simulationen löschen",
+    "confirmMessage": "Dies entfernt alles Folgende. Es kann nicht rückgängig gemacht werden.",
+    "confirmButton": "Alle löschen",
+    "commandLabel": "Alle Simulationen löschen",
+    "buttonLabel": "Alle Simulationen löschen",
+    "nothingToClear": "Keine aktiven Simulationen zum Löschen.",
+    "cleared": "{count} Simulationsobjekte gelöscht.",
+    "categories": {
+      "missiles": "Raketen",
+      "breakup": "Trümmer aus Zerfall",
+      "created": "Erstellte Satelliten"
+    }
   }
 }

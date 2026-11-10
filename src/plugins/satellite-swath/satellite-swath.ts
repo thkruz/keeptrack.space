@@ -233,6 +233,9 @@ export class SatelliteSwath extends KeepTrackPlugin implements ISettingsContribu
         ServiceLocator.getScene().swathFactory.setParams(toSwathParams(this.settings_, SatelliteSwath.meanAltKm_(sat)));
       }
     }
+    const swathSat = settingsManager.isDrawSwath ? this.getSelectedSatellite_() : null;
+
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, swathSat ? { satId: swathSat.id } : undefined);
   }
 
   openSettingsMenu(): void {

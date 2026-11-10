@@ -32,7 +32,7 @@ describe('ReportsPlugin_class', () => {
       expect(config.image).toBeDefined();
       expect(config.menuMode).toContain(MenuMode.ANALYSIS);
       expect(config.menuMode).toContain(MenuMode.ALL);
-      expect(config.isDisabledOnLoad).toBe(true);
+      expect(config.isDisabledOnLoad).toBe(false);
     });
 
     it('should return correct side menu config', () => {
@@ -166,10 +166,10 @@ describe('ReportsPlugin_class', () => {
   });
 
   describe('isRequireSatelliteSelected', () => {
-    it('should require satellite selection', () => {
+    it('should not require satellite selection (batch reports work from search results and the watchlist)', () => {
       const plugin = new ReportsPlugin();
 
-      expect(plugin.isRequireSatelliteSelected).toBe(true);
+      expect(plugin.isRequireSatelliteSelected).toBe(false);
     });
   });
 });
@@ -501,5 +501,74 @@ describe('ReportsPlugin report generation', () => {
       // Reaching the popup-blocked alert means the report was generated.
       expect(alertSpy).toHaveBeenCalled();
     });
+  });
+});
+
+describe('ReportsPlugin batch reports', () => {
+  let plugin: ReportsPlugin;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new ReportsPlugin();
+    websiteInit(plugin);
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('marks conjunction-section reports as not batchable and the single-object reports as batchable', () => {
+    const reports = ReportsPlugin.getRegisteredReports();
+
+    for (const id of ['aer-report', 'lla-report', 'eci-report', 'coes-report', 'visibility-windows-report', 'sun-eclipse-report']) {
+      expect(ReportsPlugin.isBatchEligible(reports.find((r) => r.id === id)!)).toBe(true);
+    }
+    for (const id of ['conjunction-report', 'maneuver-report', 'screening-compare-report']) {
+      expect(ReportsPlugin.isBatchEligible(reports.find((r) => r.id === id)!)).toBe(false);
+    }
+  });
+
+  it('generateReport_ runs the batch path when a non-selected source is chosen', () => {
+    const batch = vi.spyOn(p(), 'generateBatchReport_').mockResolvedValue(undefined);
+
+    p().batchSource_ = 'watchlist';
+    p().generateReport_(ReportsPlugin.getRegisteredReports().find((r) => r.id === 'lla-report')!);
+
+    expect(batch).toHaveBeenCalledOnce();
+  });
+
+  it('builds one combined table from the search results with NORAD and Name columns', async () => {
+    vi.spyOn(p(), 'searchIds_').mockReturnValue([defaultSat.id, defaultSat.id]);
+    const saveBatch = vi.spyOn(p(), 'saveBatch_').mockImplementation(() => undefined);
+    const report = {
+      id: 'fake',
+      name: 'fake',
+      generate: () => ({ filename: 'f', header: '', table: { headers: ['v'], rows: [['1'], ['2']] } }),
+    };
+
+    p().batchSource_ = 'search';
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSat);
+    await p().generateBatchReport_(report);
+
+    expect(saveBatch).toHaveBeenCalledOnce();
+    const results = saveBatch.mock.calls[0][1] as { sccNum: string; data: unknown }[];
+
+    // De-duplicated to one object that produced two rows.
+    expect(results).toHaveLength(1);
+    expect(results[0].sccNum).toBe(defaultSat.sccNum);
+  });
+
+  it('asks for confirmation above 500 objects and stops when declined', async () => {
+    vi.spyOn(p(), 'watchlistIds_').mockReturnValue(Array.from({ length: 501 }, (_, i) => i));
+    const confirmSpy = vi.spyOn(globalThis, 'confirm').mockReturnValue(false);
+    const saveBatch = vi.spyOn(p(), 'saveBatch_').mockImplementation(() => undefined);
+
+    p().batchSource_ = 'watchlist';
+    await p().generateBatchReport_({ id: 'fake', name: 'fake', generate: vi.fn() });
+
+    expect(confirmSpy).toHaveBeenCalledOnce();
+    expect(saveBatch).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,4 @@
-import { LocaleInformation, Localization } from '@app/locales/locales';
+import { LocaleInformation, Localization, loadLocale, localesReady } from '@app/locales/locales';
 import i18next from 'i18next';
 
 describe('Locales', () => {
@@ -10,9 +10,53 @@ describe('Locales', () => {
       ['unsupported', 'en'],
       ['en', 'en'],
     ]) {
+      // biome-ignore lint/performance/noAwaitInLoops: each language switch must finish before the next assertion
+      await loadLocale(requested);
       await i18next.changeLanguage(requested);
       expect(document.documentElement.lang).toBe(expected);
     }
+  });
+
+  it('lazy-loads a non-English bundle through the dynamic path and keeps the English fallback', async () => {
+    await localesReady;
+    expect(i18next.hasResourceBundle('en', 'translation')).toBe(true);
+
+    // Pick a key whose German text differs from English
+    const en = (await import('@app/locales/en.json')).default as Record<string, unknown>;
+    const de = (await import('@app/locales/de.json')).default as Record<string, unknown>;
+    const pick = (obj: unknown, path: string[]): unknown => path.reduce((o, k) => (o as Record<string, unknown> | undefined)?.[k], obj);
+    const findDiff = (a: unknown, b: unknown, path: string[] = []): string[] | null => {
+      if (typeof a === 'string') {
+        return typeof pick(b, path) === 'string' && pick(b, path) !== a ? path : null;
+      }
+      for (const k of Object.keys((a as object) ?? {})) {
+        const r = findDiff((a as Record<string, unknown>)[k], b, [...path, k]);
+
+        if (r) {
+          return r;
+        }
+      }
+
+      return null;
+    };
+    const diffPath = findDiff(en, de) as string[];
+    const key = diffPath.join('.');
+
+    await i18next.changeLanguage('en');
+    i18next.removeResourceBundle('de', 'translation');
+    expect(i18next.hasResourceBundle('de', 'translation')).toBe(false);
+
+    await loadLocale('de-DE');
+    expect(i18next.hasResourceBundle('de', 'translation')).toBe(true);
+    await i18next.changeLanguage('de');
+    expect(i18next.t(key)).toBe(pick(de, diffPath));
+    expect(i18next.t(key)).not.toBe(pick(en, diffPath));
+
+    // Unknown language: falls back to English text, loadLocale is a safe no-op
+    await loadLocale('xx');
+    await i18next.changeLanguage('xx');
+    expect(i18next.t(key)).toBe(pick(en, diffPath));
+    await i18next.changeLanguage('en');
   });
 
   const flatMapOfAllKeys: string[] = [];

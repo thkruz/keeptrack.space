@@ -1,18 +1,25 @@
 import i18next, { InitOptions } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
-import cs from './cs.json';
-import de from './de.json';
 import en from './en.json';
-import es from './es.json';
-import fr from './fr.json';
-import it from './it.json';
-import ja from './ja.json';
 import { Keys, t7e } from './keys';
-import ko from './ko.json';
-import pl from './pl.json';
-import ru from './ru.json';
-import uk from './uk.json';
-import zh from './zh.json';
+
+/**
+ * Non-English languages are loaded on demand: each dynamic import() becomes its own chunk, so main.js
+ * carries only English (the fallback). A literal path per language keeps the bundler able to split them.
+ */
+const LOCALE_LOADERS: Record<string, () => Promise<{ default: Record<string, unknown> }>> = {
+  cs: () => import('./cs.json'),
+  de: () => import('./de.json'),
+  es: () => import('./es.json'),
+  fr: () => import('./fr.json'),
+  it: () => import('./it.json'),
+  ja: () => import('./ja.json'),
+  ko: () => import('./ko.json'),
+  pl: () => import('./pl.json'),
+  ru: () => import('./ru.json'),
+  uk: () => import('./uk.json'),
+  zh: () => import('./zh.json'),
+};
 
 const opts: InitOptions = {
   interpolation: {
@@ -21,18 +28,7 @@ const opts: InitOptions = {
   fallbackLng: 'en',
   debug: false,
   resources: {
-    de: { translation: de },
     en: { translation: en },
-    fr: { translation: fr },
-    es: { translation: es },
-    ja: { translation: ja },
-    ko: { translation: ko },
-    uk: { translation: uk },
-    ru: { translation: ru },
-    zh: { translation: zh },
-    pl: { translation: pl },
-    cs: { translation: cs },
-    it: { translation: it },
   },
 };
 
@@ -40,14 +36,48 @@ const syncDocumentLanguage = (): void => {
   if (typeof document !== 'undefined') {
     const resolved = i18next.resolvedLanguage ?? 'en';
 
-    document.documentElement.lang = Object.hasOwn(opts.resources ?? {}, resolved) ? resolved : 'en';
+    document.documentElement.lang = Object.hasOwn(LOCALE_LOADERS, resolved) || resolved === 'en' ? resolved : 'en';
   }
+};
+
+/**
+ * Load a language's translation bundle (no-op for English, unknown codes, or an already-loaded language).
+ * Accepts regional tags such as 'de-DE'. Call it before i18next.changeLanguage() so the switch resolves
+ * to the real translations rather than the English fallback.
+ */
+export const loadLocale = async (code: string): Promise<void> => {
+  const base = code.split('-')[0];
+  const loader = Object.hasOwn(LOCALE_LOADERS, base) ? LOCALE_LOADERS[base] : null;
+
+  if (!loader || i18next.hasResourceBundle(base, 'translation')) {
+    return;
+  }
+
+  const bundle = await loader();
+
+  i18next.addResourceBundle(base, 'translation', bundle.default, true, true);
 };
 
 i18next.on('languageChanged', syncDocumentLanguage);
 i18next.on('initialized', syncDocumentLanguage);
-i18next.use(LanguageDetector).init(opts);
+const initPromise = i18next.use(LanguageDetector).init(opts);
 syncDocumentLanguage();
+
+/**
+ * Resolves once the detected language's bundle is loaded and applied. Boot awaits this before the first
+ * t7e() call that renders UI. Never rejects: on a load failure the app keeps running in English.
+ */
+export const localesReady: Promise<void> = Promise.resolve(initPromise)
+  .then(() => loadLocale(i18next.language ?? 'en'))
+  .then(() => {
+    if (i18next.language && i18next.language !== 'en') {
+      // Re-resolve so resolvedLanguage and the document lang reflect the freshly loaded bundle
+      return i18next.changeLanguage(i18next.language).then(() => undefined);
+    }
+
+    return undefined;
+  })
+  .catch(() => undefined);
 
 export interface SupportedLocale {
   /** BCP-47 base code matching a key in i18next `resources` above. */
@@ -57,8 +87,8 @@ export interface SupportedLocale {
 }
 
 /**
- * Canonical list of UI languages. Keep this in lockstep with the `resources`
- * map above - it is the single source of truth for language pickers (e.g. the
+ * Canonical list of UI languages. Keep this in lockstep with `LOCALE_LOADERS`
+ * above (plus English) - it is the single source of truth for language pickers (e.g. the
  * Debug menu's locale switcher) so the option list cannot drift from what is
  * actually bundled.
  */

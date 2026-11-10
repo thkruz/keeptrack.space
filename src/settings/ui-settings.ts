@@ -178,6 +178,10 @@ export class UiSettings {
    */
   satLabelMode: SatLabelMode = SatLabelMode.FOV_ONLY;
   /**
+   * Draw a GPU name label next to each active sensor. Default off. The embed's per-sensor `label` overrides it.
+   */
+  isShowSensorLabels = false;
+  /**
    * The maximum number of satellite labels to display on desktop devices.
    */
   desktopMaxLabels = 2000;

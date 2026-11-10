@@ -86,7 +86,7 @@ export class CoreSettings {
   /**
    * The relative path to the installation directory. This is necessary if the application is
    * a folder inside the main folder of the webserver.
-   * @deprecated This should be removed in favor of dynamic path resolution in the future.
+   * TODO: replace with dynamic path resolution so this setting is no longer needed.
    */
   installDirectory = '';
   /** Flag to determine if external data is available */
@@ -111,8 +111,10 @@ export class CoreSettings {
   /** The initial time */
   simulationTime: Date | null = null;
   propRate = 1.0;
-  changeTimeWithKeyboardAmountBig = (1000 * 60 * 60) as Milliseconds; // 1 hour
-  changeTimeWithKeyboardAmountSmall = (1000 * 60) as Milliseconds; // 1 minute
+  /** Large step, in ms, for the keyboard time-change shortcuts (default 1 hour) */
+  changeTimeWithKeyboardAmountBig = <Milliseconds>3600000;
+  /** Small step, in ms, for the keyboard time-change shortcuts (default 1 minute) */
+  changeTimeWithKeyboardAmountSmall = <Milliseconds>60000;
 
   // Time Machine
   /**

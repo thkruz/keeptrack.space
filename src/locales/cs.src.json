@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "Otevřít na nové kartě",
     "blankPageHint": "Prázdná stránka? Otevřete ji na nové kartě."
+  },
+  "simulationCleaners": {
+    "confirmTitle": "Vymazat všechny simulace",
+    "confirmMessage": "Tím se odstraní vše následující. Akci nelze vrátit zpět.",
+    "confirmButton": "Vymazat vše",
+    "commandLabel": "Vymazat všechny simulace",
+    "buttonLabel": "Vymazat všechny simulace",
+    "nothingToClear": "Žádné aktivní simulace k vymazání.",
+    "cleared": "Vymazáno simulačních objektů: {count}.",
+    "categories": {
+      "missiles": "Rakety",
+      "breakup": "Trosky z rozpadu",
+      "created": "Vytvořené družice"
+    }
   }
 }

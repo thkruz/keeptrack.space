@@ -3,6 +3,8 @@ import { Time2LonThreadManager } from '@app/app/threads/time2lon-thread-manager'
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { SatMathApi } from '@app/engine/math/sat-math-api';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
@@ -363,6 +365,8 @@ export class Time2LonPlots extends KeepTrackPlugin {
 
       if (typeof eventData?.satId === 'number') {
         this.selectSatManager_.selectSat(eventData.satId);
+        // Drilling into a plotted satellite is the analyst action that counts as using the plugin
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
       }
     });
 

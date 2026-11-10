@@ -48,7 +48,10 @@
         "unknown": "Desconocido",
         "notApplicable": "N/D",
         "notApplicableOem": "N/D (OEM)",
-        "notInOrbitToast": "¡El satélite {sccNum} no está en órbita!<br>La hora de simulación es {simTime}.<br>Compruebe que tiene el TLE correcto."
+        "notInOrbitToast": "¡El satélite {sccNum} no está en órbita!<br>La hora de simulación es {simTime}.<br>Compruebe que tiene el TLE correcto.",
+        "categoryKinematic": "Cinemática",
+        "categorySensor": "Sensor",
+        "kinematicOk": "Dentro de los límites del sensor"
       }
     }
   }

@@ -21,6 +21,10 @@ export const enum PosCruncherMsgType {
   SUNLIGHT_VIEW = 6,
   SATELLITE_SELECTED = 7,
   CAMERA_DATA = 8,
+  /** Many SAT_EDITs in one message (embed bulk upsert). */
+  SAT_EDIT_BATCH = 9,
+  /** Stop or restart the propagation loop (embed parking: nothing is drawn, so nothing is propagated). */
+  PAUSE = 10,
 }
 
 export enum MarkerMode {
@@ -50,6 +54,15 @@ export interface PosCruncherMsgSatEdit {
   tle1: string;
   tle2: string;
   active?: boolean;
+}
+
+export interface PosCruncherMsgSatEditBatch {
+  typ: PosCruncherMsgType.SAT_EDIT_BATCH;
+  ids: number[];
+  tle1s: string[];
+  tle2s: string[];
+  /** Parallel to ids. false deactivates the object. Omitted = all active. */
+  actives?: boolean[];
 }
 
 export interface PosCruncherMsgNewMissile {
@@ -84,6 +97,11 @@ export interface PosCruncherMsgSatSelected {
   satelliteSelected: number[];
 }
 
+export interface PosCruncherMsgPause {
+  typ: PosCruncherMsgType.PAUSE;
+  isPaused: boolean;
+}
+
 export interface PosCruncherMsgCameraData {
   typ: PosCruncherMsgType.CAMERA_DATA;
   vpMatrix: Float32Array;
@@ -95,12 +113,14 @@ export type PosCruncherInMsg =
   | PosCruncherMsgObjData
   | PosCruncherMsgOffset
   | PosCruncherMsgSatEdit
+  | PosCruncherMsgSatEditBatch
   | PosCruncherMsgNewMissile
   | PosCruncherMsgSensor
   | PosCruncherMsgUpdateMarkers
   | PosCruncherMsgSunlightView
   | PosCruncherMsgSatSelected
-  | PosCruncherMsgCameraData;
+  | PosCruncherMsgCameraData
+  | PosCruncherMsgPause;
 
 // ─── Outgoing Messages (Worker → Main Thread) ──────────────────────────────
 

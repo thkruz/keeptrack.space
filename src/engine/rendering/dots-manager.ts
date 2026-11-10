@@ -1521,6 +1521,10 @@ export class DotsManager {
       return DotStatus.Searched;
     }
 
+    if (this.highlightedDots_.has(i)) {
+      return DotStatus.Big;
+    }
+
     // Stars use distance-based sizing (size 0) — at 3e10 km they naturally get u_minSize
 
     if (this.isBodyDotBig_(i)) {
@@ -1547,6 +1551,41 @@ export class DotsManager {
       // TODO: This is hacky. We need better logic for determining when to show planet dots
       (settingsManager.maxZoomDistance > (2e6 as Kilometers) || (settingsManager.centerBody !== SolarBody.Earth && settingsManager.centerBody !== SolarBody.Moon))
     );
+  }
+
+  /** Dots drawn at the large size on request (embed API highlight). Searched and selected statuses still win. */
+  private readonly highlightedDots_ = new Set<number>();
+
+  /** Draw one dot at the large size (or back to its normal size) and refresh the GPU size buffer. */
+  setDotHighlighted(id: number, isHighlighted: boolean): void {
+    if (isHighlighted ? this.highlightedDots_.has(id) : !this.highlightedDots_.delete(id)) {
+      return;
+    }
+    if (isHighlighted) {
+      this.highlightedDots_.add(id);
+    }
+    if (this.sizeData && id < this.sizeData.length) {
+      this.updateSizeBuffer(this.sizeData.length);
+    }
+  }
+
+  /** Bulk setDotHighlighted: applies every change, then refreshes the GPU size buffer once. */
+  setDotsHighlighted(changes: [id: number, isHighlighted: boolean][]): void {
+    let changed = false;
+
+    for (const [id, isHighlighted] of changes) {
+      if (isHighlighted ? !this.highlightedDots_.has(id) : this.highlightedDots_.has(id)) {
+        if (isHighlighted) {
+          this.highlightedDots_.add(id);
+        } else {
+          this.highlightedDots_.delete(id);
+        }
+        changed = true;
+      }
+    }
+    if (changed && this.sizeData) {
+      this.updateSizeBuffer(this.sizeData.length);
+    }
   }
 
   /**
@@ -1587,6 +1626,11 @@ export class DotsManager {
      * draws a search ring around them. Selected is written last so it wins if
      * the selected object is also in the search results.
      */
+    for (const highlighted of this.highlightedDots_) {
+      if (highlighted < bufferLen) {
+        this.sizeData[highlighted] = DotStatus.Big;
+      }
+    }
     for (const lastSearchResult of settingsManager.lastSearchResults) {
       this.sizeData[lastSearchResult] = DotStatus.Searched;
     }

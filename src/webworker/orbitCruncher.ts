@@ -1,6 +1,7 @@
 import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { rebaseToAnchor } from '../engine/math/orbit-anchor-math';
 import { jday } from '../engine/utils/transforms';
+import { toCacheIndex } from './cache-index';
 import {
   OrbitCruncherCachedObject,
   OrbitCruncherInMsgChangeOrbitType,
@@ -75,6 +76,22 @@ export const onMessage = (m: { data: OrbitCruncherInMsgs }) => {
       handleMsgSatelliteUpdate_(msg);
       setEclipseInputs_(msg);
       updateOrbitData_(msg);
+      break;
+    case OrbitCruncherMsgType.SATELLITE_TLE_BATCH:
+      if (isStaleUpdate_(msg.seqNum)) {
+        break;
+      }
+      for (let k = 0; k < msg.ids.length; k++) {
+        const index = toCacheIndex(msg.ids[k], objCache.length);
+
+        if (index !== null && objCache[index]) {
+          try {
+            (objCache[index] as OrbitCruncherSatelliteObject).satrec = Sgp4.createSatrec(msg.tle1s[k], msg.tle2s[k]);
+          } catch {
+            // Bad elements: keep the previous satrec; the orbit line for this object stays as it was
+          }
+        }
+      }
       break;
     case OrbitCruncherMsgType.MISSILE_UPDATE:
       if (isStaleUpdate_(msg.seqNum)) {
@@ -425,22 +442,26 @@ const handleMsgInit_ = (data: OrbitCruncherInMsgInit) => {
 };
 
 const handleMsgSatelliteUpdate_ = (data: OrbitCruncherInMsgSatelliteUpdate) => {
-  if (data.id >= objCache.length || !objCache[data.id]) {
+  const index = toCacheIndex(data.id, objCache.length);
+
+  if (index === null || !objCache[index]) {
     return;
   }
   // If new orbit
   if (data.tle1 && data.tle2) {
-    const satelliteCacheEntry = objCache[data.id] as OrbitCruncherSatelliteObject;
+    const satelliteCacheEntry = objCache[index] as OrbitCruncherSatelliteObject;
 
     satelliteCacheEntry.satrec = Sgp4.createSatrec(data.tle1, data.tle2);
   }
 };
 
 const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
-  if (data.id >= objCache.length || !objCache[data.id]) {
+  const index = toCacheIndex(data.id, objCache.length);
+
+  if (index === null || !objCache[index]) {
     return;
   }
-  const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
+  const missileCacheEntry = objCache[index] as OrbitCruncherMissileObject;
 
   if (data.latList && data.lonList && data.altList) {
     missileCacheEntry.latList = data.latList;

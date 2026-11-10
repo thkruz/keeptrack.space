@@ -27,7 +27,8 @@
         "satellitesHeader": "衛星",
         "actionsHeader": "操作",
         "displayHeader": "表示",
-        "labelsHeader": "ラベル"
+        "labelsHeader": "ラベル",
+        "reportList": "ウォッチリストのレポート"
       },
       "msgs": {
         "watchlistLoaded": "ウォッチリストに{count}個の衛星を読み込みました"
@@ -49,6 +50,10 @@
             "fovOnly": "FOV内のみ",
             "all": "ウォッチリスト全体"
           }
+        },
+        "showSensorLabels": {
+          "label": "センサーラベルを表示",
+          "helpText": "地球儀と平面地図のセンサーマーカーの横にセンサー名を描画します。"
         }
       },
       "rmbMenu": {

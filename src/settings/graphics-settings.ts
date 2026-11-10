@@ -96,6 +96,13 @@ export class GraphicsSettings {
    */
   earthNightBrightness = 1;
   /**
+   * Vertical exaggeration of terrain relief shading (Earth and Moon), which lights the
+   * day side from the bump map's slope (0 = off, 1 = true scale). Earth's mountains are
+   * only a few texels wide even on the 8k bump map, so a little exaggeration
+   * reads closer to what astronauts see.
+   */
+  terrainReliefExaggeration = 2.5;
+  /**
    * Draws a soft, smoothly-pulsing glow around the selected satellite in non-ride-along
    * views (mirrors the 2D companion map's live marker). Off by default so the stock
    * keeptrack.space look is unchanged; the companion profile turns it on.

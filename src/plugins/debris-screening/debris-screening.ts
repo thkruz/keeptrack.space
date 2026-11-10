@@ -547,6 +547,9 @@ export class DebrisScreening extends KeepTrackPlugin {
       other.primaryId === run.primaryId && other.startTimeMs === run.startTimeMs && other.endTimeMs === run.endTimeMs && sameBox(other.boxKm, run.boxKm);
 
     this.recentRuns_ = [run, ...this.recentRuns_.filter((other) => !isSameKey(other))].slice(0, DebrisScreening.MAX_RETAINED_RUNS);
+
+    // Achievement signal: a screening run completed on this primary
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: primary.id });
   }
 
   protected onTargetChanged_(): void {

@@ -36,7 +36,7 @@ test.describe('EditSat', () => {
     await expect(drawerItem).toBeVisible();
 
     // 4. Clicking disabled drawer item should NOT open the side menu
-    await drawerItem.click({ force: true });
+    await drawerItem.click();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 2_000 });
 
     // 5. Verify form elements exist in DOM even though menu is hidden

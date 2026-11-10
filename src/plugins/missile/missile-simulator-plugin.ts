@@ -11,6 +11,8 @@ import { getEl } from '@app/engine/utils/get-el';
 import { hideLoading, showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import rocketPng from '@public/img/icons/rocket.png';
+import { registerBuiltInSimulationCleaners } from '../simulation-cleaners/builtin-cleaners';
+import { confirmAndClearAllSimulations } from '../simulation-cleaners/clear-all-simulations';
 import {
   ATTACKER_SITES,
   AttackerSite,
@@ -256,6 +258,9 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
             <button id="clearMissilesBtn" class="kt-action waves-effect waves-light" type="button" name="clear">
               <span class="kt-action-label">${l('buttons.clearMissiles')}</span>
             </button>
+            <button id="clearAllSimulationsBtn" class="kt-action waves-effect waves-light" type="button" name="clearAllSimulations">
+              <span class="kt-action-label">${t7e('simulationCleaners.buttonLabel')}</span>
+            </button>
           </form>
           <div id="ms-status" class="kt-note"></div>
         </div>
@@ -290,6 +295,12 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
         callback: () => this.clearMissiles_(),
         isAvailable: () => missileManager.missilesInUse > 0,
       },
+      {
+        id: 'MissileSimulatorPlugin.clearAllSimulations',
+        label: t7e('simulationCleaners.commandLabel'),
+        category: 'Simulation',
+        callback: () => confirmAndClearAllSimulations(),
+      },
     ];
   }
 
@@ -299,6 +310,8 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
 
   addJs(): void {
     super.addJs();
+
+    registerBuiltInSimulationCleaners();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
 
@@ -498,6 +511,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
     getEl(`${this.id}-menu-form`)!.addEventListener('change', this.missileChange_);
     getEl('searchRvBtn')!.addEventListener('click', this.searchForRvs_);
     getEl('clearMissilesBtn')!.addEventListener('click', this.clearMissiles_);
+    getEl('clearAllSimulationsBtn')?.addEventListener('click', () => confirmAndClearAllSimulations());
 
     if (menuRoot) {
       initMaterialSelects(menuRoot);

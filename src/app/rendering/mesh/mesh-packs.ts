@@ -19,6 +19,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { isProContentAllowed } from '@app/engine/core/pro-content-gate';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { t7e } from '@app/locales/keys';
 
@@ -43,7 +44,7 @@ export async function registerMeshPacks(): Promise<void> {
    * compile: those spacecraft should fall back to their shape-routed generics rather than
    * taking the whole app down.
    */
-  if (__IS_PRO__) {
+  if (__IS_PRO__ && isProContentAllowed()) {
     try {
       const pack = await import(/* @vite-ignore */ '@plugins-pro/hero-meshes/hero-meshes');
 

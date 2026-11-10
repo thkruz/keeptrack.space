@@ -107,7 +107,7 @@ export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): str
 };
 
 /** Escapes a single CSV cell per RFC 4180 (quote if it holds a comma, quote, or newline). */
-const csvCell = (cell: string): string => (/[",\n]/u.test(cell) ? `"${cell.replace(/"/gu, '""')}"` : cell);
+export const csvCell = (cell: string): string => (/[",\r\n]/u.test(cell) ? `"${cell.replace(/"/gu, '""')}"` : cell);
 
 /** Serializes the table as comma-separated values (data only, no metadata header). */
 export const tableToCsv = (table: ReportTable): string => [table.headers, ...table.rows].map((row) => row.map(csvCell).join(',')).join('\n');

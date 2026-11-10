@@ -170,6 +170,8 @@ export class Screenshot extends KeepTrackPlugin {
     link.href = this.watermarkedDataUrl_();
     link.click();
     this.queuedScreenshot_ = false;
+    // Briefing step: a view was captured (no catalog subject, matched by order and time)
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 
   private watermarkedDataUrl_() {

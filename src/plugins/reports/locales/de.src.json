@@ -348,6 +348,21 @@
           "noSensor": "Kein Sensor ausgewählt; wählen Sie einen Sensor, um Überflugfenster aufzulisten.",
           "uncertaintyAssumed": "Die 1-Sigma-Unsicherheit und das GP-Alter des Analyseobjekts sind von seinem Elternobjekt ({parent}) übernommen, und die Pc der größten Annäherung verwendet dessen Kovarianz. Ausführungsfehler des Manövers werden nicht modelliert."
         }
+      },
+      "batch": {
+        "source": "Quelle",
+        "selected": "Ausgewähltes Objekt",
+        "search": "Suchergebnisse ({count})",
+        "watchlist": "Beobachtungsliste ({count})",
+        "note": "Stapelmodus: eine gemeinsame CSV mit den Spalten NORAD und Name. Konjunktions- und Manöverberichte benötigen ein einzelnes Objekt.",
+        "progress": "Erzeuge {done} von {total}...",
+        "cancel": "Abbrechen",
+        "confirmLarge": "Dieser Stapel umfasst {count} Objekte und kann dauern. Fortfahren?",
+        "truncated": "Es werden nur die ersten {max} von {count} Objekten verwendet.",
+        "empty": "Die gewählte Quelle enthält keine Objekte.",
+        "done": "Stapelbericht gespeichert: {rows} Zeilen aus {objects} Objekten ({empty} ohne Daten, {failed} übersprungen).",
+        "rowsTruncated": "Ausgabe bei {max} Zeilen abgeschnitten.",
+        "unavailable": "Für einen Stapelbericht nicht verfügbar"
       }
     }
   }

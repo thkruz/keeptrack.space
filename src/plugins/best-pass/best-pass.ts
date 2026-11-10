@@ -211,7 +211,28 @@ export class BestPassPlugin extends KeepTrackPlugin {
       // Export is the primary action; run it first, then surface the advisory cap warning.
       this.exportPasses_(passes);
       this.toastIfTruncated_();
+      this.emitActionUsed_(sats, sensorManagerInstance.getSensor());
     });
+  }
+
+  /**
+   * Achievement signal: best passes computed. One signal per satellite in the request (the search accepts a list),
+   * each carrying the sensor the search ran from.
+   */
+  protected emitActionUsed_(sats: string, sensor: DetailedSensor | null): void {
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const sensorId = sensor?.objName ?? sensor?.name;
+    const seen = new Set<number>();
+
+    for (const token of sats.replace(/ /gu, ',').split(',')) {
+      const satId = token ? catalogManager.sccNum2Id(token) : null;
+
+      if (satId === null || seen.has(satId)) {
+        continue;
+      }
+      seen.add(satId);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, sensorId ? { satId, sensorId } : { satId });
+    }
   }
 
   /** Exports the passes. Base saves an XLSX; the Pro plugin renders a table instead. */

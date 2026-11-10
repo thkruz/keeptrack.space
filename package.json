@@ -74,6 +74,7 @@
     "start:solar-system": "tsx ./build/dev-server.ts --profile=solar-system",
     "start:ci": "tsx ./build/dev-server.ts --static",
     "test": "vitest run",
+    "test:packages": "npm test --prefix packages/embed-sdk && npm test --prefix packages/embed-client && npm test --prefix packages/embed-relay",
     "test:coverage": "vitest run --coverage",
     "test:unit": "vitest run --coverage",
     "test:e2e": "playwright test",
@@ -139,11 +140,11 @@
     "conventional-changelog-conventionalcommits": "^10.2.1",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.4",
-    "dotenv-webpack": "^8.1.1",
+    "dotenv-webpack": "^9.0.0",
     "happy-dom": "^20.5.0",
     "husky": "^8.0.1",
-    "imports-loader": "^4.0.1",
-    "jsdom": "^28.1.0",
+    "imports-loader": "^5.0.0",
+    "jsdom": "^30.1.3",
     "jsdom-worker": "^0.3.0",
     "mini-css-extract-plugin": "^2.7.6",
     "monocart-coverage-reports": "^2.12.12",
@@ -170,7 +171,7 @@
     "@materializecss/materialize": "^2.3.3",
     "@supabase/supabase-js": "^2.55.0",
     "astronomy-engine": "^2.1.19",
-    "dotenv": "^16.5.0",
+    "dotenv": "^18.0.9",
     "draggabilly": "^3.0.0",
     "echarts": "^6.1.0",
     "echarts-gl": "^2.0.9",
@@ -187,7 +188,7 @@
     "openmeteo": "^1.2.0",
     "requestidlecallback-polyfill": "^1.0.2",
     "resizable": "^2.0.0",
-    "uuid": "^11.1.0",
+    "uuid": "^14.0.2",
     "webgl-obj-loader": "^2.0.8"
   },
   "pnpm": {
@@ -203,8 +204,5 @@
   "engines": {
     "node": ">=24",
     "pnpm": ">=10"
-  },
-  "volta": {
-    "node": "24.14.0"
   }
 }

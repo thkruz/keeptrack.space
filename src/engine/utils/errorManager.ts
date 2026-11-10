@@ -26,6 +26,18 @@ const LOG_LABELS: Record<LogLevel, string> = {
 const SIGNATURE_WINDOW_MS = 5 * 60 * 1000;
 const SIGNATURE_MAP_PRUNE_THRESHOLD = 100;
 
+/**
+ * True when a stack trace has at least one frame: a V8 line ("    at fn (url:1:2)") or a SpiderMonkey/JSC line
+ * ("fn@url:1:2"). Checked line by line with simple patterns so a hostile stack cannot cause slow regex
+ * backtracking (stack text comes from whatever script raised the error).
+ */
+const hasStackFrame_ = (stack: string): boolean =>
+  stack.split('\n').some((line) => {
+    const trimmed = line.trim();
+
+    return trimmed.startsWith('at ') || (trimmed.includes('@') && /:\d+:\d+$/u.test(trimmed));
+  });
+
 export interface ErrorOptions {
   skipAutoFile?: boolean;
   skipToast?: boolean;
@@ -106,6 +118,55 @@ export class ErrorManager {
     return `[${LOG_LABELS[level]}] ${msg}`;
   }
 
+  /**
+   * Describe a non-Error thrown/rejected value. JSON.stringify only copies own enumerable
+   * properties, so WebKit host objects (whose name/message/code are prototype getters) and
+   * field-less class instances all serialize to "{}" (#1451). Prefix the type tag and fall back to
+   * the usual error-ish fields so the report says what was rejected.
+   */
+  private static describeNonError_(e: unknown): string {
+    const tag = Object.prototype.toString.call(e);
+    let own: string | undefined;
+
+    try {
+      own = JSON.stringify(e);
+    } catch {
+      own = undefined;
+    }
+
+    if (own && own !== '{}') {
+      return tag === '[object Object]' ? own : `${tag} ${own}`;
+    }
+
+    const fields: Record<string, unknown> = {};
+
+    for (const key of ['name', 'message', 'code', 'type', 'reason']) {
+      try {
+        const value = (e as Record<string, unknown>)[key];
+
+        if (value !== undefined && value !== null && typeof value !== 'function' && typeof value !== 'object') {
+          fields[key] = value;
+        }
+      } catch {
+        // getter threw; skip it
+      }
+    }
+
+    if (Object.keys(fields).length > 0) {
+      return `${tag} ${JSON.stringify(fields)}`;
+    }
+
+    let str: string;
+
+    try {
+      str = String(e);
+    } catch {
+      str = '';
+    }
+
+    return str && str !== tag ? `${tag} ${str}` : tag;
+  }
+
   private toError_(e: unknown, message?: string, source?: string, line?: number, col?: number): Error {
     if (e instanceof Error) {
       return e;
@@ -127,11 +188,7 @@ export class ErrorManager {
     } else if (typeof e === 'string') {
       err = new Error(e);
     } else {
-      try {
-        err = new Error(JSON.stringify(e));
-      } catch {
-        err = new Error(String(e));
-      }
+      err = new Error(ErrorManager.describeNonError_(e));
     }
 
     // Re-anchor the stack to the caller of toError_, so reports don't all look like
@@ -300,7 +357,25 @@ export class ErrorManager {
      * toError_ captures a stack for non-Error reasons. Match both V8 ("    at fn (url:1:2)") and
      * SpiderMonkey/JSC ("fn@url:1:2") frames so a Firefox/Safari stack is never mistaken for empty.
      */
-    if (ctx.isUnhandledRejection && !/^\s*at |@\S*:\d+:\d+\s*$/mu.test(err.stack ?? '')) {
+    if (ctx.isUnhandledRejection && !hasStackFrame_(err.stack ?? '')) {
+      return true;
+    }
+
+    /*
+     * A bare reject() with no reason carries nothing to debug, and the frames toError_ synthesizes
+     * for it point only at the trapper, so the frameless check above cannot catch it. Check the raw
+     * reason instead (#1453). Rocket Loader rejections also land here (#1371).
+     */
+    if (ctx.isUnhandledRejection && (ctx.error === null || typeof ctx.error === 'undefined')) {
+      return true;
+    }
+
+    /*
+     * Browser layout notice, not an exception: the window error event has a message but no Error
+     * object, and undelivered resize notifications are retried on the next frame (#1455). The
+     * prefix also covers the older "ResizeObserver loop limit exceeded" wording.
+     */
+    if (!ctx.error && err.message.startsWith('ResizeObserver loop ')) {
       return true;
     }
 

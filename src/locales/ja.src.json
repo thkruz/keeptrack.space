@@ -388,5 +388,19 @@
   "colorbox": {
     "openInNewTab": "新しいタブで開く",
     "blankPageHint": "ページが空白ですか？新しいタブで開いてください。"
+  },
+  "simulationCleaners": {
+    "confirmTitle": "すべてのシミュレーションを消去",
+    "confirmMessage": "以下をすべて削除します。この操作は元に戻せません。",
+    "confirmButton": "すべて消去",
+    "commandLabel": "すべてのシミュレーションを消去",
+    "buttonLabel": "すべてのシミュレーションを消去",
+    "nothingToClear": "消去するシミュレーションはありません。",
+    "cleared": "{count} 件のシミュレーションオブジェクトを消去しました。",
+    "categories": {
+      "missiles": "ミサイル",
+      "breakup": "分裂破片",
+      "created": "作成した衛星"
+    }
   }
 }

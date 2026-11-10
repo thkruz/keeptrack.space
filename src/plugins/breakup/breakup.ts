@@ -481,6 +481,7 @@ export class Breakup extends KeepTrackPlugin implements ICommandPaletteCapable {
      * racy and showed nothing until a manual re-search). Same pattern as create-sat.
      */
     ServiceLocator.getUiManager().doSearch(`${mainsat.sccNum},Breakup Piece`);
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: mainsat.id });
   }
 
   /**

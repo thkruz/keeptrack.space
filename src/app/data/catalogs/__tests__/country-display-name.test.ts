@@ -1,4 +1,4 @@
-import '@app/locales/locales';
+import { loadLocale } from '@app/locales/locales';
 import i18next from 'i18next';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { countryNameList, getCountryDisplayName } from '../countries';
@@ -9,6 +9,7 @@ import { countryNameList, getCountryDisplayName } from '../countries';
  */
 describe('getCountryDisplayName', () => {
   beforeAll(async () => {
+    await loadLocale('de');
     await i18next.changeLanguage('de');
   });
 

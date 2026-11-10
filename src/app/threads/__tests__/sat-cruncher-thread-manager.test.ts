@@ -85,6 +85,16 @@ describe('SatCruncherThreadManager', () => {
       });
     });
 
+    it('sendPause posts PAUSE with the flag', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendPause(true);
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.PAUSE, isPaused: true });
+
+      mgr.sendPause(false);
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.PAUSE, isPaused: false });
+    });
+
     it('sendSatEdit posts SAT_EDIT with the satellite fields', () => {
       const { mgr, worker } = makeMgr();
 
@@ -96,6 +106,20 @@ describe('SatCruncherThreadManager', () => {
         tle1: 'TLE-1',
         tle2: 'TLE-2',
         active: true,
+      });
+    });
+
+    it('sendSatEditBatch posts one SAT_EDIT_BATCH with parallel arrays', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendSatEditBatch([7, 8], ['a1', 'b1'], ['a2', 'b2'], [true, false]);
+
+      expect(lastMsg(worker)).toEqual({
+        typ: PosCruncherMsgType.SAT_EDIT_BATCH,
+        ids: [7, 8],
+        tle1s: ['a1', 'b1'],
+        tle2s: ['a2', 'b2'],
+        actives: [true, false],
       });
     });
 

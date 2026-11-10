@@ -98,6 +98,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_DRAW_FLAG_DECALS]: StorageScope.Device,
   [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,
+  [StorageKey.SETTINGS_SHOW_SENSOR_LABELS]: StorageScope.Device,
   // Phones default hover info off; Next Pass on hover is a fast-CPU option.
   [StorageKey.SETTINGS_SHOW_INFO_ON_HOVER]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_NEXT_PASS]: StorageScope.Device,
@@ -110,6 +111,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION]: StorageScope.Device,
+  [StorageKey.GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION]: StorageScope.Device,
 
   // --- Device: filter state (explicitly excluded from account sync) ------------
   [StorageKey.FILTER_SETTINGS_OPERATIONAL_PAYLOADS]: StorageScope.Device,
@@ -176,6 +178,8 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   // --- Device: meta/bookkeeping (never sync) ------------------------------------
   [StorageKey.VERSION]: StorageScope.Device,
   [StorageKey.USER_LAST_SYNCED]: StorageScope.Device,
+  [StorageKey.ACHIEVEMENT_TOAST_STYLE]: StorageScope.Device,
+  [StorageKey.ACHIEVEMENT_WORKFLOW_PROGRESS]: StorageScope.Device,
   [StorageKey.SYNC_META]: StorageScope.Device,
 };
 

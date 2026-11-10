@@ -150,6 +150,17 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
             PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SAT_LABEL_MODE_V2, parsed.toString());
           },
         },
+        {
+          type: 'toggle',
+          id: 'showSensorLabels',
+          label: t7e('plugins.WatchlistPlugin.settings.showSensorLabels.label'),
+          helpText: t7e('plugins.WatchlistPlugin.settings.showSensorLabels.helpText'),
+          get: () => settingsManager.isShowSensorLabels,
+          set: (next: boolean) => {
+            settingsManager.isShowSensorLabels = next;
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_SENSOR_LABELS, next.toString());
+          },
+        },
       ],
     };
   }
@@ -208,6 +219,9 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
           <input id="watchlist-file" type="file" name="files[]" style="display: none;" />
           <button id="watchlist-open" type="button" class="kt-action waves-effect">
             <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.loadList' as Parameters<typeof t7e>[0])}</span>
+          </button>
+          <button id="watchlist-report" type="button" class="kt-action waves-effect">
+            <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.reportList' as Parameters<typeof t7e>[0])}</span>
           </button>
           <button id="watchlist-clear" type="button" class="kt-action waves-effect">
             <span class="kt-action-label">${t7e('plugins.WatchlistPlugin.labels.clearList' as Parameters<typeof t7e>[0])}</span>
@@ -567,16 +581,18 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     // Remove button selected on watchlist menu
     getEl('watchlist-list')?.addEventListener('click', (evt: Event) => {
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-      if ((<HTMLElement>evt.target).classList.contains('sat-name')) {
-        const satName = (<HTMLElement>evt.target).dataset.satName;
+      const target = <HTMLElement>evt.target;
+
+      if (target.classList.contains('sat-name')) {
+        const satName = target.dataset.satName;
 
         if (satName) {
           this.selectSat(parseInt(satName, 10));
         } else {
           errorManagerInstance.debug('sat-name is null');
         }
-      } else if ((<HTMLElement>evt.target).classList.contains('watchlist-remove')) {
-        const satId = (<HTMLElement>evt.target).dataset.satId;
+      } else if (target.classList.contains('watchlist-remove')) {
+        const satId = target.dataset.satId;
 
         if (satId) {
           this.removeSat(parseInt(satId, 10));
@@ -594,6 +610,11 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     getEl('watchlist-save')?.addEventListener('click', (evt: Event) => {
       this.onSaveClicked_(evt);
+    });
+
+    getEl('watchlist-report')?.addEventListener('click', () => {
+      ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+      PluginRegistry.getPluginByName<KeepTrackPlugin & { openForBatch?: (source: 'watchlist') => void }>('ReportsPlugin')?.openForBatch?.('watchlist');
     });
 
     getEl('watchlist-clear')?.addEventListener('click', () => {
@@ -627,7 +648,12 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     if (!this.watchlistList) {
       return;
     }
-    this.isWatchlistChanged = this.isWatchlistChanged !== null;
+    // A null flag means "never touched"; any earlier value counts as a change
+    if (this.isWatchlistChanged === null) {
+      this.isWatchlistChanged = false;
+    } else {
+      this.isWatchlistChanged = true;
+    }
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
     // Drop entries whose satellite is no longer in the catalog. Filtering up
@@ -643,7 +669,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
-             <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
+            <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
           </div>
           <div class="col s7 m7 l7">
              <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name || t7e('Common.unknown')}</span>
@@ -680,6 +706,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
     PersistenceManager.getInstance().saveItem(StorageKey.WATCHLIST_LIST, this.serialize());
   }
 
+  /** Selects a satellite on the globe by catalog id. */
   selectSat(id: number) {
     const selectSatManagerInstance = PluginRegistry.getPlugin(SelectSatManager);
 
@@ -751,6 +778,9 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       });
       this.updateWatchlist();
       EventBus.getInstance().emit(EventBusEvent.onWatchlistAdd, this.watchlistList);
+      if (!isDuplicate) {
+        EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: id });
+      }
     }
   }
 

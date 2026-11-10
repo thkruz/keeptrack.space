@@ -574,6 +574,7 @@ export class Calculator extends KeepTrackPlugin {
       this.updateEpochReadout_(timeManager.simulationTimeObj);
       this.setDisplay_('calc-copy-btn', true);
       this.persistSettings_();
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     } catch (err) {
       const message = (err as Error).message;
 

@@ -27,7 +27,8 @@
         "satellitesHeader": "위성",
         "actionsHeader": "작업",
         "displayHeader": "표시",
-        "labelsHeader": "레이블"
+        "labelsHeader": "레이블",
+        "reportList": "관심 목록 보고서"
       },
       "msgs": {
         "watchlistLoaded": "{count}개의 위성으로 관심 목록을 불러왔습니다"
@@ -49,6 +50,10 @@
             "fovOnly": "FOV만",
             "all": "전체 관심 목록"
           }
+        },
+        "showSensorLabels": {
+          "label": "센서 라벨 표시",
+          "helpText": "지구본과 평면 지도의 센서 마커 옆에 센서 이름을 표시합니다."
         }
       },
       "rmbMenu": {

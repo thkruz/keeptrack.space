@@ -3,6 +3,8 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { GetSatType, ToastMsgType } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IContextMenuCapable, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
@@ -70,6 +72,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin implements IContextMenuCa
             latLon = eci2lla({ x: dragPosition[0], y: dragPosition[1], z: dragPosition[2] }, gmst);
           }
           ServiceLocator.getUiManager().toast(this.t_('latLonToast').replace('{lat}', latLon.lat.toFixed(3)).replace('{lon}', latLon.lon.toFixed(3)), ToastMsgType.normal, true);
+          EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
         }
         break;
       case 'view-sensor-info-rmb':
@@ -88,6 +91,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin implements IContextMenuCa
           if (launchSite.wikiUrl) {
             openColorbox(launchSite.wikiUrl);
           }
+          EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
         }
         break;
       case 'view-related-sats-rmb':
@@ -100,6 +104,7 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin implements IContextMenuCa
           const searchStr = intldes?.slice(0, 8) ?? '';
 
           ServiceLocator.getUiManager().doSearch(searchStr);
+          EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
         }
         break;
       default:
@@ -130,5 +135,6 @@ export class ViewInfoRmbPlugin extends KeepTrackPlugin implements IContextMenuCa
     }
 
     sensorInfoPluginInstance.getSensorInfo();
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
   }
 }

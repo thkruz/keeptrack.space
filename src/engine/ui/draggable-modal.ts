@@ -55,11 +55,40 @@ export abstract class DraggableModal extends DraggableBox {
       window.removeEventListener('blur', this.onBlur_);
     }
   };
+  private readonly onResize_ = (): void => this.onViewportResize_();
   private readonly onFocusIn_ = (event: FocusEvent): void => {
     if (this.ownsInteraction_() && !this.boxEl?.contains(event.target as Node)) {
       this.getInitialFocusElement_()?.focus();
     }
   };
+
+  /** Default: keep the modal fully inside the viewport after a window resize. */
+  protected onViewportResize_(): void {
+    this.clampToViewport_();
+  }
+
+  protected clampToViewport_(): void {
+    const el = this.boxId ? getEl(this.boxId, true) : null;
+
+    if (!el || !this.boxEl || this.boxEl.style.display === 'none') {
+      return;
+    }
+    const left = Number.parseFloat(el.style.left) || 0;
+    const top = Number.parseFloat(el.style.top) || 0;
+
+    el.style.left = `${Math.max(0, Math.min(left, window.innerWidth - el.offsetWidth))}px`;
+    el.style.top = `${Math.max(0, Math.min(top, window.innerHeight - el.offsetHeight))}px`;
+  }
+
+  protected recenter_(): void {
+    const el = this.boxId ? getEl(this.boxId, true) : null;
+
+    if (!el || !this.boxEl || this.boxEl.style.display === 'none') {
+      return;
+    }
+    el.style.left = `${Math.max(0, (window.innerWidth - el.offsetWidth) / 2)}px`;
+    el.style.top = `${Math.max(0, (window.innerHeight - el.offsetHeight) / 2)}px`;
+  }
 
   protected abstract getModalContentHtml(): string;
 
@@ -172,6 +201,7 @@ export abstract class DraggableModal extends DraggableBox {
       window.addEventListener('keydown', this.onKeyDown_, true);
       window.addEventListener('keyup', this.onKeyUp_, true);
       window.addEventListener('focusin', this.onFocusIn_, true);
+      window.addEventListener('resize', this.onResize_);
       window.addEventListener('blur', this.onBlur_);
       this.getInitialFocusElement_()?.focus();
     } else {
@@ -182,6 +212,7 @@ export abstract class DraggableModal extends DraggableBox {
   override close(cb?: () => void): void {
     window.removeEventListener('keydown', this.onKeyDown_, true);
     window.removeEventListener('focusin', this.onFocusIn_, true);
+    window.removeEventListener('resize', this.onResize_);
     if (this.pressedKeys_.size === 0) {
       window.removeEventListener('keyup', this.onKeyUp_, true);
       window.removeEventListener('blur', this.onBlur_);

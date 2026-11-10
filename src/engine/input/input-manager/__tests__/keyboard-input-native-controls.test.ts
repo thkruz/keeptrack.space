@@ -24,9 +24,14 @@ describe('native control keyboard ownership', () => {
     const original = window.addEventListener.bind(window);
     add = vi.spyOn(window, 'addEventListener').mockImplementation((type, listener, options) => {
       const scopedListener: EventListener = (event) => {
-        if (!scope.active) return;
-        if (typeof listener === 'function') listener.call(window, event);
-        else listener.handleEvent(event);
+        if (!scope.active) {
+          return;
+        }
+        if (typeof listener === 'function') {
+          listener.call(window, event);
+        } else {
+          listener.handleEvent(event);
+        }
       };
       listeners.push([type, scopedListener, options]);
       original(type, scopedListener, options);
@@ -48,7 +53,9 @@ describe('native control keyboard ownership', () => {
   });
   afterEach(() => {
     listenerScope.active = false;
-    for (const [type, listener, options] of listeners) window.removeEventListener(type, listener, options);
+    for (const [type, listener, options] of listeners) {
+      window.removeEventListener(type, listener, options);
+    }
     add.mockRestore();
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
@@ -147,8 +154,8 @@ describe('native control keyboard ownership', () => {
     expect(up).not.toHaveBeenCalled();
   });
   it.each(['Shift', 'Control'])('preserves ordinary %s release flags', (value) => {
-    key(document.body, 'keydown', value, { code: value + 'Left' });
-    key(document.body, 'keyup', value, { code: value + 'Left' });
+    key(document.body, 'keydown', value, { code: `${value}Left` });
+    key(document.body, 'keyup', value, { code: `${value}Left` });
     expect(up.mock.calls[0][value === 'Shift' ? 3 : 4]).toBe(true);
   });
   it('blocked modifier cleanup emits no synthetic letter downs and ignores unowned modifier releases', () => {
@@ -222,15 +229,16 @@ describe('native control keyboard ownership', () => {
     EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
     EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
     (drawer as unknown as { hasItems_: boolean }).hasItems_ = true;
-    const toggle = vi.spyOn(drawer, 'toggle').mockImplementation(() => {});
+    const toggle = vi.spyOn(drawer, 'toggle').mockImplementation(() => undefined);
     for (const selector of ['#first', '#edit']) {
       const element = document.querySelector(selector) as HTMLElement;
       element.focus();
       expect(key(element, 'keydown', 'Tab').defaultPrevented).toBe(false);
     }
     document.getElementById('scene')!.focus();
-    for (const options of [{ shiftKey: true }, { ctrlKey: true }, { altKey: true }, { metaKey: true }])
+    for (const options of [{ shiftKey: true }, { ctrlKey: true }, { altKey: true }, { metaKey: true }]) {
       expect(key(document.activeElement!, 'keydown', 'Tab', options).defaultPrevented).toBe(false);
+    }
     const owned = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true });
     owned.preventDefault();
     document.body.dispatchEvent(owned);

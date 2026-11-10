@@ -10,6 +10,8 @@ declare global {
 
   interface Window {
     keepTrack: KeepTrack;
+    /** Embed API facade, installed by src/main.ts in every build. */
+    keepTrackEmbed?: import('./embed/embed-types').KeepTrackEmbedApi;
     zaraz?: {
       consent?: {
         get: (key: string) => boolean;

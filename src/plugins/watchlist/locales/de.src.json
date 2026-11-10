@@ -27,7 +27,8 @@
         "satellitesHeader": "Satelliten",
         "actionsHeader": "Aktionen",
         "displayHeader": "Anzeige",
-        "labelsHeader": "Beschriftungen"
+        "labelsHeader": "Beschriftungen",
+        "reportList": "Bericht zur Beobachtungsliste"
       },
       "msgs": {
         "watchlistLoaded": "Beobachtungsliste mit {count} Satelliten geladen"
@@ -49,6 +50,10 @@
             "fovOnly": "Nur FOV",
             "all": "Gesamte Beobachtungsliste"
           }
+        },
+        "showSensorLabels": {
+          "label": "Sensorbeschriftungen anzeigen",
+          "helpText": "Zeigt den Sensornamen neben seiner Markierung auf dem Globus und der flachen Karte."
         }
       },
       "rmbMenu": {

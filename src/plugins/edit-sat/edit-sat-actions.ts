@@ -10,7 +10,6 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { GetSatType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { StringPad } from '@app/engine/utils/stringPad';
 import { t7e } from '@app/locales/keys';
 import { Earth, FormatTle, rv2tle, Satellite, SatelliteRecord, Sgp4, Tle, TleLine1, TleLine2, ZoomValue } from '@ootk/src/main';
 
@@ -97,7 +96,7 @@ export function applyTleToSat(satId: number, tle1: TleLine1, tle2: TleLine2, cou
  * id stays on the Satellite object.
  */
 export function buildEditedTle(sat: Satellite, v: EditFormValues): { tle1: TleLine1; tle2: TleLine2 } {
-  const intl = sat.tle1.substr(9, 8);
+  const intl = sat.tle1.slice(9, 17);
   const tleScc = Tle.classifySatNum(v.scc) === 'extended' ? v.scc.slice(-5) : v.scc;
 
   return FormatTle.createTle({
@@ -177,7 +176,7 @@ export function parseLoadedTle(text: string): { sccNum: string; tle1: TleLine1; 
     return null;
   }
 
-  const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number' ? String(object.sccNum) : StringPad.pad0(object.tle1.substr(2, 5).trim(), 5);
+  const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number' ? String(object.sccNum) : object.tle1.slice(2, 7).trim().padStart(5, '0');
 
   return { sccNum, tle1: object.tle1 as TleLine1, tle2: object.tle2 as TleLine2 };
 }

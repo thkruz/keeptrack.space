@@ -48,7 +48,10 @@
         "unknown": "알 수 없음",
         "notApplicable": "해당 없음",
         "notApplicableOem": "해당 없음 (OEM)",
-        "notInOrbitToast": "위성 {sccNum}은(는) 궤도에 있지 않습니다!<br>시뮬레이션 시간은 {simTime}입니다.<br>올바른 TLE인지 확인하세요."
+        "notInOrbitToast": "위성 {sccNum}은(는) 궤도에 있지 않습니다!<br>시뮬레이션 시간은 {simTime}입니다.<br>올바른 TLE인지 확인하세요.",
+        "categoryKinematic": "운동학",
+        "categorySensor": "센서",
+        "kinematicOk": "센서 한계 이내"
       }
     }
   }

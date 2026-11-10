@@ -27,7 +27,8 @@
         "satellitesHeader": "Satelity",
         "actionsHeader": "Akcje",
         "displayHeader": "Wyświetlanie",
-        "labelsHeader": "Etykiety"
+        "labelsHeader": "Etykiety",
+        "reportList": "Raport z listy obserwowanych"
       },
       "msgs": {
         "watchlistLoaded": "Wczytano listę obserwowanych z {count} satelitami"
@@ -49,6 +50,10 @@
             "fovOnly": "Tylko FOV",
             "all": "Cała lista obserwowanych"
           }
+        },
+        "showSensorLabels": {
+          "label": "Pokaż etykiety czujników",
+          "helpText": "Rysuje nazwę czujnika obok jego znacznika na globie i mapie płaskiej."
         }
       },
       "rmbMenu": {

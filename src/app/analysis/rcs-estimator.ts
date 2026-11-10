@@ -1,6 +1,5 @@
-import { SatMath } from '@app/app/analysis/sat-math';
 import { estimateStdMag } from '@app/app/analysis/std-mag-estimator';
-import { Satellite, SpaceObjectType } from '@ootk/src/main';
+import { estimateRcs as ootkEstimateRcs, Satellite, SpaceObjectType } from '@ootk/src/main';
 
 export type RcsSource = 'catalog' | 'preset' | 'catalog-mined' | 'geometric' | 'vmag-derived';
 
@@ -242,11 +241,11 @@ export const estimateRcsFromGeometry = (sat: Satellite): number | null => {
     return null;
   }
 
-  // SatMath.estimateRcs defaults to a box when shape is unknown, so an empty
+  // ootk estimateRcs defaults to a box when shape is unknown, so an empty
   // shape string is safe — but we still need to pass *something*.
   const shape = sat.shape && sat.shape.length > 0 ? sat.shape : 'box';
 
-  return SatMath.estimateRcs(length, diameter, span, shape);
+  return ootkEstimateRcs(length, diameter, span, shape);
 };
 
 // Constants for the Lambert-sphere inversion below. Match the std-mag estimator
@@ -296,7 +295,7 @@ export const estimateRcsFromVmag = (sat: Satellite): number | null => {
  *   2. Preset table    — observation-derived value for a famous bus / family.
  *   3. Catalog-mined   — mean of same-bus or same-name-prefix neighbours from
  *                        the supplied stats snapshot.
- *   4. Geometric       — derived from physical dimensions via SatMath.estimateRcs.
+ *   4. Geometric       — derived from physical dimensions via ootk estimateRcs.
  *   5. Vmag-derived    — Lambert-sphere inversion from standard magnitude.
  *                        Coarse but useful for objects with known photometry
  *                        and no radar / dimensional metadata.

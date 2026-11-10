@@ -348,6 +348,21 @@
           "noSensor": "Není vybrán žádný senzor; vyberte senzor pro zobrazení oken přeletů.",
           "uncertaintyAssumed": "Nejistota 1-sigma a stáří GP analytického objektu jsou převzaty od jeho rodiče ({parent}) a Pc nejbližšího přiblížení používá kovarianci rodiče. Chyba provedení manévru není modelována."
         }
+      },
+      "batch": {
+        "source": "Zdroj",
+        "selected": "Vybraný objekt",
+        "search": "Výsledky hledání ({count})",
+        "watchlist": "Seznam sledování ({count})",
+        "note": "Dávkový režim: jeden společný CSV se sloupci NORAD a Název. Zprávy o přiblížení a manévrech vyžadují jediný objekt.",
+        "progress": "Generuji {done} z {total}...",
+        "cancel": "Zrušit",
+        "confirmLarge": "Tato dávka zahrnuje {count} objektů a může chvíli trvat. Pokračovat?",
+        "truncated": "Použito jen prvních {max} z {count} objektů.",
+        "empty": "Ve zvoleném zdroji nejsou žádné objekty.",
+        "done": "Dávková zpráva uložena: {rows} řádků z {objects} objektů ({empty} bez dat, {failed} přeskočeno).",
+        "rowsTruncated": "Výstup zkrácen na {max} řádků.",
+        "unavailable": "Pro dávkovou zprávu nedostupné"
       }
     }
   }

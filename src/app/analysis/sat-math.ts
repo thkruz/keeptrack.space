@@ -42,9 +42,7 @@ import {
   MINUTES_PER_DAY,
   Earth as OotkEarth,
   Sun as OotkSun,
-  estimateRcs as ootkEstimateRcs,
   pow2db as ootkPow2db,
-  relativeVelocity as ootkRelativeVelocity,
   PosVel,
   RAD2DEG,
   Radians,
@@ -88,14 +86,6 @@ export abstract class SatMath {
     }
 
     return ootkPow2db(power);
-  }
-
-  /**
-   * Estimates the Radar Cross Section (RCS) of an object based on its dimensions and shape.
-   * @deprecated Use estimateRcs() from ootk instead.
-   */
-  static estimateRcs(length: number, width: number, height: number, shape: string): number {
-    return ootkEstimateRcs(length, width, height, shape);
   }
 
   /**
@@ -422,20 +412,6 @@ export abstract class SatMath {
   }
 
   /**
-   * Calculates the velocity between two objects in ECI coordinates.
-   * @param obj1 The first object's velocity in ECI coordinates.
-   * @param obj2 The second object's velocity in ECI coordinates.
-   * @returns The velocity between the two objects in kilometers/s.
-   */
-  /**
-   * Calculates the relative velocity between two objects.
-   * @deprecated Use relativeVelocity() from ootk instead.
-   */
-  static velocity(obj1: TemeVec3<KilometersPerSecond>, obj2: TemeVec3<KilometersPerSecond>): KilometersPerSecond {
-    return ootkRelativeVelocity(obj1, obj2);
-  }
-
-  /**
    * Finds the closest approach time between two satellites based on their positions and velocities.
    * @param sat1 The first satellite object.
    * @param sat2 The second satellite object.
@@ -597,18 +573,19 @@ export abstract class SatMath {
   }
 
   /**
-   * Calculates the angle between 2 satellites and the Sun.
+   * Angle at sat2 between the direction to the Sun and the direction to sat1, in radians.
    * @deprecated Use sat1.sunAngleTo(sat2, sunPosition, date) instead. Note: this method uses pre-propagated
    * positions, while the ootk method propagates to the specified date.
    */
   static getAngleBetweenSatellitesAndSun(sat1: Satellite, sat2: Satellite, sunVec: TemeVec3): number {
-    const { position: pos1 } = sat1;
-    const { position: pos2 } = sat2;
+    const pos1 = sat1.position as TemeVec3 | undefined;
+    const pos2 = sat2.position as TemeVec3 | undefined;
 
     // Check if positions are identical
-    if (pos1.x === pos2.x && pos1.y === pos2.y && pos1.z === pos2.z) {
+    if (pos1 && pos2 && pos1.x === pos2.x && pos1.y === pos2.y && pos1.z === pos2.z) {
       return Number.NaN;
     }
+
     // Sanity checks
     if (typeof pos1 === 'undefined') {
       throw new Error('Sat1 position is undefined');
@@ -617,7 +594,6 @@ export abstract class SatMath {
       throw new Error('Sat2 position is undefined');
     }
 
-    // Compute sat to sun vectors
     const sat2ToSun = vec3.fromValues(sunVec.x - pos2.x, sunVec.y - pos2.y, sunVec.z - pos2.z);
     const sat2ToSat1 = vec3.fromValues(pos1.x - pos2.x, pos1.y - pos2.y, pos1.z - pos2.z);
 
@@ -899,13 +875,6 @@ export abstract class SatMath {
    * @returns The normalized RAAN value within the 0-360 degree range.
    */
   /**
-   * @deprecated Use sat.normalizeRaan() instead.
-   */
-  static normalizeRaan(sat: Satellite, now: Date): number {
-    return sat.normalizeRaan(now);
-  }
-
-  /**
    * @deprecated Use sat.getNodalPrecessionRate() instead.
    */
   static getNodalPrecessionRate(s: Satellite): number {
@@ -913,14 +882,13 @@ export abstract class SatMath {
   }
 
   /**
-   * Calculates the angle between 2 satellites and the Sun
-   * @param hoverSat The first satellite object.
-   * @param secondaryObj The second satellite object.
-   * @returns The sun angle in deg.
+   * Angle between two objects as seen from the Sun's direction (see getAngleBetweenSatellitesAndSun).
+   * @param hoverSat The first object.
+   * @param secondaryObj The second object.
+   * @returns The angle in degrees, or NaN when an object is missing or is a star.
    */
   static sunAngle(hoverSat: BaseObject, secondaryObj?: DetailedSensor | Satellite): Degrees {
-    // Validate Objects
-    if (!secondaryObj || !hoverSat) {
+    if (!hoverSat || !secondaryObj) {
       return Number.NaN as Degrees;
     }
     if (secondaryObj.type === SpaceObjectType.STAR || hoverSat.type === SpaceObjectType.STAR) {

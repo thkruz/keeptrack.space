@@ -7,7 +7,6 @@ import {
   EarthCloudTextureQuality,
   EarthDayTextureQuality,
   EarthNightTextureQuality,
-  EarthPoliticalTextureQuality,
   EarthSpecTextureQuality,
   EarthTextureStyle,
 } from '@app/engine/rendering/draw-manager/earth-quality-enums';
@@ -74,7 +73,6 @@ export class SettingsPresets {
                   `;
       const style = document.createElement('style');
 
-      style.type = 'text/css';
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
 
@@ -110,7 +108,6 @@ export class SettingsPresets {
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
     // settings.isNotionalDebris = true;
-    settings.isEnableExtendedCatalog = false;
     settings.searchLimit = 6500;
     settings.isDisableExtraCatalog = true;
     settings.isDisableAsciiCatalog = true;
@@ -139,7 +136,6 @@ export class SettingsPresets {
     settings.maxMissiles = 1;
     settings.maxFieldOfViewMarkers = 1;
     // settings.isNotionalDebris = true;
-    settings.isEnableExtendedCatalog = true;
     settings.isDisableLaunchSites = true;
     settings.isDisableControlSites = true;
     settings.isDisableSensors = true;
@@ -195,7 +191,6 @@ export class SettingsPresets {
                   `;
       const style = document.createElement('style');
 
-      style.type = 'text/css';
       style.appendChild(document.createTextNode(toastCss));
       document.head.appendChild(style);
 
@@ -364,7 +359,6 @@ export class SettingsPresets {
     settings.isDrawBumpMap = true;
     settings.earthCloudTextureQuality = EarthCloudTextureQuality.HIGH;
     settings.isDrawCloudsMap = true;
-    settings.earthPoliticalTextureQuality = EarthPoliticalTextureQuality.HIGH;
     settings.isDrawPoliticalMap = true;
     settings.earthTextureStyle = EarthTextureStyle.BLUE_MARBLE;
     settings.isDisableSkybox = false;

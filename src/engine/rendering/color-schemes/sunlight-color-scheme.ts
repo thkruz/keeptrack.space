@@ -69,7 +69,7 @@ export class SunlightColorScheme extends ColorScheme {
 
     catalogManagerInstance.satCruncherThread.sendSunlightViewToggle(true);
     waitForCruncher({
-      cruncher: catalogManagerInstance.satCruncher,
+      cruncher: catalogManagerInstance.satCruncherThread?.worker as Worker,
       cb: () => {
         colorSchemeManagerInstance.setColorScheme(this, true);
       },

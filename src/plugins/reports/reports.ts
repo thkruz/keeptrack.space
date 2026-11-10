@@ -44,11 +44,14 @@ import { createCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import analysisPng from '@public/img/icons/reports.png';
+import { saveAs } from 'file-saver';
 
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { BestPassDeps, findPassesForSat } from '../best-pass/best-pass-calculator';
 import { DebrisScreening } from '../debris-screening/debris-screening';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { WatchlistPlugin } from '../watchlist/watchlist';
+import { applyBatchCap, BATCH_MAX_ROWS, BatchObjectResult, BatchSource, batchTableToCsv, mergeBatchTables, resolveBatchIds, runChunked } from './batch-report-core';
 import {
   AnalysisEnv,
   analystParentSccNum,
@@ -202,6 +205,11 @@ export class ReportsPlugin extends KeepTrackPlugin {
   private stepSec_: number = REPORT_DEFAULTS.stepSec;
   private format_: ReportFormat = 'text';
   protected conjHalfWidthSec_: number = CONJUNCTION_DEFAULT_HALF_WIDTH_SEC;
+  /** Where the next report takes its objects from. Not persisted: a menu session starts on the selected object. */
+  private batchSource_: BatchSource = 'selected';
+  /** Set by the cancel button while a batch runs. */
+  private batchCancelled_ = false;
+  private isBatchRunning_ = false;
 
   /**
    * Start minute shared by back-to-back reports. Without it a running clock moves the floored
@@ -251,8 +259,9 @@ export class ReportsPlugin extends KeepTrackPlugin {
     this.registerBuiltInReports_();
   }
 
-  isRequireSatelliteSelected = true;
-  isIconDisabled = true;
+  // Batch reports (search results, watchlist) need no selected object, so the menu is always openable.
+  isRequireSatelliteSelected = false;
+  isIconDisabled = false;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -264,7 +273,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       label: t7e('plugins.ReportsPlugin.bottomIconLabel'),
       image: analysisPng,
       menuMode: [MenuMode.ANALYSIS, MenuMode.ALL],
-      isDisabledOnLoad: true,
+      isDisabledOnLoad: false,
     };
   }
 
@@ -276,9 +285,171 @@ export class ReportsPlugin extends KeepTrackPlugin {
   onBottomIconClick(): void {
     // Default toggle behavior handled by base class. Screening runs and the
     // secondary can change while the menu is closed, so refresh the rows.
+    this.refreshSourceOptions_();
     this.updateReportAvailability_();
     // A new menu session starts from the current clock
     this.startAnchor_ = null;
+  }
+
+  /** Opens the Reports menu with a batch source preselected (the Watchlist menu's "Report on Watchlist" entry). */
+  openForBatch(source: BatchSource): void {
+    this.batchSource_ = source;
+    this.refreshSourceOptions_();
+    this.updateReportAvailability_();
+    this.startAnchor_ = null;
+    this.setBottomIconToSelected();
+    this.openSideMenu();
+  }
+
+  // =========================================================================
+  // Batch reports
+  // =========================================================================
+
+  /** Catalog ids of the current search results (empty when there are none). */
+  private searchIds_(): number[] {
+    try {
+      return [...(ServiceLocator.getUiManager().searchManager.getLastResultGroup()?.ids ?? [])];
+    } catch {
+      return [];
+    }
+  }
+
+  private watchlistIds_(): number[] {
+    return PluginRegistry.getPlugin(WatchlistPlugin)?.getSatellites() ?? [];
+  }
+
+  private sourceCounts_(): { search: number; watchlist: number } {
+    return { search: this.searchIds_().length, watchlist: this.watchlistIds_().length };
+  }
+
+  /** Re-labels the source dropdown with the current counts and re-applies the chosen source. */
+  private refreshSourceOptions_(): void {
+    const select = getEl('reports-source', true) as HTMLSelectElement | null;
+
+    if (!select) {
+      return;
+    }
+    select.innerHTML = this.buildSourceOptions_();
+    select.value = this.batchSource_;
+    initMaterialSelects(getEl('reports-menu', true) ?? document.body);
+  }
+
+  private setBatchProgress_(text: string | null): void {
+    const el = getEl('reports-batch-progress', true);
+    const cancel = getEl('reports-batch-cancel-btn', true);
+
+    if (el) {
+      el.textContent = text ?? '';
+      el.style.display = text === null ? 'none' : 'block';
+    }
+    if (cancel) {
+      cancel.style.display = text === null ? 'none' : 'flex';
+    }
+  }
+
+  /** Whether a report can be part of a batch: it takes one object (plus sensor and window) and nothing else. */
+  static isBatchEligible(report: ReportGenerator): boolean {
+    return ReportsPlugin.sectionOf_(report) !== 'conjunction' && !report.unavailableReason;
+  }
+
+  /** Runs a report over every object in the chosen source and saves one combined CSV. */
+  private async generateBatchReport_(report: ReportGenerator): Promise<void> {
+    if (this.isBatchRunning_) {
+      return;
+    }
+    if (!ReportsPlugin.isBatchEligible(report)) {
+      errorManagerInstance.warn(l('batch.unavailable'));
+
+      return;
+    }
+
+    const resolved = resolveBatchIds(this.batchSource_, {
+      selectedId: this.selectSatManager_?.primarySatObj?.id ?? null,
+      searchIds: this.searchIds_(),
+      watchlistIds: this.watchlistIds_(),
+    });
+    const cap = applyBatchCap(resolved);
+
+    if (cap.ids.length === 0) {
+      errorManagerInstance.warn(l('batch.empty'));
+
+      return;
+    }
+    if (cap.truncated) {
+      errorManagerInstance.warn(l('batch.truncated').replace('{max}', cap.ids.length.toString()).replace('{count}', resolved.length.toString()));
+    }
+    // biome-ignore lint/suspicious/noAlert: blocking confirmation before a long batch, matching the popup-blocker alert in this plugin
+    if (cap.needsConfirm && !confirm(l('batch.confirmLarge').replace('{count}', cap.ids.length.toString()))) {
+      return;
+    }
+
+    let sensor: DetailedSensor | null = null;
+
+    if (report.requiresSensor) {
+      sensor = this.getSensor_();
+      if (!sensor) {
+        return;
+      }
+    }
+
+    this.isBatchRunning_ = true;
+    this.batchCancelled_ = false;
+    const catalogManager = ServiceLocator.getCatalogManager();
+    const generatedAt = this.getStartTime_();
+
+    try {
+      const results = await runChunked(
+        cap.ids,
+        (id): BatchObjectResult => {
+          const obj = ReportsPlugin.asReportTarget_(catalogManager.getObject(id, GetSatType.EXTRA_ONLY));
+
+          if (!obj) {
+            return { sccNum: '', name: '', data: null };
+          }
+          const base = { sccNum: obj instanceof Satellite ? obj.sccNum : '', name: obj.name };
+
+          if (!ReportsPlugin.isReportSupported_(report, obj)) {
+            return { ...base, data: null };
+          }
+          try {
+            return { ...base, data: report.generate(obj, sensor, this.buildContext_(obj)) };
+          } catch {
+            return { ...base, data: null };
+          }
+        },
+        {
+          isCancelled: () => this.batchCancelled_,
+          onProgress: (done, total) => this.setBatchProgress_(l('batch.progress').replace('{done}', done.toString()).replace('{total}', total.toString())),
+        }
+      );
+
+      if (this.batchCancelled_ && results.length === 0) {
+        return;
+      }
+      this.saveBatch_(report, results, generatedAt);
+    } finally {
+      this.isBatchRunning_ = false;
+      this.setBatchProgress_(null);
+    }
+  }
+
+  private saveBatch_(report: ReportGenerator, results: BatchObjectResult[], generatedAt: Date): void {
+    const merged = mergeBatchTables(results);
+    const stamp = generatedAt.toISOString().replace(/[-:]/gu, '').slice(0, 15);
+
+    saveAs(createCsvBlob(batchTableToCsv(merged.table)), `${report.id}-batch-${stamp}.csv`);
+    // Batch report over several objects has no single subject (matched by order and time)
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
+    let message = l('batch.done')
+      .replace('{rows}', merged.table.rows.length.toString())
+      .replace('{objects}', merged.objectsWithRows.toString())
+      .replace('{empty}', merged.objectsEmpty.toString())
+      .replace('{failed}', merged.objectsFailed.toString());
+
+    if (merged.rowsTruncated) {
+      message += ` ${l('batch.rowsTruncated').replace('{max}', BATCH_MAX_ROWS.toString())}`;
+    }
+    errorManagerInstance.info(message);
   }
 
   getSideMenuConfig(): ISideMenuConfig {
@@ -381,6 +552,19 @@ export class ReportsPlugin extends KeepTrackPlugin {
       <div id="reports-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="reports-content" class="side-menu">
           <section class="kt-section">
+            <div class="kt-section-label">${l('batch.source')}</div>
+            <div class="kt-field-row">
+              <div class="input-field col s12">
+                <select id="reports-source">${this.buildSourceOptions_()}</select>
+              </div>
+            </div>
+            <div class="kt-note" id="reports-batch-note" style="display: none;">${l('batch.note')}</div>
+            <div class="kt-note" id="reports-batch-progress" style="display: none;"></div>
+            <button id="reports-batch-cancel-btn" type="button" class="kt-action waves-effect" style="display: none;">
+              <span class="kt-action-label">${l('batch.cancel')}</span>
+            </button>
+          </section>
+          <section class="kt-section">
             <div class="kt-section-label">${l('sections.orbitPosition')}</div>
             ${ReportsPlugin.buildActionRows_(orbitReports)}
           </section>
@@ -439,6 +623,18 @@ export class ReportsPlugin extends KeepTrackPlugin {
   /** Menu card a report belongs in. */
   private static sectionOf_(report: ReportGenerator): ReportSection {
     return report.section ?? (report.requiresSensor ? 'sensor' : 'orbit');
+  }
+
+  /** Source dropdown options; labels carry the object counts and are refreshed by {@link refreshSourceOptions_}. */
+  private buildSourceOptions_(): string {
+    const counts = this.sourceCounts_();
+    const opt = (value: BatchSource, label: string) => `<option value="${value}" ${this.batchSource_ === value ? 'selected' : ''}>${label}</option>`;
+
+    return [
+      opt('selected', l('batch.selected')),
+      opt('search', l('batch.search').replace('{count}', counts.search.toString())),
+      opt('watchlist', l('batch.watchlist').replace('{count}', counts.watchlist.toString())),
+    ].join('');
   }
 
   private buildConjWindowOptions_(): string {
@@ -500,6 +696,13 @@ export class ReportsPlugin extends KeepTrackPlugin {
     getEl('reports-step', true)?.addEventListener('change', () => this.readOptionsFromForm_());
     getEl('reports-format', true)?.addEventListener('change', () => this.readOptionsFromForm_());
     getEl('reports-conj-window', true)?.addEventListener('change', () => this.readOptionsFromForm_());
+    getEl('reports-source', true)?.addEventListener('change', () => {
+      this.batchSource_ = ((getEl('reports-source', true) as HTMLSelectElement | null)?.value as BatchSource) ?? 'selected';
+      this.updateReportAvailability_();
+    });
+    getEl('reports-batch-cancel-btn', true)?.addEventListener('click', () => {
+      this.batchCancelled_ = true;
+    });
 
     initMaterialSelects(getEl('reports-menu', true) ?? document.body);
     this.updateReportAvailability_();
@@ -522,11 +725,18 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const target = ReportsPlugin.asReportTarget_(this.selectSatManager_?.primarySatObj);
 
     const conjReasons = new Set<string>();
+    const isBatch = this.batchSource_ !== 'selected';
 
     ReportsPlugin.getRegisteredReports().forEach((r) => {
       const btn = getEl(`${r.id}-btn`, true) as HTMLButtonElement | null;
 
-      if (btn) {
+      if (btn && isBatch) {
+        // Batch: only reports that take just an object (plus sensor and window) can run.
+        const eligible = ReportsPlugin.isBatchEligible(r);
+
+        btn.disabled = !eligible || (!!r.requiresSensor && !hasSensor);
+        btn.setAttribute('kt-tooltip', eligible ? (r.description ?? r.name) : l('batch.unavailable'));
+      } else if (btn) {
         const missingSensor = !!r.requiresSensor && !hasSensor;
         // With nothing selected the menu cannot be opened anyway, so leave the
         // rows enabled rather than flashing every button disabled.
@@ -541,6 +751,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
         }
       }
     });
+
+    const batchNote = getEl('reports-batch-note', true);
+
+    if (batchNote) {
+      batchNote.style.display = isBatch ? 'block' : 'none';
+    }
 
     const note = getEl('reports-sensor-note', true);
 
@@ -674,6 +890,14 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // user currently sees, even if a styled-select change event was missed.
     this.readOptionsFromForm_();
 
+    if (this.batchSource_ !== 'selected') {
+      this.generateBatchReport_(report).catch((error: unknown) => {
+        errorManagerInstance.warn(`${l('errorMsgs.generationFailed')}: ${error instanceof Error ? error.message : String(error)}`);
+      });
+
+      return;
+    }
+
     const sat = this.getSat_();
 
     if (!sat) {
@@ -714,6 +938,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
 
     this.writeReport_(reportData);
+    // Single-object report produced: the subject is the object it was generated for
+    EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id });
   }
 
   /** Assembles the report context: time window, injected dependencies, and report epoch. */

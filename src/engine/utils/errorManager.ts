@@ -26,6 +26,18 @@ const LOG_LABELS: Record<LogLevel, string> = {
 const SIGNATURE_WINDOW_MS = 5 * 60 * 1000;
 const SIGNATURE_MAP_PRUNE_THRESHOLD = 100;
 
+/**
+ * True when a stack trace has at least one frame: a V8 line ("    at fn (url:1:2)") or a SpiderMonkey/JSC line
+ * ("fn@url:1:2"). Checked line by line with simple patterns so a hostile stack cannot cause slow regex
+ * backtracking (stack text comes from whatever script raised the error).
+ */
+const hasStackFrame_ = (stack: string): boolean =>
+  stack.split('\n').some((line) => {
+    const trimmed = line.trim();
+
+    return trimmed.startsWith('at ') || (trimmed.includes('@') && /:\d+:\d+$/u.test(trimmed));
+  });
+
 export interface ErrorOptions {
   skipAutoFile?: boolean;
   skipToast?: boolean;
@@ -345,7 +357,7 @@ export class ErrorManager {
      * toError_ captures a stack for non-Error reasons. Match both V8 ("    at fn (url:1:2)") and
      * SpiderMonkey/JSC ("fn@url:1:2") frames so a Firefox/Safari stack is never mistaken for empty.
      */
-    if (ctx.isUnhandledRejection && !/^\s*at |@\S*:\d+:\d+\s*$/mu.test(err.stack ?? '')) {
+    if (ctx.isUnhandledRejection && !hasStackFrame_(err.stack ?? '')) {
       return true;
     }
 

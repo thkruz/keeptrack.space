@@ -298,3 +298,7 @@ src/plugins-pro/data/optical/
 /.playwright-mcp/
 /.codex/config.toml
 /.agents/
+
+# Codex bridge (local agent config)
+.codex/
+AGENTS.md

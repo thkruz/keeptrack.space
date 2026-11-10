@@ -1,6 +1,7 @@
 import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { rebaseToAnchor } from '../engine/math/orbit-anchor-math';
 import { jday } from '../engine/utils/transforms';
+import { toCacheIndex } from './cache-index';
 import {
   OrbitCruncherCachedObject,
   OrbitCruncherInMsgChangeOrbitType,
@@ -81,11 +82,11 @@ export const onMessage = (m: { data: OrbitCruncherInMsgs }) => {
         break;
       }
       for (let k = 0; k < msg.ids.length; k++) {
-        const id = msg.ids[k];
+        const index = toCacheIndex(msg.ids[k], objCache.length);
 
-        if (id >= 0 && id < objCache.length && objCache[id]) {
+        if (index !== null && objCache[index]) {
           try {
-            (objCache[id] as OrbitCruncherSatelliteObject).satrec = Sgp4.createSatrec(msg.tle1s[k], msg.tle2s[k]);
+            (objCache[index] as OrbitCruncherSatelliteObject).satrec = Sgp4.createSatrec(msg.tle1s[k], msg.tle2s[k]);
           } catch {
             // Bad elements: keep the previous satrec; the orbit line for this object stays as it was
           }

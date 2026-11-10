@@ -51,6 +51,7 @@ import {
   Vector3D,
 } from '@ootk/src/main';
 import { GROUND_BUFFER_DISTANCE, RADIUS_OF_EARTH, STAR_DISTANCE } from '../engine/utils/constants';
+import { toCacheIndex } from './cache-index';
 import { PosCruncherCachedObject, PositionCruncherIncomingMsg, PositionCruncherOutgoingMsg } from './constants';
 import { MarkerMode, PosCruncherMsgType } from './position-cruncher-messages';
 import { setupTimeVariables } from './positionCruncher/calculations';
@@ -349,13 +350,13 @@ const handleObjDataMsg_ = (m: PositionCruncherIncomingMsg): void => {
  * keplerian/extra data back to the main thread.
  */
 const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
-  if (m.data.id === undefined) {
-    return;
-  }
   // Discard edits for ids outside the current catalog (e.g. in-flight after a swap to a smaller catalog).
-  if (m.data.id >= objCache.length || !objCache[m.data.id]) {
+  const index = toCacheIndex(m.data.id, objCache.length);
+
+  if (index === null || !objCache[index]) {
     return;
   }
+  const entry = objCache[index];
   // replace old TLEs
   const satrec = Sgp4.createSatrec(m.data.tle1, m.data.tle2);
   const meanMotion = (satrec.no * 60 * 24) / TAU; // convert rads/minute to rev/day
@@ -381,11 +382,11 @@ const handleSatEditMsg_ = (m: PositionCruncherIncomingMsg): void => {
   };
 
   // Update the object cache
-  objCache[m.data.id].satrec = satrec;
-  objCache[m.data.id].active = true;
-  objCache[m.data.id].apogee = extra.apogee;
-  objCache[m.data.id].perigee = extra.perigee;
-  objCache[m.data.id].isUpdated = true;
+  entry.satrec = satrec;
+  entry.active = true;
+  entry.apogee = extra.apogee;
+  entry.perigee = extra.perigee;
+  entry.isUpdated = true;
 
   if (isThisJest) {
     return;
@@ -410,8 +411,8 @@ const handleSatEditBatchMsg_ = (m: PositionCruncherIncomingMsg): void => {
     return;
   }
   for (let k = 0; k < ids.length; k++) {
-    const id = ids[k];
-    const entry = id >= 0 && id < objCache.length ? objCache[id] : undefined;
+    const index = toCacheIndex(ids[k], objCache.length);
+    const entry = index === null ? undefined : objCache[index];
 
     if (!entry) {
       continue;
@@ -465,11 +466,14 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
     case PosCruncherMsgType.SAT_EDIT_BATCH:
       handleSatEditBatchMsg_(m);
       break;
-    case PosCruncherMsgType.NEW_MISSILE:
-      if (m.data.id !== undefined && m.data.id < objCache.length) {
-        objCache[m.data.id] = <PosCruncherCachedObject>(<unknown>m.data);
+    case PosCruncherMsgType.NEW_MISSILE: {
+      const index = toCacheIndex(m.data.id, objCache.length);
+
+      if (index !== null) {
+        objCache[index] = <PosCruncherCachedObject>(<unknown>m.data);
       }
       break;
+    }
     case PosCruncherMsgType.SATELLITE_SELECTED:
       {
         const ids = m.data.satelliteSelected ?? [-1];

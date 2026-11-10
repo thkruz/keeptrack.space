@@ -12,6 +12,7 @@ const MSG = {
   CHANGE_ORBIT_TYPE: 3,
   SETTINGS_UPDATE: 4,
   RESPONSE_DATA: 5,
+  SATELLITE_TLE_BATCH: 6,
 } as const;
 
 // Canonical Vallado SGP4 test TLE for the ISS.
@@ -597,5 +598,99 @@ describe('orbitCruncher eclipse dimming', () => {
     const points = request(0, Date.UTC(2026, 2, 20, 14, 46, 0), [AU, 0, 0], false);
 
     expect(dimmedFlags(points).filter(Boolean)).toHaveLength(0);
+  });
+});
+
+describe('orbitCruncher worker - SATELLITE_TLE_BATCH', () => {
+  beforeEach(() => {
+    posted = [];
+    globalThis.postMessage = vi.fn((payload: unknown, opts?: unknown) => {
+      posted.push({ payload, opts });
+    }) as unknown as typeof globalThis.postMessage;
+  });
+
+  type Msg = Parameters<typeof onMessage>[0];
+  type Resp = { typ: number; pointsOut: Float32Array; anchor: [number, number, number]; satId: number };
+
+  const initGeoCatalog = (n: number, seqNum: number) => {
+    onMessage({
+      data: { typ: MSG.INIT, numSegs: NUM_SEGS, objData: JSON.stringify(Array.from({ length: n }, () => ({ tle1: GEO_TLE1, tle2: GEO_TLE2 }))), orbitFadeFactor: 1, seqNum },
+    } as unknown as Msg);
+    posted = [];
+  };
+
+  const lastPoints = (): Float32Array => (posted.at(-1)!.payload as Resp).pointsOut.slice();
+
+  const orbitRadius = (id: number, seqNum: number): number => {
+    posted = [];
+    onMessage({ data: { typ: MSG.SATELLITE_UPDATE, id, simulationTime: Date.UTC(2008, 8, 20), seqNum } } as unknown as Msg);
+    const res = posted.at(-1)!.payload as Resp;
+
+    return Math.hypot(res.anchor[0] + res.pointsOut[0], res.anchor[1] + res.pointsOut[1], res.anchor[2] + res.pointsOut[2]);
+  };
+
+  it('replaces the elements for many ids without posting any message', () => {
+    initGeoCatalog(3, 60);
+
+    onMessage({ data: { typ: MSG.SATELLITE_TLE_BATCH, ids: [0, 2], tle1s: [TLE1, TLE1], tle2s: [TLE2, TLE2], seqNum: 60 } } as unknown as Msg);
+
+    expect(posted).toHaveLength(0);
+    // Batched ids are now LEO; the untouched id is still GEO.
+    expect(orbitRadius(0, 60)).toBeLessThan(8000);
+    expect(orbitRadius(2, 60)).toBeLessThan(8000);
+    expect(orbitRadius(1, 60)).toBeGreaterThan(40000);
+  });
+
+  it('gives the same orbit as a single SATELLITE_UPDATE carrying the same elements', () => {
+    initGeoCatalog(2, 61);
+
+    onMessage({ data: { typ: MSG.SATELLITE_TLE_BATCH, ids: [0], tle1s: [TLE1], tle2s: [TLE2], seqNum: 61 } } as unknown as Msg);
+    posted = [];
+    onMessage({ data: { typ: MSG.SATELLITE_UPDATE, id: 0, simulationTime: Date.UTC(2008, 8, 20), seqNum: 61 } } as unknown as Msg);
+    const viaBatch = lastPoints();
+
+    posted = [];
+    onMessage({ data: { typ: MSG.SATELLITE_UPDATE, id: 1, simulationTime: Date.UTC(2008, 8, 20), seqNum: 61, tle1: TLE1, tle2: TLE2 } } as unknown as Msg);
+    const viaSingle = lastPoints();
+
+    expect(Array.from(viaBatch)).toEqual(Array.from(viaSingle));
+  });
+
+  it('skips out-of-range and negative ids but still applies the valid ones', () => {
+    initGeoCatalog(2, 62);
+
+    expect(() =>
+      onMessage({ data: { typ: MSG.SATELLITE_TLE_BATCH, ids: [-1, 99, 1], tle1s: [TLE1, TLE1, TLE1], tle2s: [TLE2, TLE2, TLE2], seqNum: 62 } } as unknown as Msg)
+    ).not.toThrow();
+
+    expect(orbitRadius(1, 62)).toBeLessThan(8000);
+  });
+
+  it('keeps the previous satrec for an entry with bad elements and continues with the rest', () => {
+    initGeoCatalog(2, 63);
+
+    expect(() =>
+      onMessage({ data: { typ: MSG.SATELLITE_TLE_BATCH, ids: [0, 1], tle1s: ['not a tle', TLE1], tle2s: ['garbage', TLE2], seqNum: 63 } } as unknown as Msg)
+    ).not.toThrow();
+
+    expect(orbitRadius(0, 63)).toBeGreaterThan(40000);
+    expect(orbitRadius(1, 63)).toBeLessThan(8000);
+  });
+
+  it('discards a stale batch (seqNum below current)', () => {
+    initGeoCatalog(1, 70);
+
+    onMessage({ data: { typ: MSG.SATELLITE_TLE_BATCH, ids: [0], tle1s: [TLE1], tle2s: [TLE2], seqNum: 5 } } as unknown as Msg);
+
+    expect(orbitRadius(0, 70)).toBeGreaterThan(40000);
+  });
+
+  it('is a no-op for an empty batch', () => {
+    initGeoCatalog(1, 71);
+
+    expect(() => onMessage({ data: { typ: MSG.SATELLITE_TLE_BATCH, ids: [], tle1s: [], tle2s: [], seqNum: 71 } } as unknown as Msg)).not.toThrow();
+
+    expect(posted).toHaveLength(0);
+    expect(orbitRadius(0, 71)).toBeGreaterThan(40000);
   });
 });

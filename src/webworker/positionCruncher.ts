@@ -111,6 +111,8 @@ const sensorMarkerArray = [0]; // Array of Markers used to show sensor fence and
 
 /** Handle of the pending propagation cycle, so a time change can pull it forward instead of waiting it out. */
 let propagationTimer_: ReturnType<typeof setTimeout> | null = null;
+/** True while the host has parked the view (PAUSE message): no cycles are scheduled until it is cleared. */
+let isPaused_ = false;
 
 /** TIME VARIABLES */
 const PROPAGATION_INTERVAL = 1000 as Milliseconds; // Limits how often the propagation loop runs
@@ -208,6 +210,10 @@ export interface ExtraDataMessage {
 const scheduleNextPropagation_ = (delayMs: number): void => {
   if (propagationTimer_ !== null) {
     clearTimeout(propagationTimer_);
+    propagationTimer_ = null;
+  }
+  if (isPaused_) {
+    return;
   }
   propagationTimer_ = setTimeout(() => {
     propagationTimer_ = null;
@@ -252,6 +258,36 @@ const handleOffsetMsg_ = (m: PositionCruncherIncomingMsg): void => {
 
   requestImmediatePropagation_();
 };
+
+/**
+ * Handles the PAUSE message. Pausing drops the pending cycle so the worker sits idle; time messages that
+ * arrive meanwhile only update the time variables. Resuming treats the gap like a time jump (every object
+ * propagates, no velocity extrapolation across the pause) and runs a cycle right away.
+ */
+const handlePauseMsg_ = (m: PositionCruncherIncomingMsg): void => {
+  const isPaused = m.data.isPaused === true;
+
+  if (isPaused === isPaused_) {
+    return;
+  }
+  isPaused_ = isPaused;
+
+  if (isPaused) {
+    scheduleNextPropagation_(0); // clears the pending timer and schedules nothing while paused
+
+    return;
+  }
+
+  if (isOnScreen_.length > 0) {
+    isOnScreen_.fill(1);
+  }
+  skipNextVisibilityUpdate_ = true;
+  lastPropSimTime_ = 0;
+  requestImmediatePropagation_();
+};
+
+/** Test hook: whether a propagation cycle is pending. */
+export const isPropagationScheduled = (): boolean => propagationTimer_ !== null;
 
 /**
  * Builds and pushes a single objCache entry from one incoming satData record.
@@ -414,6 +450,10 @@ export const onmessageProcessing = (m: PositionCruncherIncomingMsg) => {
   switch (m.data.typ) {
     case PosCruncherMsgType.OFFSET:
       handleOffsetMsg_(m);
+
+      return;
+    case PosCruncherMsgType.PAUSE:
+      handlePauseMsg_(m);
 
       return;
     case PosCruncherMsgType.OBJ_DATA:

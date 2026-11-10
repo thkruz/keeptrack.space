@@ -85,6 +85,16 @@ describe('SatCruncherThreadManager', () => {
       });
     });
 
+    it('sendPause posts PAUSE with the flag', () => {
+      const { mgr, worker } = makeMgr();
+
+      mgr.sendPause(true);
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.PAUSE, isPaused: true });
+
+      mgr.sendPause(false);
+      expect(lastMsg(worker)).toEqual({ typ: PosCruncherMsgType.PAUSE, isPaused: false });
+    });
+
     it('sendSatEdit posts SAT_EDIT with the satellite fields', () => {
       const { mgr, worker } = makeMgr();
 

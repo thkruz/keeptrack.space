@@ -492,8 +492,9 @@ export interface KeepTrackEmbedApi {
 
   // Render parking (1.3)
   /**
-   * Stop the render/update loop (cancels requestAnimationFrame) so a parked embed costs no CPU. Simulation
-   * time keeps following the clock; no events or position streams fire while suspended.
+   * Stop the render/update loop (cancels requestAnimationFrame) and pause the position worker so a parked
+   * embed costs no CPU. Simulation time keeps following the clock; no events or position streams fire while
+   * suspended. resume() propagates at the current time right away.
    */
   suspend(): void;
   /** Restart a suspended loop; forces a canvas resize and a redraw. */

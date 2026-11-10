@@ -103,5 +103,6 @@ export interface PositionCruncherIncomingMsg {
     vpMatrix?: Float32Array;
     camPosEci?: Float32Array;
     isFrustumCullingEnabled?: boolean;
+    isPaused?: boolean;
   };
 }

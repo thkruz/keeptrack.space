@@ -340,9 +340,15 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
   setRenderSuspended(suspended: boolean): void {
     const engine = window.keepTrack?.engine;
 
+    // The position worker runs its own 1 s loop; the orbit and color workers only answer requests from the
+    // render loop, so stopping the loop idles them. Pause the position worker so a parked embed costs no CPU.
+    const satCruncher = ServiceLocator.getCatalogManager()?.satCruncherThread;
+
     if (suspended) {
       engine?.suspendLoop();
+      satCruncher?.sendPause(true);
     } else {
+      satCruncher?.sendPause(false);
       engine?.resumeLoop();
     }
   }

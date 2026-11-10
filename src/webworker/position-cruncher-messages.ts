@@ -23,6 +23,8 @@ export const enum PosCruncherMsgType {
   CAMERA_DATA = 8,
   /** Many SAT_EDITs in one message (embed bulk upsert). */
   SAT_EDIT_BATCH = 9,
+  /** Stop or restart the propagation loop (embed parking: nothing is drawn, so nothing is propagated). */
+  PAUSE = 10,
 }
 
 export enum MarkerMode {
@@ -95,6 +97,11 @@ export interface PosCruncherMsgSatSelected {
   satelliteSelected: number[];
 }
 
+export interface PosCruncherMsgPause {
+  typ: PosCruncherMsgType.PAUSE;
+  isPaused: boolean;
+}
+
 export interface PosCruncherMsgCameraData {
   typ: PosCruncherMsgType.CAMERA_DATA;
   vpMatrix: Float32Array;
@@ -112,7 +119,8 @@ export type PosCruncherInMsg =
   | PosCruncherMsgUpdateMarkers
   | PosCruncherMsgSunlightView
   | PosCruncherMsgSatSelected
-  | PosCruncherMsgCameraData;
+  | PosCruncherMsgCameraData
+  | PosCruncherMsgPause;
 
 // ─── Outgoing Messages (Worker → Main Thread) ──────────────────────────────
 

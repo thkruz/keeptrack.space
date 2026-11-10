@@ -36,6 +36,14 @@ export class SatCruncherThreadManager extends WebWorkerThreadManager {
     });
   }
 
+  /** Stop (true) or restart (false) the worker's propagation loop. Used while an embed is parked. */
+  sendPause(isPaused: boolean): void {
+    this.postMessage({
+      typ: PosCruncherMsgType.PAUSE,
+      isPaused,
+    });
+  }
+
   sendSatEdit(id: number, tle1: string, tle2: string, active?: boolean): void {
     this.postMessage({
       typ: PosCruncherMsgType.SAT_EDIT,

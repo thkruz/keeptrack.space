@@ -425,7 +425,7 @@ export class CatalogLoader {
    * before {@link parseTceContent} throws on it.
    */
   static isTleContent(content: string): boolean {
-    const [first, second] = content.split('\n', 2).map((line) => line.replace('\r', ''));
+    const [first, second] = content.split('\n', 2).map((line) => line.replaceAll('\r', ''));
 
     return first.startsWith('1 ') || (second?.startsWith('1 ') ?? false);
   }
@@ -1061,7 +1061,7 @@ export class CatalogLoader {
 
     // Remove any \r characters
     for (let i = 0; i < content.length; i++) {
-      content[i] = content[i].replace('\r', '');
+      content[i] = content[i].replaceAll('\r', '');
     }
   }
 

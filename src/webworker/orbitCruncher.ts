@@ -442,22 +442,26 @@ const handleMsgInit_ = (data: OrbitCruncherInMsgInit) => {
 };
 
 const handleMsgSatelliteUpdate_ = (data: OrbitCruncherInMsgSatelliteUpdate) => {
-  if (data.id >= objCache.length || !objCache[data.id]) {
+  const index = toCacheIndex(data.id, objCache.length);
+
+  if (index === null || !objCache[index]) {
     return;
   }
   // If new orbit
   if (data.tle1 && data.tle2) {
-    const satelliteCacheEntry = objCache[data.id] as OrbitCruncherSatelliteObject;
+    const satelliteCacheEntry = objCache[index] as OrbitCruncherSatelliteObject;
 
     satelliteCacheEntry.satrec = Sgp4.createSatrec(data.tle1, data.tle2);
   }
 };
 
 const handleMsgMissileUpdate_ = (data: OrbitCruncherInMsgMissileUpdate) => {
-  if (data.id >= objCache.length || !objCache[data.id]) {
+  const index = toCacheIndex(data.id, objCache.length);
+
+  if (index === null || !objCache[index]) {
     return;
   }
-  const missileCacheEntry = objCache[data.id] as OrbitCruncherMissileObject;
+  const missileCacheEntry = objCache[index] as OrbitCruncherMissileObject;
 
   if (data.latList && data.lonList && data.altList) {
     missileCacheEntry.latList = data.latList;

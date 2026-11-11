@@ -218,6 +218,11 @@ export const findPassesForSat = (
       // Drop any state left by a discarded single-sample contact.
       if (clip) {
         resetPassState();
+      } else {
+        // Default path: the earlier lone contact is still dropped, but its peak must not carry over.
+        passMinrng = sensor.maxRng;
+        passMaxEl = 0;
+        passMaxElTime = null;
       }
       // Rising edge: the previous step was out of view, so this is the pass start.
       // At the first sample the satellite is already in view: the window start acts as AOS.

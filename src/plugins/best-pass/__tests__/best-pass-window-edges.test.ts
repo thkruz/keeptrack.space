@@ -125,7 +125,7 @@ describe('best-pass window boundary passes', () => {
   });
 });
 
-describe('best-pass window boundary passes: default (no opt-in) keeps pre-clipping behavior', () => {
+describe('best-pass window boundary passes: default (no opt-in) path', () => {
   const runDefault = (no: number, inView: (offsetMs: number) => boolean) =>
     findPassesForSat('TRAIN', satrec(no), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60 }, depsWhere(inView), 'RIDGE').passes;
 
@@ -164,15 +164,60 @@ describe('best-pass window boundary passes: default (no opt-in) keeps pre-clippi
   const runScripted = (look: (offsetMs: number) => { el: number; rng: number } | null, optIn: boolean, intervalSec = 60) =>
     findPassesForSat('TRAIN', satrec(LEO_NO), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec, includeClippedPasses: optIn }, scripted(look), 'RIDGE').passes;
 
-  it('rising edge: default keeps pre-WP1 state across a lone earlier contact; opt-in resets it', () => {
+  it('default path: a contact already in view before the window start does not leak into the later pass', () => {
+    const look = (t: number) => {
+      if (t >= -120_000 && t <= 60_000) {
+        return { el: 60, rng: 1000 };
+      }
+      if (t >= 3_600_000 && t <= 3_720_000) {
+        return { el: 30, rng: 3000 };
+      }
+
+      return null;
+    };
+    const def = runScripted(look, false);
+
+    expect(def).toHaveLength(1);
+    expect(def[0].MAXIMUM_ELEVATION).toBe('30.0');
+    expect(def[0].MINIMUM_RANGE).toBe('3000');
+  });
+
+  it('default path: a window-start contact at el 60 does not leak into the later pass at el 30', () => {
+    const look = (t: number) => {
+      if (t === 0) {
+        return { el: 60, rng: 1000 };
+      }
+      if (t >= 3_600_000 && t <= 3_720_000) {
+        return { el: 30, rng: 3000 };
+      }
+
+      return null;
+    };
+    const def = runScripted(look, false);
+
+    expect(def).toHaveLength(1);
+    expect(def[0].MAXIMUM_ELEVATION).toBe('30.0');
+    expect(def[0].MINIMUM_RANGE).toBe('3000');
+  });
+
+  it('rising edge: a lone earlier contact does not leak its peak into the next pass on either path', () => {
     // Lone contact at 10 min (el 60), then a 3-sample pass at 1 h (el 30).
-    const look = (t: number) => (t === 600_000 ? { el: 60, rng: 1000 } : t >= 3_600_000 && t <= 3_720_000 ? { el: 30, rng: 3000 } : null);
+    const look = (t: number) => {
+      if (t === 600_000) {
+        return { el: 60, rng: 1000 };
+      }
+      if (t >= 3_600_000 && t <= 3_720_000) {
+        return { el: 30, rng: 3000 };
+      }
+
+      return null;
+    };
     const def = runScripted(look, false);
     const opt = runScripted(look, true);
 
     expect(def).toHaveLength(1);
-    expect(def[0].MAXIMUM_ELEVATION).toBe('60.0');
-    expect(def[0].MINIMUM_RANGE).toBe('1000');
+    expect(def[0].MAXIMUM_ELEVATION).toBe('30.0');
+    expect(def[0].MINIMUM_RANGE).toBe('3000');
     expect(opt).toHaveLength(1);
     expect(opt[0].MAXIMUM_ELEVATION).toBe('30.0');
     expect(opt[0].MINIMUM_RANGE).toBe('3000');
@@ -180,7 +225,12 @@ describe('best-pass window boundary passes: default (no opt-in) keeps pre-clippi
 
   it('falling edge: default ignores the last in-view sample for max elevation and min range; opt-in folds it in', () => {
     // Samples at 1 h, +60 s, +120 s (last in view, el 50, rng 900).
-    const look = (t: number) => (t === 3_600_000 ? { el: 20, rng: 5000 } : t === 3_660_000 ? { el: 30, rng: 4000 } : t === 3_720_000 ? { el: 50, rng: 900 } : null);
+    const samples = new Map<number, { el: number; rng: number }>([
+      [3_600_000, { el: 20, rng: 5000 }],
+      [3_660_000, { el: 30, rng: 4000 }],
+      [3_720_000, { el: 50, rng: 900 }],
+    ]);
+    const look = (t: number) => samples.get(t) ?? null;
     const def = runScripted(look, false);
     const opt = runScripted(look, true);
 

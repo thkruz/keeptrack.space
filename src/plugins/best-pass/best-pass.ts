@@ -35,7 +35,7 @@ import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import { Kilometers } from '@ootk/src/main';
 import eventNotePng from '@public/img/icons/event-note.png';
-import { BestPassDeps, BestPassOptions, DEFAULT_MAX_RESULTS, findPassesForSat, normalizePassRows } from './best-pass-calculator';
+import { BestPassDeps, BestPassOptions, DEFAULT_MAX_RESULTS, findPassesForSat, normalizePassRows, trackRaeFailure } from './best-pass-calculator';
 import './best-pass.css';
 
 export class BestPassPlugin extends KeepTrackPlugin {
@@ -295,6 +295,10 @@ export class BestPassPlugin extends KeepTrackPlugin {
 
   /** True when the most recent search hit the per-satellite result cap for any satellite. */
   protected lastResultTruncated_ = false;
+  /** Ids (sccNum or the typed token) of objects that failed to propagate in the most recent synchronous search. */
+  protected lastFailedIds_: string[] = [];
+  /** Ids of objects that hit the per-satellite result cap in the most recent synchronous search. */
+  protected lastTruncatedIds_: string[] = [];
 
   protected findBestPasses_(sats: string, sensor: DetailedSensor | null): lookanglesRow[] {
     const sensors = this.getSearchSensors_(sensor).filter((s) => s && typeof s.minAz !== 'undefined');
@@ -308,11 +312,16 @@ export class BestPassPlugin extends KeepTrackPlugin {
     const satArray = sats.replace(/ /gu, ',').split(',');
     const catalogManager = ServiceLocator.getCatalogManager();
     const deps = this.buildBestPassDeps_();
-    const options: BestPassOptions = { lengthDays: this.looksLength_, intervalSec: this.looksInterval_ };
+    const options: BestPassOptions = { lengthDays: this.looksLength_, intervalSec: this.looksInterval_, includeClippedPasses: true };
     const passes: lookanglesRow[] = [];
     let truncated = false;
 
+    this.lastFailedIds_ = [];
+    this.lastTruncatedIds_ = [];
+
     for (const satId of satArray) {
+      let currentId = satId?.trim() ?? '';
+
       try {
         const trimmed = satId?.trim();
 
@@ -326,17 +335,30 @@ export class BestPassPlugin extends KeepTrackPlugin {
         if (!sat) {
           continue;
         }
+        currentId = sat.sccNum;
         const satrec = catalogManager.calcSatrec(sat);
+        let satTruncated = false;
+        const tracker = trackRaeFailure(deps.getRae);
+        const satDeps: BestPassDeps = { ...deps, getRae: tracker.getRae };
 
         for (const searchSensor of sensors) {
           // Use the canonical sccNum on the Satellite, not satrec.satnum: for alpha-5
           // sats satnum is the 6-digit numeric equivalent, not the "T0001" the user typed.
-          const result = findPassesForSat(sat.sccNum, satrec, searchSensor, options, deps, BestPassPlugin.sensorDisplayName_(searchSensor));
+          const result = findPassesForSat(sat.sccNum, satrec, searchSensor, options, satDeps, BestPassPlugin.sensorDisplayName_(searchSensor));
 
           passes.push(...result.passes);
           truncated = truncated || result.truncated;
+          satTruncated = satTruncated || result.truncated;
+        }
+        if (tracker.failed()) {
+          // Decayed or rejected TLE: every sample is null and no exception is raised.
+          this.lastFailedIds_.push(sat.sccNum);
+        }
+        if (satTruncated) {
+          this.lastTruncatedIds_.push(sat.sccNum);
         }
       } catch (e) {
+        this.lastFailedIds_.push(currentId);
         errorManagerInstance.debug(`Error finding best passes for ${satId}: ${e}`);
       }
     }

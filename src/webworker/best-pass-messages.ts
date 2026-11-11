@@ -37,6 +37,8 @@ export interface BpMsgStart {
   lengthDays: number;
   intervalSec: number;
   maxResults: number;
+  /** Opt in to rows clipped by the window edges (START_CLIPPED/END_CLIPPED). Absent means false. */
+  includeClippedPasses?: boolean;
   /** Snapshot of the sun's ECI position (km), reused for the whole search. */
   sunEci: { x: number; y: number; z: number };
 }
@@ -66,6 +68,12 @@ export interface BpOutChunk {
   runId: number;
   /** Raw pass rows (numeric START_DTG, Date date/time fields). Normalized on the main thread. */
   passes: lookanglesRow[];
+  /** Satellite this chunk belongs to. Absent from older workers. */
+  satId?: string;
+  /** True when no sample of this satellite propagated (bad or decayed TLE). */
+  failed?: boolean;
+  /** True when this satellite hit the per-satellite result cap at any site. */
+  truncated?: boolean;
 }
 
 export interface BpOutProgress {
@@ -80,6 +88,10 @@ export interface BpOutComplete {
   runId: number;
   /** True when any satellite hit the per-satellite result cap. */
   truncated: boolean;
+  /** Ids (sccNum) of satellites that failed to propagate (bad or decayed TLE). Absent from older workers. */
+  failedIds?: string[];
+  /** Ids (sccNum) of satellites that hit the per-satellite result cap at any site. */
+  truncatedIds?: string[];
 }
 
 export interface BpOutError {

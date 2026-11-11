@@ -108,6 +108,24 @@ describe('bestPassWorker', () => {
 
     expect(chunk).toMatchObject({ typ: OUT.CHUNK, passes: [] });
     expect(complete).toBeDefined();
+    expect(complete).toMatchObject({ failedIds: ['99999'], truncatedIds: [] });
+  });
+
+  it('does not mark a valid object with no passes as failed', async () => {
+    await loadWorker();
+    posted = [];
+
+    // A 10 km range limit means the sensor never sees the ISS, so the search finds zero passes.
+    dispatch(startMsg({ sensors: [{ ...sensor(), maxRng: 10 }] }));
+
+    await vi.runAllTimersAsync();
+
+    const chunk = posted.find((p) => p.typ === OUT.CHUNK) as { passes: unknown[]; failed?: boolean } | undefined;
+    const complete = posted.find((p) => p.typ === OUT.COMPLETE);
+
+    expect(chunk!.passes).toEqual([]);
+    expect(chunk!.failed ?? false).toBe(false);
+    expect(complete).toMatchObject({ failedIds: [] });
   });
 
   it('aborts when a CANCEL for the active runId precedes START', async () => {
@@ -126,5 +144,36 @@ describe('bestPassWorker', () => {
     await loadWorker();
 
     expect(() => dispatch({ typ: 99, runId: 1 })).not.toThrow();
+  });
+});
+
+describe('bestPassWorker clipped-pass opt-in', () => {
+  // Opt-in rows carry START_CLIPPED/END_CLIPPED keys; default rows never do.
+  const clippedKeys = (rows: unknown[]) => rows.filter((r) => 'START_CLIPPED' in (r as object) || 'END_CLIPPED' in (r as object));
+
+  const collect = async (overrides: Record<string, unknown>) => {
+    posted = [];
+    globalThis.postMessage = vi.fn((payload: { typ?: number }) => {
+      posted.push(payload);
+    }) as unknown as typeof globalThis.postMessage;
+    await import('@app/webworker/bestPassWorker');
+    dispatch(startMsg({ runId: 7, lengthDays: 2, ...overrides }));
+    await vi.runAllTimersAsync();
+
+    return posted.filter((p) => p.typ === OUT.CHUNK).flatMap((p) => p.passes ?? []);
+  };
+
+  it('without the flag returns default rows (no clip fields)', async () => {
+    const rows = await collect({});
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(clippedKeys(rows)).toHaveLength(0);
+  });
+
+  it('with includeClippedPasses: true rows carry the clip fields', async () => {
+    const rows = await collect({ includeClippedPasses: true });
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(clippedKeys(rows)).toHaveLength(rows.length);
   });
 });

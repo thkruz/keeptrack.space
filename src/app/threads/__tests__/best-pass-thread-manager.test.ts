@@ -51,6 +51,16 @@ describe('BestPassThreadManager', () => {
     expect(sent.lengthDays).toBe(7);
   });
 
+  it('forwards the per-satellite failed and truncated flags of a CHUNK to onChunk', () => {
+    const { mgr } = makeManager();
+    const cbs = callbacks();
+    const runId = mgr.startBestPass(params(), cbs);
+    const handler = mgr as unknown as OnMessageable;
+
+    handler.onMessage({ data: { typ: OUT.CHUNK, runId, passes: [], satId: '7', failed: true, truncated: true } });
+    expect(cbs.onChunk).toHaveBeenCalledWith([], { satId: '7', failed: true, truncated: true });
+  });
+
   it('routes CHUNK / PROGRESS / COMPLETE messages to callbacks for the current run', () => {
     const { mgr } = makeManager();
     const cbs = callbacks();
@@ -63,8 +73,8 @@ describe('BestPassThreadManager', () => {
     handler.onMessage({ data: { typ: OUT.PROGRESS, runId, processed: 1, total: 3 } });
     expect(cbs.onProgress).toHaveBeenCalledWith(1, 3);
 
-    handler.onMessage({ data: { typ: OUT.COMPLETE, runId, truncated: true } });
-    expect(cbs.onComplete).toHaveBeenCalledWith(true);
+    handler.onMessage({ data: { typ: OUT.COMPLETE, runId, truncated: true, failedIds: ['2'], truncatedIds: ['1'] } });
+    expect(cbs.onComplete).toHaveBeenCalledWith(true, { failedIds: ['2'], truncatedIds: ['1'] });
   });
 
   it('routes ERROR messages', () => {

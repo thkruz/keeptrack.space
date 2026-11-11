@@ -9,7 +9,7 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { BestPassDeps, findPassesForSat } from '@app/plugins/best-pass/best-pass-calculator';
+import { BestPassDeps, findPassesForSat, trackRaeFailure } from '@app/plugins/best-pass/best-pass-calculator';
 import { Kilometers, Sgp4 } from '@ootk/src/main';
 import { type BpWorkerInMsg, BpWorkerMsgType, BpWorkerOutMsgType } from './best-pass-messages';
 import { workerCheckIsInViewMasked, workerGetRae } from './shared/pass-worker-helpers';
@@ -52,9 +52,11 @@ self.onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
         z: msg.sunEci.z as Kilometers,
       }),
     };
-    const options = { lengthDays: msg.lengthDays, intervalSec: msg.intervalSec, maxResults: msg.maxResults };
+    const options = { lengthDays: msg.lengthDays, intervalSec: msg.intervalSec, maxResults: msg.maxResults, includeClippedPasses: msg.includeClippedPasses === true };
 
     let truncated = false;
+    const failedIds: string[] = [];
+    const truncatedIds: string[] = [];
     const total = msg.sats.length;
 
     for (let i = 0; i < total; i++) {
@@ -64,21 +66,35 @@ self.onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
 
       const sat = msg.sats[i];
       const satPasses = [];
+      let satTruncated = false;
+      let satFailed = false;
+      const tracker = trackRaeFailure(workerGetRae);
+      const satDeps: BestPassDeps = { ...deps, getRae: tracker.getRae };
 
       try {
         const satrec = Sgp4.createSatrec(sat.tle1, sat.tle2);
 
         for (let s = 0; s < sensors.length; s++) {
-          const result = findPassesForSat(sat.sccNum, satrec, sensors[s], options, deps, msg.sensorNames[s] ?? null);
+          const result = findPassesForSat(sat.sccNum, satrec, sensors[s], options, satDeps, msg.sensorNames[s] ?? null);
 
           satPasses.push(...result.passes);
           truncated = truncated || result.truncated;
+          satTruncated = satTruncated || result.truncated;
         }
       } catch {
-        // Skip satellites that fail to propagate (bad TLE, decayed); keep going.
+        // Skip satellites that fail to propagate (bad TLE, decayed); keep going, but report the id.
+        satFailed = true;
+      }
+      // A decayed object or a rejected TLE does not throw: every sample comes back null.
+      satFailed = satFailed || tracker.failed();
+      if (satFailed) {
+        failedIds.push(sat.sccNum);
+      }
+      if (satTruncated) {
+        truncatedIds.push(sat.sccNum);
       }
 
-      postMessage({ typ: BpWorkerOutMsgType.CHUNK, runId, passes: satPasses });
+      postMessage({ typ: BpWorkerOutMsgType.CHUNK, runId, passes: satPasses, satId: sat.sccNum, failed: satFailed, truncated: satTruncated });
       postMessage({ typ: BpWorkerOutMsgType.PROGRESS, runId, processed: i + 1, total });
 
       // Yield so a CANCEL message can be received between satellites.
@@ -90,7 +106,7 @@ self.onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
       return;
     }
 
-    postMessage({ typ: BpWorkerOutMsgType.COMPLETE, runId, truncated });
+    postMessage({ typ: BpWorkerOutMsgType.COMPLETE, runId, truncated, failedIds, truncatedIds });
   } catch (e) {
     postMessage({ typ: BpWorkerOutMsgType.ERROR, runId, message: e instanceof Error ? e.message : String(e) });
   }

@@ -59,6 +59,12 @@ export interface BestPassOptions {
   intervalSec: number;
   /** Maximum passes to collect for a single satellite before truncating. */
   maxResults?: number;
+  /**
+   * Opt-in. When true, a pass in view at the first sample starts at the window start and a pass
+   * still in view at the last sample ends at the window end, flagged START_CLIPPED / END_CLIPPED.
+   * Default false: such contacts behave as before (no start, or no stop, so no row).
+   */
+  includeClippedPasses?: boolean;
 }
 
 export interface BestPassDeps {
@@ -156,6 +162,7 @@ export const findPassesForSat = (
 
   const timeAt = (offsetMs: number): Date => new Date(baseTimeMs + offsetMs);
   const windowSec = looksLength * 24 * 60 * 60;
+  const clip = options.includeClippedPasses === true;
 
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU);
 
@@ -195,8 +202,8 @@ export const findPassesForSat = (
       return emptyPassRow();
     }
 
-    const isFirstSample = offsetSec === 0;
-    const isLastSample = offsetSec + looksInterval >= windowSec;
+    const isFirstSample = clip && offsetSec === 0;
+    const isLastSample = clip && offsetSec + looksInterval >= windowSec;
     let aer1: PassRae = aer;
     let isInFOV1 = true;
 
@@ -209,7 +216,9 @@ export const findPassesForSat = (
 
     if (isRising) {
       // Drop any state left by a discarded single-sample contact.
-      resetPassState();
+      if (clip) {
+        resetPassState();
+      }
       // Rising edge: the previous step was out of view, so this is the pass start.
       // At the first sample the satellite is already in view: the window start acts as AOS.
       // A clipped start is not a real horizon crossing, so it never earns the horizon bonus.
@@ -226,7 +235,7 @@ export const findPassesForSat = (
 
     // A rising sample can only close the pass at once when it is the last one in the window.
     if (!isRising || isLastSample) {
-      const now2 = timeAt(Math.min(offset + looksInterval * 1000, windowSec * 1000));
+      const now2 = timeAt(clip ? Math.min(offset + looksInterval * 1000, windowSec * 1000) : offset + looksInterval * 1000);
 
       aer1 = getRae(now2, satrec, sensor);
       isInFOV1 = checkIsInView(sensor, aer1);
@@ -239,12 +248,14 @@ export const findPassesForSat = (
       }
 
       if (!isInFOV1 || isLastSample) {
-        if (passMaxEl < aer.el) {
-          passMaxEl = aer.el;
-          passMaxElTime = now;
-        }
-        if (passMinrng > aer.rng) {
-          passMinrng = aer.rng;
+        if (clip) {
+          if (passMaxEl < aer.el) {
+            passMaxEl = aer.el;
+            passMaxElTime = now;
+          }
+          if (passMinrng > aer.rng) {
+            passMinrng = aer.rng;
+          }
         }
 
         // Falling edge: the next step is out of view (or the window ends), so this is the pass stop.
@@ -297,8 +308,7 @@ export const findPassesForSat = (
           SENSOR_TO_SUN_AZIMUTH: sunRae.az.toFixed(1),
           SENSOR_TO_SUN_ELEVATION: sunRae.el.toFixed(1),
           MASK_LIMITED: startMasked || lastStopMasked,
-          START_CLIPPED: startClipped,
-          END_CLIPPED: endClipped,
+          ...(clip ? { START_CLIPPED: startClipped, END_CLIPPED: endClipped } : {}),
           MASK_APPLIED: typeof sensor.hasElevationMask === 'function' && sensor.hasElevationMask(),
         };
       }
@@ -372,4 +382,29 @@ export const normalizePassRows = (passes: lookanglesRow[]): lookanglesRow[] => {
   }
 
   return passes;
+};
+
+/**
+ * Wraps a {@link GetRaeFn} to remember whether any sample produced a look angle. Opt-in for
+ * the Best Passes worker and OSS sync path only; {@link findPassesForSat} and its other
+ * callers are unchanged. A decayed object or a TLE the propagator rejects yields null
+ * elevations for every sample and no passes, without throwing.
+ */
+export const trackRaeFailure = (getRae: GetRaeFn): { getRae: GetRaeFn; failed: () => boolean } => {
+  let samples = 0;
+  let resolved = 0;
+
+  return {
+    getRae: (date, satrec, sensor) => {
+      const rae = getRae(date, satrec, sensor);
+
+      samples++;
+      if (typeof rae.el === 'number' && Number.isFinite(rae.el)) {
+        resolved++;
+      }
+
+      return rae;
+    },
+    failed: () => samples > 0 && resolved === 0,
+  };
 };

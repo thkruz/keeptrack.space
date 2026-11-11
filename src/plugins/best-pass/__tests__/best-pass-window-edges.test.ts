@@ -20,7 +20,7 @@ const depsWhere = (inView: (offsetMs: number) => boolean): BestPassDeps => ({
 });
 
 const run = (no: number, inView: (offsetMs: number) => boolean, sensorName = 'RIDGE') =>
-  findPassesForSat('TRAIN', satrec(no), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60 }, depsWhere(inView), sensorName);
+  findPassesForSat('TRAIN', satrec(no), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60, includeClippedPasses: true }, depsWhere(inView), sensorName);
 
 describe('best-pass window boundary passes', () => {
   it('(a) GEO in view for the whole window returns one row spanning the window', () => {
@@ -81,7 +81,7 @@ describe('best-pass window boundary passes', () => {
       'TRAIN',
       satrec(GEO_NO),
       defaultSensor as DetailedSensor,
-      { lengthDays: 60 / 86_400, intervalSec: 60 },
+      { lengthDays: 60 / 86_400, intervalSec: 60, includeClippedPasses: true },
       depsWhere(() => true)
     );
 
@@ -92,7 +92,7 @@ describe('best-pass window boundary passes', () => {
 
   it('does not award the horizon-to-horizon bonus to a low pass clipped at both window edges', () => {
     const low: BestPassDeps = { ...depsWhere(() => true), getRae: (): PassRae => ({ az: 200, el: 2, rng: 1500 }) };
-    const { passes } = findPassesForSat('TRAIN', satrec(GEO_NO), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60 }, low);
+    const { passes } = findPassesForSat('TRAIN', satrec(GEO_NO), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60, includeClippedPasses: true }, low);
 
     expect(passes[0].PASS_SCORE).toBe(scorePass(DAY_MS, 2, 1500, false).toFixed(1));
   });
@@ -109,7 +109,7 @@ describe('best-pass window boundary passes', () => {
         return { az: 200, el: 10 + ((t - (DAY_MS - 300_000)) / 300_000) * 40, rng: 2000 - ((t - (DAY_MS - 300_000)) / 300_000) * 500 };
       },
     };
-    const { passes } = findPassesForSat('TRAIN', satrec(LEO_NO), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60 }, rising);
+    const { passes } = findPassesForSat('TRAIN', satrec(LEO_NO), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60, includeClippedPasses: true }, rising);
 
     expect(passes).toHaveLength(1);
     expect(passes[0].END_CLIPPED).toBe(true);
@@ -122,5 +122,96 @@ describe('best-pass window boundary passes', () => {
     const { passes } = run(LEO_NO, (t) => t >= DAY_MS - 60_000 && t < DAY_MS);
 
     expect(passes).toHaveLength(0);
+  });
+});
+
+describe('best-pass window boundary passes: default (no opt-in) keeps pre-clipping behavior', () => {
+  const runDefault = (no: number, inView: (offsetMs: number) => boolean) =>
+    findPassesForSat('TRAIN', satrec(no), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec: 60 }, depsWhere(inView), 'RIDGE').passes;
+
+  it('whole window in view returns no clipped row', () => {
+    const passes = runDefault(GEO_NO, () => true);
+
+    expect(passes).toHaveLength(0);
+  });
+
+  it('in view at window start: the first (clipped) contact is not reported as a pass starting at the window start', () => {
+    const passes = runDefault(LEO_NO, (t) => t <= 300_000 || (t >= 3_600_000 && t <= 3_900_000));
+
+    expect(passes.some((p) => p.START_CLIPPED === true || p.END_CLIPPED === true)).toBe(false);
+    expect(passes.every((p) => (p.START_DATE as Date).getTime() > BASE_MS)).toBe(true);
+    expect(passes).toHaveLength(1);
+  });
+
+  it('in view at window end: no row ends at the window end', () => {
+    const passes = runDefault(LEO_NO, (t) => t >= DAY_MS - 300_000);
+
+    expect(passes.some((p) => p.START_CLIPPED === true || p.END_CLIPPED === true)).toBe(false);
+    expect(passes).toHaveLength(0);
+  });
+
+  /** Scripted look angles: a callback gives (el, rng) per offset, or null when out of view. */
+  const scripted = (look: (offsetMs: number) => { el: number; rng: number } | null): BestPassDeps => ({
+    baseTimeMs: BASE_MS,
+    getRae: (date): PassRae => {
+      const l = look(date.getTime() - BASE_MS);
+
+      return l ? { az: 200, el: l.el, rng: l.rng } : { az: 200, el: -10, rng: 40000 };
+    },
+    checkIsInView: (_sensor, rae) => (rae.el ?? -90) >= 0,
+    sunEciKm: () => ({ x: 1.4e8, y: 0, z: 0 }) as ReturnType<BestPassDeps['sunEciKm']>,
+  });
+  const runScripted = (look: (offsetMs: number) => { el: number; rng: number } | null, optIn: boolean, intervalSec = 60) =>
+    findPassesForSat('TRAIN', satrec(LEO_NO), defaultSensor as DetailedSensor, { lengthDays: 1, intervalSec, includeClippedPasses: optIn }, scripted(look), 'RIDGE').passes;
+
+  it('rising edge: default keeps pre-WP1 state across a lone earlier contact; opt-in resets it', () => {
+    // Lone contact at 10 min (el 60), then a 3-sample pass at 1 h (el 30).
+    const look = (t: number) => (t === 600_000 ? { el: 60, rng: 1000 } : t >= 3_600_000 && t <= 3_720_000 ? { el: 30, rng: 3000 } : null);
+    const def = runScripted(look, false);
+    const opt = runScripted(look, true);
+
+    expect(def).toHaveLength(1);
+    expect(def[0].MAXIMUM_ELEVATION).toBe('60.0');
+    expect(def[0].MINIMUM_RANGE).toBe('1000');
+    expect(opt).toHaveLength(1);
+    expect(opt[0].MAXIMUM_ELEVATION).toBe('30.0');
+    expect(opt[0].MINIMUM_RANGE).toBe('3000');
+  });
+
+  it('falling edge: default ignores the last in-view sample for max elevation and min range; opt-in folds it in', () => {
+    // Samples at 1 h, +60 s, +120 s (last in view, el 50, rng 900).
+    const look = (t: number) => (t === 3_600_000 ? { el: 20, rng: 5000 } : t === 3_660_000 ? { el: 30, rng: 4000 } : t === 3_720_000 ? { el: 50, rng: 900 } : null);
+    const def = runScripted(look, false);
+    const opt = runScripted(look, true);
+
+    expect(def).toHaveLength(1);
+    expect(def[0].MAXIMUM_ELEVATION).toBe('30.0');
+    expect(def[0].MINIMUM_RANGE).toBe('4000');
+    expect(opt).toHaveLength(1);
+    expect(opt[0].MAXIMUM_ELEVATION).toBe('50.0');
+    expect(opt[0].MINIMUM_RANGE).toBe('900');
+  });
+
+  it('look-ahead is not clamped to the window end by default', () => {
+    // 70 s interval does not divide the day; last sample is 86 380 s and its unclamped look-ahead (86 450 s) is out of view.
+    const look = (t: number) => (t >= DAY_MS - 300_000 && t <= DAY_MS ? { el: 30, rng: 36000 } : null);
+    const def = runScripted(look, false, 70);
+
+    expect(def).toHaveLength(1);
+    expect((def[0].STOP_DATE as Date).getTime()).toBe(BASE_MS + 86_380_000);
+    expect(def[0].END_CLIPPED).toBeUndefined();
+  });
+
+  it('opting in returns the clipped rows for the same inputs', () => {
+    const passes = findPassesForSat(
+      'TRAIN',
+      satrec(GEO_NO),
+      defaultSensor as DetailedSensor,
+      { lengthDays: 1, intervalSec: 60, includeClippedPasses: true },
+      depsWhere(() => true)
+    ).passes;
+
+    expect(passes).toHaveLength(1);
+    expect(passes[0].START_CLIPPED).toBe(true);
   });
 });

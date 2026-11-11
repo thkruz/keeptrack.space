@@ -19,10 +19,17 @@ import {
   BpWorkerOutMsgType,
 } from '@app/webworker/best-pass-messages';
 
+/** Outcome of one satellite, sent with its chunk so it survives a Cancel. */
+export interface BestPassChunkInfo {
+  satId: string;
+  failed: boolean;
+  truncated: boolean;
+}
+
 export interface BestPassCallbacks {
-  onChunk: (passes: lookanglesRow[]) => void;
+  onChunk: (passes: lookanglesRow[], info?: BestPassChunkInfo) => void;
   onProgress: (processed: number, total: number) => void;
-  onComplete: (truncated: boolean) => void;
+  onComplete: (truncated: boolean, details?: { failedIds: string[]; truncatedIds: string[] }) => void;
   onError: (message: string) => void;
 }
 
@@ -34,6 +41,7 @@ export interface BestPassParams {
   lengthDays: number;
   intervalSec: number;
   maxResults: number;
+  includeClippedPasses?: boolean;
   sunEci: { x: number; y: number; z: number };
 }
 
@@ -59,13 +67,24 @@ export class BestPassThreadManager extends WebWorkerThreadManager {
 
     switch (data.typ) {
       case BpWorkerOutMsgType.CHUNK:
-        this.callbacks_.onChunk((data as BpOutChunk).passes);
+        {
+          const chunk = data as BpOutChunk;
+
+          if (typeof chunk.satId === 'string') {
+            this.callbacks_.onChunk(chunk.passes, { satId: chunk.satId, failed: chunk.failed === true, truncated: chunk.truncated === true });
+          } else {
+            this.callbacks_.onChunk(chunk.passes);
+          }
+        }
         break;
       case BpWorkerOutMsgType.PROGRESS:
         this.callbacks_.onProgress((data as BpOutProgress).processed, (data as BpOutProgress).total);
         break;
       case BpWorkerOutMsgType.COMPLETE:
-        this.callbacks_.onComplete((data as BpOutComplete).truncated);
+        this.callbacks_.onComplete((data as BpOutComplete).truncated, {
+          failedIds: (data as BpOutComplete).failedIds ?? [],
+          truncatedIds: (data as BpOutComplete).truncatedIds ?? [],
+        });
         this.callbacks_ = null;
         break;
       case BpWorkerOutMsgType.ERROR:
@@ -92,6 +111,7 @@ export class BestPassThreadManager extends WebWorkerThreadManager {
       lengthDays: params.lengthDays,
       intervalSec: params.intervalSec,
       maxResults: params.maxResults,
+      includeClippedPasses: params.includeClippedPasses,
       sunEci: params.sunEci,
     };
 

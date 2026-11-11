@@ -38,7 +38,7 @@ const passesFor = (tle: string[], sensor: DetailedSensor) =>
     tle[0].slice(2, 7),
     Sgp4.createSatrec(tle[0], tle[1]),
     sensor,
-    { lengthDays: 1, intervalSec: 60 },
+    { lengthDays: 1, intervalSec: 60, includeClippedPasses: true },
     { baseTimeMs: BASE_MS, getRae: workerGetRae, checkIsInView: workerCheckIsInView, sunEciKm: () => ({ x: 1.4e8, y: 0, z: 0 }) as never },
     sensor.name
   ).passes;

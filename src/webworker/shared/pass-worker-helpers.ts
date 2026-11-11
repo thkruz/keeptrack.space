@@ -75,7 +75,7 @@ export function workerCheckIsInView(sensor: DetailedSensor, rae: PassRae): boole
 /**
  * Field-of-regard test that also applies the sensor's azimuth-dependent horizon mask.
  * Mirrors SatMath.checkIsInView (sector box, then el >= mask(az)). Kept separate from
- * {@link workerCheckIsInView} so tip-and-cue keeps its existing elevation-only behavior.
+ * {@link workerCheckIsInView} (box only), which stays exported for callers that want no mask.
  */
 export function workerCheckIsInViewMasked(sensor: DetailedSensor, rae: PassRae): boolean {
   if (!workerCheckIsInView(sensor, rae)) {

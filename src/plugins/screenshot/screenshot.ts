@@ -24,6 +24,7 @@
 
 import { Classification } from '@app/app/ui/classification';
 import { MenuMode } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -34,6 +35,7 @@ import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Screenshot extends KeepTrackPlugin {
   readonly id = 'Screenshot';
@@ -218,10 +220,14 @@ export class Screenshot extends KeepTrackPlugin {
     const ow = outCanvas.width;
     const oh = outCanvas.height;
 
+    const padding = shouldCrop ? 100 : 50;
+
+    // Stage 2b: Provenance caption (object, simulation time, site, catalog source)
+    this.drawCaption_(outCtx, ow, padding, this.gatherCaptionLines_());
+
     // Stage 3: Draw logos onto the final output canvas
     const logoHeight = (200 * (settingsManager.hiResWidth ?? 3840)) / 3840;
     let logoWidth: number;
-    const padding = shouldCrop ? 100 : 50;
 
     if (settingsManager.isShowSecondaryLogo && this.secondaryLogo) {
       // Draw secondary logo on the left
@@ -256,6 +262,114 @@ export class Screenshot extends KeepTrackPlugin {
     outCanvas.parentNode!.removeChild(outCanvas);
 
     return image;
+  }
+
+  private static readonly CATALOG_SOURCE_LABELS_: Record<string, string> = {
+    spacetrack: 'Space-Track',
+    celestrak: 'CelesTrak',
+    'celestrak-sup': 'CelesTrak SupGP',
+    'univ-of-mich': 'University of Michigan',
+    calpoly: 'Cal Poly',
+    nuspace: 'NuSpace',
+    vimpel: 'JSC Vimpel',
+    satnogs: 'SatNOGS',
+    'TLE.txt': 'TLE.txt',
+    'extra.json': 'extra.json',
+  };
+
+  /**
+   * Builds the caption lines: selected object, simulation time (UTC), active site and catalog source.
+   * Each line is omitted when its data is missing; a failure to read any of it yields fewer lines, never an error.
+   */
+  gatherCaptionLines_(): string[] {
+    const lines: string[] = [];
+
+    try {
+      const sat = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj as { name?: string; sccNum?: string; source?: string } | undefined;
+
+      if (sat?.name && sat.sccNum) {
+        lines.push(this.t_('caption.norad').replace('{name}', sat.name).replace('{id}', sat.sccNum));
+      }
+
+      const simTime = ServiceLocator.getTimeManager().simulationTimeObj;
+
+      if (simTime instanceof Date && !Number.isNaN(simTime.getTime())) {
+        lines.push(this.t_('caption.utc').replace('{time}', simTime.toISOString().slice(0, 19)));
+      }
+
+      const sensor = ServiceLocator.getSensorManager().getSensor() as { uiName?: string; name?: string } | null;
+      const site = sensor?.uiName || sensor?.name;
+
+      if (site) {
+        lines.push(this.t_('caption.site').replace('{site}', site));
+      }
+
+      if (sat?.name && sat.source) {
+        lines.push(this.t_('caption.source').replace('{source}', Screenshot.CATALOG_SOURCE_LABELS_[sat.source] ?? sat.source));
+      }
+    } catch {
+      // Caption data is best effort; the image still exports.
+    }
+
+    return lines;
+  }
+
+  /** Draws the caption top-left on a translucent black box, below the classification banner when one is set. */
+  drawCaption_(ctx: CanvasRenderingContext2D, outputWidth: number, padding: number, lines: string[]): void {
+    if (lines.length === 0) {
+      return;
+    }
+
+    const scale = (settingsManager.hiResWidth ?? 3840) / 3840;
+    const fontPx = Math.max(12, Math.round(36 * scale));
+    const gap = Math.round(fontPx * 0.4);
+    const boxPad = Math.round(fontPx * 0.5);
+    const lineHeight = fontPx + gap;
+
+    ctx.save();
+    ctx.font = `${fontPx}px nasalization`;
+
+    let top = padding;
+    let maxWidth = outputWidth - 2 * padding;
+    const { classificationstr } = Screenshot.calculateClassificationText_();
+
+    if (classificationstr !== '') {
+      ctx.font = '24px nasalization';
+      const classificationWidth = ctx.measureText(classificationstr).width;
+
+      ctx.font = `${fontPx}px nasalization`;
+      top = Math.max(padding, 34 + gap);
+      maxWidth = outputWidth / 2 - classificationWidth - padding;
+    }
+
+    const textWidthLimit = Math.max(0, maxWidth - 2 * boxPad);
+    const fitted = lines.map((line) => Screenshot.fitText_(ctx, line, textWidthLimit));
+    const boxWidth = Math.max(...fitted.map((line) => ctx.measureText(line).width)) + 2 * boxPad;
+    const boxHeight = fitted.length * lineHeight + 2 * boxPad - gap;
+
+    ctx.globalAlpha = 1.0;
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.fillRect(padding, top, boxWidth, boxHeight);
+    ctx.fillStyle = '#ffffff';
+    ctx.textBaseline = 'top';
+    fitted.forEach((line, i) => {
+      ctx.fillText(line, padding + boxPad, top + boxPad + i * lineHeight);
+    });
+    ctx.restore();
+  }
+
+  private static fitText_(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
+    if (ctx.measureText(text).width <= maxWidth) {
+      return text;
+    }
+
+    let end = text.length;
+
+    while (end > 1 && ctx.measureText(`${text.slice(0, end)}…`).width > maxWidth) {
+      end--;
+    }
+
+    return `${text.slice(0, end)}…`;
   }
 
   private static calculateClassificationText_(): { classificationstr: string; classificationColor: string } {

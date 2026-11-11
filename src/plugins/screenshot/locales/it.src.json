@@ -14,6 +14,12 @@
         "primaryLogoFailed": "Impossibile caricare l'immagine del logo principale.",
         "secondaryLogoFailed": "Impossibile caricare l'immagine del logo secondario.",
         "noCanvasContext": "Impossibile ottenere il contesto 2D per il canvas temporaneo. Impossibile creare lo screenshot."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Sito: {site}",
+        "source": "Fonte: {source}",
+        "utc": "{time} UTC"
       }
     }
   }

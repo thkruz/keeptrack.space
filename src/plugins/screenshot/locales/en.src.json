@@ -14,6 +14,12 @@
         "primaryLogoFailed": "Failed to load primary logo image.",
         "secondaryLogoFailed": "Failed to load secondary logo image.",
         "noCanvasContext": "Failed to get 2D context for temporary canvas. Unable to create screenshot."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Site: {site}",
+        "source": "Source: {source}",
+        "utc": "{time} UTC"
       }
     }
   }

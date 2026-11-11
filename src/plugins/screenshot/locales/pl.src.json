@@ -14,6 +14,12 @@
         "primaryLogoFailed": "Nie udało się wczytać obrazu głównego logo.",
         "secondaryLogoFailed": "Nie udało się wczytać obrazu dodatkowego logo.",
         "noCanvasContext": "Nie udało się uzyskać kontekstu 2D tymczasowego płótna. Nie można utworzyć zrzutu ekranu."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Stanowisko: {site}",
+        "source": "Źródło: {source}",
+        "utc": "{time} UTC"
       }
     }
   }

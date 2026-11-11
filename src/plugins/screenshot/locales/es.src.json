@@ -14,6 +14,12 @@
         "primaryLogoFailed": "No se pudo cargar la imagen del logotipo principal.",
         "secondaryLogoFailed": "No se pudo cargar la imagen del logotipo secundario.",
         "noCanvasContext": "No se pudo obtener el contexto 2D del lienzo temporal. No se puede crear la captura de pantalla."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Sitio: {site}",
+        "source": "Fuente: {source}",
+        "utc": "{time} UTC"
       }
     }
   }

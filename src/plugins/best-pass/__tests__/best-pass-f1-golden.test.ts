@@ -9,7 +9,8 @@ import { findPassesForSat as findPassesLegacy } from './fixtures/best-pass-calcu
  * current one over deterministic scripted look angles (no network, pinned epoch).
  *
  * Contract: opt-in output is identical; on the default path only MAXIMUM_ELEVATION, MINIMUM_RANGE,
- * MAXIMUM_ELEVATION_DTG and PASS_SCORE may differ, and only on rows that follow a dropped contact.
+ * MAXIMUM_ELEVATION_DTG and PASS_SCORE may differ, and only on rows that follow a dropped contact. A row where only
+ * PASS_SCORE differs (the start3 carry-over fix) must follow a dropped contact with el <= 3.5 deg.
  */
 const BASE_MS = Date.UTC(2026, 10, 4, 0, 0, 0);
 const MIN_MS = 60_000;
@@ -99,6 +100,7 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
   it('differs only in the four derived fields, only after a dropped contact; opt-in is identical', () => {
     let rowsCompared = 0;
     let rowsDiffering = 0;
+    let passScoreOnlyRows = 0;
     let rowsAfterDroppedContact = 0;
     const fieldsDiffering = new Set<string>();
 
@@ -109,6 +111,7 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
           const oldRows = findPassesLegacy('G', satrec(f.no), makeSensor(f), options, makeDeps(f), 'RIDGE').passes;
           const newDeps = makeDeps(f);
           const inViewSamplesMs: number[] = [];
+          const lowViewSamplesMs: number[] = [];
           let lastRaeMs = 0;
           const baseGetRae = newDeps.getRae;
           const baseCheck = newDeps.checkIsInView;
@@ -123,6 +126,9 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
 
             if (inView) {
               inViewSamplesMs.push(lastRaeMs);
+              if ((rae.el ?? 90) <= 3.5) {
+                lowViewSamplesMs.push(lastRaeMs);
+              }
             }
 
             return inView;
@@ -144,6 +150,7 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
             // A dropped contact: an in-view sample the calculator actually took (recorded through the wrapped
             // checkIsInView) strictly between the previous emitted row's stop and this row's start.
             const dropped = inViewSamplesMs.some((t) => t > prevStopMs && t < startMs);
+            const droppedLow = lowViewSamplesMs.some((t) => t > prevStopMs && t < startMs);
 
             prevStopMs = (row.STOP_DATE as Date).getTime();
             rowsCompared++;
@@ -161,6 +168,10 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
             expect({ label, row: i, optIn, diff: diff.filter((k) => !ALLOWED_DIFF.has(k)) }).toEqual({ label, row: i, optIn, diff: [] });
             expect({ label, row: i, optIn }).toEqual({ label, row: i, optIn: false });
             expect({ label, row: i, dropped }).toEqual({ label, row: i, dropped: true });
+            if (diff.includes('PASS_SCORE') && !diff.includes('MAXIMUM_ELEVATION') && !diff.includes('MINIMUM_RANGE')) {
+              passScoreOnlyRows++;
+              expect({ label, row: i, droppedLow }).toEqual({ label, row: i, droppedLow: true });
+            }
           });
         }
       }
@@ -168,5 +179,9 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
 
     expect(rowsCompared).toBeGreaterThan(100);
     expect(rowsDiffering).toBeGreaterThan(0);
+    // The scripted golden data has no dropped low contact followed by a low-setting pass, so the droppedLow guard
+    // above never runs. Pin the count at 0 so a fixture or data change that starts hitting the start3 carry-over
+    // shows up here and gets reviewed.
+    expect(passScoreOnlyRows).toBe(0);
   });
 });

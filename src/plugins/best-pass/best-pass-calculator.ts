@@ -223,6 +223,7 @@ export const findPassesForSat = (
         passMinrng = sensor.maxRng;
         passMaxEl = 0;
         passMaxElTime = null;
+        start3 = false;
       }
       // Rising edge: the previous step was out of view, so this is the pass start.
       // At the first sample the satellite is already in view: the window start acts as AOS.

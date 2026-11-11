@@ -200,6 +200,56 @@ describe('best-pass window boundary passes: default (no opt-in) path', () => {
     expect(def[0].MINIMUM_RANGE).toBe('3000');
   });
 
+  it('default path: a dropped low contact does not give the next pass the horizon-to-horizon bonus', () => {
+    // Lone contact at 10 min (el 2, dropped), then a pass at 1 h that rises at el 10 and sets at el 2.
+    const pass = (t: number) => {
+      if (t === 3_600_000) {
+        return { el: 10, rng: 3000 };
+      }
+      if (t === 3_660_000) {
+        return { el: 30, rng: 2000 };
+      }
+      if (t === 3_720_000) {
+        return { el: 2, rng: 3500 };
+      }
+
+      return null;
+    };
+    const withDropped = runScripted((t) => (t === 600_000 ? { el: 2, rng: 3500 } : pass(t)), false);
+    const alone = runScripted(pass, false);
+
+    expect(alone).toHaveLength(1);
+    expect(withDropped).toHaveLength(1);
+    expect(withDropped[0].PASS_SCORE).toBe(alone[0].PASS_SCORE);
+  });
+
+  it('default path: a dropped low contact, then a pass that rises low and sets low, still gets the horizon-to-horizon bonus', () => {
+    // Regression guard (passes on the current code): lone contact at 10 min (el 2, dropped), then a pass at 1 h that
+    // rises at el 3 (<= 3.5) and sets at el 2. start3 is legitimately true, so the bonus applies as without the drop.
+    const pass = (t: number) => {
+      if (t === 3_600_000) {
+        return { el: 3, rng: 3500 };
+      }
+      if (t === 3_660_000) {
+        return { el: 30, rng: 2000 };
+      }
+      if (t === 3_720_000) {
+        return { el: 2, rng: 3500 };
+      }
+
+      return null;
+    };
+    const withDropped = runScripted((t) => (t === 600_000 ? { el: 2, rng: 3500 } : pass(t)), false);
+    const alone = runScripted(pass, false);
+    const highStart = runScripted((t) => (t === 3_600_000 ? { el: 10, rng: 3000 } : pass(t)), false);
+
+    expect(alone).toHaveLength(1);
+    expect(withDropped).toHaveLength(1);
+    expect(withDropped[0].PASS_SCORE).toBe(alone[0].PASS_SCORE);
+    expect(highStart).toHaveLength(1);
+    expect(Number(withDropped[0].PASS_SCORE)).toBeGreaterThan(Number(highStart[0].PASS_SCORE));
+  });
+
   it('rising edge: a lone earlier contact does not leak its peak into the next pass on either path', () => {
     // Lone contact at 10 min (el 60), then a 3-sample pass at 1 h (el 30).
     const look = (t: number) => {

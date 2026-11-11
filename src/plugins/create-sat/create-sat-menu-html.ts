@@ -166,8 +166,9 @@ export function buildAdvancedTabHtml(): string {
         </div>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="AA.AAAAAAAA" id="${P}-ecen" type="text" maxlength="7" />
+            <input placeholder="AA.AAAAAAAA" id="${P}-ecen" type="text" maxlength="9" />
             <label for="${P}-ecen" class="active">${l('eccentricity')}</label>
+            <span id="${P}-ecen-hint" class="helper-text"></span>
           </div>
           <div class="input-field col s6">
             <input placeholder="AA.AAAAAAAA" id="${P}-argPe" type="text" maxlength="8" />

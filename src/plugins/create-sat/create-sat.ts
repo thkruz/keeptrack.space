@@ -28,6 +28,7 @@ import {
   FormErrorReporter,
   FormFieldError,
   fieldErrorFromException,
+  parseEccentricityField,
   TleInputParams,
   validateAdvancedFields,
   validateBasicFields,
@@ -378,7 +379,7 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       const meanmo = Number.parseFloat(meanmoEl.value);
-      const ecen = Number.parseFloat(ecenEl.value) / 1e7;
+      const ecen = Number.parseInt(parseEccentricityField(ecenEl.value) ?? '', 10) / 1e7;
       const meana = Number.parseFloat((getEl(`${CreateSat.elementPrefix}-meana`, true) as HTMLInputElement | null)?.value ?? '');
 
       if (Number.isNaN(meanmo) || Number.isNaN(ecen) || meanmo <= 0 || ecen < 0 || ecen >= 1) {
@@ -708,7 +709,7 @@ export class CreateSat extends KeepTrackPlugin {
      * Ensure eccentricity is a 7-digit number (e.g., 0000000)
      * Remove any decimal point and pad with zeros
      */
-    ecen = ecen.replace('.', '').replace(/\D/gu, '').padStart(7, '0').slice(0, 7);
+    ecen = parseEccentricityField(ecen) ?? ecen.replace('.', '').replace(/\D/gu, '').padStart(7, '0').slice(0, 7);
 
     ecenInput.value = ecen;
 

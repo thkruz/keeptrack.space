@@ -33,6 +33,34 @@ const FIELD_RANGES: Record<string, { min: number; max: number }> = {
 export const VALIDATED_FIELDS = ['scc', 'inc', 'rasc', 'ecen', 'argPe', 'meana', 'meanmo', 'per'] as const;
 
 /**
+ * Read the eccentricity field. A value with a decimal point is a decimal
+ * eccentricity in [0, 1) ("0.001"); a plain integer is the TLE form (e * 1e7).
+ * @returns the seven-digit TLE string, or null when the value is not valid.
+ */
+export function parseEccentricityField(rawValue: string): string | null {
+  const value = rawValue.trim();
+
+  if (/^\d{1,7}$/u.test(value)) {
+    return value.padStart(7, '0');
+  }
+
+  if (/^(\d+\.\d*|\.\d+)$/u.test(value)) {
+    const digits = Math.round(parseFloat(value) * 1e7);
+
+    return digits >= 0 && digits < 1e7 ? String(digits).padStart(7, '0') : null;
+  }
+
+  return null;
+}
+
+/** Label shown beside the field so the interpretation is never silent ("e = 0.0010000"). */
+export function eccentricityHint(rawValue: string): string {
+  const tle = parseEccentricityField(rawValue);
+
+  return tle === null ? '' : `e = 0.${tle}`;
+}
+
+/**
  * Evaluate a single field's raw value.
  * @returns true (valid), false (invalid), or null (empty → neutral).
  */
@@ -46,9 +74,7 @@ export function evaluateField(key: string, rawValue: string): boolean | null {
   // Eccentricity is entered as the 7-digit TLE integer (e * 1e7); the implied
   // eccentricity must be in [0, 1).
   if (key === 'ecen') {
-    const intVal = parseInt(value, 10);
-
-    return !isNaN(intVal) && intVal >= 0 && intVal < 1e7;
+    return parseEccentricityField(value) !== null;
   }
 
   const num = parseFloat(value);
@@ -95,7 +121,13 @@ export function wireInlineValidation(prefix: string, fields: readonly string[] =
       continue;
     }
 
-    const validate = (): void => applyFieldState(el, evaluateField(key, el.value));
+    const hint = key === 'ecen' ? getEl(`${prefix}-ecen-hint`, true) : null;
+    const validate = (): void => {
+      applyFieldState(el, evaluateField(key, el.value));
+      if (hint) {
+        hint.textContent = eccentricityHint(el.value);
+      }
+    };
 
     el.addEventListener('input', validate);
     validate();
@@ -258,7 +290,7 @@ export function validateAdvancedFields(v: TleInputParams): FormFieldError[] {
   if (!isInRange('rasc', v.rasc)) {
     add('rasc');
   }
-  if (!/^\d{1,7}$/u.test(v.ecen.trim())) {
+  if (parseEccentricityField(v.ecen) === null) {
     add('ecen');
   }
   if (!isInRange('argPe', v.argPe)) {

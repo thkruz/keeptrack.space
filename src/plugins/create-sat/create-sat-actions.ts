@@ -12,6 +12,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { Earth, FormatTle, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { computePresetElements, OrbitPresetId, rawIntlDesFromTle, sunSyncInclinationDeg, tleToElementFields } from './create-sat-orbits';
+import { parseEccentricityField } from './create-sat-validation';
 
 /** Advanced-tab element-id suffixes that the write helper accepts. */
 export interface AdvancedFieldWrite {
@@ -107,7 +108,7 @@ export function applyOrbitPreset(prefix: string, presetId: OrbitPresetId): void 
  */
 export function applySunSyncInclination(prefix: string): boolean {
   const meanmo = parseFloat((getEl(`${prefix}-meanmo`, true) as HTMLInputElement | null)?.value ?? '');
-  const ecenRaw = parseInt((getEl(`${prefix}-ecen`, true) as HTMLInputElement | null)?.value ?? '', 10) / 1e7;
+  const ecenRaw = parseInt(parseEccentricityField((getEl(`${prefix}-ecen`, true) as HTMLInputElement | null)?.value ?? '') ?? '', 10) / 1e7;
 
   if (isNaN(meanmo) || meanmo <= 0) {
     return false;
@@ -197,7 +198,7 @@ export function buildPreviewTleFromForm(prefix: string): { tle1: TleLine1; tle2:
   const rasc = parseFloat(v('rasc'));
   const argPe = parseFloat(v('argPe'));
   const meana = parseFloat(v('meana'));
-  const ecen = parseInt(v('ecen'), 10) / 1e7;
+  const ecen = parseInt(parseEccentricityField(v('ecen')) ?? '', 10) / 1e7;
 
   if ([inc, meanmo, rasc, argPe, meana].some(isNaN) || isNaN(ecen) || meanmo <= 0 || ecen < 0 || ecen >= 1) {
     return null;

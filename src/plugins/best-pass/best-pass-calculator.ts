@@ -155,6 +155,7 @@ export const findPassesForSat = (
   const maxResults = options.maxResults ?? DEFAULT_MAX_RESULTS;
 
   const timeAt = (offsetMs: number): Date => new Date(baseTimeMs + offsetMs);
+  const windowSec = looksLength * 24 * 60 * 60;
 
   const orbitalPeriod = MINUTES_PER_DAY / ((satrec.no * MINUTES_PER_DAY) / TAU);
 
@@ -174,12 +175,17 @@ export const findPassesForSat = (
   let stop3 = false;
   /** True when this pass's AOS was produced by the horizon mask. */
   let startMasked = false;
+  /** True when the pass was already in view at the first sample, so its real AOS is before the window. */
+  let startClipped = false;
   /** True when the last emitted pass's LOS was produced by the horizon mask. */
   let lastStopMasked = false;
 
   /** The out-of-view neighbour of an edge sample is mask-blocked: the mask made this edge. */
   const isMaskEdge = (rae: PassRae): boolean =>
     rae.az !== null && rae.el !== null && typeof sensor.isMaskBlocked === 'function' && sensor.isMaskBlocked(rae.az as Degrees, rae.el as Degrees);
+
+  /** Loop counter in seconds from the window start; the loop variable itself so float drift cannot hide the last sample. */
+  let offsetSec = 0;
 
   const propagateBestPass = (now: Date): lookanglesRow => {
     const aer = getRae(now, satrec, sensor) as Required<PassRae>;
@@ -189,41 +195,85 @@ export const findPassesForSat = (
       return emptyPassRow();
     }
 
-    const now1 = timeAt(offset - looksInterval * 1000);
-    let aer1 = getRae(now1, satrec, sensor);
-    let isInFOV1 = checkIsInView(sensor, aer1);
+    const isFirstSample = offsetSec === 0;
+    const isLastSample = offsetSec + looksInterval >= windowSec;
+    let aer1: PassRae = aer;
+    let isInFOV1 = true;
 
-    if (!isInFOV1) {
+    if (!isFirstSample) {
+      aer1 = getRae(timeAt(offset - looksInterval * 1000), satrec, sensor);
+      isInFOV1 = checkIsInView(sensor, aer1);
+    }
+
+    const isRising = isFirstSample || !isInFOV1;
+
+    if (isRising) {
+      // Drop any state left by a discarded single-sample contact.
+      resetPassState();
       // Rising edge: the previous step was out of view, so this is the pass start.
-      if (aer.el <= HORIZON_ELEVATION_DEG) {
+      // At the first sample the satellite is already in view: the window start acts as AOS.
+      // A clipped start is not a real horizon crossing, so it never earns the horizon bonus.
+      if (!isFirstSample && aer.el <= HORIZON_ELEVATION_DEG) {
         start3 = true;
       }
-      startMasked = isMaskEdge(aer1);
+      startClipped = isFirstSample;
+      startMasked = isFirstSample ? false : isMaskEdge(aer1);
       sTime = now;
       sAz = aer.az.toFixed(0);
       sEl = aer.el.toFixed(1);
       srng = aer.rng.toFixed(0);
-    } else {
-      const now2 = timeAt(offset + looksInterval * 1000);
+    }
+
+    // A rising sample can only close the pass at once when it is the last one in the window.
+    if (!isRising || isLastSample) {
+      const now2 = timeAt(Math.min(offset + looksInterval * 1000, windowSec * 1000));
 
       aer1 = getRae(now2, satrec, sensor);
       isInFOV1 = checkIsInView(sensor, aer1);
-      if (!isInFOV1) {
-        // Falling edge: the next step is out of view, so this is the pass stop.
-        stop3 = aer.el <= HORIZON_ELEVATION_DEG;
+      // At the last sample the window end acts as LOS even if the satellite is still in view.
+      const endClipped = isLastSample && isInFOV1;
+
+      // A contact seen only at the last sample is dropped, as single-sample contacts are elsewhere.
+      if (isRising && !endClipped) {
+        return emptyPassRow();
+      }
+
+      if (!isInFOV1 || isLastSample) {
+        if (passMaxEl < aer.el) {
+          passMaxEl = aer.el;
+          passMaxElTime = now;
+        }
+        if (passMinrng > aer.rng) {
+          passMinrng = aer.rng;
+        }
+
+        // Falling edge: the next step is out of view (or the window ends), so this is the pass stop.
+        // A clipped end is the window end itself, not the last sample, and never earns the horizon bonus.
+        stop3 = !endClipped && aer.el <= HORIZON_ELEVATION_DEG;
 
         if (sTime === null) {
           return emptyPassRow();
         }
 
-        const durationMs = now.getTime() - sTime.getTime();
+        const stopTime = endClipped ? timeAt(windowSec * 1000) : now;
+        const stopRae: PassRae = endClipped ? getRae(stopTime, satrec, sensor) : aer;
+
+        if (endClipped && stopRae.el !== null && stopRae.el !== undefined && passMaxEl < stopRae.el) {
+          passMaxEl = stopRae.el;
+          passMaxElTime = stopTime;
+        }
+        if (endClipped && stopRae.rng !== null && stopRae.rng !== undefined && passMinrng > stopRae.rng) {
+          passMinrng = stopRae.rng;
+        }
+
+        const durationMs = stopTime.getTime() - sTime.getTime();
 
         score = scorePass(durationMs, passMaxEl, passMinrng, start3 && stop3);
 
         const tic = durationMs / 1000 || 0;
-        const sunRae = eci2rae(now, sunEciKm(now), sensor);
+        const sunRae = eci2rae(stopTime, sunEciKm(stopTime), sensor);
 
-        lastStopMasked = isMaskEdge(aer1);
+        lastStopMasked = endClipped ? false : isMaskEdge(aer1);
 
         return {
           START_DTG: sTime.getTime(),
@@ -235,11 +285,11 @@ export const findPassesForSat = (
           START_AZIMUTH: sAz!,
           START_ELEVATION: sEl!,
           START_RANGE: srng!,
-          STOP_DATE: now,
-          STOP_TIME: now,
-          STOP_AZIMTUH: aer.az.toFixed(0),
-          STOP_ELEVATION: aer.el.toFixed(1),
-          STOP_RANGE: aer.rng.toFixed(0),
+          STOP_DATE: stopTime,
+          STOP_TIME: stopTime,
+          STOP_AZIMTUH: (stopRae.az ?? aer.az).toFixed(0),
+          STOP_ELEVATION: (stopRae.el ?? aer.el).toFixed(1),
+          STOP_RANGE: (stopRae.rng ?? aer.rng).toFixed(0),
           TIME_IN_COVERAGE_SECONDS: tic,
           MINIMUM_RANGE: passMinrng.toFixed(0),
           MAXIMUM_ELEVATION: passMaxEl.toFixed(1),
@@ -247,6 +297,9 @@ export const findPassesForSat = (
           SENSOR_TO_SUN_AZIMUTH: sunRae.az.toFixed(1),
           SENSOR_TO_SUN_ELEVATION: sunRae.el.toFixed(1),
           MASK_LIMITED: startMasked || lastStopMasked,
+          START_CLIPPED: startClipped,
+          END_CLIPPED: endClipped,
+          MASK_APPLIED: typeof sensor.hasElevationMask === 'function' && sensor.hasElevationMask(),
         };
       }
     }
@@ -274,14 +327,16 @@ export const findPassesForSat = (
     start3 = false;
     stop3 = false;
     startMasked = false;
+    startClipped = false;
   };
 
-  for (let i = 0; i < looksLength * 24 * 60 * 60; i += looksInterval) {
+  for (let i = 0; i < windowSec; i += looksInterval) {
     if (passes.length >= maxResults) {
       truncated = true;
       break;
     }
 
+    offsetSec = i;
     offset = i * 1000;
     const now = timeAt(offset);
     const row = propagateBestPass(now);

@@ -12,7 +12,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { BestPassDeps, findPassesForSat } from '@app/plugins/best-pass/best-pass-calculator';
 import { Kilometers, Sgp4 } from '@ootk/src/main';
 import { type BpWorkerInMsg, BpWorkerMsgType, BpWorkerOutMsgType } from './best-pass-messages';
-import { workerCheckIsInView, workerGetRae } from './shared/pass-worker-helpers';
+import { workerCheckIsInViewMasked, workerGetRae } from './shared/pass-worker-helpers';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
 let cancelledRunId = -1;
@@ -45,7 +45,7 @@ self.onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
     const deps: BestPassDeps = {
       baseTimeMs: msg.baseTimeMs,
       getRae: workerGetRae,
-      checkIsInView: workerCheckIsInView,
+      checkIsInView: workerCheckIsInViewMasked,
       sunEciKm: () => ({
         x: msg.sunEci.x as Kilometers,
         y: msg.sunEci.y as Kilometers,

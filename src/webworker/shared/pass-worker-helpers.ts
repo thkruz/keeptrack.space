@@ -1,8 +1,9 @@
 /**
  * Shared worker-side look-angle and field-of-regard helpers for pass-finding
- * workers (best-pass, tip-and-cue). These faithfully mirror SatMath.getRae and
- * SatMath.checkIsInView but run with no DOM/ServiceLocator dependencies so they
- * can execute inside a Web Worker.
+ * workers (best-pass, tip-and-cue). workerGetRae mirrors SatMath.getRae and
+ * workerCheckIsInViewMasked mirrors SatMath.checkIsInView (box test plus horizon
+ * mask); workerCheckIsInView is the box-only test without the mask. All run with
+ * no DOM/ServiceLocator dependencies so they can execute inside a Web Worker.
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
@@ -69,4 +70,23 @@ export function workerCheckIsInView(sensor: DetailedSensor, rae: PassRae): boole
   }
 
   return inPrimary || inSecondary;
+}
+
+/**
+ * Field-of-regard test that also applies the sensor's azimuth-dependent horizon mask.
+ * Mirrors SatMath.checkIsInView (sector box, then el >= mask(az)). Kept separate from
+ * {@link workerCheckIsInView} so tip-and-cue keeps its existing elevation-only behavior.
+ */
+export function workerCheckIsInViewMasked(sensor: DetailedSensor, rae: PassRae): boolean {
+  if (!workerCheckIsInView(sensor, rae)) {
+    return false;
+  }
+
+  if (rae.az === null || rae.el === null || typeof sensor.getMaskElevationAt !== 'function') {
+    return true;
+  }
+
+  const maskEl = sensor.getMaskElevationAt(rae.az as Degrees);
+
+  return maskEl === null || rae.el >= maskEl;
 }

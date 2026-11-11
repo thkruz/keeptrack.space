@@ -163,7 +163,9 @@
         "el": "仰角",
         "az": "方位角",
         "rng": "距离",
-        "visible": "可见"
+        "visible": "地平线以上",
+        "sunlit": "受日照",
+        "optical": "光学可见"
       },
       "msgs": {
         "notVisible": "未来{hours}小时内卫星不可见。",
@@ -174,7 +176,9 @@
         "maxEl": "最大仰角",
         "unknown": "未知",
         "inView": "在视野内",
-        "noLookAnglesToDownload": "没有可下载的观测角度!"
+        "noLookAnglesToDownload": "没有可下载的观测角度!",
+        "eclipsed": "处于地影",
+        "opticalNote": "光学可见 = 位于地平线以上、卫星受日照、且站点太阳高度不高于{limit}°。"
       },
       "maskLimited": "遮罩",
       "maskLimitedTitle": "此边界由传感器的地平线遮罩决定，而非其最小仰角",
@@ -183,7 +187,7 @@
         "imgAlt": "包含时间、方位角、仰角和距离的观测角表格",
         "imgCaption": "每一行都是一个指向解；点击某一行可将时钟跳转到该时刻。",
         "readingHeading": "读懂表格",
-        "reading": "每一行列出从传感器看到的卫星的<strong>时间</strong>、仰角（<strong>仰角</strong>）、方位角（<strong>方位角</strong>）和距离（<strong>距离</strong>），以及它在光学上是否<strong>可见</strong>。启用<strong>仅显示升起和落下时间</strong>后，表格会精简为每次过境的升起、最大仰角和落下事件，并在<strong>类型</strong>列中标注。",
+        "reading": "每一行列出从传感器看到的卫星的<strong>时间</strong>、仰角（<strong>仰角</strong>）、方位角（<strong>方位角</strong>）和距离（<strong>距离</strong>），以及它是否<strong>地平线以上</strong>、<strong>受日照</strong>，以及（仅光学传感器）是否<strong>光学可见</strong>。启用<strong>仅显示升起和落下时间</strong>后，表格会精简为每次过境的升起、最大仰角和落下事件，并在<strong>类型</strong>列中标注。",
         "howToUse": "<ol><li>同时选择一个传感器和一颗卫星；在两者都设置好之前，其抽屉图标保持禁用状态。</li><li>从抽屉打开<strong>观测角</strong>。表格会自动计算。</li><li>打开设置面板以切换升起/落下模式，或更改<strong>计算时长（天）</strong>和<strong>间隔（秒）</strong>。</li><li>点击某一行可将仿真时钟跳转到该时刻，或使用下载按钮导出表格。</li></ol>",
         "tip1": "升起/落下模式是了解下次何时能看到卫星的最快方法；需要逐秒指向角度时，请切换到完整表格。",
         "tip2": "点击行会保留您的播放状态，因此暂停的时钟在新时间点仍保持暂停。"
@@ -202,7 +206,9 @@
         "az": "方位角",
         "rng": "距离",
         "sensor": "传感器",
-        "visible": "可见"
+        "visible": "地平线以上",
+        "sunlit": "受日照",
+        "optical": "光学可见"
       },
       "msgs": {
         "notVisible": "未来{hours}小时内卫星不可见。",
@@ -210,17 +216,19 @@
         "no": "否",
         "na": "不适用",
         "sensorListMissing": "未找到传感器列表元素",
-        "satrecNotFound": "未找到卫星记录"
+        "satrecNotFound": "未找到卫星记录",
+        "eclipsed": "处于地影",
+        "opticalNote": "光学可见 = 位于地平线以上、卫星受日照、且站点太阳高度不高于{limit}°。"
       },
       "help": {
         "overview": "多站观测角回答一个网络层面的问题：在我所有的传感器中，哪一个能看到选定的卫星，何时能看到？它一次性计算多个站点的观测角，并将它们交织成一张按时间排序的表格。",
         "imgAlt": "包含传感器和指向数据的多站观测角表格",
         "imgCaption": "每一行将一个过境时刻与看到它的传感器配对。",
         "readingHeading": "读懂表格",
-        "reading": "各行按时间顺序排列，涵盖所有启用的站点，每行列出<strong>时间</strong>、仰角（<strong>仰角</strong>）、方位角（<strong>方位角</strong>）、距离（<strong>距离</strong>）、涉及的<strong>传感器</strong>以及光学可见性。传感器切换面板决定计算哪些站点：绿色传感器被包含，红色传感器被排除。",
+        "reading": "各行按时间顺序排列，涵盖所有启用的站点，每行列出<strong>时间</strong>、仰角（<strong>仰角</strong>）、方位角（<strong>方位角</strong>）、距离（<strong>距离</strong>）、涉及的<strong>传感器</strong>以及是否<strong>地平线以上</strong>、是否<strong>受日照</strong>，以及（仅光学传感器）是否<strong>光学可见</strong>。传感器切换面板决定计算哪些站点：绿色传感器被包含，红色传感器被排除。",
         "howToUse": "<ol><li>选择一颗卫星；在选择之前，其抽屉图标保持禁用状态。无需选择传感器。</li><li>从抽屉打开<strong>多站观测</strong>。默认的导弹预警网络会自动计算。</li><li>在传感器列表面板中开启或关闭传感器以更改网络。</li><li>点击某一行可选中该传感器并将时钟跳转到该时刻，或使用下载按钮导出表格。</li></ol>",
         "tip1": "用它来规划交接：当一个传感器的覆盖结束时，下一行会显示哪个站点接续跟踪该卫星。",
-        "tip2": "光学站点仅在光照条件允许实际观测时才显示可见性；雷达始终显示不适用。"
+        "tip2": "光学站点仅在卫星位于地平线以上且受日照、站点处于黑暗（太阳高度角不高于-12度）时才在“光学可见”一栏显示“是”，否则显示“否”；雷达行显示“地平线以上”和“受日照”，“光学可见”一栏显示“-”。"
       }
     }
   }

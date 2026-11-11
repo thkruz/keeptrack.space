@@ -163,7 +163,9 @@
         "el": "Élév.",
         "az": "Az.",
         "rng": "Dist.",
-        "visible": "Visible"
+        "visible": "Au-dessus de l'horizon",
+        "sunlit": "Éclairé",
+        "optical": "Visible optiquement"
       },
       "msgs": {
         "notVisible": "Le satellite ne sera pas visible pendant les {hours} prochaines heures.",
@@ -174,7 +176,9 @@
         "maxEl": "Élév. max.",
         "unknown": "Inconnu",
         "inView": "En vue",
-        "noLookAnglesToDownload": "Aucun angle de visée disponible au téléchargement !"
+        "noLookAnglesToDownload": "Aucun angle de visée disponible au téléchargement !",
+        "eclipsed": "Éclipsé",
+        "opticalNote": "Visible optiquement = au-dessus de l'horizon, satellite éclairé et Soleil à {limit}° ou en dessous au site."
       },
       "maskLimited": "masque",
       "maskLimitedTitle": "Ce bord est fixé par le masque d'horizon du capteur, pas par son élévation minimale",
@@ -183,7 +187,7 @@
         "imgAlt": "Le tableau des angles de visée avec heures, azimuts, élévations et distances",
         "imgCaption": "Chaque ligne est une solution de pointage ; cliquez sur l'une d'elles pour amener l'horloge à ce moment.",
         "readingHeading": "Lire le Tableau",
-        "reading": "Chaque ligne indique l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>) et la distance (<strong>Dist.</strong>) du satellite vu depuis le capteur, ainsi que s'il est optiquement <strong>Visible</strong>. Avec <strong>Afficher uniquement les heures de lever et de coucher</strong> activé, le tableau se réduit aux événements de lever, d'élévation maximale et de coucher de chaque passage, étiquetés dans la colonne <strong>Type</strong>.",
+        "reading": "Chaque ligne indique l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>) et la distance (<strong>Dist.</strong>) du satellite vu depuis le capteur, ainsi que s'il est <strong>Au-dessus de l'horizon</strong>, <strong>Éclairé</strong> et (capteurs optiques uniquement) <strong>Visible optiquement</strong>. Avec <strong>Afficher uniquement les heures de lever et de coucher</strong> activé, le tableau se réduit aux événements de lever, d'élévation maximale et de coucher de chaque passage, étiquetés dans la colonne <strong>Type</strong>.",
         "howToUse": "<ol><li>Sélectionnez à la fois un capteur et un satellite ; son icône dans le tiroir des extensions reste désactivée tant que les deux ne sont pas définis.</li><li>Ouvrez <strong>Angles de visée</strong> depuis le tiroir des extensions. Le tableau se calcule automatiquement.</li><li>Ouvrez le panneau des paramètres pour basculer le mode lever/coucher ou modifier la <strong>Durée du calcul (jours)</strong> et l'<strong>Intervalle (secondes)</strong>.</li><li>Cliquez sur une ligne pour amener l'horloge de la simulation à ce moment, ou utilisez le bouton de téléchargement pour exporter le tableau.</li></ol>",
         "tip1": "Le mode lever/coucher est le moyen le plus rapide de savoir quand vous pourrez voir le satellite la prochaine fois ; passez au tableau complet quand vous avez besoin d'angles de pointage seconde par seconde.",
         "tip2": "Cliquer sur une ligne préserve votre état de lecture, de sorte qu'une horloge en pause reste en pause à la nouvelle heure."
@@ -202,7 +206,9 @@
         "az": "Az.",
         "rng": "Dist.",
         "sensor": "Capteur",
-        "visible": "Visible"
+        "visible": "Au-dessus de l'horizon",
+        "sunlit": "Éclairé",
+        "optical": "Visible optiquement"
       },
       "msgs": {
         "notVisible": "Le satellite ne sera pas visible pendant les {hours} prochaines heures.",
@@ -210,17 +216,19 @@
         "no": "Non",
         "na": "N/D",
         "sensorListMissing": "Liste des capteurs introuvable dans l'interface",
-        "satrecNotFound": "Enregistrement du satellite introuvable"
+        "satrecNotFound": "Enregistrement du satellite introuvable",
+        "eclipsed": "Éclipsé",
+        "opticalNote": "Visible optiquement = au-dessus de l'horizon, satellite éclairé et Soleil à {limit}° ou en dessous au site."
       },
       "help": {
         "overview": "Les angles multi-sites répondent à une question de réseau : parmi tous mes capteurs, lequel voit le satellite sélectionné, et quand ? Ils calculent les angles de visée sur de nombreux sites à la fois et les entrelacent dans un seul tableau chronologique.",
         "imgAlt": "Le tableau des angles multi-sites avec capteurs et données de pointage",
         "imgCaption": "Chaque ligne associe un moment du passage au capteur qui le voit.",
         "readingHeading": "Lire le Tableau",
-        "reading": "Les lignes sont triées chronologiquement sur tous les sites activés, chacune indiquant l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>), la distance (<strong>Dist.</strong>), le <strong>Capteur</strong> concerné et la visibilité optique. Le panneau de sélection des capteurs détermine quels sites sont calculés : les capteurs verts sont inclus et les rouges exclus.",
+        "reading": "Les lignes sont triées chronologiquement sur tous les sites activés, chacune indiquant l'<strong>Heure</strong>, l'élévation (<strong>Élév.</strong>), l'azimut (<strong>Az.</strong>), la distance (<strong>Dist.</strong>), le <strong>Capteur</strong> concerné et s'il est <strong>Au-dessus de l'horizon</strong>, <strong>Éclairé</strong> et (capteurs optiques uniquement) <strong>Visible optiquement</strong>. Le panneau de sélection des capteurs détermine quels sites sont calculés : les capteurs verts sont inclus et les rouges exclus.",
         "howToUse": "<ol><li>Sélectionnez un satellite ; son icône dans le tiroir des extensions reste désactivée tant qu'aucun n'est sélectionné. Aucune sélection de capteur n'est nécessaire.</li><li>Ouvrez <strong>Angles multi-sites</strong> depuis le tiroir des extensions. Le réseau d'alerte aux missiles par défaut est calculé automatiquement.</li><li>Activez ou désactivez des capteurs dans le panneau de la liste des capteurs pour modifier le réseau.</li><li>Cliquez sur une ligne pour sélectionner ce capteur et amener l'horloge à ce moment, ou exportez le tableau avec le bouton de téléchargement.</li></ol>",
         "tip1": "Utilisez-le pour planifier les transferts : là où la couverture d'un capteur se termine, la ligne suivante montre quel site prend le relais du satellite.",
-        "tip2": "Les sites optiques n'affichent la visibilité que lorsque les conditions d'éclairage permettent une observation réelle ; les radars affichent toujours N/D."
+        "tip2": "Les sites optiques affichent Oui dans Visible optiquement uniquement lorsque le satellite est au-dessus de l'horizon et éclairé et que le site est sombre (Soleil à -12 degrés ou moins), sinon Non ; les lignes radar affichent Au-dessus de l'horizon et Éclairé, avec « - » dans Visible optiquement."
       }
     }
   }

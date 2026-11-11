@@ -79,6 +79,8 @@
       "crossTrack": "Poprzecznie do toru",
       "crossTrackTooltip": "Odległość poprzeczna od satelity dodatkowego"
     },
-    "noData": "BRAK DANYCH"
+    "noData": "BRAK DANYCH",
+    "notSunlit": "Nieoświetlony",
+    "assumedSuffix": "(założone)"
   }
 }

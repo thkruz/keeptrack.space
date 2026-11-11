@@ -79,6 +79,8 @@
       "crossTrack": "궤도 수직 방향",
       "crossTrackTooltip": "보조 위성까지의 궤도 수직 방향 거리"
     },
-    "noData": "데이터 없음"
+    "noData": "데이터 없음",
+    "notSunlit": "일조 없음",
+    "assumedSuffix": "(가정)"
   }
 }

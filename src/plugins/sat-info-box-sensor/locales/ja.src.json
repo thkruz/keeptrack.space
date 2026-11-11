@@ -51,7 +51,9 @@
         "notInOrbitToast": "衛星 {sccNum} は軌道上にありません!<br>シミュレーション時刻は {simTime} です。<br>正しい TLE を使用しているか確認してください。",
         "categoryKinematic": "運動学",
         "categorySensor": "センサー",
-        "kinematicOk": "センサーの制限内"
+        "kinematicOk": "センサーの制限内",
+        "notSunlit": "日照なし",
+        "assumedSuffix": "(仮定)"
       }
     }
   }

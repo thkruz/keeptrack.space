@@ -221,4 +221,48 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       expect(getEl('sat-vmag')!.innerHTML).toBe('9.87');
     });
   });
+
+  describe('Vis Mag lighting and assumed intrinsic magnitude', () => {
+    const run_ = (vmag: number | null, lighting: { sunlit: boolean | null }) => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(true);
+      vi.spyOn(SensorMath, 'nextpass').mockReturnValue('No Passes in 2 Days');
+      vi.spyOn(stdMagEstimator, 'estimateStdMag').mockReturnValue(null);
+      vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ ...lighting, siteDark: true, sunElDeg: -30 });
+      const visMagSpy = vi.spyOn(SatMath, 'calculateVisMag').mockReturnValue(9.87);
+      const prevVmag = defaultSat.vmag;
+
+      defaultSat.vmag = vmag as never;
+      try {
+        setupSensorAndSat_();
+        setSimTime_(SIM_TIME);
+        frame_();
+      } finally {
+        defaultSat.vmag = prevVmag;
+      }
+
+      return visMagSpy;
+    };
+
+    it('eclipsed satellite: shows "Not sunlit" and no number', () => {
+      const visMagSpy = run_(4.2, { sunlit: false });
+
+      expect(getEl('sat-vmag')!.innerHTML).toBe('Not sunlit');
+      expect(visMagSpy).not.toHaveBeenCalled();
+    });
+
+    it('sunlit satellite with a catalog vmag: plain number, no assumed tag', () => {
+      run_(4.2, { sunlit: true });
+
+      expect(getEl('sat-vmag')!.innerHTML).toBe('9.87');
+    });
+
+    it('sunlit satellite on the default intrinsic magnitude: number marked assumed', () => {
+      run_(null, { sunlit: true });
+
+      expect(getEl('sat-vmag')!.innerHTML).toBe('9.87 (assumed)');
+    });
+  });
 });

@@ -51,7 +51,9 @@
         "notInOrbitToast": "Супутник {sccNum} не на орбіті!<br>Час симуляції: {simTime}.<br>Переконайтеся, що використовуєте правильний TLE.",
         "categoryKinematic": "Кінематика",
         "categorySensor": "Сенсор",
-        "kinematicOk": "У межах обмежень сенсора"
+        "kinematicOk": "У межах обмежень сенсора",
+        "notSunlit": "Не освітлений",
+        "assumedSuffix": "(припущено)"
       }
     }
   }

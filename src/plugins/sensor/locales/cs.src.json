@@ -163,7 +163,9 @@
         "el": "El.",
         "az": "Az.",
         "rng": "Vzd.",
-        "visible": "Viditelný"
+        "visible": "Nad obzorem",
+        "sunlit": "Osvětlený",
+        "optical": "Opticky viditelný"
       },
       "msgs": {
         "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
@@ -174,7 +176,9 @@
         "maxEl": "Max. El.",
         "unknown": "Neznámé",
         "inView": "V dohledu",
-        "noLookAnglesToDownload": "Nejsou k dispozici žádné úhly pohledu ke stažení!"
+        "noLookAnglesToDownload": "Nejsou k dispozici žádné úhly pohledu ke stažení!",
+        "eclipsed": "Zastíněn",
+        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti."
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tuto hranu určuje maska horizontu senzoru, ne jeho minimální elevace",
@@ -183,7 +187,7 @@
         "imgAlt": "Tabulka úhlů pohledu s časy, azimuty, elevacemi a vzdálenostmi",
         "imgCaption": "Každý řádek je naváděcí řešení; kliknutím na něj přesunete hodiny na daný okamžik.",
         "readingHeading": "Čtení tabulky",
-        "reading": "Každý řádek uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>) a vzdálenost (<strong>Vzd.</strong>) satelitu při pohledu ze senzoru, plus zda je opticky <strong>Viditelný</strong>. Se zapnutou volbou <strong>Zobrazit pouze časy východu a západu</strong> se tabulka zúží na události východu, maximální elevace a západu každého přeletu, označené ve sloupci <strong>Typ</strong>.",
+        "reading": "Každý řádek uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>) a vzdálenost (<strong>Vzd.</strong>) satelitu při pohledu ze senzoru, plus zda je <strong>Nad obzorem</strong>, <strong>Osvětlený</strong> a (jen u optických senzorů) <strong>Opticky viditelný</strong>. Se zapnutou volbou <strong>Zobrazit pouze časy východu a západu</strong> se tabulka zúží na události východu, maximální elevace a západu každého přeletu, označené ve sloupci <strong>Typ</strong>.",
         "howToUse": "<ol><li>Vyberte senzor i satelit; ikona pluginu v panelu zůstává neaktivní, dokud nejsou nastaveny oba.</li><li>Otevřete <strong>Úhly pohledu</strong> z panelu. Tabulka se vypočítá automaticky.</li><li>Otevřete panel nastavení a přepněte režim východ/západ nebo změňte hodnoty <strong>Délka výpočtu (dny)</strong> a <strong>Interval (sekundy)</strong>.</li><li>Kliknutím na řádek přesunete simulační hodiny na daný okamžik, nebo tabulku exportujete tlačítkem stahování.</li></ol>",
         "tip1": "Režim východ/západ je nejrychlejší způsob, jak zjistit, kdy satelit uvidíte příště; na úplnou tabulku přepněte, když potřebujete naváděcí úhly sekundu po sekundě.",
         "tip2": "Kliknutí na řádek zachová stav přehrávání, takže pozastavené hodiny zůstanou pozastavené i v novém čase."
@@ -202,7 +206,9 @@
         "az": "Az.",
         "rng": "Vzd.",
         "sensor": "Senzor",
-        "visible": "Viditelný"
+        "visible": "Nad obzorem",
+        "sunlit": "Osvětlený",
+        "optical": "Opticky viditelný"
       },
       "msgs": {
         "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
@@ -210,17 +216,19 @@
         "no": "Ne",
         "na": "N/A",
         "sensorListMissing": "Seznam senzorů nebyl nalezen v rozhraní",
-        "satrecNotFound": "Záznam družice nebyl nalezen"
+        "satrecNotFound": "Záznam družice nebyl nalezen",
+        "eclipsed": "Zastíněn",
+        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti."
       },
       "help": {
         "overview": "Úhly pohledu z více míst odpovídají na síťovou otázku: který ze všech mých senzorů vidí vybraný satelit a kdy? Počítají úhly pohledu pro mnoho stanovišť najednou a prokládají je do jediné chronologické tabulky.",
         "imgAlt": "Tabulka úhlů pohledu z více míst se senzory a naváděcími daty",
         "imgCaption": "Každý řádek spojuje okamžik přeletu se senzorem, který jej vidí.",
         "readingHeading": "Čtení tabulky",
-        "reading": "Řádky jsou seřazeny chronologicky napříč všemi zapnutými stanovišti a každý uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>), vzdálenost (<strong>Vzd.</strong>), dotčený <strong>Senzor</strong> a optickou viditelnost. Panel přepínačů senzorů určuje, která stanoviště se počítají: zelené senzory jsou zahrnuty a červené vyloučeny.",
+        "reading": "Řádky jsou seřazeny chronologicky napříč všemi zapnutými stanovišti a každý uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>), vzdálenost (<strong>Vzd.</strong>), dotčený <strong>Senzor</strong> a zda je <strong>Nad obzorem</strong>, <strong>Osvětlený</strong> a (jen u optických senzorů) <strong>Opticky viditelný</strong>. Panel přepínačů senzorů určuje, která stanoviště se počítají: zelené senzory jsou zahrnuty a červené vyloučeny.",
         "howToUse": "<ol><li>Vyberte satelit; ikona pluginu v panelu zůstává neaktivní, dokud není vybrán. Výběr senzoru není potřeba.</li><li>Otevřete <strong>Pohledy z více míst</strong> z panelu. Výchozí síť včasné výstrahy proti raketám se vypočítá automaticky.</li><li>Zapínáním a vypínáním senzorů v panelu seznamu senzorů změníte síť.</li><li>Kliknutím na řádek vyberete daný senzor a přesunete hodiny na daný okamžik, nebo tabulku exportujete tlačítkem stahování.</li></ol>",
         "tip1": "Použijte je k plánování předávek: kde končí pokrytí jednoho senzoru, další řádek ukáže, které stanoviště satelit převezme.",
-        "tip2": "Optická stanoviště ukazují viditelnost jen tehdy, když světelné podmínky skutečné pozorování umožňují; radary vždy zobrazují N/A."
+        "tip2": "Optická stanoviště ukazují v Opticky viditelný Ano jen tehdy, když je družice nad obzorem a osvětlená a stanoviště je ve tmě (Slunce na úrovni -12 stupňů nebo níže), jinak Ne; řádky radarů ukazují Nad obzorem a Osvětlený, ve sloupci Opticky viditelný je „-“."
       }
     }
   }

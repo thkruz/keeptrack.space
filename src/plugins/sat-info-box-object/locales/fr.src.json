@@ -79,6 +79,8 @@
       "crossTrack": "Transverse",
       "crossTrackTooltip": "Distance transverse au satellite secondaire"
     },
-    "noData": "AUCUNE DONNÉE"
+    "noData": "AUCUNE DONNÉE",
+    "notSunlit": "Non éclairé",
+    "assumedSuffix": "(supposé)"
   }
 }

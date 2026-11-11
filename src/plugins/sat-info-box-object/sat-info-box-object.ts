@@ -5,6 +5,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { estimateStdMagWithSource, StdMagWithSource } from '@app/app/analysis/std-mag-estimator';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { type FlagSource, resolveFlagKey } from '@app/app/data/catalogs/flag-resolver';
+import { SensorMath } from '@app/app/sensors/sensor-math';
 import { StringExtractor } from '@app/app/ui/string-extractor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -389,9 +390,10 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     try {
       const timeManager = ServiceLocator.getTimeManager();
       const sun = ServiceLocator.getScene().sun;
-      const appMag = SatMath.calculateVisMag(sat, sensor, timeManager.simulationTimeObj, sun, intrinsicOverride);
+      const reading = SensorMath.getVisMagReading(sat, sensor, timeManager.simulationTimeObj, sun, intrinsicOverride);
 
-      appMagElement.innerHTML = appMag.toFixed(2);
+      appMagElement.innerHTML =
+        reading.kind === 'notSunlit' ? t7e('SatInfoBoxObject.notSunlit') : `${reading.value.toFixed(2)}${reading.assumed ? ` ${t7e('SatInfoBoxObject.assumedSuffix')}` : ''}`;
       appMagRow.style.display = '';
     } catch (e) {
       errorManagerInstance.debug(`Apparent magnitude calculation failed: ${e}`);

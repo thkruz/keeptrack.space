@@ -51,7 +51,9 @@
         "notInOrbitToast": "Le satellite {sccNum} n'est pas en orbite !<br>L'heure de simulation est {simTime}.<br>Vérifiez que vous disposez du bon TLE.",
         "categoryKinematic": "Cinématique",
         "categorySensor": "Capteur",
-        "kinematicOk": "Dans les limites du capteur"
+        "kinematicOk": "Dans les limites du capteur",
+        "notSunlit": "Non éclairé",
+        "assumedSuffix": "(supposé)"
       }
     }
   }

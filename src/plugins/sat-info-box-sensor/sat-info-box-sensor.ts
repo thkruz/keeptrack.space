@@ -800,13 +800,15 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       } else {
         const sat = obj as Satellite;
 
-        elements.vmag.innerHTML = SatMath.calculateVisMag(
+        const reading = SensorMath.getVisMagReading(
           sat,
           sensorManagerInstance.currentSensors[0],
           timeManagerInstance.simulationTimeObj,
           sun,
           SatInfoBoxSensor.intrinsicMagOverride_(sat)
-        ).toFixed(2);
+        );
+
+        elements.vmag.innerHTML = reading.kind === 'notSunlit' ? l('values.notSunlit') : `${reading.value.toFixed(2)}${reading.assumed ? ` ${l('values.assumedSuffix')}` : ''}`;
       }
     }
     let beamwidthString = l('values.unknown');

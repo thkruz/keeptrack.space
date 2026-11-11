@@ -239,6 +239,38 @@ export abstract class SatMath {
   }
 
   /**
+   * Geometric elevation of the Sun's centre above a ground site's local horizon.
+   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sunECI The Sun's ECI position in km.
+   * @param upECI Unit vector of the site's local vertical in ECI (the geodetic normal). Defaults to the radial direction.
+   * @returns Degrees (negative below the horizon), or null when either vector is degenerate.
+   */
+  static calculateGroundSiteSunElevation(sitePos: TemeVec3, sunECI: TemeVec3, upECI?: TemeVec3): Degrees | null {
+    if (!sitePos || !sunECI) {
+      return null;
+    }
+
+    const r = Math.hypot(sitePos.x, sitePos.y, sitePos.z);
+    const toSun = { x: sunECI.x - sitePos.x, y: sunECI.y - sitePos.y, z: sunECI.z - sitePos.z };
+    const sunDist = Math.hypot(toSun.x, toSun.y, toSun.z);
+
+    if (!Number.isFinite(r) || !Number.isFinite(sunDist) || r === 0 || sunDist === 0) {
+      return null;
+    }
+
+    const up = upECI ?? { x: sitePos.x / r, y: sitePos.y / r, z: sitePos.z / r };
+    const upLen = Math.hypot(up.x, up.y, up.z);
+
+    if (!Number.isFinite(upLen) || upLen === 0) {
+      return null;
+    }
+
+    const sinSunEl = (up.x * toSun.x + up.y * toSun.y + up.z * toSun.z) / (upLen * sunDist);
+
+    return (Math.asin(Math.min(1, Math.max(-1, sinSunEl))) * RAD2DEG) as Degrees;
+  }
+
+  /**
    * True when the Sun has fully set at a ground site (its centre more than its own radius, about 0.27 deg, below the
    * horizon). This is the "station is dark" test for optical sensors.
    * @param sitePos The site's ECI position in km (e.g. from lla2eci).

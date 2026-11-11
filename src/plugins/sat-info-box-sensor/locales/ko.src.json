@@ -51,7 +51,9 @@
         "notInOrbitToast": "위성 {sccNum}은(는) 궤도에 있지 않습니다!<br>시뮬레이션 시간은 {simTime}입니다.<br>올바른 TLE인지 확인하세요.",
         "categoryKinematic": "운동학",
         "categorySensor": "센서",
-        "kinematicOk": "센서 한계 이내"
+        "kinematicOk": "센서 한계 이내",
+        "notSunlit": "일조 없음",
+        "assumedSuffix": "(가정)"
       }
     }
   }

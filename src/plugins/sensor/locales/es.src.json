@@ -163,7 +163,9 @@
         "el": "El.",
         "az": "Az.",
         "rng": "Dist.",
-        "visible": "Visible"
+        "visible": "Sobre el horizonte",
+        "sunlit": "Iluminado",
+        "optical": "Visible ópticamente"
       },
       "msgs": {
         "notVisible": "El satélite no será visible durante las próximas {hours} horas.",
@@ -174,7 +176,9 @@
         "maxEl": "El. máx.",
         "unknown": "Desconocido",
         "inView": "En vista",
-        "noLookAnglesToDownload": "¡No hay ángulos de observación disponibles para descargar!"
+        "noLookAnglesToDownload": "¡No hay ángulos de observación disponibles para descargar!",
+        "eclipsed": "Eclipsado",
+        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio."
       },
       "maskLimited": "máscara",
       "maskLimitedTitle": "Este borde lo define la máscara de horizonte del sensor, no su elevación mínima",
@@ -183,7 +187,7 @@
         "imgAlt": "La tabla de Ángulos de Visión con horas, azimuts, elevaciones y distancias",
         "imgCaption": "Cada fila es una solución de apuntamiento; haz clic en una para saltar el reloj a ese momento.",
         "readingHeading": "Leer la Tabla",
-        "reading": "Cada fila muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>) y la distancia (<strong>Dist.</strong>) del satélite visto desde el sensor, además de si es ópticamente <strong>Visible</strong>. Con <strong>Mostrar Solo Tiempos de Salida y Puesta</strong> activado, la tabla se reduce a los eventos de salida, elevación máxima y puesta de cada pase, etiquetados en la columna <strong>Tipo</strong>.",
+        "reading": "Cada fila muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>) y la distancia (<strong>Dist.</strong>) del satélite visto desde el sensor, además de si está <strong>Sobre el horizonte</strong>, <strong>Iluminado</strong> y (solo en sensores ópticos) <strong>Visible ópticamente</strong>. Con <strong>Mostrar Solo Tiempos de Salida y Puesta</strong> activado, la tabla se reduce a los eventos de salida, elevación máxima y puesta de cada pase, etiquetados en la columna <strong>Tipo</strong>.",
         "howToUse": "<ol><li>Selecciona tanto un sensor como un satélite; su icono en el panel de complementos permanece deshabilitado hasta que ambos estén establecidos.</li><li>Abre <strong>Ángulos de Visión</strong> desde el panel de complementos. La tabla se calcula automáticamente.</li><li>Abre el panel de configuración para alternar el modo salida/puesta o cambiar la <strong>Duración del Cálculo (Días)</strong> y el <strong>Intervalo (Segundos)</strong>.</li><li>Haz clic en una fila para saltar el reloj de la simulación a ese momento, o usa el botón de descarga para exportar la tabla.</li></ol>",
         "tip1": "El modo salida/puesta es la forma más rápida de saber cuándo podrás ver el satélite la próxima vez; cambia a la tabla completa cuando necesites ángulos de apuntamiento segundo a segundo.",
         "tip2": "Hacer clic en una fila conserva tu estado de reproducción, de modo que un reloj en pausa permanece en pausa en la nueva hora."
@@ -202,7 +206,9 @@
         "az": "Az.",
         "rng": "Dist.",
         "sensor": "Sensor",
-        "visible": "Visible"
+        "visible": "Sobre el horizonte",
+        "sunlit": "Iluminado",
+        "optical": "Visible ópticamente"
       },
       "msgs": {
         "notVisible": "El satélite no será visible durante las próximas {hours} horas.",
@@ -210,17 +216,19 @@
         "no": "No",
         "na": "N/D",
         "sensorListMissing": "No se encontró la lista de sensores en la interfaz",
-        "satrecNotFound": "No se encontró el registro del satélite"
+        "satrecNotFound": "No se encontró el registro del satélite",
+        "eclipsed": "Eclipsado",
+        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio."
       },
       "help": {
         "overview": "Los Ángulos de Visión Multi-Sitio responden a una pregunta de red: de todos mis sensores, ¿cuál ve el satélite seleccionado y cuándo? Calcula los ángulos de visión en muchos sitios a la vez y los intercala en una única tabla cronológica.",
         "imgAlt": "La tabla de Ángulos de Visión Multi-Sitio con sensores y datos de apuntamiento",
         "imgCaption": "Cada fila empareja un momento del pase con el sensor que lo ve.",
         "readingHeading": "Leer la Tabla",
-        "reading": "Las filas están ordenadas cronológicamente entre todos los sitios habilitados, y cada una muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>), la distancia (<strong>Dist.</strong>), el <strong>Sensor</strong> involucrado y la visibilidad óptica. El panel de selección de sensores determina qué sitios se calculan: los sensores verdes se incluyen y los rojos se excluyen.",
+        "reading": "Las filas están ordenadas cronológicamente entre todos los sitios habilitados, y cada una muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>), la distancia (<strong>Dist.</strong>), el <strong>Sensor</strong> involucrado y si está <strong>Sobre el horizonte</strong>, <strong>Iluminado</strong> y (solo en sensores ópticos) <strong>Visible ópticamente</strong>. El panel de selección de sensores determina qué sitios se calculan: los sensores verdes se incluyen y los rojos se excluyen.",
         "howToUse": "<ol><li>Selecciona un satélite; su icono en el panel de complementos permanece deshabilitado hasta que haya uno seleccionado. No se necesita seleccionar ningún sensor.</li><li>Abre <strong>Vistas Multi-Sitio</strong> desde el panel de complementos. La red de alerta de misiles predeterminada se calcula automáticamente.</li><li>Activa o desactiva sensores en el panel de la lista de sensores para cambiar la red.</li><li>Haz clic en una fila para seleccionar ese sensor y saltar el reloj a ese momento, o exporta la tabla con el botón de descarga.</li></ol>",
         "tip1": "Úsalo para planificar traspasos: donde termina la cobertura de un sensor, la siguiente fila muestra qué sitio recoge el satélite.",
-        "tip2": "Los sitios ópticos muestran la visibilidad solo cuando las condiciones de iluminación permiten una observación real; los radares siempre muestran N/D."
+        "tip2": "Los sitios ópticos muestran Sí en Visible ópticamente solo cuando el satélite está sobre el horizonte e iluminado y el sitio está oscuro (Sol a -12 grados o menos); en caso contrario muestran No. Las filas de radar muestran Sobre el horizonte e Iluminado, con «-» en Visible ópticamente."
       }
     }
   }

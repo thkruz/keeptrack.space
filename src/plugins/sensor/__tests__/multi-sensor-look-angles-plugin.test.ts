@@ -1,4 +1,6 @@
-import type { TearrData } from '@app/app/sensors/sensor-math';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { sensors } from '@app/app/data/catalogs/sensors';
+import { SensorMath, type TearrData } from '@app/app/sensors/sensor-math';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
@@ -65,6 +67,8 @@ describe('MultiSensorLookAnglesPlugin_class', () => {
         el: 67.89 as Degrees,
         rng: 1234.5678 as Kilometers,
         visible: true,
+        sunlit: false,
+        opticalVisible: false,
       };
 
       const exportSpy = vi.fn();
@@ -77,7 +81,7 @@ describe('MultiSensorLookAnglesPlugin_class', () => {
       // Injected exporter (not the vi.mock) proves the callback hands the builder's output to the file writer
       expect(exportSpy).toHaveBeenCalledTimes(1);
       expect(exportSpy).toHaveBeenCalledWith(
-        [{ time: sample.time, sensor: sample.objName, az: 12.35, el: 67.89, rng: 1234.57, visible: true }],
+        [{ time: sample.time, sensor: sample.objName, az: 12.35, el: 67.89, rng: 1234.57, aboveHorizon: true, sunlit: false, opticalVisible: false }],
         expect.stringMatching(/^multisite-.*-20260507T000000Z-look-angles$/u)
       );
 
@@ -92,9 +96,18 @@ describe('MultiSensorLookAnglesPlugin_class', () => {
           az: 12.35,
           el: 67.89,
           rng: 1234.57,
-          visible: true,
+          aboveHorizon: true,
+          sunlit: false,
+          opticalVisible: false,
         },
       ]);
+
+      // Radar row: no lighting data exports as empty strings
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const radar = (MultiSensorLookAnglesPlugin as any).buildExport_([{ ...sample, sunlit: undefined, opticalVisible: undefined }], '012345').rows[0];
+
+      expect(radar.sunlit).toBe('');
+      expect(radar.opticalVisible).toBe('');
       // Numeric cells (not strings) and the first-row UTC stamp in the name
       expect(fileName).toBe('multisite-012345-20260507T000000Z-look-angles');
     });
@@ -155,5 +168,91 @@ describe('MultiSensorLookAnglesPlugin look-angle computation', () => {
     p().populateMultiSiteTable_([entry], [defaultSensor]);
 
     expect(getEl('multi-sensor-look-angles-table')!.querySelectorAll('tr').length).toBeGreaterThan(0);
+  });
+});
+
+describe('MultiSensorLookAnglesPlugin three-state lighting columns (F3)', () => {
+  let plugin: MultiSensorLookAnglesPlugin;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+  const cells = (rowIdx: number) => Array.from(getEl('multi-sensor-look-angles-table')!.querySelectorAll('tr')[rowIdx].querySelectorAll('td')).map((c) => c.textContent);
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new MultiSensorLookAnglesPlugin();
+    websiteInit(plugin);
+    p().isMenuButtonActive = true;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('splits the column: Above horizon, Sunlit, Optically visible (optical sensor)', () => {
+    const optical = Object.assign(Object.create(Object.getPrototypeOf(sensors.GEODDSSOC)), sensors.GEODDSSOC);
+    const entry = {
+      time: '2022-01-01T00:00:00.000Z',
+      az: 100 as Degrees,
+      el: 10 as Degrees,
+      rng: 500 as Kilometers,
+      objName: optical.objName,
+      visible: true,
+      sunlit: false,
+      opticalVisible: false,
+    } as TearrData;
+
+    p().populateMultiSiteTable_([entry], [optical]);
+
+    const header = cells(0);
+    const row = cells(1);
+
+    expect(header).toContain('Above horizon');
+    expect(header).not.toContain('Visible');
+    expect(header).toContain('Sunlit');
+    expect(header).toContain('Optically visible');
+    expect(row[header.indexOf('Above horizon')]).toBe('Yes');
+    expect(row[header.indexOf('Sunlit')]).toBe('Eclipsed');
+    expect(row[header.indexOf('Optically visible')]).toBe('No');
+  });
+
+  it('radar-only sensor list has no Optically visible column', () => {
+    const entry = {
+      time: '2022-01-01T00:00:00.000Z',
+      az: 100 as Degrees,
+      el: 10 as Degrees,
+      rng: 500 as Kilometers,
+      objName: sensors.CODSFS.objName,
+      visible: true,
+      sunlit: true,
+    } as TearrData;
+
+    p().populateMultiSiteTable_([entry], [sensors.CODSFS]);
+
+    expect(cells(0)).not.toContain('Optically visible');
+    expect(cells(0)).toContain('Sunlit');
+  });
+
+  it('computes lighting from the position propagated to each row time, not the cached one', () => {
+    const propagated = { x: 7000, y: 0, z: 0 };
+    const optical = Object.assign(Object.create(Object.getPrototypeOf(sensors.GEODDSSOC)), sensors.GEODDSSOC);
+
+    vi.spyOn(SatMath, 'getEci').mockReturnValue({ position: propagated, velocity: { x: 0, y: 0, z: 0 } } as never);
+    const lighting = vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ sunlit: true, siteDark: true, sunElDeg: -30 });
+    vi.spyOn(MultiSensorLookAnglesPlugin as never as { propagateMultiSite_: () => TearrData }, 'propagateMultiSite_').mockReturnValue({
+      time: '2022-01-01T00:00:00.000Z',
+      az: 100 as Degrees,
+      el: 10 as Degrees,
+      rng: 500 as Kilometers,
+      objName: optical.objName,
+    });
+    p().angleCalculationInterval_ = 1800;
+    p().lengthOfLookAngles_ = 0.05;
+
+    p().getlookanglesMultiSite_(defaultSat, [optical]);
+
+    const rows = ServiceLocator.getSensorManager().lastMultiSiteArray;
+
+    expect(lighting.mock.calls[0][0]).toBe(propagated);
+    expect(rows[0]).toMatchObject({ visible: true, sunlit: true, opticalVisible: true });
   });
 });

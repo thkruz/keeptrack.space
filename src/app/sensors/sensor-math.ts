@@ -21,10 +21,12 @@ import {
   Sensor,
   Sgp4,
   SpaceObjectType,
+  StateVectorSgp4,
   Sun,
   TAU,
   TemeVec3,
 } from '@ootk/src/main';
+import type { Sun as SunBody } from '../../engine/rendering/draw-manager/sun';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
 import { DetailedSensor } from './DetailedSensor';
@@ -54,6 +56,10 @@ export type TearrData = {
   lat?: Degrees;
   lon?: Degrees;
   visible?: boolean;
+  /** Satellite outside Earth's umbra at this row's time; null when unknown. */
+  sunlit?: boolean | null;
+  /** In view, sunlit and site dark. Only set for optical or observer sensors. */
+  opticalVisible?: boolean;
 };
 
 export class SensorMath {
@@ -472,6 +478,74 @@ export class SensorMath {
     }
 
     return nextPassArray;
+  }
+
+  /**
+   * Sun elevation below which a site counts as dark for optical observing (nautical twilight).
+   * Matches the Pro Optical Observability Planner (DARK_SUN_EL_DEG); OSS cannot import it.
+   */
+  static readonly SITE_DARK_SUN_EL_DEG = -12;
+
+  /** Optical sensors and observers (the custom-sensor default) are subject to lighting; radar is not. */
+  static isOpticalSensor(sensor: DetailedSensor | undefined): boolean {
+    return sensor?.type === SpaceObjectType.OPTICAL || sensor?.type === SpaceObjectType.OBSERVER;
+  }
+
+  /**
+   * Lighting at one instant: is the satellite sunlit (outside Earth's shadow) and is the site dark
+   * (Sun at or below {@link SITE_DARK_SUN_EL_DEG}). Each field is null when it cannot be computed.
+   * @param satPos The satellite's ECI position at `now` (km), not a stale cached one.
+   */
+  static getLightingState(satPos: TemeVec3 | null | undefined, sensor: DetailedSensor, now: Date): { sunlit: boolean | null; siteDark: boolean | null; sunElDeg: number | null } {
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.eci(now);
+    const sitePos = lla2eci(sensor.llaRad(), gmst);
+    // Geodetic normal of the site (lat/lon rotated into ECI by GMST), as the Pro planner's site.up
+    const lla = sensor.llaRad();
+    const up = {
+      x: Math.cos(lla.lat) * Math.cos(lla.lon + gmst),
+      y: Math.cos(lla.lat) * Math.sin(lla.lon + gmst),
+      z: Math.sin(lla.lat),
+    } as TemeVec3;
+    const sunElDeg = SatMath.calculateGroundSiteSunElevation(sitePos, sunPos, up);
+
+    let sunlit: boolean | null = null;
+
+    if (satPos && !(satPos.x === 0 && satPos.y === 0 && satPos.z === 0)) {
+      const status = SatMath.calculateIsInSun({ position: satPos } as unknown as StateVectorSgp4, sunPos);
+
+      // Only the umbra is eclipsed; penumbra still reflects (partial) sunlight, as in the Pro planner
+      sunlit = status === SunStatus.UNKNOWN ? null : status !== SunStatus.UMBRAL;
+    }
+
+    return { sunlit, siteDark: sunElDeg === null ? null : sunElDeg <= SensorMath.SITE_DARK_SUN_EL_DEG, sunElDeg };
+  }
+
+  /**
+   * What the Vis Mag rows should show. A satellite in Earth's shadow reflects no sunlight, so it has no
+   * apparent magnitude ("notSunlit"); otherwise the number, flagged `assumed` when the intrinsic magnitude
+   * is the flat default (no catalog value, preset or estimate) rather than a real value.
+   */
+  static getVisMagReading(
+    sat: Satellite,
+    sensor: DetailedSensor,
+    now: Date,
+    sun: SunBody,
+    intrinsicMagOverride?: number
+  ): { kind: 'notSunlit' } | { kind: 'mag'; value: number; assumed: boolean } {
+    if (SensorMath.getLightingState(sat.position, sensor, now).sunlit === false) {
+      return { kind: 'notSunlit' };
+    }
+
+    const hasOverride = typeof intrinsicMagOverride === 'number' && !Number.isNaN(intrinsicMagOverride);
+    const assumed = !hasOverride && !sat.vmag;
+
+    return { kind: 'mag', value: SatMath.calculateVisMag(sat, sensor, now, sun, intrinsicMagOverride), assumed };
+  }
+
+  /** Optically visible = above the horizon (in view) AND satellite sunlit AND site dark. */
+  static getOpticalVerdict(inView: boolean, state: { sunlit: boolean | null; siteDark: boolean | null }): boolean {
+    return inView && state.sunlit === true && state.siteDark === true;
   }
 
   static checkIfVisibleForOptical(sat: BaseObject, sensor: DetailedSensor, now: Date): boolean {

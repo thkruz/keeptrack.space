@@ -79,6 +79,8 @@
       "crossTrack": "横迹",
       "crossTrackTooltip": "与次要卫星的横迹距离"
     },
-    "noData": "无数据"
+    "noData": "无数据",
+    "notSunlit": "未受日照",
+    "assumedSuffix": "(假设)"
   }
 }

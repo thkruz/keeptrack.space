@@ -1,4 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
+import { SensorMath } from '@app/app/sensors/sensor-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -106,6 +107,30 @@ describe('SatInfoBoxObject data population', () => {
     EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
     expect(getEl('sat-appmag')!.innerHTML).toBe('12.34');
     expect((visMagSpy.mock.calls[1][2] as Date).getTime()).toBe(Date.UTC(2026, 9, 16, 12, 0));
+  });
+
+  it('eclipsed satellite: Apparent Mag shows "Not sunlit" instead of a number', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ sunlit: false, siteDark: true, sunElDeg: -30 });
+    const visMagSpy = vi.spyOn(SatMath, 'calculateVisMag').mockReturnValue(10.65);
+
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('Not sunlit');
+    expect(visMagSpy).not.toHaveBeenCalled();
+  });
+
+  it('sunlit satellite on the default intrinsic magnitude: Apparent Mag is marked assumed', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const sat = new Satellite({ ...defaultSat, vmag: null } as never);
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    vi.spyOn(SensorMath, 'getVisMagReading').mockReturnValue({ kind: 'mag', value: 10.65, assumed: true });
+    p().updateApparentMag_(sat);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('10.65 (assumed)');
   });
 
   it('ignores select-box updates for missiles', () => {

@@ -1,4 +1,6 @@
-import { type TearrData, TearrType } from '@app/app/sensors/sensor-math';
+import { SatMath } from '@app/app/analysis/sat-math';
+import { sensors } from '@app/app/data/catalogs/sensors';
+import { SensorMath, type TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
@@ -74,7 +76,6 @@ describe('LookAnglesPlugin look-angle computation', () => {
       rng: 500 as Kilometers,
       objName: 'COD',
       type: TearrType.RISE,
-      canStationObserve: true,
     };
 
     p().populateSideMenuTable_([entry], ServiceLocator.getTimeManager());
@@ -83,7 +84,7 @@ describe('LookAnglesPlugin look-angle computation', () => {
   });
 
   it('populateSideMenuTable_ tags a mask-limited rise row with the mask marker', () => {
-    const base = { time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees, rng: 500 as Kilometers, objName: 'COD', canStationObserve: true };
+    const base = { time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees, rng: 500 as Kilometers, objName: 'COD' };
 
     p().populateSideMenuTable_(
       [
@@ -119,7 +120,7 @@ describe('LookAnglesPlugin look-angle computation', () => {
   });
 
   it('populateSideMenuTable_ labels untyped rows "In View" (rise/set off), never "Unknown"', () => {
-    const base = { time: '2026-10-16 06:00:00', az: 120 as Degrees, el: 25 as Degrees, rng: 39524 as Kilometers, objName: 'COD', canStationObserve: false };
+    const base = { time: '2026-10-16 06:00:00', az: 120 as Degrees, el: 25 as Degrees, rng: 39524 as Kilometers, objName: 'COD' };
 
     p().populateSideMenuTable_([base, { ...base, time: '2026-10-16 06:10:00' }], ServiceLocator.getTimeManager());
 
@@ -196,5 +197,150 @@ describe('LookAnglesPlugin look-angle computation', () => {
     // Two passes for the same object no longer share a name
     expect(cls.buildExportFileName_('S', '063218', '2026-10-20 17:22:00')).not.toBe(cls.buildExportFileName_('S', '063218', '2026-10-16 06:03:07'));
     expect(cls.buildExportFileName_('S', '063218', undefined)).toBe('S-063218-look-angles');
+  });
+});
+
+describe('LookAnglesPlugin export lighting columns', () => {
+  it('exports Sunlit and Optically visible with the empty-string convention', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cls = LookAnglesPlugin as any;
+    const b = { time: '2026-10-16 06:00:00', az: 120 as Degrees, el: 25 as Degrees, rng: 900 as Kilometers, objName: 'X' };
+    const rows = cls.buildExportRows_([{ ...b, sunlit: true, opticalVisible: false }, { ...b, sunlit: null }, { ...b }], 'S') as Record<string, unknown>[];
+
+    expect(rows[0].sunlit).toBe(true);
+    expect(rows[0].opticalVisible).toBe(false);
+    expect(rows[1].sunlit).toBe('');
+    expect(rows[1].opticalVisible).toBe('');
+    expect(rows[2].sunlit).toBe('');
+  });
+});
+
+describe('LookAnglesPlugin three-state lighting columns', () => {
+  let plugin: LookAnglesPlugin;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+  const base = { time: '2026-10-16 06:00:00', az: 120 as Degrees, el: 25 as Degrees, rng: 900 as Kilometers, objName: 'X' };
+  const cells = (rowIdx: number) => Array.from(getEl('looks')!.querySelectorAll('tr')[rowIdx].querySelectorAll('td')).map((c) => c.textContent);
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new LookAnglesPlugin();
+    websiteInit(plugin);
+    p().isMenuButtonActive = true;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('renames the geometric column "Above horizon" and adds a Sunlit column', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.GEODDSSOC];
+    p().populateSideMenuTable_([{ ...base, sunlit: true, opticalVisible: true }], ServiceLocator.getTimeManager());
+
+    const header = cells(0);
+
+    expect(header).toContain('Above horizon');
+    expect(header).not.toContain('Visible');
+    expect(header).toContain('Sunlit');
+  });
+
+  it('eclipsed pass: Sunlit says Eclipsed and the optical verdict is No', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.GEODDSSOC];
+    p().populateSideMenuTable_([{ ...base, sunlit: false, opticalVisible: false }], ServiceLocator.getTimeManager());
+
+    const row = cells(1);
+
+    expect(row).toContain('Eclipsed');
+    expect(row[row.length - 1]).toBe('No');
+  });
+
+  it('sunlit pass in daylight: above horizon Yes, optical No, limit stated', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.GEODDSSOC];
+    p().populateSideMenuTable_([{ ...base, sunlit: true, opticalVisible: false }], ServiceLocator.getTimeManager());
+
+    const header = cells(0);
+    const row = cells(1);
+
+    expect(row[header.indexOf('Above horizon')]).toBe('Yes');
+    expect(row[header.indexOf('Sunlit')]).toBe('Yes');
+    expect(row[header.indexOf('Optically visible')]).toBe('No');
+    expect(getEl('looks')!.parentElement!.textContent).toContain('-12');
+  });
+
+  it('negative-minEl row (el below 0 but in view) still says Above horizon Yes', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.GEODDSSOC];
+    p().populateSideMenuTable_([{ ...base, el: -2 as Degrees, sunlit: true, opticalVisible: true }], ServiceLocator.getTimeManager());
+
+    const header = cells(0);
+
+    expect(cells(1)[header.indexOf('Above horizon')]).toBe('Yes');
+  });
+
+  it('radar sensor shows no optical verdict column', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.CODSFS];
+    p().populateSideMenuTable_([{ ...base, sunlit: true, opticalVisible: undefined }], ServiceLocator.getTimeManager());
+
+    expect(cells(0)).not.toContain('Optically visible');
+    expect(cells(0)).toContain('Above horizon');
+    expect(getEl('looks')!.parentElement!.textContent).not.toContain('-12');
+  });
+});
+
+describe('LookAnglesPlugin row-loop lighting (F7)', () => {
+  let plugin: LookAnglesPlugin;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const p = () => plugin as any;
+  const tearr = { time: '2026-10-16 06:00:00', az: 120 as Degrees, el: 25 as Degrees, rng: 900 as Kilometers, objName: 'X' };
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new LookAnglesPlugin();
+    websiteInit(plugin);
+    p().isMenuButtonActive = true;
+    p().lengthOfLookAngles_ = 0.0005;
+    p().angleCalculationInterval_ = 10;
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('feeds the propagated position of each row into getLightingState and stores sunlit/opticalVisible', () => {
+    const propagated = { x: 7000, y: 0, z: 0 };
+
+    ServiceLocator.getSensorManager().currentSensors = [sensors.GEODDSSOC];
+    vi.spyOn(SensorMath, 'getTearData').mockReturnValue(tearr as TearrData);
+    vi.spyOn(SatMath, 'getEci').mockReturnValue({ position: propagated, velocity: { x: 0, y: 0, z: 0 } } as never);
+    const lighting = vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ sunlit: false, siteDark: true, sunElDeg: -30 });
+
+    const rows = p().getlookangles_(defaultSat) as Array<TearrData & { sunlit?: boolean | null; opticalVisible?: boolean }>;
+
+    expect(rows.length).toBeGreaterThan(0);
+    expect(lighting.mock.calls[0][0]).toBe(propagated);
+    expect(lighting.mock.calls[0][1]).toBe(sensors.GEODDSSOC);
+    expect(rows.every((r) => r.sunlit === false && r.opticalVisible === false)).toBe(true);
+  });
+
+  it('radar sensor rows get sunlit but no opticalVisible', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.CODSFS];
+    vi.spyOn(SensorMath, 'getTearData').mockReturnValue(tearr as TearrData);
+    vi.spyOn(SatMath, 'getEci').mockReturnValue({ position: { x: 7000, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } } as never);
+    vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ sunlit: true, siteDark: true, sunElDeg: -30 });
+
+    const rows = p().getlookangles_(defaultSat) as Array<{ sunlit?: boolean | null; opticalVisible?: boolean }>;
+
+    expect(rows[0].sunlit).toBe(true);
+    expect(rows[0].opticalVisible).toBeUndefined();
+  });
+
+  it('negative-minEl optical row: in-view rows get the optical verdict even with el below 0', () => {
+    ServiceLocator.getSensorManager().currentSensors = [sensors.GEODDSSOC];
+    vi.spyOn(SensorMath, 'getTearData').mockReturnValue({ ...tearr, el: -2 as Degrees } as TearrData);
+    vi.spyOn(SatMath, 'getEci').mockReturnValue({ position: { x: 7000, y: 0, z: 0 }, velocity: { x: 0, y: 0, z: 0 } } as never);
+    vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ sunlit: true, siteDark: true, sunElDeg: -30 });
+
+    const rows = p().getlookangles_(defaultSat) as Array<{ opticalVisible?: boolean }>;
+
+    expect(rows[0].opticalVisible).toBe(true);
   });
 });

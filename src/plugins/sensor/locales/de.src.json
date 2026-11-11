@@ -163,7 +163,9 @@
         "el": "El.",
         "az": "Az.",
         "rng": "Entf.",
-        "visible": "Sichtbar"
+        "visible": "Über Horizont",
+        "sunlit": "Besonnt",
+        "optical": "Optisch sichtbar"
       },
       "msgs": {
         "notVisible": "Der Satellit ist in den nächsten {hours} Stunden nicht sichtbar.",
@@ -174,7 +176,9 @@
         "maxEl": "Max. El.",
         "unknown": "Unbekannt",
         "inView": "Im Sichtfeld",
-        "noLookAnglesToDownload": "Keine Blickwinkel zum Herunterladen verfügbar!"
+        "noLookAnglesToDownload": "Keine Blickwinkel zum Herunterladen verfügbar!",
+        "eclipsed": "Im Schatten",
+        "opticalNote": "Optisch sichtbar = über dem Horizont, Satellit besonnt und Sonne am Standort bei oder unter {limit}°."
       },
       "maskLimited": "Maske",
       "maskLimitedTitle": "Diese Kante wird durch die Horizontmaske des Sensors bestimmt, nicht durch seine Mindestelevation",
@@ -183,7 +187,7 @@
         "imgAlt": "Die Blickwinkel-Tabelle mit Zeiten, Azimuten, Elevationen und Entfernungen",
         "imgCaption": "Jede Zeile ist eine Zielführungslösung; klicken Sie auf eine, um die Uhr auf diesen Moment zu springen.",
         "readingHeading": "Die Tabelle lesen",
-        "reading": "Jede Zeile zeigt <strong>Zeit</strong>, Elevation (<strong>El.</strong>), Azimut (<strong>Az.</strong>) und Entfernung (<strong>Entf.</strong>) des Satelliten aus Sicht des Sensors sowie ob er optisch <strong>Sichtbar</strong> ist. Mit aktivierter Option <strong>Nur Auf- und Untergangszeiten anzeigen</strong> reduziert sich die Tabelle auf die Auf-, Maximalelevations- und Untergangsereignisse jedes Überflugs, gekennzeichnet in der Spalte <strong>Typ</strong>.",
+        "reading": "Jede Zeile zeigt <strong>Zeit</strong>, Elevation (<strong>El.</strong>), Azimut (<strong>Az.</strong>) und Entfernung (<strong>Entf.</strong>) des Satelliten aus Sicht des Sensors sowie ob er <strong>Über Horizont</strong> und <strong>Besonnt</strong> ist und (nur bei optischen Sensoren) <strong>Optisch sichtbar</strong>. Mit aktivierter Option <strong>Nur Auf- und Untergangszeiten anzeigen</strong> reduziert sich die Tabelle auf die Auf-, Maximalelevations- und Untergangsereignisse jedes Überflugs, gekennzeichnet in der Spalte <strong>Typ</strong>.",
         "howToUse": "<ol><li>Wählen Sie sowohl einen Sensor als auch einen Satelliten aus; das zugehörige Symbol in der Plugin-Leiste bleibt deaktiviert, bis beide gesetzt sind.</li><li>Öffnen Sie <strong>Blickwinkel</strong> über die Plugin-Leiste. Die Tabelle wird automatisch berechnet.</li><li>Öffnen Sie das Einstellungsfeld, um den Auf-/Untergangsmodus umzuschalten oder <strong>Berechnungsdauer (Tage)</strong> und <strong>Intervall (Sekunden)</strong> zu ändern.</li><li>Klicken Sie auf eine Zeile, um die Simulationsuhr auf diesen Moment zu springen, oder exportieren Sie die Tabelle über die Download-Schaltfläche.</li></ol>",
         "tip1": "Der Auf-/Untergangsmodus ist der schnellste Weg zu erfahren, wann Sie den Satelliten als Nächstes sehen können; wechseln Sie zur vollständigen Tabelle, wenn Sie sekundengenaue Zielwinkel benötigen.",
         "tip2": "Das Klicken auf eine Zeile bewahrt Ihren Wiedergabestatus: Eine pausierte Uhr bleibt auch zur neuen Zeit pausiert."
@@ -202,7 +206,9 @@
         "az": "Az.",
         "rng": "Entf.",
         "sensor": "Sensor",
-        "visible": "Sichtbar"
+        "visible": "Über Horizont",
+        "sunlit": "Besonnt",
+        "optical": "Optisch sichtbar"
       },
       "msgs": {
         "notVisible": "Der Satellit ist in den nächsten {hours} Stunden nicht sichtbar.",
@@ -210,17 +216,19 @@
         "no": "Nein",
         "na": "k. A.",
         "sensorListMissing": "Die Sensorliste wurde in der Oberfläche nicht gefunden",
-        "satrecNotFound": "Satellitendatensatz nicht gefunden"
+        "satrecNotFound": "Satellitendatensatz nicht gefunden",
+        "eclipsed": "Im Schatten",
+        "opticalNote": "Optisch sichtbar = über dem Horizont, Satellit besonnt und Sonne am Standort bei oder unter {limit}°."
       },
       "help": {
         "overview": "Multi-Standort-Blickwinkel beantwortet eine Netzwerkfrage: Welcher meiner Sensoren sieht den ausgewählten Satelliten, und wann? Es berechnet Blickwinkel über viele Standorte gleichzeitig und verschachtelt sie zu einer einzigen chronologischen Tabelle.",
         "imgAlt": "Die Multi-Standort-Blickwinkel-Tabelle mit Sensoren und Zielführungsdaten",
         "imgCaption": "Jede Zeile verknüpft einen Überflugmoment mit dem Sensor, der ihn sieht.",
         "readingHeading": "Die Tabelle lesen",
-        "reading": "Die Zeilen sind über alle aktivierten Standorte chronologisch sortiert; jede zeigt <strong>Zeit</strong>, Elevation (<strong>El.</strong>), Azimut (<strong>Az.</strong>), Entfernung (<strong>Entf.</strong>), den beteiligten <strong>Sensor</strong> und die optische Sichtbarkeit. Das Sensor-Umschaltfeld bestimmt, welche Standorte berechnet werden: Grüne Sensoren sind einbezogen, rote ausgeschlossen.",
+        "reading": "Die Zeilen sind über alle aktivierten Standorte chronologisch sortiert; jede zeigt <strong>Zeit</strong>, Elevation (<strong>El.</strong>), Azimut (<strong>Az.</strong>), Entfernung (<strong>Entf.</strong>), den beteiligten <strong>Sensor</strong> und ob er <strong>Über Horizont</strong> und <strong>Besonnt</strong> ist und (nur bei optischen Sensoren) <strong>Optisch sichtbar</strong>. Das Sensor-Umschaltfeld bestimmt, welche Standorte berechnet werden: Grüne Sensoren sind einbezogen, rote ausgeschlossen.",
         "howToUse": "<ol><li>Wählen Sie einen Satelliten aus; das zugehörige Symbol in der Plugin-Leiste bleibt deaktiviert, bis einer ausgewählt ist. Eine Sensorauswahl ist nicht nötig.</li><li>Öffnen Sie <strong>Multi-Standort-Blickwinkel</strong> über die Plugin-Leiste. Das Standard-Raketenwarnnetzwerk wird automatisch berechnet.</li><li>Schalten Sie Sensoren im Sensorlisten-Panel ein oder aus, um das Netzwerk zu ändern.</li><li>Klicken Sie auf eine Zeile, um diesen Sensor auszuwählen und die Uhr auf diesen Moment zu springen, oder exportieren Sie die Tabelle über die Download-Schaltfläche.</li></ol>",
         "tip1": "Nutzen Sie es zur Planung von Übergaben: Wo die Abdeckung eines Sensors endet, zeigt die nächste Zeile, welcher Standort den Satelliten übernimmt.",
-        "tip2": "Optische Standorte zeigen die Sichtbarkeit nur, wenn die Lichtverhältnisse eine tatsächliche Beobachtung zulassen; Radare zeigen immer k. A."
+        "tip2": "Optische Standorte zeigen in Optisch sichtbar nur dann Ja, wenn der Satellit über dem Horizont und besonnt ist und der Standort dunkel ist (Sonne bei -12 Grad oder tiefer), sonst Nein; Radarzeilen zeigen Über Horizont und Besonnt, in Optisch sichtbar steht „-“."
       }
     }
   }

@@ -51,7 +51,9 @@
         "notInOrbitToast": "Družice {sccNum} není na oběžné dráze!<br>Čas simulace je {simTime}.<br>Ověřte, že máte správné TLE.",
         "categoryKinematic": "Kinematika",
         "categorySensor": "Senzor",
-        "kinematicOk": "V mezích senzoru"
+        "kinematicOk": "V mezích senzoru",
+        "notSunlit": "Bez osvětlení",
+        "assumedSuffix": "(předpoklad)"
       }
     }
   }

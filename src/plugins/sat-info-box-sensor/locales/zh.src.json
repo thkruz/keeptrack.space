@@ -51,7 +51,9 @@
         "notInOrbitToast": "卫星 {sccNum} 不在轨道上!<br>模拟时间为 {simTime}。<br>请确认您使用的是正确的 TLE。",
         "categoryKinematic": "运动学",
         "categorySensor": "传感器",
-        "kinematicOk": "在传感器限制范围内"
+        "kinematicOk": "在传感器限制范围内",
+        "notSunlit": "未受日照",
+        "assumedSuffix": "(假设)"
       }
     }
   }

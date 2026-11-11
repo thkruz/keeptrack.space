@@ -79,6 +79,8 @@
       "crossTrack": "Quer zur Bahn",
       "crossTrackTooltip": "Abstand quer zur Bahn zum Sekundärsatelliten"
     },
-    "noData": "KEINE DATEN"
+    "noData": "KEINE DATEN",
+    "notSunlit": "Nicht besonnt",
+    "assumedSuffix": "(angenommen)"
   }
 }

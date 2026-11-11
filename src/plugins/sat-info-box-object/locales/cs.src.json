@@ -79,6 +79,8 @@
       "crossTrack": "Napříč dráhou",
       "crossTrackTooltip": "Vzdálenost napříč dráhou od sekundární družice"
     },
-    "noData": "ŽÁDNÁ DATA"
+    "noData": "ŽÁDNÁ DATA",
+    "notSunlit": "Bez osvětlení",
+    "assumedSuffix": "(předpoklad)"
   }
 }

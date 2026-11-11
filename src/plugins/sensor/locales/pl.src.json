@@ -163,7 +163,9 @@
         "el": "El.",
         "az": "Az.",
         "rng": "Odl.",
-        "visible": "Widoczny"
+        "visible": "Nad horyzontem",
+        "sunlit": "Oświetlony",
+        "optical": "Widoczny optycznie"
       },
       "msgs": {
         "notVisible": "Satelita nie będzie widoczny przez najbliższe {hours} godzin.",
@@ -174,7 +176,9 @@
         "maxEl": "Maks. El.",
         "unknown": "Nieznany",
         "inView": "W zasięgu",
-        "noLookAnglesToDownload": "Brak kątów obserwacji do pobrania!"
+        "noLookAnglesToDownload": "Brak kątów obserwacji do pobrania!",
+        "eclipsed": "W cieniu",
+        "opticalNote": "Widoczny optycznie = nad horyzontem, satelita oświetlony, a Słońce na {limit}° lub poniżej w miejscu obserwacji."
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tę krawędź wyznacza maska horyzontu sensora, a nie jego minimalna elewacja",
@@ -183,7 +187,7 @@
         "imgAlt": "Tabela kątów obserwacji z czasami, azymutami, elewacjami i odległościami",
         "imgCaption": "Każdy wiersz to rozwiązanie naprowadzania; kliknij go, aby przeskoczyć zegarem do tej chwili.",
         "readingHeading": "Czytanie tabeli",
-        "reading": "Każdy wiersz podaje <strong>Czas</strong>, elewację (<strong>El.</strong>), azymut (<strong>Az.</strong>) i odległość (<strong>Odl.</strong>) satelity widzianego z czujnika, a także czy jest optycznie <strong>Widoczny</strong>. Po włączeniu opcji <strong>Pokaż tylko czasy wschodu i zachodu</strong> tabela zawęża się do zdarzeń wschodu, maksymalnej elewacji i zachodu każdego przelotu, oznaczonych w kolumnie <strong>Typ</strong>.",
+        "reading": "Każdy wiersz podaje <strong>Czas</strong>, elewację (<strong>El.</strong>), azymut (<strong>Az.</strong>) i odległość (<strong>Odl.</strong>) satelity widzianego z czujnika, a także czy jest <strong>Nad horyzontem</strong>, <strong>Oświetlony</strong> oraz (tylko czujniki optyczne) <strong>Widoczny optycznie</strong>. Po włączeniu opcji <strong>Pokaż tylko czasy wschodu i zachodu</strong> tabela zawęża się do zdarzeń wschodu, maksymalnej elewacji i zachodu każdego przelotu, oznaczonych w kolumnie <strong>Typ</strong>.",
         "howToUse": "<ol><li>Wybierz zarówno czujnik, jak i satelitę; ikona wtyczki w panelu pozostaje nieaktywna, dopóki oba nie są ustawione.</li><li>Otwórz <strong>Kąty obserwacji</strong> z panelu. Tabela obliczy się automatycznie.</li><li>Otwórz panel ustawień, aby przełączyć tryb wschód/zachód albo zmienić <strong>Długość obliczeń (dni)</strong> i <strong>Interwał (sekundy)</strong>.</li><li>Kliknij wiersz, aby przeskoczyć zegarem symulacji do tej chwili, albo użyj przycisku pobierania, aby wyeksportować tabelę.</li></ol>",
         "tip1": "Tryb wschód/zachód to najszybszy sposób, aby dowiedzieć się, kiedy następnym razem zobaczysz satelitę; przełącz się na pełną tabelę, gdy potrzebujesz kątów naprowadzania sekunda po sekundzie.",
         "tip2": "Kliknięcie wiersza zachowuje stan odtwarzania, więc wstrzymany zegar pozostaje wstrzymany w nowym czasie."
@@ -202,7 +206,9 @@
         "az": "Az.",
         "rng": "Odl.",
         "sensor": "Czujnik",
-        "visible": "Widoczny"
+        "visible": "Nad horyzontem",
+        "sunlit": "Oświetlony",
+        "optical": "Widoczny optycznie"
       },
       "msgs": {
         "notVisible": "Satelita nie będzie widoczny przez najbliższe {hours} godzin.",
@@ -210,17 +216,19 @@
         "no": "Nie",
         "na": "nd.",
         "sensorListMissing": "Nie znaleziono listy czujników w interfejsie",
-        "satrecNotFound": "Nie znaleziono rekordu satelity"
+        "satrecNotFound": "Nie znaleziono rekordu satelity",
+        "eclipsed": "W cieniu",
+        "opticalNote": "Widoczny optycznie = nad horyzontem, satelita oświetlony, a Słońce na {limit}° lub poniżej w miejscu obserwacji."
       },
       "help": {
         "overview": "Wielostanowiskowe kąty obserwacji odpowiadają na pytanie sieciowe: który z moich czujników widzi wybranego satelitę i kiedy? Obliczają kąty obserwacji dla wielu stanowisk naraz i przeplatają je w jedną chronologiczną tabelę.",
         "imgAlt": "Tabela wielostanowiskowych kątów obserwacji z czujnikami i danymi naprowadzania",
         "imgCaption": "Każdy wiersz łączy moment przelotu z czujnikiem, który go widzi.",
         "readingHeading": "Czytanie tabeli",
-        "reading": "Wiersze są posortowane chronologicznie dla wszystkich włączonych stanowisk, a każdy podaje <strong>Czas</strong>, elewację (<strong>El.</strong>), azymut (<strong>Az.</strong>), odległość (<strong>Odl.</strong>), zaangażowany <strong>Czujnik</strong> i widoczność optyczną. Panel przełączania czujników wybiera, które stanowiska są obliczane: zielone czujniki są uwzględniane, a czerwone wykluczane.",
+        "reading": "Wiersze są posortowane chronologicznie dla wszystkich włączonych stanowisk, a każdy podaje <strong>Czas</strong>, elewację (<strong>El.</strong>), azymut (<strong>Az.</strong>), odległość (<strong>Odl.</strong>), zaangażowany <strong>Czujnik</strong> oraz czy jest <strong>Nad horyzontem</strong>, <strong>Oświetlony</strong> i (tylko dla czujników optycznych) <strong>Widoczny optycznie</strong>. Panel przełączania czujników wybiera, które stanowiska są obliczane: zielone czujniki są uwzględniane, a czerwone wykluczane.",
         "howToUse": "<ol><li>Wybierz satelitę; ikona wtyczki w panelu pozostaje nieaktywna, dopóki żaden nie jest wybrany. Wybór czujnika nie jest potrzebny.</li><li>Otwórz <strong>Obserwacje wielostanowiskowe</strong> z panelu. Domyślna sieć ostrzegania przed rakietami obliczy się automatycznie.</li><li>Włączaj lub wyłączaj czujniki w panelu listy czujników, aby zmienić sieć.</li><li>Kliknij wiersz, aby wybrać ten czujnik i przeskoczyć zegarem do tej chwili, albo wyeksportuj tabelę przyciskiem pobierania.</li></ol>",
         "tip1": "Używaj tego do planowania przekazań: tam, gdzie kończy się pokrycie jednego czujnika, następny wiersz pokazuje, które stanowisko przejmuje satelitę.",
-        "tip2": "Stanowiska optyczne pokazują widoczność tylko wtedy, gdy warunki oświetleniowe pozwalają na rzeczywistą obserwację; radary zawsze pokazują nd."
+        "tip2": "Stanowiska optyczne pokazują Tak w kolumnie Widoczny optycznie tylko wtedy, gdy satelita jest nad horyzontem i oświetlony, a stanowisko jest w ciemności (Słońce na wysokości -12 stopni lub niżej), w przeciwnym razie Nie; wiersze radarów pokazują Nad horyzontem i Oświetlony, a w kolumnie Widoczny optycznie „-”."
       }
     }
   }

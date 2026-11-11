@@ -79,6 +79,8 @@
       "crossTrack": "Cross-Track",
       "crossTrackTooltip": "Cross-Track Distance from Secondary Satellite"
     },
-    "noData": "NO DATA"
+    "noData": "NO DATA",
+    "notSunlit": "Not sunlit",
+    "assumedSuffix": "(assumed)"
   }
 }

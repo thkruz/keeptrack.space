@@ -132,8 +132,16 @@ export class SearchManager {
         callback: () => {
           this.toggleSearch();
           if (this.isSearchOpen) {
+            // Focus now so letters typed straight after the chord go into the box
+            // instead of firing single-key shortcuts; the delayed call covers a
+            // box that is still animating open.
+            getEl('search')?.focus();
             setTimeout(() => {
-              getEl('search')?.focus();
+              const searchEl = getEl('search', true);
+
+              if (searchEl && document.activeElement !== searchEl) {
+                searchEl.focus();
+              }
             }, 200);
           }
         },
@@ -241,6 +249,10 @@ export class SearchManager {
           this.updateSelectedResult_(results);
           break;
         case 'Enter':
+          // With nothing highlighted, a single result is unambiguous: select it.
+          if (this.selectedIndex_ < 0 && results.length === 1) {
+            this.selectedIndex_ = 0;
+          }
           if (this.selectedIndex_ >= 0 && this.selectedIndex_ < results.length) {
             evt.preventDefault();
             (results[this.selectedIndex_] as HTMLElement).click();

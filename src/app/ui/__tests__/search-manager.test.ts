@@ -810,6 +810,30 @@ describe('SearchManager interactions', () => {
     expect(p().selectedIndex_).toBe(0);
   });
 
+  it('Enter on a single result clicks it without ArrowDown', () => {
+    document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="0"></div>';
+    p().addListeners_();
+    const clicked = vi.fn();
+
+    document.querySelector('.search-result')!.addEventListener('click', clicked);
+    document.getElementById('search')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(clicked).toHaveBeenCalledTimes(1);
+  });
+
+  it('Enter with several results and none highlighted does not click', () => {
+    document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="0"></div><div class="search-result" data-obj-id="1"></div>';
+    p().addListeners_();
+    const clicked = vi.fn();
+
+    document.querySelectorAll('.search-result').forEach((el) => {
+      el.addEventListener('click', clicked);
+    });
+    document.getElementById('search')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(clicked).not.toHaveBeenCalled();
+  });
+
   it('updateSelectedResult_ marks the selected row and updates hover', () => {
     document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="7"></div><div class="search-result" data-obj-id="9"></div>';
     const rows = document.querySelectorAll('.search-result');

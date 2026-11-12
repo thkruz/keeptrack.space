@@ -727,6 +727,12 @@ export interface ICommandPaletteCommand {
   keywords?: string[];
 
   /**
+   * Marks a command that discards user data (e.g. Purge Local Settings). The
+   * palette asks for confirmation before running it.
+   */
+  destructive?: boolean;
+
+  /**
    * Callback invoked when the command is selected.
    */
   callback: () => Promise<void> | void;

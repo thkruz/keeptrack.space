@@ -5,6 +5,7 @@ import { CSV_MIME, copyTsvToClipboard, createCsvBlob, getCircularReplacer, saveC
 import { disableConsoleErrors, enableConsoleErrors } from '@test/environment/standard-env';
 import fileSaver from 'file-saver';
 import Papa from 'papaparse';
+import { appendCsvBrandFooter } from '../branding';
 
 // xlsx is mocked globally in vitest-setup.ts
 
@@ -126,7 +127,7 @@ describe('code_snippet', () => {
     const blob = saveAsSpy.mock.calls.at(-1)![0] as Blob;
 
     expect(blob.type).toBe(CSV_MIME);
-    expect(await blobBytes(blob)).toEqual(utf8(`${UTF8_BOM}${Papa.unparse(items)}`));
+    expect(await blobBytes(blob)).toEqual(utf8(`${UTF8_BOM}${appendCsvBrandFooter(Papa.unparse(items))}`));
   });
 
   // Tests that saveCsv saves an array of objects as a CSV file with provided name

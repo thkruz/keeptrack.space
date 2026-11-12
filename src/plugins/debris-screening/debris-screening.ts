@@ -11,7 +11,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { createCsvBlob } from '@app/engine/utils/saveVariable';
+import { createBrandedCsvBlob } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
 import type { DsResultRow } from '@app/webworker/debris-screening-messages';
@@ -912,7 +912,7 @@ export class DebrisScreening extends KeepTrackPlugin {
       });
 
     const csv = [headers.join(','), ...rows].join('\n');
-    const blob = createCsvBlob(csv);
+    const blob = createBrandedCsvBlob(csv);
     const link = document.createElement('a');
 
     link.href = URL.createObjectURL(blob);

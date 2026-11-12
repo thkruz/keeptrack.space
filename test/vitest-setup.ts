@@ -221,6 +221,7 @@ vi.mock('@e965/xlsx', () => {
   const writeFile = vi.fn();
   const utils = {
     json_to_sheet: vi.fn(() => ({})),
+    aoa_to_sheet: vi.fn(() => ({})),
     book_new: vi.fn(() => ({})),
     book_append_sheet: vi.fn(),
   };

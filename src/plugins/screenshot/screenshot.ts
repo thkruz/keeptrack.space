@@ -29,6 +29,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ICommandPaletteCommand, IContextMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { drawBrandUrl } from '@app/engine/utils/branding';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
@@ -240,6 +241,11 @@ export class Screenshot extends KeepTrackPlugin {
       // Draw only primary logo on the right
       logoWidth = this.logo.width * (logoHeight / this.logo.height);
       outCtx.drawImage(this.logo, ow - logoWidth - padding, oh - logoHeight - padding, logoWidth, logoHeight);
+    }
+
+    // Stage 3b: KeepTrack URL (top-right; logos sit bottom, classification top/bottom centre)
+    if (!settingsManager.copyrightOveride) {
+      drawBrandUrl(outCtx, ow, oh, Math.max(1, ow / 1600), 'top-right');
     }
 
     // Stage 4: Draw classification text

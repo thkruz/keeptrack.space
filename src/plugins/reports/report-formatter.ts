@@ -26,6 +26,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { appendCsvBrandFooter, appendTextBrandFooter } from '@app/engine/utils/branding';
 import { ReportData, ReportTable } from './reports-core';
 
 export type ReportFormat = 'text' | 'csv' | 'json';
@@ -175,7 +176,7 @@ export const buildDownloadPayload = (data: ReportData, format: ReportFormat): Do
       const preamble = data.csvIncludeHeader ? headerToCsvComments(data.csvHeader ?? data.header) : '';
       const content = preamble ? `${preamble}\n${tableToCsv(table)}` : tableToCsv(table);
 
-      return { content, ext: 'csv', mime: 'text/csv;charset=utf-8' };
+      return { content: appendCsvBrandFooter(content), ext: 'csv', mime: 'text/csv;charset=utf-8' };
     }
     case 'json':
       return {
@@ -184,6 +185,6 @@ export const buildDownloadPayload = (data: ReportData, format: ReportFormat): Do
         mime: 'application/json;charset=utf-8',
       };
     default:
-      return { content: buildPreviewText(data), ext: 'txt', mime: 'text/plain;charset=utf-8' };
+      return { content: appendTextBrandFooter(buildPreviewText(data)), ext: 'txt', mime: 'text/plain;charset=utf-8' };
   }
 };

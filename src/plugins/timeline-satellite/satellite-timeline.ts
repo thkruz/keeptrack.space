@@ -6,6 +6,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { brandedCanvasDataUrl } from '@app/engine/utils/branding';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -180,7 +181,7 @@ export class SatelliteTimeline extends KeepTrackPlugin {
   };
   downloadIconCb = () => {
     const canvas = document.getElementById('satellite-timeline-canvas') as HTMLCanvasElement;
-    const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+    const image = brandedCanvasDataUrl(canvas).replace('image/png', 'image/octet-stream');
     const link = document.createElement('a');
 
     link.href = image;

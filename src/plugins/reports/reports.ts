@@ -40,7 +40,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { createCsvBlob } from '@app/engine/utils/saveVariable';
+import { createBrandedCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import analysisPng from '@public/img/icons/reports.png';
@@ -437,7 +437,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const merged = mergeBatchTables(results);
     const stamp = generatedAt.toISOString().replace(/[-:]/gu, '').slice(0, 15);
 
-    saveAs(createCsvBlob(batchTableToCsv(merged.table)), `${report.id}-batch-${stamp}.csv`);
+    saveAs(createBrandedCsvBlob(batchTableToCsv(merged.table)), `${report.id}-batch-${stamp}.csv`);
     // Batch report over several objects has no single subject (matched by order and time)
     EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     let message = l('batch.done')
@@ -1441,7 +1441,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // The window shows the chosen format: text keeps the metadata header and
     // aligned table, CSV/JSON show exactly what the download and copy produce.
     const preview = this.format_ === 'text' ? buildPreviewText(data) : payload.content;
-    const blob = payload.ext === 'csv' ? createCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
+    const blob = payload.ext === 'csv' ? createBrandedCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
     const url = URL.createObjectURL(blob);
 
     win.document.open();

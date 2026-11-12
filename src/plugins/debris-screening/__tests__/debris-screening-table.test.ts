@@ -251,7 +251,7 @@ describe('DebrisScreening results table', () => {
     plugin.onDownload();
     const hiddenCsv = await (exported as unknown as Blob).text();
 
-    const hiddenLines = hiddenCsv.split('\n');
+    const hiddenLines = hiddenCsv.split('\n').filter((line) => line.length > 0 && !line.startsWith('#'));
 
     expect(hiddenLines).toHaveLength(2);
     expect(hiddenLines[1].startsWith('38479,')).toBe(true);

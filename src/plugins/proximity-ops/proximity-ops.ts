@@ -14,7 +14,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
-import { createCsvBlob } from '@app/engine/utils/saveVariable';
+import { createBrandedCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { CatalogSource, Satellite, Seconds } from '@ootk/src/main';
@@ -403,7 +403,7 @@ export class ProximityOps extends KeepTrackPlugin {
     }
 
     const csvData = this.convertRPOsToCSV_(this.RPOs);
-    const blob = createCsvBlob(csvData);
+    const blob = createBrandedCsvBlob(csvData);
     const link = document.createElement('a');
 
     link.href = URL.createObjectURL(blob);

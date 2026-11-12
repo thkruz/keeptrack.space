@@ -17,7 +17,7 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { readPositiveNumberInput } from '@app/engine/utils/positive-number-input';
-import { createCsvBlob } from '@app/engine/utils/saveVariable';
+import { createBrandedCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import {
   angularVelocityOfEarth,
@@ -268,7 +268,7 @@ export class SensorTimeline extends KeepTrackPlugin {
     const passes = await this.calculatePasses_();
     const sensorData = passes[0];
     const csvData = this.convertSensorPassesToCSV(sensorData);
-    const blob = createCsvBlob(csvData);
+    const blob = createBrandedCsvBlob(csvData);
     const link = document.createElement('a');
 
     link.href = URL.createObjectURL(blob);

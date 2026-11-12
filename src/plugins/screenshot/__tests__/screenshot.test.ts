@@ -45,6 +45,7 @@ describe('Screenshot_class', () => {
       getContext: vi.fn(() => ({
         drawImage: vi.fn(),
         fillText: vi.fn(),
+        strokeText: vi.fn(),
         fillRect: vi.fn(),
         save: vi.fn(),
         restore: vi.fn(),
@@ -63,6 +64,7 @@ const mockCtx = () =>
   ({
     drawImage: vi.fn(),
     fillText: vi.fn(),
+    strokeText: vi.fn(),
     fillRect: vi.fn(),
     save: vi.fn(),
     restore: vi.fn(),

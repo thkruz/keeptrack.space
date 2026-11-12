@@ -50,6 +50,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { brandedCanvasDataUrl } from '@app/engine/utils/branding';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -255,7 +256,7 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
-    const dataUrl = this.canvas_.toDataURL('image/png');
+    const dataUrl = brandedCanvasDataUrl(this.canvas_);
     const link = document.createElement('a');
 
     link.download = 'stereo-map.png';

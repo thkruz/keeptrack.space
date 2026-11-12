@@ -6,6 +6,7 @@
  * time2lon and inc2lon; centralized here so the two stay in sync.
  */
 
+import { drawBrandUrl } from '@app/engine/utils/branding';
 import type * as echarts from 'echarts';
 
 const PADDING_X = 40;
@@ -49,6 +50,9 @@ export class PlotWatermark {
       // Draw chart, then the logo watermark in the top-left corner.
       ctx.drawImage(chartImg, 0, 0);
       this.drawWatermark_(ctx, canvas.height);
+      if (!settingsManager.copyrightOveride) {
+        drawBrandUrl(ctx, canvas.width, canvas.height);
+      }
 
       const link = document.createElement('a');
 

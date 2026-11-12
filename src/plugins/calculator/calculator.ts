@@ -7,6 +7,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { IHelpConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { appendTextBrandFooter } from '@app/engine/utils/branding';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -740,7 +741,7 @@ export class Calculator extends KeepTrackPlugin {
     }
 
     // No trailing padding on any copied line.
-    this.copyText_(lines.map((line) => line.trimEnd()).join('\n'));
+    this.copyText_(appendTextBrandFooter(lines.map((line) => line.trimEnd()).join('\n')));
   }
 
   private copyText_(text: string): void {

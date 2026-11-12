@@ -129,6 +129,57 @@ describe('DraggableModal keyboard ownership', () => {
     expect(leaked).not.toHaveBeenCalled();
     window.removeEventListener('keydown', leaked);
   });
+
+  it('yields keyboard and focus to the command palette while it is open', () => {
+    const palette = document.createElement('div');
+    const paletteInput = document.createElement('input');
+    const reachedApp = vi.fn();
+
+    palette.id = 'command-palette-overlay';
+    palette.style.display = 'flex';
+    palette.append(paletteInput);
+    document.body.append(palette);
+
+    dialog.open();
+    document.addEventListener('keydown', reachedApp);
+    paletteInput.focus();
+    expect(document.activeElement).toBe(paletteInput);
+
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+
+    paletteInput.dispatchEvent(enter);
+    // The modal must not swallow the key: it reaches the palette's ancestors
+    // (a trapped event is stopped in the capture phase).
+    expect(reachedApp).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(paletteInput);
+
+    document.removeEventListener('keydown', reachedApp);
+    palette.remove();
+  });
+
+  it('keeps its focus trap when the command palette exists but is hidden', () => {
+    const palette = document.createElement('div');
+    const paletteInput = document.createElement('input');
+    const reachedApp = vi.fn();
+
+    palette.id = 'command-palette-overlay';
+    palette.style.display = 'none';
+    palette.append(paletteInput);
+    document.body.append(palette);
+
+    dialog.open();
+    document.addEventListener('keydown', reachedApp);
+    opener.focus();
+
+    const enter = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+
+    paletteInput.dispatchEvent(enter);
+    expect(reachedApp).not.toHaveBeenCalled();
+    expect(document.getElementById('qa-input-dialog')?.contains(document.activeElement)).toBe(true);
+
+    document.removeEventListener('keydown', reachedApp);
+    palette.remove();
+  });
 });
 
 describe('DraggableModal viewport resize', () => {

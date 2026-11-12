@@ -10,8 +10,8 @@ export const normalizePluginSearch = (value: string): string =>
 interface PluginAliasSource {
   /** Historical English names; always searchable regardless of UI language. */
   english: string[];
-  /** Locale key holding a comma-separated list of names in the current UI language. */
-  localeKey: TranslationKey;
+  /** Locale key holding a comma-separated list of names in the current UI language (optional). */
+  localeKey?: TranslationKey;
 }
 
 const ALIAS_SOURCES_: Record<string, PluginAliasSource> = {
@@ -22,6 +22,9 @@ const ALIAS_SOURCES_: Record<string, PluginAliasSource> = {
   multiview: {
     english: ['Multi-View', 'Multi View'],
     localeKey: 'plugins.PluginManagerPlugin.searchAliases.multiView',
+  },
+  maneuverplugin: {
+    english: ['Maneuver Menu', 'Burn Planner', 'Delta-V', 'Delta V', 'Burn', 'Propellant', 'Impulsive Burn'],
   },
 };
 
@@ -47,7 +50,7 @@ export const pluginSearchAliases = (id: string): string[] => {
   const seen = new Set<string>();
   const aliases: string[] = [];
 
-  for (const alias of [...source.english, ...translatedAliases_(source.localeKey)]) {
+  for (const alias of [...source.english, ...(source.localeKey ? translatedAliases_(source.localeKey) : [])]) {
     const trimmed = alias.trim();
     const normalized = normalizePluginSearch(trimmed);
 

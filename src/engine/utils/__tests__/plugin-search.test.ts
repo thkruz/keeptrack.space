@@ -25,6 +25,20 @@ describe('pluginSearchAliases', () => {
     expect(pluginSearchAliases('TransponderChannelData')).toEqual(['Satellite Frequencies', 'Transponder', 'Channel Data', 'Satellitenfrequenzen', 'Kanaldaten']);
   });
 
+  it('gives the Maneuver Menu burn, delta-v, maneuver and propellant aliases', () => {
+    const normalized = pluginSearchAliases('ManeuverPlugin').map(normalizePluginSearch);
+
+    for (const term of ['burn', 'deltav', 'maneuver', 'propellant']) {
+      expect(normalized.some((alias) => alias.includes(term))).toBe(true);
+    }
+  });
+
+  it('does not give the Maneuver Menu a Thrust alias', () => {
+    const normalized = pluginSearchAliases('ManeuverPlugin').map(normalizePluginSearch);
+
+    expect(normalized.some((alias) => alias.includes('thrust'))).toBe(false);
+  });
+
   it('reads multi-view aliases from the Plugin Manager namespace', () => {
     (t7e as unknown as Mock).mockImplementation((key: string) => (key === 'plugins.PluginManagerPlugin.searchAliases.multiView' ? 'マルチビュー,Multi View' : key));
 

@@ -38,9 +38,9 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('API 1.4 version', () => {
-  it('reports 1.4.0', () => {
-    expect(EMBED_API_VERSION).toBe('1.4.0');
+describe('API 1.5 version', () => {
+  it('reports 1.5.0', () => {
+    expect(EMBED_API_VERSION).toBe('1.5.0');
   });
 });
 

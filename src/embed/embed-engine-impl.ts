@@ -368,7 +368,9 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     let last = -1;
 
     EventBus.getInstance().on(EventBusEvent.updateLoop, () => {
-      const hovering = ServiceLocator.getHoverManager()?.hoveringSat ?? -1;
+      // mouseSat is the picker result and updates whatever the tooltip settings are; HoverManager.hoveringSat
+      // only moves while enableHoverOrbits is on, which would silence the event for ui.hover false / infoBox false.
+      const hovering = ServiceLocator.getInputManager()?.mouse?.mouseSat ?? -1;
 
       if (hovering !== last) {
         last = hovering;
@@ -544,6 +546,10 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
     }
     if (typeof flags.toasts === 'boolean') {
       s.isDisableToasts = !flags.toasts;
+    }
+    if (typeof flags.hover === 'boolean') {
+      s.enableHoverOverlay = flags.hover;
+      s.enableHoverOrbits = flags.hover;
     }
   }
 

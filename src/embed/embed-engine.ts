@@ -48,6 +48,8 @@ export interface EngineRuntimeUi {
   keyboard?: boolean;
   contextMenu?: boolean;
   toasts?: boolean;
+  /** Hover tooltip and hover orbit. */
+  hover?: boolean;
 }
 
 /**

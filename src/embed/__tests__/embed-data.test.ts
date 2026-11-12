@@ -84,6 +84,29 @@ describe('setUi', () => {
     expect(() => api.setUi({ keyboard: 'yes' } as never)).not.toThrow();
   });
 
+  it('forwards ui.hover to the engine', () => {
+    const { api, engine } = make();
+
+    api.setUi({ hover: true });
+    expect(engine.runtimeUi.at(-1)).toMatchObject({ hover: true });
+  });
+
+  it('emits hover events with the tooltip off (infoBox false)', () => {
+    const engine = new FakeEngine('scenario');
+    const api = new KeepTrackEmbed(engine, { config: { ui: { infoBox: false } }, readyTarget: new EventTarget() });
+    const seen: unknown[] = [];
+
+    api.start();
+    api.upsertObjects([{ hostId: 'a', name: 'A', tle1: GOOD_TLE1, tle2: GOOD_TLE2 }]);
+    api.on('hover', (e) => seen.push(e));
+    const id = engine.objects.keys().next().value as number;
+
+    engine.hoverCb(id);
+    engine.hoverCb(-1);
+    expect(seen).toHaveLength(2);
+    expect(seen[1]).toEqual({ object: null });
+  });
+
   it('keeps timeControls off while the host owns time', () => {
     const engine = new FakeEngine('scenario');
     const api = new KeepTrackEmbed(engine, { config: { ownership: { time: 'host' } }, readyTarget: new EventTarget() });

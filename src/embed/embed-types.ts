@@ -15,7 +15,7 @@
  * Licensed under the MIT License (unlike the AGPL engine) so hosts can vendor it.
  */
 
-export const EMBED_API_VERSION = '1.4.0';
+export const EMBED_API_VERSION = '1.5.0';
 
 /** Largest `catalog.capacity` the engine accepts (analyst slot block). (1.4) */
 export const EMBED_MAX_CAPACITY = 100_000;
@@ -63,6 +63,11 @@ export interface EmbedUiFlags {
   toasts: boolean;
   /** Selected-object info box. */
   infoBox: boolean;
+  /**
+   * Hover tooltip and hover orbit under the cursor. Independent of the `hover` event, which fires whatever this is.
+   * Default: follows `infoBox` (so `infoBox: false` alone gives events without a tooltip). An explicit value wins. (1.5)
+   */
+  hover: boolean;
 }
 
 export interface EmbedConfig {

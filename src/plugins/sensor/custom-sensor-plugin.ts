@@ -455,15 +455,23 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const primary = restored.find((sensor) => sensor.objName === store.primaryObjName) ?? null;
     const secondaries = restored.filter((sensor) => sensor !== primary);
 
-    CustomSensorPlugin.withCameraPreserved_(() => {
-      if (primary) {
-        // Replaces whatever the boot restored: the saved primary was this custom sensor
-        sensorManagerInstance.addSecondarySensor(primary, true);
-      }
-      for (const sensor of secondaries) {
-        sensorManagerInstance.addSecondarySensor(sensor);
-      }
-    }, true);
+    try {
+      CustomSensorPlugin.withCameraPreserved_(() => {
+        if (primary) {
+          // Replaces whatever the boot restored: the saved primary was this custom sensor
+          sensorManagerInstance.addSecondarySensor(primary, true);
+        }
+        for (const sensor of secondaries) {
+          sensorManagerInstance.addSecondarySensor(sensor);
+        }
+      }, true);
+    } catch (error) {
+      /*
+       * A throw while framing the camera or priming the cruncher must not skip the list refresh
+       * below: the sensors are already in the manager and the panel would show none of them.
+       */
+      errorManagerInstance.warn(`Custom sensor restore did not finish: ${String(error)}`);
+    }
 
     CustomSensorPlugin.updateCustomSensorListDom();
     CustomSensorPlugin.saveCustomSensors();

@@ -182,6 +182,26 @@ describe('CustomSensorPlugin persistence and camera', () => {
     expect(store.has(StorageKey.CUSTOM_SENSORS)).toBe(false);
   });
 
+  it('still refreshes the list and saves when adding a restored sensor throws', () => {
+    setForm();
+    C.processCustomSensorSubmit_();
+    const sensorManager = ServiceLocator.getSensorManager();
+    const savedJson = store.get(StorageKey.CUSTOM_SENSORS);
+
+    sensorManager.currentSensors = [];
+    sensorManager.secondarySensors = [];
+    vi.spyOn(sensorManager, 'addSecondarySensor').mockImplementation((sensor) => {
+      // The sensor is registered before the camera/cruncher step throws
+      sensorManager.currentSensors = [sensor];
+      throw new Error('camera not ready');
+    });
+    const listSpy = vi.spyOn(CustomSensorPlugin, 'updateCustomSensorListDom');
+
+    expect(() => CustomSensorPlugin.restoreCustomSensors()).not.toThrow();
+    expect(listSpy).toHaveBeenCalled();
+    expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
+  });
+
   it('skips restoring when the last-sensor restore is disabled', () => {
     setForm();
     C.processCustomSensorSubmit_();

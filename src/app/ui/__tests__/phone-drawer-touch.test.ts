@@ -19,6 +19,10 @@ describe('phone drawer and touch targets', () => {
     expect(tail).toMatch(/\.plugin-drawer\.mobile-mode \.drawer-user-account \{\s*order: -2;/u);
   });
 
+  it('#143 stacks settings panes above their parent menu on phones', () => {
+    expect(drawerCss).toMatch(/body \[id\$="-secondary"\]\.side-menu-parent \{\s*z-index: 6 !important;/u);
+  });
+
   it('#154 makes the custom sensor submit row non-sticky on phones', () => {
     const css = read('../../../plugins/sensor/custom-sensor.css');
     const phone = css.slice(css.lastIndexOf('@media (max-width: 639px)'));

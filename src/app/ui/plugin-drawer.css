@@ -1456,6 +1456,15 @@ body.is-mobile-mode {
     max-height: calc(100dvh - var(--top-menu-height)) !important;
   }
 
+  /*
+   * A settings pane (Best Passes, Custom Sensor...) opens over its parent menu at the same full-viewport rect.
+   * Desktop gives panes z-index 4 under the parent's 5, so on phones the parent's submit row painted over the
+   * pane's controls (#143, Best Passes optical gate under #bp-submit). The pane sits above the parent here.
+   */
+  body [id$="-secondary"].side-menu-parent {
+    z-index: 6 !important;
+  }
+
   .side-menu {
     overflow-x: hidden !important;
     overflow-y: auto !important;

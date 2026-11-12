@@ -308,11 +308,11 @@ describe('WatchlistPlugin settings contribution', () => {
     expect(hasSettingsContribution(plugin)).toBe(true);
   });
 
-  it('contributes the label-mode select and the sensor label toggle', () => {
+  it('contributes the label-mode select and the sensor and object label toggles', () => {
     const contribution = plugin.getSettingsContribution();
 
     expect(contribution.sectionId).toBe('WatchlistPlugin');
-    expect(contribution.controls).toHaveLength(2);
+    expect(contribution.controls).toHaveLength(3);
     const control = contribution.controls[0] as ISettingSelectControl;
 
     expect(control.type).toBe('select');

@@ -62,6 +62,32 @@ export const buildInfoBoxText = (box: HTMLElement | null, time: Date): string =>
   return lines.join('\n');
 };
 
+/**
+ * Plain-text summary of the secondary object for the combined copy output: name, identifiers and, for satellites,
+ * the main orbit values. Pure so it can be unit tested without the DOM.
+ */
+export const buildSecondaryText = (obj: BaseObject | null | undefined, heading: string): string => {
+  if (!obj) {
+    return '';
+  }
+  const sat = obj as Partial<Satellite>;
+  const lines = [`--- ${heading} ---`, obj.name];
+  const add = (key: string, value: string | number | undefined, unit = ''): void => {
+    if (value !== undefined && value !== '' && !(typeof value === 'number' && !Number.isFinite(value))) {
+      lines.push(`${key}: ${typeof value === 'number' ? value.toFixed(2) : value}${unit}`);
+    }
+  };
+
+  add('NORAD', sat.sccNum);
+  add('COSPAR', sat.intlDes);
+  add('Inclination', sat.inclination, ' deg');
+  add('Period', sat.period, ' min');
+  add('Apogee', sat.apogee, ' km');
+  add('Perigee', sat.perigee, ' km');
+
+  return lines.join('\n');
+};
+
 export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
   dependencies_: string[] = [SelectSatManager.name];
@@ -248,9 +274,14 @@ export class SatInfoBox extends KeepTrackPlugin {
    * Skips empty or "not available" values and degrades gracefully when the
    * Clipboard API is unavailable (e.g. insecure contexts or older browsers).
    */
-  /** Copies every visible key/value row of the info box, with the object name and UTC time, as plain text. */
+  /** Copies every visible key/value row of the info box, with the object name and UTC time, as plain text. A secondary object, when chosen, is appended as its own block. */
   private copyAllValues_(): void {
-    const text = buildInfoBoxText(getEl(SatInfoBox.containerId_, true), ServiceLocator.getTimeManager().simulationTimeObj);
+    let text = buildInfoBoxText(getEl(SatInfoBox.containerId_, true), ServiceLocator.getTimeManager().simulationTimeObj);
+    const secondary = PluginRegistry.getPlugin(SelectSatManager)?.secondarySatObj;
+
+    if (secondary) {
+      text += `\n\n${buildSecondaryText(secondary, t7e('satInfoBox.export.secondary' as Parameters<typeof t7e>[0]))}`;
+    }
 
     navigator.clipboard
       .writeText(text)

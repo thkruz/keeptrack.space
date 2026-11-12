@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Zobrazit popisky senzorů",
           "helpText": "Vykreslí název senzoru vedle jeho značky na globu a ploché mapě."
+        },
+        "showObjectLabels": {
+          "label": "Zobrazit názvy objektů",
+          "helpText": "Zobrazí názvy vybraného, sekundárního a sledovaných objektů ve scéně s tvarovou předponou: [1] primární, (2) sekundární, * sledovaný."
         }
       },
       "rmbMenu": {

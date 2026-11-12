@@ -42,7 +42,8 @@
     "export": {
       "copyValues": "Copiar valores como texto",
       "copied": "Valores copiados",
-      "region": "Detalles del objeto"
+      "region": "Detalles del objeto",
+      "secondary": "Objeto secundario"
     }
   }
 }

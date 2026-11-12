@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "센서 라벨 표시",
           "helpText": "지구본과 평면 지도의 센서 마커 옆에 센서 이름을 표시합니다."
+        },
+        "showObjectLabels": {
+          "label": "객체 이름 표시",
+          "helpText": "선택, 보조, 관심 목록 객체의 이름을 모양 접두사와 함께 표시합니다: [1] 기본, (2) 보조, * 관심 목록."
         }
       },
       "rmbMenu": {

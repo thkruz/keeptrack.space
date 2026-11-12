@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Mostra etichette dei sensori",
           "helpText": "Disegna il nome del sensore accanto al suo indicatore sul globo e sulla mappa piatta."
+        },
+        "showObjectLabels": {
+          "label": "Mostra i nomi degli oggetti",
+          "helpText": "Disegna i nomi accanto all'oggetto selezionato, al secondario e a quelli della lista di controllo, con prefisso di forma: [1] primario, (2) secondario, * lista di controllo."
         }
       },
       "rmbMenu": {

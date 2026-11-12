@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Pokaż etykiety czujników",
           "helpText": "Rysuje nazwę czujnika obok jego znacznika na globie i mapie płaskiej."
+        },
+        "showObjectLabels": {
+          "label": "Pokaż nazwy obiektów",
+          "helpText": "Rysuje nazwy obok wybranego, drugiego i obserwowanych obiektów z prefiksem kształtu: [1] główny, (2) drugi, * obserwowany."
         }
       },
       "rmbMenu": {

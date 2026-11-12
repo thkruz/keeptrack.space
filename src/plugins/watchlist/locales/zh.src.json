@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "显示传感器标签",
           "helpText": "在地球仪和平面地图上的传感器标记旁绘制传感器名称。"
+        },
+        "showObjectLabels": {
+          "label": "显示对象名称",
+          "helpText": "在场景中为所选、次要和关注列表对象绘制名称，并带形状前缀：[1] 主要，(2) 次要，* 关注列表。"
         }
       },
       "rmbMenu": {

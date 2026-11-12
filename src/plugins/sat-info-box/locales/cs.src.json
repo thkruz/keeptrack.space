@@ -42,7 +42,8 @@
     "export": {
       "copyValues": "Kopírovat hodnoty",
       "copied": "Hodnoty zkopírovány",
-      "region": "Podrobnosti o objektu"
+      "region": "Podrobnosti o objektu",
+      "secondary": "Sekundární objekt"
     }
   }
 }

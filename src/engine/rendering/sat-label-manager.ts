@@ -1,7 +1,10 @@
+import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { mat4 } from 'gl-matrix';
 import { CameraType } from '../camera/camera-type';
+import { PluginRegistry } from '../core/plugin-registry';
 import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
+import type { KeepTrackPlugin } from '../plugins/base-plugin';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
 import { CounterStage, FrameProfiler } from '../utils/frame-profiler';
@@ -78,6 +81,25 @@ export const composeExtraLabels = (...sources: ExtraLabelSpec[][]): ExtraLabelSp
   return out;
 };
 
+/** One object that gets a scene name label: its catalog id, name and role. */
+export interface ObjectLabelEntry {
+  satId: number;
+  name: string;
+  role: 'primary' | 'secondary' | 'watch';
+}
+
+/** Shape prefix per role so two chosen objects differ without relying on color: [1] primary, (2) secondary, * watchlist. */
+export const OBJECT_LABEL_PREFIX: Record<ObjectLabelEntry['role'], string> = { primary: '[1] ', secondary: '(2) ', watch: '* ' };
+
+/** Label specs for the selected, secondary and watchlist objects (primary and secondary win over a watchlist repeat). */
+export const buildObjectLabelSpecs = (entries: ObjectLabelEntry[]): ExtraLabelSpec[] => {
+  const colors: Record<ObjectLabelEntry['role'], [number, number, number]> = { primary: [1, 1, 1], secondary: [1, 0.85, 0.2], watch: [0.6, 0.9, 1] };
+
+  return entries
+    .filter((e) => e.satId > -1 && e.name)
+    .map((e) => ({ key: `object:${e.satId}`, text: `${OBJECT_LABEL_PREFIX[e.role]}${e.name}`, satId: e.satId, color: colors[e.role] }));
+};
+
 /**
  * ECI position (km) of a ground point as the label shader expects it: Earth-fixed lon rotated by the GMST the
  * position buffer was crunched at (the shader subtracts that GMST again, or rotates by the delta on the globe).
@@ -136,6 +158,8 @@ export class SatLabelManager {
   private markerSpecs_: ExtraLabelSpec[] = [];
   private sensorSpecs_: ExtraLabelSpec[] = [];
   private sensorSig_ = '';
+  private objectSig_ = '';
+  private objectSpecs_: ExtraLabelSpec[] = [];
 
   private attribs_ = {
     a_quadVertex: new BufferAttribute({ location: 0, vertices: 2, offset: 0 }),
@@ -250,6 +274,7 @@ export class SatLabelManager {
     }
 
     this.syncSensorLabels_();
+    this.syncObjectLabels_();
     this.updateExtraPositions_();
 
     if (this.instanceCount_ === 0) {
@@ -315,6 +340,37 @@ export class SatLabelManager {
     return this.extraSpecs_;
   }
 
+  /**
+   * Name labels for the selected, secondary and watchlist objects. Cheap per frame: reads three ids and rebuilds the glyph
+   * layout only when the set or the setting changes.
+   */
+  private syncObjectLabels_(): void {
+    const entries: ObjectLabelEntry[] = [];
+
+    if (settingsManager.isShowObjectLabels) {
+      const select = PluginRegistry.getPlugin(SelectSatManager);
+      const objectCache = ServiceLocator.getCatalogManager()?.objectCache ?? [];
+      const nameOf = (id: number): string => (objectCache[id] as { name?: string } | undefined)?.name ?? '';
+      const primary = Number(select?.selectedSat ?? -1);
+      const secondary = Number(select?.secondarySat ?? -1);
+      const watch = PluginRegistry.getPluginByName<KeepTrackPlugin & { watchlistList?: { id: number }[] }>('WatchlistPlugin')?.watchlistList ?? [];
+
+      entries.push({ satId: primary, name: nameOf(primary), role: 'primary' });
+      entries.push({ satId: secondary, name: nameOf(secondary), role: 'secondary' });
+      for (const w of watch) {
+        entries.push({ satId: w.id, name: nameOf(w.id), role: 'watch' });
+      }
+    }
+    const sig = entries.map((e) => `${e.role}${e.satId}`).join(';');
+
+    if (sig === this.objectSig_) {
+      return;
+    }
+    this.objectSig_ = sig;
+    this.objectSpecs_ = buildObjectLabelSpecs(entries);
+    this.rebuildExtras_();
+  }
+
   /** The sensors whose labels follow the global "sensor labels" setting. Rebuilt only when the sensor set or setting changes. */
   private syncSensorLabels_(): void {
     const sensors = settingsManager.isShowSensorLabels ? (ServiceLocator.getSensorManager()?.currentSensors ?? []) : [];
@@ -340,7 +396,7 @@ export class SatLabelManager {
 
   /** Re-lay the glyph quads of the extra labels (text, tint, glyph indices). Positions are filled per frame. */
   private rebuildExtras_(): void {
-    this.extraSpecs_ = composeExtraLabels(this.hostSpecs_, this.markerSpecs_, this.sensorSpecs_);
+    this.extraSpecs_ = composeExtraLabels(this.hostSpecs_, this.markerSpecs_, this.objectSpecs_, this.sensorSpecs_);
     this.extraGlyphCounts_ = [];
     if (!this.isReady_) {
       return;

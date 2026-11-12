@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { composeExtraLabels, extraLabelGlyphs, GLYPH_CHARS, glyphIndexOf, groundPointEci, MAX_EXTRA_LABELS } from '../sat-label-manager';
+import { buildObjectLabelSpecs, composeExtraLabels, extraLabelGlyphs, GLYPH_CHARS, glyphIndexOf, groundPointEci, MAX_EXTRA_LABELS } from '../sat-label-manager';
 
 describe('label glyph atlas', () => {
   it('keeps the catalog-number glyph indices (digits 0-9, J=10, S=11, C=12)', () => {
@@ -111,5 +111,23 @@ describe('ground label position math (flat map)', () => {
   it('keeps the point inside the shader ground-object radius so the globe rotates it to the current gmst', () => {
     expect(Math.hypot(...groundPointEci(10, 20, 0.3, 1))).toBeLessThan(6421);
     expect(Math.hypot(...groundPointEci(10, 20, 0.3, 1))).toBeCloseTo(6371.3, 3);
+  });
+});
+
+describe('buildObjectLabelSpecs', () => {
+  it('prefixes a distinct shape per role and lets primary win over a watchlist repeat', () => {
+    const specs = composeExtraLabels(
+      buildObjectLabelSpecs([
+        { satId: 5, name: 'ISS', role: 'primary' },
+        { satId: 7, name: 'HST', role: 'secondary' },
+        { satId: 5, name: 'ISS', role: 'watch' },
+        { satId: 9, name: 'NOAA 19', role: 'watch' },
+        { satId: -1, name: 'x', role: 'secondary' },
+      ])
+    );
+
+    expect(specs.map((sp) => sp.text)).toEqual(['[1] ISS', '(2) HST', '* NOAA 19']);
+    expect(specs.every((sp) => extraLabelGlyphs(sp.text).every((g) => g >= -1))).toBe(true);
+    expect(extraLabelGlyphs('[1] ISS').filter((g) => g === glyphIndexOf('?'))).toHaveLength(0);
   });
 });

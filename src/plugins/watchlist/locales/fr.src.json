@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Afficher les étiquettes des capteurs",
           "helpText": "Affiche le nom du capteur à côté de son marqueur sur le globe et la carte plane."
+        },
+        "showObjectLabels": {
+          "label": "Afficher les noms d'objets",
+          "helpText": "Affiche les noms à côté de l'objet sélectionné, du secondaire et de la liste de suivi, avec un préfixe de forme : [1] principal, (2) secondaire, * liste de suivi."
         }
       },
       "rmbMenu": {

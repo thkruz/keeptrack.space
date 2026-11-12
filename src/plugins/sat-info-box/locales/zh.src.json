@@ -42,7 +42,8 @@
     "export": {
       "copyValues": "将数值复制为文本",
       "copied": "数值已复制",
-      "region": "对象详情"
+      "region": "对象详情",
+      "secondary": "次要对象"
     }
   }
 }

@@ -156,6 +156,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isSatLabelModeOn: 'ui',
   satLabelMode: 'ui',
   isShowSensorLabels: 'ui',
+  isShowObjectLabels: 'ui',
   desktopMaxLabels: 'ui',
   mobileMaxLabels: 'ui',
   minTimeBetweenSatLabels: 'ui',

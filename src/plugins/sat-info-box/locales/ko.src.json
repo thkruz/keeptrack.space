@@ -42,7 +42,8 @@
     "export": {
       "copyValues": "값을 텍스트로 복사",
       "copied": "값을 복사했습니다",
-      "region": "객체 세부 정보"
+      "region": "객체 세부 정보",
+      "secondary": "보조 객체"
     }
   }
 }

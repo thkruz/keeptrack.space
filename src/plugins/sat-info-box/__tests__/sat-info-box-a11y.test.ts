@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getClockMode } from '../../date-time-manager/date-time-manager';
-import { buildInfoBoxText } from '../sat-info-box';
+import { buildInfoBoxText, buildSecondaryText } from '../sat-info-box';
 
 describe('buildInfoBoxText', () => {
   it('lists name, UTC time and visible rows', () => {
@@ -22,5 +22,16 @@ describe('getClockMode', () => {
     expect(getClockMode(0, 1000, 1000)).toBe('paused');
     expect(getClockMode(1, 1000, 100000)).toBe('simulated');
     expect(getClockMode(10, 1000, 1000)).toBe('simulated');
+  });
+});
+
+describe('buildSecondaryText', () => {
+  it('adds a headed block with identifiers and orbit values', () => {
+    const text = buildSecondaryText({ name: 'HST', sccNum: '20580', intlDes: '1990-037B', inclination: 28.47, period: 95.4 } as never, 'Secondary object');
+
+    expect(text).toBe('--- Secondary object ---\nHST\nNORAD: 20580\nCOSPAR: 1990-037B\nInclination: 28.47 deg\nPeriod: 95.40 min');
+  });
+  it('is empty without a secondary object', () => {
+    expect(buildSecondaryText(null, 'x')).toBe('');
   });
 });

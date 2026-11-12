@@ -182,6 +182,11 @@ export class UiSettings {
    */
   isShowSensorLabels = false;
   /**
+   * Draw a GPU name label (with a shape prefix: [1] primary, (2) secondary, * watchlist) next to the selected, secondary and
+   * watchlist objects. Default off.
+   */
+  isShowObjectLabels = false;
+  /**
    * The maximum number of satellite labels to display on desktop devices.
    */
   desktopMaxLabels = 2000;

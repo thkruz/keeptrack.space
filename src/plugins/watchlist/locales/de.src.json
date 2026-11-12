@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Sensorbeschriftungen anzeigen",
           "helpText": "Zeigt den Sensornamen neben seiner Markierung auf dem Globus und der flachen Karte."
+        },
+        "showObjectLabels": {
+          "label": "Objektnamen anzeigen",
+          "helpText": "Zeigt Namen neben dem gewählten, dem sekundären und den Beobachtungslisten-Objekten mit Formpräfix: [1] primär, (2) sekundär, * Beobachtungsliste."
         }
       },
       "rmbMenu": {

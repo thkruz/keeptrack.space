@@ -171,6 +171,24 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults).toEqual([0]);
     });
 
+    it('Enter on a numeric NORAD query with one result selects that row, not another id (#176)', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '05785', name: 'THOR ABLESTAR DEB' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '33757', name: 'COSMOS 2251 DEB' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+      const selectSat = vi.spyOn(SearchManager as any, 'lookAtSearchResult_').mockImplementation(() => undefined);
+
+      (searchManager as any).addListeners_();
+      searchManager.doSearch('33757');
+      expect(document.querySelectorAll('.search-result')).toHaveLength(1);
+
+      document.getElementById('search')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+      expect(selectSat).toHaveBeenCalledTimes(1);
+      expect(selectSat.mock.calls[0][1]).toBe(1);
+    });
+
     it('finds an alpha-5 sat via its 6-digit numeric form (sccNum6)', () => {
       // For an alpha-5 sat constructed via fromOmm-style with sccNum='T0001',
       // sccNum5='T0001' and sccNum6='270001'. The numeric-only search box

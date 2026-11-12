@@ -39,6 +39,21 @@ function noradHighlight(sat: Satellite, term: string): { strIndex: number; patle
   return idx < 0 ? { strIndex: 0, patlen: 0 } : { strIndex: idx, patlen: stripped.length };
 }
 
+/** Supplies user-assigned aliases (object id to alias text); registered by a plugin such as the watchlist. */
+export type SearchAliasSource = () => ReadonlyMap<number, string>;
+
+let aliasSource_: SearchAliasSource | null = null;
+
+/** Register (or clear with null) the alias source consulted by the regular text search. */
+export function registerSearchAliasSource(source: SearchAliasSource | null): void {
+  aliasSource_ = source;
+}
+
+/** The alias for an object id, or undefined when none is registered. */
+export function getSearchAlias(id: number): string | undefined {
+  return aliasSource_?.().get(id);
+}
+
 /**
  * Run a regular (text) search over the catalog, returning at most
  * {@link settingsManager.searchLimit} results plus the total number found.
@@ -64,6 +79,7 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
 
   // Initialize search results
   const satData = getSearchableObjects();
+  const aliases = aliasSource_?.() ?? null;
 
   searchList.forEach((searchStringIn) => {
     const len = searchStringIn.length;
@@ -79,7 +95,14 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
       }
 
       if (obj.isSatellite() || obj.isMissile()) {
+        const alias = aliases?.get(obj.id);
+        const before = totalFound;
+
         matchSatelliteOrMissile(obj as Satellite & MissileObject, searchStringIn, len, searchableFields, addResult_);
+        // Name, alt name and the other fields win; an alias hit only fills in when none matched.
+        if (alias && totalFound === before && alias.toUpperCase().includes(searchStringIn)) {
+          addResult_({ strIndex: alias.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.ALIAS, patlen: len, id: obj.id });
+        }
       } else {
         matchOtherObject(obj, searchStringIn, len, addResult_);
       }

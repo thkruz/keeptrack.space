@@ -23,7 +23,7 @@ import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import { isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
+import { getSearchAlias, isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
 
 export interface SearchResult {
   id: number; // Catalog Index
@@ -47,6 +47,8 @@ export enum SearchResultType {
   PLANET,
   /** Matched the alpha-5 designation (sccNum5, e.g. "A0000" for 100000). */
   NORAD_ID_A5,
+  /** Matched a user-assigned alias (provided by a plugin such as the watchlist). */
+  ALIAS,
 }
 
 /**
@@ -59,6 +61,7 @@ const SEARCH_TYPE_LABELS: Partial<Record<SearchResultType, string>> = {
   [SearchResultType.BUS]: 'BUS',
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
+  [SearchResultType.ALIAS]: 'ALIAS',
   [SearchResultType.NORAD_ID]: 'NORAD',
   [SearchResultType.NORAD_ID_A5]: 'NORAD',
   [SearchResultType.INTLDES]: 'INTL',
@@ -692,6 +695,15 @@ export class SearchManager {
         html += sat.altName.substring(result.strIndex, result.strIndex + result.patlen);
         html += '</span>';
         html += sat.altName.substring(result.strIndex + result.patlen);
+      } else if (result.searchType === SearchResultType.ALIAS) {
+        const alias = getSearchAlias(obj.id) ?? '';
+
+        // An alias matched: show the name, then the alias with the match highlighted
+        html += `${obj.name} (${alias.substring(0, result.strIndex)}`;
+        html += '<span class="search-hilight">';
+        html += alias.substring(result.strIndex, result.strIndex + result.patlen);
+        html += '</span>';
+        html += `${alias.substring(result.strIndex + result.patlen)})`;
       } else {
         // If not, just write the name
         html += obj.name;

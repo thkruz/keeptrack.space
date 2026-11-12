@@ -265,7 +265,11 @@ export class PluginDrawer {
 
     drawer.id = 'plugin-drawer';
     drawer.className = `plugin-drawer ${modeClass}`;
+    // Phone drawer covers the nav bar and its hamburger, so it carries its own close control.
+    const closeHtml = this.isMobileMode_ ? `<div id="drawer-close-btn" class="drawer-close-btn" role="button" tabindex="0" aria-label="${t7e('Common.close')}">&times;</div>` : '';
+
     drawer.innerHTML = [
+      closeHtml,
       '<div class="drawer-inner">',
       '  <div class="drawer-top-actions">',
       searchHtml,
@@ -624,6 +628,11 @@ export class PluginDrawer {
     this.hamburgerEl_?.addEventListener('click', () => {
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       this.toggle();
+    });
+
+    // Phone drawer close button
+    getEl('drawer-close-btn', true)?.addEventListener('click', () => {
+      this.close();
     });
 
     // Overlay click closes drawer

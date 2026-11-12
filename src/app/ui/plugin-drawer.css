@@ -1285,7 +1285,8 @@ body.is-mobile-mode {
     padding-right: 10px !important;
   }
 
-  .drawer-search {
+  /* The drawer search row is the touch entry point to the command palette (issue #157). */
+  .drawer-search-shortcut {
     display: none !important;
   }
 
@@ -1550,5 +1551,124 @@ body.is-mobile-mode {
 
   body {
     overflow-x: hidden;
+  }
+}
+
+/* ===================================================================
+   Phone drawer and touch targets (issues #153 to #157)
+   =================================================================== */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  /* #155: the expanded desktop-UA drawer was 420 px wide at 390 px. */
+  body.drawer-mode .plugin-drawer,
+  body.drawer-mode .plugin-drawer.desktop-mode {
+    max-width: 100vw !important;
+  }
+
+  body.drawer-mode .plugin-drawer.desktop-mode:not(.rail-mode) {
+    width: 100vw !important;
+    /* Short landscape screens: footer, account row and toggle scroll with the list instead of eating it. */
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body.drawer-mode .plugin-drawer.desktop-mode:not(.rail-mode) .drawer-inner {
+    flex: none;
+    overflow: visible;
+  }
+
+  /* Tap targets: rail rows were 41 px, the search input 25 px. */
+  body.drawer-mode .drawer-item {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode .drawer-search {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode .drawer-rail-toggle {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode #search-holder {
+    min-height: 44px;
+    min-width: 96px;
+    width: auto !important;
+    flex: 1 1 96px;
+  }
+
+  body.drawer-mode #search-holder input[type='search'] {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode .nav-logo img {
+    height: 20px;
+  }
+
+  /* The top-right icon items already live in the drawer; without this they left the search 15 px wide. */
+  body.drawer-mode #nav-top-right > li {
+    display: none !important;
+  }
+
+  body.drawer-mode #nav-top-center {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+}
+
+/* The close button only exists for the phone drawer, which covers the nav bar and its hamburger. */
+.drawer-close-btn {
+  display: none;
+}
+
+body.is-mobile-mode {
+
+  /* #156: one scroll area for the whole drawer. The footer, version links and account row used to be
+     pinned under a separate scrolling list and covered the last rows (Time Machine, Take Photo). */
+  .plugin-drawer.mobile-mode {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-inner {
+    flex: none;
+    overflow: visible;
+  }
+
+  .drawer-close-btn {
+    display: flex;
+    order: -3;
+    align-self: flex-end;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    line-height: 1;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* #153: sign-in / account row first, right under the close button. */
+  .plugin-drawer.mobile-mode .drawer-user-account {
+    order: -2;
+    border-top: none;
+    border-bottom: 2px solid var(--color-dark-border);
+    padding: 4px 16px;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-user-account__row {
+    min-height: 44px;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-rail-toggle {
+    display: none;
   }
 }

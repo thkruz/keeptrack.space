@@ -52,6 +52,14 @@ export class MobileManager {
     'Screenshot',
     'FindSatPlugin',
     'SatellitePhotos',
+    // Added for phones 2026-11-12 (issues #153, #157): sign-in row, sensors group, command palette button.
+    'UserAccountPlugin',
+    'CommandPalettePlugin',
+    'SensorListPlugin',
+    'SensorInfoPlugin',
+    'CustomSensorPlugin',
+    'LookAnglesPlugin',
+    'BestPassPlugin',
   ];
 
   static checkMobileMode() {

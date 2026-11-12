@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Scheinbare Mag",
-      "tooltip": "Scheinbare visuelle Helligkeit, beobachtet vom ausgewählten Sensor zur aktuellen Simulationszeit"
+      "tooltip": "Geschätzte scheinbare visuelle Helligkeit, beobachtet vom ausgewählten Sensor zur aktuellen Simulationszeit (Modellschätzung; Wetter wird nicht berücksichtigt)"
     },
     "estimatedSuffix": "(gesch.)",
     "unknown": "Unbekannt",

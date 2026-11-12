@@ -11,7 +11,7 @@
         "beamWidth": "Szerokość wiązki",
         "maxTmxTime": "Maks. czas Tmx",
         "sun": "Słońce",
-        "visMag": "Jasność wiz.",
+        "visMag": "Jasność wiz. (szac.)",
         "nextPass": "Następny przelot",
         "reason": "Poza zasięgiem"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Szerokość liniowa na zasięgu celu",
         "maxTmxTime": "Czas potrzebny sygnałowi RF/światłu na dotarcie do celu i powrót",
         "sun": "Czy Słońce wpływa na czujnik",
-        "visMag": "Jasność wizualna (niższe wartości oznaczają jaśniejsze obiekty)",
+        "visMag": "Szacowana jasność wizualna (niższe wartości oznaczają jaśniejsze obiekty). Obliczona ze standardowego modelu jasności; rzeczywista jasność zależy od orientacji i fazy.",
         "nextPass": "Następny czas w zasięgu",
         "reason": "Dlaczego obiekt jest poza polem widzenia sensora"
       },

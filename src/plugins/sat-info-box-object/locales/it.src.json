@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Mag apparente",
-      "tooltip": "Magnitudine visuale apparente osservata dal sensore selezionato all'ora di simulazione corrente"
+      "tooltip": "Magnitudine visuale apparente stimata osservata dal sensore selezionato all'ora di simulazione corrente (stima del modello; il meteo non è considerato)"
     },
     "estimatedSuffix": "(stim.)",
     "unknown": "Sconosciuto",

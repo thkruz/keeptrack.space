@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Jasność obs.",
-      "tooltip": "Obserwowana jasność wizualna z wybranego sensora w bieżącym czasie symulacji"
+      "tooltip": "Szacowana obserwowana jasność wizualna z wybranego sensora w bieżącym czasie symulacji (szacunek modelu; pogoda nie jest uwzględniana)"
     },
     "estimatedSuffix": "(szac.)",
     "unknown": "Nieznany",

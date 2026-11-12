@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Zdánl. magnituda",
-      "tooltip": "Zdánlivá vizuální magnituda pozorovaná z vybraného senzoru v aktuálním simulačním čase"
+      "tooltip": "Odhadnutá zdánlivá vizuální magnituda pozorovaná z vybraného senzoru v aktuálním simulačním čase (odhad modelu; počasí se neuvažuje)"
     },
     "estimatedSuffix": "(odh.)",
     "unknown": "Neznámý",

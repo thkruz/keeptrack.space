@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Apparent Mag",
-      "tooltip": "Apparent visual magnitude observed from the selected sensor at the current simulation time"
+      "tooltip": "Estimated apparent visual magnitude observed from the selected sensor at the current simulation time (model estimate; weather not considered)"
     },
     "estimatedSuffix": "(est.)",
     "unknown": "Unknown",

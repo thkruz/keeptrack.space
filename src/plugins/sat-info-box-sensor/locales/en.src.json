@@ -11,7 +11,7 @@
         "beamWidth": "Beam Width",
         "maxTmxTime": "Max Tmx Time",
         "sun": "Sun",
-        "visMag": "Vis Mag",
+        "visMag": "Vis Mag (est.)",
         "nextPass": "Next Pass",
         "reason": "Not in View"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Linear Width at Target's Range",
         "maxTmxTime": "Time for RF/Light to Reach Target and Back",
         "sun": "Does the Sun Impact the Sensor",
-        "visMag": "Visual Magnitude (Lower numbers are brighter)",
+        "visMag": "Estimated visual magnitude (lower numbers are brighter). Computed from a standard-magnitude model; real brightness varies with attitude and phase.",
         "nextPass": "Next Time in Coverage",
         "reason": "Why the object is outside the sensor field of view"
       },

@@ -11,7 +11,7 @@
         "beamWidth": "Strahlbreite",
         "maxTmxTime": "Max. Tmx-Zeit",
         "sun": "Sonne",
-        "visMag": "Vis. Mag.",
+        "visMag": "Vis. Mag. (gesch.)",
         "nextPass": "Nächster Überflug",
         "reason": "Nicht sichtbar"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Lineare Breite bei der Entfernung des Ziels",
         "maxTmxTime": "Zeit für RF/Licht zum Ziel und zurück",
         "sun": "Beeinflusst die Sonne den Sensor",
-        "visMag": "Visuelle Magnitude (Niedrigere Zahlen sind heller)",
+        "visMag": "Geschätzte visuelle Magnitude (niedrigere Zahlen sind heller). Berechnet aus einem Standardhelligkeitsmodell; die tatsächliche Helligkeit hängt von Lage und Phase ab.",
         "nextPass": "Nächste Zeit in Abdeckung",
         "reason": "Warum das Objekt außerhalb des Sensor-Sichtfelds liegt"
       },

@@ -11,7 +11,7 @@
         "beamWidth": "Šířka svazku",
         "maxTmxTime": "Max. čas Tmx",
         "sun": "Slunce",
-        "visMag": "Viz. mag.",
+        "visMag": "Viz. mag. (odhad)",
         "nextPass": "Další přelet",
         "reason": "Mimo dohled"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Lineární šířka v dosahu cíle",
         "maxTmxTime": "Čas potřebný pro RF/světlo k dosažení cíle a zpět",
         "sun": "Ovlivňuje Slunce senzor",
-        "visMag": "Vizuální magnituda (nižší čísla znamenají vyšší jas)",
+        "visMag": "Odhadnutá vizuální magnituda (nižší čísla znamenají vyšší jas). Vypočteno ze standardního magnitudového modelu; skutečný jas závisí na orientaci a fázi.",
         "nextPass": "Příští průchod v pokrytí",
         "reason": "Proč je objekt mimo zorné pole senzoru"
       },

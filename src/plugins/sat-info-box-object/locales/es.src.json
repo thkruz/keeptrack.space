@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Magnitud Aparente",
-      "tooltip": "Magnitud visual aparente observada desde el sensor seleccionado en el tiempo de simulación actual"
+      "tooltip": "Magnitud visual aparente estimada observada desde el sensor seleccionado en el tiempo de simulación actual (estimación del modelo; no se considera el clima)"
     },
     "estimatedSuffix": "(est.)",
     "unknown": "Desconocido",

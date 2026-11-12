@@ -11,7 +11,7 @@
         "beamWidth": "Larghezza del fascio",
         "maxTmxTime": "Tempo Tmx massimo",
         "sun": "Sole",
-        "visMag": "Mag visuale",
+        "visMag": "Mag visuale (stima)",
         "nextPass": "Prossimo passaggio",
         "reason": "Non in vista"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Larghezza lineare alla distanza del bersaglio",
         "maxTmxTime": "Tempo necessario al segnale RF/luce per raggiungere il bersaglio e tornare",
         "sun": "Il Sole influisce sul sensore",
-        "visMag": "Magnitudine visuale (numeri più bassi sono più luminosi)",
+        "visMag": "Magnitudine visuale stimata (numeri più bassi sono più luminosi). Calcolata da un modello di magnitudine standard; la luminosità reale varia con assetto e fase.",
         "nextPass": "Prossimo passaggio in copertura",
         "reason": "Perché l'oggetto è fuori dal campo visivo del sensore"
       },

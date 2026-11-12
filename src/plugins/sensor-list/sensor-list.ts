@@ -22,6 +22,8 @@ import { keepTrackApi } from './../../keepTrackApi';
 import { DateTimeManager } from '../date-time-manager/date-time-manager';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { getSavedSite, onSavedSitesChanged, removeSavedSite } from '../sensor/custom-site-registry';
+import { activateSavedSite, deactivateSavedSite, getSavedSiteRows, makeSavedSiteCurrent } from '../sensor/saved-site-activation';
 import './sensor-list.css';
 
 // TODO: Add a search bar and filter for sensors
@@ -66,6 +68,7 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
               <span class="kt-action-label">${t7e('plugins.SensorListPlugin.buttons.resetSensor' as Parameters<typeof t7e>[0])}</span>
             </button>
           </section>
+          <section id="saved-sites-section" class="kt-section" style="display:none"></section>
           <div id="list-of-sensors">` +
     this.renderSensorCategories_() +
     html`
@@ -214,7 +217,31 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
       },
     }));
 
-    return [...groupCommands, ...sensorCommands];
+    const savedSiteCommands: ICommandPaletteCommand[] = getSavedSiteRows().map((row) => ({
+      id: `SensorListPlugin.setSavedSite.${row.id}`,
+      label: t7e('plugins.SensorListPlugin.commands.setSavedSite' as Parameters<typeof t7e>[0]).replace('{name}', row.name),
+      category,
+      description: row.location,
+      keywords: [row.name, row.location],
+      isAvailable: () => getSavedSite(row.id) !== null,
+      callback: () => {
+        SensorListPlugin.useSavedSite_(row.id);
+      },
+    }));
+
+    const savedSiteAddCommands: ICommandPaletteCommand[] = getSavedSiteRows().map((row) => ({
+      id: `SensorListPlugin.activateSavedSite.${row.id}`,
+      label: t7e('plugins.SensorListPlugin.commands.activateSavedSite' as Parameters<typeof t7e>[0]).replace('{name}', row.name),
+      category,
+      description: row.location,
+      keywords: [row.name, row.location],
+      isAvailable: () => getSavedSite(row.id) !== null,
+      callback: () => {
+        activateSavedSite(row.id);
+      },
+    }));
+
+    return [...groupCommands, ...sensorCommands, ...savedSiteCommands, ...savedSiteAddCommands];
   }
 
   addHtml(): void {
@@ -233,41 +260,15 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
       );
     });
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      this.renderSavedSites_();
+      onSavedSitesChanged(() => this.renderSavedSites_());
+      EventBus.getInstance().on(EventBusEvent.setSensor, () => this.renderSavedSites_());
+      EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.renderSavedSites_());
       getEl('sensor-selected-container')?.addEventListener('click', () => {
         this.bottomMenuClicked();
       });
 
-      getEl('sensor-list-content')?.addEventListener('click', (e: Event) => {
-        let realTarget = e.target as HTMLElement | null | undefined;
-
-        if (!realTarget?.classList.contains('menu-selectable')) {
-          realTarget = realTarget?.closest('.menu-selectable');
-          if (!realTarget?.classList.contains('menu-selectable')) {
-            return;
-          }
-        }
-
-        if (realTarget.id === 'reset-sensor-button') {
-          ServiceLocator.getSensorManager().resetSensorSelected();
-          ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
-
-          return;
-        }
-
-        ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-
-        const markGroup = realTarget.dataset.markGroup;
-
-        if (markGroup) {
-          this.toggleSensorGroupMarkers_(markGroup);
-
-          return;
-        }
-
-        const sensorClick = realTarget.dataset.sensor;
-
-        this.sensorListContentClick(sensorClick ?? '');
-      });
+      getEl('sensor-list-content')?.addEventListener('click', (e: Event) => this.onMenuClick_(e));
     });
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
@@ -446,6 +447,168 @@ export class SensorListPlugin extends KeepTrackPlugin implements ICommandPalette
 
     toggle.classList.toggle('is-marked', isMarked);
     toggle.setAttribute('aria-pressed', isMarked ? 'true' : 'false');
+  }
+
+  /** Delegated click handler for the whole menu: marker toggles, saved sites, reset and sensor rows. */
+  private onMenuClick_(e: Event): void {
+    let realTarget = e.target as HTMLElement | null | undefined;
+
+    if (!realTarget?.classList.contains('menu-selectable')) {
+      realTarget = realTarget?.closest('.menu-selectable');
+      if (!realTarget?.classList.contains('menu-selectable')) {
+        return;
+      }
+    }
+
+    const toggleSiteId = realTarget.dataset.toggleSavedSite;
+
+    if (toggleSiteId) {
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+      if (!deactivateSavedSite(toggleSiteId)) {
+        activateSavedSite(toggleSiteId);
+      }
+      this.renderSavedSites_();
+
+      return;
+    }
+
+    const removeSiteId = realTarget.dataset.removeSavedSite;
+
+    if (removeSiteId) {
+      removeSavedSite(removeSiteId);
+      ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+
+      return;
+    }
+
+    const savedSiteId = realTarget.dataset.savedSite;
+
+    if (savedSiteId) {
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+      SensorListPlugin.useSavedSite_(savedSiteId);
+
+      return;
+    }
+
+    if (realTarget.id === 'reset-sensor-button') {
+      ServiceLocator.getSensorManager().resetSensorSelected();
+      ServiceLocator.getSoundManager()?.play(SoundNames.MENU_BUTTON);
+
+      return;
+    }
+
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+
+    const markGroup = realTarget.dataset.markGroup;
+
+    if (markGroup) {
+      this.toggleSensorGroupMarkers_(markGroup);
+
+      return;
+    }
+
+    const sensorClick = realTarget.dataset.sensor;
+
+    this.sensorListContentClick(sensorClick ?? '');
+  }
+
+  /** Make saved site `id` the current sensor and pan to it when no satellite is selected. */
+  private static useSavedSite_(id: string): boolean {
+    const sensor = makeSavedSiteCurrent(id);
+
+    if (!sensor) {
+      return false;
+    }
+    if ((PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? -1) <= -1) {
+      try {
+        keepTrackApi.getMainCamera().lookAtLatLon(sensor.lat, sensor.lon, sensor.zoom ?? ZoomValue.GEO, ServiceLocator.getTimeManager().selectedDate);
+      } catch {
+        // Camera not ready; the sensor is still current
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Rebuild the "Saved Custom Sites" section. Names are user text, so rows are built with
+   * textContent, never markup. The section is hidden while the registry is empty.
+   */
+  private renderSavedSites_(): void {
+    const section = getEl('saved-sites-section', true);
+
+    if (!section) {
+      return;
+    }
+    const rows = getSavedSiteRows();
+
+    section.textContent = '';
+    section.style.display = rows.length === 0 ? 'none' : '';
+    if (rows.length === 0) {
+      return;
+    }
+    const label = document.createElement('div');
+
+    label.className = 'kt-section-label';
+    label.textContent = t7e('plugins.SensorListPlugin.labels.savedSites' as Parameters<typeof t7e>[0]);
+    section.appendChild(label);
+
+    for (const row of rows) {
+      const wrap = document.createElement('div');
+
+      wrap.className = 'saved-site-row';
+      const button = document.createElement('button');
+
+      button.type = 'button';
+      button.className = 'kt-action waves-effect menu-selectable sensor-row';
+      button.dataset.savedSite = row.id;
+      button.setAttribute('aria-pressed', row.state === 'current' ? 'true' : 'false');
+      const labelSpan = document.createElement('span');
+
+      labelSpan.className = 'kt-action-label';
+      const nameSpan = document.createElement('span');
+
+      nameSpan.className = 'sensor-name';
+      nameSpan.textContent = row.name;
+      const locSpan = document.createElement('span');
+
+      locSpan.className = 'sensor-system';
+      locSpan.textContent = row.location;
+      labelSpan.append(nameSpan, locSpan);
+      const badge = document.createElement('span');
+
+      badge.className = 'sensor-badge';
+      badge.dataset.state = row.state;
+      badge.textContent = t7e(`plugins.SensorListPlugin.labels.savedSite_${row.state}` as Parameters<typeof t7e>[0]);
+      button.append(labelSpan, badge);
+
+      const remove = document.createElement('button');
+      const removeLabel = t7e('plugins.SensorListPlugin.buttons.removeSavedSite' as Parameters<typeof t7e>[0]).replace('{name}', row.name);
+
+      const toggle = document.createElement('button');
+      const isActive = row.state !== 'saved';
+      const toggleLabel = t7e(`plugins.SensorListPlugin.buttons.${isActive ? 'deactivateSavedSite' : 'activateSavedSite'}` as Parameters<typeof t7e>[0]).replace(
+        '{name}',
+        row.name
+      );
+
+      toggle.type = 'button';
+      toggle.className = 'menu-selectable saved-site-ctl';
+      toggle.dataset.toggleSavedSite = row.id;
+      toggle.setAttribute('aria-label', toggleLabel);
+      toggle.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      toggle.title = toggleLabel;
+      toggle.textContent = isActive ? '−' : '+';
+
+      remove.type = 'button';
+      remove.className = 'menu-selectable saved-site-ctl saved-site-remove';
+      remove.dataset.removeSavedSite = row.id;
+      remove.setAttribute('aria-label', removeLabel);
+      remove.title = removeLabel;
+      remove.textContent = '×';
+      wrap.append(button, toggle, remove);
+      section.appendChild(wrap);
+    }
   }
 
   private static createSensorRow_(sensor: DetailedSensor) {

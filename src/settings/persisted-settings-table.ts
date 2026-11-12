@@ -212,7 +212,7 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
   },
   {
     key: StorageKey.SETTINGS_DRAW_GRATICULE,
-    serialize: (sm) => String(sm.isDrawGraticule),
+    serialize: (sm) => String(sm.graticuleSavedValue ?? sm.isDrawGraticule),
     deserialize: (sm, raw) => {
       sm.isDrawGraticule = bool(raw);
     },

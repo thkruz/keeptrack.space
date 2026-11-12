@@ -124,3 +124,35 @@
   text-align: center;
   white-space: nowrap;
 }
+
+/* Saved custom sites: the row button plus a small remove control. */
+#sensor-list-content .saved-site-row {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+#sensor-list-content .saved-site-row .sensor-row {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#sensor-list-content .saved-site-ctl {
+  flex: 0 0 auto;
+  min-width: 32px;
+  background: transparent;
+  border: 1px solid var(--color-dark-border);
+  border-radius: 4px;
+  color: var(--color-dark-text-muted);
+  cursor: pointer;
+}
+
+#sensor-list-content .saved-site-ctl:hover,
+#sensor-list-content .saved-site-ctl:focus-visible {
+  color: var(--color-dark-text-accent);
+}
+
+#sensor-list-content .sensor-badge[data-state='current'] {
+  color: var(--color-dark-text-accent);
+  border-color: var(--color-dark-text-accent);
+}

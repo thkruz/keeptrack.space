@@ -139,6 +139,11 @@ export class GraphicsSettings {
    */
   isDrawGraticule = false;
   /**
+   * Set only while the flat map view is temporarily showing the graticule by default: holds the
+   * user's real (saved) isDrawGraticule value so persistence never stores the temporary one.
+   */
+  graticuleSavedValue: boolean | null = null;
+  /**
    * Determines whether or not to draw the day/night terminator line and subsolar
    * point marker on the flat (equirectangular) map view.
    */

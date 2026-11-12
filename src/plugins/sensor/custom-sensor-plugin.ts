@@ -34,6 +34,7 @@ import {
 } from './custom-sensor-core';
 import { renderCustomSensorList } from './custom-sensor-list-renderer';
 import { buildCustomSensorStore, customSensorParamsFromRecord, parseCustomSensorStore } from './custom-sensor-persistence';
+import { notifySavedSitesReloaded, saveSites } from './custom-site-registry';
 import './custom-sensor.css';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
@@ -143,37 +144,37 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         <div id="cs-prefill-note" class="cs-prefill-note" style="display: none"></div>
         <div class="switch row" data-position="top" data-delay="50" data-tooltip="${l('tooltipTelescope')}">
           <label>
-            <input id="cs-telescope" type="checkbox" checked />
+            <input id="cs-telescope" type="checkbox" />
             <span class="lever"></span>
             ${l('telescope')}
           </label>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minaz-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinAz')}">
+          <div id="cs-minaz-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinAz')}">
             <input id="cs-minaz" type="text" value="0" />
             <label for="cs-minaz" class="active">${l('minAzimuth')}</label>
           </div>
-          <div id="cs-maxaz-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxAz')}">
+          <div id="cs-maxaz-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxAz')}">
             <input id="cs-maxaz" type="text" value="360" />
             <label for="cs-maxaz" class="active">${l('maxAzimuth')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minel-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinEl')}">
+          <div id="cs-minel-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinEl')}">
             <input id="cs-minel" type="text" value="10" />
             <label for="cs-minel" class="active">${l('minElevation')}</label>
           </div>
-          <div id="cs-maxel-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxEl')}">
+          <div id="cs-maxel-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxEl')}">
             <input id="cs-maxel" type="text" value="90" />
             <label for="cs-maxel" class="active">${l('maxElevation')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minrange-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinRange')}">
+          <div id="cs-minrange-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinRange')}">
             <input id="cs-minrange" type="text" value="100" />
             <label for="cs-minrange" class="active">${l('minRange')}</label>
           </div>
-          <div id="cs-maxrange-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxRange')}">
+          <div id="cs-maxrange-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxRange')}">
             <input id="cs-maxrange" type="text" value="50000" />
             <label for="cs-maxrange" class="active">${l('maxRange')}</label>
           </div>
@@ -394,12 +395,22 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     });
     // Account sync brought custom sensors from another device: rebuild them after the catalog-sensor restore
     eventBus.on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
+      if (changedKeys.includes(StorageKey.CUSTOM_SITE_REGISTRY)) {
+        notifySavedSitesReloaded();
+      }
       if (changedKeys.includes(StorageKey.CUSTOM_SENSORS) || changedKeys.includes(StorageKey.CURRENT_SENSOR)) {
         setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
       }
     });
-    eventBus.on(EventBusEvent.setSensor, () => CustomSensorPlugin.saveCustomSensors());
-    eventBus.on(EventBusEvent.resetSensor, () => CustomSensorPlugin.saveCustomSensors());
+    // A site made current from the Sensor List or palette changes the active list too
+    eventBus.on(EventBusEvent.setSensor, () => {
+      CustomSensorPlugin.saveCustomSensors();
+      CustomSensorPlugin.updateCustomSensorListDom();
+    });
+    eventBus.on(EventBusEvent.resetSensor, () => {
+      CustomSensorPlugin.saveCustomSensors();
+      CustomSensorPlugin.updateCustomSensorListDom();
+    });
   }
 
   /**
@@ -428,6 +439,9 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const persistence = PersistenceManager.getInstance();
     const store = buildCustomSensorStore(sensorManagerInstance.currentSensors[0], sensorManagerInstance.secondarySensors);
+
+    // Every active custom site is also kept in the saved registry; Clear / Reset leave the registry alone
+    saveSites(store.sensors);
 
     if (store.sensors.length === 0) {
       persistence.removeItem(StorageKey.CUSTOM_SENSORS);
@@ -736,7 +750,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     }
   }
 
-  private static updateCustomSensorListDom() {
+  static updateCustomSensorListDom() {
     const l = (key: string) => CustomSensorPlugin.t_(`sensorList.${key}`);
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const primarySensor = isCustomSensor(sensorManagerInstance.currentSensors[0]) ? [sensorManagerInstance.currentSensors[0]] : ([] as DetailedSensor[]);

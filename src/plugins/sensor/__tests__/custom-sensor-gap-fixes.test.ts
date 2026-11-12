@@ -140,6 +140,13 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect(emitted).toEqual(['CustomSensorPlugin']);
   });
 
+  it('starts with Telescope off and the field-of-view limits visible', () => {
+    expect((getEl('cs-telescope') as HTMLInputElement).checked).toBe(false);
+    for (const id of ['cs-minaz-div', 'cs-maxaz-div', 'cs-minel-div', 'cs-maxel-div', 'cs-minrange-div', 'cs-maxrange-div']) {
+      expect(getEl(id)!.classList.contains('start-hidden')).toBe(false);
+    }
+  });
+
   it('Replace Sensor pre-fills every field of the current sensor', () => {
     const sensorManager = ServiceLocator.getSensorManager();
 

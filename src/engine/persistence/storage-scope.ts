@@ -91,6 +91,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
 
   // --- Account: custom sensor definitions follow the user to a new device (restore-on-reopen)
   [StorageKey.CUSTOM_SENSORS]: StorageScope.Account,
+  [StorageKey.CUSTOM_SITE_REGISTRY]: StorageScope.Account,
 
   // --- Device: saved starting point for Reset to Start (selection and camera are per-session)
   [StorageKey.START_POINT]: StorageScope.Device,

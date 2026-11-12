@@ -212,6 +212,9 @@ export enum StorageKey {
   // restored on boot so a custom station survives a reload)
   CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
 
+  // Saved custom-site registry (every custom site the user kept, active or not, keyed by stable id)
+  CUSTOM_SITE_REGISTRY = 'v2-keepTrack-customSiteRegistry',
+
   // Reset to Start (saved starting time, play state, selection and camera view)
   START_POINT = 'v2-keepTrack-startPoint',
 

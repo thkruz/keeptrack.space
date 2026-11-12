@@ -53,6 +53,7 @@ describe('storage-scope registry', () => {
       [
         StorageKey.CURRENT_SENSOR,
         StorageKey.CUSTOM_SENSORS,
+        StorageKey.CUSTOM_SITE_REGISTRY,
         StorageKey.WATCHLIST_LIST,
         StorageKey.SATELLITE_LISTS,
         StorageKey.FAVORITES_LIST,

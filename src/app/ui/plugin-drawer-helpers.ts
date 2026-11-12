@@ -654,3 +654,92 @@ export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<str
     items: recentItems,
   };
 }
+
+// ---- Signed-out sign-in prompt ----
+
+/** True when the row belongs to a login-gated plugin whose gate is currently closed (signed out). */
+export function isSignedOutGatedRow(el: HTMLElement): boolean {
+  if (el.dataset.proGated === undefined || settingsManager.isDisableLoginGate) {
+    return false;
+  }
+  const pluginId = drawerItemPluginId(el);
+  const plugin = pluginId ? findPluginByBottomIcon_(pluginId) : undefined;
+
+  return plugin ? plugin.isLoginRequired && !plugin.isLoginGateValid_() : !document.body.classList.contains('user-logged-in');
+}
+
+/**
+ * Show a "Sign in to <feature>" prompt for a gated row. The Sign in button reuses the
+ * existing login modal (KeepTrackPlugin.loginGateOpenModal); no auth flow lives here.
+ */
+export function showSignInPrompt(featureName: string): HTMLElement {
+  document.getElementById('drawer-sign-in-prompt')?.remove();
+
+  const overlay = document.createElement('div');
+
+  overlay.id = 'drawer-sign-in-prompt';
+  overlay.className = 'drawer-sign-in-prompt';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+
+  const card = document.createElement('div');
+
+  card.className = 'drawer-sign-in-prompt__card';
+
+  const title = document.createElement('h2');
+
+  title.className = 'drawer-sign-in-prompt__title';
+  title.textContent = t7e('pluginDrawer.signInPromptTitle' as DrawerKey_, { feature: featureName });
+
+  const body = document.createElement('p');
+
+  body.className = 'drawer-sign-in-prompt__body';
+  body.textContent = t7e('pluginDrawer.signInPromptBody' as DrawerKey_, { feature: featureName });
+
+  const actions = document.createElement('div');
+
+  actions.className = 'drawer-sign-in-prompt__actions';
+
+  const cancel = document.createElement('button');
+
+  cancel.type = 'button';
+  cancel.className = 'drawer-sign-in-prompt__cancel';
+  cancel.textContent = t7e('pluginDrawer.signInPromptCancel' as DrawerKey_);
+
+  const signIn = document.createElement('button');
+
+  signIn.type = 'button';
+  signIn.className = 'drawer-sign-in-prompt__action';
+  signIn.textContent = t7e('pluginDrawer.signInPromptAction' as DrawerKey_);
+
+  const close = (): void => overlay.remove();
+
+  cancel.addEventListener('click', close);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) {
+      close();
+    }
+  });
+  overlay.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Escape') {
+      close();
+    }
+  });
+  signIn.addEventListener('click', () => {
+    close();
+    KeepTrackPlugin.loginGateOpenModal?.();
+  });
+
+  actions.append(cancel, signIn);
+  card.append(title, body, actions);
+  overlay.append(card);
+  document.body.append(overlay);
+  signIn.focus();
+
+  return overlay;
+}
+
+/** Label of a drawer row or utility icon, for naming the feature in the prompt. */
+export function drawerRowFeatureName(el: HTMLElement): string {
+  return el.querySelector('.drawer-item-label')?.textContent?.trim() || el.getAttribute('kt-tooltip') || el.querySelector('img')?.getAttribute('alt') || '';
+}

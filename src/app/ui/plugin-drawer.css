@@ -1707,3 +1707,45 @@ body.is-mobile-mode {
     display: none;
   }
 }
+
+.drawer-sign-in-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 60%);
+}
+
+.drawer-sign-in-prompt__card {
+  max-width: 360px;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid var(--color-dark-border);
+  background: var(--color-dark-background, #1a1a1a);
+  color: white;
+}
+
+.drawer-sign-in-prompt__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.drawer-sign-in-prompt__body {
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.drawer-sign-in-prompt__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.drawer-sign-in-prompt__actions button {
+  min-height: 44px;
+  padding: 0 16px;
+  cursor: pointer;
+}

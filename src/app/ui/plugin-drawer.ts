@@ -25,14 +25,17 @@ import {
   type DrawerItemData,
   drawerItemPluginId,
   drawerItemsForPluginSelector,
+  drawerRowFeatureName,
   explainDisabledPluginReason,
   explainDisabledUtilityIcon,
+  isSignedOutGatedRow,
   loadRecents,
   type RecentEntry,
   recordRecent,
   renderBadge,
   renderStatusFooter,
   renderUtilityFooter,
+  showSignInPrompt,
   syncBadgesFromEvents,
   syncDrawerItemState,
   syncInitialUtilityState,
@@ -417,6 +420,13 @@ export class PluginDrawer {
         const pluginId = drawerItemPluginId(itemEl);
         const topMenuId = itemEl.dataset.topMenuId;
 
+        // Signed out: a gated row stays clickable and names the feature in a sign-in prompt.
+        if (isSignedOutGatedRow(itemEl)) {
+          this.showSignInPromptFor_(itemEl);
+
+          return;
+        }
+
         // A disabled item should explain itself rather than silently ignore the
         // click. Shake it for feedback. A plugin with a reason for its disabled
         // state (getDisabledReason, e.g. "add satellites to the watchlist") toasts
@@ -484,6 +494,12 @@ export class PluginDrawer {
         const iconEl = (evt.target as HTMLElement).closest('.drawer-utility-icon') as HTMLElement | null;
 
         if (!iconEl || iconEl.classList.contains('disabled')) {
+          return;
+        }
+
+        if (isSignedOutGatedRow(iconEl)) {
+          this.showSignInPromptFor_(iconEl);
+
           return;
         }
 
@@ -854,6 +870,13 @@ export class PluginDrawer {
     html += '</div>';
 
     return html;
+  }
+
+  private showSignInPromptFor_(el: HTMLElement): void {
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    this.drawerEl_?.classList.remove('rail-hover');
+    this.close();
+    showSignInPrompt(drawerRowFeatureName(el));
   }
 
   // ---- Command Palette ----

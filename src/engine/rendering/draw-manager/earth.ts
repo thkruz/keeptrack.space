@@ -1278,11 +1278,17 @@ export class Earth {
       // holds a normalized 0..1 dwell value; map it to a ramp and blend on top.
       // Inert (zero cost visually) when uCoverageEnabled is off or dwell is 0.
       if (uCoverageEnabled > 0.5) {
-        float dwell = texture(uCoverageMap, vUv).r;
+        vec2 covSample = texture(uCoverageMap, vUv).rg;
+        float dwell = covSample.r;
         if (dwell > 0.0039) { // ~1/255: ignore empty cells
           vec3 covColor = coverageRamp(dwell);
           float covAlpha = uCoverageOpacity * (0.45 + 0.55 * clamp(dwell, 0.0, 1.0));
           fragColor.rgb = mix(fragColor.rgb, covColor, covAlpha);
+        } else if (covSample.g > 0.0039) {
+          // Optional second category (green channel): cells the feeding plugin excluded
+          // by a condition (e.g. Sun elevation). Magenta is distinct from the blue-cyan-
+          // yellow-red ramp and readable on day and night sides. R8 textures read g = 0.
+          fragColor.rgb = mix(fragColor.rgb, vec3(0.85, 0.35, 0.85), uCoverageOpacity * 0.75);
         }
       }
 

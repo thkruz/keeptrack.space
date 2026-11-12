@@ -877,4 +877,31 @@ describe('Camera.zoomWheel scroll-out floor', () => {
       expect(cameraInstance.state.zoomTarget).toBeGreaterThan(0);
     }
   });
+
+  describe('with a satellite selected and snapped', () => {
+    beforeEach(() => {
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat: 5 } as never);
+      settingsManager.isZoomStopsSnappedOnSat = false;
+      cameraInstance.state.camZoomSnappedOnSat = true;
+      cameraInstance.state.minDistanceFromTarget = 0.001 as Kilometers;
+    });
+
+    it('steps out by a visible amount from a metre-scale standoff', () => {
+      cameraInstance.state.camDistBuffer = 0.002 as Kilometers;
+      cameraInstance.zoomWheel(100);
+
+      // 20% of a 1 km floor, not 20% of 2 m
+      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(0.002 + 0.2, 4);
+    });
+
+    it('keeps the proportional step once past the floor, and zoom-in stays proportional', () => {
+      cameraInstance.state.camDistBuffer = 100 as Kilometers;
+      cameraInstance.zoomWheel(100);
+      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(120, 4);
+
+      cameraInstance.state.camDistBuffer = 0.002 as Kilometers;
+      cameraInstance.zoomWheel(-100);
+      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(0.002 * 0.8, 6);
+    });
+  });
 });

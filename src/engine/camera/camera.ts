@@ -104,6 +104,8 @@ export class Camera {
    * {@link Camera.zoomOutSensitivityFloor_}.
    */
   private static readonly ZOOM_OUT_FLOOR_FRACTION_ = 0.245;
+  /** Smallest standoff (km) a satellite-snapped scroll-out steps from, so close-up zoom-out is never a few metres per notch. */
+  private static readonly ZOOM_OUT_MIN_STANDOFF_KM_ = 1;
 
   private chaseSpeed_ = 0.0005;
   private wasDragging_ = false;
@@ -461,7 +463,12 @@ export class Camera {
       // consistent feel at any distance (0.75km to 100,000km+).
       const fraction = delta / 500;
 
-      this.state.camDistBuffer = <Kilometers>(this.state.camDistBuffer * (1 + fraction));
+      // Zooming out from a very close standoff (small debris, true-scale meshes) would otherwise
+      // move by a few metres per notch, so the wheel seemed dead. Step as if the standoff were at
+      // least ZOOM_OUT_MIN_STANDOFF_KM; zooming in keeps the pure proportional step.
+      const base = delta > 0 ? Math.max(this.state.camDistBuffer, Camera.ZOOM_OUT_MIN_STANDOFF_KM_) : this.state.camDistBuffer;
+
+      this.state.camDistBuffer = <Kilometers>(this.state.camDistBuffer + base * fraction);
     }
 
     this.zoomWheelFov_(delta);

@@ -56,3 +56,17 @@
 #ui-datepicker-div .ui-datepicker-goto-input.invalid {
   border-color: #f44336;
 }
+
+/* Clock status line: UTC date plus a live/paused/simulated label (text, not color alone). */
+#datetime-status {
+  font-size: 0.7rem;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+#datetime-status[data-mode='simulated'],
+#datetime-status[data-mode='paused'] {
+  font-weight: bold;
+}

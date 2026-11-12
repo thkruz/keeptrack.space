@@ -38,6 +38,11 @@
     },
     "errorMsgs": {
       "htmlNotReady": "Le panneau d'informations du satellite n'a pas fini de se charger ; ses détails n'ont pas pu être mis à jour."
+    },
+    "export": {
+      "copyValues": "Copier les valeurs en texte",
+      "copied": "Valeurs copiées",
+      "region": "Détails de l'objet"
     }
   }
 }

@@ -39,6 +39,29 @@ const setInnerHtml = (id: string, value: string): void => {
  * This class controls all the functionality of the satellite info box.
  * There are select events and update events that are registered to the Event Bus.
  */
+/** Plain-text dump of the info box rows ("Key: value" per line) headed by the object name and UTC time. */
+export const buildInfoBoxText = (box: HTMLElement | null, time: Date): string => {
+  if (!box) {
+    return '';
+  }
+  const name = box.querySelector(`#${EL.NAME}`)?.textContent?.trim() ?? '';
+  const lines = [`${name} (${time.toISOString()} UTC)`];
+
+  box.querySelectorAll('.sat-info-row').forEach((row) => {
+    if (row instanceof HTMLElement && row.offsetParent === null && row.style.display === 'none') {
+      return;
+    }
+    const key = row.querySelector('.sat-info-key')?.textContent?.trim();
+    const value = row.querySelector('.sat-info-value')?.textContent?.trim();
+
+    if (key && value) {
+      lines.push(`${key}: ${value}`);
+    }
+  });
+
+  return lines.join('\n');
+};
+
 export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
   dependencies_: string[] = [SelectSatManager.name];
@@ -205,6 +228,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     this.addListenerToCollapseElement(getEl(`${SECTIONS.IDENTIFIERS}`));
     this.addCopyListeners_();
+    getEl(EL.COPY_VALUES, true)?.addEventListener('click', () => this.copyAllValues_());
 
     EventBus.getInstance().emit(EventBusEvent.satInfoBoxAddListeners);
   }
@@ -224,6 +248,18 @@ export class SatInfoBox extends KeepTrackPlugin {
    * Skips empty or "not available" values and degrades gracefully when the
    * Clipboard API is unavailable (e.g. insecure contexts or older browsers).
    */
+  /** Copies every visible key/value row of the info box, with the object name and UTC time, as plain text. */
+  private copyAllValues_(): void {
+    const text = buildInfoBoxText(getEl(SatInfoBox.containerId_, true), ServiceLocator.getTimeManager().simulationTimeObj);
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => ServiceLocator.getUiManager().toast(t7e('satInfoBox.export.copied' as Parameters<typeof t7e>[0]), ToastMsgType.normal))
+      .catch(() => {
+        // Clipboard write was rejected (e.g. permissions); nothing to clean up
+      });
+  }
+
   private copyIdentifier_(elementId: string): void {
     const value = getEl(elementId, true)?.textContent?.trim() ?? '';
     const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
@@ -263,7 +299,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl('canvas-holder')?.insertAdjacentHTML(
       'beforeend',
       html`
-        <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden">
+        <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden keyboard-priority" tabindex="0" role="region"
+          aria-label="${t7e('satInfoBox.export.region' as Parameters<typeof t7e>[0])}">
           ${elements
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map((el) => el.html ?? '')
@@ -286,6 +323,9 @@ export class SatInfoBox extends KeepTrackPlugin {
         <div id="${EL.TITLE}" class="center-text">
           <span id="${EL.NAME}">This is a title</span>
           <span id="${EL.FLAG}" class="fi"></span>
+          <button id="${EL.COPY_VALUES}" type="button" class="material-icons sat-info-copy-values"
+            aria-label="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}"
+            kt-tooltip="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}">content_copy</button>
         </div>
       </div>
     `;

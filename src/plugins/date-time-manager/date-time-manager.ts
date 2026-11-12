@@ -5,11 +5,26 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { Milliseconds } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
+
+export type ClockMode = 'live' | 'paused' | 'simulated';
+
+/** Live: running at 1x and within 2 s of the wall clock. Paused: rate 0. Anything else is simulated. */
+export const getClockMode = (propRate: number, simulationTimeMs: number, nowMs: number): ClockMode => {
+  if (propRate === 0) {
+    return 'paused';
+  }
+  if (propRate === 1 && Math.abs(simulationTimeMs - nowMs) <= 2000) {
+    return 'live';
+  }
+
+  return 'simulated';
+};
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -30,6 +45,7 @@ export class DateTimeManager extends KeepTrackPlugin {
   private lastDateStr_: string | null = null;
   private lastJdayStr_: string | null = null;
   private lastTimeTextStr_: string | null = null;
+  private lastStatusStr_: string | null = null;
   calendar: Calendar;
 
   // =========================================================================
@@ -113,6 +129,8 @@ export class DateTimeManager extends KeepTrackPlugin {
       }
     }
 
+    this.updateStatus_();
+
     // The clock text (HH:MM:SS) only changes once per second, so skip the DOM write
     // otherwise. Writing every frame is what showed up as "Recalculate Style" in the
     // game loop. Update the existing text node in place rather than replacing it.
@@ -125,6 +143,26 @@ export class DateTimeManager extends KeepTrackPlugin {
         this.dateDOM.childNodes[0].nodeValue = this.timeTextStr;
       }
       this.lastTimeTextStr_ = this.timeTextStr;
+    }
+  }
+
+  /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" under the clock; skips the DOM write unless the text changed. */
+  private updateStatus_(): void {
+    const statusEl = getEl('datetime-status', true);
+
+    if (!statusEl) {
+      return;
+    }
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const simMs = timeManagerInstance.simulationTimeObj.getTime();
+    const mode = getClockMode(timeManagerInstance.propRate, simMs, Date.now());
+    const label = t7e(`plugins.DateTimeManager.clock.${mode}` as Parameters<typeof t7e>[0]);
+    const text = `${timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10)} UTC · ${label}`;
+
+    if (text !== this.lastStatusStr_) {
+      statusEl.textContent = text;
+      statusEl.dataset.mode = mode;
+      this.lastStatusStr_ = text;
     }
   }
 
@@ -166,6 +204,7 @@ export class DateTimeManager extends KeepTrackPlugin {
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">
             <div id="datetime-text" class="waves-effect waves-light"></div>
+            <div id="datetime-status" role="status" aria-live="off"></div>
             <div id="datetime-input">
               <form id="datetime-input-form">
                 <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />

@@ -38,6 +38,11 @@
     },
     "errorMsgs": {
       "htmlNotReady": "위성 정보 패널이 로드를 완료하지 못해 세부 정보를 업데이트할 수 없습니다."
+    },
+    "export": {
+      "copyValues": "값을 텍스트로 복사",
+      "copied": "값을 복사했습니다",
+      "region": "객체 세부 정보"
     }
   }
 }

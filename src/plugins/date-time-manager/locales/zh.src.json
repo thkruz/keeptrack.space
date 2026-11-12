@@ -51,6 +51,11 @@
         "goToInvalid": "日期无效。请使用 UTC 格式 YYYY-MM-DD HH:MM:SS。",
         "containerNotFound": "未找到 ID 为 {id} 的容器",
         "timeInvalid": "时间格式无效！应为 HH:MM:SS、HH:MM:SS.s 或 HHMMSS"
+      },
+      "clock": {
+        "live": "实时",
+        "paused": "已暂停",
+        "simulated": "模拟"
       }
     }
   }

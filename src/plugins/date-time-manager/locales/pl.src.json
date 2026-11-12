@@ -51,6 +51,11 @@
         "goToInvalid": "Nieprawidłowa data. Użyj formatu UTC YYYY-MM-DD HH:MM:SS.",
         "containerNotFound": "Nie znaleziono kontenera o ID {id}",
         "timeInvalid": "Nieprawidłowy format czasu! Oczekiwano HH:MM:SS, HH:MM:SS.s lub HHMMSS"
+      },
+      "clock": {
+        "live": "NA ŻYWO",
+        "paused": "WSTRZYMANO",
+        "simulated": "SYMULACJA"
       }
     }
   }

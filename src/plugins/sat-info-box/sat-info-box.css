@@ -182,3 +182,24 @@
   color: var(--color-dark-text-accent);
   text-decoration: underline dotted;
 }
+
+/* Keyboard users can focus and scroll the panel; the copy button sits in the title row. */
+#sat-infobox:focus-visible {
+  outline: 2px solid var(--kt-focus-ring, #4da3ff);
+  outline-offset: -2px;
+}
+
+.sat-info-copy-values {
+  margin-left: 8px;
+  padding: 0;
+  font-size: 18px;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.sat-info-copy-values:focus-visible {
+  outline: 2px solid var(--kt-focus-ring, #4da3ff);
+}

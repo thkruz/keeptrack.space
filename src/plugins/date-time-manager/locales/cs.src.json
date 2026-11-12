@@ -51,6 +51,11 @@
         "goToInvalid": "Neplatné datum. Použijte formát UTC YYYY-MM-DD HH:MM:SS.",
         "containerNotFound": "Kontejner s ID {id} nebyl nalezen",
         "timeInvalid": "Neplatný formát času! Očekává se HH:MM:SS, HH:MM:SS.s nebo HHMMSS"
+      },
+      "clock": {
+        "live": "ŽIVĚ",
+        "paused": "POZASTAVENO",
+        "simulated": "SIMULOVÁNO"
       }
     }
   }

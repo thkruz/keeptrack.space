@@ -38,6 +38,11 @@
     },
     "errorMsgs": {
       "htmlNotReady": "Panel informacji o satelicie nie wczytał się do końca, więc nie można było zaktualizować jego danych."
+    },
+    "export": {
+      "copyValues": "Kopiuj wartości jako tekst",
+      "copied": "Skopiowano wartości",
+      "region": "Szczegóły obiektu"
     }
   }
 }

@@ -38,6 +38,11 @@
     },
     "errorMsgs": {
       "htmlNotReady": "Il pannello informazioni del satellite non ha terminato il caricamento, quindi i dettagli non sono stati aggiornati."
+    },
+    "export": {
+      "copyValues": "Copia i valori come testo",
+      "copied": "Valori copiati",
+      "region": "Dettagli dell'oggetto"
     }
   }
 }

@@ -51,6 +51,11 @@
         "goToInvalid": "Неправильна дата. Використовуйте формат UTC YYYY-MM-DD HH:MM:SS.",
         "containerNotFound": "Контейнер з ID {id} не знайдено",
         "timeInvalid": "Неправильний формат часу! Очікується HH:MM:SS, HH:MM:SS.s або HHMMSS"
+      },
+      "clock": {
+        "live": "НАЖИВО",
+        "paused": "ПАУЗА",
+        "simulated": "СИМУЛЯЦІЯ"
       }
     }
   }

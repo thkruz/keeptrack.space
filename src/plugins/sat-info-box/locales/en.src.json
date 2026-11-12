@@ -38,6 +38,11 @@
     },
     "errorMsgs": {
       "htmlNotReady": "The satellite info panel did not finish loading, so its details could not be updated."
+    },
+    "export": {
+      "copyValues": "Copy values as text",
+      "copied": "Values copied to clipboard",
+      "region": "Object details"
     }
   }
 }

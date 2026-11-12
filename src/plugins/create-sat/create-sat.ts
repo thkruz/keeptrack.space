@@ -23,7 +23,7 @@ import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, clo
 import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
-import { dateToEpochFields, OrbitPresetId } from './create-sat-orbits';
+import { dateToEpochFields, isoToEpochFields, OrbitPresetId } from './create-sat-orbits';
 import {
   FormErrorReporter,
   FormFieldError,
@@ -346,7 +346,42 @@ export class CreateSat extends KeepTrackPlugin {
       getEl(`${p}-${id}`)?.addEventListener('input', () => this.updatePreview_());
     }
 
+    CreateSat.wireEpochTimestamp_(p, () => this.updatePreview_());
     wireInlineValidation(p);
+  }
+
+  /** Typing an ISO UTC timestamp fills the year and day fields; typing in either of those clears the timestamp box. */
+  protected static wireEpochTimestamp_(p: string, onApplied: () => void): void {
+    const isoEl = getEl(`${p}-epochiso`, true) as HTMLInputElement | null;
+    const yearEl = getEl(`${p}-year`, true) as HTMLInputElement | null;
+    const dayEl = getEl(`${p}-day`, true) as HTMLInputElement | null;
+
+    if (!isoEl || !yearEl || !dayEl) {
+      return;
+    }
+    isoEl.addEventListener('change', () => {
+      if (isoEl.value.trim() === '') {
+        return;
+      }
+      const fields = isoToEpochFields(isoEl.value);
+
+      if (!fields) {
+        isoEl.classList.add('invalid');
+        ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.invalidEpochTimestamp' as T7eKey), ToastMsgType.caution, true);
+
+        return;
+      }
+      isoEl.classList.remove('invalid');
+      yearEl.value = fields.year;
+      dayEl.value = fields.day;
+      onApplied();
+    });
+    for (const el of [yearEl, dayEl]) {
+      el.addEventListener('input', () => {
+        isoEl.value = '';
+        isoEl.classList.remove('invalid');
+      });
+    }
   }
 
   /** Redraw (or clear) the live ghost-orbit preview from the current form. */

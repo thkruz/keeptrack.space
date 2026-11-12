@@ -127,6 +127,33 @@ export function dateToEpochFields(date: Date): { year: string; day: string } {
   };
 }
 
+/**
+ * Parse an ISO date-time (UTC) into the TLE epoch fields. A string without a zone designator is read as UTC; a
+ * date-only string is rejected so a typo cannot silently become midnight. Returns null when it is not a valid ISO date-time.
+ */
+export function isoToEpochFields(text: string): { year: string; day: string } | null {
+  const s = text.trim();
+  const m = /^(?<date>\d{4}-\d{2}-\d{2})[T ](?<time>\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)(?<zone>Z|[+-]\d{2}:?\d{2})?$/iu.exec(s);
+
+  if (!m?.groups) {
+    return null;
+  }
+  const zone = m.groups.zone ? m.groups.zone.toUpperCase() : 'Z';
+  const time = m.groups.time.length === 5 ? `${m.groups.time}:00` : m.groups.time;
+  const zoneIso = zone === 'Z' || zone.includes(':') ? zone : `${zone.slice(0, 3)}:${zone.slice(3)}`;
+  const date = new Date(`${m.groups.date}T${time}${zoneIso}`);
+
+  const [y, mo, d] = m.groups.date.split('-').map(Number);
+  const wall = new Date(Date.UTC(y, mo - 1, d));
+
+  // Date rolls 30 Feb over to 2 Mar instead of failing, so check the calendar date as typed.
+  if (Number.isNaN(date.getTime()) || wall.getUTCMonth() !== mo - 1 || wall.getUTCDate() !== d) {
+    return null;
+  }
+
+  return dateToEpochFields(date);
+}
+
 /** Raw TLE international-designator columns (10-17 of line 1), e.g. "98067A". */
 export function rawIntlDesFromTle(tle1: TleLine1): string {
   return tle1.substring(9, 17).trim();

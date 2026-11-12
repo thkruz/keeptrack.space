@@ -152,6 +152,12 @@ export function buildAdvancedTabHtml(): string {
             <label for="${P}-day" class="active">${l('epochDay')}</label>
           </div>
         </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input placeholder="2026-11-04T00:00:00Z" id="${P}-epochiso" type="text" autocomplete="off" />
+            <label for="${P}-epochiso" class="active">${l('epochTimestamp')}</label>
+          </div>
+        </div>
       </section>
 
       <section class="kt-section">

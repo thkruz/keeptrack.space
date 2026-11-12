@@ -2,6 +2,7 @@ import {
   computePresetElements,
   cosparToRawIntlDes,
   dateToEpochFields,
+  isoToEpochFields,
   rawIntlDesFromTle,
   sunSyncInclinationDeg,
   tleToElementFields,
@@ -71,5 +72,23 @@ describe('create-sat-orbits', () => {
     expect(fields.year).toBe('21');
     expect(fields.inc).toContain('51.6423');
     expect(fields.rasc).toContain('168.5744');
+  });
+});
+
+describe('isoToEpochFields', () => {
+  it('reads a Z timestamp as UTC and matches dateToEpochFields', () => {
+    expect(isoToEpochFields('2026-11-04T00:00:00Z')).toEqual(dateToEpochFields(new Date(Date.UTC(2026, 10, 4))));
+    expect(isoToEpochFields('2026-01-01T12:00:00Z')).toEqual({ year: '26', day: '001.50000000' });
+  });
+
+  it('treats a missing zone as UTC and honours offsets', () => {
+    expect(isoToEpochFields('2026-01-01T12:00')).toEqual({ year: '26', day: '001.50000000' });
+    expect(isoToEpochFields('2026-01-01T14:00:00+02:00')).toEqual({ year: '26', day: '001.50000000' });
+  });
+
+  it('rejects date-only, garbage and impossible dates', () => {
+    expect(isoToEpochFields('2026-11-04')).toBeNull();
+    expect(isoToEpochFields('tomorrow')).toBeNull();
+    expect(isoToEpochFields('2026-02-30T00:00:00Z')).toBeNull();
   });
 });

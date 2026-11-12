@@ -392,12 +392,24 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     });
     // Account sync brought custom sensors from another device: rebuild them after the catalog-sensor restore
     eventBus.on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
-      if (changedKeys.includes(StorageKey.CUSTOM_SENSORS)) {
+      if (changedKeys.includes(StorageKey.CUSTOM_SENSORS) || changedKeys.includes(StorageKey.CURRENT_SENSOR)) {
         setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
       }
     });
     eventBus.on(EventBusEvent.setSensor, () => CustomSensorPlugin.saveCustomSensors());
     eventBus.on(EventBusEvent.resetSensor, () => CustomSensorPlugin.saveCustomSensors());
+  }
+
+  /**
+   * Call before emitting remoteSettingsApplied. The sensor-list listener re-applies CURRENT_SENSOR
+   * synchronously; a custom primary is unknown to it, so it resets the sensor, and the resulting save
+   * would delete the freshly synced custom store (and push that deletion back to the account).
+   * Saves stay off until the deferred {@link restoreCustomSensors} has rebuilt the sensors.
+   */
+  static holdSavesForRemoteRestore(changedKeys: readonly StorageKey[]): void {
+    if (changedKeys.includes(StorageKey.CUSTOM_SENSORS) || changedKeys.includes(StorageKey.CURRENT_SENSOR)) {
+      CustomSensorPlugin.isStoreRestored_ = false;
+    }
   }
 
   /** True once {@link restoreCustomSensors} has run; saves are skipped before that. */

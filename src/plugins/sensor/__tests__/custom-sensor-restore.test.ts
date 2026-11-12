@@ -139,6 +139,22 @@ describe('CustomSensorPlugin persistence and camera', () => {
     expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
   });
 
+  it('keeps the synced store when the CURRENT_SENSOR listener resets the sensor mid-restore (issue 158)', () => {
+    setForm();
+    C.processCustomSensorSubmit_();
+    const savedJson = store.get(StorageKey.CUSTOM_SENSORS);
+
+    // Login sync: the page is past boot (flag true), then the sync hold is raised before the listeners run
+    CustomSensorPlugin.holdSavesForRemoteRestore([StorageKey.CURRENT_SENSOR, StorageKey.CUSTOM_SENSORS]);
+    ServiceLocator.getSensorManager().currentSensors = [];
+    CustomSensorPlugin.saveCustomSensors();
+
+    expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
+
+    CustomSensorPlugin.restoreCustomSensors();
+    expect(ServiceLocator.getSensorManager().currentSensors[0]?.name).toBeTruthy();
+  });
+
   it('rebuilds custom sensors when an account sync delivers them (new device)', () => {
     setForm();
     C.processCustomSensorSubmit_();

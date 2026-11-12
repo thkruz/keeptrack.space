@@ -176,3 +176,16 @@
     margin-bottom: 8px;
   }
 }
+
+/*
+ * Phone widths (issue #154): the menu body already reserves bottom padding for the floating utility
+ * pill, and a sticky submit row pinned to the scrollport edge ignores that padding, so it was drawn
+ * over the horizon mask textarea and the step bins toggle at scroll top. On phones the submit row is
+ * a normal row at the end of the form, so no field can ever sit under it.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  #custom-sensor-menu-form > #cs-submit {
+    position: static;
+    min-height: 44px;
+  }
+}

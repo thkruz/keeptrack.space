@@ -88,7 +88,8 @@
         "meanMotionRange": "{field}은(는) 0보다 크고 하루 {max}회전 이하여야 합니다.",
         "periodPositive": "{field}은(는) 양수 분 값이어야 합니다.",
         "numberRequired": "{field}은(는) 숫자여야 합니다.",
-        "noradIdReserved": "NORAD ID {id}은(는) 발사 궤적이 사용 중입니다. 다른 ID를 선택하거나 먼저 궤적을 제거하세요."
+        "noradIdReserved": "NORAD ID {id}은(는) 발사 궤적이 사용 중입니다. 다른 ID를 선택하거나 먼저 궤적을 제거하세요.",
+        "noradIdNoSlot": "NORAD ID {id}은(는) 사용 가능한 분석가 슬롯이 아닙니다. 양식이 제안하는 ID를 사용하거나 먼저 이 슬롯을 비우세요."
       },
       "successMsgs": {
         "satCreated": "위성 {name} ({scc})이(가) 성공적으로 생성되었습니다",

@@ -88,7 +88,8 @@
         "meanMotionRange": "{field} deve essere maggiore di 0 e al massimo {max} rivoluzioni al giorno.",
         "periodPositive": "{field} deve essere un numero positivo di minuti.",
         "numberRequired": "{field} deve essere un numero.",
-        "noradIdReserved": "L'ID NORAD {id} è occupato da una traiettoria di lancio. Scegli un altro ID o rimuovi prima la traiettoria."
+        "noradIdReserved": "L'ID NORAD {id} è occupato da una traiettoria di lancio. Scegli un altro ID o rimuovi prima la traiettoria.",
+        "noradIdNoSlot": "L'ID NORAD {id} non è uno slot analista disponibile. Usa un ID suggerito dal modulo o libera prima questo."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) creato con successo",

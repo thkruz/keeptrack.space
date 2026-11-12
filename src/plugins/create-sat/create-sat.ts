@@ -709,7 +709,8 @@ export class CreateSat extends KeepTrackPlugin {
      * Ensure eccentricity is a 7-digit number (e.g., 0000000)
      * Remove any decimal point and pad with zeros
      */
-    ecen = parseEccentricityField(ecen) ?? ecen.replace('.', '').replace(/\D/gu, '').padStart(7, '0').slice(0, 7);
+    // An unreadable value (e.g. 1.5) is left as typed so validation rejects it; never reshape it into a different, valid eccentricity.
+    ecen = parseEccentricityField(ecen) ?? ecen;
 
     ecenInput.value = ecen;
 
@@ -745,7 +746,11 @@ export class CreateSat extends KeepTrackPlugin {
     const meanmoNum = parseFloat(meanmo);
 
     if (!isNaN(meanmoNum)) {
-      meanmo = meanmoNum.toFixed(5).padStart(8, '0');
+      // Keep the precision typed (up to the 8 decimals a TLE line holds); 5 is the minimum shown.
+      const typedDecimals = /\.(\d+)/u.exec(meanmo)?.[1].length ?? 0;
+      const decimals = Math.min(8, Math.max(5, typedDecimals));
+
+      meanmo = meanmoNum.toFixed(decimals).padStart(decimals + 3, '0');
     } else {
       meanmo = meanmo.padStart(8, '0');
     }
@@ -858,7 +863,12 @@ export class CreateSat extends KeepTrackPlugin {
       const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
       if (!obj?.isSatellite()) {
-        ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.invalidSatObject' as T7eKey), ToastMsgType.error, true);
+        // Name the field and the reason instead of a bare "Invalid satellite object".
+        request.onFieldError({
+          id: 'scc',
+          fields: ['scc'],
+          message: t7e('plugins.CreateSat.errorMsgs.noradIdNoSlot' as T7eKey).replace('{id}', inputParams.scc.trim()),
+        });
 
         return;
       }

@@ -88,7 +88,8 @@
         "meanMotionRange": "{field}必须大于 0 且不超过每天 {max} 圈。",
         "periodPositive": "{field}必须是正的分钟数。",
         "numberRequired": "{field}必须是数字。",
-        "noradIdReserved": "NORAD ID {id} 已被一条发射轨迹占用。请选择其他 ID，或先移除该轨迹。"
+        "noradIdReserved": "NORAD ID {id} 已被一条发射轨迹占用。请选择其他 ID，或先移除该轨迹。",
+        "noradIdNoSlot": "NORAD ID {id} 不是可用的分析员槽位。请使用表单建议的 ID，或先释放该槽位。"
       },
       "successMsgs": {
         "satCreated": "卫星 {name}（{scc}）创建成功",

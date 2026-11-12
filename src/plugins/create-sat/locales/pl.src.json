@@ -88,7 +88,8 @@
         "meanMotionRange": "{field} musi być większy od 0 i wynosić najwyżej {max} obiegów na dobę.",
         "periodPositive": "{field} musi być dodatnią liczbą minut.",
         "numberRequired": "{field} musi być liczbą.",
-        "noradIdReserved": "NORAD ID {id} jest zajęty przez trajektorię startu. Wybierz inny identyfikator lub najpierw usuń trajektorię."
+        "noradIdReserved": "NORAD ID {id} jest zajęty przez trajektorię startu. Wybierz inny identyfikator lub najpierw usuń trajektorię.",
+        "noradIdNoSlot": "NORAD ID {id} nie jest dostępnym slotem analityka. Użyj identyfikatora podpowiedzianego przez formularz lub najpierw zwolnij ten."
       },
       "successMsgs": {
         "satCreated": "Satelita {name} ({scc}) utworzony pomyślnie",

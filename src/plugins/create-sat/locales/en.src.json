@@ -88,7 +88,8 @@
         "meanMotionRange": "{field} must be greater than 0 and at most {max} revolutions per day.",
         "periodPositive": "{field} must be a positive number of minutes.",
         "numberRequired": "{field} must be a number.",
-        "noradIdReserved": "NORAD ID {id} is held by a launch trajectory. Choose another ID or remove the trajectory first."
+        "noradIdReserved": "NORAD ID {id} is held by a launch trajectory. Choose another ID or remove the trajectory first.",
+        "noradIdNoSlot": "NORAD ID {id} is not an available analyst slot. Use an ID the form suggests or free this one first."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",

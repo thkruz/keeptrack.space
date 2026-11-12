@@ -150,4 +150,45 @@ describe('CreateSat advanced tab', () => {
 
     expect(atPerigee).toBeGreaterThan(atApogee);
   });
+
+  it('rejects eccentricity 1.5 with a visible reason instead of reshaping it to 0.0000015 (#25)', () => {
+    const submit = vi.spyOn(C, 'submitTle_').mockImplementation(() => undefined);
+
+    typeInto('ecen', '1.5');
+    C.createSatSubmit_();
+
+    expect(submit).not.toHaveBeenCalled();
+    expect(input('ecen').value).toBe('1.5');
+    expect(input('ecen').getAttribute('aria-invalid')).toBe('true');
+    expect(errorItems().length).toBe(1);
+  });
+
+  it('keeps the mean motion precision typed, up to 8 decimals (#26)', () => {
+    const submit = vi.spyOn(C, 'submitTle_').mockImplementation(() => undefined);
+
+    typeInto('meanmo', '15.05490646');
+    C.createSatSubmit_();
+    expect(submit.mock.calls[0][0].params.meanmo).toBe('15.05490646');
+
+    typeInto('meanmo', '1.00273791');
+    C.createSatSubmit_();
+    expect(submit.mock.calls[1][0].params.meanmo).toBe('01.00273791');
+
+    typeInto('meanmo', '15.5');
+    C.createSatSubmit_();
+    expect(submit.mock.calls[2][0].params.meanmo).toBe('15.50000');
+  });
+
+  it('names the NORAD ID field when the slot does not exist instead of "Invalid satellite object" (#100)', () => {
+    const catalog = ServiceLocator.getCatalogManager();
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+    vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(null);
+    typeInto('scc', '90001');
+    C.createSatSubmit_();
+
+    expect(toast).not.toHaveBeenCalled();
+    expect(input('scc').getAttribute('aria-invalid')).toBe('true');
+    expect(errorItems()[0]).toContain('90001');
+  });
 });

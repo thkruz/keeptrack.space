@@ -88,7 +88,8 @@
         "meanMotionRange": "{field} doit être supérieur à 0 et au plus {max} révolutions par jour.",
         "periodPositive": "{field} doit être un nombre positif de minutes.",
         "numberRequired": "{field} doit être un nombre.",
-        "noradIdReserved": "L'ID NORAD {id} est occupé par une trajectoire de lancement. Choisissez un autre ID ou supprimez d'abord la trajectoire."
+        "noradIdReserved": "L'ID NORAD {id} est occupé par une trajectoire de lancement. Choisissez un autre ID ou supprimez d'abord la trajectoire.",
+        "noradIdNoSlot": "L'ID NORAD {id} n'est pas un emplacement d'analyste disponible. Utilisez un ID proposé par le formulaire ou libérez celui-ci d'abord."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) créé avec succès",

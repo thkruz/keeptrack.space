@@ -1428,3 +1428,127 @@ body.is-mobile-mode {
     opacity: 1;
   }
 }
+
+/* ===================================================================
+   Phone widths (viewport-based, any device or UA, not only is-mobile-mode)
+   Issue #143: side menus were 400-550 px wide at 390 px (UA-only mobile rules did not
+   apply), the page scrolled sideways, and the floating utility pill expanded over
+   the bottom action buttons (Plan Observations, Export CSV).
+   Generic fix: menus fill the viewport (the drawer rail stays behind them, the menu
+   title bar has the close button), the menu body scrolls, and the scroll area ends
+   above the floating pill and the home-indicator safe area, so the last action row
+   is always reachable. Landscape phones (short height) get the same treatment.
+   =================================================================== */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  .side-menu-parent,
+  [id$="-secondary"].side-menu-parent {
+    position: fixed !important;
+    top: var(--top-menu-height) !important;
+    /* The drawer rail stays visible and tappable, the menu takes the rest of the width. */
+    left: var(--drawer-offset, 0px) !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: calc(100vw - var(--drawer-offset, 0px)) !important;
+    max-width: calc(100vw - var(--drawer-offset, 0px)) !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: calc(100dvh - var(--top-menu-height)) !important;
+  }
+
+  .side-menu {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    max-width: 100% !important;
+    padding-left: max(1rem, env(safe-area-inset-left)) !important;
+    padding-right: max(1rem, env(safe-area-inset-right)) !important;
+    /* Clear the floating utility pill (48 px + 12 px offset) and the home indicator. */
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .side-menu-title-bar {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .side-menu-title-text {
+    width: auto !important;
+    flex: 1 1 0 !important;
+    min-width: 50% !important;
+    max-width: none !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(0.75rem, 3.5vw, 1rem);
+  }
+
+  .side-menu-title-right {
+    flex-shrink: 0 !important;
+  }
+
+  /* Wide tables (Look Angles, results) scroll inside their own box instead of being clipped. */
+  .side-menu .row,
+  .side-menu table {
+    max-width: calc(100vw - var(--drawer-offset, 0px) - 2rem);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .side-menu table {
+    display: block;
+  }
+
+  .side-menu thead,
+  .side-menu tbody {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Form inputs must not sit at negative x or exceed the card. */
+  .side-menu .input-field,
+  .side-menu .input-field.col,
+  .kt-ui-v13 .kt-field-row .input-field.col {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .side-menu input,
+  .side-menu select,
+  .side-menu textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Touch targets for action buttons. */
+  .kt-ui-v13 .kt-action {
+    min-height: 44px;
+  }
+
+  /* The utility pill must not grow over menu content on touch hover; it opens by tap (.expanded). */
+  .drawer-utility-footer:not(.expanded):hover {
+    max-width: 48px;
+    padding: 6px;
+    gap: 0;
+  }
+
+  .drawer-utility-footer:not(.expanded):hover::before {
+    width: 28px;
+    opacity: 1;
+  }
+
+  .drawer-utility-footer:not(.expanded):hover .drawer-utility-section {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  .drawer-utility-footer {
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}

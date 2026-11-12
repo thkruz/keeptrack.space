@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "관측지: {site}",
         "source": "출처: {source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "계산된 화면: 이 시점에서 궤도 요소는 {age} 전 자료"
       }
     }
   }

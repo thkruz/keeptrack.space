@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "Пункт: {site}",
         "source": "Источник: {source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "Расчётный вид: орбитальным элементам на этот момент {age}"
       }
     }
   }

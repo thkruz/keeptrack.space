@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "観測地: {site}",
         "source": "ソース: {source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "計算された表示: この時点で軌道要素は {age} 前のもの"
       }
     }
   }

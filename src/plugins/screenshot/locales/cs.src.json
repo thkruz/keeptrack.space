@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "Stanoviště: {site}",
         "source": "Zdroj: {source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "Vypočtený pohled: orbitální elementy jsou v tuto chvíli staré {age}"
       }
     }
   }

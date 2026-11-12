@@ -194,17 +194,19 @@ describe('Screenshot behavior', () => {
     };
 
     it('gathers object, UTC time, site and source lines', () => {
-      stubSources({ name: 'ISS (ZARYA)', sccNum: '25544', source: 'spacetrack' }, new Date('2026-11-04T01:02:03.456Z'), { uiName: 'Eglin' });
+      stubSources({ name: 'ISS (ZARYA)', sccNum: '25544', source: 'spacetrack', ageOfElset: () => 3.25 }, new Date('2026-11-04T01:02:03.456Z'), { uiName: 'Eglin' });
 
       const lines = plugin.gatherCaptionLines_();
 
-      expect(lines).toHaveLength(4);
+      expect(lines).toHaveLength(5);
       expect(lines[0]).toContain('ISS (ZARYA)');
       expect(lines[0]).toContain('25544');
       expect(lines[1]).toContain('2026-11-04T01:02:03');
       expect(lines[1]).not.toContain('.456');
       expect(lines[2]).toContain('Eglin');
-      expect(lines[3]).toContain('Space-Track');
+      expect(lines[3]).toContain('3.3 d');
+      expect(lines[3].toLowerCase()).toContain('computed');
+      expect(lines[4]).toContain('Space-Track');
     });
 
     it('omits object and source lines when nothing is selected, and the site line when no sensor is set', () => {

@@ -310,6 +310,18 @@ export class Screenshot extends KeepTrackPlugin {
         lines.push(this.t_('caption.site').replace('{site}', site));
       }
 
+      const ageOfElset = (sat as { ageOfElset?: (date: Date) => number } | undefined)?.ageOfElset;
+
+      if (sat?.name && typeof ageOfElset === 'function' && simTime instanceof Date) {
+        const ageDays = ageOfElset.call(sat, simTime);
+
+        if (Number.isFinite(ageDays)) {
+          const ageText = Math.abs(ageDays) >= 1 ? `${ageDays.toFixed(1)} d` : `${(ageDays * 24).toFixed(1)} h`;
+
+          lines.push(this.t_('caption.computed').replace('{age}', ageText));
+        }
+      }
+
       if (sat?.name && sat.source) {
         lines.push(this.t_('caption.source').replace('{source}', Screenshot.CATALOG_SOURCE_LABELS_[sat.source] ?? sat.source));
       }

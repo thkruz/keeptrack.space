@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "Stanowisko: {site}",
         "source": "Źródło: {source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "Widok obliczony: elementy orbity mają w tej chwili {age}"
       }
     }
   }

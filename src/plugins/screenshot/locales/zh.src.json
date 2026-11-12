@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "站点:{site}",
         "source": "来源:{source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "计算视图:此刻轨道要素已有 {age}"
       }
     }
   }

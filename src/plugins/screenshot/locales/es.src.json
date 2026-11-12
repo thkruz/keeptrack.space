@@ -19,7 +19,8 @@
         "norad": "{name} (NORAD {id})",
         "site": "Sitio: {site}",
         "source": "Fuente: {source}",
-        "utc": "{time} UTC"
+        "utc": "{time} UTC",
+        "computed": "Vista calculada: elementos orbitales con {age} de antigüedad en este momento"
       }
     }
   }

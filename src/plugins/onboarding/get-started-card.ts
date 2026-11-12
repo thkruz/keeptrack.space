@@ -22,6 +22,8 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
  */
 export class GetStartedCard {
   private readonly options_: GetStartedCardOptions;
+  /** Narrow viewports collapse the checklist rows to the header; this remembers the tap. */
+  private isExpanded_ = false;
 
   constructor(options: GetStartedCardOptions) {
     this.options_ = options;
@@ -74,7 +76,7 @@ export class GetStartedCard {
       .join('');
 
     slot.innerHTML =
-      '<div class="kt-get-started-card">' +
+      `<div class="kt-get-started-card${this.isExpanded_ ? ' kt-get-started-open' : ''}">` +
       '<div class="kt-get-started-header">' +
       `<span class="kt-get-started-title">${l('card.title')}</span>` +
       '<span class="kt-get-started-progress">' +
@@ -85,12 +87,17 @@ export class GetStartedCard {
       '</svg>' +
       `<span class="kt-get-started-percent">${percent}%</span>` +
       '</span>' +
+      `<button type="button" class="kt-get-started-toggle" aria-expanded="${this.isExpanded_}" aria-label="${l('card.title')}">${this.isExpanded_ ? '&#x25B4;' : '&#x25BE;'}</button>` +
       `<button type="button" class="kt-get-started-dismiss" aria-label="${l('card.dismiss')}">&#x2715;</button>` +
       '</div>' +
       `<div class="kt-get-started-rows">${rows}</div>` +
       '</div>';
 
     slot.querySelector('.kt-get-started-dismiss')?.addEventListener('click', () => this.options_.onDismiss());
+    slot.querySelector('.kt-get-started-toggle')?.addEventListener('click', () => {
+      this.isExpanded_ = !this.isExpanded_;
+      this.render();
+    });
     slot.querySelectorAll('[data-mission-id]').forEach((el) => {
       el.addEventListener('click', () => {
         const missionId = (el as HTMLElement).dataset.missionId;

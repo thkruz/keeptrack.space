@@ -409,6 +409,34 @@
   justify-content: space-between;
 }
 
+/* The collapse toggle only exists for narrow viewports. */
+.kt-get-started-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 2px 6px;
+}
+
+/* Narrow desktop: keep the checklist to one header row until the user opens it, so the card
+   and a toast do not push the menu a third of the way down the drawer. */
+@media (max-width: 640px) {
+  .kt-get-started-toggle {
+    display: inline-block;
+  }
+
+  .kt-get-started-card:not(.kt-get-started-open) .kt-get-started-rows {
+    display: none;
+  }
+
+  .kt-get-started-card {
+    margin: 4px 10px;
+    padding: 6px 12px;
+  }
+}
+
 /* Rail mode: compact the card to just the progress ring */
 .plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-card {
   padding: 6px;
@@ -418,6 +446,7 @@
 .plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-title,
 .plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-percent,
 .plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-dismiss,
+.plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-toggle,
 .plugin-drawer.rail-mode:not(.rail-hover) .kt-get-started-rows {
   display: none;
 }

@@ -64,6 +64,14 @@ export class GraphicsSettings {
   isDrawPoliticalLabels = false;
   isDrawCloudsMap = true;
 
+  // Pro "High quality graphics" (opt-in, applied by the Pro EarthAtmosphere plugin; all default off)
+  /** Sun glint on the oceans. */
+  hqOceanGlint = false;
+  /** Soft day/night terminator with warm night lights. */
+  hqSoftTerminator = false;
+  /** ACES filmic tonemap on the Earth surface. */
+  hqFilmicTonemap = false;
+
   // Earth Rendering
   /**
    * If false, skip drawing the Earth mesh entirely (debug only).

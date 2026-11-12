@@ -98,6 +98,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   // --- Device: hardware/perf-dependent graphics --------------------------------
   [StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE]: StorageScope.Device,
   [StorageKey.SETTINGS_DRAW_SWATH_FIELD_OF_REGARD]: StorageScope.Device,
+  [StorageKey.SETTINGS_HQ_GRAPHICS]: StorageScope.Device,
   [StorageKey.SETTINGS_DRAW_FLAG_DECALS]: StorageScope.Device,
   [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,

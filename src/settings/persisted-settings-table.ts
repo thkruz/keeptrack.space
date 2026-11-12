@@ -136,6 +136,21 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_HQ_GRAPHICS,
+    serialize: (sm) => JSON.stringify({ oceanGlint: sm.hqOceanGlint, softTerminator: sm.hqSoftTerminator, filmicTonemap: sm.hqFilmicTonemap }),
+    deserialize: (sm, raw) => {
+      try {
+        const v = JSON.parse(raw) as Record<string, unknown>;
+
+        sm.hqOceanGlint = v.oceanGlint === true;
+        sm.hqSoftTerminator = v.softTerminator === true;
+        sm.hqFilmicTonemap = v.filmicTonemap === true;
+      } catch {
+        // Corrupt value: keep the defaults (all off).
+      }
+    },
+  },
+  {
     key: StorageKey.SETTINGS_DRAW_FLAG_DECALS,
     serialize: (sm) => String(sm.isDrawFlagDecals),
     deserialize: (sm, raw) => {

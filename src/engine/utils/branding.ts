@@ -46,6 +46,22 @@ export const appendTextBrandFooter = (text: string, prefix = ''): string => {
   return `${text.replace(/[\r\n]+$/u, '')}${eol}${line}${eol}`;
 };
 
+/** One-line brand text for machine-format comment lines (OEM `COMMENT`, STK `#`). Never used for TLE files. */
+export const BRAND_COMMENT = FOOTER_TEXT;
+
+/** Prepends the brand line to a comment list (idempotent). For CCSDS `COMMENT` and STK `#` comment lines. */
+export const withBrandComment = (comments?: string[]): string[] => {
+  const list = comments ?? [];
+
+  return list.includes(BRAND_COMMENT) ? list : [BRAND_COMMENT, ...list];
+};
+
+/**
+ * Top-level `meta` field for JSON exports whose root is an object. Importers ignore unknown keys.
+ * Do not add it to exports whose consumers expect a bare array.
+ */
+export const brandJsonMeta = (): { generator: string; url: string } => ({ generator: BRAND_NAME, url: BRAND_URL });
+
 /** Rows for the extra XLSX sheet (kept off the data sheet so spreadsheet importers are not affected). */
 export const brandSheetRows = (): string[][] => [[BRAND_NAME], [FOOTER_TEXT], [BRAND_URL]];
 

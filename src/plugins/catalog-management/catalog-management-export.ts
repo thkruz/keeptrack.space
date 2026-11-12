@@ -24,6 +24,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { withBrandComment } from '@app/engine/utils/branding';
 import { Satellite } from '@ootk/src/main';
 import { saveAs } from 'file-saver';
 
@@ -160,7 +161,7 @@ export function formatStkEphemeris(rows: StkEphemerisRow[], opts: StkEphemerisEx
 
   return [
     'stk.v.11.0',
-    ...(opts.comments ?? []).map((comment) => `# ${comment.replace(/[\r\n]+/gu, ' ')}`),
+    ...withBrandComment(opts.comments).map((comment) => `# ${comment.replace(/[\r\n]+/gu, ' ')}`),
     'BEGIN Ephemeris',
     `NumberOfEphemerisPoints ${rows.length}`,
     `ScenarioEpoch ${formatStkEpoch(opts.scenarioEpoch)}`,

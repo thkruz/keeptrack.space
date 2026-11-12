@@ -792,6 +792,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'LightCurvePlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/light-curve/light-curve') : undefined,
+    proClassName: 'LightCurvePlugin',
+    defaultConfig: { enabled: true, order: 428 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'EclipseSolarAnalysis',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/eclipse-solar-analysis/eclipse-solar-analysis') : undefined,
     proClassName: 'EclipseSolarAnalysis',

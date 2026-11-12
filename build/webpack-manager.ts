@@ -462,6 +462,7 @@ export class WebpackManager {
       entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
       entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];
       entry.observabilityWorker = ['./src/plugins-pro/observability-planner/observabilityWorker.ts'];
+      entry.lightCurveWorker = ['./src/plugins-pro/light-curve/lightCurveWorker.ts'];
     }
 
     return ({

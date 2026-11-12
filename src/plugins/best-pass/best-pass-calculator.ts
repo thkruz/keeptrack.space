@@ -433,9 +433,10 @@ export const normalizePassRows = (passes: lookanglesRow[]): lookanglesRow[] => {
  * callers are unchanged. A decayed object or a TLE the propagator rejects yields null
  * elevations for every sample and no passes, without throwing.
  */
-export const trackRaeFailure = (getRae: GetRaeFn): { getRae: GetRaeFn; failed: () => boolean } => {
+export const trackRaeFailure = (getRae: GetRaeFn): { getRae: GetRaeFn; failed: () => boolean; peakElDeg: (sensor: DetailedSensor) => number | null } => {
   let samples = 0;
   let resolved = 0;
+  const peaks = new Map<DetailedSensor, number>();
 
   return {
     getRae: (date, satrec, sensor) => {
@@ -444,10 +445,15 @@ export const trackRaeFailure = (getRae: GetRaeFn): { getRae: GetRaeFn; failed: (
       samples++;
       if (typeof rae.el === 'number' && Number.isFinite(rae.el)) {
         resolved++;
+        if (rae.el > (peaks.get(sensor) ?? Number.NEGATIVE_INFINITY)) {
+          peaks.set(sensor, rae.el);
+        }
       }
 
       return rae;
     },
     failed: () => samples > 0 && resolved === 0,
+    /** Highest geometric elevation seen from this sensor at the sampled times (ignores the field of view), or null when none resolved. */
+    peakElDeg: (sensor) => peaks.get(sensor) ?? null,
   };
 };

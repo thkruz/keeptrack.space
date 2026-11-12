@@ -67,3 +67,18 @@ describe('BestPassPlugin sync search records a never-propagating object as faile
     expect(plugin.lastFailedIds_).toEqual([defaultSat.sccNum]);
   });
 });
+
+describe('trackRaeFailure peak elevation', () => {
+  it('tracks the highest sampled elevation per sensor and null when never sampled', () => {
+    const els = [5, 42.5, 20];
+    let n = 0;
+    const other = { ...defaultSensor } as never;
+    const t = trackRaeFailure(() => ({ az: 1, el: els[n++ % els.length], rng: 1000 }));
+
+    for (let k = 0; k < 3; k++) {
+      t.getRae(new Date(k), {} as never, defaultSensor as never);
+    }
+    expect(t.peakElDeg(defaultSensor as never)).toBeCloseTo(42.5, 6);
+    expect(t.peakElDeg(other)).toBeNull();
+  });
+});

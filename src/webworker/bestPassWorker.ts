@@ -94,7 +94,15 @@ self.onmessage = async function onmessage(event: MessageEvent<BpWorkerInMsg>) {
         truncatedIds.push(sat.sccNum);
       }
 
-      postMessage({ typ: BpWorkerOutMsgType.CHUNK, runId, passes: satPasses, satId: sat.sccNum, failed: satFailed, truncated: satTruncated });
+      postMessage({
+        typ: BpWorkerOutMsgType.CHUNK,
+        runId,
+        passes: satPasses,
+        satId: sat.sccNum,
+        failed: satFailed,
+        truncated: satTruncated,
+        peakElDeg: sensors.map((s) => tracker.peakElDeg(s)),
+      });
       postMessage({ typ: BpWorkerOutMsgType.PROGRESS, runId, processed: i + 1, total });
 
       // Yield so a CANCEL message can be received between satellites.

@@ -286,3 +286,12 @@ describe('UrlManager.getShareUrl', () => {
     expect(window.location.href).toBe(before);
   });
 });
+
+describe('UrlManager.registerShareParamProvider', () => {
+  it('adds a provider slice to the share url and ignores providers that return null', () => {
+    UrlManager.registerShareParamProvider(() => 'zz=1');
+    UrlManager.registerShareParamProvider(() => null);
+
+    expect(UrlManager.getShareUrl()).toContain('zz=1');
+  });
+});

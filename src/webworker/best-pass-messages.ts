@@ -74,6 +74,8 @@ export interface BpOutChunk {
   failed?: boolean;
   /** True when this satellite hit the per-satellite result cap at any site. */
   truncated?: boolean;
+  /** Highest sampled elevation (deg) per sensor, parallel to the START sensors; null when no sample resolved. */
+  peakElDeg?: (number | null)[];
 }
 
 export interface BpOutProgress {

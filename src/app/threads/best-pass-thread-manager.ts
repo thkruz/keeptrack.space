@@ -24,6 +24,8 @@ export interface BestPassChunkInfo {
   satId: string;
   failed: boolean;
   truncated: boolean;
+  /** Highest sampled elevation (deg) per sensor, parallel to the search sensors. */
+  peakElDeg?: (number | null)[];
 }
 
 export interface BestPassCallbacks {
@@ -71,7 +73,7 @@ export class BestPassThreadManager extends WebWorkerThreadManager {
           const chunk = data as BpOutChunk;
 
           if (typeof chunk.satId === 'string') {
-            this.callbacks_.onChunk(chunk.passes, { satId: chunk.satId, failed: chunk.failed === true, truncated: chunk.truncated === true });
+            this.callbacks_.onChunk(chunk.passes, { satId: chunk.satId, failed: chunk.failed === true, truncated: chunk.truncated === true, peakElDeg: chunk.peakElDeg });
           } else {
             this.callbacks_.onChunk(chunk.passes);
           }

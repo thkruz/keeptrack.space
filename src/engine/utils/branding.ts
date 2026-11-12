@@ -34,6 +34,23 @@ export const appendCsvBrandFooter = (csv: string): string => {
   return `${trimmed}${eol}${CSV_BRAND_FOOTER}${eol}`;
 };
 
+/**
+ * Brands CSV text. A CSV that already opens with `#` comment lines (a metadata preamble) gets the brand row
+ * as its first line so it is visible at the top; any other CSV keeps the brand row last, because moving a
+ * `#` row above the column header would break header-keyed parsers. Idempotent.
+ */
+export const brandCsv = (csv: string): string => {
+  if (csv.includes(CSV_BRAND_FOOTER)) {
+    return csv;
+  }
+  if (!csv.startsWith('#')) {
+    return appendCsvBrandFooter(csv);
+  }
+  const eol = csv.includes('\r\n') ? '\r\n' : '\n';
+
+  return `${CSV_BRAND_FOOTER}${eol}${csv}`;
+};
+
 /** Appends a plain brand line to text for the clipboard or a text file (idempotent). */
 export const appendTextBrandFooter = (text: string, prefix = ''): string => {
   const line = `${prefix}${FOOTER_TEXT}`;

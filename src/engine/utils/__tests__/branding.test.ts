@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 import { describe, expect, it } from 'vitest';
-import { appendCsvBrandFooter, appendTextBrandFooter, BRAND_URL, brandHtmlDocument, CSV_BRAND_FOOTER } from '../branding';
+import { appendCsvBrandFooter, appendTextBrandFooter, BRAND_URL, brandCsv, brandHtmlDocument, CSV_BRAND_FOOTER } from '../branding';
 import { createBrandedCsvBlob, createCsvBlob, stripUtf8Bom } from '../saveVariable';
 
 describe('branding', () => {
@@ -30,6 +30,15 @@ describe('branding', () => {
 
     expect(stripUtf8Bom(branded)).toContain(BRAND_URL);
     expect(plain).not.toContain(BRAND_URL);
+  });
+
+  it('brandCsv puts the brand row first when the CSV opens with # comment lines, once', async () => {
+    const csv = brandCsv('# SIMULATED\n# Object: X\na,b\n1,2\n');
+
+    expect(csv.startsWith(CSV_BRAND_FOOTER)).toBe(true);
+    expect(brandCsv(csv)).toBe(csv);
+    expect(brandCsv('a,b\n1,2\n').trimEnd().endsWith(CSV_BRAND_FOOTER)).toBe(true);
+    expect(stripUtf8Bom(await createBrandedCsvBlob('# note\na,b\n').text()).startsWith(CSV_BRAND_FOOTER)).toBe(true);
   });
 
   it('adds a text footer once', () => {

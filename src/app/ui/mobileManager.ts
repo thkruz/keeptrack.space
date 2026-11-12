@@ -14,6 +14,7 @@ import { t7e } from '@app/locales/keys';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
+import { MobileZoomButtons } from './mobile-zoom-buttons';
 
 export class MobileManager {
   static readonly MOBILE_ORBIT_LIMIT = 1500;
@@ -159,6 +160,8 @@ export class MobileManager {
             ServiceLocator.getUiManager().searchManager.closeSearch();
             hideEl('actions-section');
           });
+
+          EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => MobileZoomButtons.init());
 
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;

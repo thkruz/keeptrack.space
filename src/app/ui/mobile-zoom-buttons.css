@@ -1,0 +1,26 @@
+#mobile-zoom-buttons {
+  position: fixed;
+  right: 12px;
+  bottom: 30%;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#mobile-zoom-buttons button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+#mobile-zoom-buttons button:active {
+  background: rgb(255 255 255 / 25%);
+}

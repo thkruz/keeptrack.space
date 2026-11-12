@@ -24,7 +24,7 @@
         "beamWidth": "Lineární šířka v dosahu cíle",
         "maxTmxTime": "Čas potřebný pro RF/světlo k dosažení cíle a zpět",
         "sun": "Ovlivňuje Slunce senzor",
-        "visMag": "Odhadnutá vizuální magnituda (nižší čísla znamenají vyšší jas). Vypočteno ze standardního magnitudového modelu; skutečný jas závisí na orientaci a fázi.",
+        "visMag": "Odhadnutá vizuální magnituda (nižší čísla znamenají vyšší jas). Vypočteno ze standardního magnitudového modelu; skutečný jas závisí na orientaci a fázi. Předpokládá jasnou oblohu; počasí a oblačnost se nezohledňují.",
         "nextPass": "Příští průchod v pokrytí",
         "reason": "Proč je objekt mimo zorné pole senzoru"
       },

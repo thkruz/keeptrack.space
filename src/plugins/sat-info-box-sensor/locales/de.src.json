@@ -24,7 +24,7 @@
         "beamWidth": "Lineare Breite bei der Entfernung des Ziels",
         "maxTmxTime": "Zeit für RF/Licht zum Ziel und zurück",
         "sun": "Beeinflusst die Sonne den Sensor",
-        "visMag": "Geschätzte visuelle Magnitude (niedrigere Zahlen sind heller). Berechnet aus einem Standardhelligkeitsmodell; die tatsächliche Helligkeit hängt von Lage und Phase ab.",
+        "visMag": "Geschätzte visuelle Magnitude (niedrigere Zahlen sind heller). Berechnet aus einem Standardhelligkeitsmodell; die tatsächliche Helligkeit hängt von Lage und Phase ab. Setzt klaren Himmel voraus; Wetter und Bewölkung werden nicht berücksichtigt.",
         "nextPass": "Nächste Zeit in Abdeckung",
         "reason": "Warum das Objekt außerhalb des Sensor-Sichtfelds liegt"
       },

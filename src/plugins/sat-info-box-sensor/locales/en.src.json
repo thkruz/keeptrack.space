@@ -24,7 +24,7 @@
         "beamWidth": "Linear Width at Target's Range",
         "maxTmxTime": "Time for RF/Light to Reach Target and Back",
         "sun": "Does the Sun Impact the Sensor",
-        "visMag": "Estimated visual magnitude (lower numbers are brighter). Computed from a standard-magnitude model; real brightness varies with attitude and phase.",
+        "visMag": "Estimated visual magnitude (lower numbers are brighter). Computed from a standard-magnitude model; real brightness varies with attitude and phase. Assumes a clear sky; weather and cloud cover are not considered.",
         "nextPass": "Next Time in Coverage",
         "reason": "Why the object is outside the sensor field of view"
       },

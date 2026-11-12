@@ -24,7 +24,7 @@
         "beamWidth": "Ancho lineal en el alcance del objetivo",
         "maxTmxTime": "Tiempo para que RF/Luz alcance el objetivo y regrese",
         "sun": "¿Afecta el Sol al Sensor?",
-        "visMag": "Magnitud visual estimada (números más bajos son más brillantes). Calculada con un modelo de magnitud estándar; el brillo real varía con la actitud y la fase.",
+        "visMag": "Magnitud visual estimada (números más bajos son más brillantes). Calculada con un modelo de magnitud estándar; el brillo real varía con la actitud y la fase. Supone un cielo despejado; no se tienen en cuenta el clima ni la nubosidad.",
         "nextPass": "Próxima vez en cobertura",
         "reason": "Por qué el objeto está fuera del campo de visión del sensor"
       },

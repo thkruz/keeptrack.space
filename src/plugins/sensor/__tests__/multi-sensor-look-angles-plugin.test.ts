@@ -162,6 +162,40 @@ describe('MultiSensorLookAnglesPlugin look-angle computation', () => {
     expect(getEl('multi-sensor-look-angles-sensor-list')!.querySelectorAll('button').length).toBeGreaterThan(0);
   });
 
+  it('lists every active custom site (primary and secondary) as a toggle, once each (#98)', () => {
+    if (!getEl('multi-sensor-look-angles-sensor-list', true)) {
+      document.body.insertAdjacentHTML('beforeend', '<div id="multi-sensor-look-angles-sensor-list"></div>');
+    }
+    const named = defaultSensor.clone();
+
+    named.objName = 'COD';
+    named.uiName = 'Catalog';
+    p().sensorList_ = [named];
+
+    const ridge = defaultSensor.clone();
+    const coast = defaultSensor.clone();
+
+    ridge.objName = 'Custom Sensor-aaa';
+    ridge.uiName = 'RIDGE';
+    ridge.isCustomSensor = true;
+    coast.objName = 'Custom Sensor-bbb';
+    coast.uiName = 'COAST';
+    coast.isCustomSensor = true;
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [ridge];
+    sensorManager.secondarySensors = [coast, coast];
+
+    p().refreshSideMenuData(defaultSat);
+    vi.advanceTimersByTime(2000);
+
+    const labels = Array.from(getEl('multi-sensor-look-angles-sensor-list')!.querySelectorAll('button')).map((b) => b.innerText);
+
+    expect(labels).toEqual(['Catalog', 'RIDGE', 'COAST']);
+    sensorManager.currentSensors = [];
+    sensorManager.secondarySensors = [];
+  });
+
   it('populateMultiSiteTable_ renders rows for the look-angle entries', () => {
     const entry: TearrData = { time: '2022-01-01T00:00:00.000Z', az: 100 as Degrees, el: 10 as Degrees, rng: 500 as Kilometers, objName: 'COD' };
 

@@ -1,6 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { isCustomSensor } from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -213,6 +214,25 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * Catalog sensors plus any custom sites the user has active (primary or secondary).
+   * Custom sites are on by default (they were added deliberately) and de-duplicated by objName.
+   */
+  private getSelectableSensors_(): DetailedSensor[] {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const active = [...(sensorManager.currentSensors ?? []), ...(sensorManager.secondarySensors ?? [])];
+    const custom = active.filter((s) => isCustomSensor(s) && s.objName);
+    const list = [...this.sensorList_];
+
+    for (const sensor of custom) {
+      if (!list.some((s) => s.objName === sensor.objName)) {
+        list.push(sensor);
+      }
+    }
+
+    return list;
+  }
+
   private refreshSideMenuData(sat: Satellite) {
     if (this.isMenuButtonActive) {
       if (sat) {
@@ -230,7 +250,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
           const allSensors: DetailedSensor[] = [];
 
-          for (const sensor of this.sensorList_) {
+          for (const sensor of this.getSelectableSensors_()) {
             if (!sensor.objName) {
               continue;
             }
@@ -280,7 +300,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (!sensors) {
-      sensors = this.sensorList_;
+      sensors = this.getSelectableSensors_();
     }
 
     const isResetToDefault = !sensorManagerInstance.isSensorSelected();

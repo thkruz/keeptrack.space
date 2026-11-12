@@ -239,6 +239,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     switch (targetId) {
       case 'create-observer-rmb':
+        ServiceLocator.getUiManager().hideSideMenus();
         slideInRight(getEl('custom-sensor-menu'), 300);
         this.setBottomIconToSelected();
         sensorManagerInstance.isCustomSensorMenuOpen = true;
@@ -264,6 +265,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         break;
       case 'create-sensor-rmb':
         {
+          ServiceLocator.getUiManager().hideSideMenus();
           slideInRight(getEl('custom-sensor-menu'), 300);
           this.setBottomIconToSelected();
           sensorManagerInstance.isCustomSensorMenuOpen = true;
@@ -652,7 +654,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     if (!note) {
       return;
     }
-    note.textContent = sensorName === null ? '' : t7e('plugins.CustomSensorPlugin.prefillNote' as Parameters<typeof t7e>[0], { name: sensorName });
+    note.textContent = sensorName === null ? '' : t7e('plugins.CustomSensorPlugin.labels.prefillNote' as Parameters<typeof t7e>[0], { name: sensorName });
     note.style.display = sensorName === null ? 'none' : '';
   }
 
@@ -666,6 +668,16 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
    */
   /** Identity (objName) of the sensor the last successful submit created; the action subject. */
   private static lastCreatedSensorId_: string | undefined;
+
+  /** An active sensor (primary or secondary) with the same display name, latitude and longitude. */
+  private static findActiveTwin_(values: { uiName: string; lat: number; lon: number }): DetailedSensor | undefined {
+    const sm = ServiceLocator.getSensorManager();
+    const name = resolveCustomSensorName(values.uiName);
+
+    return [...(sm.currentSensors ?? []), ...(sm.secondarySensors ?? [])].find(
+      (s) => s?.isSensor?.() && (s.uiName ?? s.name) === name && s.lat === values.lat && s.lon === values.lon
+    );
+  }
 
   private static processCustomSensorSubmit_(isReplaceSensor = false): 'added' | 'rejected' | 'duplicate' {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
@@ -687,6 +699,11 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       errorManagerInstance.warn(t7e(`plugins.CustomSensorPlugin.errorMsgs.${errorKey}` as Parameters<typeof t7e>[0], { pair }));
 
       return 'rejected';
+    }
+
+    // Same name and position as a sensor already active: adding it again would list it twice
+    if (!isReplaceSensor && CustomSensorPlugin.findActiveTwin_(values)) {
+      return 'duplicate';
     }
 
     CustomSensorPlugin.lastSubmit_ = { key: submitKey, at: now };

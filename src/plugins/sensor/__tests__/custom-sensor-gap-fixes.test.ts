@@ -115,6 +115,18 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect(addSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('does not add a sensor whose name and position match an active one', () => {
+    setForm();
+    submitForm();
+    const added = addSpy.mock.calls[0][0] as DetailedSensor;
+
+    ServiceLocator.getSensorManager().secondarySensors = [added];
+    vi.advanceTimersByTime(1500);
+    submitForm();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('accepts a different sensor submitted right after the first', () => {
     setForm();
     submitForm();
@@ -176,7 +188,7 @@ describe('CustomSensorPlugin gap fixes', () => {
     const note = getEl('cs-prefill-note')!;
 
     expect(note.style.display).toBe('');
-    expect(note.textContent).toContain('prefillNote'); // key echo until generate-t7e/locales load in tests
+    expect(note.textContent).not.toContain('prefillNote'); // rendered text, not the raw key
   });
 
   it('labels the range fields in km and the mask placeholder is not a sample mask', () => {

@@ -172,4 +172,22 @@ describe('DraggableBox', () => {
       expect(el.style.top).not.toBe('999px');
     });
   });
+
+  describe('drag geometry', () => {
+    it('fixes the floating size on pointerDown, before Draggabilly measures containment', () => {
+      const box = new TestBox('geo-box');
+
+      box.open();
+      const draggie = (box as unknown as { draggie: { on: ReturnType<typeof vi.fn> } }).draggie;
+      const call = draggie.on.mock.calls.find(([name]: [string]) => name === 'pointerDown');
+      const el = document.getElementById('geo-box')!;
+
+      expect(draggie.on.mock.calls.some(([name]: [string]) => name === 'dragStart')).toBe(false);
+      expect(call).toBeDefined();
+      call![1]();
+
+      expect(el.style.height).toBe('fit-content');
+      expect(el.style.maxHeight).toBe('80%');
+    });
+  });
 });

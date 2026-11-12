@@ -108,11 +108,15 @@ export abstract class DraggableBox {
       this.draggie = new Draggabilly(boxContent, {
         containment: getEl('canvas-holder')!,
       });
-      this.draggie.on('dragStart', () => {
-        boxContent.style.height = 'fit-content';
-        boxContent.style.maxHeight = '80%';
-      });
+      // Draggabilly measures containment right before it emits dragStart, so the
+      // final floating size must be set on pointerDown (which fires earlier).
       this.draggie.on('pointerDown', () => {
+        if (boxContent.style.height !== 'fit-content') {
+          boxContent.style.height = 'fit-content';
+        }
+        if (boxContent.style.maxHeight !== '80%') {
+          boxContent.style.maxHeight = '80%';
+        }
         this.sendToFront();
       });
       boxContent.addEventListener('mousedown', (e: MouseEvent) => {

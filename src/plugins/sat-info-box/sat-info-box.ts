@@ -212,6 +212,26 @@ export class SatInfoBox extends KeepTrackPlugin {
     });
   }
 
+  /** Pulls a just-enlarged floating box back inside its container and refreshes Draggabilly's containment. */
+  static clampAfterResize_(
+    draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number }; measureContainment?: () => void },
+    el: HTMLElement,
+    container: HTMLElement
+  ): void {
+    const overflow = el.getBoundingClientRect().bottom - container.getBoundingClientRect().bottom;
+
+    if (overflow > 0) {
+      const newTop = Math.max(0, draggie.position.y - overflow);
+
+      draggie.position.y = newTop;
+      if (draggie.startPosition) {
+        draggie.startPosition.y = newTop;
+      }
+      el.style.top = `${newTop}px`;
+    }
+    draggie.measureContainment?.();
+  }
+
   private initDraggabilly() {
     if (!settingsManager.isMobileModeEnabled) {
       const draggie = new Draggabilly(getEl(SatInfoBox.containerId_)!, {
@@ -227,6 +247,10 @@ export class SatInfoBox extends KeepTrackPlugin {
         satInfoBoxElement.classList.remove('satinfo-fixed');
 
         getEl('search-results')!.style.maxHeight = '85%';
+
+        // Draggabilly measured containment before this handler grew the box (45% to 80% max height),
+        // so re-clamp it now or the first drag lets the bottom edge leave the viewport.
+        SatInfoBox.clampAfterResize_(draggie, satInfoBoxElement, KeepTrack.getInstance().containerRoot);
       });
 
       draggie.on('pointerDown', () => {

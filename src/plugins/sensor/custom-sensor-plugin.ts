@@ -181,6 +181,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             <label for="cs-mask" class="active">${l('horizonMask')}</label>
           </div>
         </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipTimeZone')}">
+            <input id="cs-timezone" type="text" spellcheck="false" autocomplete="off" placeholder="America/New_York" />
+            <label for="cs-timezone" class="active">${l('timeZone')}</label>
+          </div>
+        </div>
       </section>
 
       <button id="cs-submit" type="submit" name="action" class="kt-action waves-effect">
@@ -547,6 +553,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       minRng: parseFloat(value('cs-minrange')),
       maxRng: parseFloat(value('cs-maxrange')),
       mask: (getEl('cs-mask', true) as HTMLTextAreaElement | null)?.value ?? '',
+      timeZone: (getEl('cs-timezone', true) as HTMLInputElement | null)?.value ?? '',
     };
   }
 

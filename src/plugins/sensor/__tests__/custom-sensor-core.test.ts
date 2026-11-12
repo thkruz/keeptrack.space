@@ -209,6 +209,7 @@ describe('custom-sensor-core form round trip', () => {
       'cs-minrange': '0',
       'cs-maxrange': '1000',
       'cs-mask': '0,5\n180,10',
+      'cs-timezone': '',
     });
   });
 

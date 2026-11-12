@@ -20,6 +20,7 @@ import {
   resolveCustomSensorName,
 } from '@app/app/sensors/custom-sensor-identity';
 import type { DetailedSensorParams } from '@app/app/sensors/DetailedSensor';
+import { normalizeTimeZone } from '@app/app/sensors/site-time-zone';
 import { Degrees, ElevationMask, Kilometers, SpaceObjectType, ZoomValue } from '@ootk/src/main';
 
 /** Bump when the record shape changes incompatibly; older documents are ignored. */
@@ -42,6 +43,8 @@ export interface CustomSensorRecord {
   zoom?: ZoomValue;
   elevationMasks?: ElevationMask[];
   interpolateMask?: boolean;
+  /** Optional IANA time zone of the site. */
+  timeZone?: string;
 }
 
 /** The persisted document. */
@@ -71,6 +74,7 @@ export interface CustomSensorSource {
   elevationMasks?: ElevationMask[];
   interpolateMask?: boolean;
   isCustomSensor?: boolean;
+  timeZone?: string;
 }
 
 const NUMERIC_FIELDS = ['lat', 'lon', 'alt', 'minAz', 'maxAz', 'minEl', 'maxEl', 'minRng', 'maxRng'] as const;
@@ -98,6 +102,9 @@ export function toCustomSensorRecord(sensor: CustomSensorSource): CustomSensorRe
   if (sensor.elevationMasks && sensor.elevationMasks.length > 0) {
     record.elevationMasks = sensor.elevationMasks.map((m) => ({ ...m }));
     record.interpolateMask = sensor.interpolateMask === true;
+  }
+  if (sensor.timeZone) {
+    record.timeZone = sensor.timeZone;
   }
 
   return record;
@@ -205,6 +212,12 @@ export function customSensorParamsFromRecord(record: CustomSensorRecord): Detail
   if (record.elevationMasks && record.elevationMasks.length > 0) {
     params.elevationMasks = record.elevationMasks.map((m) => ({ ...m }));
     params.interpolateMask = record.interpolateMask === true;
+  }
+  // Re-validate on load: a stale or hand-edited zone must not reach Intl and throw
+  const timeZone = normalizeTimeZone(record.timeZone);
+
+  if (timeZone) {
+    params.timeZone = timeZone;
   }
 
   return params;

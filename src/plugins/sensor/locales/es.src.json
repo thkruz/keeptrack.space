@@ -94,7 +94,9 @@
         "tooltipMinRange": "Rango en kilómetros (ej: 500)",
         "tooltipMaxRange": "Rango en kilómetros (ej: 20000)",
         "horizonMask": "Máscara de horizonte (az,el por línea)",
-        "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89."
+        "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89.",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "Crear",
@@ -130,7 +132,8 @@
         "maskBadPair": "Máscara de horizonte: no se puede usar \"{{pair}}\". Escriba az,el con 0 <= az < 360 y 0 <= el <= 89.",
         "maskDuplicateAz": "Máscara de horizonte: el acimut de \"{{pair}}\" aparece más de una vez.",
         "maskTooFew": "La máscara de horizonte necesita al menos 2 puntos.",
-        "maskTooMany": "La máscara de horizonte admite como máximo 72 puntos."
+        "maskTooMany": "La máscara de horizonte admite como máximo 72 puntos.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Identidad",

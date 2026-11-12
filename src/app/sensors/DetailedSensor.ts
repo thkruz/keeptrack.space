@@ -124,6 +124,8 @@ export interface DetailedSensorParams extends Omit<GroundStationParams, 'id'> {
   volume?: boolean;
   /** True for user-created sensors; identity flag independent of the display name */
   isCustomSensor?: boolean;
+  /** Optional IANA time zone of the site (typed by the user); empty means the browser zone */
+  timeZone?: string;
   /** Where the site coordinates were published (station presets) */
   sourceUrl?: string;
   /** ISO date (YYYY-MM-DD) the source was retrieved */
@@ -219,6 +221,8 @@ export class DetailedSensor extends GroundStation {
   volume?: boolean;
   /** True for user-created sensors; identity flag independent of the display name */
   isCustomSensor?: boolean;
+  /** Optional IANA time zone of the site; undefined means the browser zone */
+  timeZone?: string;
   sourceUrl?: string;
   sourceRetrieved?: string;
 
@@ -291,6 +295,7 @@ export class DetailedSensor extends GroundStation {
     this.isVolumetric = params.isVolumetric;
     this.volume = params.volume;
     this.isCustomSensor = params.isCustomSensor;
+    this.timeZone = params.timeZone;
     this.sourceUrl = params.sourceUrl;
     this.sourceRetrieved = params.sourceRetrieved;
 
@@ -767,6 +772,7 @@ export class DetailedSensor extends GroundStation {
       isVolumetric: this.isVolumetric,
       volume: this.volume,
       isCustomSensor: this.isCustomSensor,
+      timeZone: this.timeZone,
       sourceUrl: this.sourceUrl,
       sourceRetrieved: this.sourceRetrieved,
       active: this.active,

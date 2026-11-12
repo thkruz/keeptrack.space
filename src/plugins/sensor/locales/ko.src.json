@@ -94,7 +94,9 @@
         "tooltipMinRange": "킬로미터 단위의 거리 (예: 500)",
         "tooltipMaxRange": "킬로미터 단위의 거리 (예: 20000)",
         "horizonMask": "지평선 마스크 (한 줄에 az,el)",
-        "tooltipHorizonMask": "선택 사항. 방위각,고각(도) 점을 한 줄에 하나씩 또는 세미콜론으로 구분해 입력합니다. 최소 고각은 점 사이에서 보간되며 360에서 이어집니다. 2~72개 점, 0 <= az < 360, 0 <= el <= 89."
+        "tooltipHorizonMask": "선택 사항. 방위각,고각(도) 점을 한 줄에 하나씩 또는 세미콜론으로 구분해 입력합니다. 최소 고각은 점 사이에서 보간되며 360에서 이어집니다. 2~72개 점, 0 <= az < 360, 0 <= el <= 89.",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "생성",
@@ -130,7 +132,8 @@
         "maskBadPair": "지평선 마스크: \"{{pair}}\"을(를) 사용할 수 없습니다. 0 <= az < 360, 0 <= el <= 89인 az,el로 입력하세요.",
         "maskDuplicateAz": "지평선 마스크: \"{{pair}}\"의 방위각이 두 번 이상 나옵니다.",
         "maskTooFew": "지평선 마스크에는 최소 2개의 점이 필요합니다.",
-        "maskTooMany": "지평선 마스크는 최대 72개의 점까지 허용됩니다."
+        "maskTooMany": "지평선 마스크는 최대 72개의 점까지 허용됩니다.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "식별 정보",

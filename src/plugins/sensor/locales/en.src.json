@@ -94,7 +94,9 @@
         "tooltipMinRange": "Range in kilometers (ex: 500)",
         "tooltipMaxRange": "Range in kilometers (ex: 20000)",
         "horizonMask": "Horizon mask (az,el per line)",
-        "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89."
+        "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89.",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "Create",
@@ -130,7 +132,8 @@
         "maskBadPair": "Horizon mask: cannot use \"{{pair}}\". Write az,el with 0 <= az < 360 and 0 <= el <= 89.",
         "maskDuplicateAz": "Horizon mask: the azimuth in \"{{pair}}\" appears more than once.",
         "maskTooFew": "Horizon mask needs at least 2 points.",
-        "maskTooMany": "Horizon mask allows at most 72 points."
+        "maskTooMany": "Horizon mask allows at most 72 points.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Identity",

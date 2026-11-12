@@ -94,7 +94,9 @@
         "tooltipMinRange": "Portata in chilometri (es: 500)",
         "tooltipMaxRange": "Portata in chilometri (es: 20000)",
         "horizonMask": "Maschera d'orizzonte (az,el per riga)",
-        "tooltipHorizonMask": "Facoltativo. Punti azimut,elevazione in gradi, uno per riga o separati da punto e virgola. L'elevazione minima viene interpolata tra i punti e prosegue oltre 360. Da 2 a 72 punti, 0 <= az < 360, 0 <= el <= 89."
+        "tooltipHorizonMask": "Facoltativo. Punti azimut,elevazione in gradi, uno per riga o separati da punto e virgola. L'elevazione minima viene interpolata tra i punti e prosegue oltre 360. Da 2 a 72 punti, 0 <= az < 360, 0 <= el <= 89.",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "Crea",
@@ -130,7 +132,8 @@
         "maskBadPair": "Maschera d'orizzonte: impossibile usare \"{{pair}}\". Scrivi az,el con 0 <= az < 360 e 0 <= el <= 89.",
         "maskDuplicateAz": "Maschera d'orizzonte: l'azimut in \"{{pair}}\" compare più di una volta.",
         "maskTooFew": "La maschera d'orizzonte richiede almeno 2 punti.",
-        "maskTooMany": "La maschera d'orizzonte consente al massimo 72 punti."
+        "maskTooMany": "La maschera d'orizzonte consente al massimo 72 punti.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Identità",

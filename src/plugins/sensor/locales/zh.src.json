@@ -94,7 +94,9 @@
         "tooltipMinRange": "距离，单位为公里（例：500）",
         "tooltipMaxRange": "距离，单位为公里（例：20000）",
         "horizonMask": "地平线遮罩（每行 az,el）",
-        "tooltipHorizonMask": "可选。以度为单位的方位角,仰角点，每行一个或用分号分隔。最小仰角在各点之间插值，并在 360 处回绕。2 至 72 个点，0 <= az < 360，0 <= el <= 89。"
+        "tooltipHorizonMask": "可选。以度为单位的方位角,仰角点，每行一个或用分号分隔。最小仰角在各点之间插值，并在 360 处回绕。2 至 72 个点，0 <= az < 360，0 <= el <= 89。",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "创建",
@@ -130,7 +132,8 @@
         "maskBadPair": "地平线遮罩：无法使用“{{pair}}”。请按 az,el 填写，0 <= az < 360 且 0 <= el <= 89。",
         "maskDuplicateAz": "地平线遮罩：“{{pair}}”中的方位角出现了不止一次。",
         "maskTooFew": "地平线遮罩至少需要 2 个点。",
-        "maskTooMany": "地平线遮罩最多允许 72 个点。"
+        "maskTooMany": "地平线遮罩最多允许 72 个点。",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "标识",

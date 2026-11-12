@@ -12,6 +12,7 @@
 
 import { CUSTOM_SENSOR_DEFAULT_NAME, CUSTOM_SENSOR_OBJNAME_PREFIX, formatCustomSensorLocation, resolveCustomSensorName } from '@app/app/sensors/custom-sensor-identity';
 import type { DetailedSensorParams } from '@app/app/sensors/DetailedSensor';
+import { isValidTimeZone, normalizeTimeZone } from '@app/app/sensors/site-time-zone';
 import {
   Degrees,
   ElevationMask,
@@ -41,6 +42,8 @@ export interface CustomSensorFormValues {
   maxRng: number;
   /** Optional horizon mask text: `az,el` pairs, one per line or separated by semicolons. */
   mask?: string;
+  /** Optional IANA time zone of the site (e.g. "America/New_York"); empty means the browser zone. */
+  timeZone?: string;
 }
 
 /** Error keys {@link parseMask} can report (under `plugins.CustomSensorPlugin.errorMsgs`). */
@@ -181,6 +184,12 @@ export function validateCustomSensor(values: CustomSensorFormValues): string | n
     return 'rangeOrder';
   }
 
+  const zone = (values.timeZone ?? '').trim();
+
+  if (zone && !isValidTimeZone(zone)) {
+    return 'timeZoneInvalid';
+  }
+
   // Horizon mask last; the plugin fills the offending pair from parseMask(values.mask).badPair
   return parseMask(values.mask).error;
 }
@@ -219,6 +228,12 @@ export function buildCustomSensorParams(values: CustomSensorFormValues, objNameS
   if (masks.length > 0) {
     params.elevationMasks = masks;
     params.interpolateMask = true;
+  }
+
+  const timeZone = normalizeTimeZone(values.timeZone);
+
+  if (timeZone) {
+    params.timeZone = timeZone;
   }
 
   return params;
@@ -271,6 +286,7 @@ export interface CustomSensorFormSource {
   maxRng: number;
   elevationMasks?: ElevationMask[];
   interpolateMask?: boolean;
+  timeZone?: string;
 }
 
 /**
@@ -291,6 +307,7 @@ export function customSensorFormFromSensor(sensor: CustomSensorFormSource): Reco
     'cs-minrange': sensor.minRng.toString(),
     'cs-maxrange': sensor.maxRng.toString(),
     'cs-mask': formatMask(sensor.elevationMasks, sensor.interpolateMask),
+    'cs-timezone': sensor.timeZone ?? '',
   };
 }
 
@@ -313,5 +330,6 @@ export function customSensorSubmitKey(values: CustomSensorFormValues, isReplace:
     values.minRng,
     values.maxRng,
     (values.mask ?? '').trim(),
+    (values.timeZone ?? '').trim(),
   ]);
 }

@@ -143,6 +143,12 @@ export type lookanglesRow = {
   END_CLIPPED?: boolean;
   /** True when the sensor carried an azimuth-dependent horizon mask for this search. */
   MASK_APPLIED?: boolean;
+  /** Site-local wall-clock date/time of AOS and LOS and of the peak (Best Passes "site local" report mode). */
+  START_DATE_LOCAL?: string;
+  START_TIME_LOCAL?: string;
+  STOP_DATE_LOCAL?: string;
+  STOP_TIME_LOCAL?: string;
+  MAXIMUM_ELEVATION_TIME_LOCAL?: string;
   SENSOR_TO_SUN_AZIMUTH: string | null;
   SENSOR_TO_SUN_ELEVATION: string | null;
 };

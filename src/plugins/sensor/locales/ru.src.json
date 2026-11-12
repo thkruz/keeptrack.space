@@ -94,7 +94,9 @@
         "tooltipMinRange": "Дальность в километрах (например: 500)",
         "tooltipMaxRange": "Дальность в километрах (например: 20000)",
         "horizonMask": "Маска горизонта (az,el в строке)",
-        "tooltipHorizonMask": "Необязательно. Точки азимут,угол места в градусах, по одной в строке или через точку с запятой. Минимальный угол места интерполируется между точками и замыкается через 360. От 2 до 72 точек, 0 <= az < 360, 0 <= el <= 89."
+        "tooltipHorizonMask": "Необязательно. Точки азимут,угол места в градусах, по одной в строке или через точку с запятой. Минимальный угол места интерполируется между точками и замыкается через 360. От 2 до 72 точек, 0 <= az < 360, 0 <= el <= 89.",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "Создать",
@@ -130,7 +132,8 @@
         "maskBadPair": "Маска горизонта: нельзя использовать \"{{pair}}\". Укажите az,el при 0 <= az < 360 и 0 <= el <= 89.",
         "maskDuplicateAz": "Маска горизонта: азимут в \"{{pair}}\" встречается больше одного раза.",
         "maskTooFew": "Маске горизонта нужно не менее 2 точек.",
-        "maskTooMany": "Маска горизонта допускает не более 72 точек."
+        "maskTooMany": "Маска горизонта допускает не более 72 точек.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Идентификация",

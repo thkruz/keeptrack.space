@@ -94,7 +94,9 @@
         "tooltipMinRange": "キロメートル単位の距離（例：500）",
         "tooltipMaxRange": "キロメートル単位の距離（例：20000）",
         "horizonMask": "地平線マスク (1行に az,el)",
-        "tooltipHorizonMask": "任意。方位角,仰角（度）の点を1行に1つ、またはセミコロン区切りで入力します。最小仰角は点の間で補間され、360で一周します。2〜72点、0 <= az < 360、0 <= el <= 89。"
+        "tooltipHorizonMask": "任意。方位角,仰角（度）の点を1行に1つ、またはセミコロン区切りで入力します。最小仰角は点の間で補間され、360で一周します。2〜72点、0 <= az < 360、0 <= el <= 89。",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
       "rmbMenu": {
         "title": "作成",
@@ -130,7 +132,8 @@
         "maskBadPair": "地平線マスク: 「{{pair}}」は使用できません。0 <= az < 360、0 <= el <= 89 の az,el で入力してください。",
         "maskDuplicateAz": "地平線マスク: 「{{pair}}」の方位角が重複しています。",
         "maskTooFew": "地平線マスクには2点以上必要です。",
-        "maskTooMany": "地平線マスクは最大72点までです。"
+        "maskTooMany": "地平線マスクは最大72点までです。",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "識別情報",

@@ -131,3 +131,16 @@ describe('buildObjectLabelSpecs', () => {
     expect(extraLabelGlyphs('[1] ISS').filter((g) => g === glyphIndexOf('?'))).toHaveLength(0);
   });
 });
+
+describe('object labels on the flat map', () => {
+  it('anchors each object label to its catalog id, so the flat-map shader branch puts it at the dot on the ground track', () => {
+    const specs = buildObjectLabelSpecs([
+      { satId: 5, name: 'ISS', role: 'primary' },
+      { satId: 7, name: 'HST', role: 'secondary' },
+    ]);
+
+    expect(specs.map((s) => s.satId)).toEqual([5, 7]);
+    // No fixed ground point: the position is read from the live position buffer each frame in every camera mode.
+    expect(specs.every((s) => s.ground === undefined)).toBe(true);
+  });
+});

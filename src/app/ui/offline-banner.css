@@ -1,0 +1,32 @@
+/* Offline notice shown to everyone (signed in or not). Top-centre, non-blocking, never covers the bottom menu. */
+.kt-offline-banner {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9000;
+  box-sizing: border-box;
+  max-width: min(560px, calc(100vw - 32px));
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--kt-border-default, #3a3a3a);
+  background: var(--kt-bg-elevated, rgba(30, 30, 30, 0.9));
+  color: var(--kt-text-primary, #e6e6e6);
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: center;
+  pointer-events: none;
+}
+
+.kt-offline-banner[hidden] {
+  display: none;
+}
+
+.kt-offline-banner-catalog {
+  display: block;
+  color: var(--kt-text-secondary, #b5b5b5);
+}
+
+.kt-offline-banner-catalog[hidden] {
+  display: none;
+}

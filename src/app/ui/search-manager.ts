@@ -30,6 +30,7 @@ export interface SearchResult {
   searchType: SearchResultType; // Type of search result
   strIndex: number; // Index of the search string in the name
   patlen: number; // Length of the search string
+  partial?: boolean; // NORAD id only partially matches a numeric query
 }
 
 export enum SearchResultType {
@@ -674,6 +675,9 @@ export class SearchManager {
             html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += sat.sccNum.substring(result.strIndex + result.patlen);
+            if (result.partial) {
+              html += `<span class="search-partial-badge">${t7e('searchManager.partialMatch' as TranslationKey)}</span>`;
+            }
           }
           break;
         case SearchResultType.NORAD_ID_A5:
@@ -690,6 +694,9 @@ export class SearchManager {
             html += a5.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += a5.substring(result.strIndex + result.patlen);
+            if (result.partial) {
+              html += `<span class="search-partial-badge">${t7e('searchManager.partialMatch' as TranslationKey)}</span>`;
+            }
           }
           break;
         case SearchResultType.INTLDES:

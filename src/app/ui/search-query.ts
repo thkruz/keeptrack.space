@@ -18,6 +18,14 @@ function paddedSccKey(sat: Satellite): string {
 }
 
 /**
+ * True when a purely numeric query matches the NORAD id only as a substring
+ * ("70000" against 270000), so the row can be tagged apart from the exact hit.
+ */
+function isPartialNoradMatch(sat: Satellite, term: string): boolean {
+  return /^\d+$/u.test(term) && paddedSccKey(sat) !== term.padStart(6, '0');
+}
+
+/**
  * Highlight offsets for a numeric NORAD match, computed against the display
  * sccNum (which carries no leading zeros). The query is aligned by its
  * zero-stripped form so a leading zero the user typed for disambiguation is
@@ -130,7 +138,7 @@ function matchSatelliteOrMissile(
 
       const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
 
-      addResult_({ strIndex, searchType: SearchResultType.NORAD_ID, patlen, id: sat.id });
+      addResult_({ strIndex, searchType: SearchResultType.NORAD_ID, patlen, id: sat.id, partial: isPartialNoradMatch(sat, searchStringIn) });
 
       return;
     }
@@ -143,7 +151,13 @@ function matchSatelliteOrMissile(
    * leaving sccNum5 null.
    */
   if (searchableFields.noradId && sat.sccNum5?.includes(searchStringIn)) {
-    addResult_({ strIndex: sat.sccNum5.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID_A5, patlen: len, id: sat.id });
+    addResult_({
+      strIndex: sat.sccNum5.indexOf(searchStringIn),
+      searchType: SearchResultType.NORAD_ID_A5,
+      patlen: len,
+      id: sat.id,
+      partial: sat.sccNum5 !== searchStringIn && paddedSccKey(sat) !== searchStringIn.padStart(6, '0'),
+    });
 
     return;
   }
@@ -294,6 +308,7 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
         patlen,
         id: sat.id,
         searchType: SearchResultType.NORAD_ID,
+        partial: isPartialNoradMatch(sat, term),
       });
     }
   };

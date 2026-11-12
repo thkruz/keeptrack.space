@@ -17,6 +17,7 @@ import { BaseObject, Degrees, Radians, Satellite, SpaceObjectType, Star } from '
 import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
+import { runNumOnlySearch, runRegularSearch } from '../search-query';
 
 describe('SearchManager', () => {
   let searchManager: SearchManager;
@@ -261,6 +262,18 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
     });
 
+    it('flags only the substring NORAD hit as a partial match', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }), new Satellite({ ...defaultSat, id: 1, sccNum: '270000' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      for (const run of [runNumOnlySearch, runRegularSearch]) {
+        const { results } = run('70000');
+        const partialById = Object.fromEntries(results.map((r) => [r.id, Boolean(r.partial)]));
+
+        expect(partialById).toEqual({ 0: false, 1: true });
+      }
+    });
+
     it('disambiguates a leading-zero query for a shorter catalog number', () => {
       sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '5544' }), new Satellite({ ...defaultSat, id: 1, sccNum: '25544' })];
       wireUpServiceLocator(buildCatalog(sats));
@@ -359,6 +372,16 @@ describe('SearchManager', () => {
 
       searchManager.doSearch('T000');
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
+    });
+
+    it('flags partial alpha-5 hits but not the exact one', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, name: 'UNKNOWN', sccNum: 'A1234' }), new Satellite({ ...defaultSat, id: 1, name: 'UNKNOWN', sccNum: 'A1299' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      const partial = (q: string) => Object.fromEntries(runRegularSearch(q).results.map((r) => [r.id, Boolean(r.partial)]));
+
+      expect(partial('A12')).toEqual({ 0: true, 1: true });
+      expect(partial('A1234')).toEqual({ 0: false });
     });
 
     it('respects the NORAD ID field toggle for alpha-5 searches', () => {

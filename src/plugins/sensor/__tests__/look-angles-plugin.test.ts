@@ -62,6 +62,35 @@ describe('LookAnglesPlugin look-angle computation', () => {
     expect(getEl('looks')!.querySelectorAll('tr').length).toBeGreaterThan(0);
   });
 
+  it('rise/set mode adds an "In view now" row when the pass is already under way at the start time', () => {
+    p().lengthOfLookAngles_ = 0.002;
+    p().isRiseSetOnly_ = true;
+    const setRow = { time: '2026-01-01 00:00:30', rng: 900, az: 10, el: 5, type: TearrType.SET, inView: true } as TearrData;
+
+    vi.spyOn(SensorMath, 'getTearData').mockImplementation(
+      (_now, _satrec, _sensors, isRiseSet) => (isRiseSet ? setRow : { time: '2026-01-01 00:00:00', rng: 800, az: 5, el: 20, inView: true }) as TearrData
+    );
+    const rows = p().getlookangles_(defaultSat) as Array<{ inProgress?: boolean; type?: TearrType }>;
+
+    expect(rows[0].inProgress).toBe(true);
+    expect(rows[0].type).toBeUndefined();
+    expect(rows.slice(1).every((r) => r.type === TearrType.SET)).toBe(true);
+    expect(getEl('looks')!.textContent).toContain('In view now');
+  });
+
+  it('rise/set mode adds no "In view now" row when the first row is a Rise', () => {
+    p().lengthOfLookAngles_ = 0.002;
+    p().isRiseSetOnly_ = true;
+    const riseRow = { time: '2026-01-01 00:00:05', rng: 900, az: 10, el: 5, type: TearrType.RISE, inView: true } as TearrData;
+
+    vi.spyOn(SensorMath, 'getTearData').mockImplementation(
+      (_now, _satrec, _sensors, isRiseSet) => (isRiseSet ? riseRow : { time: '2026-01-01 00:00:00', rng: 800, az: 5, el: 20, inView: true }) as TearrData
+    );
+    const rows = p().getlookangles_(defaultSat) as Array<{ inProgress?: boolean }>;
+
+    expect(rows.some((r) => r.inProgress)).toBe(false);
+  });
+
   it('getlookangles_ returns an empty array when no sensor is selected', () => {
     ServiceLocator.getSensorManager().currentSensors = [];
 

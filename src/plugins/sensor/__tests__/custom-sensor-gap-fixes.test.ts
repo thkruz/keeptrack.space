@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -163,6 +165,21 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect(value('cs-mask')).toBe('0,5\n180,12');
     // Telescope off so the copied limits are visible
     expect((getEl('cs-telescope') as HTMLInputElement).checked).toBe(false);
+    // The form says the values were inherited, naming the source sensor
+    const note = getEl('cs-prefill-note')!;
+
+    expect(note.style.display).toBe('');
+    expect(note.textContent).toContain('prefillNote'); // key echo until generate-t7e/locales load in tests
+  });
+
+  it('labels the range fields in km and the mask placeholder is not a sample mask', () => {
+    const en = JSON.parse(readFileSync(resolve(__dirname, '../locales/en.src.json'), 'utf8')).plugins.CustomSensorPlugin.labels;
+
+    expect(en.minRange).toContain('(km)');
+    expect(en.maxRange).toContain('(km)');
+    expect(en.elevation).toContain('(km)');
+    expect(en.maskPlaceholder.includes(String.fromCharCode(10))).toBe(false);
+    expect((getEl('cs-mask') as HTMLTextAreaElement).placeholder.includes(String.fromCharCode(10))).toBe(false);
   });
 
   it('Clear Custom Sensors also resets a catalog primary sensor', () => {

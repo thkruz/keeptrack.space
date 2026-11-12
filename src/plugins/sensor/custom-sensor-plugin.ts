@@ -53,6 +53,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         CustomSensorPlugin.prefillFromSensor_(sensorManagerInstance.currentSensors[0]);
       } else {
         (<HTMLInputElement>getEl('cs-replace')).style.display = 'none';
+        CustomSensorPlugin.setPrefillNote_(null);
       }
     }
   };
@@ -139,6 +140,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       <section class="kt-section">
         <div class="kt-section-label">${s('fieldOfView')}</div>
+        <div id="cs-prefill-note" class="cs-prefill-note" style="display: none"></div>
         <div class="switch row" data-position="top" data-delay="50" data-tooltip="${l('tooltipTelescope')}">
           <label>
             <input id="cs-telescope" type="checkbox" checked />
@@ -178,7 +180,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         </div>
         <div class="kt-field-row">
           <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipHorizonMask')}">
-            <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="0,5&#10;90,25&#10;180,5&#10;270,25"></textarea>
+            <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="${l('maskPlaceholder')}"></textarea>
             <label for="cs-mask" class="active">${l('horizonMask')}</label>
           </div>
         </div>
@@ -621,11 +623,23 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       telescope.click();
     }
     CustomSensorPlugin.setFields_(customSensorFormFromSensor(sensor));
+    CustomSensorPlugin.setPrefillNote_(sensor.uiName ?? sensor.name);
     const maskStep = getEl('cs-mask-step', true) as HTMLInputElement | null;
 
     if (maskStep) {
       maskStep.checked = isStepBinMask(sensor.elevationMasks, sensor.interpolateMask);
     }
+  }
+
+  /** Shows (name given) or hides the line saying the field values were copied from the current sensor. */
+  private static setPrefillNote_(sensorName: string | null): void {
+    const note = getEl('cs-prefill-note', true);
+
+    if (!note) {
+      return;
+    }
+    note.textContent = sensorName === null ? '' : t7e('plugins.CustomSensorPlugin.prefillNote' as Parameters<typeof t7e>[0], { name: sensorName });
+    note.style.display = sensorName === null ? 'none' : '';
   }
 
   /** Submit key and time of the last sensor created, to swallow a double-click's second submit. */
@@ -783,6 +797,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         const sensorManagerInstance = ServiceLocator.getSensorManager();
 
         if (sensorManagerInstance.isSensorSelected()) {
+          CustomSensorPlugin.setPrefillNote_(sensorManagerInstance.currentSensors[0].uiName ?? sensorManagerInstance.currentSensors[0].name);
           CustomSensorPlugin.setFields_({
             'cs-minaz': sensorManagerInstance.currentSensors[0].minAz.toString(),
             'cs-maxaz': sensorManagerInstance.currentSensors[0].maxAz.toString(),

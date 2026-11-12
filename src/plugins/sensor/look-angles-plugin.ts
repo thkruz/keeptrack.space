@@ -27,7 +27,7 @@ import './look-angles.css';
  * sunlit, and optically visible (above horizon, sunlit and site Sun below SensorMath.SITE_DARK_SUN_EL_DEG).
  * `opticalVisible` is undefined for non-optical sensors, which get no optical verdict.
  */
-type LookAngleData = TearrData & { sunlit?: boolean | null; opticalVisible?: boolean };
+type LookAngleData = TearrData & { sunlit?: boolean | null; opticalVisible?: boolean; inProgress?: boolean };
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.LookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
@@ -176,7 +176,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     return looks.map((look, idx) => ({
       Time: dateFormat(look.time, 'isoDateTime', false),
-      Type: LookAnglesPlugin.tearrTypeToString_(look.type),
+      Type: LookAnglesPlugin.tearrTypeToString_(look.type, look.inProgress),
       'Time in view (s)': durations[idx],
       Azimuth: roundOrNull(look.az, 1),
       Elevation: roundOrNull(look.el, 1),
@@ -412,6 +412,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       }
     }
 
+    if (this.isRiseSetOnly_) {
+      this.addInProgressRow_(looksArray, sat, sensors, isOemSat);
+    }
+
     looksArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     this.lastlooksArray_ = looksArray;
 
@@ -420,6 +424,33 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     this.emitActionUsed_(sat, sensors);
 
     return looksArray;
+  }
+
+  /**
+   * Rise/set mode only reports edges, so a pass already under way at the start time has no Rise row
+   * and the table would not say the satellite is in view now. Prepend an "In view now" row at the start time.
+   */
+  private addInProgressRow_(looksArray: LookAngleData[], sat: Satellite, sensors: DetailedSensor[], isOemSat: boolean): void {
+    const first = looksArray[0];
+
+    if (first && (first.type === TearrType.RISE || first.type === TearrType.RISE_AND_MAX_EL)) {
+      return; // The pass starts inside the window; its Rise row already says so
+    }
+
+    const start = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
+    const probe = isOemSat ? (sat as unknown as OemSatellite).getTearData(start, sensors, false, false) : SensorMath.getTearData(start, sat.satrec, sensors, false, false);
+
+    if (!probe || probe.time === '' || !probe.inView) {
+      return;
+    }
+    const satPos = isOemSat ? (sat as unknown as OemSatellite).eci(start)?.position : SatMath.getEci(sat, start).position;
+    const lighting = SensorMath.getLightingState(satPos as TemeVec3 | undefined, sensors[0], start);
+    const row: LookAngleData = { ...probe, type: undefined, inProgress: true, sunlit: lighting.sunlit };
+
+    if (SensorMath.isOpticalSensor(sensors[0])) {
+      row.opticalVisible = SensorMath.getOpticalVerdict(true, lighting);
+    }
+    looksArray.unshift(row);
   }
 
   /** Achievement signal: look angles computed for a sat from a sensor. Once per sat+sensor pair until either changes. */
@@ -538,7 +569,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       if (tdType) {
         tdType = tr.insertCell();
-        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type)));
+        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type, entry.inProgress)));
         if (entry.maskLimited) {
           tdType.appendChild(LookAnglesPlugin.createMaskMarker_());
         }
@@ -587,7 +618,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
    * Label for a row's pass type. Rows without a type come from the full (not rise/set only)
    * table, where every emitted sample is inside the sensor's field of view: label them "In View".
    */
-  private static tearrTypeToString_(type?: TearrType): string {
+  private static tearrTypeToString_(type?: TearrType, inProgress?: boolean): string {
+    if (inProgress) {
+      return l('msgs.inProgress');
+    }
     if (typeof type === 'undefined') {
       return l('msgs.inView');
     }

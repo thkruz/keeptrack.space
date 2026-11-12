@@ -636,6 +636,23 @@ describe('SearchManager interactions', () => {
     vi.restoreAllMocks();
   });
 
+  it('cancels the chord letter inserted right after Shift+F focuses search (#163)', () => {
+    const searchEl = document.getElementById('search') as HTMLInputElement;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (SearchManager as any).swallowChordCharacter_();
+    const chord = new InputEvent('beforeinput', { data: 'F', cancelable: true });
+
+    searchEl.dispatchEvent(chord);
+    expect(chord.defaultPrevented).toBe(true);
+
+    // One-shot: the next letter is typed normally.
+    const next = new InputEvent('beforeinput', { data: 'i', cancelable: true });
+
+    searchEl.dispatchEvent(next);
+    expect(next.defaultPrevented).toBe(false);
+  });
+
   it('init wires the top-menu button and keyboard shortcut without throwing', () => {
     expect(() => mgr.init()).not.toThrow();
 

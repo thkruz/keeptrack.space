@@ -124,6 +124,32 @@ export class SearchManager {
   /** The chord that toggles and focuses search (Shift+F); also named in the search box placeholder. */
   private static readonly SEARCH_SHORTCUT_: Pick<IKeyboardShortcut, 'key' | 'ctrl'> = { key: 'F', ctrl: false };
 
+  /**
+   * The chord's keydown moves focus into the box while Shift is held (so the app does not
+   * preventDefault), and the browser then inserts the chord letter into the freshly focused
+   * input. Cancel that one insertion; the guard removes itself after the first input event
+   * or a short timeout.
+   */
+  private static swallowChordCharacter_() {
+    const searchEl = getEl('search', true);
+
+    if (!searchEl) {
+      return;
+    }
+    const chordLetter = SearchManager.SEARCH_SHORTCUT_.key?.toString().toLowerCase();
+    const guard = (evt: Event): void => {
+      const data = (evt as InputEvent).data;
+
+      if (typeof data === 'string' && data.toLowerCase() === chordLetter) {
+        evt.preventDefault();
+      }
+      searchEl.removeEventListener('beforeinput', guard);
+    };
+
+    searchEl.addEventListener('beforeinput', guard);
+    setTimeout(() => searchEl.removeEventListener('beforeinput', guard), 300);
+  }
+
   private setupKeyboardShortcut_() {
     const keyboard = new KeyboardComponent('SearchManager', [
       {
@@ -135,6 +161,7 @@ export class SearchManager {
             // Focus now so letters typed straight after the chord go into the box
             // instead of firing single-key shortcuts; the delayed call covers a
             // box that is still animating open.
+            SearchManager.swallowChordCharacter_();
             getEl('search')?.focus();
             setTimeout(() => {
               const searchEl = getEl('search', true);

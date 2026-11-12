@@ -432,6 +432,20 @@ body.drawer-mode {
     filter: hue-rotate(227deg) brightness(1.8);
   }
 
+  /* Lock badge: rendered for every gated row, shown only while signed out, so it
+     follows the body-level .user-logged-in class when auth state changes. */
+  .drawer-item-lock {
+    display: none;
+    margin-left: 6px;
+    font-size: 11px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-lock {
+    display: inline-block;
+  }
+
   /* ---- User Account (pinned above utility footer) ---- */
   .drawer-user-account:empty {
     display: none;
@@ -1495,6 +1509,18 @@ body.is-mobile-mode {
 
   .side-menu-title-right {
     flex-shrink: 0 !important;
+  }
+
+  /*
+   * Secondary panes (Best Passes settings...) have no title text, so the close group sat at the bar's start, and
+   * the bar's -1rem side margins (made for the primary menu's 1rem padding) pushed it past the pane's 10 px
+   * padding to x=-4 (#171). Right-align the group and drop the bleed margins inside the pane.
+   */
+  .secondary-title-bar {
+    justify-content: flex-end;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
   }
 
   /* Wide tables (Look Angles, results) scroll inside their own box instead of being clipped. */

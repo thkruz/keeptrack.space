@@ -217,6 +217,15 @@ describe('PluginDrawer', () => {
       expect(getEl('plugin-drawer')!.classList.contains('open')).toBe(false);
     });
 
+    it('bottomMenuClick closes an open drawer so a newly opened side menu is not covered', () => {
+      const drawer = buildDrawer();
+
+      drawer.open();
+      emit(EventBusEvent.bottomMenuClick, 'reports-bottom-icon');
+
+      expect(getEl('plugin-drawer')!.classList.contains('open')).toBe(false);
+    });
+
     it('selectSatData closes the drawer and syncs disabled state', () => {
       const drawer = buildDrawer();
 

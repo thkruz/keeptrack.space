@@ -107,6 +107,13 @@ export class PluginDrawer {
       }
     });
 
+    // Opening any side menu (drawer row, palette, shortcut, icon) must not leave the expanded drawer over it
+    EventBus.getInstance().on(EventBusEvent.bottomMenuClick, () => {
+      if (this.isOpen_) {
+        this.close();
+      }
+    });
+
     EventBus.getInstance().on(EventBusEvent.selectSatData, () => {
       this.close();
       this.syncDisabledState_();
@@ -830,6 +837,7 @@ export class PluginDrawer {
       const disabledClass = item.isDisabled ? ' disabled' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
       const proClass = item.isLoginRequired && !settingsManager.isDisableLoginGate ? ' bmenu-item-pro' : '';
+      const loginRequiredText = t7e('errorMsgs.LoginRequired' as TranslationKey);
       const tabIdx = item.isDisabled ? '' : ' tabindex="0"';
       const shortcutBadge = item.shortcutHint ? `<span class="drawer-item-shortcut">${item.shortcutHint}</span>` : '';
 
@@ -837,6 +845,7 @@ export class PluginDrawer {
       html += `<img class="drawer-item-icon" src="${item.imgSrc}" alt="${item.label}" />`;
       html += `<span class="drawer-item-label">${item.label}</span>`;
       html += '<span class="drawer-item-badge"></span>';
+      html += proClass ? `<span class="drawer-item-lock" aria-label="${loginRequiredText}" title="${loginRequiredText}">&#x1F512;</span>` : '';
       html += shortcutBadge;
       html += '</div>';
     }

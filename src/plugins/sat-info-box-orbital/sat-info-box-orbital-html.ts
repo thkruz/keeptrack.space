@@ -5,6 +5,7 @@ export const SECTIONS = {
 export const EL = {
   LATITUDE: 'sat-latitude',
   LONGITUDE: 'sat-longitude',
+  REGION: 'sat-region',
   ALTITUDE: 'sat-altitude',
   PERIOD: 'sat-period',
   VELOCITY: 'sat-velocity',

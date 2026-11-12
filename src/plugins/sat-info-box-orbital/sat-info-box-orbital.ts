@@ -1,5 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines */
+import { findGeoRegion, getGeoRegionName } from '@app/app/analysis/geo-region-lookup';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -15,9 +16,11 @@ import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
+import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { getRegionIndex, loadRegionIndex } from './region-data';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
 import { screeningSigmasKm } from './screening-sigmas';
 
@@ -98,6 +101,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       { key: t7e('SatInfoBoxOrbital.ArgOfPerigee.label'), id: EL.ARG_PE, tooltip: t7e('SatInfoBoxOrbital.ArgOfPerigee.tooltip'), value: 'x.xx' },
       { key: t7e('SatInfoBoxOrbital.Latitude.label'), id: EL.LATITUDE, tooltip: t7e('SatInfoBoxOrbital.Latitude.tooltip'), value: 'x.xx' },
       { key: t7e('SatInfoBoxOrbital.Longitude.label'), id: EL.LONGITUDE, tooltip: t7e('SatInfoBoxOrbital.Longitude.tooltip'), value: 'x.xx' },
+      { key: t7e('SatInfoBoxOrbital.Region.label'), id: EL.REGION, tooltip: t7e('SatInfoBoxOrbital.Region.tooltip'), value: 'xxx' },
       { key: t7e('SatInfoBoxOrbital.Altitude.label'), id: EL.ALTITUDE, tooltip: t7e('SatInfoBoxOrbital.Altitude.tooltip'), value: 'xxx km' },
       { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), value: 'xxx min' },
       { key: t7e('SatInfoBoxOrbital.Velocity.label'), id: EL.VELOCITY, tooltip: t7e('SatInfoBoxOrbital.Velocity.tooltip'), value: 'xxx km/s' },
@@ -335,6 +339,33 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
       }
     }
+
+    this.updateRegionElement_(lla.lat, lla.lon);
+  }
+
+  /**
+   * "Over" row: country under the sub-satellite point, or "Over ocean". The country polygons load
+   * once on first use; the row shows N/A until then. Runs at the info box's normal refresh rate.
+   */
+  private updateRegionElement_(lat: number, lon: number): void {
+    const regionElement = getEl(EL.REGION, true);
+
+    if (!regionElement) {
+      return;
+    }
+
+    const index = getRegionIndex();
+
+    if (!index) {
+      loadRegionIndex().catch(() => undefined);
+      regionElement.textContent = notAvailableText();
+
+      return;
+    }
+
+    const hit = findGeoRegion(index, lat, lon);
+
+    regionElement.textContent = hit ? getGeoRegionName(hit, i18next.language || 'en') : t7e('SatInfoBoxOrbital.Region.ocean');
   }
 
   /**
@@ -465,7 +496,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Interplanetary ephemerides do not have Earth-centered osculating elements;
     // report unavailable until a body/frame-aware element model is provided.
     if (obj.centerBody !== SolarBody.Earth) {
-      [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE].forEach((id) => {
+      [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE, EL.REGION].forEach((id) => {
         setInnerHtml(id, notAvailableText());
       });
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
@@ -509,6 +540,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.ELSET_AGE, notAvailableText());
       setInnerHtml(EL.LATITUDE, notAvailableText());
       setInnerHtml(EL.LONGITUDE, notAvailableText());
+      setInnerHtml(EL.REGION, notAvailableText());
     }
 
     this.updateSectionHeader_(obj);

@@ -37,6 +37,11 @@
       "east": "东",
       "west": "西"
     },
+    "Region": {
+      "label": "上空",
+      "tooltip": "星下点所在的国家（Natural Earth 边界数据）",
+      "ocean": "海洋上空"
+    },
     "Altitude": {
       "label": "高度",
       "tooltip": "当前海拔高度"

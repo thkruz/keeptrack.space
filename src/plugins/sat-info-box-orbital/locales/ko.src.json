@@ -37,6 +37,11 @@
       "east": "동",
       "west": "서"
     },
+    "Region": {
+      "label": "상공",
+      "tooltip": "위성 직하점 아래의 국가 (Natural Earth 국경 데이터)",
+      "ocean": "해양 상공"
+    },
     "Altitude": {
       "label": "고도",
       "tooltip": "해수면 위의 현재 고도"

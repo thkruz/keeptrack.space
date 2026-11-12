@@ -37,6 +37,11 @@
       "east": "V",
       "west": "Z"
     },
+    "Region": {
+      "label": "Nad",
+      "tooltip": "Stát pod podsatelitním bodem (hranice Natural Earth)",
+      "ocean": "Nad oceánem"
+    },
     "Altitude": {
       "label": "Výška",
       "tooltip": "Aktuální výška nad hladinou moře"

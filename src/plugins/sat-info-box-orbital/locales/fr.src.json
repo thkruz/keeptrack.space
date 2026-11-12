@@ -37,6 +37,11 @@
       "east": "E",
       "west": "O"
     },
+    "Region": {
+      "label": "Au-dessus de",
+      "tooltip": "Pays situé sous le point subsatellite (frontières Natural Earth)",
+      "ocean": "Au-dessus de l'océan"
+    },
     "Altitude": {
       "label": "Altitude",
       "tooltip": "Altitude actuelle au-dessus du niveau de la mer"

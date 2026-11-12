@@ -37,6 +37,11 @@
       "east": "東",
       "west": "西"
     },
+    "Region": {
+      "label": "上空",
+      "tooltip": "衛星直下点にある国（Natural Earth の国境データ）",
+      "ocean": "海洋上"
+    },
     "Altitude": {
       "label": "高度",
       "tooltip": "海抜からの現在の高度"

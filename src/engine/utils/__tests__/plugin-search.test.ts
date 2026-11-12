@@ -25,6 +25,14 @@ describe('pluginSearchAliases', () => {
     expect(pluginSearchAliases('TransponderChannelData')).toEqual(['Satellite Frequencies', 'Transponder', 'Channel Data', 'Satellitenfrequenzen', 'Kanaldaten']);
   });
 
+  it('makes the Weather Imagery plugin findable by imagery and Earth imagery', () => {
+    const normalized = pluginSearchAliases('SatellitePhotos').map(normalizePluginSearch);
+
+    expect(normalized).toContain('imagery');
+    expect(normalized).toContain('earthimagery');
+    expect(normalized).toContain('satelliteimagery');
+  });
+
   it('gives the Maneuver Menu burn, delta-v, maneuver and propellant aliases', () => {
     const normalized = pluginSearchAliases('ManeuverPlugin').map(normalizePluginSearch);
 

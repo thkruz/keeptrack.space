@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "卫星影像",
-      "title": "卫星影像",
+      "bottomIconLabel": "气象卫星影像",
+      "title": "气象卫星影像",
       "defaultImageTitle": "最新卫星影像",
       "labels": {
         "dscovrUnavailable": "DSCOVR 暂时不可用",

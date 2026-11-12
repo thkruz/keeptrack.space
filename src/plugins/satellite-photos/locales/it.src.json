@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Immagini Satellitari",
-      "title": "Immagini Satellitari",
+      "bottomIconLabel": "Immagini meteo",
+      "title": "Immagini meteo",
       "defaultImageTitle": "Ultima Immagine Satellitare",
       "labels": {
         "dscovrUnavailable": "DSCOVR temporaneamente non disponibile",

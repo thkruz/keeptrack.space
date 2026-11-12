@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "위성 영상",
-      "title": "위성 영상",
+      "bottomIconLabel": "기상 위성 영상",
+      "title": "기상 위성 영상",
       "defaultImageTitle": "최신 위성 영상",
       "labels": {
         "dscovrUnavailable": "DSCOVR 일시적으로 사용 불가",

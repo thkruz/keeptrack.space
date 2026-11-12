@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Спутниковые снимки",
-      "title": "Спутниковые снимки",
+      "bottomIconLabel": "Метеоснимки",
+      "title": "Метеоснимки",
       "defaultImageTitle": "Последний спутниковый снимок",
       "labels": {
         "dscovrUnavailable": "DSCOVR временно недоступен",

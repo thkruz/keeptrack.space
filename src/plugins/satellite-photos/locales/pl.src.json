@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Zdjęcia satelitarne",
-      "title": "Zdjęcia satelitarne",
+      "bottomIconLabel": "Zdjęcia pogodowe",
+      "title": "Zdjęcia pogodowe",
       "defaultImageTitle": "Najnowsze zdjęcie satelitarne",
       "labels": {
         "dscovrUnavailable": "DSCOVR tymczasowo niedostępny",

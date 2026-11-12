@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "衛星画像",
-      "title": "衛星画像",
+      "bottomIconLabel": "気象衛星画像",
+      "title": "気象衛星画像",
       "defaultImageTitle": "最新の衛星画像",
       "labels": {
         "dscovrUnavailable": "DSCOVRは一時的に利用できません",

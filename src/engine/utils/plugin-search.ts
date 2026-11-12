@@ -23,6 +23,9 @@ const ALIAS_SOURCES_: Record<string, PluginAliasSource> = {
     english: ['Multi-View', 'Multi View'],
     localeKey: 'plugins.PluginManagerPlugin.searchAliases.multiView',
   },
+  satellitephotos: {
+    english: ['Satellite Imagery', 'Imagery', 'Earth Imagery', 'Weather Satellite', 'Weather Imagery', 'Full Disk', 'Meteosat', 'Himawari', 'GOES', 'DSCOVR'],
+  },
   maneuverplugin: {
     english: ['Maneuver Menu', 'Burn Planner', 'Delta-V', 'Delta V', 'Burn', 'Propellant', 'Impulsive Burn'],
   },

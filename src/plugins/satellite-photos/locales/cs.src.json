@@ -1,8 +1,8 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Satelitní snímky",
-      "title": "Satelitní snímky",
+      "bottomIconLabel": "Snímky počasí",
+      "title": "Snímky počasí",
       "defaultImageTitle": "Nejnovější satelitní snímek",
       "labels": {
         "dscovrUnavailable": "DSCOVR dočasně nedostupný",

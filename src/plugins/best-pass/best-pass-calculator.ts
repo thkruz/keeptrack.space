@@ -27,6 +27,7 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { refinePassEdgeMs } from '@app/app/sensors/pass-edge';
 import { lookanglesRow } from '@app/engine/core/interfaces';
 import { Degrees, eci2rae, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } from '@ootk/src/main';
 
@@ -209,23 +210,18 @@ export const findPassesForSat = (
    */
   const refineMs = options.edgeRefineMs ?? EDGE_REFINE_MS;
   const refineEdge = (outDate: Date, inDate: Date, inRae: PassRae): { date: Date; rae: PassRae } => {
-    let outMs = outDate.getTime();
-    let inMs = inDate.getTime();
-    let rae = inRae;
-
-    while (Number.isFinite(refineMs) && refineMs >= 1 && Math.abs(inMs - outMs) > refineMs) {
-      const midMs = Math.round((inMs + outMs) / 2);
-      const midRae = getRae(new Date(midMs), satrec, sensor);
-
-      if (checkIsInView(sensor, midRae)) {
-        inMs = midMs;
-        rae = midRae;
-      } else {
-        outMs = midMs;
-      }
+    if (!Number.isFinite(refineMs) || refineMs < 1) {
+      return { date: inDate, rae: inRae };
     }
 
-    return { date: new Date(inMs), rae };
+    const edgeMs = refinePassEdgeMs((epochMs) => checkIsInView(sensor, getRae(new Date(epochMs), satrec, sensor)), outDate.getTime(), inDate.getTime());
+
+    if (edgeMs === inDate.getTime()) {
+      return { date: inDate, rae: inRae };
+    }
+    const date = new Date(edgeMs);
+
+    return { date, rae: getRae(date, satrec, sensor) };
   };
 
   const propagateBestPass = (now: Date): lookanglesRow => {

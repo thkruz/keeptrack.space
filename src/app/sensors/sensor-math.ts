@@ -30,6 +30,7 @@ import type { Sun as SunBody } from '../../engine/rendering/draw-manager/sun';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
 import { DetailedSensor } from './DetailedSensor';
+import { refinePassEdgeMs } from './pass-edge';
 
 export enum TearrType {
   RISE,
@@ -73,6 +74,17 @@ export class SensorMath {
   }
 
   /**
+   * The pass edge between an out-of-view epoch and an in-view epoch, on the whole UTC second shared by
+   * every pass view (see pass-edge.ts), with the look angles at that second.
+   */
+  private static refineEdge_(satrec: SatelliteRecord, sensor: DetailedSensor, outMs: number, inMs: number): { date: Date; aer: ReturnType<typeof SatMath.getRae> } {
+    const edgeMs = refinePassEdgeMs((epochMs) => SatMath.checkIsInView(sensor, SatMath.getRae(new Date(epochMs), satrec, sensor)), outMs, inMs);
+    const date = new Date(edgeMs);
+
+    return { date, aer: SatMath.getRae(date, satrec, sensor) };
+  }
+
+  /**
    * @deprecated - Use ootk instead
    */
   static getTearData(now: Date, satrec: SatelliteRecord, sensors: DetailedSensor[], isRiseSetLookangles = false, isMaxElFound = false): TearrData {
@@ -103,24 +115,29 @@ export class SensorMath {
         const aerNext = SatMath.getRae(now1, satrec, sensor);
         const isInFOVNext = SatMath.checkIsInView(sensor, aerNext);
 
+        // Rise and set edges are refined to the whole second shared with Best Passes and Next Pass.
+        const rise = isRise ? SensorMath.refineEdge_(satrec, sensor, Number(now) - 1000, Number(now)) : null;
+
         // if elevation is going down then it is a peak
         if (!isMaxElFound && aerNext.el && aerNext.el < aer.el) {
+          const edge = rise ?? { date: now, aer };
+
           return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
+            time: dateFormat(edge.date, 'isoDateTime', true),
+            rng: edge.aer.rng,
+            az: edge.aer.az,
+            el: edge.aer.el,
             type: isRise ? TearrType.RISE_AND_MAX_EL : TearrType.MAX_EL,
             inView: isInFOV,
             objName: sensor.objName,
             maskLimited: isRiseMasked,
           };
-        } else if (isRise) {
+        } else if (isRise && rise) {
           return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
+            time: dateFormat(rise.date, 'isoDateTime', true),
+            rng: rise.aer.rng,
+            az: rise.aer.az,
+            el: rise.aer.el,
             type: TearrType.RISE,
             inView: isInFOV,
             objName: sensor.objName,
@@ -130,11 +147,13 @@ export class SensorMath {
 
         // Is in FOV and Wont Be Next Time so Last Line of Coverage
         if (!isInFOVNext) {
+          const set = SensorMath.refineEdge_(satrec, sensor, Number(now) + 1000, Number(now));
+
           return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
+            time: dateFormat(set.date, 'isoDateTime', true),
+            rng: set.aer.rng,
+            az: set.aer.az,
+            el: set.aer.el,
             type: !isMaxElFound ? TearrType.MAX_EL_AND_SET : TearrType.SET,
             inView: isInFOV,
             objName: sensor.objName,
@@ -380,6 +399,28 @@ export class SensorMath {
     }
   }
 
+  /**
+   * A coarse search finds the first sample inside the field of view; the pass actually began somewhere in the
+   * step before it. Returns that start on the whole second shared with Look Angles and Best Passes. A first
+   * sample already in view is returned as is (the pass is under way).
+   */
+  private static refineRise_(sat: Satellite, sensor: DetailedSensor, firstInView: Date, stepSec: number): Date {
+    const inMs = firstInView.getTime();
+    // Never reach back before the search start: a pass already under way at the start reports the start
+    const outMs = Math.max(inMs - stepSec * 1000, ServiceLocator.getTimeManager().getOffsetTimeObj(0).getTime());
+
+    if (outMs >= inMs) {
+      return firstInView;
+    }
+    const isInView = (epochMs: number) => SatMath.checkIsInView(sensor, SatMath.getRae(new Date(epochMs), sat.satrec, sensor, true));
+
+    if (isInView(outMs)) {
+      return firstInView;
+    }
+
+    return new Date(refinePassEdgeMs(isInView, outMs, inMs));
+  }
+
   static nextNpasses(sat: Satellite, sensors: DetailedSensor[], searchLength: number, interval: number, numPasses: number): Date[] {
     const timeManagerInstance = ServiceLocator.getTimeManager();
     const sensorManagerInstance = ServiceLocator.getSensorManager();
@@ -414,7 +455,7 @@ export class SensorMath {
       const isInFOV = SatMath.checkIsInView(sensor, aer);
 
       if (isInFOV) {
-        passTimesArray.push(now);
+        passTimesArray.push(SensorMath.refineRise_(sat, sensor, now, interval));
         // Jump 3/4th to the next orbit
         i += orbitalPeriod * 60 * 0.75; // NOSONAR
       }
@@ -447,7 +488,7 @@ export class SensorMath {
         const isInFOV = SatMath.checkIsInView(sensor, aer);
 
         if (isInFOV) {
-          inViewTime.push(now);
+          inViewTime.push(SensorMath.refineRise_(sat, sensor, now, interval));
           break;
         }
       }

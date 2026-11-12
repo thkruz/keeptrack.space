@@ -169,6 +169,7 @@
         "az": "方位角",
         "rng": "距離",
         "visible": "地平線上",
+        "duration": "継続時間",
         "sunlit": "日照",
         "optical": "光学的に可視"
       },

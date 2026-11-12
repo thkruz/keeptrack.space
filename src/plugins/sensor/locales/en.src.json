@@ -169,6 +169,7 @@
         "az": "Az",
         "rng": "Rng",
         "visible": "Above horizon",
+        "duration": "Duration",
         "sunlit": "Sunlit",
         "optical": "Optically visible"
       },

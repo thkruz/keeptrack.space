@@ -172,9 +172,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
   /** Export rows. Numeric columns stay numbers (not toFixed strings) so the XLSX has number cells. */
   private static buildExportRows_(looks: LookAngleData[], sensorDisplayName: string): Record<string, string | number | boolean | null>[] {
-    return looks.map((look) => ({
+    const durations = LookAnglesPlugin.passDurations_(looks);
+
+    return looks.map((look, idx) => ({
       Time: dateFormat(look.time, 'isoDateTime', false),
       Type: LookAnglesPlugin.tearrTypeToString_(look.type),
+      'Time in view (s)': durations[idx],
       Azimuth: roundOrNull(look.az, 1),
       Elevation: roundOrNull(look.el, 1),
       Range: roundOrNull(look.rng, 1),
@@ -182,6 +185,32 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       sunlit: look.sunlit ?? '',
       opticalVisible: look.opticalVisible ?? '',
     }));
+  }
+
+  /**
+   * Seconds inside the sensor's field of view for each row. A Set row carries the time since the
+   * Rise row of the same pass; every other row (and a Set with no Rise, e.g. an in-progress pass) is null.
+   */
+  private static passDurations_(looks: LookAngleData[]): (number | null)[] {
+    const toMs = (time: string): number => Date.parse(/z$/iu.test(time) ? time.replace(' ', 'T') : `${time.replace(' ', 'T')}Z`);
+    let riseMs: number | null = null;
+
+    return looks.map((look) => {
+      if (look.type === TearrType.RISE) {
+        riseMs = toMs(look.time);
+
+        return null;
+      }
+      if (look.type === TearrType.SET && riseMs !== null) {
+        const seconds = Math.round((toMs(look.time) - riseMs) / 1000);
+
+        riseMs = null;
+
+        return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+      }
+
+      return null;
+    });
   }
 
   /**
@@ -424,6 +453,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const tdType: HTMLTableCellElement = tr.insertCell();
 
     tdType.appendChild(document.createTextNode(l('table.type')));
+    tr.insertCell().appendChild(document.createTextNode(l('table.duration')));
 
     const tdE = tr.insertCell();
 
@@ -445,9 +475,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tr.insertCell().appendChild(document.createTextNode(l('table.optical')));
     }
 
-    for (const entry of lookAngleData) {
-      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV, showOptical });
-    }
+    const durations = LookAnglesPlugin.passDurations_(lookAngleData);
+
+    lookAngleData.forEach((entry, idx) => {
+      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV, showOptical, durationSec: durations[idx] });
+    });
 
     const note = getEl('looks-optical-note', true);
 
@@ -461,7 +493,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       const td = tr.insertCell();
       const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
 
-      td.colSpan = showOptical ? 8 : 7;
+      td.colSpan = showOptical ? 9 : 8;
       td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
     }
   }
@@ -477,6 +509,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdType,
     tdV,
     showOptical,
+    durationSec = null,
   }: {
     tbl: HTMLTableElement;
     tdT: HTMLTableCellElement;
@@ -488,6 +521,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdType: HTMLTableCellElement;
     tdV: HTMLTableCellElement;
     showOptical: boolean;
+    durationSec?: number | null;
   }) {
     if (tbl.rows.length > 0) {
       const tr = tbl.insertRow();
@@ -509,6 +543,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
           tdType.appendChild(LookAnglesPlugin.createMaskMarker_());
         }
       }
+
+      tr.insertCell().appendChild(document.createTextNode(durationSec === null ? '' : `${durationSec} s`));
 
       tdE = tr.insertCell();
       tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? 'Unknown'));

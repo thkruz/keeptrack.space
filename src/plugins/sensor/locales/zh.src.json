@@ -169,6 +169,7 @@
         "az": "方位角",
         "rng": "距离",
         "visible": "地平线以上",
+        "duration": "持续时间",
         "sunlit": "受日照",
         "optical": "光学可见"
       },

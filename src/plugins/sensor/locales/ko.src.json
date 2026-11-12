@@ -169,6 +169,7 @@
         "az": "방위각",
         "rng": "거리",
         "visible": "수평선 위",
+        "duration": "지속 시간",
         "sunlit": "일조",
         "optical": "광학 관측 가능"
       },

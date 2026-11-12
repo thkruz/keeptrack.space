@@ -200,6 +200,23 @@ describe('LookAnglesPlugin look-angle computation', () => {
   });
 });
 
+describe('LookAnglesPlugin time in view', () => {
+  it('gives the Set row the seconds since its Rise row and exports it', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const cls = LookAnglesPlugin as any;
+    const b = { az: 180 as Degrees, el: 45 as Degrees, rng: 900 as Kilometers, objName: 'X' };
+    const looks = [
+      { ...b, time: '2026-11-04 05:33:30', type: TearrType.RISE },
+      { ...b, time: '2026-11-04 05:33:45', type: TearrType.MAX_EL },
+      { ...b, time: '2026-11-04 05:33:57', type: TearrType.SET },
+      { ...b, time: '2026-11-04 07:00:00', type: TearrType.SET },
+    ];
+
+    expect(cls.passDurations_(looks)).toEqual([null, null, 27, null]);
+    expect(cls.buildExportRows_(looks, 'S').map((r: Record<string, unknown>) => r['Time in view (s)'])).toEqual([null, null, 27, null]);
+  });
+});
+
 describe('LookAnglesPlugin export lighting columns', () => {
   it('exports Sunlit and Optically visible with the empty-string convention', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

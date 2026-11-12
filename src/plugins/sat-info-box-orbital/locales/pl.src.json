@@ -3,27 +3,33 @@
     "title": "Dane orbitalne",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Najwyższa wysokość orbity nad promieniem równikowym (6378,137 km)"
+      "tooltip": "Najwyższa wysokość orbity nad promieniem równikowym (6378,137 km)",
+      "help": "Najwyższy punkt orbity, podany jako wysokość nad Ziemią."
     },
     "Perigee": {
       "label": "Perygeum",
-      "tooltip": "Najniższa wysokość orbity nad promieniem równikowym (6378,137 km)"
+      "tooltip": "Najniższa wysokość orbity nad promieniem równikowym (6378,137 km)",
+      "help": "Najniższy punkt orbity, podany jako wysokość nad Ziemią."
     },
     "Inclination": {
       "label": "Inklinacja",
-      "tooltip": "Kąt mierzony od równika w węźle wstępującym"
+      "tooltip": "Kąt mierzony od równika w węźle wstępującym",
+      "help": "O ile orbita jest nachylona względem równika. 0° okrąża równik; 90° przechodzi nad biegunami."
     },
     "Eccentricity": {
       "label": "Mimośród",
-      "tooltip": "Jak bardzo orbita jest kolista (0 to okrąg)"
+      "tooltip": "Jak bardzo orbita jest kolista (0 to okrąg)",
+      "help": "Jak bardzo orbita jest wydłużona. 0 to idealny okrąg; wartości bliskie 1 to długie owale."
     },
     "RightAsc": {
       "label": "Rektascensja",
-      "tooltip": "Gdzie obiekt wznosi się ponad równik"
+      "tooltip": "Gdzie obiekt wznosi się ponad równik",
+      "help": "Rektascensja węzła wstępującego: kierunek na niebie, w którym orbita przecina równik w stronę północy."
     },
     "ArgOfPerigee": {
       "label": "Arg. perycentrum",
-      "tooltip": "Gdzie znajduje się najniższy punkt orbity"
+      "tooltip": "Gdzie znajduje się najniższy punkt orbity",
+      "help": "Argument perygeum: kąt wzdłuż orbity od tego przecięcia równika do najniższego punktu."
     },
     "Latitude": {
       "label": "Szer. geogr.",
@@ -51,7 +57,8 @@
       "tooltip": "Czas jednego pełnego obiegu wokół Ziemi",
       "meanMotion": "Ruch średni",
       "revPerDay": "obr./dobę",
-      "min": "min"
+      "min": "min",
+      "help": "Ile czasu obiekt potrzebuje na jedno okrążenie Ziemi."
     },
     "Velocity": {
       "label": "Prędkość",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Układ odniesienia",
       "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Reżim",
+      "tooltip": "Pasmo wysokości orbity",
+      "help": "Pasmo wysokości orbity. LEO: niska orbita okołoziemska, poniżej 2000 km. MEO: średnia orbita, do wysokości geostacjonarnej. GEO: około 35 786 km nad równikiem, obiekt stoi nad jednym punktem. HEO: bardzo eliptyczna lub wyższa niż GEO.",
+      "leo": "LEO (niska)",
+      "meo": "MEO (średnia)",
+      "geo": "GEO (geostacjonarna)",
+      "heo": "HEO (eliptyczna lub wysoka)"
     }
   }
 }

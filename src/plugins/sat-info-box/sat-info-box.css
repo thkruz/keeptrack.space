@@ -203,3 +203,31 @@
 .sat-info-copy-values:focus-visible {
   outline: 2px solid var(--kt-focus-ring, #4da3ff);
 }
+
+/* Plain-language definitions under the orbit term keys (Period, Apogee, Right Asc. and so on) */
+.sat-info-row--help {
+  flex-wrap: wrap;
+}
+
+.sat-info-key--help {
+  cursor: help;
+  text-decoration: underline dotted rgba(255, 255, 255, 0.4);
+  text-underline-offset: 2px;
+}
+
+.sat-info-key--help:focus-visible {
+  outline: 2px solid var(--color-dark-text-accent, #6cf);
+  outline-offset: 1px;
+}
+
+.sat-info-help {
+  flex: 0 0 100%;
+  margin: 2px 0 1px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sat-info-help[hidden] {
+  display: none;
+}

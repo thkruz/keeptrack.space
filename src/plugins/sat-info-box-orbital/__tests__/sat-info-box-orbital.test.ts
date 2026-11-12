@@ -93,6 +93,38 @@ describe('SatInfoBoxOrbital data population', () => {
     expect(getEl(EL.APOGEE)!.textContent).toBeTruthy();
   });
 
+  it('shows the regime of a satellite in plain words', () => {
+    p().updateOrbitData_(defaultSat);
+
+    expect(getEl(EL.REGIME)!.textContent).toMatch(/^(LEO|MEO|GEO|HEO)/u);
+  });
+
+  it('gives Period, Apogee, Right Asc. and Arg of Perigee a keyboard-reachable definition', () => {
+    for (const id of [EL.PERIOD, EL.APOGEE, EL.RAAN, EL.ARG_PE, EL.REGIME]) {
+      const key = getEl(id)!.parentElement!.querySelector<HTMLElement>('[data-help-toggle]');
+
+      expect(key, id).not.toBeNull();
+      expect(key!.getAttribute('tabindex')).toBe('0');
+      expect(key!.getAttribute('aria-expanded')).toBe('false');
+      expect(getEl(`${id}-help`)!.hidden).toBe(true);
+    }
+  });
+
+  it('opens and closes a definition with a click, Enter or Space', () => {
+    const key = getEl(EL.PERIOD)!.parentElement!.querySelector<HTMLElement>('[data-help-toggle]')!;
+    const help = getEl(`${EL.PERIOD}-help`)!;
+
+    key.click();
+    expect(help.hidden).toBe(false);
+    expect(key.getAttribute('aria-expanded')).toBe('true');
+
+    key.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(help.hidden).toBe(true);
+
+    key.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(help.hidden).toBe(false);
+  });
+
   it('updateOrbitData_ ignores a null object', () => {
     expect(() => p().updateOrbitData_(null)).not.toThrow();
   });

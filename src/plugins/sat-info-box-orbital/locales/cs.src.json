@@ -3,27 +3,33 @@
     "title": "Orbitální data",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Nejvyšší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
+      "tooltip": "Nejvyšší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)",
+      "help": "Nejvyšší bod dráhy, udaný jako výška nad Zemí."
     },
     "Perigee": {
       "label": "Perigeum",
-      "tooltip": "Nejnižší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
+      "tooltip": "Nejnižší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)",
+      "help": "Nejnižší bod dráhy, udaný jako výška nad Zemí."
     },
     "Inclination": {
       "label": "Inklinace",
-      "tooltip": "Úhel měřený od rovníku ve vzestupném uzlu"
+      "tooltip": "Úhel měřený od rovníku ve vzestupném uzlu",
+      "help": "O kolik je dráha nakloněna od rovníku. 0° obíhá rovník; 90° vede přes póly."
     },
     "Eccentricity": {
       "label": "Excentricita",
-      "tooltip": "Jak kruhová je oběžná dráha (0 je kruh)"
+      "tooltip": "Jak kruhová je oběžná dráha (0 je kruh)",
+      "help": "Jak je dráha protažená. 0 je dokonalá kružnice; hodnoty blízké 1 jsou dlouhé oválné dráhy."
     },
     "RightAsc": {
       "label": "Rektascenze",
-      "tooltip": "Kde stoupá nad rovník"
+      "tooltip": "Kde stoupá nad rovník",
+      "help": "Rektascenze výstupného uzlu: směr na obloze, kde dráha protíná rovník směrem na sever."
     },
     "ArgOfPerigee": {
       "label": "Arg. perigea",
-      "tooltip": "Kde se nachází nejnižší část oběžné dráhy"
+      "tooltip": "Kde se nachází nejnižší část oběžné dráhy",
+      "help": "Argument perigea: úhel podél dráhy od tohoto průsečíku s rovníkem k nejnižšímu bodu."
     },
     "Latitude": {
       "label": "Zem. šířka",
@@ -51,7 +57,8 @@
       "tooltip": "Čas jednoho úplného oběhu kolem Země",
       "meanMotion": "Střední pohyb",
       "revPerDay": "ob/den",
-      "min": "min"
+      "min": "min",
+      "help": "Jak dlouho trvá objektu jedno oběhnutí Země."
     },
     "Velocity": {
       "label": "Rychlost",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Vztažná soustava",
       "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Režim",
+      "tooltip": "Výškové pásmo dráhy",
+      "help": "Výškové pásmo dráhy. LEO: nízká oběžná dráha, pod 2 000 km. MEO: střední dráha, až do výšky geostacionární dráhy. GEO: asi 35 786 km nad rovníkem, objekt zůstává nad jedním místem. HEO: silně eliptická nebo vyšší než GEO.",
+      "leo": "LEO (nízká)",
+      "meo": "MEO (střední)",
+      "geo": "GEO (geostacionární)",
+      "heo": "HEO (eliptická nebo vysoká)"
     }
   }
 }

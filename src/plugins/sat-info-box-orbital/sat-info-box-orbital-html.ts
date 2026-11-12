@@ -8,6 +8,7 @@ export const EL = {
   REGION: 'sat-region',
   ALTITUDE: 'sat-altitude',
   PERIOD: 'sat-period',
+  REGIME: 'sat-regime',
   VELOCITY: 'sat-velocity',
   INCLINATION: 'sat-inclination',
   ECCENTRICITY: 'sat-eccentricity',

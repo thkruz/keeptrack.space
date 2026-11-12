@@ -3,27 +3,33 @@
     "title": "Orbitale Daten",
     "Apogee": {
       "label": "Apogäum",
-      "tooltip": "Höchste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
+      "tooltip": "Höchste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)",
+      "help": "Der höchste Punkt der Umlaufbahn, angegeben als Höhe über der Erde."
     },
     "Perigee": {
       "label": "Perigäum",
-      "tooltip": "Niedrigste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
+      "tooltip": "Niedrigste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)",
+      "help": "Der niedrigste Punkt der Umlaufbahn, angegeben als Höhe über der Erde."
     },
     "Inclination": {
       "label": "Inklination",
-      "tooltip": "Winkel vom Äquator am aufsteigenden Knoten gemessen"
+      "tooltip": "Winkel vom Äquator am aufsteigenden Knoten gemessen",
+      "help": "Wie stark die Bahn gegen den Äquator geneigt ist. 0° umkreist den Äquator; 90° führt über die Pole."
     },
     "Eccentricity": {
       "label": "Exzentrizität",
-      "tooltip": "Wie kreisförmig die Umlaufbahn ist (0 ist ein Kreis)"
+      "tooltip": "Wie kreisförmig die Umlaufbahn ist (0 ist ein Kreis)",
+      "help": "Wie gestreckt die Bahn ist. 0 ist ein perfekter Kreis; Werte nahe 1 sind lange Ovale."
     },
     "RightAsc": {
       "label": "Rektaszension",
-      "tooltip": "Wo sie über dem Äquator aufsteigt"
+      "tooltip": "Wo sie über dem Äquator aufsteigt",
+      "help": "Rektaszension des aufsteigenden Knotens: die Richtung am Himmel, in der die Bahn den Äquator nach Norden kreuzt."
     },
     "ArgOfPerigee": {
       "label": "Argument des Perigäums",
-      "tooltip": "Wo der tiefste Teil der Umlaufbahn ist"
+      "tooltip": "Wo der tiefste Teil der Umlaufbahn ist",
+      "help": "Argument des Perigäums: der Winkel entlang der Bahn von diesem Äquatordurchgang bis zum tiefsten Punkt."
     },
     "Latitude": {
       "label": "Breitengrad",
@@ -51,7 +57,8 @@
       "tooltip": "Zeit für eine vollständige Umrundung der Erde",
       "meanMotion": "Mittlere Bewegung",
       "revPerDay": "Uml./Tag",
-      "min": "Min."
+      "min": "Min.",
+      "help": "Wie lange das Objekt für einen Umlauf um die Erde braucht."
     },
     "Velocity": {
       "label": "Geschwindigkeit",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Bezugssystem",
       "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Bahnregime",
+      "tooltip": "Das Höhenband der Bahn",
+      "help": "Das Höhenband der Bahn. LEO: niedrige Erdumlaufbahn, unter 2.000 km. MEO: mittlere Erdumlaufbahn, bis zur geostationären Höhe. GEO: etwa 35.786 km über dem Äquator, das Objekt bleibt über einem Punkt. HEO: stark elliptisch oder höher als GEO.",
+      "leo": "LEO (niedrig)",
+      "meo": "MEO (mittel)",
+      "geo": "GEO (geostationär)",
+      "heo": "HEO (elliptisch oder hoch)"
     }
   }
 }

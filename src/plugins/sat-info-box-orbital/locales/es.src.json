@@ -3,27 +3,33 @@
     "title": "Datos Orbitales",
     "Apogee": {
       "label": "Apogeo",
-      "tooltip": "Altitud máxima de la órbita sobre el radio ecuatorial (6378,137 km)"
+      "tooltip": "Altitud máxima de la órbita sobre el radio ecuatorial (6378,137 km)",
+      "help": "El punto más alto de la órbita, dado como altitud sobre la Tierra."
     },
     "Perigee": {
       "label": "Perigeo",
-      "tooltip": "Altitud mínima de la órbita sobre el radio ecuatorial (6378,137 km)"
+      "tooltip": "Altitud mínima de la órbita sobre el radio ecuatorial (6378,137 km)",
+      "help": "El punto más bajo de la órbita, dado como altitud sobre la Tierra."
     },
     "Inclination": {
       "label": "Inclinación",
-      "tooltip": "Ángulo medido desde el ecuador en el nodo ascendente"
+      "tooltip": "Ángulo medido desde el ecuador en el nodo ascendente",
+      "help": "Cuánto está inclinada la órbita respecto al ecuador. 0° circunda el ecuador; 90° pasa sobre los polos."
     },
     "Eccentricity": {
       "label": "Excentricidad",
-      "tooltip": "Qué tan circular es la órbita (0 es un círculo)"
+      "tooltip": "Qué tan circular es la órbita (0 es un círculo)",
+      "help": "Cuán alargada es la órbita. 0 es un círculo perfecto; los valores cercanos a 1 son óvalos largos."
     },
     "RightAsc": {
       "label": "Asc. Recta",
-      "tooltip": "Dónde cruza sobre el ecuador"
+      "tooltip": "Dónde cruza sobre el ecuador",
+      "help": "Ascensión recta del nodo ascendente: la dirección en el cielo donde la órbita cruza el ecuador hacia el norte."
     },
     "ArgOfPerigee": {
       "label": "Arg. del Perigeo",
-      "tooltip": "Dónde está la parte más baja de la órbita"
+      "tooltip": "Dónde está la parte más baja de la órbita",
+      "help": "Argumento del perigeo: el ángulo a lo largo de la órbita desde ese cruce del ecuador hasta el punto más bajo."
     },
     "Latitude": {
       "label": "Latitud",
@@ -51,7 +57,8 @@
       "tooltip": "Tiempo para una revolución completa alrededor de la Tierra",
       "meanMotion": "Movimiento medio",
       "revPerDay": "rev/día",
-      "min": "min"
+      "min": "min",
+      "help": "Cuánto tarda el objeto en dar una vuelta a la Tierra."
     },
     "Velocity": {
       "label": "Velocidad",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Sistema de referencia",
       "tooltip": "Sistema de coordenadas de la efeméride (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Régimen",
+      "tooltip": "La franja de altitud de la órbita",
+      "help": "La franja de altitud de la órbita. LEO: órbita terrestre baja, por debajo de 2000 km. MEO: órbita terrestre media, hasta la altura geoestacionaria. GEO: unos 35 786 km sobre el ecuador, donde el objeto permanece sobre un punto. HEO: muy elíptica o más alta que GEO.",
+      "leo": "LEO (baja)",
+      "meo": "MEO (media)",
+      "geo": "GEO (geoestacionaria)",
+      "heo": "HEO (elíptica o alta)"
     }
   }
 }

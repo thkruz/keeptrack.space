@@ -3,27 +3,33 @@
     "title": "Dati orbitali",
     "Apogee": {
       "label": "Apogeo",
-      "tooltip": "Quota massima dell'orbita sopra il raggio equatoriale (6378,137 km)"
+      "tooltip": "Quota massima dell'orbita sopra il raggio equatoriale (6378,137 km)",
+      "help": "Il punto più alto dell'orbita, indicato come altitudine sopra la Terra."
     },
     "Perigee": {
       "label": "Perigeo",
-      "tooltip": "Quota minima dell'orbita sopra il raggio equatoriale (6378,137 km)"
+      "tooltip": "Quota minima dell'orbita sopra il raggio equatoriale (6378,137 km)",
+      "help": "Il punto più basso dell'orbita, indicato come altitudine sopra la Terra."
     },
     "Inclination": {
       "label": "Inclinazione",
-      "tooltip": "Angolo misurato dall'equatore al nodo ascendente"
+      "tooltip": "Angolo misurato dall'equatore al nodo ascendente",
+      "help": "Di quanto l'orbita è inclinata rispetto all'equatore. 0° segue l'equatore; 90° passa sopra i poli."
     },
     "Eccentricity": {
       "label": "Eccentricità",
-      "tooltip": "Quanto è circolare l'orbita (0 è un cerchio)"
+      "tooltip": "Quanto è circolare l'orbita (0 è un cerchio)",
+      "help": "Quanto è allungata l'orbita. 0 è un cerchio perfetto; valori vicini a 1 sono ovali lunghi."
     },
     "RightAsc": {
       "label": "Asc. retta",
-      "tooltip": "Dove sale sopra l'equatore"
+      "tooltip": "Dove sale sopra l'equatore",
+      "help": "Ascensione retta del nodo ascendente: la direzione nel cielo in cui l'orbita attraversa l'equatore verso nord."
     },
     "ArgOfPerigee": {
       "label": "Arg del perigeo",
-      "tooltip": "Dove si trova la parte più bassa dell'orbita"
+      "tooltip": "Dove si trova la parte più bassa dell'orbita",
+      "help": "Argomento del perigeo: l'angolo lungo l'orbita da quell'attraversamento dell'equatore al punto più basso."
     },
     "Latitude": {
       "label": "Latitudine",
@@ -51,7 +57,8 @@
       "tooltip": "Tempo per una rivoluzione completa attorno alla Terra",
       "meanMotion": "Moto medio",
       "revPerDay": "riv/giorno",
-      "min": "min"
+      "min": "min",
+      "help": "Quanto tempo impiega l'oggetto a compiere un giro attorno alla Terra."
     },
     "Velocity": {
       "label": "Velocità",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Sistema di riferimento",
       "tooltip": "Sistema di coordinate dell'effemeride (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Regime",
+      "tooltip": "La fascia di altitudine dell'orbita",
+      "help": "La fascia di altitudine dell'orbita. LEO: orbita terrestre bassa, sotto i 2.000 km. MEO: orbita media, fino alla quota geostazionaria. GEO: circa 35.786 km sopra l'equatore, l'oggetto resta sopra un punto fisso. HEO: molto ellittica o più alta della GEO.",
+      "leo": "LEO (bassa)",
+      "meo": "MEO (media)",
+      "geo": "GEO (geostazionaria)",
+      "heo": "HEO (ellittica o alta)"
     }
   }
 }

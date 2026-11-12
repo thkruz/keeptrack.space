@@ -20,6 +20,7 @@ import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { classifyOrbitRegime } from './orbit-regime';
 import { getRegionIndex, loadRegionIndex } from './region-data';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
 import { screeningSigmasKm } from './screening-sigmas';
@@ -75,6 +76,32 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const satInfoBoxPlugin = PluginRegistry.getPlugin(SatInfoBox)!;
 
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.ORBITAL}`), { value: this.isOrbitalSectionCollapsed_ });
+    this.addHelpListeners_(getEl(SECTIONS.ORBITAL, true));
+  }
+
+  private addHelpListeners_(section: HTMLElement | null): void {
+    if (!section || section.dataset.helpBound === 'true') {
+      return;
+    }
+    section.dataset.helpBound = 'true';
+
+    const keyOf = (target: EventTarget | null): HTMLElement | null => ((target as HTMLElement | null)?.closest?.('[data-help-toggle]') as HTMLElement | null) ?? null;
+
+    section.addEventListener('click', (e) => {
+      const key = keyOf(e.target);
+
+      if (key) {
+        SatInfoBoxOrbital.toggleHelp_(key);
+      }
+    });
+    section.addEventListener('keydown', (e) => {
+      const key = keyOf(e.target);
+
+      if (key && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        SatInfoBoxOrbital.toggleHelp_(key);
+      }
+    });
   }
 
   private createOrbitalSection(): string {
@@ -92,18 +119,49 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
   private createOrbitalDataRows(): string {
     // Create all orbital data rows
-    const rows = [
-      { key: t7e('SatInfoBoxOrbital.Apogee.label'), id: EL.APOGEE, tooltip: t7e('SatInfoBoxOrbital.Apogee.tooltip'), value: 'xxx km' },
-      { key: t7e('SatInfoBoxOrbital.Perigee.label'), id: EL.PERIGEE, tooltip: t7e('SatInfoBoxOrbital.Perigee.tooltip'), value: 'xxx km' },
-      { key: t7e('SatInfoBoxOrbital.Inclination.label'), id: EL.INCLINATION, tooltip: t7e('SatInfoBoxOrbital.Inclination.tooltip'), value: 'xxx.xx' },
-      { key: t7e('SatInfoBoxOrbital.Eccentricity.label'), id: EL.ECCENTRICITY, tooltip: t7e('SatInfoBoxOrbital.Eccentricity.tooltip'), value: 'x.xx' },
-      { key: t7e('SatInfoBoxOrbital.RightAsc.label'), id: EL.RAAN, tooltip: t7e('SatInfoBoxOrbital.RightAsc.tooltip'), value: 'x.xx' },
-      { key: t7e('SatInfoBoxOrbital.ArgOfPerigee.label'), id: EL.ARG_PE, tooltip: t7e('SatInfoBoxOrbital.ArgOfPerigee.tooltip'), value: 'x.xx' },
+    const rows: { key: string; id: string; tooltip: string; help?: string; value: string }[] = [
+      { key: t7e('SatInfoBoxOrbital.Regime.label'), id: EL.REGIME, tooltip: t7e('SatInfoBoxOrbital.Regime.tooltip'), help: t7e('SatInfoBoxOrbital.Regime.help'), value: 'xxx' },
+      { key: t7e('SatInfoBoxOrbital.Apogee.label'), id: EL.APOGEE, tooltip: t7e('SatInfoBoxOrbital.Apogee.tooltip'), help: t7e('SatInfoBoxOrbital.Apogee.help'), value: 'xxx km' },
+      {
+        key: t7e('SatInfoBoxOrbital.Perigee.label'),
+        id: EL.PERIGEE,
+        tooltip: t7e('SatInfoBoxOrbital.Perigee.tooltip'),
+        help: t7e('SatInfoBoxOrbital.Perigee.help'),
+        value: 'xxx km',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.Inclination.label'),
+        id: EL.INCLINATION,
+        tooltip: t7e('SatInfoBoxOrbital.Inclination.tooltip'),
+        help: t7e('SatInfoBoxOrbital.Inclination.help'),
+        value: 'xxx.xx',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.Eccentricity.label'),
+        id: EL.ECCENTRICITY,
+        tooltip: t7e('SatInfoBoxOrbital.Eccentricity.tooltip'),
+        help: t7e('SatInfoBoxOrbital.Eccentricity.help'),
+        value: 'x.xx',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.RightAsc.label'),
+        id: EL.RAAN,
+        tooltip: t7e('SatInfoBoxOrbital.RightAsc.tooltip'),
+        help: t7e('SatInfoBoxOrbital.RightAsc.help'),
+        value: 'x.xx',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.ArgOfPerigee.label'),
+        id: EL.ARG_PE,
+        tooltip: t7e('SatInfoBoxOrbital.ArgOfPerigee.tooltip'),
+        help: t7e('SatInfoBoxOrbital.ArgOfPerigee.help'),
+        value: 'x.xx',
+      },
       { key: t7e('SatInfoBoxOrbital.Latitude.label'), id: EL.LATITUDE, tooltip: t7e('SatInfoBoxOrbital.Latitude.tooltip'), value: 'x.xx' },
       { key: t7e('SatInfoBoxOrbital.Longitude.label'), id: EL.LONGITUDE, tooltip: t7e('SatInfoBoxOrbital.Longitude.tooltip'), value: 'x.xx' },
       { key: t7e('SatInfoBoxOrbital.Region.label'), id: EL.REGION, tooltip: t7e('SatInfoBoxOrbital.Region.tooltip'), value: 'xxx' },
       { key: t7e('SatInfoBoxOrbital.Altitude.label'), id: EL.ALTITUDE, tooltip: t7e('SatInfoBoxOrbital.Altitude.tooltip'), value: 'xxx km' },
-      { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), value: 'xxx min' },
+      { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), help: t7e('SatInfoBoxOrbital.Period.help'), value: 'xxx min' },
       { key: t7e('SatInfoBoxOrbital.Velocity.label'), id: EL.VELOCITY, tooltip: t7e('SatInfoBoxOrbital.Velocity.tooltip'), value: 'xxx km/s' },
       { key: t7e('SatInfoBoxOrbital.GPEpoch.label'), id: EL.GP_EPOCH, tooltip: t7e('SatInfoBoxOrbital.GPEpoch.tooltip'), value: 'xxxx-xx-xx xx:xx:xx UTC' },
       { key: t7e('SatInfoBoxOrbital.AgeOfGP.label'), id: EL.ELSET_AGE, tooltip: t7e('SatInfoBoxOrbital.AgeOfGP.tooltip'), value: 'xxx.xxxx' },
@@ -116,19 +174,44 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Drop the covariance rows (Radial, In Track, Cross Track Sigma) when the setting is disabled
     const visibleRows = settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance ? rows : rows.filter((row) => !covarianceIds.includes(row.id));
 
-    return (
-      this.createOemFrameRows_() +
-      visibleRows
-        .map(
-          (row) => html`
+    return this.createOemFrameRows_() + visibleRows.map((row) => SatInfoBoxOrbital.createDataRow_(row)).join('');
+  }
+
+  /**
+   * One data row. A row with a plain-language definition gets a focusable key: hover shows the short tooltip,
+   * while click, tap, Enter or Space opens the definition inline, which works on touch and with a keyboard.
+   */
+  private static createDataRow_(row: { key: string; id: string; tooltip: string; help?: string; value: string }): string {
+    if (!row.help) {
+      return html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
-      `
-        )
-        .join('')
-    );
+      `;
+    }
+
+    return html`
+        <div class="sat-info-row sat-only-info sat-info-row--help">
+          <div class="sat-info-key sat-info-key--help" kt-tooltip="${row.tooltip}" tabindex="0" role="button" aria-expanded="false" aria-controls="${row.id}-help" data-help-toggle="${row.id}-help">${row.key}</div>
+          <div class="sat-info-value" id="${row.id}">${row.value}</div>
+          <div class="sat-info-help" id="${row.id}-help" hidden>${row.help}</div>
+        </div>
+      `;
+  }
+
+  /** Opens or closes the inline definition under a key; used by click, Enter and Space. */
+  private static toggleHelp_(key: HTMLElement): void {
+    const help = getEl(key.dataset.helpToggle ?? '', true);
+
+    if (!help) {
+      return;
+    }
+
+    const isOpen = key.getAttribute('aria-expanded') === 'true';
+
+    key.setAttribute('aria-expanded', String(!isOpen));
+    help.hidden = isOpen;
   }
 
   /**
@@ -229,10 +312,18 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
 
     this.updatePeriodElement_(obj.period);
+    this.updateRegimeElement_(obj.perigee, obj.apogee, obj.eccentricity);
     this.updateElsetAgeElement_(obj);
     this.updateLatLonElements_(obj.position);
 
     this.updateSectionHeader_();
+  }
+
+  /** Names the altitude regime of the orbit (LEO, MEO, GEO, HEO) in plain language. */
+  private updateRegimeElement_(perigeeKm: number, apogeeKm: number, eccentricity: number): void {
+    const regime = classifyOrbitRegime(perigeeKm, apogeeKm, eccentricity);
+
+    setInnerHtml(EL.REGIME, regime ? t7e(`SatInfoBoxOrbital.Regime.${regime}` as Parameters<typeof t7e>[0]) : notAvailableText());
   }
 
   private updatePeriodElement_(period: number): void {
@@ -496,7 +587,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Interplanetary ephemerides do not have Earth-centered osculating elements;
     // report unavailable until a body/frame-aware element model is provided.
     if (obj.centerBody !== SolarBody.Earth) {
-      [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE, EL.REGION].forEach((id) => {
+      [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.REGIME, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE, EL.REGION].forEach((id) => {
         setInnerHtml(id, notAvailableText());
       });
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
@@ -524,6 +615,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.ARG_PE, finite(elements.argPerigeeDegrees, 2, '°'));
 
       this.updatePeriodElement_(isElliptic ? elements.period : Number.NaN);
+      this.updateRegimeElement_(isApsisAvailable ? elements.perigee : Number.NaN, elements.apogee, elements.eccentricity);
 
       setInnerHtml(EL.ELSET_AGE, notAvailableText());
 
@@ -536,6 +628,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.RAAN, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.ARG_PE, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.PERIOD, t7e('SatInfoBoxOrbital.unknown'));
+      setInnerHtml(EL.REGIME, t7e('SatInfoBoxOrbital.unknown'));
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
       setInnerHtml(EL.ELSET_AGE, notAvailableText());
       setInnerHtml(EL.LATITUDE, notAvailableText());

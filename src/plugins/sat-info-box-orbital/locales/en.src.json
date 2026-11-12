@@ -3,27 +3,33 @@
     "title": "Orbital Data",
     "Apogee": {
       "label": "Apogee",
-      "tooltip": "Highest altitude in the orbit, above the equatorial radius (6378.137 km)"
+      "tooltip": "Highest altitude in the orbit, above the equatorial radius (6378.137 km)",
+      "help": "The highest point of the orbit, given as altitude above the Earth."
     },
     "Perigee": {
       "label": "Perigee",
-      "tooltip": "Lowest altitude in the orbit, above the equatorial radius (6378.137 km)"
+      "tooltip": "Lowest altitude in the orbit, above the equatorial radius (6378.137 km)",
+      "help": "The lowest point of the orbit, given as altitude above the Earth."
     },
     "Inclination": {
       "label": "Inclination",
-      "tooltip": "Angle Measured from Equator on the Ascending Node"
+      "tooltip": "Angle Measured from Equator on the Ascending Node",
+      "help": "How far the orbit is tilted from the equator. 0° circles the equator; 90° passes over the poles."
     },
     "Eccentricity": {
       "label": "Eccentricity",
-      "tooltip": "How Circular the Orbit Is (0 is a Circle)"
+      "tooltip": "How Circular the Orbit Is (0 is a Circle)",
+      "help": "How stretched the orbit is. 0 is a perfect circle; values near 1 are long ovals."
     },
     "RightAsc": {
       "label": "Right Asc.",
-      "tooltip": "Where it Rises Above the Equator"
+      "tooltip": "Where it Rises Above the Equator",
+      "help": "Right ascension of the ascending node: the direction in the sky where the orbit crosses the equator heading north."
     },
     "ArgOfPerigee": {
       "label": "Arg of Perigee",
-      "tooltip": "Where the Lowest Part of the Orbit Is"
+      "tooltip": "Where the Lowest Part of the Orbit Is",
+      "help": "Argument of perigee: the angle along the orbit from that equator crossing to the lowest point."
     },
     "Latitude": {
       "label": "Latitude",
@@ -51,7 +57,8 @@
       "tooltip": "Time for One Complete Revolution Around Earth",
       "meanMotion": "Mean Motion",
       "revPerDay": "rev/day",
-      "min": "min"
+      "min": "min",
+      "help": "How long the object takes to go around the Earth once."
     },
     "Velocity": {
       "label": "Velocity",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Reference Frame",
       "tooltip": "Coordinate frame of the ephemeris (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Regime",
+      "tooltip": "The altitude band of the orbit",
+      "help": "The altitude band of the orbit. LEO: low Earth orbit, under 2,000 km. MEO: medium Earth orbit, up to geostationary height. GEO: about 35,786 km over the equator, where an object stays over one spot. HEO: highly elliptical, or higher than GEO.",
+      "leo": "LEO (low Earth)",
+      "meo": "MEO (medium Earth)",
+      "geo": "GEO (geostationary)",
+      "heo": "HEO (elliptical or high)"
     }
   }
 }

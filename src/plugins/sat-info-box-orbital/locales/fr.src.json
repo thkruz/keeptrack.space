@@ -3,27 +3,33 @@
     "title": "Données Orbitales",
     "Apogee": {
       "label": "Apogée",
-      "tooltip": "Altitude maximale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
+      "tooltip": "Altitude maximale de l'orbite au-dessus du rayon équatorial (6378,137 km)",
+      "help": "Le point le plus haut de l'orbite, donné en altitude au-dessus de la Terre."
     },
     "Perigee": {
       "label": "Périgée",
-      "tooltip": "Altitude minimale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
+      "tooltip": "Altitude minimale de l'orbite au-dessus du rayon équatorial (6378,137 km)",
+      "help": "Le point le plus bas de l'orbite, donné en altitude au-dessus de la Terre."
     },
     "Inclination": {
       "label": "Inclinaison",
-      "tooltip": "Angle mesuré depuis l'équateur au nœud ascendant"
+      "tooltip": "Angle mesuré depuis l'équateur au nœud ascendant",
+      "help": "L'inclinaison de l'orbite par rapport à l'équateur. 0° suit l'équateur ; 90° passe au-dessus des pôles."
     },
     "Eccentricity": {
       "label": "Excentricité",
-      "tooltip": "À quel point l'orbite est circulaire (0 est un cercle)"
+      "tooltip": "À quel point l'orbite est circulaire (0 est un cercle)",
+      "help": "À quel point l'orbite est allongée. 0 est un cercle parfait ; près de 1, c'est un ovale étiré."
     },
     "RightAsc": {
       "label": "Asc. Droite",
-      "tooltip": "Où elle passe au-dessus de l'équateur"
+      "tooltip": "Où elle passe au-dessus de l'équateur",
+      "help": "Ascension droite du nœud ascendant : la direction dans le ciel où l'orbite croise l'équateur en allant vers le nord."
     },
     "ArgOfPerigee": {
       "label": "Arg du Périgée",
-      "tooltip": "Où se trouve la partie la plus basse de l'orbite"
+      "tooltip": "Où se trouve la partie la plus basse de l'orbite",
+      "help": "Argument du périgée : l'angle le long de l'orbite entre ce passage de l'équateur et le point le plus bas."
     },
     "Latitude": {
       "label": "Latitude",
@@ -51,7 +57,8 @@
       "tooltip": "Temps pour une révolution complète autour de la Terre",
       "meanMotion": "Mouvement moyen",
       "revPerDay": "rév/jour",
-      "min": "min"
+      "min": "min",
+      "help": "Le temps que met l'objet pour faire un tour de la Terre."
     },
     "Velocity": {
       "label": "Vitesse",
@@ -94,6 +101,15 @@
     "RefFrame": {
       "label": "Repère de référence",
       "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)"
+    },
+    "Regime": {
+      "label": "Régime",
+      "tooltip": "La tranche d'altitude de l'orbite",
+      "help": "La tranche d'altitude de l'orbite. LEO : orbite terrestre basse, sous 2 000 km. MEO : orbite moyenne, jusqu'à l'altitude géostationnaire. GEO : environ 35 786 km au-dessus de l'équateur, l'objet reste au-dessus d'un même point. HEO : très elliptique ou plus haute que la GEO.",
+      "leo": "LEO (basse)",
+      "meo": "MEO (moyenne)",
+      "geo": "GEO (géostationnaire)",
+      "heo": "HEO (elliptique ou haute)"
     }
   }
 }

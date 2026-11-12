@@ -648,6 +648,10 @@
     "toggleLayers": "Ebenen umschalten",
     "layers": "Ebenen"
   },
+  "mobileZoom": {
+    "zoomIn": "Vergrößern",
+    "zoomOut": "Verkleinern"
+  },
   "modalConfirm": {
     "confirmAction": "Aktion bestätigen",
     "defaultTitle": "Sind Sie sicher?",

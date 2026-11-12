@@ -365,6 +365,10 @@
     "toggleLayers": "Přepnout vrstvy",
     "layers": "Vrstvy"
   },
+  "mobileZoom": {
+    "zoomIn": "Přiblížit",
+    "zoomOut": "Oddálit"
+  },
   "modalConfirm": {
     "confirmAction": "Potvrdit akci",
     "defaultTitle": "Jste si jisti?",

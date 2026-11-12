@@ -365,6 +365,10 @@
     "toggleLayers": "Переключить слои",
     "layers": "Слои"
   },
+  "mobileZoom": {
+    "zoomIn": "Приблизить",
+    "zoomOut": "Отдалить"
+  },
   "modalConfirm": {
     "confirmAction": "Подтвердите действие",
     "defaultTitle": "Вы уверены?",

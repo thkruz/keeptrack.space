@@ -365,6 +365,10 @@
     "toggleLayers": "レイヤーの切り替え",
     "layers": "レイヤー"
   },
+  "mobileZoom": {
+    "zoomIn": "拡大",
+    "zoomOut": "縮小"
+  },
   "modalConfirm": {
     "confirmAction": "操作の確認",
     "defaultTitle": "よろしいですか？",

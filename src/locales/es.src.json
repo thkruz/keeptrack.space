@@ -365,6 +365,10 @@
     "toggleLayers": "Alternar capas",
     "layers": "Capas"
   },
+  "mobileZoom": {
+    "zoomIn": "Acercar",
+    "zoomOut": "Alejar"
+  },
   "modalConfirm": {
     "confirmAction": "Confirmar acción",
     "defaultTitle": "¿Está seguro?",

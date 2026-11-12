@@ -360,6 +360,10 @@
     "toggleLayers": "Toggle Layers",
     "layers": "Layers"
   },
+  "mobileZoom": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
+  },
   "modalConfirm": {
     "confirmAction": "Confirm Action",
     "defaultTitle": "Are you sure?",

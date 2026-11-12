@@ -365,6 +365,10 @@
     "toggleLayers": "레이어 전환",
     "layers": "레이어"
   },
+  "mobileZoom": {
+    "zoomIn": "확대",
+    "zoomOut": "축소"
+  },
   "modalConfirm": {
     "confirmAction": "작업 확인",
     "defaultTitle": "확실합니까?",

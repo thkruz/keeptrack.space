@@ -365,6 +365,10 @@
     "toggleLayers": "切换图层",
     "layers": "图层"
   },
+  "mobileZoom": {
+    "zoomIn": "放大",
+    "zoomOut": "缩小"
+  },
   "modalConfirm": {
     "confirmAction": "确认操作",
     "defaultTitle": "确定吗？",

@@ -365,6 +365,10 @@
     "toggleLayers": "Attiva/disattiva livelli",
     "layers": "Livelli"
   },
+  "mobileZoom": {
+    "zoomIn": "Ingrandisci",
+    "zoomOut": "Riduci"
+  },
   "modalConfirm": {
     "confirmAction": "Conferma azione",
     "defaultTitle": "Sei sicuro?",

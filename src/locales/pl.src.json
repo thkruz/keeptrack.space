@@ -365,6 +365,10 @@
     "toggleLayers": "Przełącz warstwy",
     "layers": "Warstwy"
   },
+  "mobileZoom": {
+    "zoomIn": "Powiększ",
+    "zoomOut": "Pomniejsz"
+  },
   "modalConfirm": {
     "confirmAction": "Potwierdź działanie",
     "defaultTitle": "Czy na pewno?",

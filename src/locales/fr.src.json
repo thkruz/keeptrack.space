@@ -365,6 +365,10 @@
     "toggleLayers": "Afficher/masquer les calques",
     "layers": "Calques"
   },
+  "mobileZoom": {
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière"
+  },
   "modalConfirm": {
     "confirmAction": "Confirmer l'action",
     "defaultTitle": "Êtes-vous sûr ?",

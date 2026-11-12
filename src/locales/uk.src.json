@@ -370,6 +370,10 @@
     "toggleLayers": "Перемкнути шари",
     "layers": "Шари"
   },
+  "mobileZoom": {
+    "zoomIn": "Наблизити",
+    "zoomOut": "Віддалити"
+  },
   "modalConfirm": {
     "confirmAction": "Підтвердьте дію",
     "defaultTitle": "Ви впевнені?",

@@ -31,6 +31,7 @@ export enum StorageKey {
   SETTINGS_SAT_LABEL_MODE = 'v2-keepTrack-settings-satLabelMode',
   SETTINGS_SAT_LABEL_MODE_V2 = 'v2-keepTrack-settings-satLabelModeV2',
   SETTINGS_SHOW_SENSOR_LABELS = 'v2-keepTrack-settings-showSensorLabels',
+  SETTINGS_SHOW_OBJECT_LABELS = 'v2-keepTrack-settings-showObjectLabels',
   SETTINGS_FREEZE_PROP_RATE_ON_DRAG = 'v2-keepTrack-settings-freezePropRateOnDrag',
   SETTINGS_DISABLE_TIME_MACHINE_TOASTS = 'v2-keepTrack-settings-disableTimeMachineToasts',
   SETTINGS_DISABLE_TOASTS = 'v2-keepTrack-settings-disableToasts',
@@ -208,6 +209,9 @@ export enum StorageKey {
   // Custom Sensor (user-built sensor definitions and which one was the primary,
   // restored on boot so a custom station survives a reload)
   CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
+
+  // Reset to Start (saved starting time, play state, selection and camera view)
+  START_POINT = 'v2-keepTrack-startPoint',
 
   // FPS View (the one-time "how to fly" hint was shown on this device)
   FPS_VIEW_HINT_SEEN = 'v2-keepTrack-fpsViewHintSeen',

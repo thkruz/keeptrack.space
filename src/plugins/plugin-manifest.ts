@@ -581,6 +581,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 311 },
   },
   {
+    configKey: 'ResetToStart',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/reset-to-start/reset-to-start') : undefined,
+    proClassName: 'ResetToStart',
+    defaultConfig: { enabled: true, order: 318 },
+  },
+  {
     configKey: 'TerminatorToggle',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/terminator-toggle/terminator-toggle') : undefined,
     proClassName: 'TerminatorToggle',

@@ -1,5 +1,7 @@
 import { isCustomSensor } from '@app/app/sensors/custom-sensor-identity';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { getEl } from '@app/engine/utils/get-el';
@@ -135,6 +137,23 @@ describe('CustomSensorPlugin persistence and camera', () => {
     CustomSensorPlugin.saveCustomSensors();
 
     expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
+  });
+
+  it('rebuilds custom sensors when an account sync delivers them (new device)', () => {
+    setForm();
+    C.processCustomSensorSubmit_();
+    const sensorManager = ServiceLocator.getSensorManager();
+    const addedObjName = sensorManager.currentSensors[0].objName;
+
+    // A fresh device: nothing in memory, but sync wrote the store into persistence
+    sensorManager.currentSensors = [];
+    sensorManager.secondarySensors = [];
+    vi.useFakeTimers();
+    EventBus.getInstance().emit(EventBusEvent.remoteSettingsApplied, [StorageKey.CUSTOM_SENSORS]);
+    vi.runAllTimers();
+    vi.useRealTimers();
+
+    expect(sensorManager.currentSensors[0]?.objName).toBe(addedObjName);
   });
 
   it('removes the saved sensors when the list is cleared', () => {

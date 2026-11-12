@@ -89,8 +89,11 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.STARS_SETTINGS]: StorageScope.Account,
   [StorageKey.STEREO_MAP_SETTINGS]: StorageScope.Account,
 
-  // --- Device: custom sensor definitions (per-browser, like the other tool inputs)
-  [StorageKey.CUSTOM_SENSORS]: StorageScope.Device,
+  // --- Account: custom sensor definitions follow the user to a new device (restore-on-reopen)
+  [StorageKey.CUSTOM_SENSORS]: StorageScope.Account,
+
+  // --- Device: saved starting point for Reset to Start (selection and camera are per-session)
+  [StorageKey.START_POINT]: StorageScope.Device,
 
   // --- Device: hardware/perf-dependent graphics --------------------------------
   [StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE]: StorageScope.Device,
@@ -99,6 +102,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_SENSOR_LABELS]: StorageScope.Device,
+  [StorageKey.SETTINGS_SHOW_OBJECT_LABELS]: StorageScope.Device,
   // Phones default hover info off; Next Pass on hover is a fast-CPU option.
   [StorageKey.SETTINGS_SHOW_INFO_ON_HOVER]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_NEXT_PASS]: StorageScope.Device,

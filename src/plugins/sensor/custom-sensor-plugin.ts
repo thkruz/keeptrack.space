@@ -390,6 +390,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
        */
       setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
     });
+    // Account sync brought custom sensors from another device: rebuild them after the catalog-sensor restore
+    eventBus.on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
+      if (changedKeys.includes(StorageKey.CUSTOM_SENSORS)) {
+        setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
+      }
+    });
     eventBus.on(EventBusEvent.setSensor, () => CustomSensorPlugin.saveCustomSensors());
     eventBus.on(EventBusEvent.resetSensor, () => CustomSensorPlugin.saveCustomSensors());
   }

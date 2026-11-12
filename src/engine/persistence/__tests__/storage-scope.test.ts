@@ -52,6 +52,7 @@ describe('storage-scope registry', () => {
     expect([...ACCOUNT_STORAGE_KEYS].sort()).toEqual(
       [
         StorageKey.CURRENT_SENSOR,
+        StorageKey.CUSTOM_SENSORS,
         StorageKey.WATCHLIST_LIST,
         StorageKey.SATELLITE_LISTS,
         StorageKey.FAVORITES_LIST,

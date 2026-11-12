@@ -9,17 +9,26 @@
         "groundStationsHeader": "Bodenstationen",
         "groundStationsAll": "Alle Bodenstationen",
         "missingData": "Fehlende Daten",
-        "tooltipSensorsInFov": "Sensorabdeckung visualisieren"
+        "tooltipSensorsInFov": "Sensorabdeckung visualisieren",
+        "savedSites": "Gespeicherte benutzerdefinierte Standorte",
+        "savedSite_current": "Aktuell",
+        "savedSite_active": "Aktiv",
+        "savedSite_saved": "Gespeichert"
       },
       "buttons": {
         "markAll": "{name} markieren",
         "resetSensor": "Sensor zurücksetzen",
-        "showSensorsWithFov": "Alle Sensoren mit Sichtfeld anzeigen..."
+        "showSensorsWithFov": "Alle Sensoren mit Sichtfeld anzeigen...",
+        "removeSavedSite": "Gespeicherten Standort {name} entfernen",
+        "activateSavedSite": "Gespeicherten Standort {name} zusätzlich verwenden",
+        "deactivateSavedSite": "Gespeicherten Standort {name} nicht mehr verwenden"
       },
       "commands": {
         "category": "Sensoren",
         "setSensor": "Aktuellen Sensor auf {name} setzen",
-        "setSensorGroup": "Sensorgruppe festlegen: {name}"
+        "setSensorGroup": "Sensorgruppe festlegen: {name}",
+        "setSavedSite": "Aktuellen Sensor auf gespeicherten Standort {name} setzen",
+        "activateSavedSite": "Gespeicherten Standort {name} zusätzlich verwenden"
       },
       "help": {
         "overview": "Im Sensorenmenü wählen Sie die Bodenstation aus, von der aus der Rest der App rechnet. Die Sensoren sind nach dem Netzwerk gruppiert, das sie hauptsächlich unterstützen; jeder Eintrag zeigt links den Namen des Sensors und rechts das Land oder die Organisation, dem bzw. der er gehört. Der ausgewählte Sensor steuert Blickwinkel, Sichtfeldkegel, Überflugswarnungen der Beobachtungsliste und jedes andere sensorbezogene Menü.",

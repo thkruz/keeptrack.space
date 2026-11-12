@@ -282,6 +282,10 @@
     "expand": "Rozbalit",
     "phoneLink": "Propojení s telefonem",
     "phoneLinkSignIn": "Přihlaste se a propojte svůj telefon",
+    "signInPromptTitle": "Přihlaste se pro funkci {feature}",
+    "signInPromptBody": "Funkce {feature} je dostupná s bezplatným účtem. Přihlaste se a použijte ji.",
+    "signInPromptAction": "Přihlásit se",
+    "signInPromptCancel": "Teď ne",
     "connected": "Připojeno",
     "offline": "Offline",
     "footerLinks": {
@@ -408,5 +412,10 @@
       "breakup": "Trosky z rozpadu",
       "created": "Vytvořené družice"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

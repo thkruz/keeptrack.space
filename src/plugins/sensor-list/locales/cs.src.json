@@ -9,17 +9,26 @@
         "groundStationsHeader": "Pozemní stanice",
         "groundStationsAll": "Všechny pozemní stanice",
         "missingData": "Chybějící data",
-        "tooltipSensorsInFov": "Vizualizovat pokrytí senzorů"
+        "tooltipSensorsInFov": "Vizualizovat pokrytí senzorů",
+        "savedSites": "Uložená vlastní stanoviště",
+        "savedSite_current": "Aktuální",
+        "savedSite_active": "Aktivní",
+        "savedSite_saved": "Uloženo"
       },
       "buttons": {
         "markAll": "Označit {name}",
         "resetSensor": "Resetovat senzor",
-        "showSensorsWithFov": "Zobrazit všechny senzory se zorným polem..."
+        "showSensorsWithFov": "Zobrazit všechny senzory se zorným polem...",
+        "removeSavedSite": "Odebrat uložené stanoviště {name}",
+        "activateSavedSite": "Použít také uložené stanoviště {name}",
+        "deactivateSavedSite": "Přestat používat uložené stanoviště {name}"
       },
       "commands": {
         "category": "Senzory",
         "setSensor": "Nastavit aktuální senzor na {name}",
-        "setSensorGroup": "Nastavit skupinu senzorů: {name}"
+        "setSensorGroup": "Nastavit skupinu senzorů: {name}",
+        "setSavedSite": "Nastavit aktuální senzor na uložené stanoviště {name}",
+        "activateSavedSite": "Použít také uložené stanoviště {name}"
       },
       "help": {
         "overview": "Menu senzorů je místo, kde vybíráte pozemní stanici, ze které zbytek aplikace počítá. Senzory jsou seskupeny podle sítě, kterou primárně podporují, přičemž každá položka zobrazuje vlevo název senzoru a vpravo zemi nebo organizaci, která jej vlastní. Vybraný senzor řídí úhly pohledu, kužely zorného pole, upozornění na přelety ze seznamu sledovaných a všechna ostatní menu pracující se senzory.",

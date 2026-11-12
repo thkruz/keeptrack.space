@@ -282,6 +282,10 @@
     "expand": "펼치기",
     "phoneLink": "휴대폰 연결",
     "phoneLinkSignIn": "휴대폰을 연결하려면 로그인하세요",
+    "signInPromptTitle": "{feature}을(를) 사용하려면 로그인하세요",
+    "signInPromptBody": "{feature}은(는) 무료 계정으로 사용할 수 있습니다. 로그인하여 사용하세요.",
+    "signInPromptAction": "로그인",
+    "signInPromptCancel": "나중에",
     "connected": "연결됨",
     "offline": "오프라인",
     "footerLinks": {
@@ -408,5 +412,10 @@
       "breakup": "분열 파편",
       "created": "생성한 위성"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

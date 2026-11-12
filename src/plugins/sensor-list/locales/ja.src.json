@@ -9,17 +9,26 @@
         "groundStationsHeader": "地上局",
         "groundStationsAll": "すべての地上局",
         "missingData": "データ不足",
-        "tooltipSensorsInFov": "センサーカバレッジを可視化"
+        "tooltipSensorsInFov": "センサーカバレッジを可視化",
+        "savedSites": "保存済みカスタムサイト",
+        "savedSite_current": "現在",
+        "savedSite_active": "有効",
+        "savedSite_saved": "保存済み"
       },
       "buttons": {
         "markAll": "{name}をマーク",
         "resetSensor": "センサーをリセット",
-        "showSensorsWithFov": "すべてのセンサーを視野付きで表示..."
+        "showSensorsWithFov": "すべてのセンサーを視野付きで表示...",
+        "removeSavedSite": "保存済みサイト {name} を削除",
+        "activateSavedSite": "保存済みサイト {name} も使用",
+        "deactivateSavedSite": "保存済みサイト {name} の使用を停止"
       },
       "commands": {
         "category": "センサー",
         "setSensor": "現在のセンサーを{name}に設定",
-        "setSensorGroup": "センサーグループを設定: {name}"
+        "setSensorGroup": "センサーグループを設定: {name}",
+        "setSavedSite": "現在のセンサーを保存済みサイト {name} に設定",
+        "activateSavedSite": "保存済みサイト {name} も使用"
       },
       "help": {
         "overview": "センサーメニューは、アプリの他の機能が計算の基準とする地上局を選択する場所です。センサーは主にサポートするネットワークごとにグループ化されており、各項目の左側にセンサー名、右側に所有する国または組織が表示されます。選択したセンサーは、視線角度、視野コーン、ウォッチリストのパス通知、その他センサーを利用するすべてのメニューに反映されます。",

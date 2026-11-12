@@ -282,6 +282,10 @@
     "expand": "Espandi",
     "phoneLink": "Collegamento telefono",
     "phoneLinkSignIn": "Accedi per collegare il tuo telefono",
+    "signInPromptTitle": "Accedi per usare {feature}",
+    "signInPromptBody": "{feature} è disponibile con un account gratuito. Accedi per usarlo.",
+    "signInPromptAction": "Accedi",
+    "signInPromptCancel": "Non ora",
     "connected": "Connesso",
     "offline": "Offline",
     "footerLinks": {
@@ -408,5 +412,10 @@
       "breakup": "Detriti da frammentazione",
       "created": "Satelliti creati"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

@@ -9,17 +9,26 @@
         "groundStationsHeader": "Stazioni di terra",
         "groundStationsAll": "Tutte le stazioni di terra",
         "missingData": "Dati mancanti",
-        "tooltipSensorsInFov": "Visualizza la copertura dei sensori"
+        "tooltipSensorsInFov": "Visualizza la copertura dei sensori",
+        "savedSites": "Siti personalizzati salvati",
+        "savedSite_current": "Corrente",
+        "savedSite_active": "Attivo",
+        "savedSite_saved": "Salvato"
       },
       "buttons": {
         "markAll": "Contrassegna {name}",
         "resetSensor": "Reimposta sensore",
-        "showSensorsWithFov": "Mostra tutti i sensori con campo visivo..."
+        "showSensorsWithFov": "Mostra tutti i sensori con campo visivo...",
+        "removeSavedSite": "Rimuovi il sito salvato {name}",
+        "activateSavedSite": "Usa anche il sito salvato {name}",
+        "deactivateSavedSite": "Smetti di usare il sito salvato {name}"
       },
       "commands": {
         "category": "Sensori",
         "setSensor": "Imposta il sensore corrente su {name}",
-        "setSensorGroup": "Imposta gruppo di sensori: {name}"
+        "setSensorGroup": "Imposta gruppo di sensori: {name}",
+        "setSavedSite": "Imposta il sensore corrente sul sito salvato {name}",
+        "activateSavedSite": "Usa anche il sito salvato {name}"
       },
       "help": {
         "overview": "Il menu Sensori è dove scegli la stazione di terra da cui il resto dell'app effettua i calcoli. I sensori sono raggruppati in base alla rete che supportano principalmente, con ogni voce che mostra il nome del sensore a sinistra e il paese o l'organizzazione proprietaria a destra. Il sensore selezionato determina gli angoli di osservazione, i coni del campo visivo, gli avvisi di passaggio della lista di osservazione e ogni altro menu che dipende da un sensore.",

@@ -287,6 +287,10 @@
     "expand": "Розгорнути",
     "phoneLink": "Зв'язок із телефоном",
     "phoneLinkSignIn": "Увійдіть, щоб під'єднати телефон",
+    "signInPromptTitle": "Увійдіть, щоб скористатися: {feature}",
+    "signInPromptBody": "Функція «{feature}» доступна з безкоштовним обліковим записом. Увійдіть, щоб нею користуватися.",
+    "signInPromptAction": "Увійти",
+    "signInPromptCancel": "Не зараз",
     "connected": "Під'єднано",
     "offline": "Офлайн",
     "footerLinks": {
@@ -413,5 +417,10 @@
       "breakup": "Уламки руйнування",
       "created": "Створені супутники"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

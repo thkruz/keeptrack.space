@@ -282,6 +282,10 @@
     "expand": "Развернуть",
     "phoneLink": "Связь с телефоном",
     "phoneLinkSignIn": "Войдите, чтобы подключить телефон",
+    "signInPromptTitle": "Войдите, чтобы использовать: {feature}",
+    "signInPromptBody": "Функция «{feature}» доступна с бесплатной учётной записью. Войдите, чтобы ею пользоваться.",
+    "signInPromptAction": "Войти",
+    "signInPromptCancel": "Не сейчас",
     "connected": "Подключено",
     "offline": "Не в сети",
     "footerLinks": {
@@ -408,5 +412,10 @@
       "breakup": "Обломки разрушения",
       "created": "Созданные спутники"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

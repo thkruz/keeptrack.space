@@ -9,17 +9,26 @@
         "groundStationsHeader": "Estaciones terrestres",
         "groundStationsAll": "Todas las estaciones terrestres",
         "missingData": "Datos faltantes",
-        "tooltipSensorsInFov": "Visualizar cobertura de sensores"
+        "tooltipSensorsInFov": "Visualizar cobertura de sensores",
+        "savedSites": "Sitios personalizados guardados",
+        "savedSite_current": "Actual",
+        "savedSite_active": "Activo",
+        "savedSite_saved": "Guardado"
       },
       "buttons": {
         "markAll": "Marcar {name}",
         "resetSensor": "Restablecer sensor",
-        "showSensorsWithFov": "Mostrar todos los sensores con campo de visión..."
+        "showSensorsWithFov": "Mostrar todos los sensores con campo de visión...",
+        "removeSavedSite": "Quitar el sitio guardado {name}",
+        "activateSavedSite": "Usar también el sitio guardado {name}",
+        "deactivateSavedSite": "Dejar de usar el sitio guardado {name}"
       },
       "commands": {
         "category": "Sensores",
         "setSensor": "Establecer el sensor actual en {name}",
-        "setSensorGroup": "Establecer grupo de sensores: {name}"
+        "setSensorGroup": "Establecer grupo de sensores: {name}",
+        "setSavedSite": "Establecer el sensor actual en el sitio guardado {name}",
+        "activateSavedSite": "Usar también el sitio guardado {name}"
       },
       "help": {
         "overview": "El menú de Sensores es donde eliges la estación terrestre desde la que calcula el resto de la aplicación. Los sensores están agrupados por la red que principalmente respaldan, y cada entrada muestra el nombre del sensor a la izquierda y el país u organización propietaria a la derecha. El sensor seleccionado determina los ángulos de visión, los conos de campo de visión, las alertas de pases de la lista de seguimiento y todos los demás menús que dependen de un sensor.",

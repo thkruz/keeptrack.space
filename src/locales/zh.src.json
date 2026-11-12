@@ -282,6 +282,10 @@
     "expand": "展开",
     "phoneLink": "手机连接",
     "phoneLinkSignIn": "登录以连接您的手机",
+    "signInPromptTitle": "登录以使用{feature}",
+    "signInPromptBody": "{feature}需要免费账户。请登录后使用。",
+    "signInPromptAction": "登录",
+    "signInPromptCancel": "暂不",
     "connected": "已连接",
     "offline": "离线",
     "footerLinks": {
@@ -408,5 +412,10 @@
       "breakup": "解体碎片",
       "created": "已创建的卫星"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

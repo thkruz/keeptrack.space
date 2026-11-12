@@ -9,17 +9,26 @@
         "groundStationsHeader": "Stations sol",
         "groundStationsAll": "Toutes les stations sol",
         "missingData": "Données manquantes",
-        "tooltipSensorsInFov": "Visualiser la couverture des capteurs"
+        "tooltipSensorsInFov": "Visualiser la couverture des capteurs",
+        "savedSites": "Sites personnalisés enregistrés",
+        "savedSite_current": "Actuel",
+        "savedSite_active": "Actif",
+        "savedSite_saved": "Enregistré"
       },
       "buttons": {
         "markAll": "Marquer {name}",
         "resetSensor": "Réinitialiser le capteur",
-        "showSensorsWithFov": "Afficher tous les capteurs avec leur champ de vision..."
+        "showSensorsWithFov": "Afficher tous les capteurs avec leur champ de vision...",
+        "removeSavedSite": "Supprimer le site enregistré {name}",
+        "activateSavedSite": "Utiliser aussi le site enregistré {name}",
+        "deactivateSavedSite": "Ne plus utiliser le site enregistré {name}"
       },
       "commands": {
         "category": "Capteurs",
         "setSensor": "Définir le capteur actuel sur {name}",
-        "setSensorGroup": "Définir le groupe de capteurs : {name}"
+        "setSensorGroup": "Définir le groupe de capteurs : {name}",
+        "setSavedSite": "Définir le capteur actuel sur le site enregistré {name}",
+        "activateSavedSite": "Utiliser aussi le site enregistré {name}"
       },
       "help": {
         "overview": "Le menu Capteurs est l'endroit où vous choisissez la station au sol à partir de laquelle le reste de l'application effectue ses calculs. Les capteurs sont regroupés par le réseau qu'ils soutiennent principalement, chaque entrée affichant le nom du capteur à gauche et le pays ou l'organisation propriétaire à droite. Le capteur sélectionné détermine les angles de visée, les cônes de champ de vision, les alertes de passage de la liste de suivi et tous les autres menus liés aux capteurs.",

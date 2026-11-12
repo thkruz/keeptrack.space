@@ -282,6 +282,10 @@
     "expand": "展開",
     "phoneLink": "スマートフォン連携",
     "phoneLinkSignIn": "スマートフォンを連携するにはサインインしてください",
+    "signInPromptTitle": "{feature}を使うにはサインインしてください",
+    "signInPromptBody": "{feature}は無料アカウントで利用できます。サインインしてご利用ください。",
+    "signInPromptAction": "サインイン",
+    "signInPromptCancel": "あとで",
     "connected": "接続済み",
     "offline": "オフライン",
     "footerLinks": {
@@ -408,5 +412,10 @@
       "breakup": "分裂破片",
       "created": "作成した衛星"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

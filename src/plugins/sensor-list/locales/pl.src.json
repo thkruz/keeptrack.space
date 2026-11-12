@@ -9,17 +9,26 @@
         "groundStationsHeader": "Stacje naziemne",
         "groundStationsAll": "Wszystkie stacje naziemne",
         "missingData": "Brak danych",
-        "tooltipSensorsInFov": "Wizualizuj zasięg czujników"
+        "tooltipSensorsInFov": "Wizualizuj zasięg czujników",
+        "savedSites": "Zapisane lokalizacje niestandardowe",
+        "savedSite_current": "Bieżąca",
+        "savedSite_active": "Aktywna",
+        "savedSite_saved": "Zapisana"
       },
       "buttons": {
         "markAll": "Oznacz {name}",
         "resetSensor": "Resetuj czujnik",
-        "showSensorsWithFov": "Pokaż wszystkie czujniki z FOV..."
+        "showSensorsWithFov": "Pokaż wszystkie czujniki z FOV...",
+        "removeSavedSite": "Usuń zapisaną lokalizację {name}",
+        "activateSavedSite": "Użyj także zapisanej lokalizacji {name}",
+        "deactivateSavedSite": "Przestań używać zapisanej lokalizacji {name}"
       },
       "commands": {
         "category": "Czujniki",
         "setSensor": "Ustaw bieżący czujnik na {name}",
-        "setSensorGroup": "Ustaw grupę czujników: {name}"
+        "setSensorGroup": "Ustaw grupę czujników: {name}",
+        "setSavedSite": "Ustaw bieżący czujnik na zapisaną lokalizację {name}",
+        "activateSavedSite": "Użyj także zapisanej lokalizacji {name}"
       },
       "help": {
         "overview": "Menu czujników to miejsce, w którym wybierasz stację naziemną, na podstawie której reszta aplikacji wykonuje obliczenia. Czujniki są pogrupowane według sieci, którą głównie obsługują, a każda pozycja pokazuje po lewej stronie nazwę czujnika, a po prawej kraj lub organizację, do której należy. Wybrany czujnik steruje kątami obserwacji, stożkami pola widzenia, alertami przelotów z listy obserwowanych i każdym innym menu korzystającym z czujnika.",

@@ -9,17 +9,26 @@
         "groundStationsHeader": "Ground Stations",
         "groundStationsAll": "All Ground Stations",
         "missingData": "Missing Data",
-        "tooltipSensorsInFov": "Visualize Sensor Coverage"
+        "tooltipSensorsInFov": "Visualize Sensor Coverage",
+        "savedSites": "Saved Custom Sites",
+        "savedSite_current": "Current",
+        "savedSite_active": "Active",
+        "savedSite_saved": "Saved"
       },
       "buttons": {
         "markAll": "Mark {name}",
         "resetSensor": "Reset Sensor",
-        "showSensorsWithFov": "Show All Sensors with FOV..."
+        "showSensorsWithFov": "Show All Sensors with FOV...",
+        "removeSavedSite": "Remove saved site {name}",
+        "activateSavedSite": "Also use saved site {name}",
+        "deactivateSavedSite": "Stop using saved site {name}"
       },
       "commands": {
         "category": "Sensors",
         "setSensor": "Set Current Sensor to {name}",
-        "setSensorGroup": "Set Sensor Group: {name}"
+        "setSensorGroup": "Set Sensor Group: {name}",
+        "setSavedSite": "Set Current Sensor to Saved Site {name}",
+        "activateSavedSite": "Also Use Saved Site {name}"
       },
       "help": {
         "overview": "The Sensors menu is where you pick the ground station the rest of the app calculates from. Sensors are grouped by the network they primarily support, with each entry showing the sensor's name on the left and its owning country or organization on the right. The selected sensor drives look angles, field-of-view cones, watchlist pass alerts, and every other sensor-aware menu.",

@@ -26,6 +26,9 @@ export const getClockMode = (propRate: number, simulationTimeMs: number, nowMs: 
   return 'simulated';
 };
 
+/** Playback rate as shown beside the clock: "1×", "-4×", "0.5×"; at most two decimals. */
+export const formatPlaybackRate = (propRate: number): string => `${Number(propRate.toFixed(2))}×`;
+
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
   dependencies_ = [TopMenu.name];
@@ -146,7 +149,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
   }
 
-  /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" under the clock; skips the DOM write unless the text changed. */
+  /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" (plus the playback rate when simulated) under the clock; skips the DOM write unless the text changed. */
   private updateStatus_(): void {
     const statusEl = getEl('datetime-status', true);
 
@@ -157,7 +160,9 @@ export class DateTimeManager extends KeepTrackPlugin {
     const simMs = timeManagerInstance.simulationTimeObj.getTime();
     const mode = getClockMode(timeManagerInstance.propRate, simMs, Date.now());
     const label = t7e(`plugins.DateTimeManager.clock.${mode}` as Parameters<typeof t7e>[0]);
-    const text = `${timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10)} UTC · ${label}`;
+    // Paused and live states say it all; a simulated clock also shows its rate so a raised rate is never invisible.
+    const rate = mode === 'simulated' ? ` · ${formatPlaybackRate(timeManagerInstance.propRate)}` : '';
+    const text = `${timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10)} UTC · ${label}${rate}`;
 
     if (text !== this.lastStatusStr_) {
       statusEl.textContent = text;

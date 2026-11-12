@@ -420,9 +420,9 @@
   padding: 2px 6px;
 }
 
-/* Narrow desktop: keep the checklist to one header row until the user opens it, so the card
+/* Narrow or short (laptop) viewport: keep the checklist to one header row until the user opens it, so the card
    and a toast do not push the menu a third of the way down the drawer. */
-@media (max-width: 640px) {
+@media (max-width: 640px), (max-height: 800px) {
   .kt-get-started-toggle {
     display: inline-block;
   }

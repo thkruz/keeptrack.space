@@ -617,8 +617,8 @@ export class EditSat extends KeepTrackPlugin {
     if (formScc && catalogManagerInstance.sccNum2Id(formScc) !== sat.id) {
       errorManagerInstance.warn(
         t7e('plugins.EditSat.errorMsgs.sccMismatch' as T7eKey)
-          .replace('{fileScc}', parsed.sccNum)
-          .replace('{selectedScc}', formScc)
+          .replace(/\{fileScc\}/gu, parsed.sccNum)
+          .replace(/\{selectedScc\}/gu, formScc)
       );
 
       return;

@@ -39,6 +39,8 @@ export type GroupData = {
 
 export class ObjectGroup<T extends GroupType> {
   ids: number[] = [];
+  /** When true the group's member orbit lines are not drawn (set by Hide Others for its own temporary group). */
+  isOverlayHidden = false;
 
   constructor(type: T, data: GroupData[T] | null = null) {
     const objData = ServiceLocator.getCatalogManager().objectCache;

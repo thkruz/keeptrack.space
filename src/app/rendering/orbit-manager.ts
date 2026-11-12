@@ -619,7 +619,7 @@ export class OrbitManager {
     const groupManagerInstance = ServiceLocator.getGroupsManager();
     const colorData = colorSchemeManagerInstance.colorData;
 
-    if (groupManagerInstance.selectedGroup !== null && !settingsManager.isGroupOverlayDisabled) {
+    if (groupManagerInstance.selectedGroup !== null && !groupManagerInstance.selectedGroup.isOverlayHidden && !settingsManager.isGroupOverlayDisabled) {
       groupManagerInstance.selectedGroup.ids.forEach((id: number) => {
         if (id === hoverManagerInstance.getHoverId() || id === this.currentSelectId_) {
           return;

@@ -33,6 +33,9 @@ import { Degrees, eci2rae, Kilometers, MINUTES_PER_DAY, SatelliteRecord, TAU } f
 /** Default per-satellite cap on how many passes are collected before truncating. */
 export const DEFAULT_MAX_RESULTS = 5000;
 
+/** Pass AOS/LOS are bisected to this resolution (ms). */
+export const EDGE_REFINE_MS = 1000;
+
 /** Elevation (deg) at or below which a pass edge counts as a horizon-grazing pass. */
 const HORIZON_ELEVATION_DEG = 3.5;
 
@@ -65,6 +68,11 @@ export interface BestPassOptions {
    * Default false: such contacts behave as before (no start, or no stop, so no row).
    */
   includeClippedPasses?: boolean;
+  /**
+   * Resolution (ms) pass AOS/LOS are bisected to. Default {@link EDGE_REFINE_MS} (1 s).
+   * 0 disables refinement, so edges are the coarse samples (the pre-refinement behavior).
+   */
+  edgeRefineMs?: number;
 }
 
 export interface BestPassDeps {
@@ -194,6 +202,32 @@ export const findPassesForSat = (
   /** Loop counter in seconds from the window start; the loop variable itself so float drift cannot hide the last sample. */
   let offsetSec = 0;
 
+  /**
+   * Bisects between an out-of-view sample and an in-view sample down to {@link EDGE_REFINE_MS}
+   * and returns the in-view side, so pass AOS/LOS agree with finer-grained consumers (the
+   * access timeline) instead of being quantised to the coarse step.
+   */
+  const refineMs = options.edgeRefineMs ?? EDGE_REFINE_MS;
+  const refineEdge = (outDate: Date, inDate: Date, inRae: PassRae): { date: Date; rae: PassRae } => {
+    let outMs = outDate.getTime();
+    let inMs = inDate.getTime();
+    let rae = inRae;
+
+    while (Number.isFinite(refineMs) && refineMs >= 1 && Math.abs(inMs - outMs) > refineMs) {
+      const midMs = Math.round((inMs + outMs) / 2);
+      const midRae = getRae(new Date(midMs), satrec, sensor);
+
+      if (checkIsInView(sensor, midRae)) {
+        inMs = midMs;
+        rae = midRae;
+      } else {
+        outMs = midMs;
+      }
+    }
+
+    return { date: new Date(inMs), rae };
+  };
+
   const propagateBestPass = (now: Date): lookanglesRow => {
     const aer = getRae(now, satrec, sensor) as Required<PassRae>;
     const isInFOV = checkIsInView(sensor, aer);
@@ -233,10 +267,12 @@ export const findPassesForSat = (
       }
       startClipped = isFirstSample;
       startMasked = isFirstSample ? false : isMaskEdge(aer1);
-      sTime = now;
-      sAz = aer.az.toFixed(0);
-      sEl = aer.el.toFixed(1);
-      srng = aer.rng.toFixed(0);
+      const rise = isFirstSample ? { date: now, rae: aer } : refineEdge(timeAt(Math.max(offset - looksInterval * 1000, 0)), now, aer);
+
+      sTime = rise.date;
+      sAz = (rise.rae.az as number).toFixed(0);
+      sEl = (rise.rae.el as number).toFixed(1);
+      srng = (rise.rae.rng as number).toFixed(0);
     }
 
     // A rising sample can only close the pass at once when it is the last one in the window.
@@ -272,8 +308,9 @@ export const findPassesForSat = (
           return emptyPassRow();
         }
 
-        const stopTime = endClipped ? timeAt(windowSec * 1000) : now;
-        const stopRae: PassRae = endClipped ? getRae(stopTime, satrec, sensor) : aer;
+        const set = endClipped ? null : refineEdge(timeAt(Math.min(now2.getTime() - baseTimeMs, windowSec * 1000)), now, aer);
+        const stopTime = endClipped ? timeAt(windowSec * 1000) : (set as { date: Date }).date;
+        const stopRae: PassRae = endClipped ? getRae(stopTime, satrec, sensor) : (set as { rae: PassRae }).rae;
 
         if (endClipped && stopRae.el !== null && stopRae.el !== undefined && passMaxEl < stopRae.el) {
           passMaxEl = stopRae.el;

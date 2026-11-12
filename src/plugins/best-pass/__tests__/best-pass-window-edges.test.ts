@@ -298,7 +298,8 @@ describe('best-pass window boundary passes: default (no opt-in) path', () => {
     const def = runScripted(look, false, 70);
 
     expect(def).toHaveLength(1);
-    expect((def[0].STOP_DATE as Date).getTime()).toBe(BASE_MS + 86_380_000);
+    // LOS is bisected from the last in-view sample (86 380 s) toward the true edge (86 400 s), within 1 s.
+    expect(Math.abs((def[0].STOP_DATE as Date).getTime() - (BASE_MS + 86_400_000))).toBeLessThanOrEqual(1000);
     expect(def[0].END_CLIPPED).toBeUndefined();
   });
 

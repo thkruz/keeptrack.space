@@ -107,7 +107,7 @@ describe('best-pass F1 golden: pre-F1 snapshot vs current', () => {
     for (const f of FIXTURES) {
       for (const intervalSec of [30, 60, 300]) {
         for (const optIn of [false, true]) {
-          const options = { lengthDays: f.lengthDays, intervalSec, includeClippedPasses: optIn };
+          const options = { lengthDays: f.lengthDays, intervalSec, includeClippedPasses: optIn, edgeRefineMs: 0 };
           const oldRows = findPassesLegacy('G', satrec(f.no), makeSensor(f), options, makeDeps(f), 'RIDGE').passes;
           const newDeps = makeDeps(f);
           const inViewSamplesMs: number[] = [];

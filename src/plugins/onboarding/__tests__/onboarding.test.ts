@@ -4,6 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { buildMissions, sortMissionsForPersona, wireMissionAutoChecks } from '@app/plugins/onboarding/checklist';
 import { OnboardingPlugin } from '@app/plugins/onboarding/onboarding';
 import { settingsManager } from '@app/settings/settings';
@@ -48,13 +49,24 @@ describe('OnboardingPlugin behavior', () => {
   it('exposes commands, settings contribution, and help', () => {
     const commands = plugin.getCommandPaletteCommands();
 
-    expect(commands.map((c) => c.id)).toEqual(['OnboardingPlugin.startTour', 'OnboardingPlugin.startPowerTour', 'OnboardingPlugin.openChecklist']);
+    expect(commands.map((c) => c.id)).toEqual(['OnboardingPlugin.startTour', 'OnboardingPlugin.startPowerTour', 'OnboardingPlugin.openChecklist', 'OnboardingPlugin.helpForMenu']);
 
     const contribution = plugin.getSettingsContribution();
 
     expect(contribution.sectionId).toBe('OnboardingPlugin');
     expect(contribution.controls.map((c) => c.type)).toEqual(['toggle', 'button']);
     expect(plugin.getHelpConfig().title.length).toBeGreaterThan(0);
+  });
+
+  it('the help-for-this-menu command reuses the Shift+F1 path', () => {
+    const spy = vi.spyOn(adviceManagerInstance, 'showContextHelp').mockImplementation(() => undefined);
+    const cmd = plugin.getCommandPaletteCommands().find((c) => c.id === 'OnboardingPlugin.helpForMenu');
+
+    cmd?.callback();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(cmd?.shortcutHint).toBe('Shift+F1');
+    spy.mockRestore();
   });
 
   it('the settings toggle inverts the isDisableOnboarding setting', () => {

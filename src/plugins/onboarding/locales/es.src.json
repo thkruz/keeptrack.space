@@ -108,6 +108,7 @@
       "commands": {
         "startTour": "Iniciar tutorial",
         "startPowerTour": "Abrir el recorrido avanzado",
+        "helpForMenu": "Help for this menu (Shift+F1)",
         "openChecklist": "Abrir lista de primeros pasos"
       },
       "settings": {

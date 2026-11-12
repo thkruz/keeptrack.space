@@ -108,6 +108,7 @@
       "commands": {
         "startTour": "开始教程",
         "startPowerTour": "打开进阶教程",
+        "helpForMenu": "Help for this menu (Shift+F1)",
         "openChecklist": "打开新手入门清单"
       },
       "settings": {

@@ -8,6 +8,7 @@ import { TranslationKey, t7e } from '@app/locales/keys';
 import { OfflineIconBehavior } from '@app/settings/core-settings';
 import { BaseObject } from '@ootk/src/main';
 import downloadPng from '@public/img/icons/download.png';
+import helpPng from '@public/img/icons/help.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
 import settingsPng from '@public/img/icons/settings.png';
 import Module from 'module';
@@ -193,6 +194,20 @@ export abstract class KeepTrackPlugin {
 
   /** True once this plugin registered help content (config or title/body). */
   protected hasHelp_ = false;
+
+  /** Title and body passed to registerHelp, so the menu's own help button can show them directly. */
+  private helpPayload_: { title: string; text: string } | null = null;
+
+  /** Shows this plugin's own help (the menu that owns the title-bar button), not whichever menu is open first. */
+  private showOwnHelp_(): void {
+    if (!this.helpPayload_) {
+      adviceManagerInstance.showContextHelp();
+
+      return;
+    }
+    adviceManagerInstance.showAdvice(this.helpPayload_.title, this.helpPayload_.text);
+    EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.id);
+  }
 
   /**
    * Whether the bottom icon is disabled by default.
@@ -876,7 +891,23 @@ export abstract class KeepTrackPlugin {
       getEl(`${this.sideMenuElementName}-close-btn`)?.addEventListener('click', () => {
         this.hideSideMenus();
       });
+      this.showMenuHelpButton_();
     });
+  }
+
+  /**
+   * Reveals the title-bar help button when this plugin has help and wires it to the same path as
+   * Shift+F1, so free users can find the per-menu help without knowing the shortcut.
+   */
+  private showMenuHelpButton_(): void {
+    const btn = getEl(`${this.sideMenuElementName}-help-btn`);
+
+    if (!btn || !this.hasHelp_ || this.helpRole === 'none') {
+      return;
+    }
+
+    btn.hidden = false;
+    btn.addEventListener('click', () => this.showOwnHelp_());
   }
 
   private generateTitleBarHtml_(): string {
@@ -899,6 +930,15 @@ export abstract class KeepTrackPlugin {
         <img src="${secondaryIconSrc}" alt="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" class="icon-btn-img" />
       </button>`
       : '';
+    // Hidden until uiManagerFinal confirms the plugin has help (see showMenuHelpButton_).
+    const helpIconHtml = html`
+      <button id="${this.sideMenuElementName}-help-btn"
+        class="center-align btn btn-ui waves-effect waves-light icon-btn side-menu-help-btn"
+        type="button" hidden
+        aria-label="${t7e('Common.menuHelp' as TranslationKey)}"
+        kt-tooltip="${t7e('Common.menuHelp' as TranslationKey)}">
+        <span class="side-menu-help-glyph" style="--side-menu-help-icon: url('${helpPng}')"></span>
+      </button>`;
     const closeIconHtml = html`
       <button id="${this.sideMenuElementName}-close-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
@@ -913,6 +953,7 @@ export abstract class KeepTrackPlugin {
         <div class="side-menu-title-right">
           ${downloadIconHtml}
           ${settingsIconHtml}
+          ${helpIconHtml}
           ${closeIconHtml}
         </div>
       </div>`;
@@ -1764,6 +1805,7 @@ export abstract class KeepTrackPlugin {
    */
   registerHelp(helpTitle: string, helpText: string) {
     this.hasHelp_ = true;
+    this.helpPayload_ = { title: helpTitle, text: helpText };
     EventBus.getInstance().on(EventBusEvent.onHelpMenuClick, (): boolean => {
       if (this.isHelpTarget_()) {
         adviceManagerInstance.showAdvice(helpTitle, helpText);

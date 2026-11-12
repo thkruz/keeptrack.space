@@ -2839,6 +2839,21 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   pointer-events: none;
 }
 
+.icon-btn[hidden] {
+  display: none;
+}
+
+/* Title-bar help button: themed glyph via CSS mask (never a raw img). */
+.side-menu-help-glyph {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+  background-color: #fff;
+  -webkit-mask: var(--side-menu-help-icon) center / contain no-repeat;
+  mask: var(--side-menu-help-icon) center / contain no-repeat;
+}
+
 .icon-btn-img {
   width: 20px;
   height: 20px;
@@ -3136,6 +3151,13 @@ nav a.sidenav-trigger i {
 .search-result-decayed-badge {
   font-size: 0.75em;
   color: #ff6b6b;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+.search-partial-badge {
+  font-size: 0.75em;
+  opacity: 0.7;
   margin-left: 8px;
   white-space: nowrap;
 }

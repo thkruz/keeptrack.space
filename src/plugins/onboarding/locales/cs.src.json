@@ -108,6 +108,7 @@
       "commands": {
         "startTour": "Spustit výuku",
         "startPowerTour": "Otevřít pokročilou prohlídku",
+        "helpForMenu": "Help for this menu (Shift+F1)",
         "openChecklist": "Otevřít seznam Začínáme"
       },
       "settings": {

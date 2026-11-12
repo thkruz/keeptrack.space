@@ -146,6 +146,14 @@ export class AdviceManager {
       return;
     }
 
+    this.showContextHelp();
+  }
+
+  /**
+   * Opens the help of the open menu or active view, or the general help when none answers.
+   * Same path as Shift+F1, exposed so the command palette can offer it.
+   */
+  public showContextHelp(): void {
     EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
 
     if (!this.isAdviceOpen) {

@@ -12,6 +12,7 @@ import {
   ISettingsContributor,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
+import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -109,6 +110,14 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
         category,
         keywords: ['checklist', 'get started', 'missions'],
         callback: () => this.bottomMenuClicked(),
+      },
+      {
+        id: 'OnboardingPlugin.helpForMenu',
+        label: l('commands.helpForMenu'),
+        category,
+        shortcutHint: 'Shift+F1',
+        keywords: ['help', 'menu help', 'what does this do', 'documentation', 'guide'],
+        callback: () => adviceManagerInstance.showContextHelp(),
       },
     ];
   }

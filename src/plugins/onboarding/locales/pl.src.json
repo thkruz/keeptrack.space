@@ -108,6 +108,7 @@
       "commands": {
         "startTour": "Uruchom samouczek",
         "startPowerTour": "Otwórz wycieczkę zaawansowaną",
+        "helpForMenu": "Help for this menu (Shift+F1)",
         "openChecklist": "Otwórz listę pierwszych kroków"
       },
       "settings": {

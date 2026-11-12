@@ -38,8 +38,33 @@ describe('edit-sat-actions', () => {
       expect(result!.sccNum).toBe('25544');
     });
 
-    it('returns null for malformed JSON', () => {
+    it('returns null for text that is neither JSON nor a TLE', () => {
       expect(parseLoadedTle('not json')).toBeNull();
+    });
+
+    it('parses a plain two-line file with LF endings', () => {
+      const result = parseLoadedTle(`${TLE1}
+${TLE2}
+`);
+
+      expect(result).toEqual({ sccNum: '25544', tle1: TLE1, tle2: TLE2 });
+    });
+
+    it('parses a plain file with a name line, CRLF endings and a BOM', () => {
+      const result = parseLoadedTle(`﻿ISS (ZARYA)
+${TLE1}
+${TLE2}
+`);
+
+      expect(result).toEqual({ sccNum: '25544', tle1: TLE1, tle2: TLE2 });
+    });
+
+    it('rejects a plain file with a truncated line 2', () => {
+      expect(
+        parseLoadedTle(`${TLE1}
+${TLE2.slice(0, 40)}
+`)
+      ).toBeNull();
     });
 
     it('returns null when the TLE lines are missing', () => {

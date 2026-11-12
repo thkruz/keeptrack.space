@@ -200,6 +200,13 @@ export class EditSat extends KeepTrackPlugin {
       }
       this.doReaderActions_(evt);
       evt.preventDefault();
+      // Let the same file be chosen again (a revised file often keeps its name).
+      // readAsText has already captured the File, so clearing the input is safe.
+      const input = evt.target as HTMLInputElement;
+
+      setTimeout(() => {
+        input.value = '';
+      }, 0);
     });
 
     getEl(`${p}-error`)!.addEventListener('click', () => this.hideError_());
@@ -601,6 +608,18 @@ export class EditSat extends KeepTrackPlugin {
 
     if (!sat) {
       errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', parsed.sccNum));
+
+      return;
+    }
+
+    const formScc = (getEl(`${EditSat.elementPrefix}-scc`) as HTMLInputElement | null)?.value.trim();
+
+    if (formScc && catalogManagerInstance.sccNum2Id(formScc) !== sat.id) {
+      errorManagerInstance.warn(
+        t7e('plugins.EditSat.errorMsgs.sccMismatch' as T7eKey)
+          .replace('{fileScc}', parsed.sccNum)
+          .replace('{selectedScc}', formScc)
+      );
 
       return;
     }

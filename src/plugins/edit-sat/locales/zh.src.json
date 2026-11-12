@@ -38,7 +38,8 @@
         "meanAnomaly": "平近点角",
         "meanMotion": "平均运动",
         "period": "周期",
-        "error": "错误"
+        "error": "错误",
+        "sessionOnly": "编辑仅在本次会话内有效，重新加载页面后不会保存。"
       },
       "buttons": {
         "resetOriginal": "重置为原始值",
@@ -58,7 +59,8 @@
         "failedToPropagate": "卫星传播失败。请尝试不同的参数，或者如果您确信参数正确，请报告此问题。",
         "cannotCalculateDirection": "无法计算卫星方向。请稍后再试。",
         "notRealSatellite": "不是真实卫星",
-        "satrecFailed": "创建卫星记录时出错！"
+        "satrecFailed": "创建卫星记录时出错！",
+        "sccMismatch": "文件对应卫星 {fileScc}，但当前选中的是 {selectedScc}。请先选择 {fileScc}。"
       }
     }
   }

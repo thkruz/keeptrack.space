@@ -38,7 +38,8 @@
         "meanAnomaly": "평균 근점 이각",
         "meanMotion": "평균 운동",
         "period": "주기",
-        "error": "오류"
+        "error": "오류",
+        "sessionOnly": "편집 내용은 이번 세션에서만 유지됩니다. 페이지를 새로 고치면 저장되지 않습니다."
       },
       "buttons": {
         "resetOriginal": "원본으로 재설정",
@@ -58,7 +59,8 @@
         "failedToPropagate": "위성 전파에 실패했습니다. 다른 매개변수를 시도하거나, 올바르다고 확신하는 경우 이 문제를 보고해 주세요.",
         "cannotCalculateDirection": "위성 방향을 계산할 수 없습니다. 나중에 다시 시도해 주세요.",
         "notRealSatellite": "실제 위성이 아닙니다",
-        "satrecFailed": "위성 레코드를 만드는 중 오류가 발생했습니다!"
+        "satrecFailed": "위성 레코드를 만드는 중 오류가 발생했습니다!",
+        "sccMismatch": "파일은 위성 {fileScc}용이지만 {selectedScc}이(가) 선택되어 있습니다. 먼저 {fileScc}을(를) 선택하세요."
       }
     }
   }

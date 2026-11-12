@@ -169,7 +169,7 @@ export function parseLoadedTle(text: string): { sccNum: string; tle1: TleLine1; 
   try {
     object = JSON.parse(text);
   } catch {
-    return null;
+    return parsePlainTle_(text);
   }
 
   if (typeof object?.tle1 !== 'string' || typeof object?.tle2 !== 'string') {
@@ -179,6 +179,29 @@ export function parseLoadedTle(text: string): { sccNum: string; tle1: TleLine1; 
   const sccNum = typeof object.sccNum === 'string' || typeof object.sccNum === 'number' ? String(object.sccNum) : object.tle1.slice(2, 7).trim().padStart(5, '0');
 
   return { sccNum, tle1: object.tle1 as TleLine1, tle2: object.tle2 as TleLine2 };
+}
+
+/**
+ * Parse a standard two-line element file (optional name line, LF or CRLF, BOM,
+ * blank lines). Uses the first line-1/line-2 pair found.
+ */
+function parsePlainTle_(text: string): { sccNum: string; tle1: TleLine1; tle2: TleLine2 } | null {
+  const lines = text
+    .replace(/^\uFEFF/u, '')
+    .split(/\r?\n/u)
+    .map((line) => line.trimEnd())
+    .filter((line) => line.trim() !== '');
+
+  for (let i = 0; i < lines.length - 1; i++) {
+    const a = lines[i].trimStart();
+    const b = lines[i + 1].trimStart();
+
+    if (/^1 /u.test(a) && /^2 /u.test(b) && a.length >= 69 && b.length >= 69) {
+      return { sccNum: a.slice(2, 7).trim().padStart(5, '0'), tle1: a as TleLine1, tle2: b as TleLine2 };
+    }
+  }
+
+  return null;
 }
 
 /**

@@ -38,7 +38,8 @@
         "meanAnomaly": "Anomalia media",
         "meanMotion": "Moto medio",
         "period": "Periodo",
-        "error": "Errore"
+        "error": "Errore",
+        "sessionOnly": "Le modifiche valgono solo per questa sessione. Non vengono salvate quando ricarichi la pagina."
       },
       "buttons": {
         "resetOriginal": "Ripristina originale",
@@ -58,7 +59,8 @@
         "failedToPropagate": "Impossibile propagare il satellite. Provare parametri diversi o segnalare il problema se si è certi che siano corretti.",
         "cannotCalculateDirection": "Impossibile calcolare la direzione del satellite. Riprovare più tardi.",
         "notRealSatellite": "Non è un satellite reale",
-        "satrecFailed": "Errore nella creazione del record del satellite!"
+        "satrecFailed": "Errore nella creazione del record del satellite!",
+        "sccMismatch": "Il file riguarda il satellite {fileScc} ma è selezionato {selectedScc}. Seleziona prima {fileScc}."
       }
     }
   }

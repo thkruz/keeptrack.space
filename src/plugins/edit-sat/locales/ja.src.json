@@ -38,7 +38,8 @@
         "meanAnomaly": "平均近点角",
         "meanMotion": "平均運動",
         "period": "周期",
-        "error": "エラー"
+        "error": "エラー",
+        "sessionOnly": "編集内容はこのセッション中のみ有効です。ページを再読み込みすると保存されません。"
       },
       "buttons": {
         "resetOriginal": "元に戻す",
@@ -58,7 +59,8 @@
         "failedToPropagate": "衛星の伝播に失敗しました。別のパラメータを試すか、正しいと確信している場合はこの問題を報告してください。",
         "cannotCalculateDirection": "衛星の方向を計算できません。後でもう一度お試しください。",
         "notRealSatellite": "実在の衛星ではありません",
-        "satrecFailed": "衛星レコードの作成でエラーが発生しました!"
+        "satrecFailed": "衛星レコードの作成でエラーが発生しました!",
+        "sccMismatch": "ファイルは衛星 {fileScc} のものですが、{selectedScc} が選択されています。先に {fileScc} を選択してください。"
       }
     }
   }

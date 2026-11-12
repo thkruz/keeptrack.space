@@ -38,7 +38,8 @@
         "meanAnomaly": "Mean Anomaly",
         "meanMotion": "Mean Motion",
         "period": "Period",
-        "error": "Error"
+        "error": "Error",
+        "sessionOnly": "Edits last for this session only. They are not saved when you reload the page."
       },
       "buttons": {
         "resetOriginal": "Reset to Original",
@@ -58,7 +59,8 @@
         "failedToPropagate": "Failed to propagate satellite. Try different parameters or if you are confident they are correct report this issue.",
         "cannotCalculateDirection": "Cannot calculate direction of satellite. Try again later.",
         "notRealSatellite": "Not a Real Satellite",
-        "satrecFailed": "Error creating satellite record!"
+        "satrecFailed": "Error creating satellite record!",
+        "sccMismatch": "File is for satellite {fileScc} but {selectedScc} is selected. Select {fileScc} first."
       }
     }
   }

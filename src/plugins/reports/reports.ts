@@ -36,7 +36,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
-import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { initMaterialSelects, refreshMaterialSelect } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
@@ -331,7 +331,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
     select.innerHTML = this.buildSourceOptions_();
     select.value = this.batchSource_;
-    initMaterialSelects(getEl('reports-menu', true) ?? document.body);
+    refreshMaterialSelect(select);
   }
 
   private setBatchProgress_(text: string | null): void {
@@ -526,7 +526,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
         label: l('commands.open'),
         category,
         callback: () => this.bottomMenuClicked(),
-        isAvailable: () => ReportsPlugin.asReportTarget_(this.selectSatManager_?.primarySatObj) !== null,
+        // Always listed: with nothing selected, opening it explains what is needed instead of hiding the menu from search.
+        isAvailable: () => true,
       },
       ...reportCommands,
     ];
@@ -571,6 +572,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
           <section class="kt-section">
             <div class="kt-section-label">${l('sections.sensor')}</div>
             <div class="kt-note" id="reports-sensor-note">${l('sensorNote')}</div>
+            <div class="kt-note" id="reports-limit-note" style="display: none;"></div>
             ${ReportsPlugin.buildActionRows_(sensorReports)}
           </section>
           <section class="kt-section">
@@ -677,6 +679,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.selectSatData, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => this.updateReportAvailability_());
+    // Keep the Source counts live while the menu is open
+    // searchUpdated fires before the search manager stores the new result group, so read the count a tick later
+    EventBus.getInstance().on(EventBusEvent.searchUpdated, () => {
+      setTimeout(() => this.refreshSourceOptions_(), 0);
+    });
+    EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, () => this.refreshSourceOptions_());
     // A clock jump is a new set of inputs: the next report re-anchors its start
     EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
       this.startAnchor_ = null;
@@ -762,6 +770,19 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     if (note) {
       note.style.display = hasSensor ? 'none' : 'block';
+    }
+
+    const limitNote = getEl('reports-limit-note', true);
+
+    if (limitNote) {
+      const sensor = hasSensor ? ServiceLocator.getSensorManager().currentSensors[0] : null;
+
+      limitNote.textContent = sensor
+        ? l('sensorLimitNote')
+            .replace('{name}', sensor.name ?? sensor.objName ?? '')
+            .replace('{minEl}', String(sensor.minEl))
+        : '';
+      limitNote.style.display = sensor ? 'block' : 'none';
     }
 
     const conjNote = getEl('reports-conj-note', true);

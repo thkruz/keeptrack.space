@@ -48,6 +48,7 @@
       "downloadButton": "Bericht herunterladen",
       "copyButton": "In Zwischenablage kopieren",
       "sensorNote": "Diese Berichte erfordern einen ausgewählten Sensor.",
+      "sensorLimitNote": "Verwendet {name}: Mindestelevation {minEl}°. Überflüge darunter werden nicht gemeldet.",
       "sections": {
         "orbitPosition": "Orbit und Position",
         "sensor": "Sensor",

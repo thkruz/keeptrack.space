@@ -48,6 +48,7 @@
       "downloadButton": "Download Report",
       "copyButton": "Copy to Clipboard",
       "sensorNote": "These reports require a sensor to be selected.",
+      "sensorLimitNote": "Using {name}: minimum elevation {minEl}°. Passes below it are not reported.",
       "sections": {
         "orbitPosition": "Orbit and Position",
         "sensor": "Sensor",

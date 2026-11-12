@@ -72,6 +72,13 @@ describe('ReportsPlugin_class', () => {
       expect(reportIds).toContain('ReportsPlugin.sun-eclipse-report');
     });
 
+    it('lists Open Reports in the palette even with nothing selected', () => {
+      const plugin = new ReportsPlugin();
+      const open = plugin.getCommandPaletteCommands().find((c) => c.id === 'ReportsPlugin.open');
+
+      expect(open?.isAvailable?.()).toBe(true);
+    });
+
     it('should have isAvailable on report commands', () => {
       const plugin = new ReportsPlugin();
       const commands = plugin.getCommandPaletteCommands();

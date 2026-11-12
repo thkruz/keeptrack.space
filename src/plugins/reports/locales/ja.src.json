@@ -48,6 +48,7 @@
       "downloadButton": "レポートをダウンロード",
       "copyButton": "クリップボードにコピー",
       "sensorNote": "これらのレポートにはセンサーの選択が必要です。",
+      "sensorLimitNote": "{name} を使用: 最小仰角 {minEl}°。これ未満のパスは報告されません。",
       "sections": {
         "orbitPosition": "軌道と位置",
         "sensor": "センサー",

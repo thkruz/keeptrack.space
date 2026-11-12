@@ -48,6 +48,7 @@
       "downloadButton": "Pobierz raport",
       "copyButton": "Kopiuj do schowka",
       "sensorNote": "Te raporty wymagają wybrania sensora.",
+      "sensorLimitNote": "Użyto {name}: minimalna elewacja {minEl}°. Przeloty poniżej nie są raportowane.",
       "sections": {
         "orbitPosition": "Orbita i pozycja",
         "sensor": "Sensor",

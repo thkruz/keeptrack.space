@@ -48,6 +48,7 @@
       "downloadButton": "Stáhnout zprávu",
       "copyButton": "Kopírovat do schránky",
       "sensorNote": "Tyto zprávy vyžadují vybraný senzor.",
+      "sensorLimitNote": "Použit senzor {name}: minimální elevace {minEl}°. Přelety pod ní se nehlásí.",
       "sections": {
         "orbitPosition": "Dráha a poloha",
         "sensor": "Senzor",

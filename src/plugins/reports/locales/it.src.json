@@ -48,6 +48,7 @@
       "downloadButton": "Scarica rapporto",
       "copyButton": "Copia negli appunti",
       "sensorNote": "Questi rapporti richiedono la selezione di un sensore.",
+      "sensorLimitNote": "Sensore {name}: elevazione minima {minEl}°. I passaggi al di sotto non vengono riportati.",
       "sections": {
         "orbitPosition": "Orbita e posizione",
         "sensor": "Sensore",

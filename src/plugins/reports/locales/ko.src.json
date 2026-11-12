@@ -48,6 +48,7 @@
       "downloadButton": "보고서 다운로드",
       "copyButton": "클립보드에 복사",
       "sensorNote": "이 보고서를 사용하려면 센서를 선택해야 합니다.",
+      "sensorLimitNote": "{name} 사용: 최소 고도각 {minEl}°. 그 아래의 통과는 보고되지 않습니다.",
       "sections": {
         "orbitPosition": "궤도 및 위치",
         "sensor": "센서",

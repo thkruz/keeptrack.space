@@ -48,6 +48,7 @@
       "downloadButton": "下载报告",
       "copyButton": "复制到剪贴板",
       "sensorNote": "这些报告需要先选择一个传感器。",
+      "sensorLimitNote": "使用 {name}：最小仰角 {minEl}°。低于此值的过境不会报告。",
       "sections": {
         "orbitPosition": "轨道与位置",
         "sensor": "传感器",

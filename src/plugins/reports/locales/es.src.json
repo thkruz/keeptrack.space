@@ -48,6 +48,7 @@
       "downloadButton": "Descargar informe",
       "copyButton": "Copiar al portapapeles",
       "sensorNote": "Estos informes requieren tener un sensor seleccionado.",
+      "sensorLimitNote": "Usando {name}: elevación mínima {minEl}°. Los pasos por debajo no se informan.",
       "sections": {
         "orbitPosition": "Órbita y posición",
         "sensor": "Sensor",

@@ -48,6 +48,7 @@
       "downloadButton": "Télécharger le rapport",
       "copyButton": "Copier dans le presse-papiers",
       "sensorNote": "Ces rapports nécessitent la sélection d'un capteur.",
+      "sensorLimitNote": "Capteur {name} : élévation minimale {minEl}°. Les passages en dessous ne sont pas signalés.",
       "sections": {
         "orbitPosition": "Orbite et position",
         "sensor": "Capteur",

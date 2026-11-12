@@ -3,6 +3,7 @@
     "orbitPreview": "Orbit Preview",
     "unknown": "Unknown",
     "close": "Close",
+    "menuHelp": "Help for this menu",
     "download": "Download",
     "downloadNamed": "Download {name}",
     "loading": "Loading…"
@@ -319,6 +320,7 @@
     "resultCountLimited": "Showing {shown} of {total} results",
     "noResults": "No Results Found",
     "decayed": "Decayed",
+    "partialMatch": "Partial match",
     "typeStar": "Star",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Launch Site",

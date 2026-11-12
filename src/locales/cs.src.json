@@ -3,6 +3,7 @@
     "orbitPreview": "Náhled dráhy",
     "unknown": "Neznámý",
     "close": "Zavřít",
+    "menuHelp": "Help for this menu",
     "download": "Stáhnout",
     "downloadNamed": "Stáhnout {name}",
     "loading": "Načítání…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "Zobrazeno {shown} z {total} výsledků",
     "noResults": "Nebyly nalezeny žádné výsledky",
     "decayed": "Zaniklý",
+    "partialMatch": "Partial match",
     "typeStar": "Hvězda",
     "typeSensor": "Senzor",
     "typeLaunchSite": "Místo startu",

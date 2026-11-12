@@ -3,6 +3,7 @@
     "orbitPreview": "Попередній перегляд орбіти",
     "unknown": "Невідомо",
     "close": "Закрити",
+    "menuHelp": "Help for this menu",
     "download": "Завантажити",
     "downloadNamed": "Завантажити {name}",
     "loading": "Завантаження…"
@@ -329,6 +330,7 @@
     "resultCountLimited": "Показано {shown} з {total} результатів",
     "noResults": "Нічого не знайдено",
     "decayed": "Зійшов з орбіти",
+    "partialMatch": "Partial match",
     "typeStar": "Зоря",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовий майданчик",

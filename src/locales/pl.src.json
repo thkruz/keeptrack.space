@@ -3,6 +3,7 @@
     "orbitPreview": "Podgląd orbity",
     "unknown": "Nieznany",
     "close": "Zamknij",
+    "menuHelp": "Help for this menu",
     "download": "Pobierz",
     "downloadNamed": "Pobierz {name}",
     "loading": "Wczytywanie…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "Wyświetlono {shown} z {total} wyników",
     "noResults": "Nie znaleziono wyników",
     "decayed": "Spłonął",
+    "partialMatch": "Partial match",
     "typeStar": "Gwiazda",
     "typeSensor": "Czujnik",
     "typeLaunchSite": "Miejsce startu",

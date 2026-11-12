@@ -3,6 +3,7 @@
     "orbitPreview": "Anteprima orbita",
     "unknown": "Sconosciuto",
     "close": "Chiudi",
+    "menuHelp": "Help for this menu",
     "download": "Scarica",
     "downloadNamed": "Scarica {name}",
     "loading": "Caricamento…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "Mostrati {shown} di {total} risultati",
     "noResults": "Nessun risultato trovato",
     "decayed": "Rientrato",
+    "partialMatch": "Partial match",
     "typeStar": "Stella",
     "typeSensor": "Sensore",
     "typeLaunchSite": "Sito di lancio",

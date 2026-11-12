@@ -3,6 +3,7 @@
     "orbitPreview": "Bahnvorschau",
     "unknown": "Unbekannt",
     "close": "Schließen",
+    "menuHelp": "Help for this menu",
     "download": "Herunterladen",
     "downloadNamed": "{name} herunterladen",
     "loading": "Wird geladen…"
@@ -607,6 +608,7 @@
     "resultCountLimited": "{shown} von {total} Ergebnissen angezeigt",
     "noResults": "Keine Ergebnisse gefunden",
     "decayed": "Verglüht",
+    "partialMatch": "Partial match",
     "typeStar": "Stern",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Startplatz",

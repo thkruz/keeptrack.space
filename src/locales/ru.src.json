@@ -3,6 +3,7 @@
     "orbitPreview": "Предпросмотр орбиты",
     "unknown": "Неизвестно",
     "close": "Закрыть",
+    "menuHelp": "Help for this menu",
     "download": "Скачать",
     "downloadNamed": "Скачать {name}",
     "loading": "Загрузка…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "Показано {shown} из {total} результатов",
     "noResults": "Ничего не найдено",
     "decayed": "Сошёл с орбиты",
+    "partialMatch": "Partial match",
     "typeStar": "Звезда",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовая площадка",

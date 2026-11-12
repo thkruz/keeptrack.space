@@ -3,6 +3,7 @@
     "orbitPreview": "궤도 미리보기",
     "unknown": "알 수 없음",
     "close": "닫기",
+    "menuHelp": "Help for this menu",
     "download": "다운로드",
     "downloadNamed": "{name} 다운로드",
     "loading": "불러오는 중…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "{total}개 중 {shown}개 표시",
     "noResults": "검색 결과가 없습니다",
     "decayed": "소멸됨",
+    "partialMatch": "Partial match",
     "typeStar": "항성",
     "typeSensor": "센서",
     "typeLaunchSite": "발사장",

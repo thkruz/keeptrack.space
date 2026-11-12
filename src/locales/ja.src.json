@@ -3,6 +3,7 @@
     "orbitPreview": "軌道プレビュー",
     "unknown": "不明",
     "close": "閉じる",
+    "menuHelp": "Help for this menu",
     "download": "ダウンロード",
     "downloadNamed": "{name} をダウンロード",
     "loading": "読み込み中…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "{total} 件中 {shown} 件を表示",
     "noResults": "結果が見つかりません",
     "decayed": "落下済み",
+    "partialMatch": "Partial match",
     "typeStar": "恒星",
     "typeSensor": "センサー",
     "typeLaunchSite": "発射場",

@@ -3,6 +3,7 @@
     "orbitPreview": "Aperçu de l'orbite",
     "unknown": "Inconnu",
     "close": "Fermer",
+    "menuHelp": "Help for this menu",
     "download": "Télécharger",
     "downloadNamed": "Télécharger {name}",
     "loading": "Chargement…"
@@ -324,6 +325,7 @@
     "resultCountLimited": "Affichage de {shown} sur {total} résultats",
     "noResults": "Aucun résultat trouvé",
     "decayed": "Désintégré",
+    "partialMatch": "Partial match",
     "typeStar": "Étoile",
     "typeSensor": "Capteur",
     "typeLaunchSite": "Site de lancement",

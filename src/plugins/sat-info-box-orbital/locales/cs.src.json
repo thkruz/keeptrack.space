@@ -46,7 +46,25 @@
     "Region": {
       "label": "Nad",
       "tooltip": "Stát pod podsatelitním bodem (hranice Natural Earth)",
-      "ocean": "Nad oceánem"
+      "ocean": "Nad oceánem",
+      "Water": {
+        "arctic": "Severní ledový oceán",
+        "atlantic": "Atlantský oceán",
+        "pacific": "Tichý oceán",
+        "indian": "Indický oceán",
+        "southern": "Jižní oceán",
+        "mediterranean": "Středozemní moře",
+        "caribbean": "Karibské moře",
+        "gulfOfMexico": "Mexický záliv",
+        "redSea": "Rudé moře",
+        "blackSea": "Černé moře",
+        "northSea": "Severní moře",
+        "baltic": "Baltské moře",
+        "arabianSea": "Arabské moře",
+        "bayOfBengal": "Bengálský záliv",
+        "southChinaSea": "Jihočínské moře",
+        "persianGulf": "Perský záliv"
+      }
     },
     "Altitude": {
       "label": "Výška",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radiální sigma",
-      "tooltip": "Radiální nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
+      "tooltip": "Radiální nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci. Pokud zdroj neposkytl kovarianci, jde o výchozí hodnoty aplikace, ne o naměřené. Pro posouzení těsného přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky vyžaduje také kovarianci druhého objektu a velikost obou objektů."
     },
     "InTrackSigma": {
       "label": "Podélná sigma",
-      "tooltip": "Nejistota polohy ve směru letu 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
+      "tooltip": "Nejistota polohy ve směru letu 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci. Pokud zdroj neposkytl kovarianci, jde o výchozí hodnoty aplikace, ne o naměřené. Pro posouzení těsného přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky vyžaduje také kovarianci druhého objektu a velikost obou objektů."
     },
     "CrossTrackSigma": {
       "label": "Příčná sigma",
-      "tooltip": "Příčná nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
+      "tooltip": "Příčná nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci. Pokud zdroj neposkytl kovarianci, jde o výchozí hodnoty aplikace, ne o naměřené. Pro posouzení těsného přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky vyžaduje také kovarianci druhého objektu a velikost obou objektů."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Vztažná soustava",
-      "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)"
+      "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)",
+      "teme": "TEME (ze sady GP elementů)"
     },
     "Regime": {
       "label": "Režim",
@@ -110,6 +129,14 @@
       "meo": "MEO (střední)",
       "geo": "GEO (geostacionární)",
       "heo": "HEO (eliptická nebo vysoká)"
+    },
+    "LatitudeBand": {
+      "label": "Dosah šířky",
+      "tooltip": "Nejvyšší zeměpisná šířka, kam stopa na zemi dosáhne, na sever i na jih. Rovná se sklonu, u retrográdní dráhy 180 stupňů minus sklon. Mimo toto pásmo družice nikdy není nad hlavou."
+    },
+    "Sigma": {
+      "defaultTag": "výchozí",
+      "defaultNote": "Výchozí odhad aplikace pro tento druh dráhy. Nebyl změřen a nepřišel se zdrojovými daty."
     }
   }
 }

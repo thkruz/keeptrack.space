@@ -46,7 +46,25 @@
     "Region": {
       "label": "Sopra",
       "tooltip": "Paese sotto il punto subsatellite (confini Natural Earth)",
-      "ocean": "Sopra l'oceano"
+      "ocean": "Sopra l'oceano",
+      "Water": {
+        "arctic": "Oceano Artico",
+        "atlantic": "Oceano Atlantico",
+        "pacific": "Oceano Pacifico",
+        "indian": "Oceano Indiano",
+        "southern": "Oceano Antartico",
+        "mediterranean": "Mar Mediterraneo",
+        "caribbean": "Mar dei Caraibi",
+        "gulfOfMexico": "Golfo del Messico",
+        "redSea": "Mar Rosso",
+        "blackSea": "Mar Nero",
+        "northSea": "Mare del Nord",
+        "baltic": "Mar Baltico",
+        "arabianSea": "Mar Arabico",
+        "bayOfBengal": "Golfo del Bengala",
+        "southChinaSea": "Mar Cinese Meridionale",
+        "persianGulf": "Golfo Persico"
+      }
     },
     "Altitude": {
       "label": "Altitudine",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma radiale",
-      "tooltip": "Incertezza di posizione radiale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione."
+      "tooltip": "Incertezza di posizione radiale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione. Se la fonte non ha fornito la covarianza, sono valori predefiniti dell'app, non misurati. Per valutare un avvicinamento, apra il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi."
     },
     "InTrackSigma": {
       "label": "Sigma lungo traccia",
-      "tooltip": "Incertezza di posizione lungo la traccia a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione."
+      "tooltip": "Incertezza di posizione lungo la traccia a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione. Se la fonte non ha fornito la covarianza, sono valori predefiniti dell'app, non misurati. Per valutare un avvicinamento, apra il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi."
     },
     "CrossTrackSigma": {
       "label": "Sigma trasversale",
-      "tooltip": "Incertezza di posizione trasversale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione."
+      "tooltip": "Incertezza di posizione trasversale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione. Se la fonte non ha fornito la covarianza, sono valori predefiniti dell'app, non misurati. Per valutare un avvicinamento, apra il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Sistema di riferimento",
-      "tooltip": "Sistema di coordinate dell'effemeride (OEM REF_FRAME)"
+      "tooltip": "Sistema di coordinate dell'effemeride (OEM REF_FRAME)",
+      "teme": "TEME (dal set di elementi GP)"
     },
     "Regime": {
       "label": "Regime",
@@ -110,6 +129,14 @@
       "meo": "MEO (media)",
       "geo": "GEO (geostazionaria)",
       "heo": "HEO (ellittica o alta)"
+    },
+    "LatitudeBand": {
+      "label": "Estensione in latitudine",
+      "tooltip": "Latitudine massima raggiunta dalla traccia a terra, a nord e a sud. Coincide con l’inclinazione, oppure con 180 gradi meno l’inclinazione per un’orbita retrograda. Fuori da questa fascia il satellite non passa mai allo zenit."
+    },
+    "Sigma": {
+      "defaultTag": "predefinito",
+      "defaultNote": "Stima predefinita dell’app per questo tipo di orbita. Non è stata misurata e non era nei dati di origine."
     }
   }
 }

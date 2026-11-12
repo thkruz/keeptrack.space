@@ -46,7 +46,25 @@
     "Region": {
       "label": "上空",
       "tooltip": "星下点所在的国家（Natural Earth 边界数据）",
-      "ocean": "海洋上空"
+      "ocean": "海洋上空",
+      "Water": {
+        "arctic": "北冰洋",
+        "atlantic": "大西洋",
+        "pacific": "太平洋",
+        "indian": "印度洋",
+        "southern": "南大洋",
+        "mediterranean": "地中海",
+        "caribbean": "加勒比海",
+        "gulfOfMexico": "墨西哥湾",
+        "redSea": "红海",
+        "blackSea": "黑海",
+        "northSea": "北海",
+        "baltic": "波罗的海",
+        "arabianSea": "阿拉伯海",
+        "bayOfBengal": "孟加拉湾",
+        "southChinaSea": "南海",
+        "persianGulf": "波斯湾"
+      }
     },
     "Altitude": {
       "label": "高度",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "径向不确定度",
-      "tooltip": "径向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
+      "tooltip": "径向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。 如果数据源没有提供协方差,这些是应用的默认值,而非实测值。要评估近距离接近,请打开交会报告;碰撞概率还需要另一个天体的协方差以及两个天体的尺寸。"
     },
     "InTrackSigma": {
       "label": "轨道内不确定度",
-      "tooltip": "沿迹 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
+      "tooltip": "沿迹 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。 如果数据源没有提供协方差,这些是应用的默认值,而非实测值。要评估近距离接近,请打开交会报告;碰撞概率还需要另一个天体的协方差以及两个天体的尺寸。"
     },
     "CrossTrackSigma": {
       "label": "轨道横向不确定度",
-      "tooltip": "横向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
+      "tooltip": "横向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。 如果数据源没有提供协方差,这些是应用的默认值,而非实测值。要评估近距离接近,请打开交会报告;碰撞概率还需要另一个天体的协方差以及两个天体的尺寸。"
     },
     "meter": "米",
     "kilometer": "千米",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "参考系",
-      "tooltip": "星历的坐标系（OEM REF_FRAME）"
+      "tooltip": "星历的坐标系（OEM REF_FRAME）",
+      "teme": "TEME（来自GP根数集）"
     },
     "Regime": {
       "label": "轨道类型",
@@ -110,6 +129,14 @@
       "meo": "MEO（中轨）",
       "geo": "GEO（地球静止）",
       "heo": "HEO（椭圆或高轨）"
+    },
+    "LatitudeBand": {
+      "label": "纬度范围",
+      "tooltip": "星下点轨迹向北和向南到达的最高纬度。它等于轨道倾角，逆行轨道则为180度减去倾角。在此纬度带之外，卫星永远不会经过头顶。"
+    },
+    "Sigma": {
+      "defaultTag": "默认",
+      "defaultNote": "应用对这类轨道的默认估计值。它不是实测值，也不是随源数据提供的。"
     }
   }
 }

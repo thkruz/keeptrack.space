@@ -46,7 +46,25 @@
     "Region": {
       "label": "Sobre",
       "tooltip": "País bajo el punto subsatélite (fronteras de Natural Earth)",
-      "ocean": "Sobre el océano"
+      "ocean": "Sobre el océano",
+      "Water": {
+        "arctic": "Océano Ártico",
+        "atlantic": "Océano Atlántico",
+        "pacific": "Océano Pacífico",
+        "indian": "Océano Índico",
+        "southern": "Océano Austral",
+        "mediterranean": "Mar Mediterráneo",
+        "caribbean": "Mar Caribe",
+        "gulfOfMexico": "Golfo de México",
+        "redSea": "Mar Rojo",
+        "blackSea": "Mar Negro",
+        "northSea": "Mar del Norte",
+        "baltic": "Mar Báltico",
+        "arabianSea": "Mar Arábigo",
+        "bayOfBengal": "Golfo de Bengala",
+        "southChinaSea": "Mar de China Meridional",
+        "persianGulf": "Golfo Pérsico"
+      }
     },
     "Altitude": {
       "label": "Altitud",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertidumbre de posición radial a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
+      "tooltip": "Incertidumbre de posición radial a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción. Si la fuente no aportó covarianza, son valores predeterminados de la app, no medidos. Para evaluar un acercamiento, abra el Informe de conjunciones; una probabilidad de colisión también necesita la covarianza del otro objeto y el tamaño de ambos."
     },
     "InTrackSigma": {
       "label": "Sigma en Trayectoria",
-      "tooltip": "Incertidumbre de posición a lo largo de la trayectoria a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
+      "tooltip": "Incertidumbre de posición a lo largo de la trayectoria a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción. Si la fuente no aportó covarianza, son valores predeterminados de la app, no medidos. Para evaluar un acercamiento, abra el Informe de conjunciones; una probabilidad de colisión también necesita la covarianza del otro objeto y el tamaño de ambos."
     },
     "CrossTrackSigma": {
       "label": "Sigma Cruzada",
-      "tooltip": "Incertidumbre de posición transversal a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción."
+      "tooltip": "Incertidumbre de posición transversal a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción. Si la fuente no aportó covarianza, son valores predeterminados de la app, no medidos. Para evaluar un acercamiento, abra el Informe de conjunciones; una probabilidad de colisión también necesita la covarianza del otro objeto y el tamaño de ambos."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Sistema de referencia",
-      "tooltip": "Sistema de coordenadas de la efeméride (OEM REF_FRAME)"
+      "tooltip": "Sistema de coordenadas de la efeméride (OEM REF_FRAME)",
+      "teme": "TEME (del conjunto de elementos GP)"
     },
     "Regime": {
       "label": "Régimen",
@@ -110,6 +129,14 @@
       "meo": "MEO (media)",
       "geo": "GEO (geoestacionaria)",
       "heo": "HEO (elíptica o alta)"
+    },
+    "LatitudeBand": {
+      "label": "Alcance de latitud",
+      "tooltip": "Latitud más alta que alcanza la traza en el suelo, al norte y al sur. Es igual a la inclinación, o a 180 grados menos la inclinación en una órbita retrógrada. El satélite nunca pasa por el cenit fuera de esta banda."
+    },
+    "Sigma": {
+      "defaultTag": "predeterminado",
+      "defaultNote": "Estimación predeterminada de la aplicación para este tipo de órbita. No se midió ni venía con los datos de origen."
     }
   }
 }

@@ -46,7 +46,25 @@
     "Region": {
       "label": "Über",
       "tooltip": "Land unter dem Subsatellitenpunkt (Natural-Earth-Grenzen)",
-      "ocean": "Über dem Ozean"
+      "ocean": "Über dem Ozean",
+      "Water": {
+        "arctic": "Arktischer Ozean",
+        "atlantic": "Atlantischer Ozean",
+        "pacific": "Pazifischer Ozean",
+        "indian": "Indischer Ozean",
+        "southern": "Südlicher Ozean",
+        "mediterranean": "Mittelmeer",
+        "caribbean": "Karibisches Meer",
+        "gulfOfMexico": "Golf von Mexiko",
+        "redSea": "Rotes Meer",
+        "blackSea": "Schwarzes Meer",
+        "northSea": "Nordsee",
+        "baltic": "Ostsee",
+        "arabianSea": "Arabisches Meer",
+        "bayOfBengal": "Golf von Bengalen",
+        "southChinaSea": "Südchinesisches Meer",
+        "persianGulf": "Persischer Golf"
+      }
     },
     "Altitude": {
       "label": "Höhe",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radiale Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit radial aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
+      "tooltip": "1-Sigma-Positionsunsicherheit radial aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht. Wenn die Quelle keine Kovarianz lieferte, sind dies Standardwerte der App und keine Messwerte. Für eine nahe Annäherung öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "InTrackSigma": {
       "label": "In-Track Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
+      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht. Wenn die Quelle keine Kovarianz lieferte, sind dies Standardwerte der App und keine Messwerte. Für eine nahe Annäherung öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "CrossTrackSigma": {
       "label": "Cross-Track Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
+      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht. Wenn die Quelle keine Kovarianz lieferte, sind dies Standardwerte der App und keine Messwerte. Für eine nahe Annäherung öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Bezugssystem",
-      "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)"
+      "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)",
+      "teme": "TEME (aus dem GP-Elementsatz)"
     },
     "Regime": {
       "label": "Bahnregime",
@@ -110,6 +129,14 @@
       "meo": "MEO (mittel)",
       "geo": "GEO (geostationär)",
       "heo": "HEO (elliptisch oder hoch)"
+    },
+    "LatitudeBand": {
+      "label": "Breitenreichweite",
+      "tooltip": "Höchste Breite, die die Bodenspur nach Norden und Süden erreicht. Sie entspricht der Inklination, bei einer rückläufigen Bahn 180 Grad minus Inklination. Außerhalb dieses Bandes steht der Satellit nie über einem Ort."
+    },
+    "Sigma": {
+      "defaultTag": "Standard",
+      "defaultNote": "Standardschätzung der App für diese Art von Bahn. Sie wurde nicht gemessen und kam nicht mit den Quelldaten."
     }
   }
 }

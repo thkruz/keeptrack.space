@@ -46,7 +46,25 @@
     "Region": {
       "label": "Over",
       "tooltip": "Country under the sub-satellite point (Natural Earth borders)",
-      "ocean": "Over ocean"
+      "ocean": "Over ocean",
+      "Water": {
+        "arctic": "Arctic Ocean",
+        "atlantic": "Atlantic Ocean",
+        "pacific": "Pacific Ocean",
+        "indian": "Indian Ocean",
+        "southern": "Southern Ocean",
+        "mediterranean": "Mediterranean Sea",
+        "caribbean": "Caribbean Sea",
+        "gulfOfMexico": "Gulf of Mexico",
+        "redSea": "Red Sea",
+        "blackSea": "Black Sea",
+        "northSea": "North Sea",
+        "baltic": "Baltic Sea",
+        "arabianSea": "Arabian Sea",
+        "bayOfBengal": "Bay of Bengal",
+        "southChinaSea": "South China Sea",
+        "persianGulf": "Persian Gulf"
+      }
     },
     "Altitude": {
       "label": "Altitude",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radial Sigma",
-      "tooltip": "1-sigma radial position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use."
+      "tooltip": "1-sigma radial position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use. If the source gave no covariance, these are app default values, not measured ones. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
     },
     "InTrackSigma": {
       "label": "In Track Sigma",
-      "tooltip": "1-sigma in-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use."
+      "tooltip": "1-sigma in-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use. If the source gave no covariance, these are app default values, not measured ones. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
     },
     "CrossTrackSigma": {
       "label": "Cross Track Sigma",
-      "tooltip": "1-sigma cross-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use."
+      "tooltip": "1-sigma cross-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use. If the source gave no covariance, these are app default values, not measured ones. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Reference Frame",
-      "tooltip": "Coordinate frame of the ephemeris (OEM REF_FRAME)"
+      "tooltip": "Coordinate frame of the ephemeris (OEM REF_FRAME)",
+      "teme": "TEME (from the GP element set)"
     },
     "Regime": {
       "label": "Regime",
@@ -110,6 +129,14 @@
       "meo": "MEO (medium Earth)",
       "geo": "GEO (geostationary)",
       "heo": "HEO (elliptical or high)"
+    },
+    "LatitudeBand": {
+      "label": "Latitude Reach",
+      "tooltip": "Highest latitude the ground track reaches, north and south. It equals the inclination, or 180 degrees minus the inclination for a retrograde orbit. The satellite is never overhead outside this band."
+    },
+    "Sigma": {
+      "defaultTag": "default",
+      "defaultNote": "App default estimate for this kind of orbit. It was not measured and did not come with the source data."
     }
   }
 }

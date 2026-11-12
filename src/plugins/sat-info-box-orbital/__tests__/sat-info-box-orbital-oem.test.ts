@@ -90,7 +90,8 @@ describe('SatInfoBoxOrbital OEM center body, frame and ascent rows', () => {
 
     p().updateOrbitData_(defaultSat);
     expect(rowDisplay(EL.CENTER_BODY)).toBe('none');
-    expect(rowDisplay(EL.REF_FRAME)).toBe('none');
+    // A GP object has no OEM header, but its frame (TEME) is stated.
+    expect(rowDisplay(EL.REF_FRAME)).toBe('flex');
   });
 
   it('shows an Earth-centered OEM (Lucy: EARTH / EME2000)', () => {

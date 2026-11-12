@@ -6,6 +6,7 @@ export const EL = {
   LATITUDE: 'sat-latitude',
   LONGITUDE: 'sat-longitude',
   REGION: 'sat-region',
+  LAT_BAND: 'sat-lat-band',
   ALTITUDE: 'sat-altitude',
   PERIOD: 'sat-period',
   REGIME: 'sat-regime',

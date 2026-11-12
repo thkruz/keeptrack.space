@@ -46,7 +46,25 @@
     "Region": {
       "label": "Nad",
       "tooltip": "Państwo pod punktem podsatelitarnym (granice Natural Earth)",
-      "ocean": "Nad oceanem"
+      "ocean": "Nad oceanem",
+      "Water": {
+        "arctic": "Ocean Arktyczny",
+        "atlantic": "Ocean Atlantycki",
+        "pacific": "Ocean Spokojny",
+        "indian": "Ocean Indyjski",
+        "southern": "Ocean Południowy",
+        "mediterranean": "Morze Śródziemne",
+        "caribbean": "Morze Karaibskie",
+        "gulfOfMexico": "Zatoka Meksykańska",
+        "redSea": "Morze Czerwone",
+        "blackSea": "Morze Czarne",
+        "northSea": "Morze Północne",
+        "baltic": "Morze Bałtyckie",
+        "arabianSea": "Morze Arabskie",
+        "bayOfBengal": "Zatoka Bengalska",
+        "southChinaSea": "Morze Południowochińskie",
+        "persianGulf": "Zatoka Perska"
+      }
     },
     "Altitude": {
       "label": "Wysokość",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma radialna",
-      "tooltip": "Radialna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
+      "tooltip": "Radialna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji. Jeśli źródło nie podało kowariancji, są to domyślne wartości aplikacji, a nie pomiary. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "InTrackSigma": {
       "label": "Sigma wzdłuż toru",
-      "tooltip": "Niepewność położenia wzdłuż toru 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
+      "tooltip": "Niepewność położenia wzdłuż toru 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji. Jeśli źródło nie podało kowariancji, są to domyślne wartości aplikacji, a nie pomiary. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "CrossTrackSigma": {
       "label": "Sigma poprzeczna",
-      "tooltip": "Poprzeczna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
+      "tooltip": "Poprzeczna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji. Jeśli źródło nie podało kowariancji, są to domyślne wartości aplikacji, a nie pomiary. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Układ odniesienia",
-      "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)"
+      "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)",
+      "teme": "TEME (z zestawu elementów GP)"
     },
     "Regime": {
       "label": "Reżim",
@@ -110,6 +129,14 @@
       "meo": "MEO (średnia)",
       "geo": "GEO (geostacjonarna)",
       "heo": "HEO (eliptyczna lub wysoka)"
+    },
+    "LatitudeBand": {
+      "label": "Zasięg szerokości",
+      "tooltip": "Najwyższa szerokość geograficzna, do jakiej dochodzi ślad naziemny, na północ i na południe. Równa się inklinacji, a dla orbity wstecznej 180 stopni minus inklinacja. Poza tym pasem satelita nigdy nie jest w zenicie."
+    },
+    "Sigma": {
+      "defaultTag": "domyślne",
+      "defaultNote": "Domyślne oszacowanie aplikacji dla tego rodzaju orbity. Nie zostało zmierzone i nie pochodziło z danych źródłowych."
     }
   }
 }

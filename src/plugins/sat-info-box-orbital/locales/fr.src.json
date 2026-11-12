@@ -46,7 +46,25 @@
     "Region": {
       "label": "Au-dessus de",
       "tooltip": "Pays situé sous le point subsatellite (frontières Natural Earth)",
-      "ocean": "Au-dessus de l'océan"
+      "ocean": "Au-dessus de l'océan",
+      "Water": {
+        "arctic": "océan Arctique",
+        "atlantic": "océan Atlantique",
+        "pacific": "océan Pacifique",
+        "indian": "océan Indien",
+        "southern": "océan Austral",
+        "mediterranean": "mer Méditerranée",
+        "caribbean": "mer des Caraïbes",
+        "gulfOfMexico": "golfe du Mexique",
+        "redSea": "mer Rouge",
+        "blackSea": "mer Noire",
+        "northSea": "mer du Nord",
+        "baltic": "mer Baltique",
+        "arabianSea": "mer d’Arabie",
+        "bayOfBengal": "golfe du Bengale",
+        "southChinaSea": "mer de Chine méridionale",
+        "persianGulf": "golfe Persique"
+      }
     },
     "Altitude": {
       "label": "Altitude",
@@ -79,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertitude de position radiale à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
+      "tooltip": "Incertitude de position radiale à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction. Si la source n'a fourni aucune covariance, ce sont des valeurs par défaut de l'application, pas des mesures. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "InTrackSigma": {
       "label": "Sigma Sur Piste",
-      "tooltip": "Incertitude de position le long de la trace à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
+      "tooltip": "Incertitude de position le long de la trace à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction. Si la source n'a fourni aucune covariance, ce sont des valeurs par défaut de l'application, pas des mesures. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "CrossTrackSigma": {
       "label": "Sigma Hors Piste",
-      "tooltip": "Incertitude de position transverse à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
+      "tooltip": "Incertitude de position transverse à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction. Si la source n'a fourni aucune covariance, ce sont des valeurs par défaut de l'application, pas des mesures. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "meter": "m",
     "kilometer": "km",
@@ -100,7 +118,8 @@
     },
     "RefFrame": {
       "label": "Repère de référence",
-      "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)"
+      "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)",
+      "teme": "TEME (issu du jeu d’éléments GP)"
     },
     "Regime": {
       "label": "Régime",
@@ -110,6 +129,14 @@
       "meo": "MEO (moyenne)",
       "geo": "GEO (géostationnaire)",
       "heo": "HEO (elliptique ou haute)"
+    },
+    "LatitudeBand": {
+      "label": "Portée en latitude",
+      "tooltip": "Latitude la plus haute que la trace au sol atteint, au nord et au sud. Elle égale l’inclinaison, ou 180 degrés moins l’inclinaison pour une orbite rétrograde. Le satellite ne passe jamais à la verticale hors de cette bande."
+    },
+    "Sigma": {
+      "defaultTag": "par défaut",
+      "defaultNote": "Estimation par défaut de l’application pour ce type d’orbite. Elle n’a pas été mesurée et ne venait pas avec les données source."
     }
   }
 }

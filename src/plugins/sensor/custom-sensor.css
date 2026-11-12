@@ -157,3 +157,22 @@
   font-size: 13px;
   color: var(--color-dark-text-muted);
 }
+
+/*
+ * Short screens (1366x768 laptops): the form is taller than the menu, so the primary action
+ * sticks to the bottom of the scrolling menu instead of sitting below the fold, and the stacked
+ * field spacing tightens so less scrolling is needed.
+ */
+#custom-sensor-menu-form > #cs-submit {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: var(--color-dark-background);
+}
+
+@media (max-height: 800px) {
+  #custom-sensor-menu .kt-field-row .input-field.col {
+    margin-top: 14px;
+    margin-bottom: 8px;
+  }
+}

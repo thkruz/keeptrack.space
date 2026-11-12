@@ -95,6 +95,8 @@
         "tooltipMaxRange": "Range in kilometers (ex: 20000)",
         "horizonMask": "Horizon mask (az,el per line)",
         "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Step bins (hold elevation until next azimuth)",
+        "tooltipMaskStep": "Off: the minimum elevation is interpolated between points. On: each azimuth starts a bin that holds its elevation until the next azimuth, wrapping at 360 (0,10 and 90,35 means 10 degrees from 0 to 90, then 35 degrees from 90 on).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "In View",
         "noLookAnglesToDownload": "No look angles available for download!",
         "eclipsed": "Eclipsed",
-        "opticalNote": "Optically visible = above the horizon, satellite sunlit, and Sun at or below {limit}° at the site."
+        "opticalNote": "Optically visible = above the horizon, satellite sunlit, and Sun at or below {limit}° at the site. Weather and cloud cover are not considered."
       },
       "maskLimited": "mask",
       "maskLimitedTitle": "This edge is set by the sensor's horizon mask, not its minimum elevation",
@@ -221,7 +223,7 @@
         "sensorListMissing": "Could not find the sensor list",
         "satrecNotFound": "Satellite record not found",
         "eclipsed": "Eclipsed",
-        "opticalNote": "Optically visible = above the horizon, satellite sunlit, and Sun at or below {limit}° at the site."
+        "opticalNote": "Optically visible = above the horizon, satellite sunlit, and Sun at or below {limit}° at the site. Weather and cloud cover are not considered."
       },
       "help": {
         "overview": "Multi-Site Look Angles answers a network question: of all my sensors, which one sees the selected satellite, and when? It computes look angles across many sites at once and interleaves them into a single chronological table.",

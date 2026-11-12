@@ -95,6 +95,8 @@
         "tooltipMaxRange": "Zasięg w kilometrach (np.: 20000)",
         "horizonMask": "Maska horyzontu (az,el w wierszu)",
         "tooltipHorizonMask": "Opcjonalne. Punkty azymut,elewacja w stopniach, jeden w wierszu lub oddzielone średnikami. Minimalna elewacja jest interpolowana między punktami i zawija się przy 360. Od 2 do 72 punktów, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Przedziały schodkowe (elewacja obowiązuje do następnego azymutu)",
+        "tooltipMaskStep": "Wyłączone: minimalna elewacja jest interpolowana między punktami. Włączone: każdy azymut rozpoczyna przedział o danej elewacji do następnego azymutu, z zawinięciem na 360 (0,10 i 90,35 oznacza 10 stopni od 0 do 90, potem 35 stopni).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "W zasięgu",
         "noLookAnglesToDownload": "Brak kątów obserwacji do pobrania!",
         "eclipsed": "W cieniu",
-        "opticalNote": "Widoczny optycznie = nad horyzontem, satelita oświetlony, a Słońce na {limit}° lub poniżej w miejscu obserwacji."
+        "opticalNote": "Widoczny optycznie = nad horyzontem, satelita oświetlony, a Słońce na {limit}° lub poniżej w miejscu obserwacji. Pogoda i zachmurzenie nie są uwzględniane."
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tę krawędź wyznacza maska horyzontu sensora, a nie jego minimalna elewacja",
@@ -221,7 +223,7 @@
         "sensorListMissing": "Nie znaleziono listy czujników w interfejsie",
         "satrecNotFound": "Nie znaleziono rekordu satelity",
         "eclipsed": "W cieniu",
-        "opticalNote": "Widoczny optycznie = nad horyzontem, satelita oświetlony, a Słońce na {limit}° lub poniżej w miejscu obserwacji."
+        "opticalNote": "Widoczny optycznie = nad horyzontem, satelita oświetlony, a Słońce na {limit}° lub poniżej w miejscu obserwacji. Pogoda i zachmurzenie nie są uwzględniane."
       },
       "help": {
         "overview": "Wielostanowiskowe kąty obserwacji odpowiadają na pytanie sieciowe: który z moich czujników widzi wybranego satelitę i kiedy? Obliczają kąty obserwacji dla wielu stanowisk naraz i przeplatają je w jedną chronologiczną tabelę.",

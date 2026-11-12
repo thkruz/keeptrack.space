@@ -95,6 +95,8 @@
         "tooltipMaxRange": "キロメートル単位の距離（例：20000）",
         "horizonMask": "地平線マスク (1行に az,el)",
         "tooltipHorizonMask": "任意。方位角,仰角（度）の点を1行に1つ、またはセミコロン区切りで入力します。最小仰角は点の間で補間され、360で一周します。2〜72点、0 <= az < 360、0 <= el <= 89。",
+        "maskStep": "階段状ビン(次の方位角まで仰角を保持)",
+        "tooltipMaskStep": "オフ: 最小仰角は点の間で補間されます。オン: 各方位角が、次の方位角までその仰角を保つビンを開始し、360度で折り返します(0,10 と 90,35 は 0〜90度が10度、その後は35度)。",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "視野内",
         "noLookAnglesToDownload": "ダウンロードできるルックアングルがありません!",
         "eclipsed": "食",
-        "opticalNote": "光学的に可視 = 地平線上にあり、衛星が日照中で、観測地の太陽高度が{limit}°以下。"
+        "opticalNote": "光学的に可視 = 地平線上にあり、衛星が日照中で、観測地の太陽高度が{limit}°以下。天候や雲量は考慮されません。"
       },
       "maskLimited": "マスク",
       "maskLimitedTitle": "この境界はセンサーの最小仰角ではなく地平線マスクで決まります",
@@ -221,7 +223,7 @@
         "sensorListMissing": "センサー一覧の要素が見つかりませんでした",
         "satrecNotFound": "衛星レコードが見つかりません",
         "eclipsed": "食",
-        "opticalNote": "光学的に可視 = 地平線上にあり、衛星が日照中で、観測地の太陽高度が{limit}°以下。"
+        "opticalNote": "光学的に可視 = 地平線上にあり、衛星が日照中で、観測地の太陽高度が{limit}°以下。天候や雲量は考慮されません。"
       },
       "help": {
         "overview": "マルチサイト視線角度は、ネットワークに関する問いに答えます。自分のすべてのセンサーのうち、どれが選択した衛星をいつ見るのか？多数のサイトの視線角度を一度に計算し、それらを時系列順の1つのテーブルにまとめます。",

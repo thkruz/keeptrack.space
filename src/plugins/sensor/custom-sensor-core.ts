@@ -42,6 +42,8 @@ export interface CustomSensorFormValues {
   maxRng: number;
   /** Optional horizon mask text: `az,el` pairs, one per line or separated by semicolons. */
   mask?: string;
+  /** True when each mask azimuth starts a step bin (constant elevation until the next azimuth). */
+  maskStep?: boolean;
   /** Optional IANA time zone of the site (e.g. "America/New_York"); empty means the browser zone. */
   timeZone?: string;
 }
@@ -69,7 +71,7 @@ const MASK_SPLIT_RE = /[\r\n;]/u;
  * "no mask". Rules match ootk's interpolated-mask validation: 2 to 72 vertices,
  * 0 <= az < 360, 0 <= el <= 89, unique azimuths. The first problem found is reported.
  */
-export function parseMask(text: string | undefined): ParsedMask {
+export function parseMask(text: string | undefined, isStep = false): ParsedMask {
   const masks: ElevationMask[] = [];
 
   if (!text || text.trim() === '') {
@@ -106,7 +108,48 @@ export function parseMask(text: string | undefined): ParsedMask {
     return { masks: [], error: 'maskTooFew', badPair: null };
   }
 
+  if (isStep) {
+    return { masks: toStepBins(masks), error: null, badPair: null };
+  }
+
   return { masks, error: null, badPair: null };
+}
+
+/** Gap left between one step bin's end and the next bin's start (ootk sector ends are inclusive). */
+export const STEP_BIN_GAP_DEG = 0.001;
+
+/**
+ * Turn `az,el` vertices into step bins: each azimuth starts a bin that holds its elevation until
+ * the next azimuth (the last bin wraps through north to the first azimuth).
+ */
+export function toStepBins(vertices: ElevationMask[]): ElevationMask[] {
+  const sorted = [...vertices].sort((a, b) => a.startAz - b.startAz);
+
+  return sorted
+    .map((m, i) => {
+      const next = sorted[(i + 1) % sorted.length];
+
+      return {
+        startAz: m.startAz,
+        stopAz: (next.startAz - STEP_BIN_GAP_DEG) as Degrees,
+        minEl: m.minEl,
+      } as ElevationMask;
+    })
+    .map((m) => ({ ...m, stopAz: (m.stopAz < 0 ? m.stopAz + 360 : m.stopAz) as Degrees }));
+}
+
+/** True when the masks are step bins built by {@link toStepBins} (so they round-trip as `az,el` text). */
+export function isStepBinMask(masks: ElevationMask[] | undefined, isInterpolated: boolean | undefined): boolean {
+  if (!masks || masks.length < MIN_INTERPOLATED_MASK_VERTICES || isInterpolated) {
+    return false;
+  }
+  const expected = toStepBins(masks);
+
+  return masks.every((m) => {
+    const e = expected.find((x) => x.startAz === m.startAz);
+
+    return e !== undefined && Math.abs(e.stopAz - m.stopAz) < 1e-6 && e.minEl === m.minEl;
+  });
 }
 
 /** Above this max range a sensor is treated as deep-space and framed at GEO zoom. */
@@ -191,7 +234,7 @@ export function validateCustomSensor(values: CustomSensorFormValues): string | n
   }
 
   // Horizon mask last; the plugin fills the offending pair from parseMask(values.mask).badPair
-  return parseMask(values.mask).error;
+  return parseMask(values.mask, values.maskStep === true).error;
 }
 
 /**
@@ -200,7 +243,7 @@ export function validateCustomSensor(values: CustomSensorFormValues): string | n
  * the caller (a random id) so this stays pure and deterministic for tests.
  */
 export function buildCustomSensorParams(values: CustomSensorFormValues, objNameSuffix: string): DetailedSensorParams {
-  const { masks } = parseMask(values.mask);
+  const { masks } = parseMask(values.mask, values.maskStep === true);
   const name = resolveCustomSensorName(values.uiName);
   const params: DetailedSensorParams = {
     lat: values.lat as Degrees,
@@ -227,7 +270,7 @@ export function buildCustomSensorParams(values: CustomSensorFormValues, objNameS
   // Kept inside the params object so custom-sensor persistence can serialise it later
   if (masks.length > 0) {
     params.elevationMasks = masks;
-    params.interpolateMask = true;
+    params.interpolateMask = values.maskStep !== true;
   }
 
   const timeZone = normalizeTimeZone(values.timeZone);
@@ -259,10 +302,16 @@ export function sensorTypeToFormValue(type: SpaceObjectType): CustomSensorType {
 
 /**
  * Write a sensor's horizon mask back into the menu's `az,el` text (one pair per line).
- * Only interpolated vertices (`startAz` = `stopAz`) fit that format; step-sector masks from the
- * catalog cannot be expressed in it, so they give an empty string.
+ * Interpolated vertices (`startAz` = `stopAz`) and step bins made by the menu fit that format;
+ * other step-sector masks from the catalog cannot be expressed in it, so they give an empty string.
  */
 export function formatMask(masks: ElevationMask[] | undefined, isInterpolated: boolean | undefined): string {
+  if (isStepBinMask(masks, isInterpolated)) {
+    return [...masks!]
+      .sort((a, b) => a.startAz - b.startAz)
+      .map((m) => `${m.startAz},${m.minEl}`)
+      .join('\n');
+  }
   if (!masks || masks.length === 0 || !isInterpolated || masks.some((m) => m.startAz !== m.stopAz)) {
     return '';
   }
@@ -330,6 +379,7 @@ export function customSensorSubmitKey(values: CustomSensorFormValues, isReplace:
     values.minRng,
     values.maxRng,
     (values.mask ?? '').trim(),
+    values.maskStep === true,
     (values.timeZone ?? '').trim(),
   ]);
 }

@@ -95,6 +95,8 @@
         "tooltipMaxRange": "킬로미터 단위의 거리 (예: 20000)",
         "horizonMask": "지평선 마스크 (한 줄에 az,el)",
         "tooltipHorizonMask": "선택 사항. 방위각,고각(도) 점을 한 줄에 하나씩 또는 세미콜론으로 구분해 입력합니다. 최소 고각은 점 사이에서 보간되며 360에서 이어집니다. 2~72개 점, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "계단식 구간(다음 방위각까지 고도 유지)",
+        "tooltipMaskStep": "끔: 최소 고도가 점 사이에서 보간됩니다. 켬: 각 방위각이 다음 방위각까지 해당 고도를 유지하는 구간을 시작하며 360도에서 이어집니다(0,10 및 90,35는 0~90도는 10도, 이후 35도).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "시야 내",
         "noLookAnglesToDownload": "다운로드할 관측 각도가 없습니다!",
         "eclipsed": "식(그림자)",
-        "opticalNote": "광학 관측 가능 = 수평선 위에 있고, 위성이 일조 중이며, 관측지의 태양 고도가 {limit}° 이하."
+        "opticalNote": "광학 관측 가능 = 수평선 위에 있고, 위성이 일조 중이며, 관측지의 태양 고도가 {limit}° 이하. 날씨와 구름은 고려되지 않습니다."
       },
       "maskLimited": "마스크",
       "maskLimitedTitle": "이 경계는 센서의 최소 고각이 아니라 지평선 마스크로 정해집니다",
@@ -221,7 +223,7 @@
         "sensorListMissing": "센서 목록 요소를 찾을 수 없습니다",
         "satrecNotFound": "위성 레코드를 찾을 수 없습니다",
         "eclipsed": "식(그림자)",
-        "opticalNote": "광학 관측 가능 = 수평선 위에 있고, 위성이 일조 중이며, 관측지의 태양 고도가 {limit}° 이하."
+        "opticalNote": "광학 관측 가능 = 수평선 위에 있고, 위성이 일조 중이며, 관측지의 태양 고도가 {limit}° 이하. 날씨와 구름은 고려되지 않습니다."
       },
       "help": {
         "overview": "다중 사이트 관측각은 네트워크에 대한 질문에 답합니다: 내 모든 센서 중 어느 것이 선택된 위성을 언제 보는가? 여러 사이트의 관측각을 한 번에 계산하고 이를 하나의 시간순 표로 엮어 보여줍니다.",

@@ -28,6 +28,7 @@ import {
   customSensorFormFromSensor,
   customSensorSubmitKey,
   DUPLICATE_SUBMIT_WINDOW_MS,
+  isStepBinMask,
   parseMask,
   validateCustomSensor,
 } from './custom-sensor-core';
@@ -180,6 +181,13 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="0,5&#10;90,25&#10;180,5&#10;270,25"></textarea>
             <label for="cs-mask" class="active">${l('horizonMask')}</label>
           </div>
+        </div>
+        <div class="switch row" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaskStep')}">
+          <label>
+            <input id="cs-mask-step" type="checkbox" />
+            <span class="lever"></span>
+            ${l('maskStep')}
+          </label>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipTimeZone')}">
@@ -553,6 +561,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       minRng: parseFloat(value('cs-minrange')),
       maxRng: parseFloat(value('cs-maxrange')),
       mask: (getEl('cs-mask', true) as HTMLTextAreaElement | null)?.value ?? '',
+      maskStep: (getEl('cs-mask-step', true) as HTMLInputElement | null)?.checked ?? false,
       timeZone: (getEl('cs-timezone', true) as HTMLInputElement | null)?.value ?? '',
     };
   }
@@ -586,6 +595,11 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       telescope.click();
     }
     CustomSensorPlugin.setFields_(customSensorFormFromSensor(sensor));
+    const maskStep = getEl('cs-mask-step', true) as HTMLInputElement | null;
+
+    if (maskStep) {
+      maskStep.checked = isStepBinMask(sensor.elevationMasks, sensor.interpolateMask);
+    }
   }
 
   /** Submit key and time of the last sensor created, to swallow a double-click's second submit. */
@@ -614,7 +628,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     if (errorKey) {
       // Mask errors name the offending pair; other messages have no placeholders
-      const pair = parseMask(values.mask).badPair ?? '';
+      const pair = parseMask(values.mask, values.maskStep === true).badPair ?? '';
 
       errorManagerInstance.warn(t7e(`plugins.CustomSensorPlugin.errorMsgs.${errorKey}` as Parameters<typeof t7e>[0], { pair }));
 

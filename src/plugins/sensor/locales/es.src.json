@@ -95,6 +95,8 @@
         "tooltipMaxRange": "Rango en kilómetros (ej: 20000)",
         "horizonMask": "Máscara de horizonte (az,el por línea)",
         "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Tramos escalonados (la elevación se mantiene hasta el siguiente acimut)",
+        "tooltipMaskStep": "Desactivado: la elevación mínima se interpola entre puntos. Activado: cada acimut inicia un tramo que mantiene su elevación hasta el siguiente acimut, con vuelta en 360 (0,10 y 90,35 significa 10 grados de 0 a 90 y luego 35 grados).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "En vista",
         "noLookAnglesToDownload": "¡No hay ángulos de observación disponibles para descargar!",
         "eclipsed": "Eclipsado",
-        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio."
+        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio. No se consideran el clima ni la nubosidad."
       },
       "maskLimited": "máscara",
       "maskLimitedTitle": "Este borde lo define la máscara de horizonte del sensor, no su elevación mínima",
@@ -221,7 +223,7 @@
         "sensorListMissing": "No se encontró la lista de sensores en la interfaz",
         "satrecNotFound": "No se encontró el registro del satélite",
         "eclipsed": "Eclipsado",
-        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio."
+        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio. No se consideran el clima ni la nubosidad."
       },
       "help": {
         "overview": "Los Ángulos de Visión Multi-Sitio responden a una pregunta de red: de todos mis sensores, ¿cuál ve el satélite seleccionado y cuándo? Calcula los ángulos de visión en muchos sitios a la vez y los intercala en una única tabla cronológica.",

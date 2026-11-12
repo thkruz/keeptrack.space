@@ -95,6 +95,8 @@
         "tooltipMaxRange": "Portata in chilometri (es: 20000)",
         "horizonMask": "Maschera d'orizzonte (az,el per riga)",
         "tooltipHorizonMask": "Facoltativo. Punti azimut,elevazione in gradi, uno per riga o separati da punto e virgola. L'elevazione minima viene interpolata tra i punti e prosegue oltre 360. Da 2 a 72 punti, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Fasce a gradini (l'elevazione vale fino all'azimut successivo)",
+        "tooltipMaskStep": "Disattivato: l'elevazione minima è interpolata tra i punti. Attivato: ogni azimut avvia una fascia che mantiene la sua elevazione fino all'azimut successivo, con ritorno a 360 (0,10 e 90,35 significa 10 gradi da 0 a 90, poi 35 gradi).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "In vista",
         "noLookAnglesToDownload": "Nessun angolo di vista disponibile per il download!",
         "eclipsed": "In eclissi",
-        "opticalNote": "Visibile otticamente = sopra l'orizzonte, satellite illuminato e Sole a {limit}° o sotto nel sito."
+        "opticalNote": "Visibile otticamente = sopra l'orizzonte, satellite illuminato e Sole a {limit}° o sotto nel sito. Meteo e copertura nuvolosa non sono considerati."
       },
       "maskLimited": "maschera",
       "maskLimitedTitle": "Questo bordo è fissato dalla maschera d'orizzonte del sensore, non dalla sua elevazione minima",
@@ -221,7 +223,7 @@
         "sensorListMissing": "Elenco dei sensori non trovato nell'interfaccia",
         "satrecNotFound": "Record del satellite non trovato",
         "eclipsed": "In eclissi",
-        "opticalNote": "Visibile otticamente = sopra l'orizzonte, satellite illuminato e Sole a {limit}° o sotto nel sito."
+        "opticalNote": "Visibile otticamente = sopra l'orizzonte, satellite illuminato e Sole a {limit}° o sotto nel sito. Meteo e copertura nuvolosa non sono considerati."
       },
       "help": {
         "overview": "Gli angoli di osservazione multi-sito rispondono a una domanda di rete: tra tutti i miei sensori, quale vede il satellite selezionato, e quando? Calcolano gli angoli di osservazione su molti siti contemporaneamente e li intrecciano in un'unica tabella cronologica.",

@@ -95,6 +95,8 @@
         "tooltipMaxRange": "Dosah v kilometrech (např.: 20000)",
         "horizonMask": "Maska horizontu (az,el na řádek)",
         "tooltipHorizonMask": "Volitelné. Body azimut,elevace ve stupních, jeden na řádek nebo oddělené středníky. Minimální elevace se mezi body interpoluje a přechází přes 360. 2 až 72 bodů, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Stupňovité pásy (elevace platí do dalšího azimutu)",
+        "tooltipMaskStep": "Vypnuto: elevace se mezi body interpoluje. Zapnuto: každý azimut začíná pás s danou elevací až do dalšího azimutu, přes 360 se pokračuje (0,10 a 90,35 znamená 10 stupňů od 0 do 90, poté 35 stupňů).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "V dohledu",
         "noLookAnglesToDownload": "Nejsou k dispozici žádné úhly pohledu ke stažení!",
         "eclipsed": "Zastíněn",
-        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti."
+        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti. Počasí a oblačnost se neberou v úvahu."
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tuto hranu určuje maska horizontu senzoru, ne jeho minimální elevace",
@@ -221,7 +223,7 @@
         "sensorListMissing": "Seznam senzorů nebyl nalezen v rozhraní",
         "satrecNotFound": "Záznam družice nebyl nalezen",
         "eclipsed": "Zastíněn",
-        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti."
+        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti. Počasí a oblačnost se neberou v úvahu."
       },
       "help": {
         "overview": "Úhly pohledu z více míst odpovídají na síťovou otázku: který ze všech mých senzorů vidí vybraný satelit a kdy? Počítají úhly pohledu pro mnoho stanovišť najednou a prokládají je do jediné chronologické tabulky.",

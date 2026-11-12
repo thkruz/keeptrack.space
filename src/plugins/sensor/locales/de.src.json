@@ -95,6 +95,8 @@
         "tooltipMaxRange": "Reichweite in Kilometern (z.B.: 20000)",
         "horizonMask": "Horizontmaske (Az,El pro Zeile)",
         "tooltipHorizonMask": "Optional. Azimut-,Elevationspunkte in Grad, einer pro Zeile oder durch Semikolons getrennt. Die Mindestelevation wird zwischen den Punkten interpoliert und läuft über 360 hinweg. 2 bis 72 Punkte, 0 <= Az < 360, 0 <= El <= 89.",
+        "maskStep": "Stufen (Elevation gilt bis zum nächsten Azimut)",
+        "tooltipMaskStep": "Aus: Die Mindestelevation wird zwischen den Punkten interpoliert. An: Jeder Azimut beginnt einen Bereich mit dieser Elevation bis zum nächsten Azimut, über 360 hinaus umlaufend (0,10 und 90,35 heißt 10 Grad von 0 bis 90, danach 35 Grad).",
         "timeZone": "Time zone (IANA, optional)",
         "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
       },
@@ -181,7 +183,7 @@
         "inView": "Im Sichtfeld",
         "noLookAnglesToDownload": "Keine Blickwinkel zum Herunterladen verfügbar!",
         "eclipsed": "Im Schatten",
-        "opticalNote": "Optisch sichtbar = über dem Horizont, Satellit besonnt und Sonne am Standort bei oder unter {limit}°."
+        "opticalNote": "Optisch sichtbar = über dem Horizont, Satellit besonnt und Sonne am Standort bei oder unter {limit}°. Wetter und Bewölkung werden nicht berücksichtigt."
       },
       "maskLimited": "Maske",
       "maskLimitedTitle": "Diese Kante wird durch die Horizontmaske des Sensors bestimmt, nicht durch seine Mindestelevation",
@@ -221,7 +223,7 @@
         "sensorListMissing": "Die Sensorliste wurde in der Oberfläche nicht gefunden",
         "satrecNotFound": "Satellitendatensatz nicht gefunden",
         "eclipsed": "Im Schatten",
-        "opticalNote": "Optisch sichtbar = über dem Horizont, Satellit besonnt und Sonne am Standort bei oder unter {limit}°."
+        "opticalNote": "Optisch sichtbar = über dem Horizont, Satellit besonnt und Sonne am Standort bei oder unter {limit}°. Wetter und Bewölkung werden nicht berücksichtigt."
       },
       "help": {
         "overview": "Multi-Standort-Blickwinkel beantwortet eine Netzwerkfrage: Welcher meiner Sensoren sieht den ausgewählten Satelliten, und wann? Es berechnet Blickwinkel über viele Standorte gleichzeitig und verschachtelt sie zu einer einzigen chronologischen Tabelle.",

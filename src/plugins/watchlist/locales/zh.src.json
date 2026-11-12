@@ -67,6 +67,13 @@
       "infoBox": {
         "addLabel": "添加到关注列表",
         "removeLabel": "从关注列表中移除"
+      },
+      "stale": {
+        "label": "过期轨道根数阈值（小时）",
+        "helpText": "早于该阈值的轨道根数会在关注列表、过境表和导出中标记为“过期”。默认 72。",
+        "ageHeader": "GP 龄期 (h)",
+        "marker": "过期",
+        "tooltip": "轨道根数已超过 {hours} 小时，预测可能不准确。"
       }
     },
     "WatchlistOverlay": {

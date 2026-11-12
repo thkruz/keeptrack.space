@@ -116,6 +116,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION]: StorageScope.Device,
+  [StorageKey.STALE_GP_THRESHOLD_HOURS]: StorageScope.Device,
 
   // --- Device: filter state (explicitly excluded from account sync) ------------
   [StorageKey.FILTER_SETTINGS_OPERATIONAL_PAYLOADS]: StorageScope.Device,

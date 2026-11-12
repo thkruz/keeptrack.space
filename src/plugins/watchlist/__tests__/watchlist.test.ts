@@ -308,16 +308,29 @@ describe('WatchlistPlugin settings contribution', () => {
     expect(hasSettingsContribution(plugin)).toBe(true);
   });
 
-  it('contributes the label-mode select and the sensor and object label toggles', () => {
+  it('contributes the label-mode select, the sensor and object label toggles and the stale threshold', () => {
     const contribution = plugin.getSettingsContribution();
 
     expect(contribution.sectionId).toBe('WatchlistPlugin');
-    expect(contribution.controls).toHaveLength(3);
+    expect(contribution.controls).toHaveLength(4);
     const control = contribution.controls[0] as ISettingSelectControl;
 
     expect(control.type).toBe('select');
     expect(control.id).toBe('satLabelMode');
     expect(control.options.map((o) => o.value)).toEqual([String(SatLabelMode.OFF), String(SatLabelMode.FOV_ONLY), String(SatLabelMode.ALL)]);
+  });
+
+  it('stale threshold control defaults to 72 h, clamps and persists (#138)', () => {
+    const control = plugin.getSettingsContribution().controls[3] as { type: string; id: string; get: () => number; set: (n: number) => void };
+
+    expect(control.type).toBe('number');
+    expect(control.id).toBe('staleGpThreshold');
+    control.set(48);
+    expect(control.get()).toBe(48);
+    expect(settingsManager.staleGpThresholdHours).toBe(48);
+    control.set(0);
+    expect(control.get()).toBe(1);
+    control.set(72);
   });
 
   it('sensor label toggle reads and writes the setting (default off) and persists it', () => {

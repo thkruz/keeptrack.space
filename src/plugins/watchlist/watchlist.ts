@@ -33,6 +33,16 @@ import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import {
+  formatGpAge,
+  getStaleGpThresholdHours,
+  gpAgeHours,
+  gpEpochMs,
+  isGpStale,
+  MAX_STALE_GP_HOURS,
+  MIN_STALE_GP_HOURS,
+  setStaleGpThresholdHours,
+} from '@app/engine/utils/gp-age';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
@@ -170,6 +180,20 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
           set: (next: boolean) => {
             settingsManager.isShowObjectLabels = next;
             PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_OBJECT_LABELS, next.toString());
+          },
+        },
+        {
+          type: 'number',
+          id: 'staleGpThreshold',
+          label: t7e('plugins.WatchlistPlugin.stale.label'),
+          helpText: t7e('plugins.WatchlistPlugin.stale.helpText'),
+          min: MIN_STALE_GP_HOURS,
+          max: MAX_STALE_GP_HOURS,
+          step: 1,
+          unit: 'h',
+          get: () => getStaleGpThresholdHours(),
+          set: (next: number) => {
+            setStaleGpThresholdHours(next);
           },
         },
       ],
@@ -674,16 +698,26 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     let watchlistListHTML = '';
 
+    const referenceMs = ServiceLocator.getTimeManager()?.simulationTimeObj?.getTime() ?? Date.now();
+    const staleHours = getStaleGpThresholdHours();
+
     for (const { id } of this.watchlistList) {
       const sat = catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY)!;
+      const age = gpAgeHours(gpEpochMs(sat.epochYear, sat.epochDay), referenceMs);
+      const staleClass = isGpStale(age, staleHours) ? ' watchlist-age-stale' : '';
+      const ageText = age === null ? '' : `${formatGpAge(age, staleHours).replace('STALE', t7e('plugins.WatchlistPlugin.stale.marker'))}`;
+      const ageTip = staleClass ? ` kt-tooltip="${t7e('plugins.WatchlistPlugin.stale.tooltip').replace('{hours}', String(staleHours))}"` : '';
 
       watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
             <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
           </div>
-          <div class="col s7 m7 l7">
+          <div class="col s5 m5 l5">
              <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name || t7e('Common.unknown')}</span>
+          </div>
+          <div class="col s2 m2 l2">
+            <span class="watchlist-age${staleClass}" data-sat-age="${sat.id}"${ageTip}>${ageText}</span>
           </div>
           <div class="col s2 m2 l2 center-align remove-icon">
             <img class="watchlist-remove" data-sat-id="${sat.id}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>

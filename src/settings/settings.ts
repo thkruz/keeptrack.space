@@ -273,6 +273,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   isDisableControlSites: 'data',
   isDisableLaunchSites: 'data',
   isDisableSensors: 'data',
+  staleGpThresholdHours: 'data',
   apiKey: 'data',
   apiServer: 'data',
 

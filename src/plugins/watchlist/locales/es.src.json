@@ -67,6 +67,13 @@
       "infoBox": {
         "addLabel": "Añadir a la lista de seguimiento",
         "removeLabel": "Quitar de la lista de seguimiento"
+      },
+      "stale": {
+        "label": "Umbral de elementos obsoletos (horas)",
+        "helpText": "Los conjuntos de elementos más antiguos se marcan como OBSOLETO en la lista de seguimiento, las tablas de pasos y las exportaciones. Predeterminado 72.",
+        "ageHeader": "Edad GP (h)",
+        "marker": "OBSOLETO",
+        "tooltip": "El conjunto de elementos tiene más de {hours} h. Las predicciones pueden ser imprecisas."
       }
     },
     "WatchlistOverlay": {

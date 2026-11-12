@@ -104,6 +104,11 @@ export class DataSettings {
    * Disables the loading of sensor data
    */
   isDisableSensors = false;
+  /**
+   * Element sets older than this many hours are flagged as stale in the watchlist, pass tables and exports.
+   * Persisted per device through StorageKey.STALE_GP_THRESHOLD_HOURS (see engine/utils/gp-age.ts).
+   */
+  staleGpThresholdHours = 72;
 }
 
 export const defaultDataSettings = new DataSettings();

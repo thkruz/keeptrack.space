@@ -67,6 +67,13 @@
       "infoBox": {
         "addLabel": "Aggiungi alla lista di osservazione",
         "removeLabel": "Rimuovi dalla lista di osservazione"
+      },
+      "stale": {
+        "label": "Soglia elementi obsoleti (ore)",
+        "helpText": "Gli elementi orbitali più vecchi sono segnati come OBSOLETO nella lista di controllo, nelle tabelle dei passaggi e nelle esportazioni. Predefinito 72.",
+        "ageHeader": "Età GP (h)",
+        "marker": "OBSOLETO",
+        "tooltip": "Gli elementi orbitali hanno più di {hours} h. Le previsioni possono essere imprecise."
       }
     },
     "WatchlistOverlay": {

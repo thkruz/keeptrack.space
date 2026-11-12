@@ -67,6 +67,13 @@
       "infoBox": {
         "addLabel": "Ajouter à la liste de suivi",
         "removeLabel": "Retirer de la liste de suivi"
+      },
+      "stale": {
+        "label": "Seuil de données orbitales périmées (heures)",
+        "helpText": "Les éléments plus anciens sont marqués PÉRIMÉ dans la liste de suivi, les tableaux de passages et les exports. Par défaut 72.",
+        "ageHeader": "Âge GP (h)",
+        "marker": "PÉRIMÉ",
+        "tooltip": "Les éléments orbitaux ont plus de {hours} h. Les prévisions peuvent être imprécises."
       }
     },
     "WatchlistOverlay": {

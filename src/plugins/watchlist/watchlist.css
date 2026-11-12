@@ -49,3 +49,14 @@
   width: 24px;
   height: 24px;
 }
+
+/* Element set age. The STALE word carries the meaning; colour and weight only reinforce it. */
+.watchlist-age {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.watchlist-age-stale {
+  color: var(--color-warning, #ffb300);
+  font-weight: 600;
+}

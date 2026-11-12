@@ -894,6 +894,31 @@ describe('Camera.zoomWheel scroll-out floor', () => {
       expect(cameraInstance.state.camDistBuffer).toBeCloseTo(0.002 + 0.2, 4);
     });
 
+    it('reaches whole-orbit distance from a close snap in about ten notches', () => {
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat: 5, primarySatObj: { id: 5, position: { x: 6800, y: 0, z: 0 } } } as never);
+      cameraInstance.state.camDistBuffer = 1.24 as Kilometers;
+      let notches = 0;
+
+      while (cameraInstance.state.camDistBuffer < 6800 && notches < 100) {
+        cameraInstance.zoomWheel(100);
+        notches++;
+      }
+
+      expect(notches).toBeLessThanOrEqual(10);
+      expect(notches).toBeGreaterThanOrEqual(5);
+    });
+
+    it('does not boost once the standoff is at orbit scale, nor when zooming in', () => {
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat: 5, primarySatObj: { id: 5, position: { x: 6800, y: 0, z: 0 } } } as never);
+      cameraInstance.state.camDistBuffer = 7000 as Kilometers;
+      cameraInstance.zoomWheel(100);
+      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(8400, 3);
+
+      cameraInstance.state.camDistBuffer = 10 as Kilometers;
+      cameraInstance.zoomWheel(-100);
+      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(8, 6);
+    });
+
     it('keeps the proportional step once past the floor, and zoom-in stays proportional', () => {
       cameraInstance.state.camDistBuffer = 100 as Kilometers;
       cameraInstance.zoomWheel(100);

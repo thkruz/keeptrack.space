@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "衛星NORAD ID (90000-99999)",
+        "noradIdHint": "90000-99999のIDはアナリスト用オブジェクトに予約されており、実際のカタログ番号と重複しません。",
         "satelliteName": "衛星名",
         "inclinationDeg": "軌道傾斜角 (度)",
         "apogeeAltKm": "遠地点高度 (km)",

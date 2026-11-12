@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "Satellite NORAD ID (90000-99999)",
+        "noradIdHint": "IDs 90000-99999 are reserved for analyst objects so they never clash with real catalog numbers.",
         "satelliteName": "Satellite Name",
         "inclinationDeg": "Inclination (degrees)",
         "apogeeAltKm": "Apogee Altitude (km)",

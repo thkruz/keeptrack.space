@@ -74,3 +74,11 @@
 #createSat-menu #createSat-calc-velocity:disabled {
   color: #c4c4c4;
 }
+
+/* Explains the analyst ID range under the NORAD ID field. */
+#createSat-menu .createSat-hint {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.8em;
+  opacity: 0.75;
+}

@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "NORAD ID satelitu (90000-99999)",
+        "noradIdHint": "ID 90000-99999 jsou vyhrazena pro analytické objekty, aby nekolidovala se skutečnými čísly katalogu.",
         "satelliteName": "Název satelitu",
         "inclinationDeg": "Inklinace (stupně)",
         "apogeeAltKm": "Výška apogea (km)",

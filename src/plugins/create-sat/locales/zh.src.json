@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "卫星 NORAD ID (90000-99999)",
+        "noradIdHint": "90000-99999 的 ID 保留给分析对象，不会与真实目录编号冲突。",
         "satelliteName": "卫星名称",
         "inclinationDeg": "倾角（度）",
         "apogeeAltKm": "远地点高度（km）",

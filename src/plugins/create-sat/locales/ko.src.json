@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "위성 NORAD ID (90000-99999)",
+        "noradIdHint": "90000-99999 ID는 분석가 객체용으로 예약되어 실제 카탈로그 번호와 충돌하지 않습니다.",
         "satelliteName": "위성 이름",
         "inclinationDeg": "경사각 (도)",
         "apogeeAltKm": "원지점 고도 (km)",

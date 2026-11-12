@@ -42,6 +42,7 @@ export function buildBasicTabHtml(): string {
           <div class="input-field col s12">
             <input value="90000" id="${P}-basic-scc" type="text" maxlength="9" />
             <label for="${P}-basic-scc" class="active">${l('noradId')}</label>
+            <small class="createSat-hint">${l('noradIdHint')}</small>
           </div>
         </div>
         <div class="kt-field-row">
@@ -107,6 +108,7 @@ export function buildAdvancedTabHtml(): string {
           <div class="input-field col s12">
             <input value="90000" id="${P}-scc" type="text" maxlength="9" />
             <label for="${P}-scc" class="active">${l('noradId')}</label>
+            <small class="createSat-hint">${l('noradIdHint')}</small>
           </div>
         </div>
         <div class="kt-field-row">
@@ -132,7 +134,7 @@ export function buildAdvancedTabHtml(): string {
             <label for="${P}-name" class="active">${l('satelliteName')}</label>
           </div>
           <div class="input-field col s6">
-            <input placeholder="" id="${P}-src" type="text" maxlength="24" />
+            <input placeholder="" id="${P}-src" type="text" maxlength="120" />
             <label for="${P}-src" class="active">${l('dataSource')}</label>
           </div>
         </div>

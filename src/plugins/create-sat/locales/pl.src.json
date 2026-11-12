@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "Numer NORAD satelity (90000-99999)",
+        "noradIdHint": "Numery 90000-99999 są zarezerwowane dla obiektów analityka, aby nie kolidowały z prawdziwymi numerami katalogu.",
         "satelliteName": "Nazwa satelity",
         "inclinationDeg": "Inklinacja (stopnie)",
         "apogeeAltKm": "Wysokość apogeum (km)",

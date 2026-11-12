@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "ID NORAD du satellite (90000-99999)",
+        "noradIdHint": "Les ID 90000-99999 sont réservés aux objets d'analyste pour ne jamais entrer en conflit avec les vrais numéros du catalogue.",
         "satelliteName": "Nom du satellite",
         "inclinationDeg": "Inclinaison (degrés)",
         "apogeeAltKm": "Altitude de l'apogée (km)",

@@ -469,6 +469,18 @@ export class CreateSat extends KeepTrackPlugin {
   protected static advancedErrors_: FormErrorReporter | null = null;
 
   /** Raw Basic-tab values. */
+  /**
+   * Formats a typed mean motion as NN.NNNNN..., keeping the precision typed (up to the 8 decimals a TLE line
+   * holds); 5 is the minimum shown. Used on change and on submit so tabbing out never rounds the value.
+   */
+  static formatMeanMotion_(raw: string): string {
+    const value = parseFloat(raw);
+    const typedDecimals = /\.(\d+)/u.exec(raw.trim())?.[1].length ?? 0;
+    const decimals = Math.min(8, Math.max(5, typedDecimals));
+
+    return value.toFixed(decimals).padStart(decimals + 3, '0');
+  }
+
   private static readBasicInputs_(): { scc: string; name: string; inc: string; apogee: string; perigee: string } {
     const v = (suffix: string): string => (getEl(`${CreateSat.elementPrefix}-basic-${suffix}`, true) as HTMLInputElement | null)?.value ?? '';
 
@@ -567,7 +579,7 @@ export class CreateSat extends KeepTrackPlugin {
       }
     });
 
-    // Mean Motion to Period conversion
+    // Mean Motion to Period conversion (keeps the typed precision; see formatMeanMotion_)
     getEl(`${CreateSat.elementPrefix}-meanmo`)!.addEventListener('change', () => {
       const meanmoInput = getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement;
       const meanmo = meanmoInput.value;
@@ -580,11 +592,7 @@ export class CreateSat extends KeepTrackPlugin {
         const per = (1440 / parseFloat(meanmo)).toFixed(4);
         (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per.padStart(8, '0');
 
-        /*
-         * Also reformat the input just in case the user entered a value with
-         * more than 4 decimal places
-         */
-        meanmoInput.value = parseFloat(meanmo).toFixed(5).padStart(8, '0');
+        meanmoInput.value = CreateSat.formatMeanMotion_(meanmo);
       } catch (error) {
         errorManagerInstance.warn(t7e('plugins.CreateSat.errorMsgs.meanMotionToPeriodFailed' as T7eKey).replace('{error}', String(error)));
       }
@@ -781,11 +789,7 @@ export class CreateSat extends KeepTrackPlugin {
     const meanmoNum = parseFloat(meanmo);
 
     if (!isNaN(meanmoNum)) {
-      // Keep the precision typed (up to the 8 decimals a TLE line holds); 5 is the minimum shown.
-      const typedDecimals = /\.(\d+)/u.exec(meanmo)?.[1].length ?? 0;
-      const decimals = Math.min(8, Math.max(5, typedDecimals));
-
-      meanmo = meanmoNum.toFixed(decimals).padStart(decimals + 3, '0');
+      meanmo = CreateSat.formatMeanMotion_(meanmo);
     } else {
       meanmo = meanmo.padStart(8, '0');
     }

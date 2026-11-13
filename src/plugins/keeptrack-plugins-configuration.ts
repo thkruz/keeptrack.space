@@ -166,5 +166,6 @@ export type KeepTrackPluginsConfiguration = {
   LaunchpadPlugin?: PluginConfiguration;
   FavoritesMenuPlugin?: PluginConfiguration;
   ObjectComparisonPlugin?: PluginConfiguration;
+  SiteAccessSearchPlugin?: PluginConfiguration;
   OnboardingPlugin?: PluginConfiguration;
 };

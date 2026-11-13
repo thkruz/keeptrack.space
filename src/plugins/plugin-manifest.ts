@@ -1024,6 +1024,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 96 },
   },
   {
+    configKey: 'SiteAccessSearchPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/site-access-search/site-access-search') : undefined,
+    proClassName: 'SiteAccessSearchPlugin',
+    defaultConfig: { enabled: true, order: 97 },
+  },
+  {
     configKey: 'FavoritesMenuPlugin',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/favorites-menu/favorites-menu') : undefined,
     proClassName: 'FavoritesMenuPlugin',

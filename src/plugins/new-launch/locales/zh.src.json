@@ -10,6 +10,7 @@
         "inclination": "倾角",
         "launchingNorthOrSouth": "向北或向南发射",
         "launchFacility": "发射设施",
+        "searchFacilities": "搜索设施或国家...",
         "north": "北",
         "south": "南"
       },

@@ -1,0 +1,117 @@
+/* Styling for the GroupedPicker primitive (engine/ui/grouped-picker.ts). */
+
+.kt-picker-trigger {
+  display: block;
+  width: 100%;
+  padding: 8px 28px 8px 10px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--color-dark-text-accent, #fff);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+
+.kt-picker-trigger::after {
+  content: '\25BE';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+}
+
+.kt-picker-trigger:hover {
+  border-color: var(--color-primary, #1e88e5);
+}
+
+.kt-picker-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, 100vw);
+  background: var(--color-dark-background, #121212);
+  color: var(--color-dark-text-accent, #fff);
+  border-left: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
+}
+
+.kt-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.kt-picker-close {
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 22px;
+  line-height: 1;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.kt-picker-search {
+  margin: 0 14px 8px;
+  padding: 8px 10px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  border-radius: 4px;
+}
+
+.kt-picker-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 14px 14px;
+}
+
+.kt-picker-group > summary {
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-dark-text-muted, rgba(255, 255, 255, 0.7));
+}
+
+.kt-picker-item {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 13px;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.kt-picker-item:hover,
+.kt-picker-item:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.kt-picker-item-selected {
+  background: var(--color-primary, #1e88e5);
+}
+
+.kt-picker-empty {
+  padding: 16px 0;
+  font-style: italic;
+  color: var(--color-dark-text-muted, rgba(255, 255, 255, 0.5));
+}

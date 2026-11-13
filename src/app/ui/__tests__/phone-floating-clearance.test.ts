@@ -47,6 +47,6 @@ describe('phone floating clearance CSS', () => {
     expect(info).toMatch(/\.sat-info-row:has\([^)]*\) \{[^}]*min-height: 44px/u);
     expect(css).toMatch(/\.drawer-utility-icon \{[^}]*width: 44px !important[^}]*height: 44px !important/u);
     expect(css).toMatch(/\.drawer-utility-footer \{[^}]*min-width: 54px[^}]*min-height: 54px/u);
-    expect(css).toMatch(/#datetime-zone \{[^}]*padding: 12px 2px/u);
+    expect(css).toMatch(/#datetime #datetime-zone \{[^}]*width: 52px[^}]*outline-offset: -5px/u);
   });
 });

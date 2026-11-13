@@ -156,15 +156,16 @@
   /* Time-zone chip: 44 px tall select; the visible chip is the outline drawn at the old content edge. */
   body #datetime #datetime-zone {
     box-sizing: border-box;
-    width: 48px;
+    width: 52px;
     min-width: 44px;
     height: 44px;
     margin: 0;
-    /* 20 px of content height (was 16) so the chip outline sits clear of the zone text */
-    padding: 12px 2px;
+    padding: 0 2px;
     border: 0;
+    /* The outline is inset equally on all sides, so it must leave room for the whole select: a 52x44 box with a 5 px
+       inset draws a 42x34 chip that encloses the zone text and the picker arrow instead of cutting through them (#157). */
     outline: 1px solid currentcolor;
-    outline-offset: -12px;
+    outline-offset: -5px;
     border-radius: 8px;
   }
 

@@ -8,12 +8,18 @@ describe('refreshMaterialSelect container option (#266)', () => {
     document.body.innerHTML = '';
   });
 
-  it('attaches the dropdown to body inside a data-select-container="body" ancestor', () => {
+  it('attaches the dropdown to a fixed portal, never to <body> itself, inside a data-select-container="body" ancestor', () => {
     document.body.innerHTML = '<table data-select-container="body"><tr><td><select id="s1"><option>a</option></select></td></tr></table>';
     const init = vi.spyOn(FormSelect, 'init').mockReturnValue(undefined as never);
 
     refreshMaterialSelect(document.getElementById('s1') as HTMLSelectElement);
-    expect(init.mock.calls.at(-1)?.[1]?.dropdownOptions?.container).toBe(document.body);
+    const container = init.mock.calls.at(-1)?.[1]?.dropdownOptions?.container as HTMLElement;
+
+    // Materialize sets position: relative on a static container; on <body> that blanked the whole app.
+    expect(container).not.toBe(document.body);
+    expect(container.id).toBe('kt-select-portal');
+    expect(container.style.position).toBe('fixed');
+    expect(container.parentElement).toBe(document.body);
   });
 
   it('leaves the container unset elsewhere', () => {

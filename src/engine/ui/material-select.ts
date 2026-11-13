@@ -20,6 +20,27 @@ function setSelectFieldsOpen_(select: Element, isOpen: boolean): void {
   }
 }
 
+/**
+ * Viewport-sized, click-through layer that open select lists attach to instead of <body>.
+ *
+ * Materialize's `_placeDropdown` sets `style.position = 'relative'` on the dropdown's fallback ancestor when it
+ * computes as static. With `container: document.body` that ancestor is <body> itself, which re-lays-out the whole app
+ * (canvas, top bar, menus) and blanked the page (#266 regression). A fixed layer is already positioned, so <body> is
+ * never touched, and the layer sits outside every scroll container so nothing clips the list.
+ */
+function getSelectPortal_(): HTMLElement {
+  let portal = document.getElementById('kt-select-portal');
+
+  if (!portal) {
+    portal = document.createElement('div');
+    portal.id = 'kt-select-portal';
+    portal.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;overflow:visible;pointer-events:none;z-index:10000;';
+    document.body.append(portal);
+  }
+
+  return portal;
+}
+
 export function refreshMaterialSelect(select: HTMLSelectElement): void {
   /*
    * FormSelect moves a `<label for="<select id>">` INSIDE its wrapper on init, and destroy()
@@ -42,7 +63,7 @@ export function refreshMaterialSelect(select: HTMLSelectElement): void {
 
   FormSelect.init(select, {
     dropdownOptions: {
-      ...(attachToBody ? { container: document.body } : {}),
+      ...(attachToBody ? { container: getSelectPortal_() } : {}),
       /*
        * Promote the enclosing v13 section card to its own stacking context for as
        * long as this dropdown is open (open-START through close-fade END), so the

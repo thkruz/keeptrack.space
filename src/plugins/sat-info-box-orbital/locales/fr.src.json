@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertitude de position radiale à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction. Si la source n'a fourni aucune covariance, ce sont des valeurs par défaut de l'application, pas des mesures. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
+      "tooltip": "Incertitude de position 1-sigma radiale (repère RIC). Une valeur marquée (par défaut) est une valeur par défaut supposée par l'application, pas une mesure ; sinon elle est dérivée du TLE à l'époque GP. Pc et le rapport de conjonction utilisent les mêmes valeurs. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "InTrackSigma": {
       "label": "Sigma Sur Piste",
-      "tooltip": "Incertitude de position le long de la trace à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction. Si la source n'a fourni aucune covariance, ce sont des valeurs par défaut de l'application, pas des mesures. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
+      "tooltip": "Incertitude de position 1-sigma le long de la trajectoire (repère RIC). Une valeur marquée (par défaut) est une valeur par défaut supposée par l'application, pas une mesure ; sinon elle est dérivée du TLE à l'époque GP. Pc et le rapport de conjonction utilisent les mêmes valeurs. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "CrossTrackSigma": {
       "label": "Sigma Hors Piste",
-      "tooltip": "Incertitude de position transverse à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction. Si la source n'a fourni aucune covariance, ce sont des valeurs par défaut de l'application, pas des mesures. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
+      "tooltip": "Incertitude de position 1-sigma transversale (repère RIC). Une valeur marquée (par défaut) est une valeur par défaut supposée par l'application, pas une mesure ; sinon elle est dérivée du TLE à l'époque GP. Pc et le rapport de conjonction utilisent les mêmes valeurs. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "meter": "m",
     "kilometer": "km",

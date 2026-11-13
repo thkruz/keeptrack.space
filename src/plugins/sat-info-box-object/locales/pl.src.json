@@ -118,6 +118,7 @@
           "other": "Satelita"
         }
       },
+      "crewedStation": "Załogowa stacja kosmiczna",
       "rocketBody": "Człon rakiety pozostawiony na orbicie",
       "debris": "Śmieci kosmiczne na orbicie",
       "special": "Specjalny śledzony obiekt",

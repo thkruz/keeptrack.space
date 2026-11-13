@@ -215,6 +215,13 @@
   text-underline-offset: 2px;
 }
 
+/* Every key with a tooltip reads as explainable, not only the orbit terms with a help line (#273) */
+#sat-infobox .sat-info-key[kt-tooltip]:not(.sat-info-key--help) {
+  cursor: help;
+  text-decoration: underline dotted rgba(255, 255, 255, 0.4);
+  text-underline-offset: 2px;
+}
+
 .sat-info-key--help:focus-visible {
   outline: 2px solid var(--color-dark-text-accent, #6cf);
   outline-offset: 1px;

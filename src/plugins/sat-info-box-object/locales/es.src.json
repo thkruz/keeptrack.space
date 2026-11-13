@@ -118,6 +118,7 @@
           "other": "Satélite"
         }
       },
+      "crewedStation": "Estación espacial tripulada",
       "rocketBody": "Cuerpo de cohete abandonado en órbita",
       "debris": "Desechos abandonados en órbita",
       "special": "Objeto especial en seguimiento",

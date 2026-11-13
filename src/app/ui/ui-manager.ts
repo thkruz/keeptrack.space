@@ -654,6 +654,16 @@ export class UiManager {
       if (this.activeToastList_.length > 20) {
         return;
       }
+      // The same text raised twice in quick succession (two listeners reporting one event) shows once (#301)
+      const now = Date.now();
+
+      if (!action && this.recentToastAt_.get(toastText) !== undefined && now - (this.recentToastAt_.get(toastText) as number) < UiManager.TOAST_DEDUPE_MS_) {
+        return;
+      }
+      this.recentToastAt_.set(toastText, now);
+      if (this.recentToastAt_.size > 50) {
+        this.recentToastAt_.clear();
+      }
       const toastMsg = this.makeToast_(toastText, type, isLong, action);
 
       if (toastMsg) {
@@ -665,6 +675,8 @@ export class UiManager {
   }
 
   private activeToastList_ = [] as Toast[];
+  private readonly recentToastAt_ = new Map<string, number>();
+  private static readonly TOAST_DEDUPE_MS_ = 2000;
 
   /**
    * Checks if enough time has elapsed and then calls all queued updateSelectBox callbacks

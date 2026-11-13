@@ -1,5 +1,5 @@
 import { getEl } from '@app/engine/utils/get-el';
-import { createInfoCircle, INFO_CIRCLE_CLASS, infoCircleHtml, setValueWithInfo } from '../info-value';
+import { createInfoCircle, INFO_CIRCLE_CLASS, infoCircleHtml, plainValueText, setValueWithInfo } from '../info-value';
 
 describe('info-value helper (#191)', () => {
   beforeEach(() => {
@@ -54,5 +54,22 @@ describe('info-value helper (#191)', () => {
 
     expect(getEl('v')!.firstChild?.textContent).toBe('GEO');
     expect(getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`)?.getAttribute('kt-tooltip')).toBe('Geostationary.');
+  });
+
+  it('a changed explanation updates the same circle in place so a hovered tooltip follows (#274)', () => {
+    setValueWithInfo('v', 'GEO', 'Geostationary orbit.');
+    const circle = getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`) as HTMLElement;
+
+    setValueWithInfo('v', 'MEO', 'Medium Earth orbit.');
+
+    expect(getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`)).toBe(circle);
+    expect(circle.getAttribute('kt-tooltip')).toBe('Medium Earth orbit.');
+    expect(getEl('v')!.firstChild?.textContent).toBe('MEO');
+  });
+
+  it('plainValueText leaves the circle glyph out (#300)', () => {
+    setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
+
+    expect(plainValueText(getEl('v'))).toBe('LEO');
   });
 });

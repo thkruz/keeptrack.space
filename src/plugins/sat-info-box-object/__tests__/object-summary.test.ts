@@ -54,6 +54,16 @@ describe('object summary', () => {
     expect(lookup(getObjectSummaryKey(cases[3])!)).toBe('Rocket body left in orbit');
   });
 
+  it('gives crewed stations their own line (#233)', () => {
+    const iss = fakeObj(SpaceObjectType.PAYLOAD, { sccNum: '25544', name: 'ISS (ZARYA)', status: PayloadStatus.OPERATIONAL, mission: '' });
+    const tiangong = fakeObj(SpaceObjectType.PAYLOAD, { sccNum: '48274', name: 'CSS (TIANHE)', status: PayloadStatus.OPERATIONAL, mission: '' });
+    const other = fakeObj(SpaceObjectType.PAYLOAD, { sccNum: '99999', name: 'SOMESAT', status: PayloadStatus.OPERATIONAL, mission: '' });
+
+    expect(getObjectSummaryKey(iss)).toBe('SatInfoBoxObject.Summary.crewedStation');
+    expect(getObjectSummaryKey(tiangong)).toBe('SatInfoBoxObject.Summary.crewedStation');
+    expect(getObjectSummaryKey(other)).toBe('SatInfoBoxObject.Summary.Payload.active.other');
+  });
+
   it('returns null for no object or unknown type', () => {
     expect(getObjectSummaryKey(null)).toBeNull();
     expect(getObjectSummaryKey(fakeObj(SpaceObjectType.UNKNOWN))).toBeNull();

@@ -2,9 +2,9 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "Antigüedad de época: aceptable, {days}",
-        "low": "Antigüedad de época: baja, {days}",
-        "poor": "Antigüedad de época: muy baja, {days}"
+        "caution": "Antigüedad de época: envejeciendo, {days}",
+        "low": "Antigüedad de época: antigua, {days}",
+        "poor": "Antigüedad de época: muy antigua, {days}"
       },
       "tooltip": "Tiempo entre la simulación y la época del conjunto de elementos. Aceptable a partir de 3 días, baja a partir de 7, muy baja a partir de 14: cuanto más antiguos son los elementos, más se alejan las posiciones de la realidad.",
       "toast": {

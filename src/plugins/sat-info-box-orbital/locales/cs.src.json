@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radiální sigma",
-      "tooltip": "Radiální nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci. Pokud zdroj neposkytl kovarianci, jde o výchozí hodnoty aplikace, ne o naměřené. Pro posouzení těsného přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky vyžaduje také kovarianci druhého objektu a velikost obou objektů."
+      "tooltip": "1-sigma radiální nejistota polohy (soustava RIC). Hodnota označená (výchozí) je předpokládaná výchozí hodnota aplikace, nikoli měření; jinak je odvozena z TLE v epoše GP. Pc a Zpráva o konjunkcích používají stejné hodnoty. Pro posouzení přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky navíc vyžaduje kovarianci druhého objektu a velikosti obou objektů."
     },
     "InTrackSigma": {
       "label": "Podélná sigma",
-      "tooltip": "Nejistota polohy ve směru letu 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci. Pokud zdroj neposkytl kovarianci, jde o výchozí hodnoty aplikace, ne o naměřené. Pro posouzení těsného přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky vyžaduje také kovarianci druhého objektu a velikost obou objektů."
+      "tooltip": "1-sigma ve směru dráhy nejistota polohy (soustava RIC). Hodnota označená (výchozí) je předpokládaná výchozí hodnota aplikace, nikoli měření; jinak je odvozena z TLE v epoše GP. Pc a Zpráva o konjunkcích používají stejné hodnoty. Pro posouzení přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky navíc vyžaduje kovarianci druhého objektu a velikosti obou objektů."
     },
     "CrossTrackSigma": {
       "label": "Příčná sigma",
-      "tooltip": "Příčná nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci. Pokud zdroj neposkytl kovarianci, jde o výchozí hodnoty aplikace, ne o naměřené. Pro posouzení těsného přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky vyžaduje také kovarianci druhého objektu a velikost obou objektů."
+      "tooltip": "1-sigma kolmá na směr dráhy nejistota polohy (soustava RIC). Hodnota označená (výchozí) je předpokládaná výchozí hodnota aplikace, nikoli měření; jinak je odvozena z TLE v epoše GP. Pc a Zpráva o konjunkcích používají stejné hodnoty. Pro posouzení přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky navíc vyžaduje kovarianci druhého objektu a velikosti obou objektů."
     },
     "meter": "m",
     "kilometer": "km",

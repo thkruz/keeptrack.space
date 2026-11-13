@@ -118,6 +118,7 @@
           "other": "衛星"
         }
       },
+      "crewedStation": "有人宇宙ステーション",
       "rocketBody": "軌道上に残されたロケット本体",
       "debris": "軌道上に残された破片",
       "special": "特別な追跡対象",

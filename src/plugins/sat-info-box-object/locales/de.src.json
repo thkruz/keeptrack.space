@@ -118,6 +118,7 @@
           "other": "Satellit"
         }
       },
+      "crewedStation": "Bemannte Raumstation",
       "rocketBody": "Im Orbit verbliebene Raketenstufe",
       "debris": "Trümmerteil im Orbit",
       "special": "Besonderes verfolgtes Objekt",

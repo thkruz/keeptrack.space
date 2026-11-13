@@ -118,6 +118,7 @@
           "other": "卫星"
         }
       },
+      "crewedStation": "载人空间站",
       "rocketBody": "遗留在轨道上的火箭箭体",
       "debris": "遗留在轨道上的碎片",
       "special": "特殊跟踪目标",

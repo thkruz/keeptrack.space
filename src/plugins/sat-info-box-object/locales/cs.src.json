@@ -118,6 +118,7 @@
           "other": "Satelit"
         }
       },
+      "crewedStation": "Vesmírná stanice s posádkou",
       "rocketBody": "Raketový stupeň ponechaný na oběžné dráze",
       "debris": "Trosky na oběžné dráze",
       "special": "Zvláštní sledovaný objekt",

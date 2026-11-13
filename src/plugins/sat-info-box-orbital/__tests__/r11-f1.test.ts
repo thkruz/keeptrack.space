@@ -116,7 +116,7 @@ describe('SatInfoBoxOrbital R11-F1', () => {
     expect(getEl(`${EL.REF_FRAME}-row`)!.style.display).toBe('flex');
     expect(getEl(EL.UNCERTAINTY_RADIAL)!.textContent).toContain(`(${t7e('SatInfoBoxOrbital.Sigma.defaultTag' as Parameters<typeof t7e>[0])})`);
     expect(getEl(EL.UNCERTAINTY_RADIAL)!.getAttribute('kt-tooltip')).toMatch(/\d+\.\d{3} /u);
-    expect(getEl(EL.INCLINATION)!.getAttribute('kt-tooltip')).toBe('51.6416');
+    expect(getEl(EL.INCLINATION)!.getAttribute('kt-tooltip')).toBe('51.6416°');
   });
 
   it('#88 formats the latitude reach from the inclination, including retrograde orbits', () => {

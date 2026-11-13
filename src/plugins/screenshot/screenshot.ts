@@ -36,6 +36,7 @@ import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import cameraPng from '@public/img/icons/camera.png';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 
 export class Screenshot extends KeepTrackPlugin {
@@ -270,19 +271,6 @@ export class Screenshot extends KeepTrackPlugin {
     return image;
   }
 
-  private static readonly CATALOG_SOURCE_LABELS_: Record<string, string> = {
-    spacetrack: 'Space-Track',
-    celestrak: 'CelesTrak',
-    'celestrak-sup': 'CelesTrak SupGP',
-    'univ-of-mich': 'University of Michigan',
-    calpoly: 'Cal Poly',
-    nuspace: 'NuSpace',
-    vimpel: 'JSC Vimpel',
-    satnogs: 'SatNOGS',
-    'TLE.txt': 'TLE.txt',
-    'extra.json': 'extra.json',
-  };
-
   /**
    * Builds the caption lines: selected object, simulation time (UTC), active site and catalog source.
    * Each line is omitted when its data is missing; a failure to read any of it yields fewer lines, never an error.
@@ -323,7 +311,7 @@ export class Screenshot extends KeepTrackPlugin {
       }
 
       if (sat?.name && sat.source) {
-        lines.push(this.t_('caption.source').replace('{source}', Screenshot.CATALOG_SOURCE_LABELS_[sat.source] ?? sat.source));
+        lines.push(this.t_('caption.source').replace('{source}', SatInfoBox.formatSourceName(sat.source)));
       }
     } catch {
       // Caption data is best effort; the image still exports.

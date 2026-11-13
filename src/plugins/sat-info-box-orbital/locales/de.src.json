@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radiale Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit radial aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht. Wenn die Quelle keine Kovarianz lieferte, sind dies Standardwerte der App und keine Messwerte. Für eine nahe Annäherung öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
+      "tooltip": "1-Sigma-Positionsunsicherheit radiale (RIC-System). Ein mit (Standard) markierter Wert ist ein angenommener Standardwert der App und keine Messung; andernfalls wird er aus dem TLE zur GP-Epoche abgeleitet. Pc und der Konjunktionsbericht nutzen dieselben Werte. Um eine Annäherung zu beurteilen, öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "InTrackSigma": {
       "label": "In-Track Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht. Wenn die Quelle keine Kovarianz lieferte, sind dies Standardwerte der App und keine Messwerte. Für eine nahe Annäherung öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
+      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung (RIC-System). Ein mit (Standard) markierter Wert ist ein angenommener Standardwert der App und keine Messung; andernfalls wird er aus dem TLE zur GP-Epoche abgeleitet. Pc und der Konjunktionsbericht nutzen dieselben Werte. Um eine Annäherung zu beurteilen, öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "CrossTrackSigma": {
       "label": "Cross-Track Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht. Wenn die Quelle keine Kovarianz lieferte, sind dies Standardwerte der App und keine Messwerte. Für eine nahe Annäherung öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
+      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung (RIC-System). Ein mit (Standard) markierter Wert ist ein angenommener Standardwert der App und keine Messung; andernfalls wird er aus dem TLE zur GP-Epoche abgeleitet. Pc und der Konjunktionsbericht nutzen dieselben Werte. Um eine Annäherung zu beurteilen, öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "meter": "m",
     "kilometer": "km",

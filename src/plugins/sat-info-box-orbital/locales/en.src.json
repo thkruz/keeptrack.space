@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radial Sigma",
-      "tooltip": "1-sigma radial position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use. If the source gave no covariance, these are app default values, not measured ones. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
+      "tooltip": "1-sigma radial position uncertainty (RIC frame). A value marked (default) is an assumed app default, not a measurement; otherwise it is derived from the TLE at the GP epoch. Pc and the Conjunction Report use the same values. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
     },
     "InTrackSigma": {
       "label": "In Track Sigma",
-      "tooltip": "1-sigma in-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use. If the source gave no covariance, these are app default values, not measured ones. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
+      "tooltip": "1-sigma in-track position uncertainty (RIC frame). A value marked (default) is an assumed app default, not a measurement; otherwise it is derived from the TLE at the GP epoch. Pc and the Conjunction Report use the same values. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
     },
     "CrossTrackSigma": {
       "label": "Cross Track Sigma",
-      "tooltip": "1-sigma cross-track position uncertainty from the TLE-derived covariance at the GP epoch (RIC frame). Same values Pc and the Conjunction Report use. If the source gave no covariance, these are app default values, not measured ones. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
+      "tooltip": "1-sigma cross-track position uncertainty (RIC frame). A value marked (default) is an assumed app default, not a measurement; otherwise it is derived from the TLE at the GP epoch. Pc and the Conjunction Report use the same values. To judge a close approach, open the Conjunction Report; a collision probability also needs the other object's covariance and both object sizes."
     },
     "meter": "m",
     "kilometer": "km",

@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertidumbre de posición radial a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción. Si la fuente no aportó covarianza, son valores predeterminados de la app, no medidos. Para evaluar un acercamiento, abra el Informe de conjunciones; una probabilidad de colisión también necesita la covarianza del otro objeto y el tamaño de ambos."
+      "tooltip": "Incertidumbre de posición 1-sigma radial (sistema RIC). Un valor marcado (predeterminado) es un valor predeterminado supuesto por la app, no una medición; de lo contrario se deriva del TLE en la época GP. Pc y el Informe de conjunciones usan los mismos valores. Para juzgar una aproximación, abra el Informe de conjunciones; una probabilidad de colisión también requiere la covarianza del otro objeto y el tamaño de ambos objetos."
     },
     "InTrackSigma": {
       "label": "Sigma en Trayectoria",
-      "tooltip": "Incertidumbre de posición a lo largo de la trayectoria a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción. Si la fuente no aportó covarianza, son valores predeterminados de la app, no medidos. Para evaluar un acercamiento, abra el Informe de conjunciones; una probabilidad de colisión también necesita la covarianza del otro objeto y el tamaño de ambos."
+      "tooltip": "Incertidumbre de posición 1-sigma a lo largo de la órbita (sistema RIC). Un valor marcado (predeterminado) es un valor predeterminado supuesto por la app, no una medición; de lo contrario se deriva del TLE en la época GP. Pc y el Informe de conjunciones usan los mismos valores. Para juzgar una aproximación, abra el Informe de conjunciones; una probabilidad de colisión también requiere la covarianza del otro objeto y el tamaño de ambos objetos."
     },
     "CrossTrackSigma": {
       "label": "Sigma Cruzada",
-      "tooltip": "Incertidumbre de posición transversal a 1 sigma según la covarianza derivada del TLE en la época GP (marco RIC). Son los mismos valores que usan la Pc y el informe de conjunción. Si la fuente no aportó covarianza, son valores predeterminados de la app, no medidos. Para evaluar un acercamiento, abra el Informe de conjunciones; una probabilidad de colisión también necesita la covarianza del otro objeto y el tamaño de ambos."
+      "tooltip": "Incertidumbre de posición 1-sigma transversal (sistema RIC). Un valor marcado (predeterminado) es un valor predeterminado supuesto por la app, no una medición; de lo contrario se deriva del TLE en la época GP. Pc y el Informe de conjunciones usan los mismos valores. Para juzgar una aproximación, abra el Informe de conjunciones; una probabilidad de colisión también requiere la covarianza del otro objeto y el tamaño de ambos objetos."
     },
     "meter": "m",
     "kilometer": "km",

@@ -118,6 +118,7 @@
           "other": "Satellite"
         }
       },
+      "crewedStation": "Crewed space station",
       "rocketBody": "Rocket body left in orbit",
       "debris": "Debris left in orbit",
       "special": "Special tracked object",

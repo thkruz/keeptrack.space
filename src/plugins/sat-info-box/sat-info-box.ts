@@ -22,6 +22,7 @@ import contentCopyPng from '@public/img/icons/content-copy.png';
 import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { plainValueText } from './info-value';
 import { isPlaceholderIntlDes } from './placeholder-intl-des';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
@@ -52,8 +53,8 @@ export const buildInfoBoxText = (box: HTMLElement | null, time: Date): string =>
     if (row instanceof HTMLElement && row.offsetParent === null && row.style.display === 'none') {
       return;
     }
-    const key = row.querySelector('.sat-info-key')?.textContent?.trim();
-    const value = row.querySelector('.sat-info-value')?.textContent?.trim();
+    const key = plainValueText(row.querySelector('.sat-info-key'));
+    const value = plainValueText(row.querySelector('.sat-info-value'));
 
     if (key && value) {
       lines.push(`${key}: ${value}`);
@@ -317,7 +318,7 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   private copyIdentifier_(elementId: string): void {
-    const value = getEl(elementId, true)?.textContent?.trim() ?? '';
+    const value = plainValueText(getEl(elementId, true));
     const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
     const notAvailableJsc = t7e('satInfoBox.notAvailableJscVimpel' as Parameters<typeof t7e>[0]);
 
@@ -574,7 +575,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
-      setInnerHtml(EL.SOURCE, SatInfoBox.formatSourceName_(sat.source ?? CatalogSource.CELESTRAK));
+      setInnerHtml(EL.SOURCE, SatInfoBox.formatSourceName(sat.source ?? CatalogSource.CELESTRAK));
 
       this.updateConfidenceDom_(sat);
     }
@@ -593,7 +594,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     [CatalogSource.EXTRA_JSON]: 'extra.json',
   };
 
-  private static formatSourceName_(source: string): string {
+  static formatSourceName(source: string): string {
     if (!source || source.trim().toLowerCase() === 'unknown') {
       return t7e('satInfoBox.Source.notRecorded' as Parameters<typeof t7e>[0]);
     }

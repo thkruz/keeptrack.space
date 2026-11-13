@@ -52,6 +52,12 @@ export const classifyActivity = (status: PayloadStatus | string | undefined): Ac
   }
 };
 
+/** Crewed stations in low Earth orbit: ISS (ZARYA) and the Tiangong modules. They are payloads, but "Active satellite" undersells them (#233). */
+const CREWED_STATION_SCC_ = new Set(['25544', '48274', '53239', '54216']);
+const CREWED_STATION_NAME_ = /^(iss[ (]|iss$|tiangong|tianhe|wentian|mengtian)/iu;
+
+const isCrewedStation_ = (sat: Satellite): boolean => CREWED_STATION_SCC_.has(String(sat.sccNum ?? '').replace(/^0+/u, '')) || CREWED_STATION_NAME_.test(sat.name ?? '');
+
 /** Locale key for the plain-words line, or null when there is nothing to say. */
 export const getObjectSummaryKey = (obj: BaseObject | null | undefined): string | null => {
   if (!obj) {
@@ -65,6 +71,10 @@ export const getObjectSummaryKey = (obj: BaseObject | null | undefined): string 
   switch (obj.type) {
     case SpaceObjectType.PAYLOAD: {
       const sat = obj as Satellite;
+
+      if (isCrewedStation_(sat)) {
+        return 'SatInfoBoxObject.Summary.crewedStation';
+      }
 
       return `SatInfoBoxObject.Summary.Payload.${classifyActivity(sat.status)}.${classifyMission(sat.mission)}`;
     }

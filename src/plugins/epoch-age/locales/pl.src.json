@@ -2,9 +2,9 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "Wiek epoki: średni, {days}",
-        "low": "Wiek epoki: niski, {days}",
-        "poor": "Wiek epoki: bardzo niski, {days}"
+        "caution": "Wiek epoki: starzejący się, {days}",
+        "low": "Wiek epoki: stary, {days}",
+        "poor": "Wiek epoki: bardzo stary, {days}"
       },
       "tooltip": "Czas między symulacją a epoką zestawu elementów. Średni powyżej 3 dni, niski powyżej 7, bardzo niski powyżej 14: im starsze elementy, tym bardziej pozycje odbiegają od rzeczywistości.",
       "toast": {

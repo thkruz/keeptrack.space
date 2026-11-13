@@ -118,6 +118,7 @@
           "other": "위성"
         }
       },
+      "crewedStation": "유인 우주 정거장",
       "rocketBody": "궤도에 남은 로켓 본체",
       "debris": "궤도에 남은 파편",
       "special": "특별 추적 대상",

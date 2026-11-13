@@ -118,6 +118,7 @@
           "other": "Satellite"
         }
       },
+      "crewedStation": "Station spatiale habitée",
       "rocketBody": "Étage de fusée laissé en orbite",
       "debris": "Débris laissé en orbite",
       "special": "Objet spécial suivi",

@@ -349,17 +349,19 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
 
     // Hover or long-press shows the stored digits; the row keeps the short form.
-    const digits: [string, number, number][] = [
-      [EL.APOGEE, obj.apogee, 4],
-      [EL.PERIGEE, obj.perigee, 4],
-      [EL.INCLINATION, obj.inclination, 4],
-      [EL.ECCENTRICITY, obj.eccentricity, 7],
-      [EL.RAAN, obj.rightAscension, 4],
-      [EL.ARG_PE, obj.argOfPerigee, 4],
+    const km = ` ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    const digits: [string, number, number, string][] = [
+      [EL.APOGEE, obj.apogee, 4, km],
+      [EL.PERIGEE, obj.perigee, 4, km],
+      [EL.INCLINATION, obj.inclination, 4, '°'],
+      [EL.ECCENTRICITY, obj.eccentricity, 7, ''],
+      [EL.RAAN, obj.rightAscension, 4, '°'],
+      [EL.ARG_PE, obj.argOfPerigee, 4, '°'],
     ];
 
-    for (const [id, value, places] of digits) {
-      getEl(id, true)?.setAttribute('kt-tooltip', value.toFixed(places));
+    // The unit is part of the stored-digit tooltip so a bare number never floats over the row (#273)
+    for (const [id, value, places, unit] of digits) {
+      getEl(id, true)?.setAttribute('kt-tooltip', `${value.toFixed(places)}${unit}`);
     }
 
     this.updatePeriodElement_(obj.period);

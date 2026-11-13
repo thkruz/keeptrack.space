@@ -55,6 +55,17 @@ export const setValueWithInfo = (id: string, shortText: string, explanation?: st
       return;
     }
 
+    // Same circle, new text: update it in place so a hovered or focused circle keeps its tooltip and the visible
+    // tooltip follows the new selection instead of showing the previous object's text (#274)
+    if (explanation && existing instanceof HTMLElement && el.firstChild?.nodeType === Node.TEXT_NODE && el.childNodes.length === 2) {
+      el.firstChild.textContent = shortText;
+      existing.setAttribute('aria-label', explanation);
+      existing.setAttribute('kt-tooltip', explanation);
+      PluginRegistry.getPlugin(TooltipsPlugin)?.refreshTooltip(existing);
+
+      return;
+    }
+
     el.textContent = shortText;
 
     if (explanation) {
@@ -64,4 +75,18 @@ export const setValueWithInfo = (id: string, shortText: string, explanation?: st
       PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(circle);
     }
   });
+};
+
+/** Plain text of an info box element with the info circles ("i") left out, for copy / export. */
+export const plainValueText = (el: Element | null | undefined): string => {
+  if (!el) {
+    return '';
+  }
+  const clone = el.cloneNode(true) as Element;
+
+  clone.querySelectorAll(`.${INFO_CIRCLE_CLASS}`).forEach((c) => {
+    c.remove();
+  });
+
+  return (clone.textContent ?? '').replace(/\s+/gu, ' ').trim();
 };

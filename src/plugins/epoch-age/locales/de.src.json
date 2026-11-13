@@ -2,9 +2,9 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "Epochenalter: mäßig, {days}",
-        "low": "Epochenalter: gering, {days}",
-        "poor": "Epochenalter: sehr gering, {days}"
+        "caution": "Epochenalter: alternd, {days}",
+        "low": "Epochenalter: alt, {days}",
+        "poor": "Epochenalter: sehr alt, {days}"
       },
       "tooltip": "Zeit zwischen Simulation und Epoche des Bahnelementsatzes. Mäßig ab 3 Tagen, gering ab 7, sehr gering ab 14: Je älter die Elemente, desto stärker weichen die Positionen ab.",
       "toast": {

@@ -11,6 +11,13 @@ describe('buildInfoBoxText', () => {
 
     expect(text).toBe('ISS (2026-11-11T00:00:00.000Z UTC)\nAltitude: 437.45 km\nPeriod: 92.95 min');
   });
+  it('leaves the info-circle "i" out of copied values (#300)', () => {
+    document.body.innerHTML = `<div id="b"><span id="sat-info-title-name">ISS</span>
+      <div class="sat-info-row"><div class="sat-info-key">Regime</div><div class="sat-info-value">LEO<span class="sat-info-circle" kt-tooltip="x">i</span></div></div></div>`;
+    const text = buildInfoBoxText(document.getElementById('b'), new Date('2026-11-11T00:00:00Z'));
+
+    expect(text).toBe('ISS (2026-11-11T00:00:00.000Z UTC)\nRegime: LEO');
+  });
   it('returns empty text without a box', () => {
     expect(buildInfoBoxText(null, new Date())).toBe('');
   });

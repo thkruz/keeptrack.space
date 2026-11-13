@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma radiale",
-      "tooltip": "Incertezza di posizione radiale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione. Se la fonte non ha fornito la covarianza, sono valori predefiniti dell'app, non misurati. Per valutare un avvicinamento, apra il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi."
+      "tooltip": "Incertezza di posizione 1-sigma radiale (sistema RIC). Un valore contrassegnato (predefinito) è un valore predefinito assunto dall'app, non una misura; altrimenti deriva dal TLE all'epoca GP. Pc e il Rapporto di congiunzione usano gli stessi valori. Per valutare un avvicinamento apri il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi gli oggetti."
     },
     "InTrackSigma": {
       "label": "Sigma lungo traccia",
-      "tooltip": "Incertezza di posizione lungo la traccia a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione. Se la fonte non ha fornito la covarianza, sono valori predefiniti dell'app, non misurati. Per valutare un avvicinamento, apra il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi."
+      "tooltip": "Incertezza di posizione 1-sigma lungo l'orbita (sistema RIC). Un valore contrassegnato (predefinito) è un valore predefinito assunto dall'app, non una misura; altrimenti deriva dal TLE all'epoca GP. Pc e il Rapporto di congiunzione usano gli stessi valori. Per valutare un avvicinamento apri il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi gli oggetti."
     },
     "CrossTrackSigma": {
       "label": "Sigma trasversale",
-      "tooltip": "Incertezza di posizione trasversale a 1 sigma dalla covarianza derivata dal TLE all'epoca GP (sistema RIC). Stessi valori usati per la Pc e dal rapporto di congiunzione. Se la fonte non ha fornito la covarianza, sono valori predefiniti dell'app, non misurati. Per valutare un avvicinamento, apra il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi."
+      "tooltip": "Incertezza di posizione 1-sigma trasversale (sistema RIC). Un valore contrassegnato (predefinito) è un valore predefinito assunto dall'app, non una misura; altrimenti deriva dal TLE all'epoca GP. Pc e il Rapporto di congiunzione usano gli stessi valori. Per valutare un avvicinamento apri il Rapporto di congiunzione; una probabilità di collisione richiede anche la covarianza dell'altro oggetto e le dimensioni di entrambi gli oggetti."
     },
     "meter": "m",
     "kilometer": "km",

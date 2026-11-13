@@ -118,6 +118,7 @@
           "other": "Satellite"
         }
       },
+      "crewedStation": "Stazione spaziale con equipaggio",
       "rocketBody": "Stadio di razzo lasciato in orbita",
       "debris": "Detriti lasciati in orbita",
       "special": "Oggetto speciale tracciato",

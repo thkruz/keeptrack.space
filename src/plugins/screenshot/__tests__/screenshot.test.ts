@@ -206,7 +206,7 @@ describe('Screenshot behavior', () => {
       expect(lines[2]).toContain('Eglin');
       expect(lines[3]).toContain('3.3 d');
       expect(lines[3].toLowerCase()).toContain('computed');
-      expect(lines[4]).toContain('Space-Track');
+      expect(lines[4]).toContain('USSF');
     });
 
     it('omits object and source lines when nothing is selected, and the site line when no sensor is set', () => {

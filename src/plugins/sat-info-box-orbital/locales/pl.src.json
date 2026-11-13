@@ -97,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma radialna",
-      "tooltip": "Radialna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji. Jeśli źródło nie podało kowariancji, są to domyślne wartości aplikacji, a nie pomiary. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
+      "tooltip": "Niepewność położenia 1-sigma radialna (układ RIC). Wartość oznaczona (domyślne) to założona wartość domyślna aplikacji, a nie pomiar; w przeciwnym razie wynika z TLE w epoce GP. Pc i Raport zbliżeń używają tych samych wartości. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "InTrackSigma": {
       "label": "Sigma wzdłuż toru",
-      "tooltip": "Niepewność położenia wzdłuż toru 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji. Jeśli źródło nie podało kowariancji, są to domyślne wartości aplikacji, a nie pomiary. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
+      "tooltip": "Niepewność położenia 1-sigma wzdłuż toru (układ RIC). Wartość oznaczona (domyślne) to założona wartość domyślna aplikacji, a nie pomiar; w przeciwnym razie wynika z TLE w epoce GP. Pc i Raport zbliżeń używają tych samych wartości. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "CrossTrackSigma": {
       "label": "Sigma poprzeczna",
-      "tooltip": "Poprzeczna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji. Jeśli źródło nie podało kowariancji, są to domyślne wartości aplikacji, a nie pomiary. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
+      "tooltip": "Niepewność położenia 1-sigma poprzeczna (układ RIC). Wartość oznaczona (domyślne) to założona wartość domyślna aplikacji, a nie pomiar; w przeciwnym razie wynika z TLE w epoce GP. Pc i Raport zbliżeń używają tych samych wartości. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "meter": "m",
     "kilometer": "km",

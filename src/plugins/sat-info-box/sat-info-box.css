@@ -281,10 +281,10 @@
   padding-block: 4px;
 }
 
-/* Phone: the bottom menu button overlays the bottom of the box, leave scroll room so the last rows stay readable */
+/* Phone: the drawer utility footer (bottom 12px + ~64px tall) overlays the bottom of the box; --bottom-menu-height is 0 there, so reserve the same 76px the side menus use */
 @media (max-width: 639px) {
   #sat-infobox {
-    padding-bottom: calc(var(--bottom-menu-height) + 15px);
+    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
 }
 

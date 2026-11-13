@@ -36,13 +36,21 @@
         "sectionOrbit": "Orbita",
         "sectionEpoch": "Epoca",
         "sectionElements": "Elementi orbitali",
-        "sectionPresets": "Preimpostazioni"
+        "sectionPresets": "Preimpostazioni",
+        "sectionWalker": "Costellazione (Walker delta)",
+        "walkerHint": "Crea T satelliti in P piani equidistanti alla stessa altitudine e inclinazione (schema T/P/F). I membri usano gli ID analista liberi più bassi.",
+        "walkerAltKm": "Altitudine sopra il raggio medio terrestre (km)",
+        "walkerTotal": "Satelliti (T)",
+        "walkerPlanes": "Piani (P)",
+        "walkerPhasing": "Fasamento (F)",
+        "walkerPrefix": "Prefisso del nome"
       },
       "buttons": {
         "createSatellite": "Crea satellite",
         "saveTle": "Salva TLE",
         "makeSunSync": "Inclinazione eliosincrona",
-        "cloneSelected": "Clona satellite selezionato"
+        "cloneSelected": "Clona satellite selezionato",
+        "createWalker": "Crea costellazione"
       },
       "options": {
         "payload": "Carico utile",
@@ -125,6 +133,20 @@
         "replace": "Sostituisci",
         "cancel": "Annulla",
         "changed": "Il satellite o il modulo è cambiato. Verifica e invia di nuovo."
+      },
+      "walker": {
+        "created": "Creati {count} satelliti chiamati {prefix}-P#-S# ({failed} falliti)",
+        "errors": {
+          "altitude": "L'altitudine deve essere tra 160 e 400000 km.",
+          "inclination": "L'inclinazione deve essere tra 0 e 180 gradi.",
+          "total": "Satelliti (T) deve essere un intero di almeno 1.",
+          "planes": "Piani (P) deve essere un intero da 1 a T.",
+          "phasing": "Fasamento (F) deve essere un intero da 0 a {max}.",
+          "divisible": "T deve essere divisibile per P.",
+          "tooMany": "Al massimo {max} satelliti per costellazione.",
+          "noSlots": "Slot analista liberi insufficienti ({free} liberi, {needed} necessari).",
+          "failed": "Impossibile generare la costellazione."
+        }
       }
     }
   }

@@ -36,13 +36,21 @@
         "sectionOrbit": "Orbit",
         "sectionEpoch": "Epoche",
         "sectionElements": "Bahnelemente",
-        "sectionPresets": "Voreinstellungen"
+        "sectionPresets": "Voreinstellungen",
+        "sectionWalker": "Konstellation (Walker Delta)",
+        "walkerHint": "Erzeugt T Satelliten in P gleichmäßig verteilten Bahnebenen mit gleicher Höhe und Neigung (Muster T/P/F). Die Mitglieder nutzen die niedrigsten freien Analysten-IDs.",
+        "walkerAltKm": "Höhe über mittlerem Erdradius (km)",
+        "walkerTotal": "Satelliten (T)",
+        "walkerPlanes": "Ebenen (P)",
+        "walkerPhasing": "Phasierung (F)",
+        "walkerPrefix": "Namenspräfix"
       },
       "buttons": {
         "createSatellite": "Satellit erstellen",
         "saveTle": "TLE speichern",
         "makeSunSync": "Sonnensynchrone Inklination",
-        "cloneSelected": "Ausgewählten Satelliten klonen"
+        "cloneSelected": "Ausgewählten Satelliten klonen",
+        "createWalker": "Konstellation erstellen"
       },
       "options": {
         "payload": "Nutzlast",
@@ -125,6 +133,20 @@
         "replace": "Ersetzen",
         "cancel": "Abbrechen",
         "changed": "Satellit oder Formular wurde geändert. Bitte prüfen und erneut senden."
+      },
+      "walker": {
+        "created": "{count} Satelliten mit Namen {prefix}-P#-S# erstellt ({failed} fehlgeschlagen)",
+        "errors": {
+          "altitude": "Die Höhe muss zwischen 160 und 400000 km liegen.",
+          "inclination": "Die Neigung muss zwischen 0 und 180 Grad liegen.",
+          "total": "Satelliten (T) muss eine ganze Zahl von mindestens 1 sein.",
+          "planes": "Ebenen (P) muss eine ganze Zahl von 1 bis T sein.",
+          "phasing": "Phasierung (F) muss eine ganze Zahl von 0 bis {max} sein.",
+          "divisible": "T muss durch P teilbar sein.",
+          "tooMany": "Höchstens {max} Satelliten pro Konstellation.",
+          "noSlots": "Nicht genug freie Analysten-Plätze ({free} frei, {needed} nötig).",
+          "failed": "Die Konstellation konnte nicht erzeugt werden."
+        }
       }
     }
   }

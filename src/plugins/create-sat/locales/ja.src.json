@@ -36,13 +36,21 @@
         "sectionOrbit": "軌道",
         "sectionEpoch": "元期",
         "sectionElements": "軌道要素",
-        "sectionPresets": "プリセット"
+        "sectionPresets": "プリセット",
+        "sectionWalker": "コンステレーション (ウォーカーデルタ)",
+        "walkerHint": "同一の高度と軌道傾斜角で、等間隔のP個の軌道面にT機の衛星を作成します (T/P/Fパターン)。各衛星は空いている最小のアナリストIDを使います。",
+        "walkerAltKm": "平均地球半径からの高度 (km)",
+        "walkerTotal": "衛星数 (T)",
+        "walkerPlanes": "軌道面数 (P)",
+        "walkerPhasing": "位相 (F)",
+        "walkerPrefix": "名前の接頭辞"
       },
       "buttons": {
         "createSatellite": "衛星を作成",
         "saveTle": "TLEを保存",
         "makeSunSync": "太陽同期傾斜角",
-        "cloneSelected": "選択した衛星を複製"
+        "cloneSelected": "選択した衛星を複製",
+        "createWalker": "コンステレーションを作成"
       },
       "options": {
         "payload": "ペイロード",
@@ -125,6 +133,20 @@
         "replace": "置き換える",
         "cancel": "キャンセル",
         "changed": "衛星またはフォームが変更されました。確認して再送信してください。"
+      },
+      "walker": {
+        "created": "{prefix}-P#-S# という名前の衛星を {count} 機作成しました ({failed} 件失敗)",
+        "errors": {
+          "altitude": "高度は160〜400000 kmにしてください。",
+          "inclination": "軌道傾斜角は0〜180度にしてください。",
+          "total": "衛星数 (T) は1以上の整数にしてください。",
+          "planes": "軌道面数 (P) は1からTまでの整数にしてください。",
+          "phasing": "位相 (F) は0から{max}までの整数にしてください。",
+          "divisible": "TはPで割り切れる必要があります。",
+          "tooMany": "1つのコンステレーションは最大{max}機までです。",
+          "noSlots": "空いているアナリストスロットが足りません (空き {free}、必要 {needed})。",
+          "failed": "コンステレーションを生成できませんでした。"
+        }
       }
     }
   }

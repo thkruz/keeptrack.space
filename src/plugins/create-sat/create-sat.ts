@@ -19,7 +19,7 @@ import { saveAs } from 'file-saver';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
-import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc } from './create-sat-actions';
+import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc, getFreeAnalystSccs } from './create-sat-actions';
 import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
@@ -34,6 +34,7 @@ import {
   validateBasicFields,
   wireInlineValidation,
 } from './create-sat-validation';
+import { parseWalkerInputs, planWalker, walkerErrorMessage } from './create-sat-walker';
 import './create-sat.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -55,6 +56,10 @@ interface CreateRequest {
   resubmit: (confirmed: Satellite) => void;
   /** Shows a field error the composer or parser found after validation passed. */
   onFieldError: (error: FormFieldError) => void;
+  /** Batch creation: no per-satellite toast, search or usage event, and a needed replacement confirmation counts as a failure. */
+  quiet?: boolean;
+  /** Called once per satellite installed in quiet mode. */
+  onSuccess?: () => void;
 }
 /**
  * CreateSat plugin for creating and editing satellites
@@ -268,6 +273,8 @@ export class CreateSat extends KeepTrackPlugin {
     getEl('createSat-save')!.addEventListener('click', CreateSat.exportTLE_);
     // Submit button for Basic tab
     getEl('createSat-basic-submit')!.addEventListener('click', () => this.createSatBasicSubmit_());
+    // Walker delta constellation generator (Basic tab)
+    getEl('createSat-walker-submit')?.addEventListener('click', () => CreateSat.createWalkerSubmit_());
 
     // Values stay the catalog codes; only the option text follows the UI language.
     countryNameList
@@ -547,6 +554,77 @@ export class CreateSat extends KeepTrackPlugin {
         onFieldError: (error) => ServiceLocator.getUiManager().toast(error.message, ToastMsgType.error, true),
       },
       confirmedObject
+    );
+  }
+
+  /** Show or clear the Walker form message. */
+  private static setWalkerMessage_(text: string): void {
+    const el = getEl(`${CreateSat.elementPrefix}-walker-error`, true);
+
+    if (el) {
+      el.textContent = text;
+      el.hidden = text === '';
+    }
+  }
+
+  /**
+   * Create a Walker delta constellation (T/P/F) from the Basic tab's Walker section, one analyst satellite per
+   * member in the lowest free slots, named "<prefix>-P<plane>-S<slot>" so the set can be found with one search.
+   */
+  protected static createWalkerSubmit_(): void {
+    const v = (id: string): string => (getEl(`${CreateSat.elementPrefix}-walker-${id}`, true) as HTMLInputElement | null)?.value ?? '';
+    const raw = { altitude: v('alt'), inclination: v('inc'), total: v('total'), planes: v('planes'), phasing: v('phasing'), prefix: v('prefix') };
+    const parsed = parseWalkerInputs(raw);
+
+    if ('code' in parsed) {
+      CreateSat.setWalkerMessage_(walkerErrorMessage(parsed));
+
+      return;
+    }
+
+    const plan = planWalker(raw, new Date(ServiceLocator.getTimeManager().simulationTimeObj), getFreeAnalystSccs(parsed.total));
+
+    if ('code' in plan) {
+      CreateSat.setWalkerMessage_(walkerErrorMessage(plan));
+
+      return;
+    }
+
+    CreateSat.setWalkerMessage_('');
+    let created = 0;
+    let failed = 0;
+
+    for (const member of plan) {
+      CreateSat.submitTle_({
+        params: member.params,
+        intl: member.intl,
+        snapshot: () => member.params.scc,
+        resubmit: () => {
+          failed++;
+        },
+        onFieldError: () => {
+          failed++;
+        },
+        quiet: true,
+        onSuccess: () => {
+          created++;
+        },
+      });
+    }
+
+    const prefix = plan[0].params.name.replace(/-P1-S1$/u, '');
+
+    if (created > 0) {
+      ServiceLocator.getUiManager().doSearch(prefix);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'CreateSat');
+    }
+    ServiceLocator.getUiManager().toast(
+      t7e('plugins.CreateSat.walker.created' as T7eKey)
+        .replace('{count}', String(created))
+        .replace('{prefix}', prefix)
+        .replace('{failed}', String(failed)),
+      failed > 0 ? ToastMsgType.caution : ToastMsgType.normal,
+      true
     );
   }
 
@@ -915,6 +993,15 @@ export class CreateSat extends KeepTrackPlugin {
       const sat = obj as Satellite;
 
       if ((sat.active || sat.country !== 'ANALSAT') && confirmedObject !== sat) {
+        if (request.quiet) {
+          request.onFieldError({
+            id: 'scc',
+            fields: ['scc'],
+            message: t7e('plugins.CreateSat.errorMsgs.noradIdNoSlot' as T7eKey).replace('{id}', inputParams.scc.trim()),
+          });
+
+          return;
+        }
         const oldTle1 = sat.tle1;
         const oldTle2 = sat.tle2;
         const oldIdentity = JSON.stringify([sat.name, sat.country, sat.active]);
@@ -1061,6 +1148,12 @@ export class CreateSat extends KeepTrackPlugin {
 
       if (selectSatManager?.selectedSat === satId) {
         selectSatManager.selectSat(satId);
+      }
+
+      if (request.quiet) {
+        request.onSuccess?.();
+
+        return;
       }
 
       // Search for the new satellite

@@ -36,13 +36,21 @@
         "sectionOrbit": "궤도",
         "sectionEpoch": "기준 시각",
         "sectionElements": "궤도 요소",
-        "sectionPresets": "프리셋"
+        "sectionPresets": "프리셋",
+        "sectionWalker": "콘스텔레이션 (워커 델타)",
+        "walkerHint": "같은 고도와 경사각으로 균등 간격의 P개 궤도면에 T개 위성을 만듭니다 (T/P/F 패턴). 각 위성은 비어 있는 가장 낮은 분석가 ID를 사용합니다.",
+        "walkerAltKm": "지구 평균 반경 기준 고도 (km)",
+        "walkerTotal": "위성 수 (T)",
+        "walkerPlanes": "궤도면 수 (P)",
+        "walkerPhasing": "위상 (F)",
+        "walkerPrefix": "이름 접두어"
       },
       "buttons": {
         "createSatellite": "위성 생성",
         "saveTle": "TLE 저장",
         "makeSunSync": "태양 동기 경사각",
-        "cloneSelected": "선택한 위성 복제"
+        "cloneSelected": "선택한 위성 복제",
+        "createWalker": "콘스텔레이션 만들기"
       },
       "options": {
         "payload": "탑재체",
@@ -125,6 +133,20 @@
         "replace": "교체",
         "cancel": "취소",
         "changed": "위성 또는 양식이 변경되었습니다. 확인 후 다시 제출하세요."
+      },
+      "walker": {
+        "created": "{prefix}-P#-S# 이름의 위성 {count}개를 만들었습니다 ({failed}개 실패)",
+        "errors": {
+          "altitude": "고도는 160~400000 km여야 합니다.",
+          "inclination": "경사각은 0~180도여야 합니다.",
+          "total": "위성 수 (T)는 1 이상의 정수여야 합니다.",
+          "planes": "궤도면 수 (P)는 1부터 T까지의 정수여야 합니다.",
+          "phasing": "위상 (F)은 0부터 {max}까지의 정수여야 합니다.",
+          "divisible": "T는 P로 나누어떨어져야 합니다.",
+          "tooMany": "콘스텔레이션당 최대 {max}개 위성입니다.",
+          "noSlots": "비어 있는 분석가 슬롯이 부족합니다 (여유 {free}, 필요 {needed}).",
+          "failed": "콘스텔레이션을 생성하지 못했습니다."
+        }
       }
     }
   }

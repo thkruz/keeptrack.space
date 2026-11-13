@@ -36,13 +36,21 @@
         "sectionOrbit": "Órbita",
         "sectionEpoch": "Época",
         "sectionElements": "Elementos orbitales",
-        "sectionPresets": "Preajustes"
+        "sectionPresets": "Preajustes",
+        "sectionWalker": "Constelación (Walker delta)",
+        "walkerHint": "Crea T satélites en P planos equiespaciados con una misma altitud e inclinación (patrón T/P/F). Los miembros usan los ID de analista libres más bajos.",
+        "walkerAltKm": "Altitud sobre el radio medio de la Tierra (km)",
+        "walkerTotal": "Satélites (T)",
+        "walkerPlanes": "Planos (P)",
+        "walkerPhasing": "Fase (F)",
+        "walkerPrefix": "Prefijo del nombre"
       },
       "buttons": {
         "createSatellite": "Crear Satélite",
         "saveTle": "Guardar TLE",
         "makeSunSync": "Inclinación heliosíncrona",
-        "cloneSelected": "Clonar satélite seleccionado"
+        "cloneSelected": "Clonar satélite seleccionado",
+        "createWalker": "Crear constelación"
       },
       "options": {
         "payload": "Carga Útil",
@@ -125,6 +133,20 @@
         "replace": "Reemplazar",
         "cancel": "Cancelar",
         "changed": "El satélite o el formulario cambió. Revísalo y envíalo de nuevo."
+      },
+      "walker": {
+        "created": "Se crearon {count} satélites llamados {prefix}-P#-S# ({failed} fallidos)",
+        "errors": {
+          "altitude": "La altitud debe estar entre 160 y 400000 km.",
+          "inclination": "La inclinación debe estar entre 0 y 180 grados.",
+          "total": "Satélites (T) debe ser un entero de al menos 1.",
+          "planes": "Planos (P) debe ser un entero de 1 a T.",
+          "phasing": "Fase (F) debe ser un entero de 0 a {max}.",
+          "divisible": "T debe ser divisible por P.",
+          "tooMany": "Máximo {max} satélites por constelación.",
+          "noSlots": "No hay suficientes ranuras de analista libres ({free} libres, {needed} necesarias).",
+          "failed": "No se pudo generar la constelación."
+        }
       }
     }
   }

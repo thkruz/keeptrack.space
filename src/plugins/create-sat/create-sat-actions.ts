@@ -64,6 +64,34 @@ export function getFreeAnalystScc(): string | null {
   return lowest === null ? null : lowest.toString();
 }
 
+/** Up to `count` lowest free analyst SCCs (same freeness rule as getFreeAnalystScc), ascending. */
+export function getFreeAnalystSccs(count: number): string[] {
+  const free: number[] = [];
+
+  for (const obj of ServiceLocator.getCatalogManager().objectCache) {
+    if (!obj?.isSatellite?.()) {
+      continue;
+    }
+
+    const sat = obj as Satellite;
+
+    if (sat.country !== 'ANALSAT' || AnalystSlotReservations.isReserved(sat.sccNum)) {
+      continue;
+    }
+
+    const num = parseInt(sat.sccNum, 10);
+
+    if (!isNaN(num) && num >= 90_000 && num <= 99_999) {
+      free.push(num);
+    }
+  }
+
+  return free
+    .sort((x, y) => x - y)
+    .slice(0, count)
+    .map(String);
+}
+
 /** Write the supplied Advanced-tab fields and refresh the derived readout. */
 export function writeAdvancedFields(prefix: string, fields: AdvancedFieldWrite): void {
   for (const [key, value] of Object.entries(fields)) {

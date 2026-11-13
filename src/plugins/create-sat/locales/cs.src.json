@@ -36,13 +36,21 @@
         "sectionOrbit": "Oběžná dráha",
         "sectionEpoch": "Epocha",
         "sectionElements": "Elementy dráhy",
-        "sectionPresets": "Předvolby"
+        "sectionPresets": "Předvolby",
+        "sectionWalker": "Konstelace (Walker delta)",
+        "walkerHint": "Vytvoří T družic v P rovnoměrně rozmístěných rovinách s jednou výškou a sklonem (vzor T/P/F). Členové použijí nejnižší volná analytická ID.",
+        "walkerAltKm": "Výška nad středním poloměrem Země (km)",
+        "walkerTotal": "Družice (T)",
+        "walkerPlanes": "Roviny (P)",
+        "walkerPhasing": "Fázování (F)",
+        "walkerPrefix": "Předpona názvu"
       },
       "buttons": {
         "createSatellite": "Vytvořit satelit",
         "saveTle": "Uložit TLE",
         "makeSunSync": "Slunečně synchronní sklon",
-        "cloneSelected": "Klonovat vybraný satelit"
+        "cloneSelected": "Klonovat vybraný satelit",
+        "createWalker": "Vytvořit konstelaci"
       },
       "options": {
         "payload": "Užitečné zatížení",
@@ -125,6 +133,20 @@
         "replace": "Nahradit",
         "cancel": "Zrušit",
         "changed": "Družice nebo formulář se změnily. Zkontrolujte je a odešlete znovu."
+      },
+      "walker": {
+        "created": "Vytvořeno {count} družic s názvem {prefix}-P#-S# ({failed} selhalo)",
+        "errors": {
+          "altitude": "Výška musí být 160 až 400000 km.",
+          "inclination": "Sklon musí být 0 až 180 stupňů.",
+          "total": "Družice (T) musí být celé číslo alespoň 1.",
+          "planes": "Roviny (P) musí být celé číslo od 1 do T.",
+          "phasing": "Fázování (F) musí být celé číslo od 0 do {max}.",
+          "divisible": "T musí být dělitelné P.",
+          "tooMany": "Nejvýše {max} družic na konstelaci.",
+          "noSlots": "Nedostatek volných analytických pozic ({free} volných, {needed} potřeba).",
+          "failed": "Konstelaci se nepodařilo vygenerovat."
+        }
       }
     }
   }

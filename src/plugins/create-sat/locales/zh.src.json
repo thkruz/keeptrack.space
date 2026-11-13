@@ -36,13 +36,21 @@
         "sectionOrbit": "轨道",
         "sectionEpoch": "历元",
         "sectionElements": "轨道要素",
-        "sectionPresets": "预设"
+        "sectionPresets": "预设",
+        "sectionWalker": "星座 (Walker delta)",
+        "walkerHint": "在同一高度和倾角下,于P个等间隔轨道面创建T颗卫星 (T/P/F 模式)。成员使用最小的空闲分析员编号。",
+        "walkerAltKm": "平均地球半径以上的高度 (km)",
+        "walkerTotal": "卫星数 (T)",
+        "walkerPlanes": "轨道面数 (P)",
+        "walkerPhasing": "相位 (F)",
+        "walkerPrefix": "名称前缀"
       },
       "buttons": {
         "createSatellite": "创建卫星",
         "saveTle": "保存 TLE",
         "makeSunSync": "太阳同步倾角",
-        "cloneSelected": "克隆所选卫星"
+        "cloneSelected": "克隆所选卫星",
+        "createWalker": "创建星座"
       },
       "options": {
         "payload": "有效载荷",
@@ -125,6 +133,20 @@
         "replace": "替换",
         "cancel": "取消",
         "changed": "卫星或表单已更改。请检查后重新提交。"
+      },
+      "walker": {
+        "created": "已创建 {count} 颗卫星,名称为 {prefix}-P#-S# ({failed} 个失败)",
+        "errors": {
+          "altitude": "高度必须在 160 到 400000 km 之间。",
+          "inclination": "倾角必须在 0 到 180 度之间。",
+          "total": "卫星数 (T) 必须是不小于 1 的整数。",
+          "planes": "轨道面数 (P) 必须是 1 到 T 之间的整数。",
+          "phasing": "相位 (F) 必须是 0 到 {max} 之间的整数。",
+          "divisible": "T 必须能被 P 整除。",
+          "tooMany": "每个星座最多 {max} 颗卫星。",
+          "noSlots": "空闲分析员位置不足 (空闲 {free},需要 {needed})。",
+          "failed": "无法生成星座。"
+        }
       }
     }
   }

@@ -36,13 +36,21 @@
         "sectionOrbit": "Orbita",
         "sectionEpoch": "Epoka",
         "sectionElements": "Elementy orbity",
-        "sectionPresets": "Ustawienia wstępne"
+        "sectionPresets": "Ustawienia wstępne",
+        "sectionWalker": "Konstelacja (Walker delta)",
+        "walkerHint": "Tworzy T satelitów w P równomiernie rozmieszczonych płaszczyznach o jednej wysokości i inklinacji (wzór T/P/F). Członkowie używają najniższych wolnych identyfikatorów analityka.",
+        "walkerAltKm": "Wysokość nad średnim promieniem Ziemi (km)",
+        "walkerTotal": "Satelity (T)",
+        "walkerPlanes": "Płaszczyzny (P)",
+        "walkerPhasing": "Fazowanie (F)",
+        "walkerPrefix": "Prefiks nazwy"
       },
       "buttons": {
         "createSatellite": "Utwórz satelitę",
         "saveTle": "Zapisz TLE",
         "makeSunSync": "Nachylenie heliosynchroniczne",
-        "cloneSelected": "Klonuj wybranego satelitę"
+        "cloneSelected": "Klonuj wybranego satelitę",
+        "createWalker": "Utwórz konstelację"
       },
       "options": {
         "payload": "Ładunek użyteczny",
@@ -125,6 +133,20 @@
         "replace": "Zastąp",
         "cancel": "Anuluj",
         "changed": "Satelita lub formularz uległ zmianie. Sprawdź i wyślij ponownie."
+      },
+      "walker": {
+        "created": "Utworzono {count} satelitów o nazwach {prefix}-P#-S# ({failed} nieudanych)",
+        "errors": {
+          "altitude": "Wysokość musi wynosić od 160 do 400000 km.",
+          "inclination": "Inklinacja musi wynosić od 0 do 180 stopni.",
+          "total": "Satelity (T) muszą być liczbą całkowitą co najmniej 1.",
+          "planes": "Płaszczyzny (P) muszą być liczbą całkowitą od 1 do T.",
+          "phasing": "Fazowanie (F) musi być liczbą całkowitą od 0 do {max}.",
+          "divisible": "T musi być podzielne przez P.",
+          "tooMany": "Najwyżej {max} satelitów w konstelacji.",
+          "noSlots": "Za mało wolnych miejsc analityka ({free} wolnych, {needed} potrzebnych).",
+          "failed": "Nie udało się wygenerować konstelacji."
+        }
       }
     }
   }

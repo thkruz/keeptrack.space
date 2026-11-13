@@ -36,13 +36,21 @@
         "sectionOrbit": "Orbit",
         "sectionEpoch": "Epoch",
         "sectionElements": "Orbital Elements",
-        "sectionPresets": "Presets"
+        "sectionPresets": "Presets",
+        "sectionWalker": "Constellation (Walker delta)",
+        "walkerHint": "Creates T satellites in P evenly spaced planes at one altitude and inclination (T/P/F pattern). Members use the lowest free analyst IDs.",
+        "walkerAltKm": "Altitude above mean Earth radius (km)",
+        "walkerTotal": "Satellites (T)",
+        "walkerPlanes": "Planes (P)",
+        "walkerPhasing": "Phasing (F)",
+        "walkerPrefix": "Name prefix"
       },
       "buttons": {
         "createSatellite": "Create Satellite",
         "saveTle": "Save TLE",
         "makeSunSync": "Sun-Sync Inclination",
-        "cloneSelected": "Clone Selected Satellite"
+        "cloneSelected": "Clone Selected Satellite",
+        "createWalker": "Create Constellation"
       },
       "options": {
         "payload": "Payload",
@@ -125,6 +133,20 @@
         "replace": "Replace",
         "cancel": "Cancel",
         "changed": "The satellite or form changed. Review it and submit again."
+      },
+      "walker": {
+        "created": "Created {count} satellites named {prefix}-P#-S# ({failed} failed)",
+        "errors": {
+          "altitude": "Altitude must be 160 to 400000 km.",
+          "inclination": "Inclination must be 0 to 180 degrees.",
+          "total": "Satellites (T) must be a whole number of at least 1.",
+          "planes": "Planes (P) must be a whole number from 1 to T.",
+          "phasing": "Phasing (F) must be a whole number from 0 to {max}.",
+          "divisible": "T must be divisible by P.",
+          "tooMany": "At most {max} satellites per constellation.",
+          "noSlots": "Not enough free analyst slots ({free} free, {needed} needed).",
+          "failed": "The constellation could not be generated."
+        }
       }
     }
   }

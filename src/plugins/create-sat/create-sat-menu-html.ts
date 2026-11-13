@@ -73,6 +73,42 @@ export function buildBasicTabHtml(): string {
         <div id="${P}-basic-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-basic-submit', b('createSatellite'))}
       </section>
+      <section class="kt-section" id="${P}-walker-section">
+        <div class="kt-section-label">${l('sectionWalker')}</div>
+        <small class="createSat-hint">${l('walkerHint')}</small>
+        <div class="kt-field-row">
+          <div class="input-field col s6">
+            <input placeholder="550" id="${P}-walker-alt" type="text" />
+            <label for="${P}-walker-alt" class="active">${l('walkerAltKm')}</label>
+          </div>
+          <div class="input-field col s6">
+            <input placeholder="53" id="${P}-walker-inc" type="text" />
+            <label for="${P}-walker-inc" class="active">${l('inclinationDeg')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s4">
+            <input placeholder="24" id="${P}-walker-total" type="text" />
+            <label for="${P}-walker-total" class="active">${l('walkerTotal')}</label>
+          </div>
+          <div class="input-field col s4">
+            <input placeholder="3" id="${P}-walker-planes" type="text" />
+            <label for="${P}-walker-planes" class="active">${l('walkerPlanes')}</label>
+          </div>
+          <div class="input-field col s4">
+            <input placeholder="1" id="${P}-walker-phasing" type="text" />
+            <label for="${P}-walker-phasing" class="active">${l('walkerPhasing')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input placeholder="WALKER" id="${P}-walker-prefix" type="text" maxlength="12" />
+            <label for="${P}-walker-prefix" class="active">${l('walkerPrefix')}</label>
+          </div>
+        </div>
+        <div id="${P}-walker-error" class="create-sat-form-error" role="alert" hidden></div>
+        ${createSatActionButton('createSat-walker-submit', b('createWalker'))}
+      </section>
     </form>
   `;
 }

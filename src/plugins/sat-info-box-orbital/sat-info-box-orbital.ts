@@ -13,7 +13,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
+import { getEl, writeTextIfChanged } from '@app/engine/utils/get-el';
 import { getStaleGpThresholdHours, isGpStale } from '@app/engine/utils/gp-age';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
@@ -403,7 +403,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (periodDom) {
       if (!Number.isFinite(period) || period <= 0) {
-        periodDom.textContent = notAvailableText();
+        writeTextIfChanged(periodDom, notAvailableText());
         periodDom.removeAttribute('kt-tooltip');
 
         return;
@@ -546,7 +546,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (!index) {
       loadRegionIndex().catch(() => undefined);
-      regionElement.textContent = notAvailableText();
+      writeTextIfChanged(regionElement, notAvailableText());
 
       return;
     }
@@ -555,7 +555,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const language = i18next.language || 'en';
 
     if (hit) {
-      regionElement.textContent = getGeoRegionName(hit, language);
+      writeTextIfChanged(regionElement, getGeoRegionName(hit, language));
 
       return;
     }
@@ -568,7 +568,10 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       loadMarineIndex().catch(() => undefined);
     }
 
-    regionElement.textContent = marineHit ? getGeoRegionName(marineHit, language) : t7e(`SatInfoBoxOrbital.Region.Water.${findWaterBody(lat, lon)}` as Parameters<typeof t7e>[0]);
+    writeTextIfChanged(
+      regionElement,
+      marineHit ? getGeoRegionName(marineHit, language) : t7e(`SatInfoBoxOrbital.Region.Water.${findWaterBody(lat, lon)}` as Parameters<typeof t7e>[0])
+    );
   }
 
   /**
@@ -600,8 +603,8 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       if (!centerBody) {
         errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
 
-        satAltitudeElement.textContent = notAvailableText();
-        satVelocityElement.textContent = notAvailableText();
+        writeTextIfChanged(satAltitudeElement, notAvailableText());
+        writeTextIfChanged(satVelocityElement, notAvailableText());
 
         return false;
       }

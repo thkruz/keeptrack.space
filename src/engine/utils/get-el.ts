@@ -50,6 +50,37 @@ export const requestIdleWrite = (cb: () => void): void => {
   setTimeout(cb, 0);
 };
 
+const lastWrittenHtml_ = new WeakMap<Element, { html: string; serialized: string }>();
+
+/**
+ * Assign `html` to `el.innerHTML` unless the element already shows it. Compares against the last value written
+ * through this helper (and the element's current serialization, so outside edits still get overwritten).
+ * Returns true when the DOM was written. Rewriting identical content costs layout work and detaches hovered nodes.
+ */
+export const writeHtmlIfChanged = (el: Element, html: string): boolean => {
+  const last = lastWrittenHtml_.get(el);
+
+  if (last?.html === html && el.innerHTML === last.serialized) {
+    return false;
+  }
+
+  el.innerHTML = html;
+  lastWrittenHtml_.set(el, { html, serialized: el.innerHTML });
+
+  return true;
+};
+
+/** Assign `text` to `el.textContent` unless it already shows it. Returns true when the DOM was written. */
+export const writeTextIfChanged = (el: Element, text: string): boolean => {
+  if (el.textContent === text) {
+    return false;
+  }
+
+  el.textContent = text;
+
+  return true;
+};
+
 export const setInnerHtml = (id: string, html: string) => {
   requestIdleWrite(() => {
     const el = getEl(id, true);
@@ -59,7 +90,7 @@ export const setInnerHtml = (id: string, html: string) => {
 
       return;
     }
-    el.innerHTML = html;
+    writeHtmlIfChanged(el, html);
   });
 };
 

@@ -1557,7 +1557,7 @@ body.is-mobile-mode {
     padding-left: max(1rem, env(safe-area-inset-left)) !important;
     padding-right: max(1rem, env(safe-area-inset-right)) !important;
     /* Clear the floating utility pill (48 px + 12 px offset) and the home indicator. */
-    padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }

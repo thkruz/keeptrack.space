@@ -14,6 +14,6 @@ describe('phone tooltips and sat info box', () => {
     const phone = css.slice(css.lastIndexOf('@media (max-width: 639px)'));
 
     expect(phone).toMatch(/#sat-mission-data \{\s*max-height: 5000px;/u);
-    expect(phone).toMatch(/padding-bottom: calc\(76px/u);
+    expect(phone).toMatch(/padding-bottom: calc\(96px/u);
   });
 });

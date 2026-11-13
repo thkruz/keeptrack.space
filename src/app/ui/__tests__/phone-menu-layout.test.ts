@@ -22,7 +22,7 @@ describe('phone side-menu layout CSS', () => {
 
   it('scrolls the menu body and clears the floating pill and safe area', () => {
     expect(block).toMatch(/overflow-y: auto !important/u);
-    expect(block).toMatch(/padding-bottom: calc\(76px \+ env\(safe-area-inset-bottom/u);
+    expect(block).toMatch(/padding-bottom: calc\(96px \+ env\(safe-area-inset-bottom/u);
   });
 
   it('stops the utility pill expanding on touch hover', () => {

@@ -71,3 +71,42 @@ describe('GroupedPicker', () => {
     expect(picker.isOpen()).toBe(false);
   });
 });
+
+describe('GroupedPicker keyboard and multi-select', () => {
+  it('marks the search box keyboard-priority and stops typed keys at the drawer', () => {
+    const { picker } = build();
+    const outer = vi.fn();
+
+    document.body.addEventListener('keydown', outer);
+    picker.open();
+    const search = document.querySelector('.kt-picker-search') as HTMLInputElement;
+
+    expect(search.classList.contains('keyboard-priority')).toBe(true);
+    search.dispatchEvent(new KeyboardEvent('keydown', { key: 'p', bubbles: true }));
+    expect(outer).not.toHaveBeenCalled();
+    document.body.removeEventListener('keydown', outer);
+  });
+
+  it('toggles several options in multiple mode and keeps the drawer open', () => {
+    document.body.innerHTML = `<select id="m" multiple>
+      <optgroup label="USA"><option value="a">Cape</option><option value="b">Vandenberg</option></optgroup></select>`;
+    const select = document.getElementById('m') as HTMLSelectElement;
+    const onChange = vi.fn();
+
+    select.addEventListener('change', onChange);
+    const picker = new GroupedPicker(select, { title: 'Sites', multiple: true, emptyText: 'None chosen' });
+
+    expect(document.querySelector('.kt-picker-trigger')?.textContent).toBe('None chosen');
+    picker.open();
+    const items = document.querySelectorAll<HTMLElement>('.kt-picker-item');
+
+    items[0].click();
+    document.querySelectorAll<HTMLElement>('.kt-picker-item')[1].click();
+    expect(Array.from(select.selectedOptions).map((o) => o.value)).toEqual(['a', 'b']);
+    expect(onChange).toHaveBeenCalledTimes(2);
+    expect(picker.isOpen()).toBe(true);
+    expect(document.querySelector('.kt-picker-trigger')?.textContent).toBe('Cape, Vandenberg');
+    document.querySelectorAll<HTMLElement>('.kt-picker-item')[0].click();
+    expect(Array.from(select.selectedOptions).map((o) => o.value)).toEqual(['b']);
+  });
+});

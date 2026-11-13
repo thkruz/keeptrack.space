@@ -14,6 +14,12 @@ export interface GroupedPickerOptions {
   searchPlaceholder?: string;
   /** Text for the empty-search state. */
   noResultsText?: string;
+  /** Multi-select mode: items toggle, the drawer stays open, the trigger shows a summary. */
+  multiple?: boolean;
+  /** Trigger text when nothing is selected in multiple mode. */
+  emptyText?: string;
+  /** Trigger summary in multiple mode; receives the selected labels. Defaults to a comma list. */
+  summarize?: (labels: string[]) => string;
 }
 
 interface PickerGroup {
@@ -33,8 +39,9 @@ export class GroupedPicker {
   private groups_: PickerGroup[] = [];
   private readonly onSelectChange_ = (): void => this.updateTrigger_();
   private readonly onKeyDown_ = (e: KeyboardEvent): void => {
+    // Keep typed letters and arrows from reaching the global shortcut handlers.
+    e.stopPropagation();
     if (e.key === 'Escape') {
-      e.stopPropagation();
       this.close();
     }
   };
@@ -104,7 +111,7 @@ export class GroupedPicker {
     const search = document.createElement('input');
 
     search.type = 'search';
-    search.className = 'kt-picker-search';
+    search.className = 'kt-picker-search keyboard-priority';
     search.placeholder = this.options_.searchPlaceholder ?? '';
     search.setAttribute('aria-label', this.options_.searchPlaceholder ?? this.options_.title);
     search.addEventListener('input', () => this.render_());
@@ -152,6 +159,18 @@ export class GroupedPicker {
   }
 
   private choose_(value: string): void {
+    if (this.options_.multiple) {
+      const opt = Array.from(this.select_.options).find((o) => o.value === value);
+
+      if (opt) {
+        opt.selected = !opt.selected;
+      }
+      this.select_.dispatchEvent(new Event('change', { bubbles: true }));
+      this.updateTrigger_();
+      this.render_();
+
+      return;
+    }
     this.select_.value = value;
     this.select_.dispatchEvent(new Event('change', { bubbles: true }));
     this.updateTrigger_();
@@ -159,6 +178,14 @@ export class GroupedPicker {
   }
 
   private updateTrigger_(): void {
+    if (this.options_.multiple) {
+      const labels = Array.from(this.select_.selectedOptions).map(cleanText_);
+
+      this.trigger_.textContent = labels.length === 0 ? (this.options_.emptyText ?? this.options_.title) : (this.options_.summarize?.(labels) ?? labels.join(', '));
+      this.trigger_.title = this.options_.title;
+
+      return;
+    }
     this.trigger_.textContent = this.getSelectedText() || this.options_.title;
     this.trigger_.title = this.options_.title;
   }
@@ -186,7 +213,7 @@ export class GroupedPicker {
       return;
     }
     const query = (this.searchEl_?.value ?? '').trim().toLowerCase();
-    const selected = this.select_.value;
+    const selectedSet = new Set(this.options_.multiple ? Array.from(this.select_.selectedOptions).map((o) => o.value) : [this.select_.value]);
     const frag = document.createDocumentFragment();
     let shown = 0;
 
@@ -203,7 +230,7 @@ export class GroupedPicker {
 
       details.className = 'kt-picker-group';
       // Collapsed by default; a search or the group holding the current choice opens it.
-      details.open = !group.label || query !== '' || opts.some((o) => o.value === selected);
+      details.open = !group.label || query !== '' || opts.some((o) => selectedSet.has(o.value));
       if (group.label) {
         const summary = document.createElement('summary');
 
@@ -217,9 +244,11 @@ export class GroupedPicker {
         btn.className = 'kt-picker-item';
         btn.dataset.pickerValue = o.value;
         btn.textContent = o.text;
-        if (o.value === selected) {
+        if (selectedSet.has(o.value)) {
           btn.classList.add('kt-picker-item-selected');
-          btn.setAttribute('aria-current', 'true');
+          btn.setAttribute(this.options_.multiple ? 'aria-pressed' : 'aria-current', 'true');
+        } else if (this.options_.multiple) {
+          btn.setAttribute('aria-pressed', 'false');
         }
         details.appendChild(btn);
       }

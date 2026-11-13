@@ -104,12 +104,6 @@ export class Camera {
    * {@link Camera.zoomOutSensitivityFloor_}.
    */
   private static readonly ZOOM_OUT_FLOOR_FRACTION_ = 0.245;
-  /** Smallest standoff (km) a satellite-snapped scroll-out steps from, so close-up zoom-out is never a few metres per notch. */
-  private static readonly ZOOM_OUT_MIN_STANDOFF_KM_ = 0.01;
-  /** Standoff (km) at and above which the orbit-scale boost applies in full; below it the boost fades in linearly. */
-  private static readonly ZOOM_OUT_BOOST_FULL_KM_ = 1;
-  /** Largest multiple of the proportional step a far-from-orbit-scale scroll-out may take. */
-  private static readonly ZOOM_OUT_BOOST_CAP_ = 40;
 
   private chaseSpeed_ = 0.0005;
   private wasDragging_ = false;
@@ -467,37 +461,10 @@ export class Camera {
       // consistent feel at any distance (0.75km to 100,000km+).
       const fraction = delta / 500;
 
-      // Zooming out from a very close standoff (small debris, true-scale meshes) would otherwise
-      // move by a few metres per notch, so the wheel seemed dead. Step as if the standoff were at
-      // least ZOOM_OUT_MIN_STANDOFF_KM; zooming in keeps the pure proportional step.
-      const base = delta > 0 ? Math.max(this.state.camDistBuffer, Camera.ZOOM_OUT_MIN_STANDOFF_KM_) : this.state.camDistBuffer;
-
-      // Far below the target's orbit scale a flat 20% step needs ~50 notches to show the whole orbit,
-      // so grow the out-step with how many times the standoff fits into the orbit radius.
-      const target = selectSatManagerInstance?.primarySatObj;
-      const targetDist = target?.position ? Math.sqrt(target.position.x ** 2 + target.position.y ** 2 + target.position.z ** 2) : 0;
-      // Fade the boost in from the model scale so the first notches off a 3D model stay small.
-      const ramp = Math.min(1, this.state.camDistBuffer / Camera.ZOOM_OUT_BOOST_FULL_KM_);
-      const boost = delta > 0 ? 1 + (Camera.zoomOutOrbitBoost_(base, targetDist) - 1) * ramp : 1;
-
-      this.state.camDistBuffer = <Kilometers>(this.state.camDistBuffer + base * fraction * boost);
+      this.state.camDistBuffer = <Kilometers>(this.state.camDistBuffer * (1 + fraction));
     }
 
     this.zoomWheelFov_(delta);
-  }
-
-  /**
-   * Multiplier for a satellite-snapped scroll-out step: (orbit radius / standoff) ^ 0.75, capped at
-   * {@link Camera.ZOOM_OUT_BOOST_CAP_}. 1 once the standoff reaches the target's orbit scale, so
-   * fine control near the object (zoom-in, or outside the orbit) is unchanged. From a 1 km standoff
-   * at ISS altitude about 9 notches of 100 reach the whole orbit instead of 45-50.
-   */
-  private static zoomOutOrbitBoost_(standoffKm: number, orbitRadiusKm: number): number {
-    if (!(standoffKm > 0) || !(orbitRadiusKm > standoffKm)) {
-      return 1;
-    }
-
-    return Math.min((orbitRadiusKm / standoffKm) ** 0.75, Camera.ZOOM_OUT_BOOST_CAP_);
   }
 
   /**

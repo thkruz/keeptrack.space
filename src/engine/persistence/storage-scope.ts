@@ -34,6 +34,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.OBSERVATION_STATIONS]: StorageScope.Account,
   [StorageKey.SCENARIO_LIBRARY]: StorageScope.Account,
   [StorageKey.ACHIEVEMENT_COUNTERS]: StorageScope.Account,
+  [StorageKey.DISPLAY_TIME_ZONE]: StorageScope.Account,
 
   // --- Account: visual/UX preferences (settings menu) -------------------------
   [StorageKey.SETTINGS_DRAW_CAMERA_WIDGET]: StorageScope.Account,

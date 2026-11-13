@@ -1,3 +1,5 @@
+import { describeZoneAt, getDisplayTimeZone, getDisplayZoneChoices, isUtcZone, setDisplayTimeZone } from '@app/app/sensors/display-time-zone';
+import { formatInTimeZone } from '@app/app/sensors/site-time-zone';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -49,6 +51,9 @@ export class DateTimeManager extends KeepTrackPlugin {
   private lastJdayStr_: string | null = null;
   private lastTimeTextStr_: string | null = null;
   private lastStatusStr_: string | null = null;
+  /** Display zone, re-read from storage at most once a second (account sync can change it behind our back). */
+  private displayZone_ = 'UTC';
+  private displayZoneReadAt_ = 0;
   calendar: Calendar;
 
   // =========================================================================
@@ -106,6 +111,8 @@ export class DateTimeManager extends KeepTrackPlugin {
       this.lastJdayStr_ = jdayStr;
     }
 
+    const zone = this.readDisplayZone_();
+
     if (!this.simulationTimeSerialized_ || Math.abs(this.lastTime - timeManagerInstance.simulationTimeObj.getTime()) > (1000 as Milliseconds)) {
       this.simulationTimeSerialized_ = timeManagerInstance.simulationTimeObj.toJSON();
       this.timeTextStr = this.timeTextStrEmpty_;
@@ -113,6 +120,10 @@ export class DateTimeManager extends KeepTrackPlugin {
         if (this.iText > 11) {
           this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
         }
+      }
+
+      if (!isUtcZone(zone)) {
+        this.timeTextStr = formatInTimeZone(timeManagerInstance.simulationTimeObj.getTime(), zone).time;
       }
 
       this.lastTime = timeManagerInstance.simulationTimeObj.getTime() as Milliseconds;
@@ -149,6 +160,40 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
   }
 
+  /** The display zone, refreshed from storage once a second; a change forces the clock text to rebuild. */
+  private readDisplayZone_(): string {
+    const now = Date.now();
+
+    if (now - this.displayZoneReadAt_ > 1000) {
+      this.displayZoneReadAt_ = now;
+      const zone = getDisplayTimeZone();
+
+      if (zone !== this.displayZone_) {
+        this.displayZone_ = zone;
+        this.simulationTimeSerialized_ = null;
+        this.syncZoneChip_();
+      }
+    }
+
+    return this.displayZone_;
+  }
+
+  /** Shows the zone beside the clock: neutral for UTC, caution colour for anything else. */
+  private syncZoneChip_(): void {
+    const chip = getEl('datetime-zone', true) as HTMLSelectElement | null;
+
+    if (!chip) {
+      return;
+    }
+    const zone = this.displayZone_;
+
+    chip.innerHTML = getDisplayZoneChoices(zone)
+      .map((z) => `<option value="${z}">${isUtcZone(z) ? 'UTC' : describeZoneAt(ServiceLocator.getTimeManager().simulationTimeObj.getTime(), z)}</option>`)
+      .join('');
+    chip.value = zone;
+    chip.dataset.zone = isUtcZone(zone) ? 'utc' : 'other';
+  }
+
   /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" (plus the playback rate when simulated) under the clock; skips the DOM write unless the text changed. */
   private updateStatus_(): void {
     const statusEl = getEl('datetime-status', true);
@@ -162,7 +207,9 @@ export class DateTimeManager extends KeepTrackPlugin {
     const label = t7e(`plugins.DateTimeManager.clock.${mode}` as Parameters<typeof t7e>[0]);
     // Paused and live states say it all; a simulated clock also shows its rate so a raised rate is never invisible.
     const rate = mode === 'simulated' ? ` · ${formatPlaybackRate(timeManagerInstance.propRate)}` : '';
-    const text = `${timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10)} UTC · ${label}${rate}`;
+    const zone = this.displayZone_;
+    const day = isUtcZone(zone) ? timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10) : formatInTimeZone(simMs, zone).date;
+    const text = `${day} ${isUtcZone(zone) ? 'UTC' : zone} · ${label}${rate}`;
 
     if (text !== this.lastStatusStr_) {
       statusEl.textContent = text;
@@ -210,6 +257,7 @@ export class DateTimeManager extends KeepTrackPlugin {
           <div id="${this.dateTimeContainerId_}">
             <div id="datetime-text" class="waves-effect waves-light"></div>
             <div id="datetime-status" role="status" aria-live="off"></div>
+            <select id="datetime-zone" class="browser-default" aria-label="Time zone for the clock and tables" data-zone="utc"><option value="UTC">UTC</option></select>
             <div id="datetime-input">
               <form id="datetime-input-form">
                 <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />
@@ -235,6 +283,16 @@ export class DateTimeManager extends KeepTrackPlugin {
     this.calendar = new Calendar('datetime-input-form');
 
     document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
+
+    this.displayZone_ = getDisplayTimeZone();
+    this.syncZoneChip_();
+    document.getElementById('datetime-zone')?.addEventListener('change', (e) => {
+      this.displayZone_ = setDisplayTimeZone((e.target as HTMLSelectElement).value);
+      this.displayZoneReadAt_ = Date.now();
+      this.simulationTimeSerialized_ = null;
+      this.syncZoneChip_();
+      this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
+    });
 
     if (settingsManager.isJdayToggleable) {
       const jdayEl = getEl('jday', true);

@@ -4,6 +4,7 @@
 
 import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { displayZoneColumns, displayZoneHeaders, getDisplayTimeZone } from '@app/app/sensors/display-time-zone';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -280,17 +281,23 @@ export class SensorTimeline extends KeepTrackPlugin {
   };
 
   convertSensorPassesToCSV = (sensorPassesArray: Passes[]) => {
+    const zone = getDisplayTimeZone();
+    // startTime/endTime stay UTC ISO strings; a non-UTC display zone adds columns after them, never replaces them.
     const rows = sensorPassesArray
       .flatMap((sensorPass) =>
         sensorPass.passes.map((pass) => {
           const formattedStart = pass.start.toISOString();
           const formattedEnd = pass.end.toISOString();
+          const start = displayZoneColumns(pass.start.getTime(), zone);
+          const end = displayZoneColumns(pass.end.getTime(), zone);
+          const extra = start && end ? `,${start.local},${start.offset},${end.local},${end.offset}` : '';
 
-          return `${sensorPass.sensor.sensorId},${SensorTimeline.csvField_(SensorTimeline.sensorDisplayName_(sensorPass.sensor))},${formattedStart},${formattedEnd}`;
+          return `${sensorPass.sensor.sensorId},${SensorTimeline.csvField_(SensorTimeline.sensorDisplayName_(sensorPass.sensor))},${formattedStart},${formattedEnd}${extra}`;
         })
       )
       .join('\n');
-    const csvData = `sensorId,sensorName,startTime,endTime\n${rows}`;
+    const zoneHeaders = displayZoneHeaders('startTime', zone).concat(displayZoneHeaders('endTime', zone)).join(',');
+    const csvData = `sensorId,sensorName,startTime,endTime${zoneHeaders ? `,${zoneHeaders}` : ''}\n${rows}`;
 
     return csvData;
   };

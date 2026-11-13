@@ -151,6 +151,9 @@ export enum StorageKey {
   // Achievement unlock toast style: 'compact' | 'card'
   ACHIEVEMENT_TOAST_STYLE = 'v2-keepTrack-achievementToastStyle',
 
+  // Display time zone for clocks and tables: 'UTC' (default) or an IANA zone name (synced to the account)
+  DISPLAY_TIME_ZONE = 'v2-keepTrack-displayTimeZone',
+
   // Best Pass Pro (column visibility + propagation settings)
   BEST_PASS_SETTINGS = 'v2-keepTrack-bestPassSettings',
 

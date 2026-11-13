@@ -1,3 +1,4 @@
+import { setDisplayTimeZone } from '@app/app/sensors/display-time-zone';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { getEl } from '@app/engine/utils/get-el';
@@ -58,6 +59,21 @@ describe('SensorTimeline behavior', () => {
 
     expect(csv).toContain('sensorId,sensorName,startTime,endTime');
     expect(csv).toContain('COD');
+  });
+
+  it('convertSensorPassesToCSV keeps UTC columns and appends display-zone columns when the zone is not UTC', () => {
+    const onePass = { start: new Date('2022-01-01T12:00:00Z'), end: new Date('2022-01-01T12:10:00Z') };
+    const passes = [{ sensor: { sensorId: 7, objName: 'COD' }, passes: [onePass] }];
+
+    setDisplayTimeZone('America/New_York');
+    try {
+      const [header, row] = plugin.convertSensorPassesToCSV(passes as never).split('\n');
+
+      expect(header).toBe('sensorId,sensorName,startTime,endTime,startTime (America/New_York),startTime offset,endTime (America/New_York),endTime offset');
+      expect(row).toBe('7,COD,2022-01-01T12:00:00.000Z,2022-01-01T12:10:00.000Z,2022-01-01 07:00:00,UTC-05:00,2022-01-01 07:10:00,UTC-05:00');
+    } finally {
+      setDisplayTimeZone('UTC');
+    }
   });
 
   describe('updateTimeline guards', () => {

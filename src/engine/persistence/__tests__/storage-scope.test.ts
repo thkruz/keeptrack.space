@@ -52,6 +52,7 @@ describe('storage-scope registry', () => {
     expect([...ACCOUNT_STORAGE_KEYS].sort()).toEqual(
       [
         StorageKey.CURRENT_SENSOR,
+        StorageKey.DISPLAY_TIME_ZONE,
         StorageKey.CUSTOM_SENSORS,
         StorageKey.CUSTOM_SITE_REGISTRY,
         StorageKey.WATCHLIST_LIST,

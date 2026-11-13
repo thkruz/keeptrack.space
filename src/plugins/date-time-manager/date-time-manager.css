@@ -70,3 +70,28 @@
 #datetime-status[data-mode='paused'] {
   font-weight: bold;
 }
+
+/* Zone chip: neutral for UTC; the caution colour whenever times are not UTC, so it is never silent. */
+#datetime-zone {
+  display: block;
+  margin: 2px auto 0;
+  width: auto;
+  height: auto;
+  padding: 0 4px;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentcolor;
+  border-radius: 8px;
+  opacity: 0.85;
+  cursor: pointer;
+  appearance: auto;
+}
+
+#datetime-zone[data-zone='other'] {
+  color: var(--colorCaution, #ffb300);
+  border-color: var(--colorCaution, #ffb300);
+  font-weight: bold;
+  opacity: 1;
+}

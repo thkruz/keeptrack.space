@@ -83,4 +83,34 @@ describe('TooltipsPlugin behavior', () => {
     expect(() => plugin.hideTooltip()).not.toThrow();
     expect(() => plugin.showTooltip(el, 'text')).not.toThrow();
   });
+
+  it('tap toggles the tooltip on touch for kt-tooltip-tap targets only', () => {
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    document.body.appendChild(div);
+    const tap = document.createElement('span');
+    const plain = document.createElement('span');
+
+    tap.setAttribute('kt-tooltip', 'Explain');
+    tap.setAttribute('kt-tooltip-tap', '');
+    plain.setAttribute('kt-tooltip', 'Other');
+    document.body.append(tap, plain);
+    plugin.createTooltip(tap);
+    plugin.createTooltip(plain);
+    const touch = (el: HTMLElement) => {
+      const down = new Event('pointerdown');
+
+      Object.defineProperty(down, 'pointerType', { value: 'touch' });
+      el.dispatchEvent(down);
+      el.click();
+    };
+
+    touch(tap);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    touch(tap);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+    touch(plain);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
 });

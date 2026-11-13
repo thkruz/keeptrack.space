@@ -117,7 +117,7 @@
       "tooltip": "Těleso, od kterého se měří polohy efemeridy (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Vztažná soustava",
+      "label": "Souřadnice",
       "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)",
       "teme": "TEME",
       "temeInfo": "ze sady GP elementů"
@@ -127,13 +127,13 @@
       "tooltip": "Výškové pásmo dráhy",
       "help": "Výškové pásmo dráhy. LEO: nízká oběžná dráha, pod 2 000 km. MEO: střední dráha, až do výšky geostacionární dráhy. GEO: asi 35 786 km nad rovníkem, objekt zůstává nad jedním místem. HEO: silně eliptická nebo vyšší než GEO.",
       "leo": "LEO",
-      "leoInfo": "nízká",
+      "leoInfo": "Nízká oběžná dráha Země, do výšky 2 000 km.",
       "meo": "MEO",
-      "meoInfo": "střední",
+      "meoInfo": "Střední oběžná dráha Země, mezi LEO a geostacionární výškou.",
       "geo": "GEO",
-      "geoInfo": "geostacionární",
+      "geoInfo": "Geostacionární dráha, asi 35 786 km nad rovníkem.",
       "heo": "HEO",
-      "heoInfo": "eliptická nebo vysoká"
+      "heoInfo": "Silně eliptická dráha nebo vyšší než geostacionární."
     },
     "LatitudeBand": {
       "label": "Dosah šířky",

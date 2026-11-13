@@ -117,7 +117,7 @@
       "tooltip": "Cuerpo desde el que se miden las posiciones de la efeméride (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Sistema de referencia",
+      "label": "Sist. ref.",
       "tooltip": "Sistema de coordenadas de la efeméride (OEM REF_FRAME)",
       "teme": "TEME",
       "temeInfo": "del conjunto de elementos GP"
@@ -127,13 +127,13 @@
       "tooltip": "La franja de altitud de la órbita",
       "help": "La franja de altitud de la órbita. LEO: órbita terrestre baja, por debajo de 2000 km. MEO: órbita terrestre media, hasta la altura geoestacionaria. GEO: unos 35 786 km sobre el ecuador, donde el objeto permanece sobre un punto. HEO: muy elíptica o más alta que GEO.",
       "leo": "LEO",
-      "leoInfo": "baja",
+      "leoInfo": "Órbita terrestre baja, por debajo de 2000 km de altitud.",
       "meo": "MEO",
-      "meoInfo": "media",
+      "meoInfo": "Órbita terrestre media, entre LEO y la altura geoestacionaria.",
       "geo": "GEO",
-      "geoInfo": "geoestacionaria",
+      "geoInfo": "Órbita geoestacionaria, a unos 35 786 km sobre el ecuador.",
       "heo": "HEO",
-      "heoInfo": "elíptica o alta"
+      "heoInfo": "Muy elíptica o más alta que la geoestacionaria."
     },
     "LatitudeBand": {
       "label": "Alcance de latitud",

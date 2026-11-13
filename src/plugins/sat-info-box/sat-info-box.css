@@ -259,3 +259,15 @@
   outline: 2px solid currentColor;
   outline-offset: 1px;
 }
+
+/* 24 px touch target around the 12 px circle without changing the row height */
+.sat-info-circle {
+  position: relative;
+}
+
+.sat-info-circle::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+}

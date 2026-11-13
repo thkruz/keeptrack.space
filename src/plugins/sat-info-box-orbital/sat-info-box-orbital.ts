@@ -34,7 +34,8 @@ const notAvailableText = (): string => t7e('SatInfoBoxOrbital.notAvailable' as P
 const setInnerHtml = (id: string, value: string): void => {
   const element = getEl(id, true);
 
-  if (element) {
+  // Skip unchanged rows: the info box refreshes about twice a second and a rewrite detaches focused children.
+  if (element && element.innerHTML !== value) {
     element.innerHTML = value;
   }
 };

@@ -117,7 +117,7 @@
       "tooltip": "Corpo da cui sono misurate le posizioni dell'effemeride (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Sistema di riferimento",
+      "label": "Rif. coord.",
       "tooltip": "Sistema di coordinate dell'effemeride (OEM REF_FRAME)",
       "teme": "TEME",
       "temeInfo": "dal set di elementi GP"
@@ -127,13 +127,13 @@
       "tooltip": "La fascia di altitudine dell'orbita",
       "help": "La fascia di altitudine dell'orbita. LEO: orbita terrestre bassa, sotto i 2.000 km. MEO: orbita media, fino alla quota geostazionaria. GEO: circa 35.786 km sopra l'equatore, l'oggetto resta sopra un punto fisso. HEO: molto ellittica o più alta della GEO.",
       "leo": "LEO",
-      "leoInfo": "bassa",
+      "leoInfo": "Orbita terrestre bassa, sotto i 2.000 km di quota.",
       "meo": "MEO",
-      "meoInfo": "media",
+      "meoInfo": "Orbita terrestre media, tra LEO e la quota geostazionaria.",
       "geo": "GEO",
-      "geoInfo": "geostazionaria",
+      "geoInfo": "Orbita geostazionaria, a circa 35.786 km sopra l'equatore.",
       "heo": "HEO",
-      "heoInfo": "ellittica o alta"
+      "heoInfo": "Molto ellittica o più alta della geostazionaria."
     },
     "LatitudeBand": {
       "label": "Estensione in latitudine",

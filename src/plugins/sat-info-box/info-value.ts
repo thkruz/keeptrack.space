@@ -20,6 +20,7 @@ export const createInfoCircle = (explanation: string): HTMLElement => {
   circle.setAttribute('role', 'img');
   circle.setAttribute('aria-label', explanation);
   circle.setAttribute('kt-tooltip', explanation);
+  circle.setAttribute('kt-tooltip-tap', '');
   circle.textContent = 'i';
 
   return circle;
@@ -29,7 +30,7 @@ export const createInfoCircle = (explanation: string): HTMLElement => {
 export const infoCircleHtml = (explanation: string): string => {
   const safe = escapeAttr_(explanation);
 
-  return `<span class="${INFO_CIRCLE_CLASS}" tabindex="0" role="img" aria-label="${safe}" kt-tooltip="${safe}">i</span>`;
+  return `<span class="${INFO_CIRCLE_CLASS}" tabindex="0" role="img" aria-label="${safe}" kt-tooltip="${safe}" kt-tooltip-tap>i</span>`;
 };
 
 /**
@@ -41,6 +42,16 @@ export const setValueWithInfo = (id: string, shortText: string, explanation?: st
     const el = getEl(id, true);
 
     if (!el) {
+      return;
+    }
+
+    // The info box refreshes rows about twice a second. Rewriting an unchanged row would detach a
+    // focused or hovered info circle, so leave the DOM alone when nothing changed.
+    const existing = el.querySelector(`.${INFO_CIRCLE_CLASS}`);
+    const currentText = existing ? el.firstChild?.textContent : el.textContent;
+    const isSame = currentText === shortText && (explanation ? existing?.getAttribute('kt-tooltip') === explanation : !existing) && el.childNodes.length === (explanation ? 2 : 1);
+
+    if (isSame) {
       return;
     }
 

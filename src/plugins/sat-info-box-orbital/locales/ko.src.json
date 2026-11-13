@@ -117,7 +117,7 @@
       "tooltip": "궤도력 위치의 기준이 되는 천체 (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "기준 좌표계",
+      "label": "좌표계",
       "tooltip": "궤도력의 좌표계 (OEM REF_FRAME)",
       "teme": "TEME",
       "temeInfo": "GP 요소 세트 기준"
@@ -127,13 +127,13 @@
       "tooltip": "궤도의 고도 구간입니다",
       "help": "궤도의 고도 구간입니다. LEO: 저궤도, 2,000 km 미만. MEO: 중궤도, 정지궤도 높이까지. GEO: 적도 위 약 35,786 km로, 물체가 한 지점 위에 머뭅니다. HEO: 매우 긴 타원이거나 GEO보다 높은 궤도.",
       "leo": "LEO",
-      "leoInfo": "저궤도",
+      "leoInfo": "저궤도. 고도 2,000 km 미만.",
       "meo": "MEO",
-      "meoInfo": "중궤도",
+      "meoInfo": "중궤도. 저궤도와 정지궤도 고도 사이.",
       "geo": "GEO",
-      "geoInfo": "정지궤도",
+      "geoInfo": "정지궤도. 적도 상공 약 35,786 km.",
       "heo": "HEO",
-      "heoInfo": "타원 또는 고궤도"
+      "heoInfo": "고타원 궤도이거나 정지궤도보다 높은 궤도."
     },
     "LatitudeBand": {
       "label": "위도 도달 범위",

@@ -117,7 +117,7 @@
       "tooltip": "Ciało, względem którego mierzone są pozycje efemerydy (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Układ odniesienia",
+      "label": "Układ",
       "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)",
       "teme": "TEME",
       "temeInfo": "z zestawu elementów GP"
@@ -127,13 +127,13 @@
       "tooltip": "Pasmo wysokości orbity",
       "help": "Pasmo wysokości orbity. LEO: niska orbita okołoziemska, poniżej 2000 km. MEO: średnia orbita, do wysokości geostacjonarnej. GEO: około 35 786 km nad równikiem, obiekt stoi nad jednym punktem. HEO: bardzo eliptyczna lub wyższa niż GEO.",
       "leo": "LEO",
-      "leoInfo": "niska",
+      "leoInfo": "Niska orbita okołoziemska, poniżej 2000 km wysokości.",
       "meo": "MEO",
-      "meoInfo": "średnia",
+      "meoInfo": "Średnia orbita okołoziemska, między LEO a wysokością geostacjonarną.",
       "geo": "GEO",
-      "geoInfo": "geostacjonarna",
+      "geoInfo": "Orbita geostacjonarna, około 35 786 km nad równikiem.",
       "heo": "HEO",
-      "heoInfo": "eliptyczna lub wysoka"
+      "heoInfo": "Silnie eliptyczna lub wyższa niż geostacjonarna."
     },
     "LatitudeBand": {
       "label": "Zasięg szerokości",

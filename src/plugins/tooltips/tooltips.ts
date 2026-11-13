@@ -36,6 +36,9 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   private isVisible_ = false;
   private showTimer_: ReturnType<typeof setTimeout> | null = null;
   tooltipTag = 'kt-tooltip';
+  /** Attribute that opts a target into tap-to-toggle on touch devices. */
+  tapAttr = 'kt-tooltip-tap';
+  private shownFor_: HTMLElement | null = null;
 
   private static readonly SHOW_DELAY_ = 150;
 
@@ -84,6 +87,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     }
 
     let isHovered = false;
+    let lastPointerType = '';
 
     const dismiss = () => {
       if (this.showTimer_) {
@@ -92,6 +96,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       }
       this.hideTooltip();
       this.isVisible_ = false;
+      this.shownFor_ = null;
     };
 
     el.addEventListener('mouseenter', () => {
@@ -151,7 +156,31 @@ export class TooltipsPlugin extends KeepTrackPlugin {
      * target (e.g. a drawer item closing the drawer); no mouseleave fires for an
      * element hidden under the cursor, which left the tooltip stuck on screen.
      */
-    el.addEventListener('click', dismiss);
+    el.addEventListener('pointerdown', (e: PointerEvent) => {
+      lastPointerType = e.pointerType;
+    });
+    el.addEventListener('click', () => {
+      // Touch has no hover: a tap on a tap-to-toggle target (info circles) shows its tooltip, a second tap hides it.
+      if (lastPointerType === 'touch' && (el as HTMLElement).hasAttribute(this.tapAttr)) {
+        const wasShownHere = this.isVisible_ && this.shownFor_ === el;
+
+        dismiss();
+
+        if (!wasShownHere) {
+          const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
+
+          if (text) {
+            this.showTooltip(el as HTMLElement, text);
+            this.isVisible_ = true;
+            this.shownFor_ = el as HTMLElement;
+          }
+        }
+
+        return;
+      }
+
+      dismiss();
+    });
 
     el.style.cursor = 'pointer';
   }

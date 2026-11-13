@@ -36,4 +36,23 @@ describe('info-value helper (#191)', () => {
     setValueWithInfo('v', 'LEO');
     expect(getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`)).toBeNull();
   });
+
+  it('setValueWithInfo keeps the same circle node when nothing changed (focus survives refresh)', () => {
+    setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
+    const circle = getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`) as HTMLElement;
+
+    circle.focus();
+    setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
+
+    expect(getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`)).toBe(circle);
+    expect(document.activeElement).toBe(circle);
+  });
+
+  it('setValueWithInfo rewrites when the value or explanation changes', () => {
+    setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
+    setValueWithInfo('v', 'GEO', 'Geostationary.');
+
+    expect(getEl('v')!.firstChild?.textContent).toBe('GEO');
+    expect(getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`)?.getAttribute('kt-tooltip')).toBe('Geostationary.');
+  });
 });

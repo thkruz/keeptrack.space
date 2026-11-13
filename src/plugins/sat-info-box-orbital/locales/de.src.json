@@ -117,7 +117,7 @@
       "tooltip": "Körper, von dem aus die Ephemeridenpositionen gemessen werden (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Bezugssystem",
+      "label": "Bezugssys.",
       "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)",
       "teme": "TEME",
       "temeInfo": "aus dem GP-Elementsatz"
@@ -127,13 +127,13 @@
       "tooltip": "Das Höhenband der Bahn",
       "help": "Das Höhenband der Bahn. LEO: niedrige Erdumlaufbahn, unter 2.000 km. MEO: mittlere Erdumlaufbahn, bis zur geostationären Höhe. GEO: etwa 35.786 km über dem Äquator, das Objekt bleibt über einem Punkt. HEO: stark elliptisch oder höher als GEO.",
       "leo": "LEO",
-      "leoInfo": "niedrig",
+      "leoInfo": "Niedrige Erdumlaufbahn, unter 2.000 km Höhe.",
       "meo": "MEO",
-      "meoInfo": "mittel",
+      "meoInfo": "Mittlere Erdumlaufbahn, zwischen LEO und geostationärer Höhe.",
       "geo": "GEO",
-      "geoInfo": "geostationär",
+      "geoInfo": "Geostationäre Bahn, etwa 35.786 km über dem Äquator.",
       "heo": "HEO",
-      "heoInfo": "elliptisch oder hoch"
+      "heoInfo": "Stark elliptisch oder höher als geostationär."
     },
     "LatitudeBand": {
       "label": "Breitenreichweite",

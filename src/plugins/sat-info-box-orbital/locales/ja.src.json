@@ -117,7 +117,7 @@
       "tooltip": "エフェメリスの位置の基準となる天体（OEM CENTER_NAME）"
     },
     "RefFrame": {
-      "label": "基準座標系",
+      "label": "座標系",
       "tooltip": "エフェメリスの座標系（OEM REF_FRAME）",
       "teme": "TEME",
       "temeInfo": "GP要素セットより"
@@ -127,13 +127,13 @@
       "tooltip": "軌道の高度帯",
       "help": "軌道の高度帯。LEO：低軌道、2,000 km未満。MEO：中軌道、静止軌道の高さまで。GEO：赤道上空約35,786 kmで、物体は同じ場所の上に留まります。HEO：非常に細長い楕円、またはGEOより高い軌道。",
       "leo": "LEO",
-      "leoInfo": "低軌道",
+      "leoInfo": "低軌道。高度2,000 km未満。",
       "meo": "MEO",
-      "meoInfo": "中軌道",
+      "meoInfo": "中軌道。低軌道と静止軌道高度の間。",
       "geo": "GEO",
-      "geoInfo": "静止軌道",
+      "geoInfo": "静止軌道。赤道上空約35,786 km。",
       "heo": "HEO",
-      "heoInfo": "楕円または高軌道"
+      "heoInfo": "大離心率の楕円軌道、または静止軌道より高い軌道。"
     },
     "LatitudeBand": {
       "label": "緯度の到達範囲",

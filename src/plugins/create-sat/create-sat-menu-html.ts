@@ -191,7 +191,7 @@ export function buildAdvancedTabHtml(): string {
         </div>
         <div class="kt-field-row">
           <div class="input-field col s12">
-            <input placeholder="2026-11-04T00:00:00Z" id="${P}-epochiso" type="text" autocomplete="off" />
+            <input placeholder="YYYY-MM-DDTHH:MM:SSZ" id="${P}-epochiso" type="text" autocomplete="off" />
             <label for="${P}-epochiso" class="active">${l('epochTimestamp')}</label>
           </div>
         </div>

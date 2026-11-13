@@ -223,6 +223,27 @@ export class StereoMap extends KeepTrackPlugin {
     };
   }
 
+  /**
+   * The Pro flat-earth map, when this build has it. The free 2D map is redundant next to it (#220), so every
+   * way of opening this map (M key, command palette) is handed to the flat map instead. Looked up by id
+   * because the Pro plugin is not importable from the OSS tree.
+   */
+  protected getFlatMapView_(): { bottomIconCallback: () => void } | null {
+    return PluginRegistry.getPluginByName<KeepTrackPlugin & { bottomIconCallback: () => void }>('FlatMapView');
+  }
+
+  /** Redirects to the Pro flat map when present (toggling it again returns to 3D); otherwise opens this map. */
+  override bottomMenuClicked(): void {
+    const flatMap = this.getFlatMapView_();
+
+    if (flatMap) {
+      flatMap.bottomIconCallback();
+
+      return;
+    }
+    super.bottomMenuClicked();
+  }
+
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
@@ -268,6 +289,11 @@ export class StereoMap extends KeepTrackPlugin {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // The Pro flat map replaces this map's bottom icon (#220); M and the palette redirect in bottomMenuClicked
+      if (this.getFlatMapView_()) {
+        hideEl(this.bottomIconElementName);
+      }
+
       // v13 marker: the wrapper (and the Pro secondary menu) are generated, not authored
       getEl('map-menu')?.classList.add('kt-ui-v13');
       getEl('map-menu-secondary', true)?.classList.add('kt-ui-v13');

@@ -91,3 +91,35 @@ describe('SatInfoBox top inset (#49)', () => {
     expect(el.style.top).toBe('90px');
   });
 });
+
+describe('SatInfoBox.releaseStalePointer_ (#49)', () => {
+  it('clears a press whose pointerup never arrived so the next drag from the dock starts', () => {
+    const element = document.createElement('div');
+
+    element.classList.add('is-pointer-down', 'is-dragging');
+    element.style.transform = 'translate3d(5px, 5px, 0)';
+    const draggie = {
+      isPointerDown: true,
+      isDragging: true,
+      element,
+      pointerDone: vi.fn(() => {
+        draggie.isPointerDown = false;
+      }),
+    };
+
+    expect(SatInfoBox.releaseStalePointer_(draggie)).toBe(true);
+    expect(draggie.pointerDone).toHaveBeenCalledTimes(1);
+    expect(draggie.isPointerDown).toBe(false);
+    expect(draggie.isDragging).toBe(false);
+    expect(element.classList.contains('is-dragging')).toBe(false);
+    expect(element.classList.contains('is-pointer-down')).toBe(false);
+    expect(element.style.transform).toBe('');
+  });
+
+  it('does nothing when no press is recorded', () => {
+    const draggie = { isPointerDown: false, isDragging: false, pointerDone: vi.fn() };
+
+    expect(SatInfoBox.releaseStalePointer_(draggie)).toBe(false);
+    expect(draggie.pointerDone).not.toHaveBeenCalled();
+  });
+});

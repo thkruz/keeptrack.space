@@ -287,11 +287,37 @@ export class SatInfoBox extends KeepTrackPlugin {
     }
   }
 
+  /**
+   * Draggabilly only starts a drag while `isPointerDown` is false, and only clears it when a matching
+   * pointerup or pointercancel reaches the window. A release that never arrives (the box hidden or the
+   * window blurred mid-press, a handler swallowing the event) leaves it true, and the next press from the
+   * docked box is ignored or drags on hover (#49). Clear that state by hand.
+   */
+  static releaseStalePointer_(draggie: { isPointerDown?: boolean; isDragging?: boolean; pointerDone?: () => void; element?: HTMLElement }): boolean {
+    if (!draggie.isPointerDown && !draggie.isDragging) {
+      return false;
+    }
+    if (draggie.isPointerDown) {
+      draggie.pointerDone?.();
+    }
+    draggie.isDragging = false;
+    if (draggie.element) {
+      draggie.element.classList.remove('is-dragging', 'is-pointer-down');
+      draggie.element.style.transform = '';
+    }
+
+    return true;
+  }
+
+  private draggie_: Draggabilly | null = null;
+
   private initDraggabilly() {
     if (!settingsManager.isMobileModeEnabled) {
       const draggie = new Draggabilly(getEl(SatInfoBox.containerId_)!, {
         containment: KeepTrack.getInstance().containerRoot,
       });
+
+      this.draggie_ = draggie;
 
       draggie.on('dragStart', () => {
         const satInfoBoxElement = getEl(SatInfoBox.containerId_)!;
@@ -328,6 +354,18 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     // If right click kill and reinit
     const satInfobox = getEl(SatInfoBox.containerId_)!;
+
+    // Capture phase, so it runs before Draggabilly's own pointerdown handler: a fresh press means any
+    // recorded press is stale.
+    satInfobox.addEventListener(
+      'pointerdown',
+      () => {
+        if (this.draggie_) {
+          SatInfoBox.releaseStalePointer_(this.draggie_ as unknown as Parameters<typeof SatInfoBox.releaseStalePointer_>[0]);
+        }
+      },
+      true
+    );
 
     satInfobox.addEventListener('mousedown', (e: MouseEvent) => {
       if (e.button === 2) {
@@ -791,6 +829,9 @@ export class SatInfoBox extends KeepTrackPlugin {
   }
 
   hide(): void {
+    if (this.draggie_) {
+      SatInfoBox.releaseStalePointer_(this.draggie_ as unknown as Parameters<typeof SatInfoBox.releaseStalePointer_>[0]);
+    }
     hideEl(SatInfoBox.containerId_);
     this.isVisible_ = false;
   }

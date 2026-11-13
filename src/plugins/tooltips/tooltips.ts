@@ -39,6 +39,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   /** Attribute that opts a target into tap-to-toggle on touch devices. */
   tapAttr = 'kt-tooltip-tap';
   private shownFor_: HTMLElement | null = null;
+  private readonly wired_ = new WeakSet<HTMLElement>();
 
   private static readonly SHOW_DELAY_ = 150;
 
@@ -52,6 +53,22 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
       this.initTooltips();
     });
+
+    /*
+     * Targets rendered after onKeepTrackReady (sat info box circles, menus built on demand) were never wired.
+     * Wire them on first pointer contact; capture phase so the listeners exist before the target's own phase.
+     */
+    const wireLate = (e: Event) => {
+      const target = e.target as Element | null;
+      const el = typeof target?.closest === 'function' ? (target.closest(`[${this.tooltipTag}]`) as HTMLElement | null) : null;
+
+      if (el && !this.wired_.has(el) && el.getAttribute(this.tooltipTag)) {
+        this.createTooltip(el);
+      }
+    };
+
+    document.addEventListener('pointerdown', wireLate, true);
+    document.addEventListener('mouseover', wireLate, true);
 
     // A tap-shown tooltip stays until the next tap elsewhere
     document.addEventListener('pointerdown', (e: PointerEvent) => {
@@ -91,8 +108,12 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       return;
     }
 
+    if (this.wired_.has(el)) {
+      return;
+    }
+    this.wired_.add(el);
+
     let isHovered = false;
-    let lastPointerType = '';
 
     const dismiss = () => {
       if (this.showTimer_) {
@@ -161,9 +182,6 @@ export class TooltipsPlugin extends KeepTrackPlugin {
      * target (e.g. a drawer item closing the drawer); no mouseleave fires for an
      * element hidden under the cursor, which left the tooltip stuck on screen.
      */
-    el.addEventListener('pointerdown', (e: PointerEvent) => {
-      lastPointerType = e.pointerType;
-    });
     /*
      * Touch has no hover: a tap on a tap-to-toggle target (info circles) shows its tooltip and a second tap hides it.
      * The toggle runs on pointerup so it does not depend on the emulated mouse events a touch screen sends afterwards
@@ -194,6 +212,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         toggleForTouch();
       }
     });
+    // Tap-to-toggle targets toggle on click for any pointer type (phone harnesses and hybrid devices send mouse events)
     el.addEventListener('click', () => {
       if (handledByTouch) {
         handledByTouch = false;
@@ -201,8 +220,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         return;
       }
 
-      // Fallback for environments that deliver only pointerdown + click
-      if (lastPointerType === 'touch' && (el as HTMLElement).hasAttribute(this.tapAttr)) {
+      if ((el as HTMLElement).hasAttribute(this.tapAttr)) {
         toggleForTouch();
 
         return;

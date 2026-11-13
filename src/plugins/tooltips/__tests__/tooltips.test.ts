@@ -127,6 +127,45 @@ describe('TooltipsPlugin behavior', () => {
     expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
   });
 
+  it('wires a circle added after init on first pointer contact; mouse click toggles and tap elsewhere hides', () => {
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    document.body.insertAdjacentHTML('beforeend', '<span id="late-circle" kt-tooltip="Late text" kt-tooltip-tap></span>');
+    const circle = document.getElementById('late-circle') as HTMLElement;
+
+    circle.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    circle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    circle.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }));
+    circle.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    expect(div.innerHTML).toBe('Late text');
+
+    circle.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+
+    circle.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
+
+  it('shows a late-added target on hover without prior wiring', () => {
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    document.body.insertAdjacentHTML('beforeend', '<span id="late-hover" kt-tooltip="Hover text"></span>');
+    const el = document.getElementById('late-hover') as HTMLElement;
+
+    el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    el.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(200);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+  });
+
   it('pointerup tap shows the tooltip once and the following click does not toggle it off', () => {
     const div = document.createElement('div');
 

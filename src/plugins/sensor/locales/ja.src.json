@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "ルックアングルを計算する日数",
         "intervalTooltip": "ルックアングルの各行の間隔 (秒)"
       },
+      "framing": {
+        "section": "フレーミング計画(露光ウィンドウ)",
+        "start": "露光開始(UTC)",
+        "startTooltip": "日付と時刻、またはシミュレーション日付のHH:MM:SS",
+        "length": "露光時間(秒)",
+        "inFrame": "視野内",
+        "enters": "進入",
+        "leaves": "退出",
+        "none": "この時間帯はセンサーの視野外です"
+      },
       "table": {
         "time": "時刻",
         "type": "種別",

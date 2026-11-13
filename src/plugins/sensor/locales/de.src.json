@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "Für wie viele Tage Blickwinkel berechnet werden sollen",
         "intervalTooltip": "Sekunden zwischen den einzelnen Blickwinkelzeilen"
       },
+      "framing": {
+        "section": "Bildausschnitt-Plan (Belichtungsfenster)",
+        "start": "Belichtungsbeginn (UTC)",
+        "startTooltip": "Datum und Uhrzeit oder HH:MM:SS am Simulationsdatum",
+        "length": "Belichtungsdauer (s)",
+        "inFrame": "im Bild",
+        "enters": "tritt ein",
+        "leaves": "verlässt",
+        "none": "In diesem Fenster nicht im Sichtfeld des Sensors"
+      },
       "table": {
         "time": "Zeit",
         "type": "Typ",

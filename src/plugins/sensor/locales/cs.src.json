@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "Kolik dní úhlů pohledu se má vypočítat",
         "intervalTooltip": "Počet sekund mezi jednotlivými řádky úhlů pohledu"
       },
+      "framing": {
+        "section": "Plán záběru (okno expozice)",
+        "start": "Začátek expozice (UTC)",
+        "startTooltip": "Datum a čas, nebo HH:MM:SS v datu simulace",
+        "length": "Délka expozice (s)",
+        "inFrame": "ve výhledu",
+        "enters": "vstoupí",
+        "leaves": "opustí",
+        "none": "V tomto okně není v zorném poli senzoru"
+      },
       "table": {
         "time": "Čas",
         "type": "Typ",

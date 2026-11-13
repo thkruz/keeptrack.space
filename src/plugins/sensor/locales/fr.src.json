@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "Nombre de jours d'angles de visée à calculer",
         "intervalTooltip": "Secondes entre chaque ligne d'angles de visée"
       },
+      "framing": {
+        "section": "Plan de cadrage (fenêtre d'exposition)",
+        "start": "Début d'exposition (UTC)",
+        "startTooltip": "Date et heure, ou HH:MM:SS à la date de simulation",
+        "length": "Durée d'exposition (s)",
+        "inFrame": "dans le champ",
+        "enters": "entre",
+        "leaves": "sort",
+        "none": "Hors du champ de vision du capteur pendant cette fenêtre"
+      },
       "table": {
         "time": "Heure",
         "type": "Type",

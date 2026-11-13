@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "Cuántos días de ángulos de observación se deben calcular",
         "intervalTooltip": "Segundos entre cada línea de ángulos de observación"
       },
+      "framing": {
+        "section": "Plan de encuadre (ventana de exposición)",
+        "start": "Inicio de exposición (UTC)",
+        "startTooltip": "Fecha y hora, o HH:MM:SS en la fecha de la simulación",
+        "length": "Duración de exposición (s)",
+        "inFrame": "en el campo",
+        "enters": "entra",
+        "leaves": "sale",
+        "none": "No está en el campo de visión del sensor en esta ventana"
+      },
       "table": {
         "time": "Hora",
         "type": "Tipo",

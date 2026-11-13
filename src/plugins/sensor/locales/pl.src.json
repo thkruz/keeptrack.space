@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "Na ile dni obliczyć kąty obserwacji",
         "intervalTooltip": "Liczba sekund między kolejnymi wierszami kątów obserwacji"
       },
+      "framing": {
+        "section": "Plan kadrowania (okno ekspozycji)",
+        "start": "Początek ekspozycji (UTC)",
+        "startTooltip": "Data i godzina albo HH:MM:SS w dacie symulacji",
+        "length": "Czas ekspozycji (s)",
+        "inFrame": "w kadrze",
+        "enters": "wchodzi",
+        "leaves": "opuszcza",
+        "none": "W tym oknie poza polem widzenia sensora"
+      },
       "table": {
         "time": "Czas",
         "type": "Typ",

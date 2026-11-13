@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "How Many Days of Look Angles Should be Calculated",
         "intervalTooltip": "Seconds Between Each Line of Look Angles"
       },
+      "framing": {
+        "section": "Framing plan (exposure window)",
+        "start": "Exposure start (UTC)",
+        "startTooltip": "Date and time, or HH:MM:SS on the simulation date",
+        "length": "Exposure length (s)",
+        "inFrame": "in frame",
+        "enters": "enters",
+        "leaves": "leaves",
+        "none": "Not in the sensor field of view during this window"
+      },
       "table": {
         "time": "Time",
         "type": "Type",

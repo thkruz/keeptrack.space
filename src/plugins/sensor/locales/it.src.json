@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "Quanti giorni di angoli di vista calcolare",
         "intervalTooltip": "Secondi tra ogni riga di angoli di vista"
       },
+      "framing": {
+        "section": "Piano di inquadratura (finestra di esposizione)",
+        "start": "Inizio esposizione (UTC)",
+        "startTooltip": "Data e ora, oppure HH:MM:SS alla data della simulazione",
+        "length": "Durata esposizione (s)",
+        "inFrame": "nel campo",
+        "enters": "entra",
+        "leaves": "esce",
+        "none": "Fuori dal campo visivo del sensore in questa finestra"
+      },
       "table": {
         "time": "Ora",
         "type": "Tipo",

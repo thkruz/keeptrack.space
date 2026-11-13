@@ -20,6 +20,7 @@ import { BaseObject, Satellite, TemeVec3 } from '@ootk/src/main';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { computeFraming, describeFraming, parseExposureStart } from './look-angles-framing';
 import './look-angles.css';
 
 /**
@@ -134,6 +135,22 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
             <label for="look-angles-interval" class="active">${l('settings.interval')}</label>
         </div>
       </div>
+    </section>
+    <section class="kt-section">
+      <div class="kt-section-label">${l('framing.section')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="look-angles-exposure-start" value="" type="text" placeholder="YYYY-MM-DD HH:MM:SS" data-position="bottom" data-delay="50" data-tooltip="${l('framing.startTooltip')}" />
+            <label for="look-angles-exposure-start" class="active">${l('framing.start')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="look-angles-exposure-length" value="30" type="text" data-position="bottom" data-delay="50" />
+            <label for="look-angles-exposure-length" class="active">${l('framing.length')}</label>
+        </div>
+      </div>
+      <p id="look-angles-framing-result" class="la-optical-note"></p>
     </section>`;
   downloadIconSrc = fileExcelPng;
   downloadIconCb = () => {
@@ -165,16 +182,58 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const lookAnglesSat = this.selectSatManager_.getSelectedSat() as Satellite;
 
     saveXlsx(
-      LookAnglesPlugin.buildExportRows_(this.lastlooksArray_, sensorDisplayName),
+      LookAnglesPlugin.buildExportRows_(this.lastlooksArray_, sensorDisplayName, this.readFramingInput_()),
       LookAnglesPlugin.buildExportFileName_(sensorDisplayName, `${lookAnglesSat.sccNum6 ?? lookAnglesSat.sccNum}`, this.lastlooksArray_[0]?.time)
     );
   };
 
+  /** The exposure window typed in the Framing plan section, or null when it is blank or unreadable. */
+  private readFramingInput_(): { startMs: number; lengthSec: number } | null {
+    const startText = (getEl('look-angles-exposure-start', true) as HTMLInputElement | null)?.value ?? '';
+    const lengthText = (getEl('look-angles-exposure-length', true) as HTMLInputElement | null)?.value ?? '';
+    const startMs = parseExposureStart(startText, ServiceLocator.getTimeManager().simulationTimeObj.getTime());
+    const lengthSec = Number.parseFloat(lengthText);
+
+    if (!Number.isFinite(startMs) || !Number.isFinite(lengthSec) || lengthSec <= 0) {
+      return null;
+    }
+
+    return { startMs, lengthSec };
+  }
+
+  /** Recompute the in-frame seconds for the exposure window against the rows now in the table. */
+  private updateFraming_(): void {
+    const out = getEl('look-angles-framing-result', true);
+
+    if (!out) {
+      return;
+    }
+    const input = this.readFramingInput_();
+
+    if (!input || !this.lastlooksArray_) {
+      out.textContent = '';
+
+      return;
+    }
+    const result = computeFraming(this.lastlooksArray_, input.startMs, input.lengthSec);
+
+    out.textContent = describeFraming(result, {
+      inFrame: l('framing.inFrame'),
+      enters: l('framing.enters'),
+      leaves: l('framing.leaves'),
+      none: l('framing.none'),
+    });
+  }
+
   /** Export rows. Numeric columns stay numbers (not toFixed strings) so the XLSX has number cells. */
-  private static buildExportRows_(looks: LookAngleData[], sensorDisplayName: string): Record<string, string | number | boolean | null>[] {
+  private static buildExportRows_(
+    looks: LookAngleData[],
+    sensorDisplayName: string,
+    framing: { startMs: number; lengthSec: number } | null = null
+  ): Record<string, string | number | boolean | null>[] {
     const durations = LookAnglesPlugin.passDurations_(looks);
 
-    return looks.map((look, idx) => ({
+    const rows: Record<string, string | number | boolean | null>[] = looks.map((look, idx) => ({
       Time: dateFormat(look.time, 'isoDateTime', false),
       Type: LookAnglesPlugin.tearrTypeToString_(look.type, look.inProgress),
       'Time in view (s)': durations[idx],
@@ -184,7 +243,27 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       Sensor: sensorDisplayName,
       sunlit: look.sunlit ?? '',
       opticalVisible: look.opticalVisible ?? '',
+      'Exposure length (s)': '',
     }));
+
+    if (framing) {
+      const result = computeFraming(looks, framing.startMs, framing.lengthSec);
+
+      rows.push({
+        Time: dateFormat(new Date(framing.startMs).toISOString(), 'isoDateTime', false),
+        Type: l('framing.section'),
+        'Time in view (s)': result.inFrameSec,
+        Azimuth: null,
+        Elevation: null,
+        Range: null,
+        Sensor: sensorDisplayName,
+        sunlit: '',
+        opticalVisible: '',
+        'Exposure length (s)': framing.lengthSec,
+      });
+    }
+
+    return rows;
   }
 
   /**
@@ -274,6 +353,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
         this.refreshSideMenuData_();
       });
+
+      getEl('look-angles-exposure-start')?.addEventListener('change', () => this.updateFraming_());
+      getEl('look-angles-exposure-length')?.addEventListener('change', () => this.updateFraming_());
 
       getEl('settings-riseset')!.addEventListener('change', this.settingsRisesetChange_.bind(this));
 
@@ -418,6 +500,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     looksArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     this.lastlooksArray_ = looksArray;
+    this.updateFraming_();
 
     // Populate the Side Menu
     this.populateSideMenuTable_(looksArray, timeManagerInstance);

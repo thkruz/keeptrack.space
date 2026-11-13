@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "要计算多少天的观测角度",
         "intervalTooltip": "每行观测角度之间的秒数"
       },
+      "framing": {
+        "section": "取景计划(曝光窗口)",
+        "start": "曝光开始(UTC)",
+        "startTooltip": "日期和时间,或模拟日期上的 HH:MM:SS",
+        "length": "曝光时长(秒)",
+        "inFrame": "在视场内",
+        "enters": "进入",
+        "leaves": "离开",
+        "none": "此窗口内不在传感器视场内"
+      },
       "table": {
         "time": "时间",
         "type": "类型",

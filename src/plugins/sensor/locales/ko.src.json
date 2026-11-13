@@ -164,6 +164,16 @@
         "calculationLengthTooltip": "관측 각도를 계산할 일수",
         "intervalTooltip": "관측 각도 각 행 사이의 초"
       },
+      "framing": {
+        "section": "프레이밍 계획(노출 구간)",
+        "start": "노출 시작(UTC)",
+        "startTooltip": "날짜와 시간, 또는 시뮬레이션 날짜의 HH:MM:SS",
+        "length": "노출 시간(초)",
+        "inFrame": "시야 내",
+        "enters": "진입",
+        "leaves": "이탈",
+        "none": "이 구간에는 센서 시야 밖입니다"
+      },
       "table": {
         "time": "시간",
         "type": "유형",

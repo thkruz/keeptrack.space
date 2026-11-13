@@ -110,3 +110,25 @@ describe('CustomSensorPlugin.processCustomSensorSubmit_', () => {
     expect(addSpy).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('CustomSensorPlugin.showFovLayerForLimitedSensor_', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const C = CustomSensorPlugin as any;
+
+  it('does nothing for a full-sky sensor and when the layer is unavailable', () => {
+    expect(() => C.showFovLayerForLimitedSensor_({ minAz: 0, maxAz: 360, minEl: 0, maxEl: 90 })).not.toThrow();
+    expect(() => C.showFovLayerForLimitedSensor_({ minAz: 160, maxAz: 200, minEl: 30, maxEl: 60 })).not.toThrow();
+  });
+
+  it('turns the Sensor FOV layer on for a narrow az/el window', async () => {
+    const { PluginRegistry } = await import('@app/engine/core/plugin-registry');
+    const fov = { isIconDisabled: false, isMenuButtonActive: false, enableFovView: vi.fn() };
+    const spy = vi.spyOn(PluginRegistry, 'getPluginByName').mockReturnValue(fov as never);
+
+    C.showFovLayerForLimitedSensor_({ minAz: 0, maxAz: 360, minEl: 0, maxEl: 90 });
+    expect(fov.enableFovView).not.toHaveBeenCalled();
+    C.showFovLayerForLimitedSensor_({ minAz: 160, maxAz: 200, minEl: 30, maxEl: 60 });
+    expect(fov.enableFovView).toHaveBeenCalledTimes(1);
+    spy.mockRestore();
+  });
+});

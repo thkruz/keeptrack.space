@@ -3,6 +3,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -22,6 +23,7 @@ import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import viewListPng from '@public/img/icons/view-list.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
+import type { SensorFov } from '../sensor-fov/sensor-fov';
 import {
   buildCustomSensorParams,
   CustomSensorFormValues,
@@ -726,6 +728,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     CustomSensorPlugin.updateCustomSensorListDom();
     CustomSensorPlugin.saveCustomSensors();
+    CustomSensorPlugin.showFovLayerForLimitedSensor_(values);
 
     let toastKey = 'addedSecondary';
 
@@ -740,6 +743,25 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     );
 
     return 'added';
+  }
+
+  /**
+   * A sensor with a narrow az/el window (a camera frame) is only checkable by eye when the
+   * Sensor FOV layer is on, and nothing told the user to switch it on. Turn it on for those
+   * sensors; a full-sky sensor keeps the layer as the user left it.
+   */
+  private static showFovLayerForLimitedSensor_(values: { minAz: number; maxAz: number; minEl: number; maxEl: number }): void {
+    const isFullSky = values.maxAz - values.minAz >= 360 && values.minEl <= 0 && values.maxEl >= 90;
+
+    if (isFullSky) {
+      return;
+    }
+
+    const fovPlugin = PluginRegistry.getPluginByName<SensorFov>('SensorFov');
+
+    if (fovPlugin && !fovPlugin.isIconDisabled && !fovPlugin.isMenuButtonActive) {
+      fovPlugin.enableFovView();
+    }
   }
 
   /**

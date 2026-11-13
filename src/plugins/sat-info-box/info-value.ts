@@ -93,5 +93,24 @@ export const plainValueText = (el: Element | null | undefined): string => {
     c.remove();
   });
 
+  // Form controls carry no useful textContent: a select lists every option, an input lists nothing.
+  const origSelects = el.querySelectorAll('select');
+  const origInputs = el.querySelectorAll('input');
+
+  clone.querySelectorAll('select').forEach((sel, i) => {
+    const chosen = (origSelects[i] as HTMLSelectElement | undefined)?.selectedOptions?.[0]?.textContent ?? '';
+    const target = sel.closest('.select-wrapper') ?? sel;
+
+    target.replaceWith(clone.ownerDocument.createTextNode(` ${chosen} `));
+  });
+  clone.querySelectorAll('input').forEach((inp, i) => {
+    if ((inp as HTMLInputElement).type === 'hidden') {
+      inp.remove();
+
+      return;
+    }
+    inp.replaceWith(clone.ownerDocument.createTextNode(` ${(origInputs[i] as HTMLInputElement | undefined)?.value ?? ''} `));
+  });
+
   return (clone.textContent ?? '').replace(/\s+/gu, ' ').trim();
 };

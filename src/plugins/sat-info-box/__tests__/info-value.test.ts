@@ -82,4 +82,24 @@ describe('info-value helper (#191)', () => {
 
     expect(plainValueText(getEl('v'))).toBe('LEO');
   });
+
+  it('plainValueText gives the selected select option once, not every option', () => {
+    document.body.innerHTML =
+      '<div id="v"><div class="select-wrapper"><input class="select-dropdown" value="Custom"><ul class="dropdown-content"><li><span>ISS</span></li><li><span>Custom</span></li></ul><select><option value="a">ISS</option><option value="b" selected>Custom</option></select></div></div>';
+
+    expect(plainValueText(getEl('v'))).toBe('Custom');
+  });
+
+  it('plainValueText gives an input value followed by its unit', () => {
+    document.body.innerHTML = '<div id="v"><input type="number" value="400"> MHz</div>';
+    (document.querySelector('#v input') as HTMLInputElement).value = '437.5';
+
+    expect(plainValueText(getEl('v'))).toBe('437.5 MHz');
+  });
+
+  it('plainValueText leaves plain text unchanged', () => {
+    document.body.innerHTML = '<div id="v"> 12.5   km </div>';
+
+    expect(plainValueText(getEl('v'))).toBe('12.5 km');
+  });
 });

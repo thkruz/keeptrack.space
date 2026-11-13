@@ -39,4 +39,14 @@ describe('phone floating clearance CSS', () => {
     expect(phoneInfo).toMatch(/\.sat-info-circle \{[^}]*width: 44px[^}]*height: 44px/u);
     expect(phoneInfo).toMatch(/@media \(max-width: 639px\)/u);
   });
+
+  it('keeps key help areas, utility icons and the pill at 44px and rows apart (#157)', () => {
+    const info = readFileSync(resolve(__dirname, '../../../plugins/sat-info-box/sat-info-box.css'), 'utf8');
+
+    expect(info).toMatch(/\.sat-info-key--help,\s*#sat-infobox \.sat-info-key\[kt-tooltip\] \{[^}]*min-width: 44px[^}]*min-height: 44px/u);
+    expect(info).toMatch(/\.sat-info-row:has\([^)]*\) \{[^}]*min-height: 44px/u);
+    expect(css).toMatch(/\.drawer-utility-icon \{[^}]*width: 44px !important[^}]*height: 44px !important/u);
+    expect(css).toMatch(/\.drawer-utility-footer \{[^}]*min-width: 54px[^}]*min-height: 54px/u);
+    expect(css).toMatch(/#datetime-zone \{[^}]*padding: 12px 2px/u);
+  });
 });

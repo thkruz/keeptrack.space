@@ -351,8 +351,21 @@
   /* Keys that open a tooltip or help line: 14 px text, 44 px hit area. */
   #sat-infobox .sat-info-key--help,
   #sat-infobox .sat-info-key[kt-tooltip] {
-    padding-block: 15px;
-    margin-block: -15px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Rows with a help key or info circle are 44 px tall so neighbouring rows' hit areas never overlap (a tap used to
+     land on the wrong row's help or circle). The circle's negative margins no longer need to reach past the row. */
+  #sat-infobox .sat-info-row:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle) {
+    min-height: 44px;
+  }
+
+  #sat-infobox .sat-info-row .sat-info-circle {
+    margin-block: 0;
   }
 }
 

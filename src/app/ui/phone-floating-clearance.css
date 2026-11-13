@@ -160,16 +160,19 @@
     min-width: 44px;
     height: 44px;
     margin: 0;
-    padding: 14px 2px;
+    /* 20 px of content height (was 16) so the chip outline sits clear of the zone text */
+    padding: 12px 2px;
     border: 0;
     outline: 1px solid currentcolor;
-    outline-offset: -14px;
+    outline-offset: -12px;
     border-radius: 8px;
   }
 
   /* Utility pill: collapsed square and expanded icons are 44 px; padding trimmed so it still fits the 68 px band. */
   body .drawer-utility-footer {
     max-width: 54px;
+    min-width: 54px;
+    min-height: 54px;
     padding: 4px;
     box-sizing: border-box;
   }
@@ -177,6 +180,7 @@
   body .drawer-utility-footer::before {
     width: 44px;
     height: 44px;
+    flex: 0 0 44px;
   }
 
   body .drawer-utility-footer:hover,
@@ -189,9 +193,13 @@
     gap: 0;
   }
 
+  /* Stated with !important and flex-basis: the 32 px desktop size was still winning the height on a phone (#157) */
   body .drawer-utility-icon {
-    width: 44px;
-    height: 44px;
+    box-sizing: border-box;
+    flex: 0 0 44px;
+    width: 44px !important;
+    height: 44px !important;
     min-width: 44px;
+    min-height: 44px;
   }
 }

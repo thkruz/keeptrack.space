@@ -147,6 +147,10 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
         currentRank = getSearchRank(obj, searchStringIn);
 
         matchSatelliteOrMissile(obj as Satellite & MissileObject, searchStringIn, len, searchableFields, addResult_);
+        // A common name ("INTERNATIONAL SPACE STATION") never appears in the catalog name, so add the row it maps to.
+        if (totalFound === before && currentRank === 0) {
+          addResult_({ strIndex: 0, searchType: SearchResultType.OBJECT_NAME, patlen: 0, id: obj.id });
+        }
         // Name, alt name and the other fields win; an alias hit only fills in when none matched.
         if (alias && totalFound === before && alias.toUpperCase().includes(searchStringIn)) {
           addResult_({ strIndex: alias.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.ALIAS, patlen: len, id: obj.id });

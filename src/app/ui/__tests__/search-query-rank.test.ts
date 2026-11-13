@@ -46,4 +46,10 @@ describe('search ranking', () => {
 
     expect(results.map((r) => r.id)).toEqual([2]);
   });
+
+  it('finds the station from a multi-word common name that is not in the catalog name', () => {
+    const { results } = runRegularSearch('INTERNATIONAL SPACE STATION');
+
+    expect(results.map((r) => r.id)).toEqual([2]);
+  });
 });

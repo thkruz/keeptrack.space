@@ -61,6 +61,8 @@ export class MobileManager {
     'CustomSensorPlugin',
     'LookAnglesPlugin',
     'BestPassPlugin',
+    // Added 2026-11-13 (#191): info circles and icon-only buttons need TooltipsPlugin, which supports tap on touch.
+    'TooltipsPlugin',
   ];
 
   static checkMobileMode() {

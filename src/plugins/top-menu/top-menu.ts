@@ -91,6 +91,7 @@ export class TopMenu extends KeepTrackPlugin {
         sensorSelectedDom.parentElement!.style.display = 'none';
       } else {
         sensorSelectedDom.innerText = sensorTitle;
+        sensorSelectedDom.title = sensorTitle;
         sensorSelectedDom.parentElement!.style.display = 'block';
       }
     }

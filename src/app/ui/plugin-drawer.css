@@ -1745,6 +1745,71 @@ body.is-mobile-mode {
     min-width: 0;
     flex: 0 1 auto;
   }
+
+  /* #157: the desktop block above nests these under body.drawer-mode:not(.is-mobile-mode), which outranks the
+     rules just above and left the clock group at max-content (290 px), pushing Search to x=451 at 390 px.
+     Same row, same order: the sensor name shrinks and ellipsizes, Search keeps a 44 px icon target. */
+  body.drawer-mode:not(.is-mobile-mode) #nav-top-center {
+    min-width: 0;
+    flex: 1 1 0;
+    overflow: hidden;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #datetime {
+    flex: 0 0 auto;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 160px;
+    width: auto;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #search-holder,
+  body.drawer-mode:not(.is-mobile-mode) #search-holder.search-slide-up {
+    flex: 0 0 44px;
+    width: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: 0;
+    border-left: 0;
+    padding: 0;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #search-holder input[type='search'],
+  body.drawer-mode:not(.is-mobile-mode) #search-holder.search-slide-up input[type='search'] {
+    width: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 !important;
+    color: transparent;
+    cursor: pointer;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") center / 20px no-repeat;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #search-holder input[type='search']::placeholder {
+    color: transparent;
+  }
+
+  /* Expand to a readable field while focused; the clock group shrinks to make room. */
+  body.drawer-mode:not(.is-mobile-mode) #search-holder:focus-within,
+  body.drawer-mode:not(.is-mobile-mode) #search-holder.search-slide-up:focus-within {
+    flex: 0 0 min(220px, 60vw);
+    width: min(220px, 60vw) !important;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #search-holder:focus-within input[type='search'] {
+    width: 100% !important;
+    padding: 0 10px !important;
+    color: inherit;
+    background-image: none;
+    cursor: text;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #search-holder:focus-within input[type='search']::placeholder {
+    color: inherit;
+  }
 }
 
 /* The close button only exists for the phone drawer, which covers the nav bar and its hamburger. */

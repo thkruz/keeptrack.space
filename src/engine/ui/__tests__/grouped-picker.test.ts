@@ -109,4 +109,23 @@ describe('GroupedPicker keyboard and multi-select', () => {
     document.querySelectorAll<HTMLElement>('.kt-picker-item')[0].click();
     expect(Array.from(select.selectedOptions).map((o) => o.value)).toEqual(['b']);
   });
+
+  it('moves focus with arrow keys from the search box through headings and items', () => {
+    const { picker } = build();
+
+    picker.open();
+    const search = document.querySelector<HTMLInputElement>('.kt-picker-search')!;
+    const press = (key: string): void => {
+      document.activeElement?.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true, cancelable: true }));
+    };
+
+    expect(document.activeElement).toBe(search);
+    press('ArrowDown');
+    expect(document.activeElement?.tagName).toBe('SUMMARY');
+    press('ArrowDown');
+    expect(document.activeElement?.className).toContain('kt-picker-item');
+    press('ArrowUp');
+    press('ArrowUp');
+    expect(document.activeElement).toBe(search);
+  });
 });

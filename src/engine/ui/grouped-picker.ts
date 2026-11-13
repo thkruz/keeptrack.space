@@ -43,6 +43,8 @@ export class GroupedPicker {
     e.stopPropagation();
     if (e.key === 'Escape') {
       this.close();
+    } else if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Home' || e.key === 'End') {
+      this.moveFocus_(e);
     }
   };
 
@@ -188,6 +190,38 @@ export class GroupedPicker {
     }
     this.trigger_.textContent = this.getSelectedText() || this.options_.title;
     this.trigger_.title = this.options_.title;
+  }
+
+  /** Arrow/Home/End navigation over the search box, group headings and visible items. */
+  private moveFocus_(e: KeyboardEvent): void {
+    if (!this.drawer_ || !this.searchEl_ || !this.bodyEl_) {
+      return;
+    }
+    const stops: HTMLElement[] = [this.searchEl_];
+
+    this.bodyEl_.querySelectorAll<HTMLElement>('summary, .kt-picker-item').forEach((el) => {
+      const details = el.closest('details');
+
+      if (el.tagName === 'SUMMARY' || !details || details.open) {
+        stops.push(el);
+      }
+    });
+    const cur = stops.indexOf(document.activeElement as HTMLElement);
+    let next = cur;
+
+    if (e.key === 'ArrowDown') {
+      next = Math.min(stops.length - 1, cur + 1);
+    } else if (e.key === 'ArrowUp') {
+      next = Math.max(0, cur - 1);
+    } else if (cur > 0) {
+      // Home/End move within the list only (the search box keeps its caret keys).
+      next = e.key === 'Home' ? 1 : stops.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    stops[next]?.focus();
+    stops[next]?.scrollIntoView?.({ block: 'nearest' });
   }
 
   private readGroups_(): PickerGroup[] {

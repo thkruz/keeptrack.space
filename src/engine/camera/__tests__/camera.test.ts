@@ -890,8 +890,25 @@ describe('Camera.zoomWheel scroll-out floor', () => {
       cameraInstance.state.camDistBuffer = 0.002 as Kilometers;
       cameraInstance.zoomWheel(100);
 
-      // 20% of a 1 km floor, not 20% of 2 m
-      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(0.002 + 0.2, 4);
+      // 20% of a 10 m floor, not 20% of 2 m
+      expect(cameraInstance.state.camDistBuffer).toBeCloseTo(0.002 + 0.002, 4);
+    });
+
+    it('keeps the first notches off a 3D model small even with a target far out in orbit', () => {
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat: 5, primarySatObj: { id: 5, position: { x: 6800, y: 0, z: 0 } } } as never);
+      cameraInstance.state.camDistBuffer = 0.002 as Kilometers;
+      const steps: number[] = [];
+
+      for (let i = 0; i < 5; i++) {
+        const before = cameraInstance.state.camDistBuffer;
+
+        cameraInstance.zoomWheel(100);
+        steps.push(cameraInstance.state.camDistBuffer - before);
+      }
+
+      // every one of the first five notches stays under 100 m, and steps grow as the view leaves the model
+      expect(Math.max(...steps)).toBeLessThan(0.1);
+      expect(steps[4]).toBeGreaterThan(steps[0]);
     });
 
     it('reaches whole-orbit distance from a close snap in about ten notches', () => {

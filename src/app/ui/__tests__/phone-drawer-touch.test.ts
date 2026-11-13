@@ -50,3 +50,15 @@ describe('phone drawer and touch targets', () => {
     expect(tl).toMatch(/__tool-btn \{\s*width: 44px;\s*height: 44px/u);
   });
 });
+
+describe('Settings menu on phone (Z21, #206)', () => {
+  it('keeps SettingsMenuPlugin enabled on phones', () => {
+    expect(MobileManager.MOBILE_PLUGINS).toContain('SettingsMenuPlugin');
+  });
+
+  it('has a phone-width block for the settings menu', () => {
+    const css = readFileSync(resolve(__dirname, '../../../plugins/settings-menu/settings-menu.css'), 'utf8');
+
+    expect(css).toMatch(/@media \(max-width: 639px\) \{[\s\S]*#settings-filter \{\s*height: 44px/u);
+  });
+});

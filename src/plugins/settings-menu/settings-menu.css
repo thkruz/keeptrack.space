@@ -107,3 +107,40 @@
   margin: 4px 0 2px;
   padding-top: 2px;
 }
+
+/* ===== Phone (390 px) fit, Z21 ===== */
+@media (max-width: 639px) {
+  #settings-menu {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* 16px stops iOS zooming on focus; 44px is the touch target minimum. */
+  #settings-filter {
+    height: 44px;
+    font-size: 16px;
+  }
+
+  #settings-menu .kt-action {
+    min-height: 44px;
+  }
+
+  #settings-menu .kt-section .input-field,
+  #settings-menu .kt-section .input-field input,
+  #settings-menu .kt-section .select-wrapper {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  #settings-menu .kt-section .switch.row {
+    margin-top: 16px;
+  }
+
+  #settings-menu .kt-section .switch label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}

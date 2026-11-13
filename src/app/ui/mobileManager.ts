@@ -63,6 +63,8 @@ export class MobileManager {
     'BestPassPlugin',
     // Added 2026-11-13 (#191): info circles and icon-only buttons need TooltipsPlugin, which supports tap on touch.
     'TooltipsPlugin',
+    // Added 2026-11-13 (Z21, #206): Settings menu reachable from the phone drawer.
+    'SettingsMenuPlugin',
   ];
 
   static checkMobileMode() {

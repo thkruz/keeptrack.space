@@ -9,6 +9,7 @@ import './mobile-zoom-buttons.css';
 export class MobileZoomButtons {
   static readonly CONTAINER_ID = 'mobile-zoom-buttons';
   static readonly HIDDEN_CLASS = 'mobile-zoom-hidden';
+  static readonly RAISED_CLASS = 'mobile-zoom-raised';
 
   static init(): void {
     if (!settingsManager.isMobileModeEnabled || document.getElementById(MobileZoomButtons.CONTAINER_ID)) {
@@ -34,10 +35,25 @@ export class MobileZoomButtons {
    * `display` on `.side-menu-parent` (slide helpers), so watch style/class changes.
    */
   private static watchSideMenus_(root: HTMLElement, container: HTMLElement): void {
-    const sync = () => container.classList.toggle(MobileZoomButtons.HIDDEN_CLASS, MobileZoomButtons.isSideMenuOpen_());
+    const sync = () => {
+      container.classList.toggle(MobileZoomButtons.HIDDEN_CLASS, MobileZoomButtons.isSideMenuOpen_() || MobileZoomButtons.isDrawerOpen_());
+      // Pro issue #195: lift the buttons above the sat info box so they never cover its table.
+      container.classList.toggle(MobileZoomButtons.RAISED_CLASS, MobileZoomButtons.isInfoBoxShown_());
+    };
 
     new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['style', 'class'], subtree: true });
     sync();
+  }
+
+  /** The plugin drawer carries `open` while it is showing (Pro issue #195). */
+  private static isDrawerOpen_(): boolean {
+    return document.getElementById('plugin-drawer')?.classList.contains('open') ?? false;
+  }
+
+  private static isInfoBoxShown_(): boolean {
+    const el = document.getElementById('sat-infobox');
+
+    return !!el && el.style.display !== '' && el.style.display !== 'none';
   }
 
   private static isSideMenuOpen_(): boolean {

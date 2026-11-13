@@ -58,4 +58,22 @@ describe('MobileZoomButtons', () => {
     await Promise.resolve();
     expect(container.classList.contains('mobile-zoom-hidden')).toBe(false);
   });
+
+  it('hides while the drawer is open and rises above an open sat info box', async () => {
+    (globalThis as { settingsManager: unknown }).settingsManager = { isMobileModeEnabled: true };
+    document.body.innerHTML = '<div id="plugin-drawer"></div><div id="sat-infobox" style="display: none"></div>';
+    MobileZoomButtons.init();
+    const container = document.getElementById('mobile-zoom-buttons') as HTMLElement;
+    const drawer = document.getElementById('plugin-drawer') as HTMLElement;
+    const box = document.getElementById('sat-infobox') as HTMLElement;
+
+    drawer.classList.add('open');
+    await Promise.resolve();
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(true);
+    drawer.classList.remove('open');
+    box.style.display = 'block';
+    await Promise.resolve();
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(false);
+    expect(container.classList.contains('mobile-zoom-raised')).toBe(true);
+  });
 });

@@ -29,3 +29,8 @@
 #mobile-zoom-buttons.mobile-zoom-hidden {
   display: none;
 }
+
+/* Sat info box open (up to 45% of the screen tall): sit above it instead of over its table (pro issue #195). */
+#mobile-zoom-buttons.mobile-zoom-raised {
+  bottom: calc(45% + 12px);
+}

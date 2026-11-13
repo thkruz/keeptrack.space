@@ -213,7 +213,7 @@ export class SensorMath {
     const positionEci = <TemeVec3>Sgp4.propagate(sat.satrec, m!).position;
 
     if (!positionEci) {
-      errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${now}`);
+      errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
       tearr.alt = <Kilometers>0;
       tearr.lon = <Degrees>0;
       tearr.lat = <Degrees>0;
@@ -366,7 +366,7 @@ export class SensorMath {
       const eci = <TemeVec3>Sgp4.propagate(sat.satrec, m!).position;
 
       if (!eci) {
-        errorManagerInstance.debug(`No ECI position for ${sat.satrec?.satnum} at ${now}`);
+        errorManagerInstance.debug(`No ECI position for ${sat.satrec?.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
         continue;
       }
 

@@ -48,6 +48,9 @@ const setElHtml = (element: HTMLElement, value: string): void => {
   }
 };
 
+/** Three decimals hide the difference between LEO orbits (ISS 0.0007349 read 0.001), so small values keep four significant digits. */
+const formatEccentricity_ = (eccentricity: number): string => (eccentricity > 0 && eccentricity < 0.01 ? eccentricity.toPrecision(4) : eccentricity.toFixed(3));
+
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
   dependencies_: string[] = [SatInfoBox.name];
@@ -351,7 +354,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     setInnerHtml(EL.INCLINATION, `${obj.inclination.toFixed(2)}°`);
-    setInnerHtml(EL.ECCENTRICITY, obj.eccentricity.toFixed(3));
+    setInnerHtml(EL.ECCENTRICITY, formatEccentricity_(obj.eccentricity));
     setInnerHtml(EL.RAAN, `${obj.rightAscension.toFixed(2)}°`);
     setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
 
@@ -736,7 +739,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       // Earth-centered elements of an escape or heliocentric trajectory are not an orbit, so do not show them as one.
       setInnerHtml(EL.PERIGEE, isApsisAvailable ? finite(elements.perigee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
       setInnerHtml(EL.INCLINATION, finite(elements.inclinationDegrees, 2, '°'));
-      setInnerHtml(EL.ECCENTRICITY, isElliptic ? finite(elements.eccentricity, 3) : notAvailableText());
+      setInnerHtml(EL.ECCENTRICITY, isElliptic && Number.isFinite(elements.eccentricity) ? formatEccentricity_(elements.eccentricity) : notAvailableText());
       setInnerHtml(EL.RAAN, finite(elements.rightAscensionDegrees, 2, '°'));
       setInnerHtml(EL.ARG_PE, finite(elements.argPerigeeDegrees, 2, '°'));
 

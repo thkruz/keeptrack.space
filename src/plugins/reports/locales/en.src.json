@@ -114,8 +114,8 @@
           "generatedWallClock": "Generated (wall clock)",
           "appVersion": "KeepTrack version",
           "ricConvention": "RIC convention",
-          "passCaveat": "Site-local times use the {zone} zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is the best value at the sampling step and can be lower than the true peak.",
-          "passCaveatDisplay": "Local times use the {zone} display zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is the best value at the sampling step and can be lower than the true peak."
+          "passCaveat": "Site-local times use the {zone} zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second.",
+          "passCaveatDisplay": "Local times use the {zone} display zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second."
         },
         "titles": {
           "aer": "Azimuth Elevation Range Report",

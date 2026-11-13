@@ -114,8 +114,8 @@
           "generatedWallClock": "Vytvořeno (skutečný čas)",
           "appVersion": "Verze KeepTrack",
           "ricConvention": "Konvence RIC",
-          "passCaveat": "Místní časy stanoviště používají pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je nejlepší hodnota při daném kroku vzorkování a může být nižší než skutečné maximum.",
-          "passCaveatDisplay": "Místní časy používají zobrazované pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je nejlepší hodnota při daném kroku vzorkování a může být nižší než skutečné maximum."
+          "passCaveat": "Místní časy stanoviště používají pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu.",
+          "passCaveatDisplay": "Místní časy používají zobrazované pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu."
         },
         "titles": {
           "aer": "Zpráva azimut, elevace, vzdálenost",

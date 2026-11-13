@@ -108,7 +108,7 @@ export abstract class SatMath {
 
       positionEci = <TemeVec3>stateVector.position;
       if (!stateVector || !positionEci) {
-        errorManagerInstance.log(`No ECI position for ${satrec.satnum} at ${now}`);
+        errorManagerInstance.log(`No ECI position for ${satrec.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
 
         return <Kilometers>0;
       }
@@ -762,7 +762,7 @@ export abstract class SatMath {
       const velPts = SatMath.getEci(sat, now).velocity;
 
       if (!eciPts) {
-        errorManagerInstance.debug(`No ECI position for ${sat.sccNum} at ${now}`);
+        errorManagerInstance.debug(`No ECI position for ${sat.sccNum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
         continue;
       }
 
@@ -773,7 +773,7 @@ export abstract class SatMath {
         eciPts2 = SatMath.getEci(sat2, now).position;
         velPts2 = SatMath.getEci(sat2, now).velocity;
         if (!eciPts2) {
-          errorManagerInstance.debug(`No ECI position for ${sat2.sccNum} at ${now}`);
+          errorManagerInstance.debug(`No ECI position for ${sat2.sccNum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
           continue;
         }
       }
@@ -827,7 +827,7 @@ export abstract class SatMath {
 
     if (!positionEci) {
       if (!isHideToasts) {
-        errorManagerInstance.info(`No ECI position for ${satrec.satnum} at ${now}`);
+        errorManagerInstance.info(`No ECI position for ${satrec.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
       }
 
       return { az: null, el: null, rng: null };

@@ -411,8 +411,11 @@ export class CreateSat extends KeepTrackPlugin {
     if (!isoEl || !yearEl || !dayEl) {
       return;
     }
-    isoEl.value = epochFieldsToIso(yearEl.value, dayEl.value) ?? '';
-    isoEl.classList.remove('invalid');
+    const iso = epochFieldsToIso(yearEl.value, dayEl.value);
+
+    isoEl.value = iso ?? '';
+    // A typed but invalid epoch is flagged rather than left looking like a forgotten blank.
+    isoEl.classList.toggle('invalid', iso === null && (yearEl.value.trim() !== '' || dayEl.value.trim() !== ''));
   }
 
   /** Redraw (or clear) the live ghost-orbit preview from the current form. */
@@ -860,6 +863,8 @@ export class CreateSat extends KeepTrackPlugin {
     }
 
     dayInput.value = day;
+    // The reformatted year and day are the new truth; rewrite the timestamp so it never keeps an earlier epoch.
+    CreateSat.refreshEpochTimestamp();
 
     const incInput = getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement;
     let inc = incInput.value.trim();

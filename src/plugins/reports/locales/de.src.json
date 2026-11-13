@@ -114,8 +114,8 @@
           "generatedWallClock": "Erstellt (Echtzeit)",
           "appVersion": "KeepTrack-Version",
           "ricConvention": "RIC-Konvention",
-          "passCaveat": "Ortszeiten der Station verwenden die Zone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist der beste Wert im Abtastschritt und kann unter dem wahren Maximum liegen.",
-          "passCaveatDisplay": "Ortszeiten verwenden die Anzeigezone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist der beste Wert im Abtastschritt und kann unter dem wahren Maximum liegen."
+          "passCaveat": "Ortszeiten der Station verwenden die Zone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet.",
+          "passCaveatDisplay": "Ortszeiten verwenden die Anzeigezone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet."
         },
         "titles": {
           "aer": "Bericht Azimut, Elevation, Entfernung",

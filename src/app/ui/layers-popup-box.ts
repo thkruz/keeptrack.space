@@ -152,6 +152,8 @@ export class LayersPopupBox extends DraggableBox {
     closeBtn.setAttribute('tabindex', '0');
     closeBtn.setAttribute('aria-label', label);
     closeBtn.setAttribute('kt-tooltip', label);
+    // The base box now sets a native title; the kt-tooltip replaces it so two tooltips do not stack.
+    closeBtn.removeAttribute('title');
     closeBtn.innerHTML = html`<span class="layers-popup-box__close-glyph" style="--layers-close-icon: url('${cancelPng}')"></span>`;
     closeBtn.addEventListener('keydown', (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {

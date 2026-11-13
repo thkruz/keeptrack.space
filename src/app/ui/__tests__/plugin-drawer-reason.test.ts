@@ -64,4 +64,16 @@ describe('drawer row disabled reason (pro issue #193)', () => {
     syncDrawerItemState(row);
     expect(row.querySelector('.drawer-item-reason')?.textContent).toBe('Add satellites first');
   });
+
+  it('carries the reason in the tooltip and restores the plain label when enabled', () => {
+    PluginRegistry.addPlugin(makePlugin({ isRequireSensorSelected: false, getDisabledReason: () => 'Add satellites first' }) as never);
+    const row = setup(true);
+
+    row.setAttribute('kt-tooltip', 'Look Angles');
+    syncDrawerItemState(row);
+    expect(row.getAttribute('kt-tooltip')).toBe('Look Angles: Add satellites first');
+    document.getElementById('look-angles-bottom-icon')!.classList.remove('bmenu-item-disabled');
+    syncDrawerItemState(row);
+    expect(row.getAttribute('kt-tooltip')).toBe('Look Angles');
+  });
 });

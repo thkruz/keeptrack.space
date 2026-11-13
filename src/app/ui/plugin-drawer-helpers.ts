@@ -129,12 +129,27 @@ export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void
     reasonEl.textContent = text;
   }
 
+  // The reason line hides in rail mode, so the tooltip carries it there.
+  const baseLabel = el.dataset.drawerLabel ?? el.getAttribute('kt-tooltip') ?? '';
+
+  if (baseLabel) {
+    el.dataset.drawerLabel = baseLabel;
+    el.setAttribute('kt-tooltip', text ? `${baseLabel}: ${text}` : baseLabel);
+  }
+
   el.setAttribute('aria-disabled', String(isDisabled));
   if (isDisabled && text && reasonEl) {
     el.setAttribute('aria-describedby', reasonEl.id);
   } else {
     el.removeAttribute('aria-describedby');
   }
+}
+
+/** Hide the shared tooltip popup, which would otherwise stay on screen after the row under it collapses. */
+export function hideDrawerTooltips(): void {
+  document.querySelectorAll('.kt-tooltip-popup.kt-tooltip-visible').forEach((el) => {
+    el.classList.remove('kt-tooltip-visible');
+  });
 }
 
 // ---- Shared Item Collection ----

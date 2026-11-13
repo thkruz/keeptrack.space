@@ -30,6 +30,7 @@ import {
   drawerRowFeatureName,
   explainDisabledPluginReason,
   explainDisabledUtilityIcon,
+  hideDrawerTooltips,
   isGroupExpanded,
   isSignedOutGatedRow,
   loadRecents,
@@ -634,6 +635,7 @@ export class PluginDrawer {
       drawer.addEventListener('mouseleave', () => {
         this.cancelRailHoverTimer_();
         drawer.classList.remove('rail-hover');
+        hideDrawerTooltips();
       });
 
       // Prevent the toggle button from triggering hover expansion
@@ -1104,6 +1106,7 @@ export class PluginDrawer {
 
   private enterRailMode_(): void {
     this.cancelRailHoverTimer_();
+    hideDrawerTooltips();
     this.drawerEl_?.classList.remove('rail-hover');
     this.drawerEl_?.classList.add('rail-mode');
     document.documentElement.style.setProperty('--drawer-offset', '60px');

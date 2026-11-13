@@ -10,7 +10,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { saveCsv, saveXlsx } from '@app/engine/utils/saveVariable';
-import { t7e } from '@app/locales/keys';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import transponderChannelDataPng from '@public/img/icons/sat-channel-freq.png';
 import { SatConstellations } from '../sat-constellations/sat-constellations';
@@ -211,6 +211,16 @@ export class TransponderChannelData extends KeepTrackPlugin {
       // the list would resolve correctly via sccNum2Id.
       PluginRegistry.getPlugin(SatConstellations)?.addConstellation(t7e('plugins.TransponderChannelData.constellationName'), GroupType.SCC_NUM, [...this.satsWithChannels_]);
     });
+  }
+
+  getDisabledReason(): string | null {
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+    if (!selectSatManager || selectSatManager.selectedSat === -1) {
+      return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
+    }
+
+    return null;
   }
 
   addJs(): void {

@@ -428,6 +428,11 @@ body.drawer-mode {
     display: none;
   }
 
+  /* Rail mode keeps the row one line tall; the reason lives in the tooltip */
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-reason {
+    display: none;
+  }
+
   &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-account-hint {
     display: block;
   }

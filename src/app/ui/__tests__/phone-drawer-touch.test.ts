@@ -15,6 +15,12 @@ describe('phone drawer and touch targets', () => {
     }
   });
 
+  it('#303 keeps the curated Pro menus on phones', () => {
+    for (const key of ['ObservabilityPlanner', 'SatInfoBoxDoppler']) {
+      expect(MobileManager.MOBILE_PLUGINS).toContain(key);
+    }
+  });
+
   it('#153 puts the account row first in the phone drawer', () => {
     expect(tail).toMatch(/\.plugin-drawer\.mobile-mode \.drawer-user-account \{\s*order: -2;/u);
   });
@@ -64,5 +70,19 @@ describe('Settings menu on phone (Z21, #206)', () => {
     const css = readFileSync(resolve(__dirname, '../../../plugins/settings-menu/settings-menu.css'), 'utf8');
 
     expect(css).toMatch(/@media \(max-width: 639px\) \{[\s\S]*#settings-filter \{\s*height: 44px/u);
+  });
+
+  const drawerCss = readFileSync(resolve(__dirname, '../plugin-drawer.css'), 'utf8');
+
+  it('#297 keeps the phone drawer close control stuck to the top while the drawer scrolls', () => {
+    expect(drawerCss).toMatch(/\.drawer-close-btn \{\s*display: flex;\s*position: sticky;\s*top: 0;/u);
+  });
+
+  it('#157 gives drawer group headers a 44 px touch target on phones', () => {
+    expect(drawerCss).toMatch(/body\.drawer-mode \.drawer-group-header \{\s*min-height: 44px;/u);
+  });
+
+  it('#291 hides the account hint in the collapsed rail', () => {
+    expect(drawerCss).toMatch(/\.drawer-item \.drawer-item-account-hint \{\s*display: none !important;/u);
   });
 });

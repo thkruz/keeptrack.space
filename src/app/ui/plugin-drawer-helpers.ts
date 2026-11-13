@@ -141,7 +141,21 @@ export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void
   if (isDisabled && text && reasonEl) {
     el.setAttribute('aria-describedby', reasonEl.id);
   } else {
-    el.removeAttribute('aria-describedby');
+    // Locked (Pro) rows keep pointing at their "Free account unlocks this" line.
+    const hintEl = el.querySelector<HTMLElement>(':scope > .drawer-item-account-hint');
+    const hintId = hintEl?.id;
+
+    // #214: accounts that already have access never see the "Free account unlocks this" line
+    // (the CSS keys off a body class; the plugin's own gate is the source of truth).
+    if (hintEl) {
+      hintEl.hidden = !isSignedOutGatedRow(el);
+    }
+
+    if (hintId && hintEl && !hintEl.hidden) {
+      el.setAttribute('aria-describedby', hintId);
+    } else {
+      el.removeAttribute('aria-describedby');
+    }
   }
 }
 

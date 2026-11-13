@@ -42,6 +42,10 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   private readonly wired_ = new WeakSet<HTMLElement>();
 
   private static readonly SHOW_DELAY_ = 150;
+  private static readonly WATCH_INTERVAL_ = 400;
+  /** The element the visible tooltip belongs to, so a watchdog can clear it when that element stops being hovered or shown (#287). */
+  private activeTarget_: HTMLElement | null = null;
+  private watchTimer_: ReturnType<typeof setInterval> | null = null;
 
   addHtml(): void {
     super.addHtml();
@@ -237,7 +241,60 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     el.style.cursor = 'pointer';
   }
 
+  /** Re-renders the visible tooltip when it belongs to `el` and the element's text changed while it was showing (#274). */
+  refreshTooltip(el: HTMLElement): void {
+    if (this.activeTarget_ !== el || !el.isConnected) {
+      return;
+    }
+    const text = el.getAttribute(this.tooltipTag) ?? '';
+
+    if (text) {
+      this.showTooltip(el, text);
+    } else {
+      this.hideTooltip();
+    }
+  }
+
+  /** True while the tooltip's element is still attached, rendered and under the pointer or keyboard focus. */
+  private isTargetStillActive_(): boolean {
+    const target = this.activeTarget_;
+
+    if (!target || !target.isConnected) {
+      return false;
+    }
+    const rect = target.getBoundingClientRect();
+
+    if (rect.width === 0 && rect.height === 0) {
+      return false;
+    }
+    if (target === this.shownFor_) {
+      return true;
+    }
+
+    return target.matches(':hover') || target.matches(':focus-visible');
+  }
+
+  private startWatchdog_(): void {
+    this.stopWatchdog_();
+    this.watchTimer_ = setInterval(() => {
+      if (!this.isTargetStillActive_()) {
+        this.hideTooltip();
+        this.isVisible_ = false;
+        this.shownFor_ = null;
+      }
+    }, TooltipsPlugin.WATCH_INTERVAL_);
+  }
+
+  private stopWatchdog_(): void {
+    if (this.watchTimer_) {
+      clearInterval(this.watchTimer_);
+      this.watchTimer_ = null;
+    }
+    this.activeTarget_ = null;
+  }
+
   hideTooltip() {
+    this.stopWatchdog_();
     const tooltipDiv = document.getElementById('tooltip');
 
     if (tooltipDiv) {
@@ -300,8 +357,44 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     // Clamp vertically to viewport
     top = Math.max(8, Math.min(top, viewportHeight + window.scrollY - tooltipRect.height - 8));
 
+    // Left drawer rows: open beside the drawer so the popup never covers a neighbouring row's label or shortcut (#298).
+    const drawerEl = targetEl.closest<HTMLElement>('.plugin-drawer');
+
+    if (drawerEl) {
+      const drawerRect = drawerEl.getBoundingClientRect();
+      const sideLeft = drawerRect.right + 8;
+
+      if (sideLeft + tooltipRect.width + 8 > viewportWidth) {
+        // No room beside the drawer (phone): the row label is already on screen, so show nothing.
+        return;
+      }
+      left = sideLeft;
+      top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
+    }
+
+    // Info box rows: open beside the box (left, else right) so the popup never hides the neighbouring values (#273)
+    const infoBoxEl = targetEl.closest<HTMLElement>('#sat-infobox');
+
+    if (infoBoxEl) {
+      const boxRect = infoBoxEl.getBoundingClientRect();
+      const sideTop = Math.max(
+        8,
+        Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8)
+      );
+
+      if (boxRect.left - 8 - tooltipRect.width >= 8) {
+        left = boxRect.left - 8 - tooltipRect.width;
+        top = sideTop;
+      } else if (boxRect.right + 8 + tooltipRect.width + 8 <= viewportWidth) {
+        left = boxRect.right + 8;
+        top = sideTop;
+      }
+    }
+
     tooltipDiv.style.left = `${left}px`;
     tooltipDiv.style.top = `${top}px`;
     tooltipDiv.classList.add('kt-tooltip-visible');
+    this.activeTarget_ = targetEl;
+    this.startWatchdog_();
   }
 }

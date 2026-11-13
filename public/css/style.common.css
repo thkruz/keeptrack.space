@@ -3231,6 +3231,11 @@ nav a.sidenav-trigger i {
   border-color: var(--color-dark-border);
 }
 
+/* #288: the sat-info box (z-index 4) sits in the same column; an open result list goes above it so every row stays reachable */
+body.search-results-open #search-results {
+  z-index: 5;
+}
+
 
 /* ========== Modals and Dialogs ========== */
 

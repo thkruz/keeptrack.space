@@ -428,9 +428,25 @@ body.drawer-mode {
     display: none;
   }
 
+  .drawer-item-account-hint[hidden] {
+    display: none !important;
+  }
+
+  /* The reason line wraps under the row; keep it after the star, shortcut and badges (#295) */
+  .drawer-item-reason,
+  .drawer-item-account-hint {
+    order: 10;
+  }
+
   /* Rail mode keeps the row one line tall; the reason lives in the tooltip */
-  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-reason {
-    display: none;
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-reason,
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item .drawer-item-account-hint {
+    display: none !important;
+  }
+
+  /* #291: the lock keeps the blue icon tint in the rail (a gold row tint must not bleed into it) */
+  .plugin-drawer .drawer-item .drawer-item-lock-icon {
+    filter: var(--filter-icon-blue) !important;
   }
 
   &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-account-hint {
@@ -1698,6 +1714,12 @@ body.is-mobile-mode {
     box-sizing: border-box;
   }
 
+  /* #157: group headers were 35 px tall */
+  body.drawer-mode .drawer-group-header {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
   body.drawer-mode #search-holder {
     min-height: 44px;
     min-width: 96px;
@@ -1747,8 +1769,13 @@ body.is-mobile-mode {
     overflow: visible;
   }
 
+  /* #297: the drawer itself scrolls, so the close control sticks to its top edge */
   .drawer-close-btn {
     display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: var(--color-dark-background, #1a1a1a);
     order: -3;
     align-self: flex-end;
     align-items: center;

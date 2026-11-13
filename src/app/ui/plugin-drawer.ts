@@ -335,6 +335,7 @@ export class PluginDrawer {
     const recentGroup = this.buildRecentGroup_(menuGroups);
 
     this.renderMenuGroups_(menuGroups, recentGroup);
+    this.syncRenderedReasons_();
     this.renderUtilityFooter_(utilityGroups);
     this.renderStatusFooter_();
     this.syncInitialUtilityState_();
@@ -353,6 +354,22 @@ export class PluginDrawer {
     if (this.isRailMode_ && !this.isMobileMode_) {
       this.enterRailMode_();
     }
+  }
+
+  /**
+   * A fresh render only knows load-time state, and no icon-class change fires for rows that start
+   * disabled, so give every row its aria-disabled and "why" line up front (#193).
+   */
+  private syncRenderedReasons_(): void {
+    getEl('drawer-content', true)
+      ?.querySelectorAll<HTMLElement>(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR)
+      .forEach((el) => {
+        const pluginId = drawerItemPluginId(el);
+        const bottomIcon = pluginId ? getEl(pluginId, true) : null;
+        const isDisabled = bottomIcon ? bottomIcon.classList.contains('bmenu-item-disabled') : el.classList.contains('disabled');
+
+        syncDrawerItemReason(el, isDisabled);
+      });
   }
 
   private renderMenuGroups_(groups: Record<string, DrawerGroup>, recentGroup?: DrawerGroup): void {
@@ -932,14 +949,17 @@ export class PluginDrawer {
       const tabIdx = item.isDisabled ? '' : ' tabindex="0"';
       const shortcutBadge = item.shortcutHint ? `<span class="drawer-item-shortcut">${item.shortcutHint}</span>` : '';
 
-      html += `<div class="drawer-item${disabledClass}${proClass}" ${dataAttr}${proAttr}${tabIdx} role="button" kt-tooltip="${item.label}">`;
+      const hintId = `drawer-hint-${key}-${item.id}`;
+      const hintAttr = proClass ? ` aria-describedby="${hintId}"` : '';
+
+      html += `<div class="drawer-item${disabledClass}${proClass}" ${dataAttr}${proAttr}${tabIdx}${hintAttr} role="button" kt-tooltip="${item.label}">`;
       html += `<img class="drawer-item-icon" src="${item.imgSrc}" alt="${item.label}" />`;
       html += `<span class="drawer-item-label">${item.label}</span>`;
       html += '<span class="drawer-item-badge"></span>';
       html += proClass
         ? `<span class="drawer-item-lock" aria-label="${loginRequiredText}" title="${loginRequiredText}"><img class="drawer-item-lock-icon" src="${lockPng}" alt="" /></span>`
         : '';
-      html += proClass ? `<span class="drawer-item-account-hint">${t7e('pluginDrawer.reasonFreeAccount' as TranslationKey)}</span>` : '';
+      html += proClass ? `<span class="drawer-item-account-hint" id="${hintId}">${t7e('pluginDrawer.reasonFreeAccount' as TranslationKey)}</span>` : '';
       html += shortcutBadge;
       html += '</div>';
     }

@@ -3,6 +3,8 @@ export const SECTIONS = {
   SECONDARY: 'secondary-sat-info',
 };
 export const EL = {
+  /** Plain-words line under the title ("Inactive weather satellite"). */
+  SUMMARY: 'sat-summary',
   TYPE: 'sat-type',
   STATUS: 'sat-status',
   COUNTRY: 'sat-country',

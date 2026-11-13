@@ -81,6 +81,47 @@
     },
     "noData": "AUCUNE DONNÉE",
     "notSunlit": "Non éclairé",
-    "assumedSuffix": "(supposé)"
+    "assumedSuffix": "(supposé)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Satellite militaire actif",
+          "communications": "Satellite de communication actif",
+          "navigation": "Satellite de navigation actif",
+          "weather": "Satellite météorologique actif",
+          "earthObservation": "Satellite d'observation de la Terre actif",
+          "astronomy": "Télescope spatial actif",
+          "science": "Satellite scientifique actif",
+          "technology": "Satellite de démonstration technologique actif",
+          "other": "Satellite actif"
+        },
+        "inactive": {
+          "military": "Satellite militaire inactif",
+          "communications": "Satellite de communication inactif",
+          "navigation": "Satellite de navigation inactif",
+          "weather": "Satellite météorologique inactif",
+          "earthObservation": "Satellite d'observation de la Terre inactif",
+          "astronomy": "Télescope spatial inactif",
+          "science": "Satellite scientifique inactif",
+          "technology": "Satellite de démonstration technologique inactif",
+          "other": "Satellite inactif"
+        },
+        "plain": {
+          "military": "Satellite militaire",
+          "communications": "Satellite de communication",
+          "navigation": "Satellite de navigation",
+          "weather": "Satellite météorologique",
+          "earthObservation": "Satellite d'observation de la Terre",
+          "astronomy": "Télescope spatial",
+          "science": "Satellite scientifique",
+          "technology": "Satellite de démonstration technologique",
+          "other": "Satellite"
+        }
+      },
+      "rocketBody": "Étage de fusée laissé en orbite",
+      "debris": "Débris laissé en orbite",
+      "special": "Objet spécial suivi",
+      "missile": "Missile balistique en vol"
+    }
   }
 }

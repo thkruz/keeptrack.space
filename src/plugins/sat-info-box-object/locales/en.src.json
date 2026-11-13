@@ -81,6 +81,47 @@
     },
     "noData": "NO DATA",
     "notSunlit": "Not sunlit",
-    "assumedSuffix": "(assumed)"
+    "assumedSuffix": "(assumed)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Active military satellite",
+          "communications": "Active communications satellite",
+          "navigation": "Active navigation satellite",
+          "weather": "Active weather satellite",
+          "earthObservation": "Active Earth observation satellite",
+          "astronomy": "Active space telescope",
+          "science": "Active science satellite",
+          "technology": "Active technology demonstration satellite",
+          "other": "Active satellite"
+        },
+        "inactive": {
+          "military": "Inactive military satellite",
+          "communications": "Inactive communications satellite",
+          "navigation": "Inactive navigation satellite",
+          "weather": "Inactive weather satellite",
+          "earthObservation": "Inactive Earth observation satellite",
+          "astronomy": "Inactive space telescope",
+          "science": "Inactive science satellite",
+          "technology": "Inactive technology demonstration satellite",
+          "other": "Inactive satellite"
+        },
+        "plain": {
+          "military": "Military satellite",
+          "communications": "Communications satellite",
+          "navigation": "Navigation satellite",
+          "weather": "Weather satellite",
+          "earthObservation": "Earth observation satellite",
+          "astronomy": "Space telescope",
+          "science": "Science satellite",
+          "technology": "Technology demonstration satellite",
+          "other": "Satellite"
+        }
+      },
+      "rocketBody": "Rocket body left in orbit",
+      "debris": "Debris left in orbit",
+      "special": "Special tracked object",
+      "missile": "Ballistic missile in flight"
+    }
   }
 }

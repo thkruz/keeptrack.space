@@ -81,6 +81,47 @@
     },
     "noData": "데이터 없음",
     "notSunlit": "일조 없음",
-    "assumedSuffix": "(가정)"
+    "assumedSuffix": "(가정)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "작동 중인 군사 위성",
+          "communications": "작동 중인 통신 위성",
+          "navigation": "작동 중인 항법 위성",
+          "weather": "작동 중인 기상 위성",
+          "earthObservation": "작동 중인 지구 관측 위성",
+          "astronomy": "작동 중인 우주 망원경",
+          "science": "작동 중인 과학 위성",
+          "technology": "작동 중인 기술 시연 위성",
+          "other": "작동 중인 위성"
+        },
+        "inactive": {
+          "military": "작동이 중지된 군사 위성",
+          "communications": "작동이 중지된 통신 위성",
+          "navigation": "작동이 중지된 항법 위성",
+          "weather": "작동이 중지된 기상 위성",
+          "earthObservation": "작동이 중지된 지구 관측 위성",
+          "astronomy": "작동이 중지된 우주 망원경",
+          "science": "작동이 중지된 과학 위성",
+          "technology": "작동이 중지된 기술 시연 위성",
+          "other": "작동이 중지된 위성"
+        },
+        "plain": {
+          "military": "군사 위성",
+          "communications": "통신 위성",
+          "navigation": "항법 위성",
+          "weather": "기상 위성",
+          "earthObservation": "지구 관측 위성",
+          "astronomy": "우주 망원경",
+          "science": "과학 위성",
+          "technology": "기술 시연 위성",
+          "other": "위성"
+        }
+      },
+      "rocketBody": "궤도에 남은 로켓 본체",
+      "debris": "궤도에 남은 파편",
+      "special": "특별 추적 대상",
+      "missile": "비행 중인 탄도 미사일"
+    }
   }
 }

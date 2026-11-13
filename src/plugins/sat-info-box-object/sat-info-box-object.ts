@@ -22,6 +22,7 @@ import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { getObjectSummaryKey, getProvidedObjectSummary } from './object-summary';
 import { EL, SECTIONS } from './sat-info-box-object-html';
 import './sat-info-box-object.css';
 
@@ -84,6 +85,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
+      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSummaryLine_(), order: 1 });
       PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createObjectSection_(), order: 7 });
       PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSecondarySection(), order: 9 });
     });
@@ -129,6 +131,26 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
 
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.OBJECT}`), { value: this.isObjectDataSectionCollapsed_ });
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.SECONDARY}`), { value: this.isSecondaryDataSectionCollapsed_ });
+  }
+
+  private createSummaryLine_(): string {
+    return html`<div id="${EL.SUMMARY}" class="sat-summary" style="display: none;"></div>`;
+  }
+
+  /** Plain-words line near the top of the info box; an AI summary provider (#219) can override it. */
+  private updateSummary_(obj: BaseObject): void {
+    const el = getEl(EL.SUMMARY, true);
+
+    if (!el) {
+      return;
+    }
+
+    const provided = getProvidedObjectSummary(obj);
+    const key = getObjectSummaryKey(obj);
+    const text = provided ?? (key ? t7e(key as Parameters<typeof t7e>[0]) : '');
+
+    el.textContent = text;
+    el.style.display = text ? '' : 'none';
   }
 
   private createObjectSection_(): string {
@@ -297,6 +319,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     }
     this.updateSatType_(obj);
     this.updateSatStatus_(obj);
+    this.updateSummary_(obj);
 
     if (satMisl.isMissile()) {
       return;

@@ -81,6 +81,47 @@
     },
     "noData": "ŽÁDNÁ DATA",
     "notSunlit": "Bez osvětlení",
-    "assumedSuffix": "(předpoklad)"
+    "assumedSuffix": "(předpoklad)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Aktivní vojenský satelit",
+          "communications": "Aktivní komunikační satelit",
+          "navigation": "Aktivní navigační satelit",
+          "weather": "Aktivní meteorologický satelit",
+          "earthObservation": "Aktivní satelit pro pozorování Země",
+          "astronomy": "Aktivní vesmírný dalekohled",
+          "science": "Aktivní vědecký satelit",
+          "technology": "Aktivní technologický demonstrační satelit",
+          "other": "Aktivní satelit"
+        },
+        "inactive": {
+          "military": "Neaktivní vojenský satelit",
+          "communications": "Neaktivní komunikační satelit",
+          "navigation": "Neaktivní navigační satelit",
+          "weather": "Neaktivní meteorologický satelit",
+          "earthObservation": "Neaktivní satelit pro pozorování Země",
+          "astronomy": "Neaktivní vesmírný dalekohled",
+          "science": "Neaktivní vědecký satelit",
+          "technology": "Neaktivní technologický demonstrační satelit",
+          "other": "Neaktivní satelit"
+        },
+        "plain": {
+          "military": "Vojenský satelit",
+          "communications": "Komunikační satelit",
+          "navigation": "Navigační satelit",
+          "weather": "Meteorologický satelit",
+          "earthObservation": "Satelit pro pozorování Země",
+          "astronomy": "Vesmírný dalekohled",
+          "science": "Vědecký satelit",
+          "technology": "Technologický demonstrační satelit",
+          "other": "Satelit"
+        }
+      },
+      "rocketBody": "Raketový stupeň ponechaný na oběžné dráze",
+      "debris": "Trosky na oběžné dráze",
+      "special": "Zvláštní sledovaný objekt",
+      "missile": "Balistická raketa za letu"
+    }
   }
 }

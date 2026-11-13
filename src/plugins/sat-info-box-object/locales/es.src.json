@@ -81,6 +81,47 @@
     },
     "noData": "SIN DATOS",
     "notSunlit": "Sin iluminar",
-    "assumedSuffix": "(supuesto)"
+    "assumedSuffix": "(supuesto)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Satélite militar activo",
+          "communications": "Satélite de comunicaciones activo",
+          "navigation": "Satélite de navegación activo",
+          "weather": "Satélite meteorológico activo",
+          "earthObservation": "Satélite de observación de la Tierra activo",
+          "astronomy": "Telescopio espacial activo",
+          "science": "Satélite científico activo",
+          "technology": "Satélite de demostración tecnológica activo",
+          "other": "Satélite activo"
+        },
+        "inactive": {
+          "military": "Satélite militar inactivo",
+          "communications": "Satélite de comunicaciones inactivo",
+          "navigation": "Satélite de navegación inactivo",
+          "weather": "Satélite meteorológico inactivo",
+          "earthObservation": "Satélite de observación de la Tierra inactivo",
+          "astronomy": "Telescopio espacial inactivo",
+          "science": "Satélite científico inactivo",
+          "technology": "Satélite de demostración tecnológica inactivo",
+          "other": "Satélite inactivo"
+        },
+        "plain": {
+          "military": "Satélite militar",
+          "communications": "Satélite de comunicaciones",
+          "navigation": "Satélite de navegación",
+          "weather": "Satélite meteorológico",
+          "earthObservation": "Satélite de observación de la Tierra",
+          "astronomy": "Telescopio espacial",
+          "science": "Satélite científico",
+          "technology": "Satélite de demostración tecnológica",
+          "other": "Satélite"
+        }
+      },
+      "rocketBody": "Cuerpo de cohete abandonado en órbita",
+      "debris": "Desechos abandonados en órbita",
+      "special": "Objeto especial en seguimiento",
+      "missile": "Misil balístico en vuelo"
+    }
   }
 }

@@ -15,3 +15,12 @@
   padding: 2px 0 4px;
   white-space: normal;
 }
+
+/* Plain-words description of the object, shown right under the title */
+#sat-summary.sat-summary {
+  padding: 4px 8px 6px;
+  font-size: 13px;
+  line-height: 1.35;
+  text-align: center;
+  white-space: normal;
+}

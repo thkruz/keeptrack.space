@@ -81,6 +81,47 @@
     },
     "noData": "BRAK DANYCH",
     "notSunlit": "Nieoświetlony",
-    "assumedSuffix": "(założone)"
+    "assumedSuffix": "(założone)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Aktywny satelita wojskowy",
+          "communications": "Aktywny satelita telekomunikacyjny",
+          "navigation": "Aktywny satelita nawigacyjny",
+          "weather": "Aktywny satelita meteorologiczny",
+          "earthObservation": "Aktywny satelita obserwacji Ziemi",
+          "astronomy": "Aktywny teleskop kosmiczny",
+          "science": "Aktywny satelita naukowy",
+          "technology": "Aktywny satelita do demonstracji technologii",
+          "other": "Aktywny satelita"
+        },
+        "inactive": {
+          "military": "Nieaktywny satelita wojskowy",
+          "communications": "Nieaktywny satelita telekomunikacyjny",
+          "navigation": "Nieaktywny satelita nawigacyjny",
+          "weather": "Nieaktywny satelita meteorologiczny",
+          "earthObservation": "Nieaktywny satelita obserwacji Ziemi",
+          "astronomy": "Nieaktywny teleskop kosmiczny",
+          "science": "Nieaktywny satelita naukowy",
+          "technology": "Nieaktywny satelita do demonstracji technologii",
+          "other": "Nieaktywny satelita"
+        },
+        "plain": {
+          "military": "Satelita wojskowy",
+          "communications": "Satelita telekomunikacyjny",
+          "navigation": "Satelita nawigacyjny",
+          "weather": "Satelita meteorologiczny",
+          "earthObservation": "Satelita obserwacji Ziemi",
+          "astronomy": "Teleskop kosmiczny",
+          "science": "Satelita naukowy",
+          "technology": "Satelita do demonstracji technologii",
+          "other": "Satelita"
+        }
+      },
+      "rocketBody": "Człon rakiety pozostawiony na orbicie",
+      "debris": "Śmieci kosmiczne na orbicie",
+      "special": "Specjalny śledzony obiekt",
+      "missile": "Pocisk balistyczny w locie"
+    }
   }
 }

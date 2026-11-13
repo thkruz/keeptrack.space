@@ -81,6 +81,47 @@
     },
     "noData": "KEINE DATEN",
     "notSunlit": "Nicht besonnt",
-    "assumedSuffix": "(angenommen)"
+    "assumedSuffix": "(angenommen)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Aktiver Militärsatellit",
+          "communications": "Aktiver Kommunikationssatellit",
+          "navigation": "Aktiver Navigationssatellit",
+          "weather": "Aktiver Wettersatellit",
+          "earthObservation": "Aktiver Erdbeobachtungssatellit",
+          "astronomy": "Aktives Weltraumteleskop",
+          "science": "Aktiver Forschungssatellit",
+          "technology": "Aktiver Technologie-Demonstrationssatellit",
+          "other": "Aktiver Satellit"
+        },
+        "inactive": {
+          "military": "Inaktiver Militärsatellit",
+          "communications": "Inaktiver Kommunikationssatellit",
+          "navigation": "Inaktiver Navigationssatellit",
+          "weather": "Inaktiver Wettersatellit",
+          "earthObservation": "Inaktiver Erdbeobachtungssatellit",
+          "astronomy": "Inaktives Weltraumteleskop",
+          "science": "Inaktiver Forschungssatellit",
+          "technology": "Inaktiver Technologie-Demonstrationssatellit",
+          "other": "Inaktiver Satellit"
+        },
+        "plain": {
+          "military": "Militärsatellit",
+          "communications": "Kommunikationssatellit",
+          "navigation": "Navigationssatellit",
+          "weather": "Wettersatellit",
+          "earthObservation": "Erdbeobachtungssatellit",
+          "astronomy": "Weltraumteleskop",
+          "science": "Forschungssatellit",
+          "technology": "Technologie-Demonstrationssatellit",
+          "other": "Satellit"
+        }
+      },
+      "rocketBody": "Im Orbit verbliebene Raketenstufe",
+      "debris": "Trümmerteil im Orbit",
+      "special": "Besonderes verfolgtes Objekt",
+      "missile": "Ballistische Rakete im Flug"
+    }
   }
 }

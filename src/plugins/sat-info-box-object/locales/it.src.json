@@ -81,6 +81,47 @@
     },
     "noData": "NESSUN DATO",
     "notSunlit": "Non illuminato",
-    "assumedSuffix": "(ipotizzato)"
+    "assumedSuffix": "(ipotizzato)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Satellite militare attivo",
+          "communications": "Satellite per comunicazioni attivo",
+          "navigation": "Satellite di navigazione attivo",
+          "weather": "Satellite meteorologico attivo",
+          "earthObservation": "Satellite per l'osservazione della Terra attivo",
+          "astronomy": "Telescopio spaziale attivo",
+          "science": "Satellite scientifico attivo",
+          "technology": "Satellite per dimostrazioni tecnologiche attivo",
+          "other": "Satellite attivo"
+        },
+        "inactive": {
+          "military": "Satellite militare inattivo",
+          "communications": "Satellite per comunicazioni inattivo",
+          "navigation": "Satellite di navigazione inattivo",
+          "weather": "Satellite meteorologico inattivo",
+          "earthObservation": "Satellite per l'osservazione della Terra inattivo",
+          "astronomy": "Telescopio spaziale inattivo",
+          "science": "Satellite scientifico inattivo",
+          "technology": "Satellite per dimostrazioni tecnologiche inattivo",
+          "other": "Satellite inattivo"
+        },
+        "plain": {
+          "military": "Satellite militare",
+          "communications": "Satellite per comunicazioni",
+          "navigation": "Satellite di navigazione",
+          "weather": "Satellite meteorologico",
+          "earthObservation": "Satellite per l'osservazione della Terra",
+          "astronomy": "Telescopio spaziale",
+          "science": "Satellite scientifico",
+          "technology": "Satellite per dimostrazioni tecnologiche",
+          "other": "Satellite"
+        }
+      },
+      "rocketBody": "Stadio di razzo lasciato in orbita",
+      "debris": "Detriti lasciati in orbita",
+      "special": "Oggetto speciale tracciato",
+      "missile": "Missile balistico in volo"
+    }
   }
 }

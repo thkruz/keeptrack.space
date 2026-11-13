@@ -81,6 +81,47 @@
     },
     "noData": "データなし",
     "notSunlit": "日照なし",
-    "assumedSuffix": "(仮定)"
+    "assumedSuffix": "(仮定)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "稼働中の軍事衛星",
+          "communications": "稼働中の通信衛星",
+          "navigation": "稼働中の航法衛星",
+          "weather": "稼働中の気象衛星",
+          "earthObservation": "稼働中の地球観測衛星",
+          "astronomy": "稼働中の宇宙望遠鏡",
+          "science": "稼働中の科学衛星",
+          "technology": "稼働中の技術実証衛星",
+          "other": "稼働中の衛星"
+        },
+        "inactive": {
+          "military": "運用停止中の軍事衛星",
+          "communications": "運用停止中の通信衛星",
+          "navigation": "運用停止中の航法衛星",
+          "weather": "運用停止中の気象衛星",
+          "earthObservation": "運用停止中の地球観測衛星",
+          "astronomy": "運用停止中の宇宙望遠鏡",
+          "science": "運用停止中の科学衛星",
+          "technology": "運用停止中の技術実証衛星",
+          "other": "運用停止中の衛星"
+        },
+        "plain": {
+          "military": "軍事衛星",
+          "communications": "通信衛星",
+          "navigation": "航法衛星",
+          "weather": "気象衛星",
+          "earthObservation": "地球観測衛星",
+          "astronomy": "宇宙望遠鏡",
+          "science": "科学衛星",
+          "technology": "技術実証衛星",
+          "other": "衛星"
+        }
+      },
+      "rocketBody": "軌道上に残されたロケット本体",
+      "debris": "軌道上に残された破片",
+      "special": "特別な追跡対象",
+      "missile": "飛行中の弾道ミサイル"
+    }
   }
 }

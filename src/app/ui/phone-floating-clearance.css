@@ -160,13 +160,21 @@
     min-width: 44px;
     height: 44px;
     margin: 0;
-    padding: 0 2px;
+    /* 10 px left clears the 5 px outline inset plus breathing room; the right side leaves the picker arrow room. */
+    padding: 0 4px 0 10px;
     border: 0;
     /* The outline is inset equally on all sides, so it must leave room for the whole select: a 52x44 box with a 5 px
        inset draws a 42x34 chip that encloses the zone text and the picker arrow instead of cutting through them (#157). */
     outline: 1px solid currentcolor;
     outline-offset: -5px;
     border-radius: 8px;
+  }
+
+  /* Keyboard/switch focus must differ from the resting 1 px chip: thicker accent ring plus a tint (#157). */
+  body #datetime #datetime-zone:focus-visible {
+    outline: 3px solid var(--kt-accent-light, #e01a0e);
+    outline-offset: -4px;
+    background-color: rgba(255, 255, 255, 0.12);
   }
 
   /* Utility pill: collapsed square and expanded icons are 44 px; padding trimmed so it still fits the 68 px band. */

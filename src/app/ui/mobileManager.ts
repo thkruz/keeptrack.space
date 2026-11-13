@@ -65,6 +65,11 @@ export class MobileManager {
     'TooltipsPlugin',
     // Added 2026-11-13 (Z21, #206): Settings menu reachable from the phone drawer.
     'SettingsMenuPlugin',
+    // Added 2026-11-14 (#303): curated Pro set. In: ObservabilityPlanner (single-column form plus a results table that
+    // scrolls inside its own box) and SatInfoBoxDoppler (an info-box section, no side menu of its own). Out: the wide
+    // multi-pane analysis menus (Coverage, Link Budget, Multi-view, Polar/Flat map), which need a desktop pointer or width.
+    'ObservabilityPlanner',
+    'SatInfoBoxDoppler',
   ];
 
   static checkMobileMode() {

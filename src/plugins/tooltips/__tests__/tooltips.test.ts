@@ -233,4 +233,29 @@ describe('TooltipsPlugin behavior', () => {
     document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
     expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
   });
+  it('keeps a hovered tooltip past the watchdog interval and refreshes its text in place (#277, #274)', () => {
+    // Watchdog intervals leaked from earlier tests would hide the shared popup div
+    vi.clearAllTimers();
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="Geostationary" id="tt-stale"></div>');
+    const el = document.getElementById('tt-stale') as HTMLElement;
+
+    plugin.createTooltip(el);
+    vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ width: 10, height: 10, top: 0, left: 0, right: 10, bottom: 10, x: 0, y: 0, toJSON: () => '' });
+    vi.spyOn(el, 'matches').mockImplementation((sel: string) => sel === ':hover');
+
+    el.dispatchEvent(new Event('mouseenter'));
+    vi.advanceTimersByTime(200);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    vi.advanceTimersByTime(1200);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+
+    el.setAttribute('kt-tooltip', 'Medium Earth orbit');
+    plugin.refreshTooltip(el);
+    expect(div.innerHTML).toBe('Medium Earth orbit');
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+  });
 });

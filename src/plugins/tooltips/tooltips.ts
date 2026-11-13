@@ -394,7 +394,9 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     tooltipDiv.style.left = `${left}px`;
     tooltipDiv.style.top = `${top}px`;
     tooltipDiv.classList.add('kt-tooltip-visible');
-    this.activeTarget_ = targetEl;
+    // startWatchdog_ clears activeTarget_ (via stopWatchdog_), so assign it afterwards or the watchdog hides the
+    // bubble at its first tick (#277) and refreshTooltip never matches (#274).
     this.startWatchdog_();
+    this.activeTarget_ = targetEl;
   }
 }

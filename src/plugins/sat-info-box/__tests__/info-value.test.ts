@@ -102,4 +102,20 @@ describe('info-value helper (#191)', () => {
 
     expect(plainValueText(getEl('v'))).toBe('12.5 km');
   });
+
+  it('plainValueText reads a Materialize select whose options are empty, and keeps the Ref Frequency unit (#300)', () => {
+    // Shape seen in the real app: wrapper with its own input, empty <option> elements, unit supplied by data-copy-unit
+    document.body.innerHTML =
+      '<div class="sat-info-value" id="p"><div class="select-wrapper"><input class="select-dropdown dropdown-trigger" type="text" readonly value="Custom"><ul class="dropdown-content"><li><span>Custom</span></li></ul><select id="pre"><option value="custom" selected></option><option value="iss-voice"></option></select></div></div>' +
+      '<div class="sat-info-value" id="f"><input type="number" data-copy-unit="MHz" value="437.8"></div>';
+
+    expect(plainValueText(getEl('p'))).toBe('Custom');
+    expect(plainValueText(getEl('f'))).toBe('437.8 MHz');
+  });
+
+  it('plainValueText does not double the unit when it already follows the input', () => {
+    document.body.innerHTML = '<div id="f"><input type="number" data-copy-unit="MHz" value="437.8"> MHz</div>';
+
+    expect(plainValueText(getEl('f'))).toBe('437.8 MHz');
+  });
 });

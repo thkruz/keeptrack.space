@@ -67,6 +67,22 @@ describe('EpochAge behavior', () => {
     expect(badge().dataset.level).toBeUndefined();
   });
 
+  it('mounts the badge inside #ui-wrapper so side menus (same stacking context) cover it', () => {
+    document.getElementById(EpochAge.BADGE_ID)?.remove();
+    let wrapper = document.getElementById('ui-wrapper');
+
+    if (!wrapper) {
+      wrapper = document.createElement('div');
+      wrapper.id = 'ui-wrapper';
+      document.body.appendChild(wrapper);
+    }
+    // Recreate the badge: createBadge_ ran at beforeEach with no #ui-wrapper in the document
+    (plugin as unknown as { badge_: HTMLElement | null }).badge_ = null;
+    (plugin as unknown as { createBadge_: () => void }).createBadge_();
+
+    expect(badge().parentElement).toBe(wrapper);
+  });
+
   it('toasts once per satellite when the age crosses 14 days', () => {
     EventBus.getInstance().emit(EventBusEvent.selectSatData, selected as Satellite, 0);
     setSimTime(EPOCH_MS + 10 * DAY);

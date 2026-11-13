@@ -141,7 +141,12 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
     badge.setAttribute('role', 'status');
     badge.setAttribute('kt-tooltip', t7e('plugins.EpochAge.tooltip'));
     badge.style.display = 'none';
-    KeepTrack.getInstance().containerRoot.appendChild(badge);
+    /*
+     * Mount inside #ui-wrapper (under #canvas-holder, z-index -2) next to #left-menus. A child of the
+     * root sits in a higher stacking context than every side menu, so z-index could never put the
+     * menus above it (#204).
+     */
+    (document.getElementById('ui-wrapper') ?? KeepTrack.getInstance().containerRoot).appendChild(badge);
     this.badge_ = badge;
     this.refresh();
   }

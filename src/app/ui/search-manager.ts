@@ -886,6 +886,12 @@ export class SearchManager {
       }
     }
 
+    // On phones the expanded drawer sits over the results list and swallows taps (#216); the search box is
+    // outside the drawer, so folding it away keeps the typed query and exposes the rows.
+    if (settingsManager.isMobileModeEnabled) {
+      ServiceLocator.getUiManager()?.pluginDrawer?.close();
+    }
+
     colorSchemeManagerInstance.isUseGroupColorScheme = true;
     colorSchemeManagerInstance.calculateColorBuffers(true);
   }

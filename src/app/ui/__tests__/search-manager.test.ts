@@ -780,6 +780,27 @@ describe('SearchManager interactions', () => {
     expect(document.querySelectorAll('.search-result').length).toBe(3);
   });
 
+  it('fillResultBox closes the plugin drawer on phones only (#216)', () => {
+    const sat = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
+
+    ServiceLocator.getCatalogManager().objectCache = [sat] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    const close = vi.fn();
+
+    vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ pluginDrawer: { close }, hideSideMenus: vi.fn() } as never);
+    const row = { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 };
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = false;
+    mgr.fillResultBox([row], ServiceLocator.getCatalogManager(), 1);
+    expect(close).not.toHaveBeenCalled();
+
+    settingsManager.isMobileModeEnabled = true;
+    mgr.fillResultBox([row], ServiceLocator.getCatalogManager(), 1);
+    expect(close).toHaveBeenCalledTimes(1);
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
   it('addListeners_ routes the input event to doSearch and the icon click to toggleSearch', () => {
     p().addListeners_();
     const searchSpy = vi.spyOn(mgr, 'doSearch').mockImplementation(() => undefined);

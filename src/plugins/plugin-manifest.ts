@@ -754,6 +754,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'TrajectoryComparePlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/trajectory-compare/trajectory-compare') : undefined,
+    proClassName: 'TrajectoryComparePlugin',
+    defaultConfig: { enabled: true, order: 421.5 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'BestPassPlugin',
     ossImport: () => import('./best-pass/best-pass'),
     ossClassName: 'BestPassPlugin',
@@ -1009,6 +1016,12 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/launchpad/launchpad') : undefined,
     proClassName: 'LaunchpadPlugin',
     defaultConfig: { enabled: true },
+  },
+  {
+    configKey: 'ObjectComparisonPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/object-comparison/object-comparison') : undefined,
+    proClassName: 'ObjectComparisonPlugin',
+    defaultConfig: { enabled: true, order: 96 },
   },
   {
     configKey: 'FavoritesMenuPlugin',

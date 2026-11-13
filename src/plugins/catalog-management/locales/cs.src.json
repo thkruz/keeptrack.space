@@ -20,7 +20,12 @@
         "tleSource": "Zdroj",
         "tleFormat": "Formát",
         "timeSpanHrs": "Časové rozpětí (hod)",
-        "stepSizeSec": "Velikost kroku (s)"
+        "stepSizeSec": "Velikost kroku (s)",
+        "keepSatInfoHint": "Obnoví dráhy satelitů, které už jsou v katalogu; názvy, země a data mise zůstanou.",
+        "importNewOnlyHint": "Přidá jen satelity, které v katalogu ještě nejsou; stávající zůstanou beze změny.",
+        "importHint": "Přijímá .tce, .tle nebo .txt. Se dvěma vypnutými přepínači soubor nahradí celý katalog; zapnutím přepínače se data sloučí.",
+        "sourceHint": "Official: pouze skutečné katalogizované objekty. KeepTrack: i analytické satelity, které jste vytvořili.",
+        "selectedSatReason": "Pro aktivaci těchto exportů vyberte satelit."
       },
       "options": {
         "sourceOfficial": "Oficiální",

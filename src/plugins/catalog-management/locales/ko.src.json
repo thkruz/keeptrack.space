@@ -20,7 +20,12 @@
         "tleSource": "소스",
         "tleFormat": "형식",
         "timeSpanHrs": "기간 (시간)",
-        "stepSizeSec": "스텝 크기 (초)"
+        "stepSizeSec": "스텝 크기 (초)",
+        "keepSatInfoHint": "카탈로그에 이미 있는 위성의 궤도를 갱신합니다. 이름, 국가, 임무 데이터는 유지됩니다.",
+        "importNewOnlyHint": "카탈로그에 없는 위성만 추가합니다. 기존 위성은 변경되지 않습니다.",
+        "importHint": "지원 형식: .tce, .tle, .txt. 두 스위치가 모두 꺼져 있으면 파일이 전체 카탈로그를 대체하며, 스위치를 켜면 병합합니다.",
+        "sourceHint": "Official: 실제 등록된 객체만. KeepTrack: 직접 만든 분석가 위성도 포함합니다.",
+        "selectedSatReason": "이 내보내기를 사용하려면 위성을 선택하세요."
       },
       "options": {
         "sourceOfficial": "공식",

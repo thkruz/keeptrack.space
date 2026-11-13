@@ -20,7 +20,12 @@
         "tleSource": "Source",
         "tleFormat": "Format",
         "timeSpanHrs": "Durée (h)",
-        "stepSizeSec": "Pas de temps (s)"
+        "stepSizeSec": "Pas de temps (s)",
+        "keepSatInfoHint": "Met à jour les orbites des satellites déjà au catalogue ; noms, pays et données de mission sont conservés.",
+        "importNewOnlyHint": "Ajoute uniquement les satellites absents du catalogue ; les existants restent inchangés.",
+        "importHint": "Accepte .tce, .tle ou .txt. Avec les deux commutateurs désactivés, le fichier remplace tout le catalogue ; activez-en un pour fusionner.",
+        "sourceHint": "Official : objets catalogués réels uniquement. KeepTrack : inclut aussi les satellites d'analyste que vous avez créés.",
+        "selectedSatReason": "Sélectionnez un satellite pour activer ces exports."
       },
       "options": {
         "sourceOfficial": "Officiel",

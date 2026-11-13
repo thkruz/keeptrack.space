@@ -20,7 +20,12 @@
         "tleSource": "Quelle",
         "tleFormat": "Format",
         "timeSpanHrs": "Zeitspanne (Std.)",
-        "stepSizeSec": "Schrittweite (Sek.)"
+        "stepSizeSec": "Schrittweite (Sek.)",
+        "keepSatInfoHint": "Aktualisiert die Bahnen von Satelliten, die schon im Katalog sind; Namen, Länder und Missionsdaten bleiben erhalten.",
+        "importNewOnlyHint": "Fügt nur Satelliten hinzu, die noch nicht im Katalog sind; vorhandene bleiben unverändert.",
+        "importHint": "Akzeptiert .tce, .tle oder .txt. Sind beide Schalter aus, ersetzt die Datei den ganzen Katalog; mit einem Schalter wird zusammengeführt.",
+        "sourceHint": "Official: nur echte katalogisierte Objekte. KeepTrack: auch von Ihnen erstellte Analysten-Satelliten.",
+        "selectedSatReason": "Wählen Sie einen Satelliten, um diese Exporte zu aktivieren."
       },
       "options": {
         "sourceOfficial": "Offiziell",

@@ -46,6 +46,31 @@ describe('CatalogManagementPlugin behavior', () => {
     expect((getEl('de-export-ephem') as HTMLButtonElement).disabled).toBe(true);
   });
 
+  it('keeps real export names while disabled and shows the reason separately', () => {
+    document.body.insertAdjacentHTML('beforeend', plugin.getSideMenuConfig().html);
+    const ephemLabel = () => getEl('de-export-ephem')!.querySelector('.kt-action-label')!.textContent;
+    const before = ephemLabel();
+
+    expect(before).toBe(t7e('plugins.CatalogManagementPlugin.buttons.exportEphemeris'));
+    expect(getEl('de-selected-sat-reason')!.hidden).toBe(false);
+
+    p().updateEphemerisButton_({ isSatellite: () => false });
+    expect(ephemLabel()).toBe(before);
+    expect(getEl('de-selected-sat-reason')!.hidden).toBe(false);
+
+    p().updateEphemerisButton_({ isSatellite: () => true });
+    expect(ephemLabel()).toBe(before);
+    expect(getEl('de-selected-sat-reason')!.hidden).toBe(true);
+  });
+
+  it('renders a hint under each import toggle, the import button and the source dropdown', () => {
+    document.body.insertAdjacentHTML('beforeend', plugin.getSideMenuConfig().html);
+
+    expect(document.querySelectorAll('.cm-toggle-row .cm-hint').length).toBeGreaterThanOrEqual(2);
+    expect(document.querySelectorAll('.cm-import-hint').length).toBeGreaterThanOrEqual(1);
+    expect(document.querySelectorAll('.cm-hint').length).toBeGreaterThanOrEqual(5);
+  });
+
   it('handleImportFile_ rejects unsupported file extensions', () => {
     const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 

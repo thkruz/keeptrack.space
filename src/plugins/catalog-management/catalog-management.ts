@@ -164,6 +164,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
           <span class="lever"></span>
           ${l('labels.keepSatInfo')}
         </label>
+        <div class="cm-hint">${l('labels.keepSatInfoHint')}</div>
       </div>
       <div class="switch row cm-toggle-row">
         <label for="cm-import-new-only" kt-tooltip="${l('labels.importNewOnlyTooltip')}">
@@ -171,6 +172,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
           <span class="lever"></span>
           ${l('labels.importNewOnly')}
         </label>
+        <div class="cm-hint">${l('labels.importNewOnlyHint')}</div>
       </div>
       <div class="row">
         <center>
@@ -179,6 +181,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
             ${l('buttons.importCatalog')} &#9658;
           </button>
         </center>
+        <div class="cm-hint cm-import-hint">${l('labels.importHint')}</div>
       </div>
     `;
   }
@@ -242,6 +245,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
           <label for="de-tle-format">${l('labels.tleFormat')}</label>
         </div>
       </div>
+      <div class="cm-hint">${l('labels.sourceHint')}</div>
       ${CatalogManagementPlugin.actionButton_('de-export-tle', l('buttons.downloadTle'))}
     `;
   }
@@ -262,6 +266,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
    */
   protected buildSelectedSatBody_(): string {
     return html`
+      <div id="de-selected-sat-reason" class="cm-hint cm-reason" role="status">${l('labels.selectedSatReason')}</div>
       <form id="de-ephemeris-form">
         <div class="kt-field-row">
           <div class="input-field col s6">
@@ -273,7 +278,7 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
             <label for="de-ephem-step" class="active">${l('labels.stepSizeSec')}</label>
           </div>
         </div>
-        ${CatalogManagementPlugin.actionButton_('de-export-ephem', l('buttons.selectSatelliteFirst'), { submit: true, disabled: true })}
+        ${CatalogManagementPlugin.actionButton_('de-export-ephem', l('buttons.exportEphemeris'), { submit: true, disabled: true })}
       </form>
     `;
   }
@@ -658,8 +663,13 @@ export class CatalogManagementPlugin extends KeepTrackPlugin {
 
     const isSat = obj?.isSatellite() ?? false;
 
+    // The button keeps its real name; the reason it is disabled is shown in a separate line.
     btn.disabled = !isSat;
-    CatalogManagementPlugin.setActionLabel_('de-export-ephem', isSat ? l('buttons.exportEphemeris') : l('buttons.selectSatelliteFirst'));
+    const reasonEl = getEl('de-selected-sat-reason', true);
+
+    if (reasonEl) {
+      reasonEl.hidden = isSat;
+    }
   }
 
   /**

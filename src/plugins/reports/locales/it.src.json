@@ -113,7 +113,8 @@
           "windowLine": "Periodo del report: da {start} a {end} UTC, passo: {step} s",
           "generatedWallClock": "Generato (ora reale)",
           "appVersion": "Versione di KeepTrack",
-          "ricConvention": "Convenzione RIC"
+          "ricConvention": "Convenzione RIC",
+          "passCaveat": "Gli orari locali del sito usano il fuso {zone}. Le finestre mostrano solo l'accesso geometrico, non la prova che un segnale possa essere ricevuto. L'elevazione massima è il valore migliore al passo di campionamento e può essere inferiore al massimo reale."
         },
         "titles": {
           "aer": "Report azimut, elevazione, distanza",
@@ -158,7 +159,11 @@
           "radialKm": "Radiale (km)",
           "intrackKm": "Lungo traccia (km)",
           "crosstrackKm": "Fuori traccia (km)",
-          "relSpeed": "Vel. rel. (km/s)"
+          "relSpeed": "Vel. rel. (km/s)",
+          "timeLocal": "Ora locale",
+          "riseLocal": "Ora di sorgere (locale)",
+          "setLocal": "Ora di tramonto (locale)",
+          "maxElTimeLocal": "Ora di elevazione max. (locale)"
         },
         "empty": {
           "noPasses": "Nessun passaggio trovato!",

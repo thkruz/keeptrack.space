@@ -113,7 +113,8 @@
           "windowLine": "报告时段：{start} 至 {end} UTC，步长：{step} 秒",
           "generatedWallClock": "生成时间（实际时间）",
           "appVersion": "KeepTrack 版本",
-          "ricConvention": "RIC 约定"
+          "ricConvention": "RIC 约定",
+          "passCaveat": "站点本地时间使用 {zone} 时区。时间窗仅表示几何可见性，不证明可以接收到信号。最大仰角是采样步长内的最佳值，可能低于真实峰值。"
         },
         "titles": {
           "aer": "方位角、仰角、距离报告",
@@ -158,7 +159,11 @@
           "radialKm": "径向 (km)",
           "intrackKm": "沿迹 (km)",
           "crosstrackKm": "横迹 (km)",
-          "relSpeed": "相对速度 (km/s)"
+          "relSpeed": "相对速度 (km/s)",
+          "timeLocal": "本地时间",
+          "riseLocal": "升起时间（本地）",
+          "setLocal": "落下时间（本地）",
+          "maxElTimeLocal": "最大仰角时间（本地）"
         },
         "empty": {
           "noPasses": "未找到过境！",

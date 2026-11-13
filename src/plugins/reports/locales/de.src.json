@@ -113,7 +113,8 @@
           "windowLine": "Berichtszeitraum: {start} bis {end} UTC, Schritt: {step} s",
           "generatedWallClock": "Erstellt (Echtzeit)",
           "appVersion": "KeepTrack-Version",
-          "ricConvention": "RIC-Konvention"
+          "ricConvention": "RIC-Konvention",
+          "passCaveat": "Ortszeiten der Station verwenden die Zone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist der beste Wert im Abtastschritt und kann unter dem wahren Maximum liegen."
         },
         "titles": {
           "aer": "Bericht Azimut, Elevation, Entfernung",
@@ -158,7 +159,11 @@
           "radialKm": "Radial (km)",
           "intrackKm": "Entlang der Bahn (km)",
           "crosstrackKm": "Quer zur Bahn (km)",
-          "relSpeed": "Rel. Geschw. (km/s)"
+          "relSpeed": "Rel. Geschw. (km/s)",
+          "timeLocal": "Ortszeit",
+          "riseLocal": "Aufgangszeit (Ortszeit)",
+          "setLocal": "Untergangszeit (Ortszeit)",
+          "maxElTimeLocal": "Zeit max. Elevation (Ortszeit)"
         },
         "empty": {
           "noPasses": "Keine Überflüge gefunden!",

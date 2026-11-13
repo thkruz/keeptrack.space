@@ -113,7 +113,8 @@
           "windowLine": "Report Window: {start} to {end} UTC, Step: {step} s",
           "generatedWallClock": "Generated (wall clock)",
           "appVersion": "KeepTrack version",
-          "ricConvention": "RIC convention"
+          "ricConvention": "RIC convention",
+          "passCaveat": "Site-local times use the {zone} zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is the best value at the sampling step and can be lower than the true peak."
         },
         "titles": {
           "aer": "Azimuth Elevation Range Report",
@@ -158,7 +159,11 @@
           "radialKm": "Radial (km)",
           "intrackKm": "In-Track (km)",
           "crosstrackKm": "Cross-Track (km)",
-          "relSpeed": "Rel Speed (km/s)"
+          "relSpeed": "Rel Speed (km/s)",
+          "timeLocal": "Local Time",
+          "riseLocal": "Rise Time (Local)",
+          "setLocal": "Set Time (Local)",
+          "maxElTimeLocal": "Max Elevation Time (Local)"
         },
         "empty": {
           "noPasses": "No passes found!",

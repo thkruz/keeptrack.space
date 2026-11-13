@@ -113,7 +113,8 @@
           "windowLine": "Období zprávy: {start} až {end} UTC, krok: {step} s",
           "generatedWallClock": "Vytvořeno (skutečný čas)",
           "appVersion": "Verze KeepTrack",
-          "ricConvention": "Konvence RIC"
+          "ricConvention": "Konvence RIC",
+          "passCaveat": "Místní časy stanoviště používají pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je nejlepší hodnota při daném kroku vzorkování a může být nižší než skutečné maximum."
         },
         "titles": {
           "aer": "Zpráva azimut, elevace, vzdálenost",
@@ -158,7 +159,11 @@
           "radialKm": "Radiální (km)",
           "intrackKm": "Podél dráhy (km)",
           "crosstrackKm": "Napříč dráhou (km)",
-          "relSpeed": "Rel. rychlost (km/s)"
+          "relSpeed": "Rel. rychlost (km/s)",
+          "timeLocal": "Místní čas",
+          "riseLocal": "Čas východu (místní)",
+          "setLocal": "Čas západu (místní)",
+          "maxElTimeLocal": "Čas max. elevace (místní)"
         },
         "empty": {
           "noPasses": "Nenalezeny žádné přelety!",

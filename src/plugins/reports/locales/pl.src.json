@@ -113,7 +113,8 @@
           "windowLine": "Okres raportu: od {start} do {end} UTC, krok: {step} s",
           "generatedWallClock": "Wygenerowano (czas rzeczywisty)",
           "appVersion": "Wersja KeepTrack",
-          "ricConvention": "Konwencja RIC"
+          "ricConvention": "Konwencja RIC",
+          "passCaveat": "Czasy lokalne stanowiska używają strefy {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja to najlepsza wartość w kroku próbkowania i może być niższa od rzeczywistego maksimum."
         },
         "titles": {
           "aer": "Raport azymut, elewacja, odległość",
@@ -158,7 +159,11 @@
           "radialKm": "Radialna (km)",
           "intrackKm": "Wzdłuż toru (km)",
           "crosstrackKm": "W poprzek toru (km)",
-          "relSpeed": "Prędk. wzgl. (km/s)"
+          "relSpeed": "Prędk. wzgl. (km/s)",
+          "timeLocal": "Czas lokalny",
+          "riseLocal": "Czas wschodu (lokalny)",
+          "setLocal": "Czas zachodu (lokalny)",
+          "maxElTimeLocal": "Czas maks. elewacji (lokalny)"
         },
         "empty": {
           "noPasses": "Nie znaleziono przelotów!",

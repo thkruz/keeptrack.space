@@ -157,11 +157,25 @@ describe('reports-core', () => {
     it('AER samples the look angle inside each injected pass window', () => {
       const data = generateAerReport(defaultSat, fakeSensor, opts, deps, generatedAt);
 
-      expect(data.table!.headers).toEqual(['Time (UTC)', 'Pass', 'Azimuth(°)', 'Elevation(°)', 'Range(km)']);
+      expect(data.table!.headers).toEqual(['Time (UTC)', 'Pass', 'Azimuth(°)', 'Elevation(°)', 'Range(km)', 'Local Time']);
       // 180s window at 60s step inclusive -> 4 samples, all pass index 1.
       expect(data.table!.rows.length).toBe(4);
       expect(data.table!.rows.every((r) => r[1] === '1')).toBe(true);
       expect(data.table!.rows[0][2]).toBe('123.456');
+    });
+
+    it('#117 AER and Visibility Windows add site-local time columns and the reception caveat', () => {
+      const tokyo = { ...fakeSensor, timeZone: 'Asia/Tokyo' } as unknown as DetailedSensor;
+      const aer = generateAerReport(defaultSat, tokyo, opts, deps, generatedAt);
+      const vis = generateVisibilityWindowsReport(defaultSat, tokyo, opts, deps, generatedAt);
+
+      // 00:01:00Z is 09:01:00 in Tokyo (UTC+9)
+      expect(aer.table!.rows[0].at(-1)).toBe('2022-01-01 09:01:00');
+      expect(aer.header).toContain('Asia/Tokyo');
+      expect(aer.header).toContain('not proof that a signal can be received');
+      expect(vis.table!.headers).toEqual(expect.arrayContaining(['Rise Time (Local)', 'Set Time (Local)', 'Max Elevation Time (Local)']));
+      expect(vis.table!.rows[0].slice(6, 9)).toEqual(['2022-01-01 09:01:00', '2022-01-01 09:04:00', '2022-01-01 09:02:30']);
+      expect(vis.csvHeader).toContain('Asia/Tokyo');
     });
 
     it('AER reports an empty message when there are no passes', () => {
@@ -314,7 +328,9 @@ describe('reports-core', () => {
       expect(csv).toContain('# Report Window: 2022-01-01 00:00:00 to 2022-01-01 06:00:00 UTC, Step: 60 s');
       const tableStart = lines.findIndex((line) => !line.startsWith('#'));
 
-      expect(lines[tableStart]).toBe('Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)');
+      expect(lines[tableStart]).toBe(
+        'Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC),Rise Time (Local),Set Time (Local),Max Elevation Time (Local)'
+      );
     });
 
     it('pure time-series CSVs (LLA) stay data-only', () => {

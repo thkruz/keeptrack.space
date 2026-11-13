@@ -113,7 +113,8 @@
           "windowLine": "レポート期間: {start} から {end} UTC、ステップ: {step} 秒",
           "generatedWallClock": "生成日時 (実時間)",
           "appVersion": "KeepTrack バージョン",
-          "ricConvention": "RIC 規約"
+          "ricConvention": "RIC 規約",
+          "passCaveat": "サイトのローカル時刻はタイムゾーン {zone} を使用します。ウィンドウは幾何学的な可視性のみを示し、信号を受信できる証拠ではありません。最大仰角はサンプリング間隔での最良値であり、実際の最大値より低い場合があります。"
         },
         "titles": {
           "aer": "方位角・仰角・距離レポート",
@@ -158,7 +159,11 @@
           "radialKm": "径方向 (km)",
           "intrackKm": "軌道方向 (km)",
           "crosstrackKm": "軌道直交方向 (km)",
-          "relSpeed": "相対速度 (km/s)"
+          "relSpeed": "相対速度 (km/s)",
+          "timeLocal": "ローカル時刻",
+          "riseLocal": "出現時刻（ローカル）",
+          "setLocal": "消失時刻（ローカル）",
+          "maxElTimeLocal": "最大仰角時刻（ローカル）"
         },
         "empty": {
           "noPasses": "パスが見つかりません!",

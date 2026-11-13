@@ -114,7 +114,8 @@
           "generatedWallClock": "Wygenerowano (czas rzeczywisty)",
           "appVersion": "Wersja KeepTrack",
           "ricConvention": "Konwencja RIC",
-          "passCaveat": "Czasy lokalne stanowiska używają strefy {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja to najlepsza wartość w kroku próbkowania i może być niższa od rzeczywistego maksimum."
+          "passCaveat": "Czasy lokalne stanowiska używają strefy {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja to najlepsza wartość w kroku próbkowania i może być niższa od rzeczywistego maksimum.",
+          "passCaveatDisplay": "Czasy lokalne używają strefy wyświetlania {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja to najlepsza wartość w kroku próbkowania i może być niższa od rzeczywistego maksimum."
         },
         "titles": {
           "aer": "Raport azymut, elewacja, odległość",

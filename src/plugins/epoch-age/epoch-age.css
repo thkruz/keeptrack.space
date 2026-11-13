@@ -14,7 +14,8 @@
   top: calc(var(--top-menu-height, 50px) + 6px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 10;
+  /* Below secondary menus (4) and the side-menu parent (5) so a wide menu covers the badge instead of the badge floating over its header buttons (#204). */
+  z-index: 3;
   padding: 2px 10px;
   border-radius: 10px;
   font-size: 12px;

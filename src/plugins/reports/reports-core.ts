@@ -27,7 +27,7 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { formatInTimeZone, resolveSiteTimeZone } from '@app/app/sensors/site-time-zone';
+import { formatInTimeZone, normalizeTimeZone, resolveSiteTimeZone } from '@app/app/sensors/site-time-zone';
 import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 import { doc, docEn, fillDoc } from './report-i18n';
 
@@ -318,7 +318,7 @@ export const wrapReportText = (text: string, columns: number): string => {
  * elevation is the best sampled value, so it can sit below the true peak.
  */
 export const buildPassCaveatLine = (sensor: Pick<DetailedSensor, 'timeZone'>, tr: ReportText = doc): string =>
-  `${wrapReportText(fillDoc(tr('header.passCaveat'), { zone: resolveSiteTimeZone(sensor.timeZone) }), REPORT_HEADER_WRAP_COLUMNS)}
+  `${wrapReportText(fillDoc(tr(normalizeTimeZone(sensor.timeZone) ? 'header.passCaveat' : 'header.passCaveatDisplay'), { zone: resolveSiteTimeZone(sensor.timeZone) }), REPORT_HEADER_WRAP_COLUMNS)}
 
 `;
 

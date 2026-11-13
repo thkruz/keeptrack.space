@@ -114,7 +114,8 @@
           "generatedWallClock": "Generato (ora reale)",
           "appVersion": "Versione di KeepTrack",
           "ricConvention": "Convenzione RIC",
-          "passCaveat": "Gli orari locali del sito usano il fuso {zone}. Le finestre mostrano solo l'accesso geometrico, non la prova che un segnale possa essere ricevuto. L'elevazione massima è il valore migliore al passo di campionamento e può essere inferiore al massimo reale."
+          "passCaveat": "Gli orari locali del sito usano il fuso {zone}. Le finestre mostrano solo l'accesso geometrico, non la prova che un segnale possa essere ricevuto. L'elevazione massima è il valore migliore al passo di campionamento e può essere inferiore al massimo reale.",
+          "passCaveatDisplay": "Gli orari locali usano il fuso di visualizzazione {zone}. Le finestre mostrano solo l'accesso geometrico, non la prova che un segnale possa essere ricevuto. L'elevazione massima è il valore migliore al passo di campionamento e può essere inferiore al massimo reale."
         },
         "titles": {
           "aer": "Report azimut, elevazione, distanza",

@@ -131,6 +131,45 @@ describe('MouseInput handlers', () => {
     });
   });
 
+  describe('Escape deselects from the bare scene only', () => {
+    const press = (target: EventTarget | null = document.body) => m().deselectOnEscape_({ key: 'Escape', defaultPrevented: false, target } as never);
+
+    beforeEach(() => {
+      vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(() => ({ selectSat, setSecondarySat, selectedSat: 5 }) as never);
+      inputManager.isRmbMenuOpen = false;
+      // The standard environment replaces the global Element; the handler needs the DOM one.
+      vi.stubGlobal('Element', window.Element);
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('closes an open search first and keeps the selection', () => {
+      const closeSearch = vi.fn();
+
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: true, closeSearch } } as never);
+      press();
+      expect(closeSearch).toHaveBeenCalledWith(true);
+      expect(selectSat).not.toHaveBeenCalled();
+    });
+
+    it('deselects on the next press once search is closed', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+    });
+
+    it('leaves the selection while the right-click menu is open or a field has focus', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      inputManager.isRmbMenuOpen = true;
+      press();
+      inputManager.isRmbMenuOpen = false;
+      press(document.createElement('input'));
+      expect(selectSat).not.toHaveBeenCalled();
+    });
+  });
+
   describe('right-click menu dismissal', () => {
     it('closes the menu on Escape only while it is open', () => {
       inputManager.isRmbMenuOpen = false;

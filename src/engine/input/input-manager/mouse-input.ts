@@ -18,6 +18,7 @@ import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
+import { isNativeKeyboardTarget } from './keyboard-native-target';
 
 export class MouseInput {
   private dragHasMoved = false;
@@ -86,6 +87,11 @@ export class MouseInput {
 
       // Escape dismisses the right-click menu
       window.addEventListener('keydown', (e: KeyboardEvent) => this.dismissRmbMenuOnEscape_(e));
+
+      // One Escape rule: the first press closes whatever is open (search, right-click menu,
+      // drawer, dialog); the next press, from the bare scene, deselects the object.
+      // Capture phase so the state is read before the other Escape handlers close things.
+      window.addEventListener('keydown', (e: KeyboardEvent) => this.deselectOnEscape_(e), true);
 
       // Create Event Listeners for Right Menu Buttons.
       // Single-action items (no submenu) are clicked directly on their L1 element.
@@ -283,6 +289,44 @@ export class MouseInput {
 
     if (evt.key === 'Escape' && inputManager.isRmbMenuOpen) {
       inputManager.hidePopUps();
+    }
+  }
+
+  /**
+   * Escape on the bare scene deselects the selected object (closing the info box).
+   * Anything else that Escape closes takes the press instead, so one Escape never
+   * closes search and drops the selection in the same keystroke.
+   */
+  private deselectOnEscape_(evt: KeyboardEvent): void {
+    if (evt.key !== 'Escape' || evt.defaultPrevented) {
+      return;
+    }
+
+    const uiManager = ServiceLocator.getUiManager();
+    const searchManager = uiManager?.searchManager;
+
+    if (searchManager?.isSearchOpen) {
+      // Search owns this press even when its input is not focused.
+      searchManager.closeSearch(true);
+
+      return;
+    }
+
+    if (ServiceLocator.getInputManager().isRmbMenuOpen) {
+      return;
+    }
+
+    const target = evt.target instanceof Element ? evt.target : null;
+
+    // Typing fields, dialogs and the open drawer keep their own Escape.
+    if (isNativeKeyboardTarget(target) || document.querySelector('.plugin-drawer.open, dialog[open], [role="dialog"]:not([hidden])')) {
+      return;
+    }
+
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+    if (selectSatManager && selectSatManager.selectedSat !== -1 && userActionGate.allowSelection(-1)) {
+      selectSatManager.selectSat(-1);
     }
   }
 

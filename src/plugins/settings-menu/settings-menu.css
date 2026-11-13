@@ -80,3 +80,30 @@
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
+
+/* Reset to Defaults wipes every display option, so mark it destructive. */
+#settings-menu .kt-action--destructive {
+  border-color: rgba(229, 83, 83, 0.55);
+}
+
+#settings-menu .kt-action--destructive .kt-action-label,
+#settings-menu .kt-action--destructive::after {
+  color: #ff7a7a;
+}
+
+#settings-menu .kt-action--destructive:hover {
+  background: rgba(229, 83, 83, 0.14);
+}
+
+/* Sub-groups inside a section (General Settings is split into labelled runs). */
+#settings-menu .kt-subgroup + .kt-subgroup {
+  margin-top: 14px;
+}
+
+#settings-menu .kt-subgroup-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-dark-text-muted);
+  margin: 4px 0 2px;
+  padding-top: 2px;
+}

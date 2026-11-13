@@ -1,4 +1,4 @@
-import { fuzzyMatchIndices, fuzzyScore, fuzzySubsequenceScore } from '@app/engine/utils/fuzzy-match';
+import { dropWeakFuzzyHits, fuzzyMatchIndices, fuzzyScore, fuzzySubsequenceScore } from '@app/engine/utils/fuzzy-match';
 
 describe('fuzzySubsequenceScore', () => {
   it('returns 0 when the query is not a subsequence of the label', () => {
@@ -68,5 +68,26 @@ describe('fuzzyMatchIndices', () => {
 
   it('returns an empty array when the query is not a subsequence', () => {
     expect(fuzzyMatchIndices('Calculator', 'xyz')).toEqual([]);
+  });
+});
+
+describe('dropWeakFuzzyHits', () => {
+  const rows = ['Cape Cod', 'Colorado Peaks', 'Medicina', 'Colorado'];
+  const score = (name: string): number => fuzzyScore(name, 'cape');
+
+  it('hides subsequence-only hits once a prefix or substring hit exists', () => {
+    expect(fuzzyScore('Colorado Peaks', 'cape')).toBeGreaterThan(0);
+    expect(
+      dropWeakFuzzyHits(
+        rows.filter((r) => score(r) > 0),
+        score
+      )
+    ).toEqual(['Cape Cod']);
+  });
+
+  it('keeps weak hits when nothing matches strongly', () => {
+    const weak = rows.filter((r) => fuzzyScore(r, 'cnbr') > 0);
+
+    expect(dropWeakFuzzyHits(weak, (r) => fuzzyScore(r, 'cnbr'))).toEqual(weak);
   });
 });

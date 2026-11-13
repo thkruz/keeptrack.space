@@ -14,7 +14,7 @@
       },
       "sections": {
         "general": "General Settings",
-        "fastCpu": "Fast CPU Required"
+        "fastCpu": "Performance-Heavy (Needs a Fast CPU)"
       },
       "labels": {
         "showInfoOnHover": "Show Info On Hover",
@@ -52,9 +52,15 @@
         "imgAlt": "The Settings menu with its general option switches",
         "imgCaption": "Toggle any option to apply it instantly; use the filter to find settings fast.",
         "howToUse": "<ol><li>Open <strong>Settings</strong> from the drawer.</li><li>Toggle any switch to apply it instantly; hover a row for a tooltip explaining it.</li><li>Use the <strong>filter</strong> box at the top to quickly find a setting by name.</li><li><strong>Reset to Defaults</strong> restores every display option, including plugin contributed sections, to factory values.</li></ol>",
-        "tip1": "Options under Fast CPU Required, like showing the next pass on hover, run extra calculations every frame; leave them off on slower machines.",
+        "tip1": "Options under Performance-Heavy (Needs a Fast CPU), like showing the next pass on hover, run extra calculations every frame; leave them off on slower machines.",
         "tip2": "Plugin sections at the bottom come from other plugins (Watchlist, Time Machine, and more), so the menu grows as plugins are enabled."
-      }
+      },
+      "groups": {
+        "display": "Display and Hover",
+        "orbits": "Orbits and Sensor Lines",
+        "behavior": "Camera, Time and Notifications"
+      },
+      "resetConfirm": "Reset every display option in the Settings menu to its factory value? Your current choices will be lost."
     }
   }
 }

@@ -829,6 +829,13 @@ interface ISettingControlBase {
   helpText?: string;
 
   /**
+   * Optional pre-translated sub-group label. Consecutive controls sharing the
+   * same label render under one small heading inside the section; the control's
+   * DOM id is unchanged.
+   */
+  group?: string;
+
+  /**
    * Optional predicate returning false to hide this control. Defaults to
    * always visible. Emit {@link EventBusEvent.settingsMenuRefresh} if the
    * value would change after the menu has been rendered.

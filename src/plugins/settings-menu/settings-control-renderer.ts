@@ -128,7 +128,24 @@ export const renderSettingControl = (control: ISettingControl, sectionId: string
  * Returns empty string if every control is hidden by {@link ISettingControl.isAvailable}.
  */
 export const renderSettingsSection = (contribution: ISettingsContribution): string => {
-  const controlsHtml = contribution.controls.map((c) => renderSettingControl(c, contribution.sectionId)).join('');
+  let controlsHtml = '';
+  let openGroup: string | undefined;
+
+  for (const control of contribution.controls) {
+    const controlHtml = renderSettingControl(control, contribution.sectionId);
+
+    // A hidden control must not leave an empty sub-group heading behind.
+    if (controlHtml.trim().length === 0) {
+      continue;
+    }
+    if (control.group !== openGroup) {
+      controlsHtml += openGroup ? '\n        </div>' : '';
+      controlsHtml += control.group ? `\n        <div class="kt-subgroup"><div class="kt-subgroup-label">${escapeText_(control.group)}</div>` : '';
+      openGroup = control.group;
+    }
+    controlsHtml += controlHtml;
+  }
+  controlsHtml += openGroup ? '\n        </div>' : '';
 
   if (controlsHtml.trim().length === 0) {
     return '';

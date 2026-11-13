@@ -57,6 +57,14 @@ describe('CatalogBrowserPlugin_composition', () => {
     expect(commands.some((c) => c.id === 'CatalogBrowserPlugin.load.starlink')).toBe(true);
     expect(commands.some((c) => c.id === 'CatalogBrowserPlugin.load.gps-ops')).toBe(true);
   });
+
+  test('getCommandPaletteCommands never repeats a label and names the GP/SupGP source', () => {
+    const labels = new CatalogBrowserPlugin().getCommandPaletteCommands().map((c) => c.label);
+
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(labels.some((l) => l.endsWith('(SupGP)'))).toBe(true);
+    expect(labels.some((l) => l.endsWith('(GP)'))).toBe(true);
+  });
 });
 
 describe('CatalogBrowserPlugin_url', () => {

@@ -7,6 +7,7 @@ import { PersistenceManager } from '@app/engine/persistence/persistence-manager'
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISettingsContribution } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { ModalConfirm } from '@app/engine/ui/modal-confirm';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
@@ -66,7 +67,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
           <div id="settings-own-sections"></div>
           <div id="settings-plugin-sections"></div>
           <div id="settings-no-matches" class="kt-note" style="display: none;">${l('noMatches')}</div>
-          <button id="settings-reset" type="button" class="kt-action waves-effect">
+          <button id="settings-reset" type="button" class="kt-action kt-action--destructive waves-effect">
             <span class="kt-action-label">${l('buttons.resetToDefaults')}</span>
           </button>
         </form>
@@ -125,7 +126,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         id: 'SettingsMenu.reset',
         label: l('commands.reset'),
         category,
-        callback: () => SettingsMenuPlugin.resetToDefaults(),
+        callback: () => SettingsMenuPlugin.confirmReset(),
       },
     ];
   }
@@ -135,7 +136,7 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
       SettingsMenuPlugin.renderAllSections_();
 
-      getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.resetToDefaults);
+      getEl('settings-reset')?.addEventListener('click', SettingsMenuPlugin.confirmReset);
       getEl('settings-filter')?.addEventListener('input', SettingsMenuPlugin.onFilterInput_);
     });
 
@@ -275,6 +276,13 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
         }
       });
 
+      // A sub-group whose rows are all filtered out hides its heading too.
+      section.querySelectorAll<HTMLElement>('.kt-subgroup').forEach((group) => {
+        const hasVisibleRow = Array.from(group.querySelectorAll<HTMLElement>('.switch.row, .input-field')).some((row) => row.style.display !== 'none');
+
+        group.style.display = hasVisibleRow ? '' : 'none';
+      });
+
       section.style.display = anyVisible ? '' : 'none';
       if (anyVisible) {
         anySectionVisible = true;
@@ -286,6 +294,17 @@ export class SettingsMenuPlugin extends KeepTrackPlugin {
     if (noMatches) {
       noMatches.style.display = needle.length > 0 && !anySectionVisible ? '' : 'none';
     }
+  }
+
+  /** Ask before wiping every display option; the button and the palette command both come here. */
+  static confirmReset(): void {
+    ModalConfirm.getInstance().open(() => SettingsMenuPlugin.resetToDefaults(), {
+      title: l('buttons.resetToDefaults'),
+      message: l('resetConfirm'),
+      confirmText: l('buttons.resetToDefaults'),
+      cancelText: t7e('modalConfirm.cancel'),
+      isDestructive: true,
+    });
   }
 
   static resetToDefaults(): void {

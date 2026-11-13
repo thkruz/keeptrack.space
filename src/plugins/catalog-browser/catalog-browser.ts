@@ -141,9 +141,21 @@ export class CatalogBrowserPlugin extends KeepTrackPlugin implements ICommandPal
       );
     }
 
+    // A constellation offered from both CelesTrak GP and SupGP shares one display name;
+    // tag both rows with their source so the palette never shows two identical labels.
+    const nameCounts = new Map<string, number>();
+
     for (const cat of CatalogBrowserData.categories) {
       for (const entry of cat.entries) {
-        const label = t7e(`plugins.CatalogBrowserPlugin.entries.${entry.nameKey}` as T7eKey);
+        nameCounts.set(entry.nameKey, (nameCounts.get(entry.nameKey) ?? 0) + 1);
+      }
+    }
+
+    for (const cat of CatalogBrowserData.categories) {
+      for (const entry of cat.entries) {
+        const baseLabel = t7e(`plugins.CatalogBrowserPlugin.entries.${entry.nameKey}` as T7eKey);
+        const isShared = (nameCounts.get(entry.nameKey) ?? 0) > 1;
+        const label = isShared ? `${baseLabel} (${entry.queryParam.startsWith('FILE=') ? 'SupGP' : 'GP'})` : baseLabel;
 
         commands.push({
           id: `CatalogBrowserPlugin.load.${entry.id}`,

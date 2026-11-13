@@ -1,6 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { ModalConfirm } from '@app/engine/ui/modal-confirm';
 import { getEl } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { SettingsMenuPlugin } from '@app/plugins/settings-menu/settings-menu';
@@ -155,6 +156,56 @@ describe('SettingsMenuPlugin reset and filter', () => {
     expect(settingsManager.isShowNextPass).toBe(false);
     expect(settingsManager.numberOfEcfOrbitsToDraw).toBe(1);
     expect(settingsManager.satLabelMode).toBe(SatLabelMode.FOV_ONLY);
+  });
+
+  it('Reset to Defaults is styled destructive and only resets after the confirm modal is accepted', () => {
+    const open = vi.fn();
+
+    vi.spyOn(ModalConfirm, 'getInstance').mockReturnValue({ open } as unknown as ModalConfirm);
+    settingsManager.isDrawTrailingOrbits = true;
+
+    expect(getEl('settings-reset')!.classList.contains('kt-action--destructive')).toBe(true);
+    getEl('settings-reset')!.click();
+    expect(open).toHaveBeenCalledTimes(1);
+    expect(open.mock.calls[0][1]).toMatchObject({ isDestructive: true });
+    expect(settingsManager.isDrawTrailingOrbits).toBe(true);
+
+    open.mock.calls[0][0]();
+    expect(settingsManager.isDrawTrailingOrbits).toBe(false);
+  });
+
+  it('the palette reset command asks for the same confirmation', () => {
+    const open = vi.fn();
+
+    vi.spyOn(ModalConfirm, 'getInstance').mockReturnValue({ open } as unknown as ModalConfirm);
+    plugin
+      .getCommandPaletteCommands()
+      .find((c) => c.id === 'SettingsMenu.reset')!
+      .callback();
+    expect(open).toHaveBeenCalledTimes(1);
+  });
+
+  it('splits the General toggles into labelled sub-groups without changing control ids', () => {
+    const labels = Array.from(document.querySelectorAll('#settings-section-general .kt-subgroup-label')).map((el) => el.textContent);
+
+    // Labels come from the locale keys; the key itself shows until generate-t7e has run.
+    expect(labels).toHaveLength(3);
+    expect(new Set(labels).size).toBe(3);
+    expect(getEl('setting-general-drawOrbits')!.closest('.kt-subgroup')!.querySelector('.kt-subgroup-label')!.textContent).toBe(labels[1]);
+    expect(getEl('setting-general-enableDemoMode')!.closest('.kt-subgroup')!.querySelector('.kt-subgroup-label')!.textContent).toBe(labels[2]);
+  });
+
+  it('hides a sub-group heading when the filter removes all of its rows', () => {
+    const filter = getEl('settings-filter') as HTMLInputElement;
+
+    filter.value = 'demo';
+    filter.dispatchEvent(new Event('input'));
+
+    const groups = Array.from(document.querySelectorAll<HTMLElement>('#settings-section-general .kt-subgroup'));
+
+    expect(groups.map((g) => g.style.display)).toEqual(['none', 'none', '']);
+    filter.value = '';
+    filter.dispatchEvent(new Event('input'));
   });
 
   it('filtering hides rows whose label does not match and collapses empty sections', () => {

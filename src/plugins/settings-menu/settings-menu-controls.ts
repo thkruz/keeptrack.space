@@ -238,31 +238,49 @@ const demoModeToggle_ = (): OwnSettingDescriptor => {
   };
 };
 
+/** Tag every descriptor's control with a sub-group label (rendered inside the same section). */
+const inGroup_ = (group: string, descriptors: OwnSettingDescriptor[]): OwnSettingDescriptor[] => {
+  descriptors.forEach((d) => {
+    d.control.group = group;
+  });
+
+  return descriptors;
+};
+
 /**
  * All own controls, grouped by section. Declaration order is render order.
  * Reset values come from {@link OWN_SETTING_DEFAULTS} (the settings classes' own defaults).
  */
 const ownDescriptors_ = (): { general: OwnSettingDescriptor[]; fastCpu: OwnSettingDescriptor[] } => ({
   general: [
-    boolToggle_('showInfoOnHover', 'enableHoverOverlay', OWN_SETTING_DEFAULTS.enableHoverOverlay),
-    // The master flag always flipped here (the user clicked it), so the heavier
-    // drawOrbitsSettingChanged path runs unconditionally.
-    boolToggle_('drawOrbits', 'isDrawOrbits', OWN_SETTING_DEFAULTS.isDrawOrbits, { apply: () => applyOrbitChange_(true) }),
-    boolToggle_('drawTrailingOrbits', 'isDrawTrailingOrbits', OWN_SETTING_DEFAULTS.isDrawTrailingOrbits, { apply: () => applyOrbitChange_() }),
-    boolToggle_('drawOrbitsInEcf', 'isOrbitCruncherInEcf', OWN_SETTING_DEFAULTS.isOrbitCruncherInEcf, { apply: () => applyOrbitChange_() }),
-    ecfOrbitsSelect_(),
-    boolToggle_('drawFovLines', 'isDrawInCoverageLines', OWN_SETTING_DEFAULTS.isDrawInCoverageLines),
-    boolToggle_('displayEciOnHover', 'isEciOnHover', OWN_SETTING_DEFAULTS.isEciOnHover),
-    boolToggle_('showCameraWidget', 'drawCameraWidget', OWN_SETTING_DEFAULTS.drawCameraWidget),
-    // Only surfaced when the catalog actually carries confidence data.
-    boolToggle_('showConfidenceLevels', 'isShowConfidenceLevels', OWN_SETTING_DEFAULTS.isShowConfidenceLevels, {
-      apply: applyColorRecalc_,
-      isAvailable: () => settingsManager.isShowConfidenceLevels,
-    }),
-    demoModeToggle_(),
-    boolToggle_('enableFreezeTime', 'isFreezePropRateOnDrag', OWN_SETTING_DEFAULTS.isFreezePropRateOnDrag),
-    boolToggle_('compensateEarthRotation', 'isCompensateForEarthRotation', OWN_SETTING_DEFAULTS.isCompensateForEarthRotation),
-    boolToggle_('disableToasts', 'isDisableToasts', OWN_SETTING_DEFAULTS.isDisableToasts),
+    // Display and hover
+    ...inGroup_(l('groups.display'), [
+      boolToggle_('showInfoOnHover', 'enableHoverOverlay', OWN_SETTING_DEFAULTS.enableHoverOverlay),
+      boolToggle_('displayEciOnHover', 'isEciOnHover', OWN_SETTING_DEFAULTS.isEciOnHover),
+      boolToggle_('showCameraWidget', 'drawCameraWidget', OWN_SETTING_DEFAULTS.drawCameraWidget),
+      // Only surfaced when the catalog actually carries confidence data.
+      boolToggle_('showConfidenceLevels', 'isShowConfidenceLevels', OWN_SETTING_DEFAULTS.isShowConfidenceLevels, {
+        apply: applyColorRecalc_,
+        isAvailable: () => settingsManager.isShowConfidenceLevels,
+      }),
+    ]),
+    // Orbits and sensor lines
+    ...inGroup_(l('groups.orbits'), [
+      // The master flag always flipped here (the user clicked it), so the heavier
+      // drawOrbitsSettingChanged path runs unconditionally.
+      boolToggle_('drawOrbits', 'isDrawOrbits', OWN_SETTING_DEFAULTS.isDrawOrbits, { apply: () => applyOrbitChange_(true) }),
+      boolToggle_('drawTrailingOrbits', 'isDrawTrailingOrbits', OWN_SETTING_DEFAULTS.isDrawTrailingOrbits, { apply: () => applyOrbitChange_() }),
+      boolToggle_('drawOrbitsInEcf', 'isOrbitCruncherInEcf', OWN_SETTING_DEFAULTS.isOrbitCruncherInEcf, { apply: () => applyOrbitChange_() }),
+      ecfOrbitsSelect_(),
+      boolToggle_('drawFovLines', 'isDrawInCoverageLines', OWN_SETTING_DEFAULTS.isDrawInCoverageLines),
+    ]),
+    // Camera, time and notifications
+    ...inGroup_(l('groups.behavior'), [
+      demoModeToggle_(),
+      boolToggle_('enableFreezeTime', 'isFreezePropRateOnDrag', OWN_SETTING_DEFAULTS.isFreezePropRateOnDrag),
+      boolToggle_('compensateEarthRotation', 'isCompensateForEarthRotation', OWN_SETTING_DEFAULTS.isCompensateForEarthRotation),
+      boolToggle_('disableToasts', 'isDisableToasts', OWN_SETTING_DEFAULTS.isDisableToasts),
+    ]),
   ],
   fastCpu: [boolToggle_('showNextPassOnHover', 'isShowNextPass', OWN_SETTING_DEFAULTS.isShowNextPass)],
 });

@@ -118,3 +118,19 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/*
+ * The facility field is a flex item (.kt-field-row .input-field.col, flex: 1 1 0) whose default
+ * min-width:auto is the nowrap picker trigger's full text width, so the field and trigger ran
+ * past the card edge and the ellipsis never showed (#201). Let it shrink to the row.
+ */
+#newLaunch-menu #nl-launch-menu {
+  min-width: 0;
+}
+
+#newLaunch-menu #nl-launch-menu .kt-picker-trigger {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

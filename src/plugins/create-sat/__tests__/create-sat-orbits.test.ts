@@ -2,6 +2,8 @@ import {
   computePresetElements,
   cosparToRawIntlDes,
   dateToEpochFields,
+  epochFieldsToIso,
+  epochYearToFull,
   isoToEpochFields,
   rawIntlDesFromTle,
   sunSyncInclinationDeg,
@@ -90,5 +92,33 @@ describe('isoToEpochFields', () => {
     expect(isoToEpochFields('2026-11-04')).toBeNull();
     expect(isoToEpochFields('tomorrow')).toBeNull();
     expect(isoToEpochFields('2026-02-30T00:00:00Z')).toBeNull();
+  });
+});
+
+describe('epoch year and timestamp helpers', () => {
+  it.each([
+    ['26', 2026],
+    ['57', 1957],
+    ['56', 2056],
+    ['2026', 2026],
+    ['1957', 1957],
+    ['2056', 2056],
+  ])('reads %s as %i', (raw, full) => {
+    expect(epochYearToFull(raw)).toBe(full);
+  });
+
+  it.each(['2699', '1900', '2057', '202', 'ab', ''])('rejects %s', (raw) => {
+    expect(epochYearToFull(raw)).toBeNull();
+  });
+
+  it('builds the matching ISO timestamp and round-trips through isoToEpochFields', () => {
+    const iso = epochFieldsToIso('26', '308.00000000');
+
+    expect(iso).toBe('2026-11-04T00:00:00Z');
+    expect(isoToEpochFields(iso as string)).toEqual({ year: '26', day: '308.00000000' });
+  });
+
+  it('returns null for an invalid day', () => {
+    expect(epochFieldsToIso('26', '999.00000000')).toBeNull();
   });
 });

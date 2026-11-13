@@ -14,6 +14,7 @@
 import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import { epochYearToFull } from './create-sat-orbits';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
@@ -57,7 +58,12 @@ export function parseEccentricityField(rawValue: string): string | null {
 export function eccentricityHint(rawValue: string): string {
   const tle = parseEccentricityField(rawValue);
 
-  return tle === null ? '' : `e = 0.${tle}`;
+  if (tle !== null) {
+    return `e = 0.${tle}`;
+  }
+
+  // A non-empty value that is not a valid eccentricity states the rule right at the field.
+  return rawValue.trim() === '' ? '' : errMsg('invalidEccentricity');
 }
 
 /**
@@ -126,6 +132,7 @@ export function wireInlineValidation(prefix: string, fields: readonly string[] =
       applyFieldState(el, evaluateField(key, el.value));
       if (hint) {
         hint.textContent = eccentricityHint(el.value);
+        hint.classList.toggle('create-sat-hint-error', el.classList.contains('invalid'));
       }
     };
 
@@ -278,7 +285,7 @@ export function validateAdvancedFields(v: TleInputParams): FormFieldError[] {
   if (!v.source || v.source.trim() === '') {
     add('src', errMsg('invalidSource'));
   }
-  if (!/^\d{1,2}$/u.test(v.epochyr.trim())) {
+  if (epochYearToFull(v.epochyr) === null && !/^\d{1,2}$/u.test(v.epochyr.trim())) {
     add('year');
   }
   if (!isInRange('day', v.epochday)) {

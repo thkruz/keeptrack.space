@@ -23,7 +23,7 @@ import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, clo
 import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
-import { dateToEpochFields, isoToEpochFields, OrbitPresetId } from './create-sat-orbits';
+import { dateToEpochFields, epochFieldsToIso, epochYearToFull, isoToEpochFields, OrbitPresetId } from './create-sat-orbits';
 import {
   FormErrorReporter,
   FormFieldError,
@@ -243,8 +243,17 @@ export class CreateSat extends KeepTrackPlugin {
     // An untouched Advanced epoch follows the simulation clock, not the menu-build time.
     CreateSat.syncAutoEpoch_();
     // Defer so isMenuButtonActive has settled before drawing the preview orbit.
-    setTimeout(() => this.updatePreview_(), 0);
+    setTimeout(() => {
+      this.updatePreview_();
+      CreateSat.syncToastClearance_(this.isMenuButtonActive);
+    }, 0);
   }
+
+  /** While the menu is open the toast stack moves to the bottom so it never covers the menu title. */
+  protected static syncToastClearance_(isOpen: boolean): void {
+    document.body.classList.toggle('create-sat-menu-open', isOpen);
+  }
+
   /**
    * Add HTML and register events
    */
@@ -253,7 +262,10 @@ export class CreateSat extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
     // Drop the preview orbit whenever the side menu closes.
-    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => this.orbitPreview_.clear());
+    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => {
+      this.orbitPreview_.clear();
+      CreateSat.syncToastClearance_(false);
+    });
   }
 
   /**
@@ -383,12 +395,24 @@ export class CreateSat extends KeepTrackPlugin {
       dayEl.value = fields.day;
       onApplied();
     });
+    // Editing Epoch Year or Epoch Day rewrites the timestamp so both always name the same instant.
     for (const el of [yearEl, dayEl]) {
-      el.addEventListener('input', () => {
-        isoEl.value = '';
-        isoEl.classList.remove('invalid');
-      });
+      el.addEventListener('input', () => CreateSat.refreshEpochTimestamp(p));
     }
+    CreateSat.refreshEpochTimestamp(p);
+  }
+
+  /** Rewrite the Epoch timestamp box from Epoch Year + Epoch Day (blank when they are not a valid epoch). Call after writing those fields in code. */
+  static refreshEpochTimestamp(p: string = CreateSat.elementPrefix): void {
+    const isoEl = getEl(`${p}-epochiso`, true) as HTMLInputElement | null;
+    const yearEl = getEl(`${p}-year`, true) as HTMLInputElement | null;
+    const dayEl = getEl(`${p}-day`, true) as HTMLInputElement | null;
+
+    if (!isoEl || !yearEl || !dayEl) {
+      return;
+    }
+    isoEl.value = epochFieldsToIso(yearEl.value, dayEl.value) ?? '';
+    isoEl.classList.remove('invalid');
   }
 
   /** Redraw (or clear) the live ghost-orbit preview from the current form. */
@@ -424,16 +448,48 @@ export class CreateSat extends KeepTrackPlugin {
       const ecen = Number.parseInt(parseEccentricityField(ecenEl.value) ?? '', 10) / 1e7;
       const meana = Number.parseFloat((getEl(`${CreateSat.elementPrefix}-meana`, true) as HTMLInputElement | null)?.value ?? '');
 
-      if (Number.isNaN(meanmo) || Number.isNaN(ecen) || meanmo <= 0 || ecen < 0 || ecen >= 1) {
+      const apogeeEl = getEl(`${CreateSat.elementPrefix}-calc-apogee`) as HTMLInputElement;
+      const perigeeEl = getEl(`${CreateSat.elementPrefix}-calc-perigee`) as HTMLInputElement;
+      const smaEl = getEl(`${CreateSat.elementPrefix}-calc-sma`) as HTMLInputElement;
+      const velocityEl = getEl(`${CreateSat.elementPrefix}-calc-velocity`) as HTMLInputElement;
+      const noteEl = getEl(`${CreateSat.elementPrefix}-calc-note`, true);
+      const showNote = (key: string | null): void => {
+        if (noteEl) {
+          noteEl.textContent = key ? t7e(`plugins.CreateSat.errorMsgs.${key}` as T7eKey) : '';
+          noteEl.hidden = key === null;
+        }
+      };
+      const clearCalculated = (key: string): void => {
+        for (const el of [apogeeEl, perigeeEl, smaEl, velocityEl]) {
+          if (el) {
+            el.value = '';
+            el.placeholder = '--';
+          }
+        }
+        showNote(key);
+      };
+
+      // Invalid input blanks the readout and says why, instead of leaving the last good (or a meaningless) number.
+      if ((ecenEl.value.trim() !== '' && Number.isNaN(ecen)) || ecen < 0 || ecen >= 1) {
+        clearCalculated('calcInvalidEccentricity');
+
+        return;
+      }
+      if (Number.isNaN(meanmo) || meanmo <= 0) {
+        return;
+      }
+      if (Number.isNaN(ecen)) {
         return;
       }
 
       const derived = CreateSat.calculateDerivedParams(meanmo, ecen, Number.isNaN(meana) ? 0 : meana);
 
-      const apogeeEl = getEl(`${CreateSat.elementPrefix}-calc-apogee`) as HTMLInputElement;
-      const perigeeEl = getEl(`${CreateSat.elementPrefix}-calc-perigee`) as HTMLInputElement;
-      const smaEl = getEl(`${CreateSat.elementPrefix}-calc-sma`) as HTMLInputElement;
-      const velocityEl = getEl(`${CreateSat.elementPrefix}-calc-velocity`) as HTMLInputElement;
+      if (derived.perigee < 0) {
+        clearCalculated('calcSubSurface');
+
+        return;
+      }
+      showNote(null);
 
       if (apogeeEl) {
         apogeeEl.value = derived.apogee.toFixed(1);
@@ -758,6 +814,7 @@ export class CreateSat extends KeepTrackPlugin {
     yearEl.value = year;
     dayEl.value = day;
     dayEl.setAttribute(CreateSat.AUTO_EPOCH_ATTR_, `${year}|${day}`);
+    CreateSat.refreshEpochTimestamp();
   }
 
   /** Every invalid Advanced field (empty when the form can be submitted). */
@@ -775,9 +832,16 @@ export class CreateSat extends KeepTrackPlugin {
     sccInput.value = scc;
 
     const yearInput = getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement;
-    let year = yearInput.value.trim().replace(/\D/gu, '').slice(-2); // Only digits, last 2
+    let year = yearInput.value.trim().replace(/\D/gu, ''); // Only digits
 
-    year = year.padStart(2, '0'); // Must be 2 digits
+    const fullYear = epochYearToFull(year);
+
+    // A plausible four-digit year (1957-2056) becomes its TLE two digits; an implausible one ("2699") stays as typed so validation rejects it.
+    if (year.length === 4 && fullYear !== null) {
+      year = year.slice(-2);
+    } else if (year.length <= 2) {
+      year = year.padStart(2, '0'); // Must be 2 digits
+    }
 
     yearInput.value = year;
 

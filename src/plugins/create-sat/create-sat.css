@@ -82,3 +82,34 @@
   font-size: 0.8em;
   opacity: 0.75;
 }
+
+/* The eccentricity rule appears under the field itself when the value is not accepted. */
+#createSat-menu .helper-text.create-sat-hint-error {
+  color: var(--color-error, #ffb4ab);
+  white-space: normal;
+  line-height: 1.3;
+}
+
+/* Says why the Calculated Parameters are blank (invalid eccentricity, sub-surface orbit). */
+#createSat-menu .create-sat-calc-note {
+  margin: 4px 6px 0;
+  color: var(--color-warning, #ffd479);
+  line-height: 1.4;
+}
+#createSat-menu .create-sat-calc-note[hidden] {
+  display: none;
+}
+
+/* Toasts (TLE import results, remap warnings) sit at the bottom while this menu is open, clear of its title. */
+body.create-sat-menu-open #toast-container {
+  top: auto;
+  bottom: 7%;
+}
+
+/* Keep the constellation labels on one line; a long translation is cut with an ellipsis rather than wrapping onto the value. */
+#createSat-menu #createSat-walker-alt + label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}

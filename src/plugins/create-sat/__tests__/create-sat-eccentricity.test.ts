@@ -1,4 +1,4 @@
-import { evaluateField, parseEccentricityField } from '@app/plugins/create-sat/create-sat-validation';
+import { eccentricityHint, evaluateField, parseEccentricityField } from '@app/plugins/create-sat/create-sat-validation';
 
 describe('eccentricity field parsing', () => {
   it.each([
@@ -21,5 +21,17 @@ describe('eccentricity field parsing', () => {
   it('treats empty as neutral', () => {
     expect(parseEccentricityField('')).toBeNull();
     expect(evaluateField('ecen', '')).toBeNull();
+  });
+});
+
+describe('eccentricity hint', () => {
+  it('states the accepted forms and range for an invalid value', () => {
+    expect(eccentricityHint('1.5')).not.toBe('');
+    expect(eccentricityHint('1.5').startsWith('e =')).toBe(false);
+  });
+
+  it('shows the interpreted value for a valid one and nothing when empty', () => {
+    expect(eccentricityHint('0.001')).toBe('e = 0.0010000');
+    expect(eccentricityHint('')).toBe('');
   });
 });

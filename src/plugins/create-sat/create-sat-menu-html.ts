@@ -181,7 +181,7 @@ export function buildAdvancedTabHtml(): string {
         <div class="kt-section-label">${l('sectionEpoch')}</div>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="AA" id="${P}-year" type="text" maxlength="2" />
+            <input placeholder="AA" id="${P}-year" type="text" maxlength="4" />
             <label for="${P}-year" class="active">${l('epochYear')}</label>
           </div>
           <div class="input-field col s6">
@@ -241,6 +241,7 @@ export function buildAdvancedTabHtml(): string {
 
       <section class="kt-section" id="createSat-derived">
         <div class="kt-section-label">${l('calculatedParameters')}</div>
+        <div id="${P}-calc-note" class="create-sat-calc-note" role="status" hidden></div>
         <div class="kt-field-row">
           <div class="input-field col s6">
             <input disabled id="${P}-calc-apogee" type="text" />

@@ -173,3 +173,48 @@ export function cosparToRawIntlDes(objectId: string | undefined): string {
 
   return `${match.groups.year.slice(-2)}${match.groups.rest}`;
 }
+
+/** Earliest and latest calendar year a TLE epoch can name (two-digit years 57-99 are 19xx, 00-56 are 20xx). */
+export const MIN_EPOCH_YEAR = 1957;
+export const MAX_EPOCH_YEAR = 2056;
+
+/**
+ * Read the Epoch Year field: two digits ("26") or a four-digit calendar year inside 1957-2056 ("2026").
+ * @returns the full calendar year, or null when the text is not a plausible TLE epoch year.
+ */
+export function epochYearToFull(raw: string): number | null {
+  const text = raw.trim();
+
+  if (/^\d{2}$/u.test(text)) {
+    const yy = Number.parseInt(text, 10);
+
+    return yy >= 57 ? 1900 + yy : 2000 + yy;
+  }
+  if (/^\d{4}$/u.test(text)) {
+    const full = Number.parseInt(text, 10);
+
+    return full >= MIN_EPOCH_YEAR && full <= MAX_EPOCH_YEAR ? full : null;
+  }
+
+  return null;
+}
+
+/**
+ * The ISO UTC timestamp for an Epoch Year + Epoch Day pair, so both inputs can describe the same instant.
+ * @returns null when either field is not a valid epoch.
+ */
+export function epochFieldsToIso(yearText: string, dayText: string): string | null {
+  const year = epochYearToFull(yearText);
+  const day = dayText.trim() === '' ? Number.NaN : Number(dayText.trim());
+
+  if (year === null || !(day >= 1 && day < 367)) {
+    return null;
+  }
+  const date = new Date(Date.UTC(year, 0, 1) + (day - 1) * 86_400_000);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().replace(/\.000Z$/u, 'Z');
+}

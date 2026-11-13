@@ -1,6 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { t7e } from '@app/locales/keys';
 import './mobile-zoom-buttons.css';
+import './phone-floating-clearance.css';
 
 /**
  * On-screen zoom in / zoom out buttons for the phone layout (pro issue #173).

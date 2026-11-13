@@ -1,0 +1,148 @@
+/*
+ * Floating utility pill clearance and phone header layout (pro issues #143, #171, #195, #231, #292, #293, #294).
+ *
+ * The pill (.drawer-utility-footer) is fixed at the bottom centre: 12px offset + ~48px tall. Padding inside a
+ * scroll area only clears it at the last scroll position, so rows covered by it mid-scroll (Inclination,
+ * Maximum Range, Optical gate text). Instead the panels end ABOVE the pill band, so nothing is under it at any
+ * scroll position. Selectors carry a `body` prefix to win over plugin-drawer.css without editing it.
+ */
+:root {
+  --pill-clearance: calc(68px + env(safe-area-inset-bottom, 0px));
+}
+
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  /* Side menus and panes stop above the pill band; the old 96px bottom padding is no longer needed. */
+  body .side-menu-parent,
+  body [id$="-secondary"].side-menu-parent {
+    bottom: var(--pill-clearance) !important;
+    max-height: calc(100dvh - var(--top-menu-height) - var(--pill-clearance)) !important;
+  }
+
+  body .side-menu {
+    padding-bottom: 16px !important;
+  }
+
+  /*
+   * Panel headers: the shared .btn class gave icon buttons 16px side padding (40px wide), and the title text had
+   * min-width 50%, so the 4th Look Angles button and the Best Passes close button ran past the right edge (#293).
+   * In a column flex pane the header also shrank (overflow hidden, min-height 0) so its buttons stuck out above
+   * the pane top under the nav bar (#171).
+   */
+  body .side-menu-title-bar,
+  body .secondary-title-bar {
+    flex: 0 0 auto;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+
+  body .side-menu-title-text {
+    min-width: 0 !important;
+  }
+
+  body .side-menu-title-right {
+    gap: 4px;
+    margin-right: 8px;
+  }
+
+  body .side-menu-title-right .icon-btn {
+    flex: 0 0 32px;
+    width: 32px;
+    min-width: 0;
+    height: 32px;
+    padding: 6px;
+    line-height: normal;
+    box-sizing: border-box;
+  }
+
+  /* Hover tooltips stick after a tap on touch and paint a clipped dark box over the header (#294). */
+  [data-tooltip]::before,
+  [data-tooltip]::after {
+    display: none !important;
+  }
+
+  /* Toggle rows: label text wraps beside the lever, not under it (#294 "Step bins"). */
+  body .side-menu .switch label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  body .side-menu .switch label .lever {
+    flex: 0 0 auto;
+    margin: 0 4px 0 0;
+  }
+
+  /* Sat info box ends above the pill band instead of being padded under it (#195). */
+  body #sat-infobox {
+    bottom: var(--pill-clearance);
+    padding-bottom: 8px;
+  }
+
+  body #sat-infobox::after {
+    height: 8px;
+  }
+
+  /* Zoom buttons sit above the raised info box (45% tall). */
+  #mobile-zoom-buttons.mobile-zoom-raised {
+    bottom: calc(45% + var(--pill-clearance) + 12px);
+  }
+
+  /* Top bar (#231): the clock block may not outgrow its slot, so the date cannot run over the logo and the zone
+     chip stays inside the clock column instead of sliding under Search. */
+  body #nav-top-center {
+    flex: 2 1 0;
+    width: auto;
+    min-width: 0;
+    margin-left: 4px;
+    overflow: hidden;
+  }
+
+  body #datetime-text {
+    font-size: clamp(10px, 3vw, 13px);
+    white-space: nowrap;
+    padding: 0 !important;
+    border-left: 0 !important;
+  }
+
+  body #datetime-status {
+    font-size: 0.6rem;
+  }
+
+  body #datetime-zone {
+    max-width: 100%;
+  }
+
+  /* One-row clock (#234): at 390 px the slot holds the time, the mode label and the zone chip. The date leaves the
+     status line here (it is the one repeat-free piece the phone can lose; the date picker still shows it). */
+  body #datetime {
+    justify-content: flex-start;
+    column-gap: 4px;
+    max-width: 100%;
+  }
+
+  body #datetime .datetime-status-day {
+    display: none;
+  }
+
+  body #datetime-zone {
+    width: 48px;
+    font-size: 0.6rem;
+    padding: 0 2px;
+  }
+}
+
+/* Desktop: the pill is centred at the bottom and covered table cells in wide panes (Tip and Cue Cue LOS, #292). */
+@media (min-width: 640px) {
+  .side-menu::after {
+    content: '';
+    display: block;
+    height: 64px;
+  }
+
+  .side-menu-settings::after {
+    content: '';
+    flex: 0 0 56px;
+  }
+}

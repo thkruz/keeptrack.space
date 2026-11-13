@@ -96,23 +96,28 @@
   opacity: 1;
 }
 
-/* Compact clock block (#209): the nav sets line-height to the bar height, so the date line alone used to be
-   as tall as the bar and the status line plus zone chip pushed the centred stack past the viewport top at
-   1366x768. Date on the first row, status and zone chip side by side on the second; total stays under 40 px. */
+/* One-row clock (#234, supersedes the two-row block of #209): time, then "date · mode", then the zone chip, all on a
+   single line aligned with the other top-bar controls. The zone is named only by the chip. */
 #datetime {
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-  column-gap: 6px;
+  column-gap: 8px;
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 #datetime #datetime-text {
-  grid-column: 1 / -1;
   line-height: 1.1;
 }
 
 #datetime #datetime-zone {
   margin: 0;
+  flex: 0 0 auto;
+}
+
+#jday {
+  white-space: nowrap;
+  opacity: 0.85;
 }

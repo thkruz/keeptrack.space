@@ -101,9 +101,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
 
     const timeManagerInstance = ServiceLocator.getTimeManager();
-    const jdayStr = settingsManager.isUseJdayOnTopMenu
-      ? timeManagerInstance.getUTCDayOfYear(timeManagerInstance.simulationTimeObj).toString()
-      : timeManagerInstance.simulationTimeObj.toLocaleDateString();
+    // The date appears once (status line); JDAY is only ever the day of year, so it never repeats the date (#234).
+    const jdayStr = settingsManager.isUseJdayOnTopMenu ? `JDAY ${timeManagerInstance.getUTCDayOfYear(timeManagerInstance.simulationTimeObj).toString()}` : '';
 
     // Only touch the jday DOM on change; setInnerHtml rewrites innerHTML which triggers a style recalc.
     if (jdayStr !== this.lastJdayStr_) {
@@ -209,20 +208,28 @@ export class DateTimeManager extends KeepTrackPlugin {
     const rate = mode === 'simulated' ? ` · ${formatPlaybackRate(timeManagerInstance.propRate)}` : '';
     const zone = this.displayZone_;
     const day = isUtcZone(zone) ? timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10) : formatInTimeZone(simMs, zone).date;
-    const text = `${day} ${isUtcZone(zone) ? 'UTC' : zone} · ${label}${rate}`;
+    // The zone is named once, by the chip next to this line (#234), so it is not repeated here.
+    const text = `${day} · ${label}${rate}`;
 
     if (text !== this.lastStatusStr_) {
-      statusEl.textContent = text;
+      // The date sits in its own span so a phone can drop it and keep the mode label on the one row (#234).
+      const dayEl = document.createElement('span');
+
+      dayEl.className = 'datetime-status-day';
+      dayEl.textContent = `${day} · `;
+      statusEl.replaceChildren(dayEl, document.createTextNode(`${label}${rate}`));
       statusEl.dataset.mode = mode;
       this.lastStatusStr_ = text;
     }
   }
 
   datetimeTextClick(): void {
-    const simulationDateObj = new Date(ServiceLocator.getTimeManager().simulationTimeObj);
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
+    // Refresh the sim time first: the copy below must be the clock the header shows, not the last drawn frame's.
+    timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.synchronize();
+    const simulationDateObj = new Date(timeManagerInstance.simulationTimeObj);
 
     this.updateDateTime(simulationDateObj);
     this.calendar.setDate(simulationDateObj);
@@ -293,18 +300,6 @@ export class DateTimeManager extends KeepTrackPlugin {
       this.syncZoneChip_();
       this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
     });
-
-    if (settingsManager.isJdayToggleable) {
-      const jdayEl = getEl('jday', true);
-
-      if (jdayEl) {
-        jdayEl.style.cursor = 'pointer';
-        jdayEl.addEventListener('click', () => {
-          settingsManager.isUseJdayOnTopMenu = !settingsManager.isUseJdayOnTopMenu;
-          this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
-        });
-      }
-    }
 
     const datetimeInputTb = document.getElementById(this.dateTimeInputTbId_);
 

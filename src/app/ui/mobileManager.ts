@@ -70,6 +70,8 @@ export class MobileManager {
     // multi-pane analysis menus (Coverage, Link Budget, Multi-view, Polar/Flat map), which need a desktop pointer or width.
     'ObservabilityPlanner',
     'SatInfoBoxDoppler',
+    // Added 2026-11-13 (#157): the access timeline strip has no other entry point; phone CSS gives it 44 px targets.
+    'AccessTimelinePlugin',
   ];
 
   static checkMobileMode() {

@@ -53,9 +53,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-replace')).style.display = '';
+        getEl('cs-add-replace-note')!.style.display = '';
         CustomSensorPlugin.prefillFromSensor_(sensorManagerInstance.currentSensors[0]);
       } else {
         (<HTMLInputElement>getEl('cs-replace')).style.display = 'none';
+        // The note explains Replace, so it is only shown while the Replace button is.
+        getEl('cs-add-replace-note')!.style.display = 'none';
         CustomSensorPlugin.setPrefillNote_(null);
       }
     }

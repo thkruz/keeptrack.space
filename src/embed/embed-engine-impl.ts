@@ -366,11 +366,22 @@ export class KeepTrackEmbedEngine implements EmbedEngine {
 
   onHoverChanged(cb: (id: number) => void): void {
     let last = -1;
+    // The picker keeps its last result after the pointer leaves the canvas, so a leave must report "none" until
+    // the pointer moves over the canvas again.
+    let outside = false;
+    const canvas = document.getElementById('keeptrack-canvas');
+
+    canvas?.addEventListener('pointerleave', () => {
+      outside = true;
+    });
+    canvas?.addEventListener('pointermove', () => {
+      outside = false;
+    });
 
     EventBus.getInstance().on(EventBusEvent.updateLoop, () => {
       // mouseSat is the picker result and updates whatever the tooltip settings are; HoverManager.hoveringSat
       // only moves while enableHoverOrbits is on, which would silence the event for ui.hover false / infoBox false.
-      const hovering = ServiceLocator.getInputManager()?.mouse?.mouseSat ?? -1;
+      const hovering = outside ? -1 : (ServiceLocator.getInputManager()?.mouse?.mouseSat ?? -1);
 
       if (hovering !== last) {
         last = hovering;

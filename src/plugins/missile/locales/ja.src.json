@@ -47,6 +47,7 @@
         "unitedKingdom": "イギリス",
         "france": "フランス",
         "northKorea": "北朝鮮",
+        "iran": "イラン",
         "natoCountries": "NATO加盟国",
         "nonNatoCountries": "NATO非加盟国",
         "usMilitaryBases": "米軍基地",
@@ -106,7 +107,8 @@
         "sinpoSub": "新浦級潜水艦（北極星1号）",
         "sinpo": "新浦",
         "pyongan": "平安",
-        "pyongyang": "平壌"
+        "pyongyang": "平壌",
+        "semnan": "セムナーン（仮想ICBM）"
       },
       "targets": {
         "washingtonDc": "ワシントンD.C.",

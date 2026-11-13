@@ -1,5 +1,5 @@
 import { CHINA_LARGEST_CITIES, CHINA_MILITARY_BASES } from './china-targets';
-import { ChinaICBM, FraSLBM, globalBMTargets, NorthKoreanBM, RussianICBM, UsaICBM, ukSLBM } from './missile-data';
+import { ChinaICBM, FraSLBM, globalBMTargets, IranBM, NorthKoreanBM, RussianICBM, UsaICBM, ukSLBM } from './missile-data';
 import { RUSSIA_LARGEST_CITIES, RUSSIA_MILITARY_BASES } from './russia-targets';
 import { type GeoTarget, US_LARGEST_CITIES, US_MILITARY_BASES } from './us-targets';
 
@@ -113,6 +113,7 @@ const MIN_ALT_CHINA = 1120;
 const MIN_ALT_NORTH_KOREA = 1120;
 const MIN_ALT_FRANCE = 1000;
 const MIN_ALT_UK = 1200;
+const MIN_ALT_IRAN = 1120;
 
 /**
  * Every launch site the menu can offer, in dropdown order, grouped by `groupKey`.
@@ -184,6 +185,9 @@ export const ATTACKER_SITES: readonly AttackerSite[] = [
   { id: 401, labelKey: 'sinpo', groupKey: 'northKorea', country: 'North Korea', isSub: false, minAltKm: MIN_ALT_NORTH_KOREA, data: NorthKoreanBM, index: 1 },
   { id: 402, labelKey: 'pyongan', groupKey: 'northKorea', country: 'North Korea', isSub: false, minAltKm: MIN_ALT_NORTH_KOREA, data: NorthKoreanBM, index: 2 },
   { id: 403, labelKey: 'pyongyang', groupKey: 'northKorea', country: 'North Korea', isSub: false, minAltKm: MIN_ALT_NORTH_KOREA, data: NorthKoreanBM, index: 3 },
+
+  // Iran (IranBM)
+  { id: 700, labelKey: 'semnan', groupKey: 'iran', country: 'Iran', isSub: false, minAltKm: MIN_ALT_IRAN, data: IranBM, index: 0 },
 ];
 
 /** Impact points in dropdown order. `groupKey: undefined` renders as a standalone (ungrouped) option. */
@@ -215,6 +219,40 @@ export const TARGET_OPTIONS: readonly TargetOption[] = [
   { id: 23, labelKey: 'pyongyang', groupKey: 'nonNatoCountries' },
   ...extendedTargetOptions,
 ];
+
+/** A default launch-site / target pairing offered when the menu opens. */
+export interface DefaultScenario {
+  /** `ATTACKER_SITES` id. */
+  attackerId: number;
+  /** `TARGET_OPTIONS` id. */
+  targetId: number;
+}
+
+/** Iran, China, Russia and North Korea each attacking a US or a European target. */
+export const DEFAULT_SCENARIOS: readonly DefaultScenario[] = [
+  { attackerId: 700, targetId: 12 }, // Iran (Semnan) -> London
+  { attackerId: 700, targetId: 16 }, // Iran (Semnan) -> Rome
+  { attackerId: 300, targetId: 2 }, // China (Nanyang) -> Los Angeles
+  { attackerId: 303, targetId: 5 }, // China (Haiyan) -> Seattle
+  { attackerId: 200, targetId: 0 }, // Russia (Aleysk) -> Washington DC
+  { attackerId: 211, targetId: 17 }, // Russia (Teykovo) -> Berlin
+  { attackerId: 402, targetId: 5 }, // North Korea (P'yong'an) -> Seattle
+  { attackerId: 401, targetId: 10 }, // North Korea (Sinpo) -> Hawaii
+];
+
+let sessionScenario_: DefaultScenario | null = null;
+
+/** Random default scenario, chosen once per page session and then returned unchanged. */
+export const getSessionDefaultScenario = (random: () => number = Math.random): DefaultScenario => {
+  sessionScenario_ ??= DEFAULT_SCENARIOS[Math.min(DEFAULT_SCENARIOS.length - 1, Math.floor(random() * DEFAULT_SCENARIOS.length))];
+
+  return sessionScenario_;
+};
+
+/** Test hook: forget the cached session scenario. */
+export const resetSessionDefaultScenario = (): void => {
+  sessionScenario_ = null;
+};
 
 /** Look up a launch site by its `ms-attacker` option value. */
 export const getAttackerSite = (id: number): AttackerSite | undefined => ATTACKER_SITES.find((site) => site.id === id);

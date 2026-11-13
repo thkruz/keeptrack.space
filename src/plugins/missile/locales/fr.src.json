@@ -47,6 +47,7 @@
         "unitedKingdom": "Royaume-Uni",
         "france": "France",
         "northKorea": "Corée du Nord",
+        "iran": "Iran",
         "natoCountries": "Pays de l'OTAN",
         "nonNatoCountries": "Pays hors OTAN",
         "usMilitaryBases": "Bases militaires américaines",
@@ -106,7 +107,8 @@
         "sinpoSub": "Sous-marin de Sinpo (Pukkŭksŏng-1)",
         "sinpo": "Sinpo",
         "pyongan": "P'yong'an",
-        "pyongyang": "Pyongyang"
+        "pyongyang": "Pyongyang",
+        "semnan": "Semnan (ICBM hypothétique)"
       },
       "targets": {
         "washingtonDc": "Washington DC",

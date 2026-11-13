@@ -22,6 +22,7 @@ import {
   attackerRangeKm,
   CUSTOM_TARGET_ID,
   getAttackerSite,
+  getSessionDefaultScenario,
   TARGET_OPTIONS,
   targetLat,
   targetLon,
@@ -512,6 +513,11 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
     getEl('searchRvBtn')!.addEventListener('click', this.searchForRvs_);
     getEl('clearMissilesBtn')!.addEventListener('click', this.clearMissiles_);
     getEl('clearAllSimulationsBtn')?.addEventListener('click', () => confirmAndClearAllSimulations());
+
+    const scenario = getSessionDefaultScenario();
+
+    (getEl('ms-attacker') as HTMLSelectElement).value = scenario.attackerId.toString();
+    (getEl('ms-target') as HTMLSelectElement).value = scenario.targetId.toString();
 
     if (menuRoot) {
       initMaterialSelects(menuRoot);

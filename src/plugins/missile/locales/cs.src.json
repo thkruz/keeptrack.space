@@ -47,6 +47,7 @@
         "unitedKingdom": "Spojené království",
         "france": "Francie",
         "northKorea": "Severní Korea",
+        "iran": "Írán",
         "natoCountries": "Země NATO",
         "nonNatoCountries": "Země mimo NATO",
         "usMilitaryBases": "Vojenské základny USA",
@@ -106,7 +107,8 @@
         "sinpoSub": "Ponorka Sinpcho (Pukkŭksŏng-1)",
         "sinpo": "Sinpcho",
         "pyongan": "Pchjongan",
-        "pyongyang": "Pchjongjang"
+        "pyongyang": "Pchjongjang",
+        "semnan": "Semnán (hypotetická ICBM)"
       },
       "targets": {
         "washingtonDc": "Washington DC",

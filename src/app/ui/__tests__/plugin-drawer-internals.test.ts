@@ -69,6 +69,8 @@ describe('PluginDrawer internals', () => {
     expect(html).toContain('data-pro-gated');
     expect(html).toContain('drawer-item-lock');
     expect(html.match(/class="drawer-item-lock"/gu)?.length).toBe(1);
+    expect(html).toContain('drawer-item-lock-icon');
+    expect(html).not.toContain('&#x1F512;');
     expect(html).toContain('drawer-item-shortcut');
   });
 

@@ -14,6 +14,7 @@ import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
 import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
+import lockPng from '@public/img/icons/lock.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
@@ -861,7 +862,9 @@ export class PluginDrawer {
       html += `<img class="drawer-item-icon" src="${item.imgSrc}" alt="${item.label}" />`;
       html += `<span class="drawer-item-label">${item.label}</span>`;
       html += '<span class="drawer-item-badge"></span>';
-      html += proClass ? `<span class="drawer-item-lock" aria-label="${loginRequiredText}" title="${loginRequiredText}">&#x1F512;</span>` : '';
+      html += proClass
+        ? `<span class="drawer-item-lock" aria-label="${loginRequiredText}" title="${loginRequiredText}"><img class="drawer-item-lock-icon" src="${lockPng}" alt="" /></span>`
+        : '';
       html += shortcutBadge;
       html += '</div>';
     }

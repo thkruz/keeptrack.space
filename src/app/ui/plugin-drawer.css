@@ -437,9 +437,15 @@ body.drawer-mode {
   .drawer-item-lock {
     display: none;
     margin-left: 6px;
-    font-size: 11px;
     line-height: 1;
     flex-shrink: 0;
+  }
+
+  .drawer-item-lock-icon {
+    display: block;
+    width: 16px;
+    height: 16px;
+    filter: var(--filter-icon-blue);
   }
 
   &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-lock {

@@ -22,7 +22,7 @@ import contentCopyPng from '@public/img/icons/content-copy.png';
 import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
-import { plainValueText } from './info-value';
+import { INFO_CIRCLE_CLASS, plainValueText } from './info-value';
 import { isPlaceholderIntlDes } from './placeholder-intl-des';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
@@ -219,11 +219,16 @@ export class SatInfoBox extends KeepTrackPlugin {
    * drag from the dock jumped the box to the top edge (#49). Pin the box at its current on-screen position
    * with explicit top/left and tell Draggabilly the same numbers, so the box stays under the pointer.
    */
-  static freezeFloatingGeometry_(draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number } }, el: HTMLElement, container: HTMLElement): void {
+  static freezeFloatingGeometry_(
+    draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number } },
+    el: HTMLElement,
+    container: HTMLElement,
+    topInset = 0
+  ): void {
     const rect = el.getBoundingClientRect();
     const containerRect = container.getBoundingClientRect();
     const x = Math.max(0, Math.round(rect.left - containerRect.left));
-    const y = Math.max(0, Math.round(rect.top - containerRect.top));
+    const y = Math.max(topInset, Math.round(rect.top - containerRect.top));
 
     el.style.bottom = 'auto';
     el.style.right = 'auto';
@@ -239,14 +244,15 @@ export class SatInfoBox extends KeepTrackPlugin {
 
   /** Pulls a just-enlarged floating box back inside its container and refreshes Draggabilly's containment. */
   static clampAfterResize_(
-    draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number }; measureContainment?: () => void },
+    draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number }; relativeStartPosition?: { x: number; y: number }; measureContainment?: () => void },
     el: HTMLElement,
-    container: HTMLElement
+    container: HTMLElement,
+    topInset = 0
   ): void {
     const overflow = el.getBoundingClientRect().bottom - container.getBoundingClientRect().bottom;
 
     if (overflow > 0) {
-      const newTop = Math.max(0, draggie.position.y - overflow);
+      const newTop = Math.max(topInset, draggie.position.y - overflow);
 
       draggie.position.y = newTop;
       if (draggie.startPosition) {
@@ -255,6 +261,30 @@ export class SatInfoBox extends KeepTrackPlugin {
       el.style.top = `${newTop}px`;
     }
     draggie.measureContainment?.();
+    SatInfoBox.applyTopInset_(draggie, topInset);
+  }
+
+  /** Pixel height of the top bar (nav, classification bar and time slider) the floating box must stay below (#49). */
+  static getTopInsetPx_(container: HTMLElement): number {
+    const probe = document.createElement('div');
+
+    probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:1px;height:var(--top-menu-height, 50px)';
+    container.appendChild(probe);
+    const inset = probe.getBoundingClientRect().height;
+
+    probe.remove();
+
+    return Number.isFinite(inset) ? Math.round(inset) : 0;
+  }
+
+  /**
+   * Draggabilly contains the drag inside the container; shrink that containment from the top so the header can
+   * never be dragged under the top bar, where it could not be grabbed again (#49). Call after measureContainment.
+   */
+  static applyTopInset_(draggie: { relativeStartPosition?: { x: number; y: number } }, topInset: number): void {
+    if (topInset > 0 && draggie.relativeStartPosition) {
+      draggie.relativeStartPosition.y -= topInset;
+    }
   }
 
   private initDraggabilly() {
@@ -284,8 +314,11 @@ export class SatInfoBox extends KeepTrackPlugin {
 
         // Draggabilly measured position and containment before this handler grew the box (45% to 80% max
         // height) and undocked it, so pin the final floating geometry now, then re-clamp and re-measure.
-        SatInfoBox.freezeFloatingGeometry_(draggie, satInfoBoxElement, KeepTrack.getInstance().containerRoot);
-        SatInfoBox.clampAfterResize_(draggie, satInfoBoxElement, KeepTrack.getInstance().containerRoot);
+        const containerRoot = KeepTrack.getInstance().containerRoot;
+        const topInset = SatInfoBox.getTopInsetPx_(containerRoot);
+
+        SatInfoBox.freezeFloatingGeometry_(draggie, satInfoBoxElement, containerRoot, topInset);
+        SatInfoBox.clampAfterResize_(draggie, satInfoBoxElement, containerRoot, topInset);
       });
 
       draggie.on('pointerDown', () => {
@@ -496,7 +529,10 @@ export class SatInfoBox extends KeepTrackPlugin {
         let node = textNodes.nextNode();
 
         while (node) {
-          node.textContent = '';
+          // The "i" glyph of an info circle must survive a deselect, or every circle renders empty after the next selection (#277)
+          if (!node.parentElement?.closest(`.${INFO_CIRCLE_CLASS}`)) {
+            node.textContent = '';
+          }
           node = textNodes.nextNode();
         }
         element.removeAttribute('kt-tooltip');

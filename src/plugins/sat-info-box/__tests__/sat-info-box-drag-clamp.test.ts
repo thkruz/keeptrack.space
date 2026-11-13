@@ -54,3 +54,40 @@ describe('SatInfoBox.freezeFloatingGeometry_', () => {
     expect(draggie.startPosition).toEqual({ x: 1006, y: 307 });
   });
 });
+
+describe('SatInfoBox top inset (#49)', () => {
+  it('never lets the clamp pull the header above the top bar', () => {
+    const container = document.createElement('div');
+    const el = document.createElement('div');
+
+    container.getBoundingClientRect = rectAt(0, 768);
+    el.getBoundingClientRect = rectAt(100, 900);
+    const draggie = { position: { x: 0, y: 100 }, startPosition: { x: 0, y: 100 }, measureContainment: vi.fn() };
+
+    SatInfoBox.clampAfterResize_(draggie, el, container, 90);
+
+    expect(draggie.position.y).toBe(90);
+    expect(el.style.top).toBe('90px');
+  });
+
+  it('shrinks Draggabilly containment from the top so a drag stops below the top bar', () => {
+    const draggie = { relativeStartPosition: { x: 0, y: 300 } };
+
+    SatInfoBox.applyTopInset_(draggie, 90);
+
+    expect(draggie.relativeStartPosition.y).toBe(210);
+  });
+
+  it('pins a docked box no higher than the top inset', () => {
+    const container = document.createElement('div');
+    const el = document.createElement('div');
+
+    container.getBoundingClientRect = rectAt(0, 768);
+    el.getBoundingClientRect = rectAt(10, 600);
+    const draggie = { position: { x: 0, y: 0 }, startPosition: { x: 0, y: 0 } };
+
+    SatInfoBox.freezeFloatingGeometry_(draggie, el, container, 90);
+
+    expect(el.style.top).toBe('90px');
+  });
+});

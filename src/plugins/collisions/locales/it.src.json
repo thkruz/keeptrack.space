@@ -2,7 +2,7 @@
   "plugins": {
     "Collisions": {
       "bottomIconLabel": "Collisioni",
-      "title": "Menu collisioni",
+      "title": "Collisioni",
       "toolbar": {
         "fetchData": "Scarica dati",
         "refresh": "Aggiorna"

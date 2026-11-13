@@ -283,50 +283,36 @@
   border-radius: 50%;
 }
 
+/* One placement rule (#273): the info circle always follows the value, on the same line, never wrapped alone.
+   Rows whose value is rewritten wholesale (sensor rows) keep the circle as a sibling inside this wrapper. */
+.sat-info-value-wrap {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  float: right;
+  width: 45%;
+  min-width: 0;
+}
+
+.sat-info-value-wrap > .sat-info-value {
+  float: none;
+  width: auto;
+  min-width: 0;
+  flex: 0 1 auto;
+  white-space: nowrap;
+}
+
+.sat-info-value-wrap > .sat-info-circle {
+  flex: 0 0 auto;
+}
+
 /* Room for the 24 px circle inside the clipped value box */
 .sat-info-value:has(.sat-info-circle) {
   padding-block: 4px;
 }
 
 /* Phone: the drawer utility footer (bottom 12px + ~64px tall) overlays the bottom of the box; --bottom-menu-height is 0 there, so reserve the same 96px (#223) the side menus use */
-@media (max-width: 639px) {
-  #sat-infobox {
-    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
-  }
-
-  /* Some engines drop scroll-container bottom padding; a trailing spacer keeps the last row clear of the pill (#223) */
-  #sat-infobox::after {
-    content: '';
-    display: block;
-    height: 24px;
-  }
-
-  /* The 1000px section cap is for the collapse animation; at phone width long mission text wraps past it and the last rows (Data: GCAT) were clipped (#195) */
-  .sat-info-section,
-  #sat-identifier-data,
-  #orbital-section,
-  #secondary-sat-info,
-  #sensor-sat-info,
-  #sat-mission-data {
-    max-height: 5000px;
-  }
-
-  .sat-info-section.collapsed,
-  #sat-identifier-data.collapsed,
-  #orbital-section.collapsed,
-  #secondary-sat-info.collapsed,
-  #sensor-sat-info.collapsed,
-  #sat-mission-data.collapsed {
-    max-height: 20px;
-  }
-}
-
-/* Age of GP past the stale threshold (same setting as the watchlist STALE flag). The STALE word carries the meaning. */
-.sat-info-value.sat-info-stale {
-  color: var(--color-warning, #ffb300);
-  font-weight: 600;
-}
-
 /* Phone touch targets (#157): 44x44 px hit areas for every tappable control in the info box. Padding with an equal
    negative margin keeps the compact row layout; the visible glyph sizes are unchanged. */
 @media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
@@ -368,4 +354,42 @@
     padding-block: 15px;
     margin-block: -15px;
   }
+}
+
+@media (max-width: 639px) {
+  #sat-infobox {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Some engines drop scroll-container bottom padding; a trailing spacer keeps the last row clear of the pill (#223) */
+  #sat-infobox::after {
+    content: '';
+    display: block;
+    height: 24px;
+  }
+
+  /* The 1000px section cap is for the collapse animation; at phone width long mission text wraps past it and the last rows (Data: GCAT) were clipped (#195) */
+  .sat-info-section,
+  #sat-identifier-data,
+  #orbital-section,
+  #secondary-sat-info,
+  #sensor-sat-info,
+  #sat-mission-data {
+    max-height: 5000px;
+  }
+
+  .sat-info-section.collapsed,
+  #sat-identifier-data.collapsed,
+  #orbital-section.collapsed,
+  #secondary-sat-info.collapsed,
+  #sensor-sat-info.collapsed,
+  #sat-mission-data.collapsed {
+    max-height: 20px;
+  }
+}
+
+/* Age of GP past the stale threshold (same setting as the watchlist STALE flag). The STALE word carries the meaning. */
+.sat-info-value.sat-info-stale {
+  color: var(--color-warning, #ffb300);
+  font-weight: 600;
 }

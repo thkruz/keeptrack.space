@@ -730,9 +730,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       tdT = tr.insertCell();
       // An in-progress row shows when the pass began (searched back), not the time the table was computed
-      const shownTime = entry.inProgress && typeof entry.passRiseMs === 'number' ? new Date(entry.passRiseMs) : entry.time;
+      // The column header says UTC, so a Date must be formatted with the utc flag (browser local time was 5 h off, #71)
+      const shownTime =
+        entry.inProgress && typeof entry.passRiseMs === 'number' ? dateFormat(new Date(entry.passRiseMs), 'isoDateTime', true) : dateFormat(entry.time, 'isoDateTime', false);
 
-      tdT.appendChild(document.createTextNode(dateFormat(shownTime, 'isoDateTime', false)));
+      tdT.appendChild(document.createTextNode(shownTime));
 
       // Create click listener
       tr.addEventListener('click', () => {

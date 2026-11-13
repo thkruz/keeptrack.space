@@ -2,7 +2,7 @@
   "plugins": {
     "Collisions": {
       "bottomIconLabel": "衝突",
-      "title": "衝突メニュー",
+      "title": "衝突",
       "toolbar": {
         "fetchData": "データを取得",
         "refresh": "更新"

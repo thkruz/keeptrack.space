@@ -95,7 +95,7 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       }
       expect(getEl('sat-ra')!.innerHTML).toMatch(/^\d+\.\d{4}°$/u);
 
-      const raKey = getEl('sat-ra')!.parentElement!.querySelector('.sat-info-key')!;
+      const raKey = getEl('sat-ra')!.closest('.sat-info-row')!.querySelector('.sat-info-key')!;
 
       expect(raKey.textContent).toContain('J2000');
       expect(raKey.textContent).toContain('topo');

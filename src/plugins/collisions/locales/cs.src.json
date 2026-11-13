@@ -2,7 +2,7 @@
   "plugins": {
     "Collisions": {
       "bottomIconLabel": "Kolize",
-      "title": "Nabídka kolizí",
+      "title": "Kolize",
       "toolbar": {
         "fetchData": "Načíst data",
         "refresh": "Obnovit"

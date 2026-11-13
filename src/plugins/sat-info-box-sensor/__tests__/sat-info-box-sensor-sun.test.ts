@@ -38,7 +38,7 @@ describe('SatInfoBoxSensor sun status', () => {
 
     p().calculateSunStatus_(defaultSat);
 
-    expect(sunEl()!.parentElement!.style.display).toBe('none');
+    expect(((sunEl()!.closest('.sat-info-row') ?? sunEl()!.parentElement) as HTMLElement).style.display).toBe('none');
   });
 
   it('reports "No Effect" for a non-optical (radar) sensor', () => {

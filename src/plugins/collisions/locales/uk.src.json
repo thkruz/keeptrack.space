@@ -2,7 +2,7 @@
   "plugins": {
     "Collisions": {
       "bottomIconLabel": "Зіткнення",
-      "title": "Меню зіткнень",
+      "title": "Зіткнення",
       "toolbar": {
         "fetchData": "Отримати дані",
         "refresh": "Оновити"

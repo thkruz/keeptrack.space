@@ -37,6 +37,16 @@ describe('info-value helper (#191)', () => {
     expect(getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`)).toBeNull();
   });
 
+  it('setValueWithInfo restores an emptied "i" glyph (deselect blanked the circle text, #277)', () => {
+    setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
+    const circle = getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`) as HTMLElement;
+
+    circle.textContent = '';
+    setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
+
+    expect((getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`) as HTMLElement).textContent).toBe('i');
+  });
+
   it('setValueWithInfo keeps the same circle node when nothing changed (focus survives refresh)', () => {
     setValueWithInfo('v', 'LEO', 'Low Earth orbit.');
     const circle = getEl('v')!.querySelector(`.${INFO_CIRCLE_CLASS}`) as HTMLElement;

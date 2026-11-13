@@ -49,7 +49,11 @@ export const setValueWithInfo = (id: string, shortText: string, explanation?: st
     // focused or hovered info circle, so leave the DOM alone when nothing changed.
     const existing = el.querySelector(`.${INFO_CIRCLE_CLASS}`);
     const currentText = existing ? el.firstChild?.textContent : el.textContent;
-    const isSame = currentText === shortText && (explanation ? existing?.getAttribute('kt-tooltip') === explanation : !existing) && el.childNodes.length === (explanation ? 2 : 1);
+    const isSame =
+      currentText === shortText &&
+      (!existing || existing.textContent === 'i') &&
+      (explanation ? existing?.getAttribute('kt-tooltip') === explanation : !existing) &&
+      el.childNodes.length === (explanation ? 2 : 1);
 
     if (isSame) {
       return;
@@ -59,6 +63,7 @@ export const setValueWithInfo = (id: string, shortText: string, explanation?: st
     // tooltip follows the new selection instead of showing the previous object's text (#274)
     if (explanation && existing instanceof HTMLElement && el.firstChild?.nodeType === Node.TEXT_NODE && el.childNodes.length === 2) {
       el.firstChild.textContent = shortText;
+      existing.textContent = 'i';
       existing.setAttribute('aria-label', explanation);
       existing.setAttribute('kt-tooltip', explanation);
       PluginRegistry.getPlugin(TooltipsPlugin)?.refreshTooltip(existing);

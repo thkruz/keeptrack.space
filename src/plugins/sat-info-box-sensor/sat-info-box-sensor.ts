@@ -171,9 +171,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         <div class="sat-info-key" data-position="top" data-delay="50"
           kt-tooltip="${row.tooltip}"
         >
-          ${row.key}${INFO_CIRCLE_ROWS.has(row.id) ? infoCircleHtml(row.tooltip) : ''}
+          ${row.key}
         </div>
-        <div class="sat-info-value" id="${row.id}">${row.value}</div>
+        ${
+          INFO_CIRCLE_ROWS.has(row.id)
+            ? `<div class="sat-info-value-wrap"><div class="sat-info-value" id="${row.id}">${row.value}</div>${infoCircleHtml(row.tooltip)}</div>`
+            : `<div class="sat-info-value" id="${row.id}">${row.value}</div>`
+        }
         </div>
       `
         )
@@ -213,8 +217,10 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     if (!sensorManagerInstance.isSensorSelected()) {
       const satSunDom = getEl(EL.SUN);
 
-      if (satSunDom?.parentElement) {
-        satSunDom.parentElement.style.display = 'none';
+      const sunRow = (satSunDom?.closest<HTMLElement>('.sat-info-row') ?? satSunDom?.parentElement) as HTMLElement | null | undefined;
+
+      if (sunRow) {
+        sunRow.style.display = 'none';
       }
     } else {
       this.calculateSunStatus_(obj);
@@ -245,14 +251,16 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     // If No Sensor, then Ignore Sun Exclusion
     const satSunDom = getEl(EL.SUN);
 
-    if (satSunDom?.parentElement) {
+    const sunRow = (satSunDom?.closest<HTMLElement>('.sat-info-row') ?? satSunDom?.parentElement) as HTMLElement | null | undefined;
+
+    if (satSunDom && sunRow) {
       // If No Sensor, then Ignore Sun Exclusion
       if (!sensorManagerInstance.isSensorSelected()) {
-        satSunDom.parentElement.style.display = 'none';
+        sunRow.style.display = 'none';
 
         return;
       }
-      satSunDom.parentElement.style.display = 'flex';
+      sunRow.style.display = 'flex';
 
       // If Radar Selected, then Say the Sun Doesn't Matter
       if (sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OPTICAL && sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OBSERVER) {

@@ -213,6 +213,11 @@ export class SearchManager {
 
       if (obj) {
         SearchManager.lookAtSearchResult_(obj, satId);
+        // On a phone the open list covers the globe: fold it away but keep the query in the box.
+        if (settingsManager.isMobileModeEnabled) {
+          this.collapseResults_();
+          (getEl('search', true) as HTMLInputElement | null)?.blur();
+        }
       }
     });
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
@@ -246,6 +251,17 @@ export class SearchManager {
       const searchStr = (<HTMLInputElement>getEl('search')).value;
 
       this.doSearch(searchStr);
+    });
+    // Tapping the box again after a collapse brings the list for the kept query back.
+    getEl('search')?.addEventListener('focus', () => {
+      if (!settingsManager.isMobileModeEnabled || this.isResultsOpen) {
+        return;
+      }
+      const value = (<HTMLInputElement>getEl('search')).value;
+
+      if (value.length >= settingsManager.minimumSearchCharacters) {
+        this.doSearch(value);
+      }
     });
     getEl('search')?.addEventListener('blur', () => {
       if (this.isSearchOpen && this.getCurrentSearch().length === 0) {
@@ -456,6 +472,20 @@ export class SearchManager {
     }
 
     return '';
+  }
+
+  /**
+   * Folds the results list away without touching the query, the highlighted group or the colour scheme.
+   * Used on phones after a pick; reopening the search re-runs the kept query.
+   */
+  private collapseResults_(): void {
+    const resultsEl = getEl('search-results', true);
+
+    if (resultsEl) {
+      slideOutUp(resultsEl, 200);
+      resultsEl.innerHTML = '';
+    }
+    this.isResultsOpen = false;
   }
 
   /**

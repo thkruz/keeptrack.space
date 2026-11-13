@@ -54,20 +54,66 @@ export function getSearchAlias(id: number): string | undefined {
   return aliasSource_?.().get(id);
 }
 
+/** Rank of a result that does not earn a boost. */
+const SEARCH_RANK_OTHER = 3;
+
+/**
+ * Common names that people type instead of the catalog name, mapped to the NORAD id they mean.
+ * Kept short on purpose: only objects whose catalog name hides the common one.
+ */
+const COMMON_NAME_NORAD: Readonly<Record<string, string>> = {
+  ISS: '25544',
+  'INTERNATIONAL SPACE STATION': '25544',
+  HUBBLE: '20580',
+  TIANGONG: '48274',
+};
+
+/**
+ * Ranking rule for the text search (lower sorts first):
+ * 0 = the query is a common name for this object (ISS -> 25544),
+ * 1 = the query equals the object's name or alt name exactly,
+ * 2 = the name starts with the query as a whole word ("ISS (ZARYA)" for "ISS"),
+ * 3 = any other substring match, kept in catalog order.
+ */
+export function getSearchRank(obj: BaseObject, query: string): number {
+  const q = query.trim().toUpperCase();
+  const commonId = COMMON_NAME_NORAD[q];
+
+  if (commonId && (obj as Satellite).sccNum === commonId) {
+    return 0;
+  }
+
+  const name = obj.name?.toUpperCase() ?? '';
+  const altName = (obj as Satellite).altName?.toUpperCase() ?? '';
+
+  if (name === q || altName === q) {
+    return 1;
+  }
+  if (name.startsWith(`${q} `) || name.startsWith(`${q}(`)) {
+    return 2;
+  }
+
+  return SEARCH_RANK_OTHER;
+}
+
 /**
  * Run a regular (text) search over the catalog, returning at most
  * {@link settingsManager.searchLimit} results plus the total number found.
  */
 export function runRegularSearch(searchString: string): { results: SearchResult[]; totalFound: number } {
-  const results: SearchResult[] = [];
+  const normal: SearchResult[] = [];
+  const boosted: { rank: number; result: SearchResult }[] = [];
   let totalFound = 0;
   const limit = settingsManager.searchLimit;
   const { searchableFields } = settingsManager;
+  let currentRank = SEARCH_RANK_OTHER;
 
   const addResult_ = (result: SearchResult) => {
     totalFound++;
-    if (results.length < limit) {
-      results.push(result);
+    if (currentRank < SEARCH_RANK_OTHER) {
+      boosted.push({ rank: currentRank, result });
+    } else if (normal.length < limit) {
+      normal.push(result);
     }
   };
 
@@ -98,16 +144,23 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
         const alias = aliases?.get(obj.id);
         const before = totalFound;
 
+        currentRank = getSearchRank(obj, searchStringIn);
+
         matchSatelliteOrMissile(obj as Satellite & MissileObject, searchStringIn, len, searchableFields, addResult_);
         // Name, alt name and the other fields win; an alias hit only fills in when none matched.
         if (alias && totalFound === before && alias.toUpperCase().includes(searchStringIn)) {
           addResult_({ strIndex: alias.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.ALIAS, patlen: len, id: obj.id });
         }
       } else {
+        currentRank = SEARCH_RANK_OTHER;
         matchOtherObject(obj, searchStringIn, len, addResult_);
       }
     }
   });
+
+  // Stable sort: best rank first, catalog order inside a rank.
+  boosted.sort((a, b) => a.rank - b.rank);
+  const results = [...boosted.map((b) => b.result), ...normal].slice(0, limit);
 
   return { results, totalFound };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { writeHtmlIfChanged, writeTextIfChanged } from '../get-el';
+import { writeAttrIfChanged, writeHtmlIfChanged, writeTextIfChanged, writeTitleIfChanged } from '../get-el';
 
 const countMutations = (el: HTMLElement, fn: () => void): number => {
   const observer = new MutationObserver(() => undefined);
@@ -41,5 +41,35 @@ describe('writeTextIfChanged', () => {
     expect(countMutations(el, () => writeTextIfChanged(el, 'Over Peru'))).toBe(1);
     expect(countMutations(el, () => writeTextIfChanged(el, 'Over Peru'))).toBe(0);
     expect(writeTextIfChanged(el, 'Over Chile')).toBe(true);
+  });
+});
+
+describe('writeAttrIfChanged', () => {
+  it('skips an identical attribute value (no attribute mutation record) and writes a changed one', () => {
+    const el = document.createElement('div');
+    const observer = new MutationObserver(() => undefined);
+
+    expect(writeAttrIfChanged(el, 'kt-tooltip', '1.00')).toBe(true);
+    observer.observe(el, { attributes: true });
+    expect(writeAttrIfChanged(el, 'kt-tooltip', '1.00')).toBe(false);
+    expect(observer.takeRecords()).toHaveLength(0);
+    expect(writeAttrIfChanged(el, 'kt-tooltip', '2.00')).toBe(true);
+    expect(observer.takeRecords()).toHaveLength(1);
+    expect(el.getAttribute('kt-tooltip')).toBe('2.00');
+  });
+});
+
+describe('writeTitleIfChanged', () => {
+  it('skips a repeated title, including the empty title once the attribute exists', () => {
+    const el = document.createElement('div');
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(el, { attributes: true });
+    expect(writeTitleIfChanged(el, '')).toBe(true);
+    observer.takeRecords();
+    expect(writeTitleIfChanged(el, '')).toBe(false);
+    expect(writeTitleIfChanged(el, '12.5')).toBe(true);
+    expect(writeTitleIfChanged(el, '12.5')).toBe(false);
+    expect(el.title).toBe('12.5');
   });
 });

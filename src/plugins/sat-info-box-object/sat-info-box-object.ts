@@ -15,7 +15,7 @@ import type { ISettingsContribution, ISettingsMultiContributor } from '@app/engi
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeHtmlIfChanged } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
@@ -418,8 +418,10 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
       const sun = ServiceLocator.getScene().sun;
       const reading = SensorMath.getVisMagReading(sat, sensor, timeManager.simulationTimeObj, sun, intrinsicOverride);
 
-      appMagElement.innerHTML =
-        reading.kind === 'notSunlit' ? t7e('SatInfoBoxObject.notSunlit') : `${reading.value.toFixed(2)}${reading.assumed ? ` ${t7e('SatInfoBoxObject.assumedSuffix')}` : ''}`;
+      writeHtmlIfChanged(
+        appMagElement,
+        reading.kind === 'notSunlit' ? t7e('SatInfoBoxObject.notSunlit') : `${reading.value.toFixed(2)}${reading.assumed ? ` ${t7e('SatInfoBoxObject.assumedSuffix')}` : ''}`
+      );
       appMagRow.style.display = '';
     } catch (e) {
       errorManagerInstance.debug(`Apparent magnitude calculation failed: ${e}`);

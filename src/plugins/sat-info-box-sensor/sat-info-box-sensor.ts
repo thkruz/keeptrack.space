@@ -14,7 +14,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl, writeHtmlIfChanged } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeHtmlIfChanged, writeTitleIfChanged } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
@@ -670,15 +670,15 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
      */
     if (elements.az) {
       writeHtmlIfChanged(elements.az, tearr.az ? `${tearr.az.toFixed(0)}°` : l('values.unknown'));
-      elements.az.title = '';
+      writeTitleIfChanged(elements.az, '');
     }
     if (elements.el) {
       writeHtmlIfChanged(elements.el, tearr.el ? `${tearr.el.toFixed(1)}°` : l('values.unknown'));
-      elements.el.title = '';
+      writeTitleIfChanged(elements.el, '');
     }
     if (elements.rng) {
       writeHtmlIfChanged(elements.rng, tearr.rng ? `${tearr.rng.toFixed(2)} km` : l('values.unknown'));
-      elements.rng.title = '';
+      writeTitleIfChanged(elements.rng, '');
     }
 
     SatInfoBoxSensor.setReasonRow_(tearr.fovReason ?? l('values.outOfFov'));
@@ -700,7 +700,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       writeHtmlIfChanged(elements.beamwidth, l('values.outOfFov'));
     }
     if (elements.beamwidth) {
-      elements.beamwidth.title = beamwidthString;
+      writeTitleIfChanged(elements.beamwidth, beamwidthString);
     }
     if (elements.maxTmx) {
       writeHtmlIfChanged(elements.maxTmx, l('values.outOfFov'));

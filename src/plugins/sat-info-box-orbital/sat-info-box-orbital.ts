@@ -13,7 +13,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, writeTextIfChanged } from '@app/engine/utils/get-el';
+import { getEl, writeAttrIfChanged, writeTextIfChanged } from '@app/engine/utils/get-el';
 import { getStaleGpThresholdHours, isGpStale } from '@app/engine/utils/gp-age';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
@@ -45,6 +45,15 @@ const setInnerHtml = (id: string, value: string): void => {
 const setElHtml = (element: HTMLElement, value: string): void => {
   if (element.innerHTML !== value) {
     element.innerHTML = value;
+  }
+};
+
+/** Tooltip write that skips identical values (setAttribute queues a mutation record even when nothing changed). */
+const writeTooltip_ = (id: string, value: string): void => {
+  const element = getEl(id, true);
+
+  if (element) {
+    writeAttrIfChanged(element, 'kt-tooltip', value);
   }
 };
 
@@ -371,7 +380,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     // The unit is part of the stored-digit tooltip so a bare number never floats over the row (#273)
     for (const [id, value, places, unit] of digits) {
-      getEl(id, true)?.setAttribute('kt-tooltip', `${value.toFixed(places)}${unit}`);
+      writeTooltip_(id, `${value.toFixed(places)}${unit}`);
     }
 
     this.updatePeriodElement_(obj.period);
@@ -409,9 +418,13 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         return;
       }
       setElHtml(periodDom, `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`);
-      periodDom.dataset.position = 'top';
-      periodDom.dataset.delay = '50';
-      periodDom.setAttribute('kt-tooltip', `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`);
+      writeAttrIfChanged(periodDom, 'data-position', 'top');
+      writeAttrIfChanged(periodDom, 'data-delay', '50');
+      writeAttrIfChanged(
+        periodDom,
+        'kt-tooltip',
+        `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`
+      );
     }
   }
 
@@ -432,9 +445,10 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
       setElHtml(elsetAgeDom, isStale ? `${ageText} ${t7e('plugins.WatchlistPlugin.stale.marker')}` : ageText);
       elsetAgeDom.classList.toggle('sat-info-stale', isStale);
-      elsetAgeDom.dataset.position = 'top';
-      elsetAgeDom.dataset.delay = '50';
-      elsetAgeDom.setAttribute(
+      writeAttrIfChanged(elsetAgeDom, 'data-position', 'top');
+      writeAttrIfChanged(elsetAgeDom, 'data-delay', '50');
+      writeAttrIfChanged(
+        elsetAgeDom,
         'kt-tooltip',
         `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
            ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}${staleNote}`
@@ -665,7 +679,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       const note = `${t7e('SatInfoBoxOrbital.Sigma.defaultNote' as Parameters<typeof t7e>[0])} ${(sigmaKm * 1000).toFixed(3)} ${t7e('SatInfoBoxOrbital.meter')}`;
 
       setValueWithInfo(id, `${SatInfoBoxOrbital.formatSigmaKm(sigmaKm)} (${t7e('SatInfoBoxOrbital.Sigma.defaultTag' as Parameters<typeof t7e>[0])})`, note);
-      getEl(id, true)?.setAttribute('kt-tooltip', note);
+      writeTooltip_(id, note);
     }
   }
 
@@ -790,9 +804,9 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       const phase = obj.getActivePhase();
       const phaseName = phase ? phase.name : '';
 
-      headerSpan.textContent = phaseName ? `${t7e('SatInfoBoxOrbital.title')} (${phaseName})` : t7e('SatInfoBoxOrbital.title');
+      writeTextIfChanged(headerSpan, phaseName ? `${t7e('SatInfoBoxOrbital.title')} (${phaseName})` : t7e('SatInfoBoxOrbital.title'));
     } else {
-      headerSpan.textContent = t7e('SatInfoBoxOrbital.title');
+      writeTextIfChanged(headerSpan, t7e('SatInfoBoxOrbital.title'));
     }
   }
 }

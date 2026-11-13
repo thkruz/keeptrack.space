@@ -140,6 +140,18 @@ describe('SatInfoBoxOrbital data population', () => {
     expect(() => p().updateOrbitData_(missile)).not.toThrow();
   });
 
+  it('a repeated updateOrbitData_ and updateSectionHeader_ write no attributes, text or nodes (#49)', () => {
+    p().updateOrbitData_(defaultSat);
+    const section = getEl('orbital-section')!;
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(section, { childList: true, subtree: true, characterData: true, attributes: true });
+    p().updateOrbitData_(defaultSat);
+    p().updateSectionHeader_();
+    expect(observer.takeRecords()).toHaveLength(0);
+    observer.disconnect();
+  });
+
   it('updateSectionHeader_ updates the section title without throwing', () => {
     expect(() => p().updateSectionHeader_()).not.toThrow();
   });

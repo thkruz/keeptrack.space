@@ -81,6 +81,28 @@ export const writeTextIfChanged = (el: Element, text: string): boolean => {
   return true;
 };
 
+/** Set an attribute unless it already has that value. Any `setAttribute` call queues a mutation record, even for identical values. Returns true when written. */
+export const writeAttrIfChanged = (el: Element, name: string, value: string): boolean => {
+  if (el.getAttribute(name) === value) {
+    return false;
+  }
+
+  el.setAttribute(name, value);
+
+  return true;
+};
+
+/** Assign `title` unless the element already has it. A same-value assignment still queues a mutation record. */
+export const writeTitleIfChanged = (el: HTMLElement, title: string): boolean => {
+  if (el.title === title && (title !== '' || el.hasAttribute('title'))) {
+    return false;
+  }
+
+  el.title = title;
+
+  return true;
+};
+
 export const setInnerHtml = (id: string, html: string) => {
   requestIdleWrite(() => {
     const el = getEl(id, true);

@@ -130,6 +130,27 @@ describe('SatInfoBoxObject data population', () => {
     expect((visMagSpy.mock.calls[1][2] as Date).getTime()).toBe(Date.UTC(2026, 9, 16, 12, 0));
   });
 
+  it('repeating the same Apparent Mag reading makes no DOM write, a new reading does (#49)', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    const readingSpy = vi.spyOn(SensorMath, 'getVisMagReading').mockReturnValue({ kind: 'mag', value: 10.65, assumed: false });
+
+    p().updateApparentMag_(defaultSat);
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(getEl('sat-appmag')!, { childList: true, subtree: true, characterData: true });
+    p().updateApparentMag_(defaultSat);
+    expect(observer.takeRecords()).toHaveLength(0);
+
+    readingSpy.mockReturnValue({ kind: 'mag', value: 10.7, assumed: false });
+    p().updateApparentMag_(defaultSat);
+    expect(observer.takeRecords().length).toBeGreaterThan(0);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('10.70');
+    observer.disconnect();
+  });
+
   it('eclipsed satellite: Apparent Mag shows "Not sunlit" instead of a number', () => {
     const sensorManager = ServiceLocator.getSensorManager();
 

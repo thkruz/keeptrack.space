@@ -224,3 +224,29 @@ describe('SatInfoBoxSensor', () => {
     });
   });
 });
+
+describe('SatInfoBoxSensor out-of-FOV refresh (#49)', () => {
+  it('writes no title or text again when the out-of-FOV values repeat', () => {
+    setupStandardEnvironment([SelectSatManager, SatInfoBox]);
+    const plugin = new SatInfoBoxSensor();
+    const make = () => document.createElement('div');
+    const elements = { az: make(), el: make(), rng: make(), vmag: make(), beamwidth: make(), maxTmx: make(), ra: make(), dec: make() };
+    const host = document.createElement('div');
+
+    host.append(...Object.values(elements));
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [defaultSensor];
+    sensorManager.currentTEARR = { ...sensorManager.currentTEARR, az: 10 as Degrees, el: 5 as Degrees, rng: 1000 as Kilometers, inView: false } as never;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const run = () => (plugin as any).updateSatTearrOutFov_(elements, sensorManager);
+
+    run();
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(host, { childList: true, subtree: true, characterData: true, attributes: true });
+    run();
+    expect(observer.takeRecords()).toHaveLength(0);
+    observer.disconnect();
+  });
+});

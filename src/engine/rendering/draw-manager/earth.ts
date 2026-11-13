@@ -61,6 +61,12 @@ import { PoliticalMap } from './political-map';
 import { OcclusionProgram } from './post-processing';
 import { RELIEF_NORMAL_GLSL } from './relief-shading';
 
+/**
+ * The single rule for cloud fade: only the camera zoom (0 = close, 1 = far) matters, never
+ * whether a satellite is selected or which camera mode is active. Non-Earth center bodies show clouds fully.
+ */
+export const getCloudFadeZoom = (isEarthCenterBody: boolean, zoomLevel: number): number => (isEarthCenterBody ? zoomLevel : 1.0);
+
 export class Earth {
   private gl_: WebGL2RenderingContext;
   private glowDirection_ = 1;
@@ -821,10 +827,8 @@ export class Earth {
     const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (ServiceLocator.getMainCamera().zoomLevel() / 2) ** (1 / 2) : 1.0);
-    const camType = ServiceLocator.getMainCamera().cameraType;
-    const isSatMode = camType === CameraType.FIXED_TO_SAT_LVLH || camType === CameraType.FIXED_TO_SAT_ECI;
 
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uRawZoomLevel, !isEarthCenterBody || isSatMode ? 1.0 : ServiceLocator.getMainCamera().zoomLevel());
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uRawZoomLevel, getCloudFadeZoom(isEarthCenterBody, ServiceLocator.getMainCamera().zoomLevel()));
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -1222,7 +1226,7 @@ export class Earth {
 
       //................................................
       // Specular lighting
-      vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.05;
+      vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.03;
 
       //................................................
       // Final color

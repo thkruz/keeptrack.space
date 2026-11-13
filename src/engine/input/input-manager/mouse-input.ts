@@ -60,6 +60,9 @@ export class MouseInput {
     }
 
     this.mouseMoveTimeout = -1;
+    canvasDOM.addEventListener('mouseleave', () => {
+      ServiceLocator.getHoverManager()?.clearHover();
+    });
     canvasDOM.addEventListener('mousemove', (e) => {
       this.canvasMouseMove_(e);
       settingsManager.lastInteractionTime = Date.now();
@@ -319,7 +322,7 @@ export class MouseInput {
     const target = evt.target instanceof Element ? evt.target : null;
 
     // Typing fields, dialogs and the open drawer keep their own Escape.
-    if (isNativeKeyboardTarget(target) || document.querySelector('.plugin-drawer.open, dialog[open], [role="dialog"]:not([hidden])')) {
+    if (isNativeKeyboardTarget(target) || MouseInput.hasVisibleOverlay_()) {
       return;
     }
 
@@ -328,6 +331,19 @@ export class MouseInput {
     if (selectSatManager && selectSatManager.selectedSat !== -1 && userActionGate.allowSelection(-1)) {
       selectSatManager.selectSat(-1);
     }
+  }
+
+  /** True when the open drawer, an open dialog or a really visible role=dialog is on screen. */
+  private static hasVisibleOverlay_(): boolean {
+    if (document.querySelector('.plugin-drawer.open, dialog[open]')) {
+      return true;
+    }
+
+    return Array.from(document.querySelectorAll('[role="dialog"]:not([hidden])')).some((el) => {
+      const style = window.getComputedStyle(el);
+
+      return style.display !== 'none' && style.visibility !== 'hidden';
+    });
   }
 
   private canvasClick_(evt: MouseEvent) {

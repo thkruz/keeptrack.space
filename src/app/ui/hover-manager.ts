@@ -39,6 +39,20 @@ export class HoverManager {
     return this.currentHoverId;
   }
 
+  /** Drop the hover card and forget the hovered object (pointer left the canvas, or the selection changed). */
+  clearHover(): void {
+    const box = getEl('sat-hoverbox');
+
+    if (box) {
+      box.style.display = 'none';
+    }
+    const { mouse } = ServiceLocator.getInputManager();
+
+    if (mouse) {
+      mouse.mouseSat = -1;
+    }
+  }
+
   init() {
     /*
      * NOTE: Reusing these cached value causes the hover menu to get stuck on or off
@@ -49,6 +63,7 @@ export class HoverManager {
     this.satHoverBoxNode3 = <HTMLDivElement>(<unknown>getEl('sat-hoverbox3'));
     this.satHoverBoxDOM = <HTMLDivElement>(<unknown>getEl('sat-hoverbox'));
 
+    EventBus.getInstance().on(EventBusEvent.selectSatData, () => this.clearHover());
     EventBus.getInstance().on(EventBusEvent.highPerformanceRender, () => {
       // Only update hover if we are not on mobile
       if (!settingsManager.isMobileModeEnabled) {

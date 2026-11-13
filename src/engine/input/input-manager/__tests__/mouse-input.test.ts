@@ -160,6 +160,18 @@ describe('MouseInput handlers', () => {
       expect(selectSat).toHaveBeenCalledWith(-1);
     });
 
+    it('ignores a role=dialog that is display:none but yields to a visible one', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      document.body.innerHTML = '<div id="launchpad" role="dialog" style="display:none"></div>';
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      document.getElementById('launchpad')!.style.display = 'block';
+      press();
+      expect(selectSat).not.toHaveBeenCalled();
+      document.body.innerHTML = '';
+    });
+
     it('leaves the selection while the right-click menu is open or a field has focus', () => {
       vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
       inputManager.isRmbMenuOpen = true;

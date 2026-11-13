@@ -43,7 +43,8 @@
         "walkerTotal": "Спутники (T)",
         "walkerPlanes": "Плоскости (P)",
         "walkerPhasing": "Фазировка (F)",
-        "walkerPrefix": "Префикс имени"
+        "walkerPrefix": "Префикс имени",
+        "walkerTpfHelp": "T должно быть кратно P. F (фазирование) принимает значения от 0 до P-1."
       },
       "buttons": {
         "createSatellite": "Создать спутник",

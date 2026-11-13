@@ -43,7 +43,8 @@
         "walkerTotal": "卫星数 (T)",
         "walkerPlanes": "轨道面数 (P)",
         "walkerPhasing": "相位 (F)",
-        "walkerPrefix": "名称前缀"
+        "walkerPrefix": "名称前缀",
+        "walkerTpfHelp": "T 必须是 P 的倍数。F(相位)取值范围为 0 到 P-1。"
       },
       "buttons": {
         "createSatellite": "创建卫星",

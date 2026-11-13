@@ -78,34 +78,35 @@ export function buildBasicTabHtml(): string {
         <small class="createSat-hint">${l('walkerHint')}</small>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="550" id="${P}-walker-alt" type="text" />
+            <input value="550" id="${P}-walker-alt" type="text" />
             <label for="${P}-walker-alt" class="active">${l('walkerAltKm')}</label>
           </div>
           <div class="input-field col s6">
-            <input placeholder="53" id="${P}-walker-inc" type="text" />
+            <input value="53" id="${P}-walker-inc" type="text" />
             <label for="${P}-walker-inc" class="active">${l('inclinationDeg')}</label>
           </div>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s4">
-            <input placeholder="24" id="${P}-walker-total" type="text" />
+            <input value="24" id="${P}-walker-total" type="text" />
             <label for="${P}-walker-total" class="active">${l('walkerTotal')}</label>
           </div>
           <div class="input-field col s4">
-            <input placeholder="3" id="${P}-walker-planes" type="text" />
+            <input value="3" id="${P}-walker-planes" type="text" />
             <label for="${P}-walker-planes" class="active">${l('walkerPlanes')}</label>
           </div>
           <div class="input-field col s4">
-            <input placeholder="1" id="${P}-walker-phasing" type="text" />
+            <input value="1" id="${P}-walker-phasing" type="text" />
             <label for="${P}-walker-phasing" class="active">${l('walkerPhasing')}</label>
           </div>
         </div>
         <div class="kt-field-row">
           <div class="input-field col s12">
-            <input placeholder="WALKER" id="${P}-walker-prefix" type="text" maxlength="12" />
+            <input value="WALKER" id="${P}-walker-prefix" type="text" maxlength="12" />
             <label for="${P}-walker-prefix" class="active">${l('walkerPrefix')}</label>
           </div>
         </div>
+        <small class="createSat-hint">${l('walkerTpfHelp')}</small>
         <div id="${P}-walker-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-walker-submit', b('createWalker'))}
       </section>

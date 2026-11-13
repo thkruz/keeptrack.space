@@ -43,7 +43,8 @@
         "walkerTotal": "Satellites (T)",
         "walkerPlanes": "Planes (P)",
         "walkerPhasing": "Phasing (F)",
-        "walkerPrefix": "Name prefix"
+        "walkerPrefix": "Name prefix",
+        "walkerTpfHelp": "T must be a multiple of P. F (phasing) runs from 0 to P-1."
       },
       "buttons": {
         "createSatellite": "Create Satellite",

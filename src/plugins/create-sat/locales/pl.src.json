@@ -43,7 +43,8 @@
         "walkerTotal": "Satelity (T)",
         "walkerPlanes": "Płaszczyzny (P)",
         "walkerPhasing": "Fazowanie (F)",
-        "walkerPrefix": "Prefiks nazwy"
+        "walkerPrefix": "Prefiks nazwy",
+        "walkerTpfHelp": "T musi być wielokrotnością P. F (fazowanie) wynosi od 0 do P-1."
       },
       "buttons": {
         "createSatellite": "Utwórz satelitę",

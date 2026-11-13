@@ -43,7 +43,8 @@
         "walkerTotal": "衛星数 (T)",
         "walkerPlanes": "軌道面数 (P)",
         "walkerPhasing": "位相 (F)",
-        "walkerPrefix": "名前の接頭辞"
+        "walkerPrefix": "名前の接頭辞",
+        "walkerTpfHelp": "T は P の倍数にしてください。F(位相)は 0 から P-1 までです。"
       },
       "buttons": {
         "createSatellite": "衛星を作成",

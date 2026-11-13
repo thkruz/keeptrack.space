@@ -43,7 +43,8 @@
         "walkerTotal": "위성 수 (T)",
         "walkerPlanes": "궤도면 수 (P)",
         "walkerPhasing": "위상 (F)",
-        "walkerPrefix": "이름 접두어"
+        "walkerPrefix": "이름 접두어",
+        "walkerTpfHelp": "T는 P의 배수여야 합니다. F(위상)는 0부터 P-1까지입니다."
       },
       "buttons": {
         "createSatellite": "위성 생성",

@@ -43,7 +43,8 @@
         "walkerTotal": "Satélites (T)",
         "walkerPlanes": "Planos (P)",
         "walkerPhasing": "Fase (F)",
-        "walkerPrefix": "Prefijo del nombre"
+        "walkerPrefix": "Prefijo del nombre",
+        "walkerTpfHelp": "T debe ser múltiplo de P. F (fase) va de 0 a P-1."
       },
       "buttons": {
         "createSatellite": "Crear Satélite",

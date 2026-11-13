@@ -43,7 +43,8 @@
         "walkerTotal": "Satellites (T)",
         "walkerPlanes": "Plans (P)",
         "walkerPhasing": "Phasage (F)",
-        "walkerPrefix": "Préfixe du nom"
+        "walkerPrefix": "Préfixe du nom",
+        "walkerTpfHelp": "T doit être un multiple de P. F (phasage) va de 0 à P-1."
       },
       "buttons": {
         "createSatellite": "Créer le satellite",

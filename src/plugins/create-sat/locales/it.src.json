@@ -43,7 +43,8 @@
         "walkerTotal": "Satelliti (T)",
         "walkerPlanes": "Piani (P)",
         "walkerPhasing": "Fasamento (F)",
-        "walkerPrefix": "Prefisso del nome"
+        "walkerPrefix": "Prefisso del nome",
+        "walkerTpfHelp": "T deve essere un multiplo di P. F (fasatura) va da 0 a P-1."
       },
       "buttons": {
         "createSatellite": "Crea satellite",

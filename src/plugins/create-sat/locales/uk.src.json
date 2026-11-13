@@ -43,7 +43,8 @@
         "walkerTotal": "Супутники (T)",
         "walkerPlanes": "Площини (P)",
         "walkerPhasing": "Фазування (F)",
-        "walkerPrefix": "Префікс назви"
+        "walkerPrefix": "Префікс назви",
+        "walkerTpfHelp": "T має бути кратним P. F (фазування) має значення від 0 до P-1."
       },
       "buttons": {
         "createSatellite": "Створити супутник",

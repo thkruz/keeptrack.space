@@ -43,7 +43,8 @@
         "walkerTotal": "Družice (T)",
         "walkerPlanes": "Roviny (P)",
         "walkerPhasing": "Fázování (F)",
-        "walkerPrefix": "Předpona názvu"
+        "walkerPrefix": "Předpona názvu",
+        "walkerTpfHelp": "T musí být násobek P. F (fázování) je od 0 do P-1."
       },
       "buttons": {
         "createSatellite": "Vytvořit satelit",

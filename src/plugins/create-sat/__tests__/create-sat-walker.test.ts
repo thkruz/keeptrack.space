@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { buildBasicTabHtml } from '../create-sat-menu-html';
 import { parseWalkerInputs, planWalker, WALKER_MAX_SATS, type WalkerInputValues, walkerMemberName } from '../create-sat-walker';
 
 const base: WalkerInputValues = { altitude: '550', inclination: '53', total: '24', planes: '3', phasing: '1', prefix: 'STAR' };
@@ -75,5 +76,15 @@ describe('planWalker', () => {
 
   it('passes validation errors through', () => {
     expect(planWalker({ ...base, planes: '5' }, epoch, sccs(24))).toEqual({ code: 'divisible' });
+  });
+});
+
+describe('walker form defaults', () => {
+  it('prefills real values (not placeholders) and shows the T/P/F help', () => {
+    const doc = new DOMParser().parseFromString(buildBasicTabHtml(), 'text/html');
+    const value = (id: string): string | null => doc.getElementById(`createSat-walker-${id}`)?.getAttribute('value') ?? null;
+
+    expect([value('alt'), value('inc'), value('total'), value('planes'), value('phasing'), value('prefix')]).toEqual(['550', '53', '24', '3', '1', 'WALKER']);
+    expect(doc.getElementById('createSat-walker-section')?.textContent).toMatch(/walkerTpfHelp|T must be a multiple of P/u);
   });
 });

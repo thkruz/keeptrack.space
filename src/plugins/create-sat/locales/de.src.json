@@ -43,7 +43,8 @@
         "walkerTotal": "Satelliten (T)",
         "walkerPlanes": "Ebenen (P)",
         "walkerPhasing": "Phasierung (F)",
-        "walkerPrefix": "Namenspräfix"
+        "walkerPrefix": "Namenspräfix",
+        "walkerTpfHelp": "T muss ein Vielfaches von P sein. F (Phasenversatz) reicht von 0 bis P-1."
       },
       "buttons": {
         "createSatellite": "Satellit erstellen",

@@ -68,6 +68,19 @@ describe('CustomSensorPlugin.processCustomSensorSubmit_', () => {
     expect(warnSpy).not.toHaveBeenCalled();
   });
 
+  it('toasts on a successful add and a re-add right after Clear is not swallowed as a double-click', () => {
+    const toastSpy = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+    setForm();
+    expect(C.processCustomSensorSubmit_()).toBe('added');
+    const afterFirst = toastSpy.mock.calls.length;
+
+    expect(afterFirst).toBeGreaterThan(0);
+    C.lastSubmit_ = null; // what the Clear and remove handlers do
+    expect(C.processCustomSensorSubmit_()).toBe('added');
+    expect(toastSpy.mock.calls.length).toBeGreaterThan(afterFirst);
+  });
+
   it('warns and does not add when a field is out of range', () => {
     setForm({ 'cs-lat': '95' });
     C.processCustomSensorSubmit_();

@@ -576,6 +576,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       }
       const sensorManagerInstance = ServiceLocator.getSensorManager();
 
+      // A re-add right after Clear is a real add, not a double-click; never swallow it silently
+      CustomSensorPlugin.lastSubmit_ = null;
       sensorManagerInstance.clearSecondarySensors();
       // clearSecondarySensors keeps a catalog primary; Clear resets every sensor
       if (sensorManagerInstance.isSensorSelected()) {
@@ -824,6 +826,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       }
       e.preventDefault();
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+      CustomSensorPlugin.lastSubmit_ = null;
       const sensorManagerInstance = ServiceLocator.getSensorManager();
       const sensor = sensorManagerInstance.getSensorByObjName(removeBtn.dataset.id);
 

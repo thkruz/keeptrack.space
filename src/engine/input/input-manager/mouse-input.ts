@@ -61,9 +61,14 @@ export class MouseInput {
 
     this.mouseMoveTimeout = -1;
     canvasDOM.addEventListener('mouseleave', () => {
+      ServiceLocator.getInputManager().isPointerOverCanvas = false;
       ServiceLocator.getHoverManager()?.clearHover();
     });
+    canvasDOM.addEventListener('mouseenter', () => {
+      ServiceLocator.getInputManager().isPointerOverCanvas = true;
+    });
     canvasDOM.addEventListener('mousemove', (e) => {
+      ServiceLocator.getInputManager().isPointerOverCanvas = true;
       this.canvasMouseMove_(e);
       settingsManager.lastInteractionTime = Date.now();
       ServiceLocator.getInputManager().markPickActivity();
@@ -342,7 +347,13 @@ export class MouseInput {
     return Array.from(document.querySelectorAll('[role="dialog"]:not([hidden])')).some((el) => {
       const style = window.getComputedStyle(el);
 
-      return style.display !== 'none' && style.visibility !== 'hidden';
+      if (style.display === 'none' || style.visibility === 'hidden' || Number.parseFloat(style.opacity) === 0 || el.hasAttribute('inert')) {
+        return false;
+      }
+      // Zero-size leftovers (closed login / email modals keep display:block) are not on screen.
+      const rect = el.getBoundingClientRect();
+
+      return rect.width > 0 && rect.height > 0;
     });
   }
 

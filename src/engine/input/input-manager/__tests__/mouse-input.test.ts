@@ -166,9 +166,24 @@ describe('MouseInput handlers', () => {
       press();
       expect(selectSat).toHaveBeenCalledWith(-1);
       selectSat.mockClear();
-      document.getElementById('launchpad')!.style.display = 'block';
+      const pad = document.getElementById('launchpad')!;
+
+      pad.style.display = 'block';
+      // A display:block dialog with no size (closed login / email modals) does not block Escape.
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      pad.getBoundingClientRect = () => ({ width: 300, height: 200 }) as DOMRect;
       press();
       expect(selectSat).not.toHaveBeenCalled();
+      pad.style.opacity = '0';
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      pad.style.opacity = '1';
+      pad.setAttribute('inert', '');
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
       document.body.innerHTML = '';
     });
 

@@ -76,6 +76,8 @@ export class InputManager {
   public isPickingSupported = true;
   private hasWarnedPickingDisabled_ = false;
   lastUpdateTime: number = 0;
+  /** False once the pointer left the canvas; hover picking must not reuse the stale coordinates. */
+  isPointerOverCanvas = true;
 
   // ─── On-demand GPU picking gate (WP4) ───────────────────────────────
   /** How long after the last pointer/read activity to keep rendering the picking buffer. */
@@ -887,7 +889,9 @@ export class InputManager {
       if (uiManagerInstance.searchHoverSatId >= 0) {
         this.mouse.mouseSat = uiManagerInstance.searchHoverSatId;
       } else if (!settingsManager.isMobileModeEnabled) {
-        if (Date.now() - this.lastUpdateTime > 100) {
+        if (!this.isPointerOverCanvas) {
+          this.mouse.mouseSat = -1;
+        } else if (Date.now() - this.lastUpdateTime > 100) {
           this.mouse.mouseSat = this.getSatIdFromCoord(inputCamera.state.mouseX, inputCamera.state.mouseY);
           this.lastUpdateTime = Date.now();
         }

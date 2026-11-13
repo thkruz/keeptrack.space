@@ -41,6 +41,13 @@ const setInnerHtml = (id: string, value: string): void => {
   }
 };
 
+/** Same skip-if-unchanged write for an element already in hand (#49: fewer DOM writes while the panel is dragged). */
+const setElHtml = (element: HTMLElement, value: string): void => {
+  if (element.innerHTML !== value) {
+    element.innerHTML = value;
+  }
+};
+
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
   dependencies_: string[] = [SatInfoBox.name];
@@ -398,7 +405,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
         return;
       }
-      periodDom.innerHTML = `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`;
+      setElHtml(periodDom, `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`);
       periodDom.dataset.position = 'top';
       periodDom.dataset.delay = '50';
       periodDom.setAttribute('kt-tooltip', `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`);
@@ -420,7 +427,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       const isStale = Number.isFinite(ageDays) && isGpStale(ageDays * 24, staleHours);
       const staleNote = isStale ? `<br/>${t7e('plugins.WatchlistPlugin.stale.tooltip').replace('{hours}', String(staleHours))}` : '';
 
-      elsetAgeDom.innerHTML = isStale ? `${ageText} ${t7e('plugins.WatchlistPlugin.stale.marker')}` : ageText;
+      setElHtml(elsetAgeDom, isStale ? `${ageText} ${t7e('plugins.WatchlistPlugin.stale.marker')}` : ageText);
       elsetAgeDom.classList.toggle('sat-info-stale', isStale);
       elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
@@ -489,14 +496,14 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (satLonElement && satLatElement) {
       if (lla.lon >= 0) {
-        satLonElement.innerHTML = `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`;
+        setElHtml(satLonElement, `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`);
       } else {
-        satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`;
+        setElHtml(satLonElement, `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`);
       }
       if (lla.lat >= 0) {
-        satLatElement.innerHTML = `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`;
+        setElHtml(satLatElement, `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`);
       } else {
-        satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
+        setElHtml(satLatElement, `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`);
       }
     }
 
@@ -601,25 +608,25 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         z: (obj.position.z - centerBody.position[2]) as Kilometers,
       };
 
-      satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+      setElHtml(satAltitudeElement, `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     } else {
       const state = obj instanceof Satellite ? SatInfoBoxOrbital.currentState_(obj) : { position: obj.position, speed: obj.totalVelocity };
 
-      satAltitudeElement.innerHTML = `${SatMath.getAlt(state.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+      setElHtml(satAltitudeElement, `${SatMath.getAlt(state.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
       speedKmS = state.speed;
     }
 
-    satVelocityElement.innerHTML = `${speedKmS.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
+    setElHtml(satVelocityElement, `${speedKmS.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`);
 
     return true;
   }
 
   private updateMissileAltitudeAndVelocity_(misl: MissileObject, satAltitudeElement: HTMLElement, satVelocityElement: HTMLElement): void {
-    satAltitudeElement.innerHTML = `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    setElHtml(satAltitudeElement, `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     if (misl.totalVelocity) {
-      satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
+      setElHtml(satVelocityElement, `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`);
     } else {
-      satVelocityElement.innerHTML = t7e('SatInfoBoxOrbital.unknown');
+      setElHtml(satVelocityElement, t7e('SatInfoBoxOrbital.unknown'));
     }
   }
 
@@ -690,10 +697,10 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const satCrossTrackElement = getEl('sat-sec-crosstrack');
 
     if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
-      satDistanceElement.innerHTML = `${dist} km`;
-      satRadiusElement.innerHTML = `${ric.position.x.toFixed(2)}km`;
-      satInTrackElement.innerHTML = `${ric.position.y.toFixed(2)}km`;
-      satCrossTrackElement.innerHTML = `${ric.position.z.toFixed(2)}km`;
+      setElHtml(satDistanceElement, `${dist} km`);
+      setElHtml(satRadiusElement, `${ric.position.x.toFixed(2)}km`);
+      setElHtml(satInTrackElement, `${ric.position.y.toFixed(2)}km`);
+      setElHtml(satCrossTrackElement, `${ric.position.z.toFixed(2)}km`);
     } else {
       errorManagerInstance.debug('Error updating secondary satellite info!');
     }

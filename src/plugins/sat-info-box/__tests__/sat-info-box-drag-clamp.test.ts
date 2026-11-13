@@ -35,3 +35,22 @@ describe('SatInfoBox.clampAfterResize_', () => {
     expect(draggie.measureContainment).toHaveBeenCalled();
   });
 });
+
+describe('SatInfoBox.freezeFloatingGeometry_', () => {
+  it('pins a bottom-docked box at its on-screen position so the first drag does not jump to y = 0', () => {
+    const container = document.createElement('div');
+    const el = document.createElement('div');
+
+    container.getBoundingClientRect = rectAt(0, 768);
+    el.getBoundingClientRect = () => ({ top: 307, bottom: 768, left: 1006, right: 1366, width: 360, height: 461 }) as DOMRect;
+    const draggie = { position: { x: 0, y: 0 }, startPosition: { x: 0, y: 0 } };
+
+    SatInfoBox.freezeFloatingGeometry_(draggie, el, container);
+
+    expect(el.style.top).toBe('307px');
+    expect(el.style.left).toBe('1006px');
+    expect(el.style.bottom).toBe('auto');
+    expect(draggie.position).toEqual({ x: 1006, y: 307 });
+    expect(draggie.startPosition).toEqual({ x: 1006, y: 307 });
+  });
+});

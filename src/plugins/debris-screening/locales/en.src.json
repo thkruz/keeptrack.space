@@ -19,7 +19,7 @@
         "low": "Low",
         "unknown": "N/A"
       },
-      "sccLabel": "Satellite SCC#",
+      "sccLabel": "Primary NORAD ID",
       "timeWindowLabel": "Time Window",
       "timeOptions": {
         "h1": "1 Hour",

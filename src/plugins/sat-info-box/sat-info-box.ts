@@ -214,6 +214,29 @@ export class SatInfoBox extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * The docked box is anchored by `bottom` with `top: auto`, which Draggabilly reads as y = 0, so the first
+   * drag from the dock jumped the box to the top edge (#49). Pin the box at its current on-screen position
+   * with explicit top/left and tell Draggabilly the same numbers, so the box stays under the pointer.
+   */
+  static freezeFloatingGeometry_(draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number } }, el: HTMLElement, container: HTMLElement): void {
+    const rect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const x = Math.max(0, Math.round(rect.left - containerRect.left));
+    const y = Math.max(0, Math.round(rect.top - containerRect.top));
+
+    el.style.bottom = 'auto';
+    el.style.right = 'auto';
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    draggie.position.x = x;
+    draggie.position.y = y;
+    if (draggie.startPosition) {
+      draggie.startPosition.x = x;
+      draggie.startPosition.y = y;
+    }
+  }
+
   /** Pulls a just-enlarged floating box back inside its container and refreshes Draggabilly's containment. */
   static clampAfterResize_(
     draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number }; measureContainment?: () => void },
@@ -243,15 +266,25 @@ export class SatInfoBox extends KeepTrackPlugin {
       draggie.on('dragStart', () => {
         const satInfoBoxElement = getEl(SatInfoBox.containerId_)!;
 
-        satInfoBoxElement.style.height = 'fit-content';
-        satInfoBoxElement.style.maxHeight = '80%';
+        // Only write what changes: a repeat drag finds the floating geometry already in place.
+        if (satInfoBoxElement.style.height !== 'fit-content') {
+          satInfoBoxElement.style.height = 'fit-content';
+        }
+        if (satInfoBoxElement.style.maxHeight !== '80%') {
+          satInfoBoxElement.style.maxHeight = '80%';
+        }
         document.documentElement.style.setProperty('--search-box-bottom', '0px');
         satInfoBoxElement.classList.remove('satinfo-fixed');
 
-        getEl('search-results')!.style.maxHeight = '85%';
+        const searchResults = getEl('search-results')!;
 
-        // Draggabilly measured containment before this handler grew the box (45% to 80% max height),
-        // so re-clamp it now or the first drag lets the bottom edge leave the viewport.
+        if (searchResults.style.maxHeight !== '85%') {
+          searchResults.style.maxHeight = '85%';
+        }
+
+        // Draggabilly measured position and containment before this handler grew the box (45% to 80% max
+        // height) and undocked it, so pin the final floating geometry now, then re-clamp and re-measure.
+        SatInfoBox.freezeFloatingGeometry_(draggie, satInfoBoxElement, KeepTrack.getInstance().containerRoot);
         SatInfoBox.clampAfterResize_(draggie, satInfoBoxElement, KeepTrack.getInstance().containerRoot);
       });
 

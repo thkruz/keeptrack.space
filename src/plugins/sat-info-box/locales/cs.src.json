@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "Zdroj",
-      "tooltip": "Zdroj dat o satelitu"
+      "tooltip": "Zdroj dat o satelitu",
+      "notRecorded": "Nezaznamenáno"
     },
     "Confidence": {
       "label": "Spolehlivost",

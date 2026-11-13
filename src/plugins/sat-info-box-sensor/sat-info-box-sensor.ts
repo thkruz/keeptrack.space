@@ -22,6 +22,7 @@ import { BaseObject, cKmPerMs, DEG2RAD, Degrees, eci2lla, Kilometers, RadecTopoc
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
+import { infoCircleHtml } from '../sat-info-box/info-value';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
@@ -43,6 +44,9 @@ const EL = {
   NEXT_PASS: 'sat-nextpass',
   REASON: 'sat-fov-reason',
 };
+
+/** Rows whose jargon label gets a visible info circle (the key's hover tooltip alone is not discoverable). */
+const INFO_CIRCLE_ROWS = new Set<string>(['sat-beamwidth', 'sat-maxTmx', 'sat-sun']);
 
 const l = (key: string): string => t7e(`plugins.SatInfoBoxSensor.${key}` as Parameters<typeof t7e>[0]);
 
@@ -166,7 +170,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
         <div class="sat-info-key" data-position="top" data-delay="50"
           kt-tooltip="${row.tooltip}"
         >
-          ${row.key}
+          ${row.key}${INFO_CIRCLE_ROWS.has(row.id) ? infoCircleHtml(row.tooltip) : ''}
         </div>
         <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>

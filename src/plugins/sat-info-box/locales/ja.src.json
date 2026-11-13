@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "情報源",
-      "tooltip": "衛星情報のデータソース"
+      "tooltip": "衛星情報のデータソース",
+      "notRecorded": "記録なし"
     },
     "Confidence": {
       "label": "信頼度",

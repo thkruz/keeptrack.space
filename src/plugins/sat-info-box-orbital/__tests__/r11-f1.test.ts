@@ -120,15 +120,12 @@ describe('SatInfoBoxOrbital R11-F1', () => {
   });
 
   it('#88 formats the latitude reach from the inclination, including retrograde orbits', () => {
-    const north = t7e('SatInfoBoxOrbital.Latitude.north');
-    const south = t7e('SatInfoBoxOrbital.Latitude.south');
-
-    expect(SatInfoBoxOrbital.formatLatitudeBand(51.6416)).toBe(`51.64°${north} / 51.64°${south}`);
-    expect(SatInfoBoxOrbital.formatLatitudeBand(98.2)).toBe(`81.80°${north} / 81.80°${south}`);
+    expect(SatInfoBoxOrbital.formatLatitudeBand(51.6416)).toBe('±51.64°');
+    expect(SatInfoBoxOrbital.formatLatitudeBand(98.2)).toBe('±81.80°');
     expect(SatInfoBoxOrbital.formatLatitudeBand(Number.NaN)).toBe(t7e('SatInfoBoxOrbital.notAvailable' as Parameters<typeof t7e>[0]));
 
     p().updateOrbitData_(iss);
-    expect(getEl(EL.LAT_BAND)!.textContent).toBe(`51.64°${north} / 51.64°${south}`);
+    expect(getEl(EL.LAT_BAND)!.textContent).toBe('±51.64°');
   });
 
   it('#133 names the water body when no country is under the satellite', () => {

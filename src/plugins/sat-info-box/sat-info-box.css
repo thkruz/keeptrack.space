@@ -232,42 +232,64 @@
   display: none;
 }
 
-/* Info circle after a short value; the explanation lives in its kt-tooltip */
+/* Info circle after a short value; the explanation lives in its kt-tooltip.
+   The element itself is the 24 px touch target (negative margins keep the row layout of a 12 px circle);
+   the visible 12 px ring is drawn by ::before. */
 .sat-info-circle {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 12px;
-  height: 12px;
-  margin-left: 4px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  margin: -6px -6px -6px -2px;
   font-size: 9px;
   font-style: italic;
   line-height: 1;
   vertical-align: middle;
-  opacity: 0.7;
   cursor: help;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.sat-info-circle:hover,
-.sat-info-circle:focus-visible {
+.sat-info-circle::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.sat-info-circle:hover::before,
+.sat-info-circle:focus-visible::before {
   opacity: 1;
 }
 
 .sat-info-circle:focus-visible {
   outline: 2px solid currentColor;
-  outline-offset: 1px;
-}
-
-/* 24 px touch target around the 12 px circle without changing the row height */
-.sat-info-circle {
-  position: relative;
-}
-
-.sat-info-circle::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
+  outline-offset: -4px;
   border-radius: 50%;
+}
+
+/* Room for the 24 px circle inside the clipped value box */
+.sat-info-value:has(.sat-info-circle) {
+  padding-block: 4px;
+}
+
+/* Phone: the bottom menu button overlays the bottom of the box, leave scroll room so the last rows stay readable */
+@media (max-width: 639px) {
+  #sat-infobox {
+    padding-bottom: calc(var(--bottom-menu-height) + 15px);
+  }
+}
+
+/* Age of GP past the stale threshold (same setting as the watchlist STALE flag). The STALE word carries the meaning. */
+.sat-info-value.sat-info-stale {
+  color: var(--color-warning, #ffb300);
+  font-weight: 600;
 }

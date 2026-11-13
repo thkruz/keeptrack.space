@@ -14,6 +14,7 @@ import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodi
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
+import { getStaleGpThresholdHours, isGpStale } from '@app/engine/utils/gp-age';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 import i18next from 'i18next';
@@ -411,13 +412,20 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const elsetAgeDom = getEl(EL.ELSET_AGE);
 
     if (elsetAgeDom) {
-      elsetAgeDom.innerHTML = ageText;
+      // Same threshold and comparison as the watchlist STALE flag (hours past the stale setting).
+      const ageDays = obj.ageOfElset(simTime);
+      const staleHours = getStaleGpThresholdHours();
+      const isStale = Number.isFinite(ageDays) && isGpStale(ageDays * 24, staleHours);
+      const staleNote = isStale ? `<br/>${t7e('plugins.WatchlistPlugin.stale.tooltip').replace('{hours}', String(staleHours))}` : '';
+
+      elsetAgeDom.innerHTML = isStale ? `${ageText} ${t7e('plugins.WatchlistPlugin.stale.marker')}` : ageText;
+      elsetAgeDom.classList.toggle('sat-info-stale', isStale);
       elsetAgeDom.dataset.position = 'top';
       elsetAgeDom.dataset.delay = '50';
       elsetAgeDom.setAttribute(
         'kt-tooltip',
         `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
-           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`
+           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}${staleNote}`
       );
     }
   }
@@ -494,7 +502,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   }
 
   /**
-   * Latitude reach row: the highest latitude the ground track gets to, north and south. For an inclination i that is
+   * Latitude reach row: the highest latitude the ground track gets to, the same north and south (shown as ±). For an inclination i that is
    * i (i up to 90) or 180 - i (retrograde). Same for every point of the orbit, so it is the band the object stays in.
    */
   static formatLatitudeBand(inclinationDeg: number): string {
@@ -504,7 +512,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     const reach = inclinationDeg > 90 ? 180 - inclinationDeg : inclinationDeg;
 
-    return `${reach.toFixed(2)}°${t7e('SatInfoBoxOrbital.Latitude.north')} / ${reach.toFixed(2)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
+    return `±${reach.toFixed(2)}°`;
   }
 
   private updateLatitudeBand_(inclinationDeg: number): void {
@@ -638,11 +646,11 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     ];
 
     for (const [id, sigmaKm] of rows) {
-      setInnerHtml(id, `${SatInfoBoxOrbital.formatSigmaKm(sigmaKm)} (${t7e('SatInfoBoxOrbital.Sigma.defaultTag' as Parameters<typeof t7e>[0])})`);
-      getEl(id, true)?.setAttribute(
-        'kt-tooltip',
-        `${t7e('SatInfoBoxOrbital.Sigma.defaultNote' as Parameters<typeof t7e>[0])} ${(sigmaKm * 1000).toFixed(3)} ${t7e('SatInfoBoxOrbital.meter')}`
-      );
+      // The info circle explains what "default" means; the same note stays as the value's own tooltip.
+      const note = `${t7e('SatInfoBoxOrbital.Sigma.defaultNote' as Parameters<typeof t7e>[0])} ${(sigmaKm * 1000).toFixed(3)} ${t7e('SatInfoBoxOrbital.meter')}`;
+
+      setValueWithInfo(id, `${SatInfoBoxOrbital.formatSigmaKm(sigmaKm)} (${t7e('SatInfoBoxOrbital.Sigma.defaultTag' as Parameters<typeof t7e>[0])})`, note);
+      getEl(id, true)?.setAttribute('kt-tooltip', note);
     }
   }
 

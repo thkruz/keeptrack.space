@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "来源",
-      "tooltip": "卫星信息的数据来源"
+      "tooltip": "卫星信息的数据来源",
+      "notRecorded": "未记录"
     },
     "Confidence": {
       "label": "置信度",

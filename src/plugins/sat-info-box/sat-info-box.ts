@@ -594,6 +594,10 @@ export class SatInfoBox extends KeepTrackPlugin {
   };
 
   private static formatSourceName_(source: string): string {
+    if (!source || source.trim().toLowerCase() === 'unknown') {
+      return t7e('satInfoBox.Source.notRecorded' as Parameters<typeof t7e>[0]);
+    }
+
     return SatInfoBox.SOURCE_DISPLAY_NAMES_[source] ?? source;
   }
 

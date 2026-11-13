@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "출처",
-      "tooltip": "위성 정보의 데이터 출처"
+      "tooltip": "위성 정보의 데이터 출처",
+      "notRecorded": "기록 없음"
     },
     "Confidence": {
       "label": "신뢰도",

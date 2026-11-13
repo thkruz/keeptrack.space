@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "Źródło",
-      "tooltip": "Źródło danych o satelicie"
+      "tooltip": "Źródło danych o satelicie",
+      "notRecorded": "Nie zapisano"
     },
     "Confidence": {
       "label": "Pewność",

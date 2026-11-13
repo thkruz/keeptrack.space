@@ -347,7 +347,20 @@ describe('SatInfoBoxOrbital Age of GP row', () => {
     timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 20));
     p().updateOrbitData_(landsat8);
 
-    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`10.22 ${days()}`);
+    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`10.22 ${days()} ${t7e('plugins.WatchlistPlugin.stale.marker')}`);
+  });
+
+  it('#210 colours Age of GP only past the watchlist stale threshold', () => {
+    const timeManager = ServiceLocator.getTimeManager();
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 10));
+    p().updateOrbitData_(landsat8);
+    expect(getEl(EL.ELSET_AGE)!.classList.contains('sat-info-stale')).toBe(false);
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 20));
+    p().updateOrbitData_(landsat8);
+    expect(getEl(EL.ELSET_AGE)!.classList.contains('sat-info-stale')).toBe(true);
+    expect(getEl(EL.ELSET_AGE)!.getAttribute('kt-tooltip')).toContain('72');
   });
 
   it('shows a negative age with a note when the sim time is before the GP epoch', () => {

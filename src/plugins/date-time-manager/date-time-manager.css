@@ -95,3 +95,24 @@
   font-weight: bold;
   opacity: 1;
 }
+
+/* Compact clock block (#209): the nav sets line-height to the bar height, so the date line alone used to be
+   as tall as the bar and the status line plus zone chip pushed the centred stack past the viewport top at
+   1366x768. Date on the first row, status and zone chip side by side on the second; total stays under 40 px. */
+#datetime {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  column-gap: 6px;
+  line-height: 1.1;
+}
+
+#datetime #datetime-text {
+  grid-column: 1 / -1;
+  line-height: 1.1;
+}
+
+#datetime #datetime-zone {
+  margin: 0;
+}

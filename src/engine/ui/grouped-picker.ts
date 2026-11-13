@@ -260,12 +260,14 @@ export class GroupedPicker {
       }
       shown += opts.length;
 
-      const details = document.createElement('details');
+      // An unlabeled group is a plain div: a <details> without a <summary> makes the browser draw a stray "Details"
+      // disclosure heading above its buttons (#105).
+      const details = document.createElement(group.label ? 'details' : 'div') as HTMLDetailsElement;
 
       details.className = 'kt-picker-group';
-      // Collapsed by default; a search or the group holding the current choice opens it.
-      details.open = !group.label || query !== '' || opts.some((o) => selectedSet.has(o.value));
       if (group.label) {
+        // Collapsed by default; a search or the group holding the current choice opens it.
+        details.open = query !== '' || opts.some((o) => selectedSet.has(o.value));
         const summary = document.createElement('summary');
 
         summary.textContent = `${group.label} (${opts.length})`;

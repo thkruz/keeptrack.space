@@ -915,8 +915,8 @@ export abstract class KeepTrackPlugin {
       ? html`
       <button id="${this.sideMenuElementName}-download-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
-        type="button">
-        <img src="${this.downloadIconSrc}" alt="${t7e('Common.download' as TranslationKey)}" class="icon-btn-img" />
+        type="button" aria-label="${t7e('Common.download' as TranslationKey)}" title="${t7e('Common.download' as TranslationKey)}">
+        <img src="${this.downloadIconSrc}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>
     `
       : '';
@@ -926,8 +926,8 @@ export abstract class KeepTrackPlugin {
       ? html`
       <button id="${this.sideMenuElementName}-secondary-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
-        type="button">
-        <img src="${secondaryIconSrc}" alt="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" class="icon-btn-img" />
+        type="button" aria-label="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" title="${t7e('pluginDrawer.modeSettings' as TranslationKey)}">
+        <img src="${secondaryIconSrc}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>`
       : '';
     // Hidden until uiManagerFinal confirms the plugin has help (see showMenuHelpButton_).
@@ -942,8 +942,8 @@ export abstract class KeepTrackPlugin {
     const closeIconHtml = html`
       <button id="${this.sideMenuElementName}-close-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
-        type="button">
-        <img src="${leftPanelClosePng}" alt="${t7e('Common.close' as TranslationKey)}" class="icon-btn-img" />
+        type="button" aria-label="${t7e('Common.close' as TranslationKey)}" title="${t7e('Common.close' as TranslationKey)}">
+        <img src="${leftPanelClosePng}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>`;
 
     return html`

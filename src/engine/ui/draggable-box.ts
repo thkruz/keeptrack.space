@@ -4,6 +4,7 @@ import { getEl, showEl } from '@app/engine/utils/get-el';
 import Draggabilly from 'draggabilly';
 import { html } from '../utils/development/formatter';
 import './engine-ui.css';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { ServiceLocator } from '../core/service-locator';
 
 interface DraggableBoxOptions {
@@ -62,8 +63,8 @@ export abstract class DraggableBox {
                 ${this.getBoxTitleHtml()}
               </span>
             </div>
-            ${this.isDockable ? `<span id="${this.boxId}-dock" class="draggable-box__btn draggable-box__dock-btn"></span>` : ''}
-            <span id="${this.boxId}-close" class="draggable-box__btn draggable-box__close-btn"></span>
+            ${this.isDockable ? `<span id="${this.boxId}-dock" class="draggable-box__btn draggable-box__dock-btn" role="button" tabindex="0" aria-label="${t7e('Common.dock' as TranslationKey)}" title="${t7e('Common.dock' as TranslationKey)}"></span>` : ''}
+            <span id="${this.boxId}-close" class="draggable-box__btn draggable-box__close-btn" role="button" tabindex="0" aria-label="${t7e('Common.close' as TranslationKey)}" title="${t7e('Common.close' as TranslationKey)}"></span>
           </div>
           <div class="draggable-box__content">
             ${this.getBoxContentHtml()}

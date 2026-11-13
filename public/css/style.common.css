@@ -2843,6 +2843,18 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   display: none;
 }
 
+/* Phone: touch targets of at least 40 px (watchlist toolbar, menu title-bar buttons) */
+@media (max-width: 639px) {
+  .icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .icon-btn[hidden] {
+    display: none;
+  }
+}
+
 /* Title-bar help button: themed glyph via CSS mask (never a raw img). */
 .side-menu-help-glyph {
   width: 20px;

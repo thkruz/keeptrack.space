@@ -33,8 +33,16 @@ export function refreshMaterialSelect(select: HTMLSelectElement): void {
     wrapper.after(label);
   }
   FormSelect.getInstance(select)?.destroy();
+
+  /*
+   * A select inside a scrolling container (a wide table in a side menu) would have its open list clipped by that
+   * container. Mark the container `data-select-container="body"` and the list is attached to <body> instead (#266).
+   */
+  const attachToBody = Boolean(select.closest('[data-select-container="body"]'));
+
   FormSelect.init(select, {
     dropdownOptions: {
+      ...(attachToBody ? { container: document.body } : {}),
       /*
        * Promote the enclosing v13 section card to its own stacking context for as
        * long as this dropdown is open (open-START through close-fade END), so the

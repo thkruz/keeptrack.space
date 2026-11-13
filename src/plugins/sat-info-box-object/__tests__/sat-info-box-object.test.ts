@@ -51,6 +51,27 @@ describe('SatInfoBoxObject data population', () => {
     vi.unstubAllGlobals();
   });
 
+  it('registers the summary line right after the title header (order 0.5)', () => {
+    const infoBox = PluginRegistry.getPlugin(SatInfoBox)!;
+
+    EventBus.getInstance().emit(EventBusEvent.satInfoBoxInit);
+    const summary = infoBox.getElements().find((el) => el.html?.includes('id="sat-summary"'));
+
+    expect(summary).toBeDefined();
+    expect(summary!.order).toBeGreaterThan(0);
+    expect(summary!.order).toBeLessThan(1);
+  });
+
+  it('redraws the summary line when the object data refreshes', () => {
+    document.body.insertAdjacentHTML('beforeend', p().createSummaryLine_());
+    p().updateObjectData_(defaultSat);
+    const first = getEl('sat-summary')!.textContent;
+
+    getEl('sat-summary')!.textContent = '';
+    p().updateObjectData_(defaultSat);
+    expect(getEl('sat-summary')!.textContent).toBe(first);
+  });
+
   it('updateObjectData_ does nothing for a non-satellite/non-missile object', () => {
     expect(() => p().updateObjectData_({ isSatellite: () => false, isMissile: () => false })).not.toThrow();
   });

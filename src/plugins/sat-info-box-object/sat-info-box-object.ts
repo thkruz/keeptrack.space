@@ -26,6 +26,9 @@ import { getObjectSummaryKey, getProvidedObjectSummary } from './object-summary'
 import { EL, SECTIONS } from './sat-info-box-object-html';
 import './sat-info-box-object.css';
 
+/** Sorts right after the title header (order 0) and before the Actions section and every other section. */
+const SUMMARY_ORDER_ = 0.5;
+
 export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiContributor {
   readonly id = 'SatInfoBoxObject';
   dependencies_: string[] = [SatInfoBox.name];
@@ -85,7 +88,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
-      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSummaryLine_(), order: 1 });
+      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSummaryLine_(), order: SUMMARY_ORDER_ });
       PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createObjectSection_(), order: 7 });
       PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSecondarySection(), order: 9 });
     });

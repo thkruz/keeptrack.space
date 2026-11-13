@@ -16,7 +16,7 @@
   white-space: normal;
 }
 
-/* Plain-words description of the object, shown right under the title */
+/* Plain-words description of the object, shown directly under the title header (before every section) */
 #sat-summary.sat-summary {
   padding: 4px 8px 6px;
   font-size: 13px;

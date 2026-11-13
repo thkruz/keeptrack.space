@@ -24,11 +24,13 @@ import {
   type DrawerBadge,
   type DrawerGroup,
   type DrawerItemData,
+  defaultOpenGroupKeys,
   drawerItemPluginId,
   drawerItemsForPluginSelector,
   drawerRowFeatureName,
   explainDisabledPluginReason,
   explainDisabledUtilityIcon,
+  isGroupExpanded,
   isSignedOutGatedRow,
   loadRecents,
   type RecentEntry,
@@ -38,6 +40,7 @@ import {
   renderUtilityFooter,
   showSignInPrompt,
   syncBadgesFromEvents,
+  syncDrawerItemReason,
   syncDrawerItemState,
   syncInitialUtilityState,
   syncUtilityFooterState,
@@ -53,6 +56,8 @@ export class PluginDrawer {
   private overlayEl_: HTMLElement | null = null;
   private hamburgerEl_: HTMLElement | null = null;
   private groupStates_: Record<string, boolean> = {};
+  /** Groups that start open when the user has no stored choice; onboarding (#124) can override via setDefaultOpenGroups. */
+  private extraOpenGroups_: string[] = [];
   private readonly allDrawerItems_: Map<string, DrawerItemData> = new Map();
   private isRailMode_ = false;
   private readonly badges_: Map<string, DrawerBadge> = new Map();
@@ -363,6 +368,11 @@ export class PluginDrawer {
       html += PluginDrawer.renderGroupHtml_('recent', recentGroup, true);
     }
 
+    const nonEmptyKeys = Object.entries(groups)
+      .filter(([, g]) => g.items.length > 0)
+      .map(([k]) => k);
+    const defaultOpen = defaultOpenGroupKeys(nonEmptyKeys, this.extraOpenGroups_);
+
     for (const [key, group] of Object.entries(groups)) {
       if (group.items.length === 0) {
         continue;
@@ -370,7 +380,7 @@ export class PluginDrawer {
 
       group.items.sort((a, b) => a.order - b.order);
 
-      const isExpanded = this.groupStates_[key] !== false;
+      const isExpanded = isGroupExpanded(key, this.groupStates_, defaultOpen);
 
       html += PluginDrawer.renderGroupHtml_(key, group, isExpanded);
     }
@@ -378,18 +388,8 @@ export class PluginDrawer {
     contentEl.innerHTML = html;
 
     // Wire group header click handlers for collapsible behavior
-    contentEl.querySelectorAll('.drawer-group-header').forEach((header) => {
-      header.addEventListener('click', () => {
-        const groupEl = header.parentElement;
-
-        groupEl?.classList.toggle('collapsed');
-        const key = groupEl?.dataset.groupKey;
-
-        if (key) {
-          this.groupStates_[key] = !groupEl?.classList.contains('collapsed');
-          this.saveGroupStates_();
-        }
-      });
+    contentEl.querySelectorAll('.drawer-group').forEach((groupEl) => {
+      this.wireGroupHeader_(groupEl as HTMLElement);
     });
   }
 
@@ -797,6 +797,7 @@ export class PluginDrawer {
       const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
 
       el.classList.toggle('disabled', isDisabled);
+      syncDrawerItemReason(el as HTMLElement, isDisabled);
     });
 
     this.syncUtilityFooterState_();
@@ -809,6 +810,76 @@ export class PluginDrawer {
 
     document.documentElement.style.setProperty('--bottom-menu-top', `${height}px`);
     document.documentElement.style.setProperty('--bottom-menu-height', `${height}px`);
+  }
+
+  /** Click and keyboard (Enter/Space) toggle for a group header; persists the user's choice. */
+  private wireGroupHeader_(groupEl: HTMLElement): void {
+    const header = groupEl.querySelector('.drawer-group-header');
+
+    const toggle = () => {
+      groupEl.classList.toggle('collapsed');
+      const collapsed = groupEl.classList.contains('collapsed');
+
+      header?.setAttribute('aria-expanded', String(!collapsed));
+      const key = groupEl.dataset.groupKey;
+
+      if (key) {
+        this.groupStates_[key] = !collapsed;
+        this.saveGroupStates_();
+      }
+    };
+
+    header?.addEventListener('click', toggle);
+    header?.addEventListener('keydown', (evt) => {
+      const e = evt as KeyboardEvent;
+
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
+    });
+  }
+
+  /**
+   * Choose which groups start open for a user with no stored choice (used by onboarding, #124).
+   * Re-renders only if the drawer is already built. Stored user choices still win.
+   */
+  setDefaultOpenGroups(keys: string[]): void {
+    this.extraOpenGroups_ = [...keys];
+    this.applyDefaultsToDom_();
+  }
+
+  /**
+   * Update already-rendered groups to the current defaults without persisting anything.
+   * Groups the user has toggled (stored true/false) are left alone.
+   */
+  private applyDefaultsToDom_(): void {
+    const groupEls = Array.from(getEl('drawer-content', true)?.querySelectorAll('.drawer-group[data-group-key]') ?? []) as HTMLElement[];
+
+    if (groupEls.length === 0) {
+      return;
+    }
+
+    const menuKeys = groupEls.map((el) => el.dataset.groupKey as string).filter((k) => k !== 'recent');
+    const defaultOpen = defaultOpenGroupKeys(menuKeys, this.extraOpenGroups_);
+
+    for (const groupEl of groupEls) {
+      const key = groupEl.dataset.groupKey as string;
+      const expanded = isGroupExpanded(key, this.groupStates_, defaultOpen);
+
+      groupEl.classList.toggle('collapsed', !expanded);
+      groupEl.querySelector('.drawer-group-header')?.setAttribute('aria-expanded', String(expanded));
+    }
+  }
+
+  /** Open or close one group programmatically and persist it as the user's choice. */
+  setGroupExpanded(key: string, expanded: boolean): void {
+    this.groupStates_[key] = expanded;
+    this.saveGroupStates_();
+    const groupEl = getEl('drawer-content', true)?.querySelector(`.drawer-group[data-group-key="${key}"]`);
+
+    groupEl?.classList.toggle('collapsed', !expanded);
+    groupEl?.querySelector('.drawer-group-header')?.setAttribute('aria-expanded', String(expanded));
   }
 
   private loadGroupStates_(): void {
@@ -838,8 +909,9 @@ export class PluginDrawer {
     const collapsedClass = isExpanded ? '' : ' collapsed';
     let html = `<div class="drawer-group${collapsedClass}" data-group-key="${key}">`;
 
-    html += '<div class="drawer-group-header">';
+    html += `<div class="drawer-group-header" role="button" tabindex="0" aria-expanded="${isExpanded}">`;
     html += `<span class="drawer-group-label">${group.label}</span>`;
+    html += key === 'recent' ? '' : `<span class="drawer-group-count">${group.items.length}</span>`;
     html += '<span class="drawer-group-chevron">&#x25BE;</span>';
     html += '</div>';
     html += '<div class="drawer-group-items">';
@@ -865,6 +937,7 @@ export class PluginDrawer {
       html += proClass
         ? `<span class="drawer-item-lock" aria-label="${loginRequiredText}" title="${loginRequiredText}"><img class="drawer-item-lock-icon" src="${lockPng}" alt="" /></span>`
         : '';
+      html += proClass ? `<span class="drawer-item-account-hint">${t7e('pluginDrawer.reasonFreeAccount' as TranslationKey)}</span>` : '';
       html += shortcutBadge;
       html += '</div>';
     }
@@ -975,17 +1048,7 @@ export class PluginDrawer {
       });
 
       // Wire collapsible header for the new group
-      const header = newGroupEl.querySelector('.drawer-group-header');
-
-      header?.addEventListener('click', () => {
-        newGroupEl.classList.toggle('collapsed');
-        const key = (newGroupEl as HTMLElement).dataset.groupKey;
-
-        if (key) {
-          this.groupStates_[key] = !newGroupEl.classList.contains('collapsed');
-          this.saveGroupStates_();
-        }
-      });
+      this.wireGroupHeader_(newGroupEl as HTMLElement);
     }
   }
 

@@ -62,6 +62,62 @@ describe('PluginDrawer', () => {
     expect(getEl('plugin-drawer')!.classList.contains('open')).toBe(false);
   });
 
+  describe('Tab key (#202)', () => {
+    const pressTab = (target: Element | Window, init: KeyboardEventInit = {}): KeyboardEvent => {
+      const evt = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true, ...init });
+
+      target.dispatchEvent(evt);
+
+      return evt;
+    };
+    const isOpen = (): boolean => getEl('plugin-drawer')!.classList.contains('open');
+
+    it('toggles the drawer when focus is on the scene (body)', () => {
+      const drawer = buildDrawer();
+
+      (drawer as unknown as { hasItems_: boolean }).hasItems_ = true;
+      const evt = pressTab(document.body);
+
+      expect(isOpen()).toBe(true);
+      expect(evt.defaultPrevented).toBe(true);
+    });
+
+    it('leaves Tab to the browser when a button is focused', () => {
+      const drawer = buildDrawer();
+
+      (drawer as unknown as { hasItems_: boolean }).hasItems_ = true;
+      document.body.insertAdjacentHTML('beforeend', '<button id="tab-test-btn">x</button>');
+      const btn = getEl('tab-test-btn')!;
+
+      btn.focus();
+      pressTab(btn);
+
+      expect(isOpen()).toBe(false);
+    });
+
+    it('leaves Tab to the browser for a tabindex element such as the info circle', () => {
+      const drawer = buildDrawer();
+
+      (drawer as unknown as { hasItems_: boolean }).hasItems_ = true;
+      document.body.insertAdjacentHTML('beforeend', '<span id="tab-test-circle" tabindex="0">i</span>');
+      const circle = getEl('tab-test-circle')!;
+
+      circle.focus();
+      pressTab(circle);
+
+      expect(isOpen()).toBe(false);
+    });
+
+    it('does not take Shift+Tab', () => {
+      const drawer = buildDrawer();
+
+      (drawer as unknown as { hasItems_: boolean }).hasItems_ = true;
+      pressTab(document.body, { shiftKey: true });
+
+      expect(isOpen()).toBe(false);
+    });
+  });
+
   it('open is idempotent and close is a no-op when already closed', () => {
     const drawer = buildDrawer();
 

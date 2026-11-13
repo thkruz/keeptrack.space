@@ -1,3 +1,4 @@
+import { getPresetOpenGroups } from '@app/app/ui/drawer-presets';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -178,6 +179,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     wireMissionAutoChecks((missionId: string) => this.markMissionDone_(missionId));
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      this.applyDrawerPreset_();
       this.renderChecklistMenu_();
       this.card_?.render();
       this.wireChecklistMenu_();
@@ -315,6 +317,14 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   // Stage: welcome
   // =========================================================================
 
+  /**
+   * Role answer picks which drawer groups start open (#124). Nothing is hidden and groups the user
+   * toggled themselves keep their state; clearing the role restores the app default.
+   */
+  private applyDrawerPreset_(): void {
+    ServiceLocator.getUiManager()?.pluginDrawer?.setDefaultOpenGroups(getPresetOpenGroups(this.state_.persona));
+  }
+
   private startWelcome_(): void {
     if (this.engine_?.isActive) {
       return;
@@ -350,6 +360,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
 
             this.state_.persona = this.state_.persona === persona ? null : persona;
             this.saveState_();
+            this.applyDrawerPreset_();
             popoverEl.querySelectorAll('.kt-tour-chip').forEach((c) => {
               c.classList.toggle('kt-tour-chip-selected', (c as HTMLElement).dataset.persona === this.state_.persona);
             });

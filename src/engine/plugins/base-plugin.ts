@@ -1477,14 +1477,16 @@ export abstract class KeepTrackPlugin {
    */
   isRequireSatelliteSelected = false;
 
-  verifySatelliteSelected(): boolean {
+  verifySatelliteSelected(isMakeToast = true): boolean {
     /*
      * const searchDom = getEl('search', true);
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
     if (((PluginRegistry.getPluginByName('SelectSatManager') as unknown as { selectedSat: number } | null)?.selectedSat ?? -1) === -1) {
-      errorManagerInstance.warnToast(t7e('errorMsgs.SelectSatelliteFirst'));
-      this.shakeBottomIcon();
+      if (isMakeToast) {
+        errorManagerInstance.warnToast(t7e('errorMsgs.SelectSatelliteFirst'));
+        this.shakeBottomIcon();
+      }
 
       return false;
     }

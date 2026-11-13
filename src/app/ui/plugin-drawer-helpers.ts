@@ -1,6 +1,7 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { migrateLegacyBottomIconId } from '@app/engine/plugins/bottom-icon-id';
 import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
@@ -40,6 +41,29 @@ export interface DrawerGroup {
 
 const MAX_RECENT_PLUGINS_ = 8;
 
+/** Group keys that start open when the user has not chosen otherwise ("recent" plus the first menu group). */
+export function defaultOpenGroupKeys(groupKeys: string[], extraOpen: string[] = []): Set<string> {
+  const open = new Set<string>(['recent', ...extraOpen]);
+  const first = groupKeys[0];
+
+  if (first && extraOpen.length === 0) {
+    open.add(first);
+  }
+
+  return open;
+}
+
+/**
+ * Whether a drawer group renders expanded. A choice the user made (stored true/false) always wins;
+ * otherwise groups start collapsed except the default-open ones. Nothing is hidden: collapsed groups
+ * keep their header and item count and open on click.
+ */
+export function isGroupExpanded(key: string, states: Record<string, boolean>, defaultOpen: Set<string>): boolean {
+  const stored = states[key];
+
+  return typeof stored === 'boolean' ? stored : defaultOpen.has(key);
+}
+
 /**
  * Every plugin row in the drawer content. Rows in a plugin's own group carry
  * data-plugin-id; the copies in the Recent group carry data-recent-plugin-id and the
@@ -67,6 +91,50 @@ export function syncDrawerItemState(el: HTMLElement): void {
 
   el.classList.toggle('active', isSelected);
   el.classList.toggle('disabled', isDisabled);
+  syncDrawerItemReason(el, isDisabled);
+}
+
+/** Why a disabled drawer row is unavailable: missing sensor, missing satellite, or the plugin's own reason. */
+export function drawerDisabledReasonText(pluginId: string | undefined): string {
+  const plugin = pluginId ? PluginRegistry.plugins.find((p) => p.bottomIconElementName === pluginId) : undefined;
+
+  if (!plugin) {
+    return '';
+  }
+  if (plugin.isRequireSensorSelected && !ServiceLocator.getSensorManager()?.isSensorSelected()) {
+    return t7e('pluginDrawer.reasonSelectSensor' as TranslationKey);
+  }
+  if (plugin.isRequireSatelliteSelected && !plugin.verifySatelliteSelected(false)) {
+    return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
+  }
+
+  return plugin.getDisabledReason() ?? '';
+}
+
+/**
+ * Keep a drawer row's visible "why disabled" line, aria-disabled and aria-describedby in step with its disabled state.
+ * The line is created on first use so rows copied elsewhere (Favorites) get it too.
+ */
+export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void {
+  let reasonEl = el.querySelector<HTMLElement>(':scope > .drawer-item-reason');
+  const text = isDisabled ? drawerDisabledReasonText(drawerItemPluginId(el)) : '';
+
+  if (!reasonEl && text) {
+    reasonEl = document.createElement('span');
+    reasonEl.className = 'drawer-item-reason';
+    reasonEl.id = `drawer-reason-${drawerItemPluginId(el) ?? el.dataset.topMenuId ?? Math.random().toString(36).slice(2)}${el.hasAttribute('data-recent-plugin-id') ? '-recent' : ''}`;
+    el.appendChild(reasonEl);
+  }
+  if (reasonEl) {
+    reasonEl.textContent = text;
+  }
+
+  el.setAttribute('aria-disabled', String(isDisabled));
+  if (isDisabled && text && reasonEl) {
+    el.setAttribute('aria-describedby', reasonEl.id);
+  } else {
+    el.removeAttribute('aria-describedby');
+  }
 }
 
 // ---- Shared Item Collection ----

@@ -300,6 +300,26 @@ body.drawer-mode {
     transform: rotate(-90deg);
   }
 
+  .drawer-group-count {
+    margin-left: auto;
+    margin-right: 8px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .plugin-drawer.rail-mode .drawer-group-count {
+    display: none;
+  }
+
+  .plugin-drawer.rail-mode.rail-hover .drawer-group-count {
+    display: inline;
+  }
+
+  .drawer-group-header:focus-visible {
+    outline: 2px solid var(--color-primary, #4da3ff);
+    outline-offset: -2px;
+  }
+
   .drawer-group-items {
     overflow: hidden;
     transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
@@ -380,9 +400,41 @@ body.drawer-mode {
    * signals it is not a normal action. (pointer-events: none would swallow the
    * click and the hint with it.)
    */
+  .drawer-item {
+    flex-wrap: wrap;
+  }
+
   .drawer-item.disabled {
-    opacity: 0.35;
     cursor: not-allowed;
+  }
+
+  .drawer-item.disabled > :not(.drawer-item-reason) {
+    opacity: 0.35;
+  }
+
+  /* One-line "why unavailable" under the label of a disabled or locked row */
+  .drawer-item-reason,
+  .drawer-item-account-hint {
+    flex-basis: 100%;
+    margin-top: 2px;
+    padding-left: 40px;
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
+  }
+
+  .drawer-item-reason:empty,
+  .drawer-item-account-hint {
+    display: none;
+  }
+
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-account-hint {
+    display: block;
+  }
+
+  /* Signed out, the sign-in prompt is the first thing a tap shows, so the account hint wins over the disabled reason */
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-reason {
+    display: none;
   }
 
   .drawer-item.disabled .drawer-item-icon {

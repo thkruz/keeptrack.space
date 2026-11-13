@@ -103,7 +103,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <section class="kt-section">
         <div class="kt-section-label">${s('identity')}</div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipSensorName')}">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipSensorName')}">
             <input id="cs-uiName" type="text" value="${getCustomSensorDefaultDisplayName()}" />
             <label for="cs-uiName" class="active">${l('sensorName')}</label>
           </div>
@@ -124,17 +124,17 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <section class="kt-section">
         <div class="kt-section-label">${s('location')}</div>
         <div class="kt-field-row">
-          <div class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipLatitude')}">
+          <div class="input-field col s6" kt-tooltip="${l('tooltipLatitude')}">
             <input id="cs-lat" type="text" value="0" />
             <label for="cs-lat" class="active">${l('latitude')}</label>
           </div>
-          <div class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipLongitude')}">
+          <div class="input-field col s6" kt-tooltip="${l('tooltipLongitude')}">
             <input id="cs-lon" type="text" value="0" />
             <label for="cs-lon" class="active">${l('longitude')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipElevation')}">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipElevation')}">
             <input id="cs-hei" type="text" value="0" />
             <label for="cs-hei" class="active">${l('elevation')}</label>
           </div>
@@ -144,7 +144,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <section class="kt-section">
         <div class="kt-section-label">${s('fieldOfView')}</div>
         <div id="cs-prefill-note" class="cs-prefill-note" style="display: none"></div>
-        <div class="switch row" data-position="top" data-delay="50" data-tooltip="${l('tooltipTelescope')}">
+        <div class="switch row" kt-tooltip="${l('tooltipTelescope')}">
           <label>
             <input id="cs-telescope" type="checkbox" />
             <span class="lever"></span>
@@ -152,42 +152,42 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           </label>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minaz-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinAz')}">
+          <div id="cs-minaz-div" class="input-field col s6" kt-tooltip="${l('tooltipMinAz')}">
             <input id="cs-minaz" type="text" value="0" />
             <label for="cs-minaz" class="active">${l('minAzimuth')}</label>
           </div>
-          <div id="cs-maxaz-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxAz')}">
+          <div id="cs-maxaz-div" class="input-field col s6" kt-tooltip="${l('tooltipMaxAz')}">
             <input id="cs-maxaz" type="text" value="360" />
             <label for="cs-maxaz" class="active">${l('maxAzimuth')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minel-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinEl')}">
+          <div id="cs-minel-div" class="input-field col s6" kt-tooltip="${l('tooltipMinEl')}">
             <input id="cs-minel" type="text" value="10" />
             <label for="cs-minel" class="active">${l('minElevation')}</label>
           </div>
-          <div id="cs-maxel-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxEl')}">
+          <div id="cs-maxel-div" class="input-field col s6" kt-tooltip="${l('tooltipMaxEl')}">
             <input id="cs-maxel" type="text" value="90" />
             <label for="cs-maxel" class="active">${l('maxElevation')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minrange-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinRange')}">
+          <div id="cs-minrange-div" class="input-field col s6" kt-tooltip="${l('tooltipMinRange')}">
             <input id="cs-minrange" type="text" value="100" />
             <label for="cs-minrange" class="active">${l('minRange')}</label>
           </div>
-          <div id="cs-maxrange-div" class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxRange')}">
+          <div id="cs-maxrange-div" class="input-field col s6" kt-tooltip="${l('tooltipMaxRange')}">
             <input id="cs-maxrange" type="text" value="50000" />
             <label for="cs-maxrange" class="active">${l('maxRange')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipHorizonMask')}">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipHorizonMask')}">
             <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="${l('maskPlaceholder')}"></textarea>
             <label for="cs-mask" class="active">${l('horizonMask')}</label>
           </div>
         </div>
-        <div class="switch row" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaskStep')}">
+        <div class="switch row" kt-tooltip="${l('tooltipMaskStep')}">
           <label>
             <input id="cs-mask-step" type="checkbox" />
             <span class="lever"></span>
@@ -195,7 +195,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
           </label>
         </div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipTimeZone')}">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipTimeZone')}">
             <input id="cs-timezone" type="text" spellcheck="false" autocomplete="off" placeholder="${l('timeZonePlaceholder')}" />
             <label for="cs-timezone" class="active">${l('timeZone')}</label>
           </div>

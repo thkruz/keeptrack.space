@@ -148,7 +148,65 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
      */
     (document.getElementById('ui-wrapper') ?? KeepTrack.getInstance().containerRoot).appendChild(badge);
     this.badge_ = badge;
+    this.watchMenus_();
     this.refresh();
+  }
+
+  /** Re-places the badge whenever a side menu opens, closes or resizes (#256). */
+  private watchMenus_(): void {
+    if (typeof MutationObserver === 'undefined') {
+      return;
+    }
+    const target = document.getElementById('ui-wrapper');
+
+    if (!target) {
+      return;
+    }
+    let queued = false;
+
+    new MutationObserver(() => {
+      if (queued) {
+        return;
+      }
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        this.placeBadge_();
+      });
+    }).observe(target, { attributes: true, attributeFilter: ['style', 'class'], subtree: true });
+  }
+
+  /**
+   * A wide side menu (Best Passes is 695 px) covers the centred badge, leaving only its right end showing (#256).
+   * On desktop widths, move the badge into the free strip right of the open menus when the centred spot is covered.
+   */
+  private placeBadge_(): void {
+    const badge = this.badge_;
+
+    if (!badge || badge.style.display === 'none') {
+      return;
+    }
+    badge.style.left = '';
+    if (window.innerWidth < 768) {
+      return;
+    }
+    let menusRight = 0;
+
+    document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((el) => {
+      if (el.style.display !== 'block') {
+        return;
+      }
+      const rect = el.getBoundingClientRect();
+
+      if (rect.width > 0 && rect.left < window.innerWidth / 2) {
+        menusRight = Math.max(menusRight, rect.right);
+      }
+    });
+    const half = badge.offsetWidth / 2;
+
+    if (menusRight > window.innerWidth / 2 - half) {
+      badge.style.left = `${Math.round(menusRight + 12 + half)}px`;
+    }
   }
 
   private showBadge_(level: EpochAgeLevel, days: number): void {
@@ -158,6 +216,7 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
     this.badge_.textContent = t7e(`plugins.EpochAge.badge.${level}` as TranslationKey).replace('{days}', formatDays(days));
     this.badge_.dataset.level = level;
     this.badge_.style.display = '';
+    this.placeBadge_();
   }
 
   private hideBadge_(): void {

@@ -20,6 +20,13 @@
   border-bottom: 1px solid var(--color-dark-border);
 }
 
+/* #283: the TIME column stays on one line (the ISO stamp wrapped to three lines at 1366x768) */
+.msla-table td:first-child {
+  white-space: nowrap;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
 /* Header row (v13 uppercase-muted look; replaces the old per-cell underline) */
 .msla-table .msla-table-header td {
   padding: 4px;

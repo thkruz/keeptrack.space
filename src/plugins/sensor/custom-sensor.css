@@ -169,7 +169,10 @@
   z-index: 2;
   /* Opaque, including the 8px margin gap above the button, so scrolled fields never show through */
   background: var(--color-dark-background, #1f1f1f) !important;
-  box-shadow: 0 -8px 0 0 var(--color-dark-background, #1f1f1f);
+  /* #281: the second shadow fills the menu's bottom padding so scrolled fields never show as a strip under the bar */
+  box-shadow:
+    0 -8px 0 0 var(--color-dark-background, #1f1f1f),
+    0 24px 0 0 var(--color-dark-background, #1f1f1f);
 }
 
 /* Destructive action: set apart from Add / Replace and drawn in the accent colour */

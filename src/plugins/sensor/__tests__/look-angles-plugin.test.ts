@@ -402,3 +402,34 @@ describe('LookAnglesPlugin row-loop lighting (F7)', () => {
     expect(rows[0].opticalVisible).toBe(true);
   });
 });
+
+describe('LookAnglesPlugin framing start hint', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let plugin: any;
+
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+    plugin = new LookAnglesPlugin();
+    websiteInit(plugin);
+    plugin.isMenuButtonActive = true;
+  });
+
+  it('shows the format hint when the exposure start cannot be parsed', () => {
+    (getEl('look-angles-exposure-start') as HTMLInputElement).value = 'banana';
+    plugin.updateFraming_();
+
+    expect(getEl('look-angles-framing-result')?.textContent).toContain('Use HH:MM:SS or YYYY-MM-DDTHH:MM:SS (UTC)');
+  });
+
+  it('shows no hint for a blank or valid exposure start', () => {
+    const input = getEl('look-angles-exposure-start') as HTMLInputElement;
+
+    input.value = '';
+    plugin.updateFraming_();
+    expect(getEl('look-angles-framing-result')?.textContent).toBe('');
+
+    input.value = '21:48:00';
+    plugin.updateFraming_();
+    expect(getEl('look-angles-framing-result')?.textContent).toBe('');
+  });
+});

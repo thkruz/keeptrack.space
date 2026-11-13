@@ -201,6 +201,13 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     return { startMs, lengthSec };
   }
 
+  /** True when something is typed in Exposure start but it cannot be parsed. */
+  private hasUnreadableExposureStart_(): boolean {
+    const startText = ((getEl('look-angles-exposure-start', true) as HTMLInputElement | null)?.value ?? '').trim();
+
+    return startText !== '' && !Number.isFinite(parseExposureStart(startText, ServiceLocator.getTimeManager().simulationTimeObj.getTime()));
+  }
+
   /** Recompute the in-frame seconds for the exposure window against the rows now in the table. */
   private updateFraming_(): void {
     const out = getEl('look-angles-framing-result', true);
@@ -211,7 +218,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const input = this.readFramingInput_();
 
     if (!input || !this.lastlooksArray_) {
-      out.textContent = '';
+      out.textContent = this.hasUnreadableExposureStart_() ? l('framing.startInvalid') : '';
 
       return;
     }

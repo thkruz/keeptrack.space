@@ -218,7 +218,7 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
 
       expect(visMagSpy).toHaveBeenCalled();
       expect(visMagSpy.mock.calls[0][4]).toBe(2.5);
-      expect(getEl('sat-vmag')!.innerHTML).toBe('9.87');
+      expect(getEl('sat-vmag')!.innerHTML).toMatch(/^9.87 /u);
     });
   });
 

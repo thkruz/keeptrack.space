@@ -99,7 +99,7 @@ describe('SensorMath.getVisMagReading', () => {
     setupStandardEnvironment([]);
   });
 
-  it('flags the flat default intrinsic magnitude as assumed, not a catalog value or override', () => {
+  it('flags any non-catalog intrinsic magnitude (default, preset or estimate override) as assumed', () => {
     const site = cloneSensor(sensors.GEODDSSOC);
     const sat = defaultSat.clone();
 
@@ -107,7 +107,7 @@ describe('SensorMath.getVisMagReading', () => {
 
     sat.vmag = null as never;
     expect(SensorMath.getVisMagReading(sat, site, NIGHT, sun)).toMatchObject({ kind: 'mag', assumed: true });
-    expect(SensorMath.getVisMagReading(sat, site, NIGHT, sun, 3.1)).toMatchObject({ kind: 'mag', assumed: false });
+    expect(SensorMath.getVisMagReading(sat, site, NIGHT, sun, 3.1)).toMatchObject({ kind: 'mag', assumed: true });
     sat.vmag = 4.2 as never;
     expect(SensorMath.getVisMagReading(sat, site, NIGHT, sun)).toMatchObject({ kind: 'mag', assumed: false });
   });

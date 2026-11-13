@@ -174,6 +174,7 @@
         "start": "Début d'exposition (UTC)",
         "startTooltip": "Date et heure, ou HH:MM:SS à la date de simulation",
         "startPlaceholder": "p. ex. 22:11:03 ou 2026-11-13T22:11:03",
+        "startInvalid": "Utilisez HH:MM:SS ou YYYY-MM-DDTHH:MM:SS (UTC)",
         "length": "Durée d'exposition (s)",
         "inFrame": "dans le champ",
         "enters": "entre",

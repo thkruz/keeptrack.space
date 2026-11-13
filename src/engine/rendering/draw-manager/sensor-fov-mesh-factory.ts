@@ -12,6 +12,12 @@ import { CustomMeshFactory } from './custom-mesh-factory';
 import { FieldOfViewMesh } from './field-of-view-mesh';
 import { SensorFovMesh } from './sensor-fov-mesh';
 
+/**
+ * Sensors reaching beyond this range (km) are deep-space sensors (GEO and beyond, e.g. GEODSS at 400000 km).
+ * Radars and mechanical trackers rated to 50000 km only reach GEO and are not deep space.
+ */
+export const DEEP_SPACE_MIN_RANGE_KM = 100000;
+
 // TODO: Sensors should be indpeneent of the object they are attached to. This will remove minAz2 and maxAz2 type of properties
 
 export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
@@ -61,14 +67,15 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
       return;
     }
 
-    ServiceLocator.getUiManager().toast(t7e('toasts.noValidFov'), ToastMsgType.caution);
-
+    // Switch the layers off first so a re-entrant or next-frame draw cannot toast a second time
     if (isFovOn) {
       sensorFovPlugin?.disableFovView();
     }
     if (isFenceOn) {
       sensorSurvFencePlugin?.disableSurvView();
     }
+
+    ServiceLocator.getUiManager().toast(t7e('toasts.noValidFov'), ToastMsgType.caution);
   }
 
   /**
@@ -81,7 +88,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
    * The function evaluates the following conditions:
    * - If the sensor type is `SHORT_TERM_FENCE` and there are no short-term fence sensors, it returns `false`.
    * - If the sensor type is not `SHORT_TERM_FENCE` and neither the SensorFov nor SensorSurvFence plugins have their menu buttons active, it returns `false`.
-   * - If there are multiple active sensors and the sensor's maximum range is greater than 40,000, it returns `false`.
+   * - If there are multiple active sensors and the sensor's maximum range is greater than DEEP_SPACE_MIN_RANGE_KM, it returns `false`.
    * - Otherwise, it returns `true`.
    */
   private checkIfNeeded_(activeSensors: DetailedSensor[], mesh: SensorFovMesh): boolean {
@@ -102,7 +109,7 @@ export class SensorFovMeshFactory extends CustomMeshFactory<SensorFovMesh> {
     }
 
     // Ignore deep space when there are multiple sensors active
-    if (activeSensors.length > 1 && mesh.sensor.maxRng > 40000) {
+    if (activeSensors.length > 1 && mesh.sensor.maxRng > DEEP_SPACE_MIN_RANGE_KM) {
       return false;
     }
 

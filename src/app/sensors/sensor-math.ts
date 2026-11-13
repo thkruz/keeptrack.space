@@ -564,8 +564,8 @@ export class SensorMath {
 
   /**
    * What the Vis Mag rows should show. A satellite in Earth's shadow reflects no sunlight, so it has no
-   * apparent magnitude ("notSunlit"); otherwise the number, flagged `assumed` when the intrinsic magnitude
-   * is the flat default (no catalog value, preset or estimate) rather than a real value.
+   * apparent magnitude ("notSunlit"); otherwise the number, flagged `assumed` whenever the intrinsic magnitude
+   * is not a catalog value: the flat default, a preset or a physics estimate (passed as the override) all count.
    */
   static getVisMagReading(
     sat: Satellite,
@@ -578,8 +578,7 @@ export class SensorMath {
       return { kind: 'notSunlit' };
     }
 
-    const hasOverride = typeof intrinsicMagOverride === 'number' && !Number.isNaN(intrinsicMagOverride);
-    const assumed = !hasOverride && !sat.vmag;
+    const assumed = !sat.vmag || Boolean((sat as Satellite & { isVmagEstimated?: boolean }).isVmagEstimated);
 
     return { kind: 'mag', value: SatMath.calculateVisMag(sat, sensor, now, sun, intrinsicMagOverride), assumed };
   }

@@ -103,6 +103,7 @@ export type KeepTrackPluginsConfiguration = {
   GraticuleToggle?: PluginConfiguration;
   TerminatorToggle?: PluginConfiguration;
   ResetToStart?: PluginConfiguration;
+  OfflineBundle?: PluginConfiguration;
   CloudsToggle?: PluginConfiguration;
   PoliticalMapToggle?: PluginConfiguration;
   HideOtherSatellitesPlugin?: PluginConfiguration;

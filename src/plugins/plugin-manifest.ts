@@ -587,6 +587,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 318 },
   },
   {
+    configKey: 'OfflineBundle',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/offline-bundle/offline-bundle') : undefined,
+    proClassName: 'OfflineBundlePlugin',
+    defaultConfig: { enabled: true, order: 319 },
+  },
+  {
     configKey: 'TerminatorToggle',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/terminator-toggle/terminator-toggle') : undefined,
     proClassName: 'TerminatorToggle',

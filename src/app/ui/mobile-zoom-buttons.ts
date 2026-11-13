@@ -41,7 +41,14 @@ export class MobileZoomButtons {
   }
 
   private static isSideMenuOpen_(): boolean {
-    return Array.from(document.querySelectorAll<HTMLElement>('.side-menu-parent')).some((el) => el.style.display === 'block');
+    return Array.from(document.querySelectorAll<HTMLElement>('.side-menu-parent')).some((el) => el.style.display === 'block' && !MobileZoomButtons.isSlidOut_(el));
+  }
+
+  /** `slideOutLeft` closes a menu by translating it off-screen and leaves `display:block`, so a non-zero translate means closed. */
+  private static isSlidOut_(el: HTMLElement): boolean {
+    const match = /translate[XY]\((-?[\d.]+)/u.exec(el.style.transform);
+
+    return match !== null && Number(match[1]) !== 0;
   }
 
   private static makeButton_(id: string, glyph: string, label: string, onPress: () => void): HTMLButtonElement {

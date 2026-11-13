@@ -46,4 +46,16 @@ describe('MobileZoomButtons', () => {
     await Promise.resolve();
     expect(container.classList.contains('mobile-zoom-hidden')).toBe(false);
   });
+  it('shows the buttons again when a menu slides off-screen but keeps display:block', async () => {
+    (globalThis as { settingsManager: unknown }).settingsManager = { isMobileModeEnabled: true };
+    document.body.innerHTML = '<div id="best-pass-menu" class="side-menu-parent" style="display: block; transform: translateX(0)"></div>';
+    MobileZoomButtons.init();
+    const container = document.getElementById('mobile-zoom-buttons') as HTMLElement;
+    const menu = document.getElementById('best-pass-menu') as HTMLElement;
+
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(true);
+    menu.style.transform = 'translateX(-120%)';
+    await Promise.resolve();
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(false);
+  });
 });

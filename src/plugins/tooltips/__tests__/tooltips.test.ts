@@ -84,6 +84,19 @@ describe('TooltipsPlugin behavior', () => {
     expect(() => plugin.showTooltip(el, 'text')).not.toThrow();
   });
 
+  it('showTooltip lazily creates the popup div when uiManagerInit never made it (phone boot)', () => {
+    document.getElementById('tooltip')?.remove();
+    const el = document.createElement('div');
+
+    document.body.appendChild(el);
+    plugin.showTooltip(el, 'lazy text');
+
+    const popup = document.getElementById('tooltip');
+
+    expect(popup).not.toBeNull();
+    expect(popup!.innerHTML).toBe('lazy text');
+  });
+
   it('tap toggles the tooltip on touch for kt-tooltip-tap targets only', () => {
     const div = document.createElement('div');
 

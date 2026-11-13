@@ -46,11 +46,7 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
-      const tooltipDiv = document.createElement('div');
-
-      tooltipDiv.id = 'tooltip';
-      tooltipDiv.className = 'kt-tooltip-popup';
-      document.body.appendChild(tooltipDiv);
+      this.ensureTooltipDiv_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -226,8 +222,25 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     }
   }
 
+  /** Returns the popup div, creating it when missing (phone boots can skip or miss uiManagerInit). */
+  private ensureTooltipDiv_(): HTMLElement {
+    const existing = document.getElementById('tooltip');
+
+    if (existing) {
+      return existing;
+    }
+
+    const tooltipDiv = document.createElement('div');
+
+    tooltipDiv.id = 'tooltip';
+    tooltipDiv.className = 'kt-tooltip-popup';
+    document.body.appendChild(tooltipDiv);
+
+    return tooltipDiv;
+  }
+
   showTooltip(targetEl: HTMLElement, text: string): void {
-    const tooltipDiv = document.getElementById('tooltip');
+    const tooltipDiv = this.ensureTooltipDiv_();
 
     if (!tooltipDiv) {
       return;

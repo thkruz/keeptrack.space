@@ -207,6 +207,14 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect(note.textContent).not.toContain('prefillNote'); // rendered text, not the raw key
   });
 
+  it('keeps the add/replace note aligned with the button labels and above the sticky bar (#327)', () => {
+    const css = readFileSync(resolve(__dirname, '../custom-sensor.css'), 'utf8');
+    const rule = css.slice(css.lastIndexOf('#custom-sensor-menu-form > #cs-add-replace-note'));
+
+    expect(rule).toMatch(/padding-left:\s*21px/u);
+    expect(rule).toMatch(/z-index:\s*3/u);
+  });
+
   it('labels the range fields in km and the mask placeholder is not a sample mask', () => {
     const en = JSON.parse(readFileSync(resolve(__dirname, '../locales/en.src.json'), 'utf8')).plugins.CustomSensorPlugin.labels;
 

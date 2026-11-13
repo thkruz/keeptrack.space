@@ -212,3 +212,16 @@
   font-size: 12px;
   opacity: 0.8;
 }
+
+/*
+ * #327: the note under Replace lines up with the button labels (buttons are inset 6px plus the 14px note padding
+ * gives 20px; the label sits 7px further in) and is drawn above the sticky Add bar's shadow so its first line is
+ * never hidden when the form is scrolled to the bottom.
+ */
+#custom-sensor-menu-form > #cs-add-replace-note {
+  position: relative;
+  z-index: 3;
+  margin-top: 12px;
+  padding-left: 21px;
+  background: var(--color-dark-background, #1f1f1f);
+}

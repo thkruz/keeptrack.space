@@ -146,3 +146,52 @@
     flex: 0 0 56px;
   }
 }
+
+/*
+ * Phone touch targets (#157): every tappable control reaches 44x44 px. Laptop is untouched (this block is phone
+ * only). Where a control must keep its small visual size, padding plus an equal negative margin (or an outline
+ * drawn at the old edge) enlarges the hit area without moving neighbours.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  /* Time-zone chip: 44 px tall select; the visible chip is the outline drawn at the old content edge. */
+  body #datetime #datetime-zone {
+    box-sizing: border-box;
+    width: 48px;
+    min-width: 44px;
+    height: 44px;
+    margin: 0;
+    padding: 14px 2px;
+    border: 0;
+    outline: 1px solid currentcolor;
+    outline-offset: -14px;
+    border-radius: 8px;
+  }
+
+  /* Utility pill: collapsed square and expanded icons are 44 px; padding trimmed so it still fits the 68 px band. */
+  body .drawer-utility-footer {
+    max-width: 54px;
+    padding: 4px;
+    box-sizing: border-box;
+  }
+
+  body .drawer-utility-footer::before {
+    width: 44px;
+    height: 44px;
+  }
+
+  body .drawer-utility-footer:hover,
+  body .drawer-utility-footer.expanded {
+    max-width: 90vw;
+    padding: 4px 8px;
+  }
+
+  body .drawer-utility-icons {
+    gap: 0;
+  }
+
+  body .drawer-utility-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+}

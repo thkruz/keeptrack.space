@@ -326,3 +326,46 @@
   color: var(--color-warning, #ffb300);
   font-weight: 600;
 }
+
+/* Phone touch targets (#157): 44x44 px hit areas for every tappable control in the info box. Padding with an equal
+   negative margin keeps the compact row layout; the visible glyph sizes are unchanged. */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  #sat-infobox .sat-watchlist-icon {
+    box-sizing: content-box;
+    padding: 13px;
+    margin: -13px;
+  }
+
+  #sat-infobox .sat-info-copy-values {
+    box-sizing: border-box;
+    min-width: 44px;
+    min-height: 44px;
+    margin: -12px -12px -12px -4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #sat-infobox .sat-info-circle {
+    width: 44px;
+    height: 44px;
+    margin: -16px -16px -16px -12px;
+  }
+
+  #sat-infobox .sat-info-circle::before {
+    top: 16px;
+    left: 16px;
+  }
+
+  /* The value box clips overflow for ellipsis; let the enlarged circle hit area show. */
+  #sat-infobox .sat-info-value:has(.sat-info-circle) {
+    overflow: visible;
+  }
+
+  /* Keys that open a tooltip or help line: 14 px text, 44 px hit area. */
+  #sat-infobox .sat-info-key--help,
+  #sat-infobox .sat-info-key[kt-tooltip] {
+    padding-block: 15px;
+    margin-block: -15px;
+  }
+}

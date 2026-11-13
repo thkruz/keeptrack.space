@@ -26,4 +26,17 @@ describe('phone floating clearance CSS', () => {
     expect(css).toMatch(/\[data-tooltip\]::before[\s\S]*?display: none !important/u);
     expect(css).toMatch(/#nav-top-center \{[^}]*overflow: hidden/u);
   });
+
+  it('gives phone controls 44px hit areas (#157)', () => {
+    const info = readFileSync(resolve(__dirname, '../../../plugins/sat-info-box/sat-info-box.css'), 'utf8');
+    const phoneInfo = info.slice(info.lastIndexOf('#157'));
+
+    expect(css).toMatch(/#datetime #datetime-zone \{[^}]*height: 44px/u);
+    expect(css).toMatch(/\.drawer-utility-icon \{[^}]*width: 44px[^}]*height: 44px/u);
+    expect(css).toMatch(/\.drawer-utility-footer::before \{[^}]*width: 44px[^}]*height: 44px/u);
+    expect(phoneInfo).toMatch(/\.sat-watchlist-icon \{[^}]*padding: 13px/u);
+    expect(phoneInfo).toMatch(/\.sat-info-copy-values \{[^}]*min-height: 44px/u);
+    expect(phoneInfo).toMatch(/\.sat-info-circle \{[^}]*width: 44px[^}]*height: 44px/u);
+    expect(phoneInfo).toMatch(/@media \(max-width: 639px\)/u);
+  });
 });

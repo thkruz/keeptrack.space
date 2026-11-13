@@ -30,4 +30,20 @@ describe('MobileZoomButtons', () => {
     expect(camera.zoomIn).toHaveBeenCalledTimes(1);
     expect(camera.zoomOut).toHaveBeenCalledTimes(1);
   });
+
+  it('hides the buttons while a side menu is open and shows them after it closes', async () => {
+    (globalThis as { settingsManager: unknown }).settingsManager = { isMobileModeEnabled: true };
+    document.body.innerHTML = '<div id="best-pass-menu" class="side-menu-parent" style="display: none"></div>';
+    MobileZoomButtons.init();
+    const container = document.getElementById('mobile-zoom-buttons') as HTMLElement;
+    const menu = document.getElementById('best-pass-menu') as HTMLElement;
+
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(false);
+    menu.style.display = 'block';
+    await Promise.resolve();
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(true);
+    menu.style.display = 'none';
+    await Promise.resolve();
+    expect(container.classList.contains('mobile-zoom-hidden')).toBe(false);
+  });
 });

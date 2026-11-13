@@ -24,3 +24,8 @@
 #mobile-zoom-buttons button:active {
   background: rgb(255 255 255 / 25%);
 }
+
+/* Hidden while a side menu is open so the buttons never cover pane fields (pro issue #182). */
+#mobile-zoom-buttons.mobile-zoom-hidden {
+  display: none;
+}

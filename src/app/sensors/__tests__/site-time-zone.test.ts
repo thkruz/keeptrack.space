@@ -35,3 +35,13 @@ describe('site time zone helpers', () => {
     }
   });
 });
+
+describe('catalog site zones', () => {
+  it('puts Eglin AFB in America/Chicago and leaves unknown names unset', async () => {
+    const { catalogSiteTimeZone } = await import('@app/app/sensors/catalog-site-time-zones');
+
+    expect(catalogSiteTimeZone('EGLAFB')).toBe('America/Chicago');
+    expect(catalogSiteTimeZone('toString')).toBeUndefined();
+    expect(catalogSiteTimeZone('SBXRDR')).toBeUndefined();
+  });
+});

@@ -31,6 +31,7 @@ import {
   TtcAntenna,
   ZoomValue,
 } from '@ootk/src/main';
+import { catalogSiteTimeZone } from './catalog-site-time-zones';
 
 /**
  * Parameters for constructing a DetailedSensor (legacy format).
@@ -295,7 +296,7 @@ export class DetailedSensor extends GroundStation {
     this.isVolumetric = params.isVolumetric;
     this.volume = params.volume;
     this.isCustomSensor = params.isCustomSensor;
-    this.timeZone = params.timeZone;
+    this.timeZone = params.timeZone ?? (params.isCustomSensor ? undefined : catalogSiteTimeZone(this.objName));
     this.sourceUrl = params.sourceUrl;
     this.sourceRetrieved = params.sourceRetrieved;
 

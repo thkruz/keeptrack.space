@@ -46,7 +46,7 @@ const EL = {
 };
 
 /** Rows whose jargon label gets a visible info circle (the key's hover tooltip alone is not discoverable). */
-const INFO_CIRCLE_ROWS = new Set<string>(['sat-beamwidth', 'sat-maxTmx', 'sat-sun']);
+const INFO_CIRCLE_ROWS = new Set<string>(['sat-beamwidth', 'sat-maxTmx', 'sat-sun', 'sat-ra', 'sat-dec']);
 
 const l = (key: string): string => t7e(`plugins.SatInfoBoxSensor.${key}` as Parameters<typeof t7e>[0]);
 
@@ -95,6 +95,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   // Starting values of the collapsable sections
   private readonly isSensorSectionCollapsed_ = true;
   private nextPassCache_: NextPassCache | null = null;
+  private nextPassText_ = '';
   private static readonly reasonProviders_: FovReasonProvider[] = [];
 
   /** Lets an add-on contribute reasons to the Not in View row. Registering the same provider twice is a no-op. */
@@ -458,18 +459,21 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     const realNowMs = Date.now();
     const isInView = !!sensorManagerInstance.currentTEARR?.inView;
 
-    if (!SatInfoBoxSensor.shouldRecalcNextPass_(this.nextPassCache_, { satId, sensorName, simNowMs, realNowMs, isInView })) {
+    if (SatInfoBoxSensor.shouldRecalcNextPass_(this.nextPassCache_, { satId, sensorName, simNowMs, realNowMs, isInView })) {
+      const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
+      const parsedMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
+
+      this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: realNowMs, resultMs: parsedMs };
+      this.nextPassText_ = parsedMs === null ? nextPassText : `${nextPassText} UTC`;
+    }
+
+    if (!nextPassElement) {
       return;
     }
+    // The cached time is the rise of a pass that has already begun: while the object is in view say so instead of a past time
+    const cachedMs = this.nextPassCache_?.resultMs ?? null;
 
-    const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
-    const resultMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
-
-    this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: realNowMs, resultMs };
-
-    if (nextPassElement) {
-      nextPassElement.innerHTML = resultMs === null ? nextPassText : `${nextPassText} UTC`;
-    }
+    nextPassElement.innerHTML = isInView && cachedMs !== null && cachedMs <= simNowMs ? t7e('plugins.LookAnglesPlugin.msgs.inProgress') : this.nextPassText_;
   }
 
   /** Decides whether the cached Next Pass is stale for the current object, sensor and sim time. */

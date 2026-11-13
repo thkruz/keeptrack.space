@@ -1,6 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { refinePassEdgeMs } from '@app/app/sensors/pass-edge';
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -16,7 +17,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Satellite, TemeVec3 } from '@ootk/src/main';
+import { BaseObject, Degrees, Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -28,7 +29,7 @@ import './look-angles.css';
  * sunlit, and optically visible (above horizon, sunlit and site Sun below SensorMath.SITE_DARK_SUN_EL_DEG).
  * `opticalVisible` is undefined for non-optical sensors, which get no optical verdict.
  */
-type LookAngleData = TearrData & { sunlit?: boolean | null; opticalVisible?: boolean; inProgress?: boolean };
+type LookAngleData = TearrData & { sunlit?: boolean | null; opticalVisible?: boolean; inProgress?: boolean; passRiseMs?: number };
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.LookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
@@ -282,6 +283,12 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     let riseMs: number | null = null;
 
     return looks.map((look) => {
+      if (look.inProgress) {
+        // A pass under way at the start time: its true rise (searched back) when known, else the row's own time
+        riseMs = look.passRiseMs ?? toMs(look.time);
+
+        return null;
+      }
       if (look.type === TearrType.RISE) {
         riseMs = toMs(look.time);
 
@@ -501,11 +508,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       }
     }
 
+    looksArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     if (this.isRiseSetOnly_) {
       this.addInProgressRow_(looksArray, sat, sensors, isOemSat);
     }
-
-    looksArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
     this.lastlooksArray_ = looksArray;
     this.updateFraming_();
 
@@ -541,7 +547,66 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     if (SensorMath.isOpticalSensor(sensors[0])) {
       row.opticalVisible = SensorMath.getOpticalVerdict(true, lighting);
     }
+    if (!isOemSat) {
+      this.applyTruePassStart_(looksArray, row, sat, sensors[0], start);
+    }
     looksArray.unshift(row);
+  }
+
+  /**
+   * For a pass already under way: search back (5 s steps, up to 30 min) for the true rise and the pass maximum.
+   * A descending object makes the first forward sample read as "Max El" at the current position, so that row is
+   * replaced by the true peak (placed right after the In view now row). The rise time is kept on the in-progress
+   * row so the Set row can show a duration.
+   */
+  private applyTruePassStart_(looksArray: LookAngleData[], row: LookAngleData, sat: Satellite, sensor: DetailedSensor, start: Date): void {
+    const startMs = start.getTime();
+    const stepMs = 5000;
+    const getAer = (ms: number) => SatMath.getRae(new Date(ms), sat.satrec, sensor, true);
+    const isIn = (ms: number): boolean => SatMath.checkIsInView(sensor, getAer(ms));
+    let peak = { ms: startMs, el: row.el ?? -90, rng: row.rng, az: row.az };
+    let earliestInMs = startMs;
+    let outMs: number | null = null;
+
+    for (let back = stepMs; back <= 30 * 60 * 1000; back += stepMs) {
+      const ms = startMs - back;
+      const aer = getAer(ms);
+
+      if (!SatMath.checkIsInView(sensor, aer)) {
+        outMs = ms;
+        break;
+      }
+      earliestInMs = ms;
+      if (aer.el !== null && aer.el > peak.el) {
+        peak = { ms, el: aer.el, rng: aer.rng, az: aer.az };
+      }
+    }
+    if (outMs !== null) {
+      row.passRiseMs = refinePassEdgeMs(isIn, outMs, earliestInMs);
+    }
+    // Only an object already past its peak has a stale "Max El" first row; a rising one keeps the forward-found peak
+    const first = looksArray[0];
+    const isStalePeak =
+      first && (first.type === TearrType.MAX_EL || first.type === TearrType.MAX_EL_AND_SET) && Math.abs(Date.parse(`${first.time.replace(' ', 'T')}Z`) - startMs) < 2000;
+
+    if (isStalePeak && peak.ms !== startMs) {
+      const truePeak: LookAngleData = {
+        ...first,
+        time: dateFormat(new Date(peak.ms), 'isoDateTime', true),
+        el: peak.el as Degrees,
+        rng: peak.rng as Kilometers,
+        az: peak.az as Degrees,
+        type: TearrType.MAX_EL,
+        maskLimited: false,
+      };
+
+      if (first.type === TearrType.MAX_EL_AND_SET) {
+        looksArray[0] = { ...first, type: TearrType.SET };
+      } else {
+        looksArray.shift();
+      }
+      looksArray.unshift(truePeak);
+    }
   }
 
   /** Achievement signal: look angles computed for a sat from a sensor. Once per sat+sensor pair until either changes. */

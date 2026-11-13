@@ -1073,12 +1073,54 @@ export class ReportsPlugin extends KeepTrackPlugin {
       deps
     );
 
-    return passes.map((row) => ({
-      aos: row.START_DATE as Date,
-      los: row.STOP_DATE as Date,
-      maxEl: parseFloat((row.MAXIMUM_ELEVATION as string) ?? '0'),
-      maxElTime: new Date(row.MAXIMUM_ELEVATION_DTG as number),
-    }));
+    const detectStepMs = Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC) * 1000;
+
+    return passes.map((row) => {
+      const sampledMs = row.MAXIMUM_ELEVATION_DTG as number;
+      const sampledEl = parseFloat((row.MAXIMUM_ELEVATION as string) ?? '0');
+      const peak = ReportsPlugin.refinePeak_(
+        (ms) => SatMath.getRae(new Date(ms), satrec, sensor, true).el,
+        sampledMs,
+        sampledEl,
+        detectStepMs,
+        (row.START_DATE as Date).getTime(),
+        (row.STOP_DATE as Date).getTime()
+      );
+
+      return { aos: row.START_DATE as Date, los: row.STOP_DATE as Date, maxEl: peak.el, maxElTime: new Date(peak.ms) };
+    });
+  }
+
+  /**
+   * The detector only samples elevation every few tens of seconds, so its peak can sit below the true maximum.
+   * Ternary search of the elevation curve around the sampled peak (one sample step either side, inside the pass),
+   * snapped to a whole second so it matches Look Angles and Best Passes.
+   */
+  static refinePeak_(elAt: (ms: number) => number | null, sampledMs: number, sampledEl: number, stepMs: number, aosMs: number, losMs: number): { ms: number; el: number } {
+    let lo = Math.max(aosMs, sampledMs - stepMs);
+    let hi = Math.min(losMs, sampledMs + stepMs);
+
+    while (hi - lo > 1000) {
+      const m1 = lo + (hi - lo) / 3;
+      const m2 = hi - (hi - lo) / 3;
+
+      if ((elAt(m1) ?? -90) < (elAt(m2) ?? -90)) {
+        lo = m1;
+      } else {
+        hi = m2;
+      }
+    }
+    let best = { ms: sampledMs, el: sampledEl };
+
+    for (const ms of [Math.floor(lo / 1000) * 1000, Math.ceil(hi / 1000) * 1000]) {
+      const el = elAt(ms);
+
+      if (el !== null && el > best.el) {
+        best = { ms, el };
+      }
+    }
+
+    return best;
   }
 
   /** Computes the satellite's sun-illumination state and sun angle at a given time. */

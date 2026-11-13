@@ -69,7 +69,7 @@
         "removeLabel": "Von der Beobachtungsliste entfernen"
       },
       "stale": {
-        "label": "Schwelle für veraltete Bahndaten (Stunden)",
+        "label": "Schwelle für veraltete Bahndaten",
         "helpText": "Bahndaten, die älter sind, werden in Beobachtungsliste, Überflugtabellen und Exporten als VERALTET markiert. Standard 72.",
         "ageHeader": "GP-Alter (h)",
         "marker": "VERALTET",

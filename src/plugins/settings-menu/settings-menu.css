@@ -36,10 +36,10 @@
 /* ===== Dense-form fixes (recurring v13 miss) ===== */
 
 /* Stacked select/number fields: keep the floating "active" label from striking
-   through the row above. The first field after the section label only needs the
-   smaller gap. */
+   through the row above, and the first field after the section label needs room
+   too, or its label overlaps the section label (#201). */
 #settings-menu .kt-section .input-field.col.s12 { margin-top: 18px; }
-#settings-menu .kt-section-label + .input-field.col.s12 { margin-top: 6px; }
+#settings-menu .kt-section-label + .input-field.col.s12 { margin-top: 20px; }
 
 /* Toggle rows: tighten the Materialize .row default and give the switches a
    little consistent vertical rhythm inside the card. */

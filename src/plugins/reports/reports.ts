@@ -72,6 +72,7 @@ import {
   generateSunEclipseReport,
   generateVisibilityWindowsReport,
   REPORT_DEFAULTS,
+  REPORT_PASS_DETECT_STEP_SEC,
   ReportCoreDeps,
   ReportData,
   ReportOptions,
@@ -1039,7 +1040,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       return { inView: SatMath.checkIsInView(sensor, rae as Parameters<typeof SatMath.checkIsInView>[1]), el: rae.el };
     };
 
-    return addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, 30), sampleAt);
+    return addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC), sampleAt);
   }
 
   /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */
@@ -1066,7 +1067,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       sensor,
       {
         lengthDays: opts.windowSec / (24 * 60 * 60),
-        intervalSec: Math.min(opts.stepSec, 30),
+        intervalSec: Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC),
         maxResults: 1000,
       },
       deps

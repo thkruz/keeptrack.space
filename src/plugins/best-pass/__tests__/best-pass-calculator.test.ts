@@ -1,6 +1,7 @@
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { lookanglesRow } from '@app/engine/core/interfaces';
 import { BestPassDeps, emptyPassRow, findPassesForSat, normalizePassRows, PassRae, scorePass } from '@app/plugins/best-pass/best-pass-calculator';
+import { REPORT_PASS_DETECT_STEP_SEC } from '@app/plugins/reports/reports-core';
 import { Degrees, ElevationMask, Kilometers, SatelliteRecord, SpaceObjectType } from '@ootk/src/main';
 import { defaultSensor } from '@test/environment/apiMocks';
 
@@ -59,6 +60,16 @@ describe('best-pass-calculator', () => {
   });
 
   describe('findPassesForSat', () => {
+    it('finds a 19 s pass at the report detection step but can miss it at 30 s (#199)', () => {
+      const shortPass = buildDeps([[31_000, 50_000]]);
+
+      expect(findPassesForSat('25544', fakeSatrec(0.0011), defaultSensor, { lengthDays: 0.01, intervalSec: 30 }, shortPass).passes).toHaveLength(0);
+
+      const { passes } = findPassesForSat('25544', fakeSatrec(0.0011), defaultSensor, { lengthDays: 0.01, intervalSec: REPORT_PASS_DETECT_STEP_SEC }, shortPass);
+
+      expect(passes).toHaveLength(1);
+    });
+
     it('detects a single pass and fills its geometry', () => {
       const { passes, truncated } = findPassesForSat(
         '25544',

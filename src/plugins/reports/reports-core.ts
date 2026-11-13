@@ -222,6 +222,13 @@ export const REPORT_DEFAULTS = {
   stepSec: 30,
 } as const;
 
+/**
+ * Sampling step for pass detection in the AER and Visibility Windows reports, independent of the
+ * (coarser) table step. A pass shorter than the step can fall between two samples, so this is the
+ * shortest pass guaranteed to be found; Look Angles resolves shorter ones.
+ */
+export const REPORT_PASS_DETECT_STEP_SEC = 10;
+
 const HEADER_RULE = '-'.repeat(31);
 
 /**
@@ -282,13 +289,36 @@ export const formatSiteLocalTime = (time: Date, sensor: Pick<DetailedSensor, 'ti
   return `${date} ${clock}`;
 };
 
+/** Width the free-text header notes wrap at, so the monospace preview needs no sideways scroll for them. */
+const REPORT_HEADER_WRAP_COLUMNS = 80;
+
+/** Greedy word wrap for a header note; words longer than `columns` stay whole. Exported for tests. */
+export const wrapReportText = (text: string, columns: number): string => {
+  const lines: string[] = [];
+  let current = '';
+
+  for (const word of text.split(/\s+/u).filter(Boolean)) {
+    if (current && current.length + 1 + word.length > columns) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = current ? `${current} ${word}` : word;
+    }
+  }
+  if (current) {
+    lines.push(current);
+  }
+
+  return lines.join('\n');
+};
+
 /**
  * One header line naming the site zone used by the local-time columns and stating that the
  * windows are geometric access only (not proof a signal can be received) and that peak
  * elevation is the best sampled value, so it can sit below the true peak.
  */
 export const buildPassCaveatLine = (sensor: Pick<DetailedSensor, 'timeZone'>, tr: ReportText = doc): string =>
-  `${fillDoc(tr('header.passCaveat'), { zone: resolveSiteTimeZone(sensor.timeZone) })}
+  `${wrapReportText(fillDoc(tr('header.passCaveat'), { zone: resolveSiteTimeZone(sensor.timeZone) }), REPORT_HEADER_WRAP_COLUMNS)}
 
 `;
 

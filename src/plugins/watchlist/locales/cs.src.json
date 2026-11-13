@@ -69,7 +69,7 @@
         "removeLabel": "Odebrat ze seznamu sledovaných"
       },
       "stale": {
-        "label": "Práh zastaralých drah. prvků (hodiny)",
+        "label": "Práh zastaralých drah. prvků",
         "helpText": "Dráhové prvky starší než tento práh jsou v seznamu sledování, tabulkách přeletů a exportech označeny jako ZASTARALÉ. Výchozí 72.",
         "ageHeader": "Stáří GP (h)",
         "marker": "ZASTARALÉ",

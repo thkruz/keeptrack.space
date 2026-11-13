@@ -2,6 +2,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { buildDownloadPayload } from '@app/plugins/reports/report-formatter';
 import {
   addWindowEdgePasses,
+  buildPassCaveatLine,
   buildReportHeader,
   buildReportWindowLine,
   formatReportTime,
@@ -14,6 +15,7 @@ import {
   ReportCoreDeps,
   ReportOptions,
   ReportPass,
+  wrapReportText,
 } from '@app/plugins/reports/reports-core';
 import { Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
@@ -51,6 +53,21 @@ const deps: ReportCoreDeps = {
 };
 
 describe('reports-core', () => {
+  describe('pass caveat wrapping (#201)', () => {
+    it('wraps the caveat so no line is wider than the preview', () => {
+      const lines = buildPassCaveatLine({ timeZone: 'America/New_York' }).trim().split('\n');
+
+      expect(lines.length).toBeGreaterThan(1);
+      expect(Math.max(...lines.map((line) => line.length))).toBeLessThanOrEqual(80);
+    });
+
+    it('wrapReportText keeps an over-long word whole and drops no words', () => {
+      const wrapped = wrapReportText(`aa bb ${'x'.repeat(12)} cc`, 6);
+
+      expect(wrapped.split('\n')).toEqual(['aa bb', 'xxxxxxxxxxxx', 'cc']);
+    });
+  });
+
   describe('formatReportTime', () => {
     it('renders YYYY-MM-DD HH:MM:SS in UTC', () => {
       expect(formatReportTime(new Date('2022-03-04T05:06:07.890Z'))).toBe('2022-03-04 05:06:07');

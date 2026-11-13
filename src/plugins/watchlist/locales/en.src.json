@@ -69,7 +69,7 @@
         "removeLabel": "Remove from Watchlist"
       },
       "stale": {
-        "label": "Stale Element Set Threshold (hours)",
+        "label": "Stale Element Set Threshold",
         "helpText": "Element sets older than this are marked STALE in the watchlist, pass tables and exports. Default 72.",
         "ageHeader": "GP Age (h)",
         "marker": "STALE",

@@ -3,10 +3,12 @@
 .kt-picker-trigger {
   display: block;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 8px 28px 8px 10px;
   text-align: left;
   font-size: 14px;
-  color: var(--color-dark-text-accent, #fff);
+  color: var(--kt-text-primary, #f5f5f5);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
   border-radius: 4px;
@@ -40,7 +42,7 @@
   flex-direction: column;
   width: min(360px, 100vw);
   background: var(--color-dark-background, #121212);
-  color: var(--color-dark-text-accent, #fff);
+  color: var(--kt-text-primary, #f5f5f5);
   border-left: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
   box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
 }
@@ -91,6 +93,8 @@
 .kt-picker-item {
   display: block;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 8px 10px;
   text-align: left;
   font-size: 13px;

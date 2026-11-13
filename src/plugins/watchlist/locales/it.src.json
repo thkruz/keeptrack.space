@@ -69,7 +69,7 @@
         "removeLabel": "Rimuovi dalla lista di osservazione"
       },
       "stale": {
-        "label": "Soglia elementi obsoleti (ore)",
+        "label": "Soglia elementi obsoleti",
         "helpText": "Gli elementi orbitali più vecchi sono segnati come OBSOLETO nella lista di controllo, nelle tabelle dei passaggi e nelle esportazioni. Predefinito 72.",
         "ageHeader": "Età GP (h)",
         "marker": "OBSOLETO",

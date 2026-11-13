@@ -69,7 +69,7 @@
         "removeLabel": "Usuń z listy obserwowanych"
       },
       "stale": {
-        "label": "Próg przestarzałych elementów orbity (godziny)",
+        "label": "Próg przestarzałych elementów orbity",
         "helpText": "Elementy orbity starsze niż ten próg są oznaczane jako PRZESTARZAŁE na liście obserwacji, w tabelach przelotów i eksportach. Domyślnie 72.",
         "ageHeader": "Wiek GP (h)",
         "marker": "PRZESTARZAŁE",

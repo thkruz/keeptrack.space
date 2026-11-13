@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "Reference Frame",
       "tooltip": "Coordinate frame of the ephemeris (OEM REF_FRAME)",
-      "teme": "TEME (from the GP element set)"
+      "teme": "TEME",
+      "temeInfo": "from the GP element set"
     },
     "Regime": {
       "label": "Regime",
       "tooltip": "The altitude band of the orbit",
       "help": "The altitude band of the orbit. LEO: low Earth orbit, under 2,000 km. MEO: medium Earth orbit, up to geostationary height. GEO: about 35,786 km over the equator, where an object stays over one spot. HEO: highly elliptical, or higher than GEO.",
-      "leo": "LEO (low Earth)",
-      "meo": "MEO (medium Earth)",
-      "geo": "GEO (geostationary)",
-      "heo": "HEO (elliptical or high)"
+      "leo": "LEO",
+      "leoInfo": "low Earth",
+      "meo": "MEO",
+      "meoInfo": "medium Earth",
+      "geo": "GEO",
+      "geoInfo": "geostationary",
+      "heo": "HEO",
+      "heoInfo": "elliptical or high"
     },
     "LatitudeBand": {
       "label": "Latitude Reach",

@@ -94,9 +94,14 @@ describe('SatInfoBoxOrbital data population', () => {
   });
 
   it('shows the regime of a satellite in plain words', () => {
+    vi.stubGlobal('requestIdleCallback', (cb: IdleRequestCallback) => cb({ didTimeout: false, timeRemaining: () => 50 }));
     p().updateOrbitData_(defaultSat);
 
-    expect(getEl(EL.REGIME)!.textContent).toMatch(/^(LEO|MEO|GEO|HEO)/u);
+    const value = getEl(EL.REGIME)!;
+
+    expect(value.firstChild?.textContent).toMatch(/^(LEO|MEO|GEO|HEO)/u);
+    // #191 the explanation sits in a focusable info circle, not in the value text
+    expect(value.querySelector('.sat-info-circle')?.getAttribute('aria-label')).toBeTruthy();
   });
 
   it('gives Period, Apogee, Right Asc. and Arg of Perigee a keyboard-reachable definition', () => {

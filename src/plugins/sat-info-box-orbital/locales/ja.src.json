@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "基準座標系",
       "tooltip": "エフェメリスの座標系（OEM REF_FRAME）",
-      "teme": "TEME (GP要素セットより)"
+      "teme": "TEME",
+      "temeInfo": "GP要素セットより"
     },
     "Regime": {
       "label": "軌道領域",
       "tooltip": "軌道の高度帯",
       "help": "軌道の高度帯。LEO：低軌道、2,000 km未満。MEO：中軌道、静止軌道の高さまで。GEO：赤道上空約35,786 kmで、物体は同じ場所の上に留まります。HEO：非常に細長い楕円、またはGEOより高い軌道。",
-      "leo": "LEO（低軌道）",
-      "meo": "MEO（中軌道）",
-      "geo": "GEO（静止軌道）",
-      "heo": "HEO（楕円または高軌道）"
+      "leo": "LEO",
+      "leoInfo": "低軌道",
+      "meo": "MEO",
+      "meoInfo": "中軌道",
+      "geo": "GEO",
+      "geoInfo": "静止軌道",
+      "heo": "HEO",
+      "heoInfo": "楕円または高軌道"
     },
     "LatitudeBand": {
       "label": "緯度の到達範囲",

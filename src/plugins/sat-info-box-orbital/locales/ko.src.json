@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "기준 좌표계",
       "tooltip": "궤도력의 좌표계 (OEM REF_FRAME)",
-      "teme": "TEME (GP 요소 세트 기준)"
+      "teme": "TEME",
+      "temeInfo": "GP 요소 세트 기준"
     },
     "Regime": {
       "label": "궤도 영역",
       "tooltip": "궤도의 고도 구간입니다",
       "help": "궤도의 고도 구간입니다. LEO: 저궤도, 2,000 km 미만. MEO: 중궤도, 정지궤도 높이까지. GEO: 적도 위 약 35,786 km로, 물체가 한 지점 위에 머뭅니다. HEO: 매우 긴 타원이거나 GEO보다 높은 궤도.",
-      "leo": "LEO (저궤도)",
-      "meo": "MEO (중궤도)",
-      "geo": "GEO (정지궤도)",
-      "heo": "HEO (타원 또는 고궤도)"
+      "leo": "LEO",
+      "leoInfo": "저궤도",
+      "meo": "MEO",
+      "meoInfo": "중궤도",
+      "geo": "GEO",
+      "geoInfo": "정지궤도",
+      "heo": "HEO",
+      "heoInfo": "타원 또는 고궤도"
     },
     "LatitudeBand": {
       "label": "위도 도달 범위",

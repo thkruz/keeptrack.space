@@ -1,3 +1,4 @@
+import { buildGeoRegionIndex } from '@app/app/analysis/geo-region-lookup';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -16,9 +17,13 @@ import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
 import { vi } from 'vitest';
 
+const marineMock = vi.hoisted(() => ({ index: null as null | { polygons: unknown[] } }));
+
 vi.mock('@app/plugins/sat-info-box-orbital/region-data', () => ({
   getRegionIndex: () => ({ polygons: [] }),
   loadRegionIndex: async () => null,
+  getMarineIndex: () => marineMock.index,
+  loadMarineIndex: async () => null,
 }));
 
 describe('findWaterBody', () => {
@@ -106,7 +111,8 @@ describe('SatInfoBoxOrbital R11-F1', () => {
   it('#93 shows TEME for a GP object and tags the sigmas as default with the stored digits on hover', () => {
     p().updateOrbitData_(iss);
 
-    expect(getEl(EL.REF_FRAME)!.textContent).toBe(t7e('SatInfoBoxOrbital.RefFrame.teme' as Parameters<typeof t7e>[0]));
+    expect(getEl(EL.REF_FRAME)!.firstChild?.textContent).toBe(t7e('SatInfoBoxOrbital.RefFrame.teme' as Parameters<typeof t7e>[0]));
+    expect(getEl(EL.REF_FRAME)!.querySelector('.sat-info-circle')?.getAttribute('kt-tooltip')).toBeTruthy();
     expect(getEl(`${EL.REF_FRAME}-row`)!.style.display).toBe('flex');
     expect(getEl(EL.UNCERTAINTY_RADIAL)!.textContent).toContain(`(${t7e('SatInfoBoxOrbital.Sigma.defaultTag' as Parameters<typeof t7e>[0])})`);
     expect(getEl(EL.UNCERTAINTY_RADIAL)!.getAttribute('kt-tooltip')).toMatch(/\d+\.\d{3} /u);
@@ -131,5 +137,33 @@ describe('SatInfoBoxOrbital R11-F1', () => {
     p().updateRegionElement_(0, -140);
 
     expect(regionEl.textContent).toBe(t7e('SatInfoBoxOrbital.Region.Water.pacific' as Parameters<typeof t7e>[0]));
+  });
+
+  it('#27 prefers the marine polygon name over the coarse water box once loaded', () => {
+    const regionEl = getEl(EL.REGION)!;
+
+    marineMock.index = buildGeoRegionIndex([
+      {
+        properties: { name: 'Coral Sea', names: { de: 'Korallenmeer' } },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            [
+              [-150, -10],
+              [-130, -10],
+              [-130, 10],
+              [-150, 10],
+              [-150, -10],
+            ],
+          ],
+        },
+      },
+    ]);
+    try {
+      p().updateRegionElement_(0, -140);
+      expect(regionEl.textContent).toBe('Coral Sea');
+    } finally {
+      marineMock.index = null;
+    }
   });
 });

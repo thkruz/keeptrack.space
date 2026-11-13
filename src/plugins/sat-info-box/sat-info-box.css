@@ -192,7 +192,7 @@
 .sat-info-copy-values {
   margin-left: 8px;
   padding: 0;
-  font-size: 18px;
+  line-height: 0;
   color: inherit;
   background: transparent;
   border: 0;
@@ -230,4 +230,32 @@
 
 .sat-info-help[hidden] {
   display: none;
+}
+
+/* Info circle after a short value; the explanation lives in its kt-tooltip */
+.sat-info-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 12px;
+  height: 12px;
+  margin-left: 4px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 9px;
+  font-style: italic;
+  line-height: 1;
+  vertical-align: middle;
+  opacity: 0.7;
+  cursor: help;
+}
+
+.sat-info-circle:hover,
+.sat-info-circle:focus-visible {
+  opacity: 1;
+}
+
+.sat-info-circle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 1px;
 }

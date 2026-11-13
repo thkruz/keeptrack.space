@@ -133,6 +133,19 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       dismiss();
     });
 
+    // Keyboard users reach tooltipped controls with Tab: show on keyboard focus, hide on blur.
+    el.addEventListener('focus', () => {
+      const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
+
+      if (!text || !(el as HTMLElement).matches(':focus-visible')) {
+        return;
+      }
+
+      this.showTooltip(el as HTMLElement, text);
+      this.isVisible_ = true;
+    });
+    el.addEventListener('blur', dismiss);
+
     /*
      * Clicking a tooltipped control usually toggles UI that hides or replaces the
      * target (e.g. a drawer item closing the drawer); no mouseleave fires for an

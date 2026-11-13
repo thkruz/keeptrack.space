@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "Sistema di riferimento",
       "tooltip": "Sistema di coordinate dell'effemeride (OEM REF_FRAME)",
-      "teme": "TEME (dal set di elementi GP)"
+      "teme": "TEME",
+      "temeInfo": "dal set di elementi GP"
     },
     "Regime": {
       "label": "Regime",
       "tooltip": "La fascia di altitudine dell'orbita",
       "help": "La fascia di altitudine dell'orbita. LEO: orbita terrestre bassa, sotto i 2.000 km. MEO: orbita media, fino alla quota geostazionaria. GEO: circa 35.786 km sopra l'equatore, l'oggetto resta sopra un punto fisso. HEO: molto ellittica o più alta della GEO.",
-      "leo": "LEO (bassa)",
-      "meo": "MEO (media)",
-      "geo": "GEO (geostazionaria)",
-      "heo": "HEO (ellittica o alta)"
+      "leo": "LEO",
+      "leoInfo": "bassa",
+      "meo": "MEO",
+      "meoInfo": "media",
+      "geo": "GEO",
+      "geoInfo": "geostazionaria",
+      "heo": "HEO",
+      "heoInfo": "ellittica o alta"
     },
     "LatitudeBand": {
       "label": "Estensione in latitudine",

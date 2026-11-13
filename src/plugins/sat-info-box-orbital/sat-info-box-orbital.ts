@@ -18,10 +18,11 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { setValueWithInfo } from '../sat-info-box/info-value';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { classifyOrbitRegime } from './orbit-regime';
-import { getRegionIndex, loadRegionIndex } from './region-data';
+import { getMarineIndex, getRegionIndex, loadMarineIndex, loadRegionIndex } from './region-data';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
 import { screeningSigmasKm } from './screening-sigmas';
 import { findWaterBody } from './water-bodies';
@@ -270,7 +271,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
 
     if (isGp) {
-      setInnerHtml(EL.REF_FRAME, t7e('SatInfoBoxOrbital.RefFrame.teme' as Parameters<typeof t7e>[0]));
+      setValueWithInfo(EL.REF_FRAME, t7e('SatInfoBoxOrbital.RefFrame.teme' as Parameters<typeof t7e>[0]), t7e('SatInfoBoxOrbital.RefFrame.temeInfo' as Parameters<typeof t7e>[0]));
     }
 
     if (!isOem) {
@@ -372,7 +373,15 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   private updateRegimeElement_(perigeeKm: number, apogeeKm: number, eccentricity: number): void {
     const regime = classifyOrbitRegime(perigeeKm, apogeeKm, eccentricity);
 
-    setInnerHtml(EL.REGIME, regime ? t7e(`SatInfoBoxOrbital.Regime.${regime}` as Parameters<typeof t7e>[0]) : notAvailableText());
+    if (regime) {
+      setValueWithInfo(
+        EL.REGIME,
+        t7e(`SatInfoBoxOrbital.Regime.${regime}` as Parameters<typeof t7e>[0]),
+        t7e(`SatInfoBoxOrbital.Regime.${regime}Info` as Parameters<typeof t7e>[0])
+      );
+    } else {
+      setInnerHtml(EL.REGIME, notAvailableText());
+    }
   }
 
   private updatePeriodElement_(period: number): void {
@@ -522,10 +531,23 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     }
 
     const hit = findGeoRegion(index, lat, lon);
+    const language = i18next.language || 'en';
 
-    regionElement.textContent = hit
-      ? getGeoRegionName(hit, i18next.language || 'en')
-      : t7e(`SatInfoBoxOrbital.Region.Water.${findWaterBody(lat, lon)}` as Parameters<typeof t7e>[0]);
+    if (hit) {
+      regionElement.textContent = getGeoRegionName(hit, language);
+
+      return;
+    }
+
+    // Over water: named sea or ocean polygons (lazy-loaded), else the coarse boxes while loading or if the fetch failed.
+    const marine = getMarineIndex();
+    const marineHit = marine ? findGeoRegion(marine, lat, lon) : null;
+
+    if (!marine) {
+      loadMarineIndex().catch(() => undefined);
+    }
+
+    regionElement.textContent = marineHit ? getGeoRegionName(marineHit, language) : t7e(`SatInfoBoxOrbital.Region.Water.${findWaterBody(lat, lon)}` as Parameters<typeof t7e>[0]);
   }
 
   /**

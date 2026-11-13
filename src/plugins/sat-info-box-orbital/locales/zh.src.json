@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "参考系",
       "tooltip": "星历的坐标系（OEM REF_FRAME）",
-      "teme": "TEME（来自GP根数集）"
+      "teme": "TEME",
+      "temeInfo": "来自GP根数集"
     },
     "Regime": {
       "label": "轨道类型",
       "tooltip": "轨道的高度范围",
       "help": "轨道的高度范围。LEO：近地轨道，低于 2,000 公里。MEO：中地球轨道，至地球静止轨道高度。GEO：赤道上空约 35,786 公里，物体停留在同一点上空。HEO：高椭圆轨道，或高于 GEO。",
-      "leo": "LEO（近地）",
-      "meo": "MEO（中轨）",
-      "geo": "GEO（地球静止）",
-      "heo": "HEO（椭圆或高轨）"
+      "leo": "LEO",
+      "leoInfo": "近地",
+      "meo": "MEO",
+      "meoInfo": "中轨",
+      "geo": "GEO",
+      "geoInfo": "地球静止",
+      "heo": "HEO",
+      "heoInfo": "椭圆或高轨"
     },
     "LatitudeBand": {
       "label": "纬度范围",

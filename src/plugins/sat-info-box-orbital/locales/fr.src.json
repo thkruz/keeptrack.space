@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "Repère de référence",
       "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)",
-      "teme": "TEME (issu du jeu d’éléments GP)"
+      "teme": "TEME",
+      "temeInfo": "issu du jeu d’éléments GP"
     },
     "Regime": {
       "label": "Régime",
       "tooltip": "La tranche d'altitude de l'orbite",
       "help": "La tranche d'altitude de l'orbite. LEO : orbite terrestre basse, sous 2 000 km. MEO : orbite moyenne, jusqu'à l'altitude géostationnaire. GEO : environ 35 786 km au-dessus de l'équateur, l'objet reste au-dessus d'un même point. HEO : très elliptique ou plus haute que la GEO.",
-      "leo": "LEO (basse)",
-      "meo": "MEO (moyenne)",
-      "geo": "GEO (géostationnaire)",
-      "heo": "HEO (elliptique ou haute)"
+      "leo": "LEO",
+      "leoInfo": "basse",
+      "meo": "MEO",
+      "meoInfo": "moyenne",
+      "geo": "GEO",
+      "geoInfo": "géostationnaire",
+      "heo": "HEO",
+      "heoInfo": "elliptique ou haute"
     },
     "LatitudeBand": {
       "label": "Portée en latitude",

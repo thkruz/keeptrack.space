@@ -18,6 +18,7 @@ import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import contentCopyPng from '@public/img/icons/content-copy.png';
 import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -378,9 +379,9 @@ export class SatInfoBox extends KeepTrackPlugin {
         <div id="${EL.TITLE}" class="center-text">
           <span id="${EL.NAME}">This is a title</span>
           <span id="${EL.FLAG}" class="fi"></span>
-          <button id="${EL.COPY_VALUES}" type="button" class="material-icons sat-info-copy-values"
+          <button id="${EL.COPY_VALUES}" type="button" class="sat-info-copy-values"
             aria-label="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}"
-            kt-tooltip="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}">content_copy</button>
+            kt-tooltip="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}"><img class="sat-watchlist-icon off-watchlist" src="${contentCopyPng}" alt="" /></button>
         </div>
       </div>
     `;

@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "Układ odniesienia",
       "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)",
-      "teme": "TEME (z zestawu elementów GP)"
+      "teme": "TEME",
+      "temeInfo": "z zestawu elementów GP"
     },
     "Regime": {
       "label": "Reżim",
       "tooltip": "Pasmo wysokości orbity",
       "help": "Pasmo wysokości orbity. LEO: niska orbita okołoziemska, poniżej 2000 km. MEO: średnia orbita, do wysokości geostacjonarnej. GEO: około 35 786 km nad równikiem, obiekt stoi nad jednym punktem. HEO: bardzo eliptyczna lub wyższa niż GEO.",
-      "leo": "LEO (niska)",
-      "meo": "MEO (średnia)",
-      "geo": "GEO (geostacjonarna)",
-      "heo": "HEO (eliptyczna lub wysoka)"
+      "leo": "LEO",
+      "leoInfo": "niska",
+      "meo": "MEO",
+      "meoInfo": "średnia",
+      "geo": "GEO",
+      "geoInfo": "geostacjonarna",
+      "heo": "HEO",
+      "heoInfo": "eliptyczna lub wysoka"
     },
     "LatitudeBand": {
       "label": "Zasięg szerokości",

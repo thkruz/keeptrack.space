@@ -119,16 +119,21 @@
     "RefFrame": {
       "label": "Bezugssystem",
       "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)",
-      "teme": "TEME (aus dem GP-Elementsatz)"
+      "teme": "TEME",
+      "temeInfo": "aus dem GP-Elementsatz"
     },
     "Regime": {
       "label": "Bahnregime",
       "tooltip": "Das Höhenband der Bahn",
       "help": "Das Höhenband der Bahn. LEO: niedrige Erdumlaufbahn, unter 2.000 km. MEO: mittlere Erdumlaufbahn, bis zur geostationären Höhe. GEO: etwa 35.786 km über dem Äquator, das Objekt bleibt über einem Punkt. HEO: stark elliptisch oder höher als GEO.",
-      "leo": "LEO (niedrig)",
-      "meo": "MEO (mittel)",
-      "geo": "GEO (geostationär)",
-      "heo": "HEO (elliptisch oder hoch)"
+      "leo": "LEO",
+      "leoInfo": "niedrig",
+      "meo": "MEO",
+      "meoInfo": "mittel",
+      "geo": "GEO",
+      "geoInfo": "geostationär",
+      "heo": "HEO",
+      "heoInfo": "elliptisch oder hoch"
     },
     "LatitudeBand": {
       "label": "Breitenreichweite",

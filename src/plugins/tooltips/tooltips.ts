@@ -56,6 +56,15 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
       this.initTooltips();
     });
+
+    // A tap-shown tooltip stays until the next tap elsewhere
+    document.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (this.shownFor_ && !this.shownFor_.contains(e.target as Node | null)) {
+        this.hideTooltip();
+        this.isVisible_ = false;
+        this.shownFor_ = null;
+      }
+    });
   }
 
   initTooltips(): void {
@@ -159,22 +168,46 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     el.addEventListener('pointerdown', (e: PointerEvent) => {
       lastPointerType = e.pointerType;
     });
+    /*
+     * Touch has no hover: a tap on a tap-to-toggle target (info circles) shows its tooltip and a second tap hides it.
+     * The toggle runs on pointerup so it does not depend on the emulated mouse events a touch screen sends afterwards
+     * (mouseenter would otherwise race the click); the click that follows is swallowed.
+     */
+    let handledByTouch = false;
+    const toggleForTouch = () => {
+      const wasShownHere = this.isVisible_ && this.shownFor_ === el;
+
+      dismiss();
+
+      if (wasShownHere) {
+        return;
+      }
+
+      const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
+
+      if (text) {
+        this.showTooltip(el as HTMLElement, text);
+        this.isVisible_ = true;
+        this.shownFor_ = el as HTMLElement;
+      }
+    };
+
+    el.addEventListener('pointerup', (e: PointerEvent) => {
+      if (e.pointerType === 'touch' && (el as HTMLElement).hasAttribute(this.tapAttr)) {
+        handledByTouch = true;
+        toggleForTouch();
+      }
+    });
     el.addEventListener('click', () => {
-      // Touch has no hover: a tap on a tap-to-toggle target (info circles) shows its tooltip, a second tap hides it.
+      if (handledByTouch) {
+        handledByTouch = false;
+
+        return;
+      }
+
+      // Fallback for environments that deliver only pointerdown + click
       if (lastPointerType === 'touch' && (el as HTMLElement).hasAttribute(this.tapAttr)) {
-        const wasShownHere = this.isVisible_ && this.shownFor_ === el;
-
-        dismiss();
-
-        if (!wasShownHere) {
-          const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
-
-          if (text) {
-            this.showTooltip(el as HTMLElement, text);
-            this.isVisible_ = true;
-            this.shownFor_ = el as HTMLElement;
-          }
-        }
+        toggleForTouch();
 
         return;
       }

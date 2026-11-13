@@ -113,4 +113,53 @@ describe('TooltipsPlugin behavior', () => {
     touch(plain);
     expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
   });
+
+  it('pointerup tap shows the tooltip once and the following click does not toggle it off', () => {
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    document.body.appendChild(div);
+    const tap = document.createElement('span');
+
+    tap.setAttribute('kt-tooltip', 'Explain');
+    tap.setAttribute('kt-tooltip-tap', '');
+    document.body.appendChild(tap);
+    plugin.createTooltip(tap);
+    const fire = (type: string) => {
+      const ev = new Event(type);
+
+      Object.defineProperty(ev, 'pointerType', { value: 'touch' });
+      tap.dispatchEvent(ev);
+    };
+
+    fire('pointerdown');
+    fire('pointerup');
+    tap.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    fire('pointerdown');
+    fire('pointerup');
+    tap.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
+
+  it('a tap elsewhere hides a tap-shown tooltip', () => {
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    document.body.appendChild(div);
+    const tap = document.createElement('span');
+
+    tap.setAttribute('kt-tooltip', 'Explain');
+    tap.setAttribute('kt-tooltip-tap', '');
+    document.body.appendChild(tap);
+    plugin.createTooltip(tap);
+    plugin.addHtml();
+    const up = new Event('pointerup');
+
+    Object.defineProperty(up, 'pointerType', { value: 'touch' });
+    tap.dispatchEvent(up);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
 });

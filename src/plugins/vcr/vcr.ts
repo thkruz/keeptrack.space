@@ -100,9 +100,45 @@ export class VcrPlugin extends KeepTrackPlugin {
       this.fastForwardBtn_?.addEventListener('click', this.handleFastForward.bind(this));
     });
 
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => this.initNarrowPopover_());
+
     EventBus.getInstance().on(EventBusEvent.propRateChanged, this.onPropRateChanged_.bind(this));
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, this.onPropRateChanged_.bind(this));
     EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.onStaticOffsetChanged_.bind(this));
+  }
+
+  /**
+   * Narrow widths hide #vcr-container from the bar (vcr.css); the clock's mode label toggles it as a popover instead (#367).
+   * Delegated listeners, because the clock block is built by another plugin.
+   */
+  private initNarrowPopover_(): void {
+    const status = document.getElementById('datetime-status');
+
+    if (status) {
+      status.setAttribute('role', 'button');
+      status.setAttribute('tabindex', '0');
+      status.dataset.vcrToggle = 'true';
+    }
+    const toggle = () => document.getElementById('vcr-container')?.classList.toggle('vcr-popover-open');
+    const close = () => document.getElementById('vcr-container')?.classList.remove('vcr-popover-open');
+
+    document.addEventListener('click', (evt) => {
+      const target = evt.target as Element | null;
+
+      if (target?.closest('#datetime-status')) {
+        toggle();
+      } else if (!target?.closest('#vcr-container')) {
+        close();
+      }
+    });
+    document.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Escape') {
+        close();
+      } else if ((evt.key === 'Enter' || evt.key === ' ') && (evt.target as Element | null)?.closest?.('#datetime-status')) {
+        evt.preventDefault();
+        toggle();
+      }
+    });
   }
 
   verifyTimeControl(): boolean {

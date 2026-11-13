@@ -1,5 +1,36 @@
-  @media (max-width: 900px) {
-    #vcr-container {
-      display: none;
-    }
+/* Narrow widths (#367): the bar has no room for rewind / play / forward, so they leave it and open from the clock's
+   mode label ("LIVE", "PAUSED"). Same buttons and handlers, shown as a compact popover under the top bar. */
+@media (max-width: 900px) {
+  #vcr-container {
+    display: none;
   }
+
+  #vcr-container.vcr-popover-open {
+    display: flex;
+    position: fixed;
+    top: 54px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10001;
+    gap: 4px;
+    padding: 4px;
+    background: var(--kt-surface, rgba(20, 24, 32, 0.96));
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  }
+
+  #vcr-container.vcr-popover-open .vcr-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  body #datetime-status[data-vcr-toggle] {
+    cursor: pointer;
+    text-decoration: underline dotted;
+    text-underline-offset: 2px;
+  }
+}

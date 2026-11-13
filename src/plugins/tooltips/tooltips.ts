@@ -126,6 +126,11 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     };
 
     el.addEventListener('mouseenter', () => {
+      // Touch screens emulate mouseenter after a tap; hover tooltips would then stick over neighbouring labels (#217).
+      if (typeof window.matchMedia === 'function' && window.matchMedia('(hover: none)').matches && !el.hasAttribute(this.tapAttr)) {
+        return;
+      }
+
       isHovered = true;
 
       // A pending show for another element would otherwise leak through the shared timer

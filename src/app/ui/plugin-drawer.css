@@ -1539,7 +1539,15 @@ body.is-mobile-mode {
    * pane's controls (#143, Best Passes optical gate under #bp-submit). The pane sits above the parent here.
    */
   body [id$="-secondary"].side-menu-parent {
-    z-index: 6 !important;
+    z-index: 102 !important;
+  }
+
+  /*
+   * The camera widget canvas sits at z-index 100 and took taps meant for the menu's help and close buttons (#217).
+   * Open side menus fill the phone viewport, so they stack above the widget; the drawer (1000) stays above both.
+   */
+  body .side-menu-parent {
+    z-index: 101 !important;
   }
 
   .side-menu {

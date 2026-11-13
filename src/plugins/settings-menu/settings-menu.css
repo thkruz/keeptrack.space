@@ -125,6 +125,18 @@
     min-height: 44px;
   }
 
+  /* Keep the last rows clear of the floating bottom-centre menu button (#217). */
+  #settings-content {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  #settings-content::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    min-height: 24px;
+  }
+
   #settings-menu .kt-section .input-field,
   #settings-menu .kt-section .input-field input,
   #settings-menu .kt-section .select-wrapper {

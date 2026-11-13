@@ -20,7 +20,11 @@ describe('phone drawer and touch targets', () => {
   });
 
   it('#143 stacks settings panes above their parent menu on phones', () => {
-    expect(drawerCss).toMatch(/body \[id\$="-secondary"\]\.side-menu-parent \{\s*z-index: 6 !important;/u);
+    expect(drawerCss).toMatch(/body \[id\$="-secondary"\]\.side-menu-parent \{\s*z-index: 102 !important;/u);
+  });
+
+  it('#217 stacks open side menus above the camera widget (z-index 100) on phones', () => {
+    expect(drawerCss).toMatch(/body \.side-menu-parent \{\s*z-index: 101 !important;/u);
   });
 
   it('#154 makes the custom sensor submit row non-sticky on phones', () => {

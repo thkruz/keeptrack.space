@@ -64,6 +64,25 @@ describe('TooltipsPlugin behavior', () => {
     expect(document.getElementById('tooltip')!.classList.contains('kt-tooltip-visible')).toBe(false);
   });
 
+  it('ignores the emulated mouseenter on a touch-only device (#217)', () => {
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="Howdy" id="tt-touch"></div>');
+    const el = document.getElementById('tt-touch') as HTMLElement;
+    const original = window.matchMedia;
+
+    window.matchMedia = ((query: string) => ({ matches: query === '(hover: none)', media: query })) as unknown as typeof window.matchMedia;
+    try {
+      plugin.createTooltip(el);
+      el.dispatchEvent(new Event('mouseenter'));
+      vi.advanceTimersByTime(500);
+      expect(document.getElementById('tooltip')!.classList.contains('kt-tooltip-visible')).toBe(false);
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
   it('resolves a string id and warns when the element is missing', () => {
     // Browser branch so getEl returns null instead of throwing; warn would hit console.trace there.
     vi.spyOn(isThisNodeMod, 'isThisNode').mockReturnValue(false);

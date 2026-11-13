@@ -96,6 +96,9 @@
         "horizonMask": "Maska horizontu (az,el na řádek)",
         "maskPlaceholder": "Volitelné. Jedna dvojice azimut,elevace na řádek, např. 90,25",
         "prefillNote": "Pole jsou převzata z aktuálního senzoru ({{name}}). Upravte je před přidáním.",
+        "addReplaceNote": "Přidat ponechá aktuální senzor a přidá tento jako vedlejší. Nahradit z něj udělá hlavní senzor.",
+        "confirmClear": "Odebrat všechny vlastní senzory a obnovit výběr senzoru?",
+        "timeZonePlaceholder": "např. Europe/Paris",
         "tooltipHorizonMask": "Volitelné. Body azimut,elevace ve stupních, jeden na řádek nebo oddělené středníky. Minimální elevace se mezi body interpoluje a přechází přes 360. 2 až 72 bodů, 0 <= az < 360, 0 <= el <= 89.",
         "maskStep": "Stupňovité pásy (elevace platí do dalšího azimutu)",
         "tooltipMaskStep": "Vypnuto: elevace se mezi body interpoluje. Zapnuto: každý azimut začíná pás s danou elevací až do dalšího azimutu, přes 360 se pokračuje (0,10 a 90,35 znamená 10 stupňů od 0 do 90, poté 35 stupňů).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Vlastní senzor „{{name}}“ byl přidán jako primární senzor.",
         "addedSecondary": "Vlastní senzor „{{name}}“ byl přidán jako sekundární senzor.",
+        "duplicate": "Vlastní senzor „{{name}}“ je na tomto místě již aktivní. Změňte název nebo polohu a přidejte další.",
+        "cleared": "Vlastní senzory byly vymazány.",
         "replaced": "Primární senzor byl nahrazen senzorem „{{name}}“."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Plán záběru (okno expozice)",
         "start": "Začátek expozice (UTC)",
         "startTooltip": "Datum a čas, nebo HH:MM:SS v datu simulace",
+        "startPlaceholder": "např. 22:11:03 nebo 2026-11-13T22:11:03",
         "length": "Délka expozice (s)",
         "inFrame": "ve výhledu",
         "enters": "vstoupí",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Čas",
+        "title": "{object} ze stanice {sensor}",
+        "timeUtc": "Čas (UTC)",
         "type": "Typ",
         "el": "El.",
         "az": "Az.",

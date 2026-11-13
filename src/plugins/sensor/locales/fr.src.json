@@ -96,6 +96,9 @@
         "horizonMask": "Masque d'horizon (az,él par ligne)",
         "maskPlaceholder": "Facultatif. Une paire azimut,élévation par ligne, p. ex. 90,25",
         "prefillNote": "Champs copiés du capteur actuel ({{name}}). Modifiez-les avant d’ajouter.",
+        "addReplaceNote": "Ajouter conserve le capteur actuel et ajoute celui-ci comme capteur secondaire. Remplacer en fait le capteur principal.",
+        "confirmClear": "Supprimer tous les capteurs personnalisés et réinitialiser la sélection de capteur ?",
+        "timeZonePlaceholder": "p. ex. Europe/Paris",
         "tooltipHorizonMask": "Facultatif. Points azimut,élévation en degrés, un par ligne ou séparés par des points-virgules. L'élévation minimale est interpolée entre les points et boucle à 360. De 2 à 72 points, 0 <= az < 360, 0 <= él <= 89.",
         "maskStep": "Paliers (l'élévation vaut jusqu'à l'azimut suivant)",
         "tooltipMaskStep": "Désactivé : l'élévation minimale est interpolée entre les points. Activé : chaque azimut ouvre un palier qui garde son élévation jusqu'à l'azimut suivant, avec bouclage à 360 (0,10 et 90,35 donne 10 degrés de 0 à 90, puis 35 degrés).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Capteur personnalisé « {{name}} » ajouté comme capteur principal.",
         "addedSecondary": "Capteur personnalisé « {{name}} » ajouté comme capteur secondaire.",
+        "duplicate": "Un capteur personnalisé « {{name}} » est déjà actif à cet endroit. Changez le nom ou la position pour en ajouter un autre.",
+        "cleared": "Capteurs personnalisés effacés.",
         "replaced": "Capteur principal remplacé par « {{name}} »."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Plan de cadrage (fenêtre d'exposition)",
         "start": "Début d'exposition (UTC)",
         "startTooltip": "Date et heure, ou HH:MM:SS à la date de simulation",
+        "startPlaceholder": "p. ex. 22:11:03 ou 2026-11-13T22:11:03",
         "length": "Durée d'exposition (s)",
         "inFrame": "dans le champ",
         "enters": "entre",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Heure",
+        "title": "{object} depuis {sensor}",
+        "timeUtc": "Heure (UTC)",
         "type": "Type",
         "el": "Élév.",
         "az": "Az.",

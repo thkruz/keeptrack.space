@@ -96,6 +96,9 @@
         "horizonMask": "Horizontmaske (Az,El pro Zeile)",
         "maskPlaceholder": "Optional. Ein Paar Azimut,Elevation pro Zeile, z. B. 90,25",
         "prefillNote": "Felder vom aktuellen Sensor ({{name}}) übernommen. Vor dem Hinzufügen anpassen.",
+        "addReplaceNote": "Hinzufügen behält den aktuellen Sensor und fügt diesen als sekundären Sensor hinzu. Ersetzen macht ihn zum primären Sensor.",
+        "confirmClear": "Alle benutzerdefinierten Sensoren entfernen und die Sensorauswahl zurücksetzen?",
+        "timeZonePlaceholder": "z. B. Europe/Paris",
         "tooltipHorizonMask": "Optional. Azimut-,Elevationspunkte in Grad, einer pro Zeile oder durch Semikolons getrennt. Die Mindestelevation wird zwischen den Punkten interpoliert und läuft über 360 hinweg. 2 bis 72 Punkte, 0 <= Az < 360, 0 <= El <= 89.",
         "maskStep": "Stufen (Elevation gilt bis zum nächsten Azimut)",
         "tooltipMaskStep": "Aus: Die Mindestelevation wird zwischen den Punkten interpoliert. An: Jeder Azimut beginnt einen Bereich mit dieser Elevation bis zum nächsten Azimut, über 360 hinaus umlaufend (0,10 und 90,35 heißt 10 Grad von 0 bis 90, danach 35 Grad).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Benutzerdefinierter Sensor „{{name}}“ als primärer Sensor hinzugefügt.",
         "addedSecondary": "Benutzerdefinierter Sensor „{{name}}“ als sekundärer Sensor hinzugefügt.",
+        "duplicate": "Ein benutzerdefinierter Sensor „{{name}}“ ist an diesem Ort bereits aktiv. Ändern Sie Name oder Position, um einen weiteren hinzuzufügen.",
+        "cleared": "Benutzerdefinierte Sensoren gelöscht.",
         "replaced": "Primärer Sensor durch „{{name}}“ ersetzt."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Bildausschnitt-Plan (Belichtungsfenster)",
         "start": "Belichtungsbeginn (UTC)",
         "startTooltip": "Datum und Uhrzeit oder HH:MM:SS am Simulationsdatum",
+        "startPlaceholder": "z. B. 22:11:03 oder 2026-11-13T22:11:03",
         "length": "Belichtungsdauer (s)",
         "inFrame": "im Bild",
         "enters": "tritt ein",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Zeit",
+        "title": "{object} von {sensor}",
+        "timeUtc": "Zeit (UTC)",
         "type": "Typ",
         "el": "El.",
         "az": "Az.",

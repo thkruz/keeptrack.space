@@ -78,6 +78,7 @@ describe('CustomSensorPlugin persistence and camera', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('keeps the camera zoom when a custom sensor is added', () => {
@@ -177,6 +178,7 @@ describe('CustomSensorPlugin persistence and camera', () => {
     C.processCustomSensorSubmit_();
     expect(store.has(StorageKey.CUSTOM_SENSORS)).toBe(true);
 
+    vi.stubGlobal('confirm', () => true);
     (getEl('cs-clear') as HTMLButtonElement).click();
 
     expect(store.has(StorageKey.CUSTOM_SENSORS)).toBe(false);

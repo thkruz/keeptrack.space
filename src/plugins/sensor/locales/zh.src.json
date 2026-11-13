@@ -96,6 +96,9 @@
         "horizonMask": "地平线遮罩（每行 az,el）",
         "maskPlaceholder": "可选。每行一对方位角,仰角，例如 90,25",
         "prefillNote": "字段已从当前传感器（{{name}}）复制。添加前请修改。",
+        "addReplaceNote": "“添加”保留当前传感器并将此传感器添加为次要传感器。“替换”则将其设为主传感器。",
+        "confirmClear": "删除所有自定义传感器并重置传感器选择？",
+        "timeZonePlaceholder": "例如 Europe/Paris",
         "tooltipHorizonMask": "可选。以度为单位的方位角,仰角点，每行一个或用分号分隔。最小仰角在各点之间插值，并在 360 处回绕。2 至 72 个点，0 <= az < 360，0 <= el <= 89。",
         "maskStep": "阶梯分段(仰角保持到下一个方位角)",
         "tooltipMaskStep": "关闭:最小仰角在各点之间插值。开启:每个方位角开始一个分段,保持其仰角直到下一个方位角,并在360度处回绕(0,10 和 90,35 表示0到90度为10度,之后为35度)。",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "已将自定义传感器“{{name}}”添加为主传感器。",
         "addedSecondary": "已将自定义传感器“{{name}}”添加为辅助传感器。",
+        "duplicate": "此位置已有名为“{{name}}”的自定义传感器处于启用状态。请更改名称或位置后再添加。",
+        "cleared": "已清除自定义传感器。",
         "replaced": "已将主传感器替换为“{{name}}”。"
       }
     },
@@ -168,6 +173,7 @@
         "section": "取景计划(曝光窗口)",
         "start": "曝光开始(UTC)",
         "startTooltip": "日期和时间,或模拟日期上的 HH:MM:SS",
+        "startPlaceholder": "例如 22:11:03 或 2026-11-13T22:11:03",
         "length": "曝光时长(秒)",
         "inFrame": "在视场内",
         "enters": "进入",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "时间",
+        "title": "{sensor}观测{object}",
+        "timeUtc": "时间 (UTC)",
         "type": "类型",
         "el": "仰角",
         "az": "方位角",

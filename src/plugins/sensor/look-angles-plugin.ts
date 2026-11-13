@@ -109,7 +109,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   sideMenuElementName: string = 'look-angles-menu';
   sideMenuElementHtml: string = html`
     <section class="kt-section">
-      <div class="kt-section-label">${l('sections.results')}</div>
+      <div id="looks-title" class="kt-section-label">${l('sections.results')}</div>
       <table id="looks" class="la-table center-align"></table>
       <p id="looks-optical-note" class="la-optical-note" style="display: none;"></p>
     </section>`;
@@ -140,7 +140,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       <div class="kt-section-label">${l('framing.section')}</div>
       <div class="kt-field-row">
         <div class="input-field col s12">
-            <input id="look-angles-exposure-start" value="" type="text" placeholder="YYYY-MM-DD HH:MM:SS" data-position="bottom" data-delay="50" data-tooltip="${l('framing.startTooltip')}" />
+            <input id="look-angles-exposure-start" value="" type="text" placeholder="${l('framing.startPlaceholder')}" data-position="bottom" data-delay="50" data-tooltip="${l('framing.startTooltip')}" />
             <label for="look-angles-exposure-start" class="active">${l('framing.start')}</label>
         </div>
       </div>
@@ -504,6 +504,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
     // Populate the Side Menu
     this.populateSideMenuTable_(looksArray, timeManagerInstance);
+    LookAnglesPlugin.setTitle_(sat, sensors[0]);
     this.emitActionUsed_(sat, sensors);
 
     return looksArray;
@@ -552,6 +553,18 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id, sensorId });
   }
 
+  /** Name the object and the sensor above the table, e.g. "ISS (ZARYA) from Maui". */
+  private static setTitle_(sat: Satellite, sensor: DetailedSensor | undefined): void {
+    const titleEl = getEl('looks-title', true);
+
+    if (!titleEl) {
+      return;
+    }
+    const sensorName = sensor?.system ? `${sensor.system} (${sensor.name})` : sensor?.name;
+
+    titleEl.textContent = sensorName ? l('table.title').replace('{object}', sat.name).replace('{sensor}', sensorName) : l('sections.results');
+  }
+
   private populateSideMenuTable_(lookAngleData: LookAngleData[], timeManagerInstance: TimeManager) {
     const tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
 
@@ -561,7 +574,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tr.classList.add('la-table-header');
     const tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode(l('table.time')));
+    // The times in this table are UTC; say so in the header.
+    tdT.appendChild(document.createTextNode(l('table.timeUtc')));
 
     // Type column: Rise/Set/Max El in rise-set mode, "In View" for every sample otherwise
     const tdType: HTMLTableCellElement = tr.insertCell();

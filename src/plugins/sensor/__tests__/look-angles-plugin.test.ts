@@ -62,6 +62,18 @@ describe('LookAnglesPlugin look-angle computation', () => {
     expect(getEl('looks')!.querySelectorAll('tr').length).toBeGreaterThan(0);
   });
 
+  it('names the object and the sensor above the table and labels the time column UTC', () => {
+    // Locale lookups return the key in this environment, so assert the title was replaced and the header names UTC.
+    p().lengthOfLookAngles_ = 0.002;
+    p().getlookangles_(defaultSat);
+
+    const title = getEl('looks-title')!.textContent ?? '';
+
+    expect(title).not.toBe('');
+    expect(title).not.toContain('sections.results');
+    expect(getEl('looks')!.querySelector('tr td')!.textContent).toMatch(/UTC/iu);
+  });
+
   it('rise/set mode adds an "In view now" row when the pass is already under way at the start time', () => {
     p().lengthOfLookAngles_ = 0.002;
     p().isRiseSetOnly_ = true;

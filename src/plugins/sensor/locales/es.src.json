@@ -96,6 +96,9 @@
         "horizonMask": "Máscara de horizonte (az,el por línea)",
         "maskPlaceholder": "Opcional. Un par azimut,elevación por línea, p. ej. 90,25",
         "prefillNote": "Campos copiados del sensor actual ({{name}}). Edítelos antes de añadir.",
+        "addReplaceNote": "Añadir conserva el sensor actual y añade este como sensor secundario. Reemplazar lo convierte en el sensor principal.",
+        "confirmClear": "¿Eliminar todos los sensores personalizados y restablecer la selección de sensor?",
+        "timeZonePlaceholder": "p. ej. Europe/Paris",
         "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89.",
         "maskStep": "Tramos escalonados (la elevación se mantiene hasta el siguiente acimut)",
         "tooltipMaskStep": "Desactivado: la elevación mínima se interpola entre puntos. Activado: cada acimut inicia un tramo que mantiene su elevación hasta el siguiente acimut, con vuelta en 360 (0,10 y 90,35 significa 10 grados de 0 a 90 y luego 35 grados).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Sensor personalizado «{{name}}» añadido como sensor principal.",
         "addedSecondary": "Sensor personalizado «{{name}}» añadido como sensor secundario.",
+        "duplicate": "Ya hay un sensor personalizado \"{{name}}\" activo en esta ubicación. Cambie el nombre o la posición para añadir otro.",
+        "cleared": "Sensores personalizados borrados.",
         "replaced": "Sensor principal sustituido por «{{name}}»."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Plan de encuadre (ventana de exposición)",
         "start": "Inicio de exposición (UTC)",
         "startTooltip": "Fecha y hora, o HH:MM:SS en la fecha de la simulación",
+        "startPlaceholder": "p. ej. 22:11:03 o 2026-11-13T22:11:03",
         "length": "Duración de exposición (s)",
         "inFrame": "en el campo",
         "enters": "entra",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Hora",
+        "title": "{object} desde {sensor}",
+        "timeUtc": "Hora (UTC)",
         "type": "Tipo",
         "el": "El.",
         "az": "Az.",

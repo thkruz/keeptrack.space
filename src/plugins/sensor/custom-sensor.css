@@ -167,7 +167,20 @@
   position: sticky;
   bottom: 0;
   z-index: 2;
-  background: var(--color-dark-background);
+  /* Opaque, including the 8px margin gap above the button, so scrolled fields never show through */
+  background: var(--color-dark-background, #1f1f1f) !important;
+  box-shadow: 0 -8px 0 0 var(--color-dark-background, #1f1f1f);
+}
+
+/* Destructive action: set apart from Add / Replace and drawn in the accent colour */
+#custom-sensor-menu-form > #cs-clear {
+  margin-top: 28px;
+  background: transparent !important;
+  border: 1px solid var(--color-primary, #ba160c);
+}
+
+#custom-sensor-menu-form > #cs-clear .kt-action-label {
+  color: var(--color-primary-light, #e01a0e);
 }
 
 @media (max-height: 800px) {

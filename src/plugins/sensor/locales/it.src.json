@@ -96,6 +96,9 @@
         "horizonMask": "Maschera d'orizzonte (az,el per riga)",
         "maskPlaceholder": "Facoltativo. Una coppia azimut,elevazione per riga, ad es. 90,25",
         "prefillNote": "Campi copiati dal sensore attuale ({{name}}). Modificali prima di aggiungere.",
+        "addReplaceNote": "Aggiungi mantiene il sensore attuale e aggiunge questo come sensore secondario. Sostituisci lo rende il sensore principale.",
+        "confirmClear": "Rimuovere tutti i sensori personalizzati e reimpostare la selezione del sensore?",
+        "timeZonePlaceholder": "es. Europe/Paris",
         "tooltipHorizonMask": "Facoltativo. Punti azimut,elevazione in gradi, uno per riga o separati da punto e virgola. L'elevazione minima viene interpolata tra i punti e prosegue oltre 360. Da 2 a 72 punti, 0 <= az < 360, 0 <= el <= 89.",
         "maskStep": "Fasce a gradini (l'elevazione vale fino all'azimut successivo)",
         "tooltipMaskStep": "Disattivato: l'elevazione minima è interpolata tra i punti. Attivato: ogni azimut avvia una fascia che mantiene la sua elevazione fino all'azimut successivo, con ritorno a 360 (0,10 e 90,35 significa 10 gradi da 0 a 90, poi 35 gradi).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Sensore personalizzato \"{{name}}\" aggiunto come sensore principale.",
         "addedSecondary": "Sensore personalizzato \"{{name}}\" aggiunto come sensore secondario.",
+        "duplicate": "Un sensore personalizzato \"{{name}}\" è già attivo in questa posizione. Cambia nome o posizione per aggiungerne un altro.",
+        "cleared": "Sensori personalizzati cancellati.",
         "replaced": "Sensore principale sostituito con \"{{name}}\"."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Piano di inquadratura (finestra di esposizione)",
         "start": "Inizio esposizione (UTC)",
         "startTooltip": "Data e ora, oppure HH:MM:SS alla data della simulazione",
+        "startPlaceholder": "es. 22:11:03 o 2026-11-13T22:11:03",
         "length": "Durata esposizione (s)",
         "inFrame": "nel campo",
         "enters": "entra",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Ora",
+        "title": "{object} da {sensor}",
+        "timeUtc": "Ora (UTC)",
         "type": "Tipo",
         "el": "El.",
         "az": "Az.",

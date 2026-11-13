@@ -96,6 +96,9 @@
         "horizonMask": "Horizon mask (az,el per line)",
         "maskPlaceholder": "Optional. One azimuth,elevation pair per line, e.g. 90,25",
         "prefillNote": "Fields copied from the current sensor ({{name}}). Edit them before adding.",
+        "addReplaceNote": "Add keeps the current sensor and adds this one as a secondary sensor. Replace makes this the primary sensor.",
+        "confirmClear": "Remove all custom sensors and reset the sensor selection?",
+        "timeZonePlaceholder": "e.g. Europe/Paris",
         "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89.",
         "maskStep": "Step bins (hold elevation until next azimuth)",
         "tooltipMaskStep": "Off: the minimum elevation is interpolated between points. On: each azimuth starts a bin that holds its elevation until the next azimuth, wrapping at 360 (0,10 and 90,35 means 10 degrees from 0 to 90, then 35 degrees from 90 on).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Custom sensor \"{{name}}\" added as the primary sensor.",
         "addedSecondary": "Custom sensor \"{{name}}\" added as a secondary sensor.",
+        "duplicate": "A custom sensor named \"{{name}}\" is already active at this location. Change the name or position to add another.",
+        "cleared": "Custom sensors cleared.",
         "replaced": "Primary sensor replaced with \"{{name}}\"."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Framing plan (exposure window)",
         "start": "Exposure start (UTC)",
         "startTooltip": "Date and time, or HH:MM:SS on the simulation date",
+        "startPlaceholder": "e.g. 22:11:03 or 2026-11-13T22:11:03",
         "length": "Exposure length (s)",
         "inFrame": "in frame",
         "enters": "enters",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Time",
+        "title": "{object} from {sensor}",
+        "timeUtc": "Time (UTC)",
         "type": "Type",
         "el": "El",
         "az": "Az",

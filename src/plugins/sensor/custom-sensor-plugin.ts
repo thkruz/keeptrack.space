@@ -196,7 +196,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         </div>
         <div class="kt-field-row">
           <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipTimeZone')}">
-            <input id="cs-timezone" type="text" spellcheck="false" autocomplete="off" placeholder="America/New_York" />
+            <input id="cs-timezone" type="text" spellcheck="false" autocomplete="off" placeholder="${l('timeZonePlaceholder')}" />
             <label for="cs-timezone" class="active">${l('timeZone')}</label>
           </div>
         </div>
@@ -208,11 +208,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <button id="cs-replace" type="button" name="action" class="kt-action waves-effect">
         <span class="kt-action-label">${l('replaceSensor')}</span>
       </button>
-      <button id="cs-clear" type="button" name="action" class="kt-action waves-effect">
-        <span class="kt-action-label">${l('clearCustomSensors')}</span>
-      </button>
+      <div id="cs-add-replace-note" class="cs-prefill-note">${l('addReplaceNote')}</div>
       <button id="cs-geolocation" type="button" name="search" class="kt-action waves-effect">
         <span class="kt-action-label">${l('useGeolocation')}</span>
+      </button>
+      <button id="cs-clear" type="button" name="action" class="kt-action kt-action-danger cs-clear waves-effect">
+        <span class="kt-action-label">${l('clearCustomSensors')}</span>
       </button>
     </form>
     `;
@@ -569,6 +570,10 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addClearCustomSensorListener_() {
     getEl('cs-clear')!.addEventListener('click', () => {
+      // Destructive and unrecoverable: ask first
+      if (!confirm(CustomSensorPlugin.t_('labels.confirmClear'))) {
+        return;
+      }
       const sensorManagerInstance = ServiceLocator.getSensorManager();
 
       sensorManagerInstance.clearSecondarySensors();
@@ -579,6 +584,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       CustomSensorPlugin.updateCustomSensorListDom();
       CustomSensorPlugin.saveCustomSensors();
+      ServiceLocator.getUiManager().toast(CustomSensorPlugin.t_('toasts.cleared'), ToastMsgType.normal);
     });
   }
 
@@ -705,6 +711,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     // Same name and position as a sensor already active: adding it again would list it twice
     if (!isReplaceSensor && CustomSensorPlugin.findActiveTwin_(values)) {
+      // Never a silent no-op: say why nothing was added
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.CustomSensorPlugin.toasts.duplicate' as Parameters<typeof t7e>[0], { name: resolveCustomSensorName(values.uiName) }),
+        ToastMsgType.caution
+      );
+
       return 'duplicate';
     }
 

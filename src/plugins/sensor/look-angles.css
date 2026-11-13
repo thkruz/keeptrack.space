@@ -72,3 +72,18 @@
   color: var(--color-dark-text-muted);
   border: 1px solid var(--color-dark-border);
 }
+
+/*
+ * Phone width: fit the 5 core columns (time, type, el, az, rng) in 390 px without sideways scrolling.
+ * Duration, Above horizon, Sunlit and Optically visible are hidden here only; the export keeps every column.
+ */
+@media (max-width: 600px) {
+  #looks-title { overflow-wrap: anywhere; }
+
+  .la-table { font-size: 12px; table-layout: auto; }
+  .la-table td { padding: 5px 2px; }
+  .la-table .la-table-header td { font-size: 10px; letter-spacing: 0; }
+
+  .la-table td:not(:only-child):nth-child(3),
+  .la-table td:not(:only-child):nth-child(n+7) { display: none; }
+}

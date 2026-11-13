@@ -74,6 +74,7 @@ describe('custom site registry wiring', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   const addSite = (name: string, lat: string): string => {
@@ -99,6 +100,7 @@ describe('custom site registry wiring', () => {
     addSite('RIDGE', '40');
     addSite('COAST', '41');
 
+    vi.stubGlobal('confirm', () => true);
     (getEl('cs-clear') as HTMLButtonElement).click();
 
     expect(store.has(StorageKey.CUSTOM_SENSORS)).toBe(false);
@@ -126,6 +128,7 @@ describe('custom site registry wiring', () => {
     const idA = addSite('RIDGE', '40');
     const idB = addSite('COAST', '41');
 
+    vi.stubGlobal('confirm', () => true);
     (getEl('cs-clear') as HTMLButtonElement).click();
     expect(ServiceLocator.getSensorManager().currentSensors).toHaveLength(0);
 

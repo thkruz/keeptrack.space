@@ -85,6 +85,7 @@ describe('CustomSensorPlugin gap fixes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     vi.advanceTimersByTime(1000);
   });
 
@@ -125,6 +126,21 @@ describe('CustomSensorPlugin gap fixes', () => {
     submitForm();
 
     expect(addSpy).toHaveBeenCalledTimes(1);
+    // Never silent: the second Add explains why nothing was added
+    expect(toastSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('adds a sensor with a new name at the same position as an active one (#197)', () => {
+    setForm();
+    submitForm();
+    const added = addSpy.mock.calls[0][0] as DetailedSensor;
+
+    ServiceLocator.getSensorManager().secondarySensors = [added];
+    vi.advanceTimersByTime(1500);
+    setForm({ 'cs-uiName': 'Wide', 'cs-minaz': '0', 'cs-maxaz': '360' });
+    submitForm();
+
+    expect(addSpy).toHaveBeenCalledTimes(2);
   });
 
   it('accepts a different sensor submitted right after the first', () => {
@@ -201,7 +217,18 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect((getEl('cs-mask') as HTMLTextAreaElement).placeholder.includes(String.fromCharCode(10))).toBe(false);
   });
 
+  it('Clear Custom Sensors does nothing when the confirmation is declined', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const clearSpy = vi.spyOn(sensorManager, 'clearSecondarySensors');
+
+    vi.stubGlobal('confirm', () => false);
+    getEl('cs-clear')!.click();
+
+    expect(clearSpy).not.toHaveBeenCalled();
+  });
+
   it('Clear Custom Sensors also resets a catalog primary sensor', () => {
+    vi.stubGlobal('confirm', () => true);
     const sensorManager = ServiceLocator.getSensorManager();
 
     sensorManager.currentSensors = [catalogSensor()];

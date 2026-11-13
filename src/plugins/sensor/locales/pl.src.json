@@ -96,6 +96,9 @@
         "horizonMask": "Maska horyzontu (az,el w wierszu)",
         "maskPlaceholder": "Opcjonalnie. Jedna para azymut,elewacja w wierszu, np. 90,25",
         "prefillNote": "Pola skopiowane z bieżącego czujnika ({{name}}). Edytuj je przed dodaniem.",
+        "addReplaceNote": "Dodaj zachowuje bieżący czujnik i dodaje ten jako dodatkowy. Zastąp ustawia go jako główny.",
+        "confirmClear": "Usunąć wszystkie czujniki użytkownika i zresetować wybór czujnika?",
+        "timeZonePlaceholder": "np. Europe/Paris",
         "tooltipHorizonMask": "Opcjonalne. Punkty azymut,elewacja w stopniach, jeden w wierszu lub oddzielone średnikami. Minimalna elewacja jest interpolowana między punktami i zawija się przy 360. Od 2 do 72 punktów, 0 <= az < 360, 0 <= el <= 89.",
         "maskStep": "Przedziały schodkowe (elewacja obowiązuje do następnego azymutu)",
         "tooltipMaskStep": "Wyłączone: minimalna elewacja jest interpolowana między punktami. Włączone: każdy azymut rozpoczyna przedział o danej elewacji do następnego azymutu, z zawinięciem na 360 (0,10 i 90,35 oznacza 10 stopni od 0 do 90, potem 35 stopni).",
@@ -147,6 +150,8 @@
       "toasts": {
         "addedPrimary": "Dodano własny czujnik „{{name}}” jako czujnik główny.",
         "addedSecondary": "Dodano własny czujnik „{{name}}” jako czujnik dodatkowy.",
+        "duplicate": "Czujnik użytkownika „{{name}}” jest już aktywny w tej lokalizacji. Zmień nazwę lub pozycję, aby dodać kolejny.",
+        "cleared": "Usunięto czujniki użytkownika.",
         "replaced": "Czujnik główny zastąpiono czujnikiem „{{name}}”."
       }
     },
@@ -168,6 +173,7 @@
         "section": "Plan kadrowania (okno ekspozycji)",
         "start": "Początek ekspozycji (UTC)",
         "startTooltip": "Data i godzina albo HH:MM:SS w dacie symulacji",
+        "startPlaceholder": "np. 22:11:03 lub 2026-11-13T22:11:03",
         "length": "Czas ekspozycji (s)",
         "inFrame": "w kadrze",
         "enters": "wchodzi",
@@ -176,6 +182,8 @@
       },
       "table": {
         "time": "Czas",
+        "title": "{object} ze stacji {sensor}",
+        "timeUtc": "Czas (UTC)",
         "type": "Typ",
         "el": "El.",
         "az": "Az.",

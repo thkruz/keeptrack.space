@@ -286,6 +286,25 @@
   #sat-infobox {
     padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px));
   }
+
+  /* The 1000px section cap is for the collapse animation; at phone width long mission text wraps past it and the last rows (Data: GCAT) were clipped (#195) */
+  .sat-info-section,
+  #sat-identifier-data,
+  #orbital-section,
+  #secondary-sat-info,
+  #sensor-sat-info,
+  #sat-mission-data {
+    max-height: 5000px;
+  }
+
+  .sat-info-section.collapsed,
+  #sat-identifier-data.collapsed,
+  #orbital-section.collapsed,
+  #secondary-sat-info.collapsed,
+  #sensor-sat-info.collapsed,
+  #sat-mission-data.collapsed {
+    max-height: 20px;
+  }
 }
 
 /* Age of GP past the stale threshold (same setting as the watchlist STALE flag). The STALE word carries the meaning. */

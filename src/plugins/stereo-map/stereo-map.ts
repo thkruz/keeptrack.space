@@ -651,6 +651,33 @@ export class StereoMap extends KeepTrackPlugin {
     });
     ctx.fillText(utc, originX, originY + contentH);
     ctx.restore();
+    this.clearMarkersUnderLegend_({
+      left: originX - 8,
+      top: originY - 18,
+      right: originX - 8 + Math.min(contentW, this.canvas_.width - 36) + 16,
+      bottom: originY - 18 + contentH + 24,
+    });
+  }
+
+  /**
+   * The ground-track markers are DOM images stacked above the canvas, so they
+   * drew over the legend text. Hide the ones whose box overlaps the legend box.
+   */
+  private clearMarkersUnderLegend_(box: { left: number; top: number; right: number; bottom: number }): void {
+    const half = this.halfDotSize_;
+
+    for (let i = 1; i <= 50; i++) {
+      const dot = getEl(`map-look${i}`, true) as HTMLImageElement | null;
+
+      if (!dot) {
+        continue;
+      }
+      const x = Number.parseFloat(dot.style.left);
+      const y = Number.parseFloat(dot.style.top);
+      const covered = Number.isFinite(x) && Number.isFinite(y) && x + 2 * half > box.left && x < box.right && y + 2 * half > box.top && y < box.bottom;
+
+      dot.style.visibility = covered ? 'hidden' : '';
+    }
   }
 
   /**

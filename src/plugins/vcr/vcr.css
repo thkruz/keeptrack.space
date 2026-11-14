@@ -9,8 +9,9 @@
     display: flex;
     position: fixed;
     top: 54px;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 8px;
+    right: 8px;
+    justify-content: center;
     z-index: 100000;
     gap: 4px;
     padding: 8px;

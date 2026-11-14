@@ -82,19 +82,29 @@
     margin: 0 4px 0 0;
   }
 
-  /* Sat info box ends above the pill band instead of being padded under it (#195). */
+  /*
+   * Sat info box (#460, supersedes the #195 raised box): full width, docked to the bottom edge with no gap. The
+   * utility pill sits inside a non-scrolling strip at the bottom of the box (its own bottom border, painted in the
+   * box background), so box and controls read as one surface and scrolled rows never run under the pill. The box
+   * is capped at 45% of the viewport (dvh where supported) and scrolls inside.
+   */
   body #sat-infobox {
-    bottom: var(--pill-clearance);
+    bottom: 0;
+    box-sizing: border-box;
+    border-bottom: var(--pill-clearance) solid var(--color-dark-background);
     padding-bottom: 8px;
+    max-height: 45vh;
+    max-height: 45dvh;
+    overscroll-behavior: contain;
   }
 
   body #sat-infobox::after {
     height: 8px;
   }
 
-  /* Zoom buttons sit above the raised info box (45% tall). */
+  /* Zoom buttons sit above the docked info box (45% tall at most). */
   #mobile-zoom-buttons.mobile-zoom-raised {
-    bottom: calc(45% + var(--pill-clearance) + 12px);
+    bottom: calc(45% + 12px);
   }
 
   /* Top bar (#231): the clock block may not outgrow its slot, so the date cannot run over the logo and the zone

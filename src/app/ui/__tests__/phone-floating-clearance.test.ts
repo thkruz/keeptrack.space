@@ -13,7 +13,16 @@ describe('phone floating clearance CSS', () => {
 
   it('ends side menus and the info box above the utility pill', () => {
     expect(css).toMatch(/\.side-menu-parent[\s\S]*?bottom: var\(--pill-clearance\) !important/u);
-    expect(css).toMatch(/#sat-infobox \{[^}]*bottom: var\(--pill-clearance\)/u);
+  });
+
+  it('docks the info box full width to the bottom, capped at 45dvh, with the pill inside its own strip (#460)', () => {
+    const box = /body #sat-infobox \{([^}]*)\}/u.exec(css)?.[1] ?? '';
+
+    expect(box).toMatch(/bottom: 0;/u);
+    expect(box).toMatch(/border-bottom: var\(--pill-clearance\) solid/u);
+    expect(box).toMatch(/max-height: 45dvh/u);
+    expect(box).not.toMatch(/^\s*bottom: var\(--pill-clearance\)/mu);
+    expect(css).toMatch(/mobile-zoom-raised \{[^}]*bottom: calc\(45% \+ 12px\)/u);
   });
 
   it('keeps header icon buttons 32px and the title text shrinkable', () => {

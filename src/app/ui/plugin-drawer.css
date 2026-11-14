@@ -1809,8 +1809,8 @@ body.is-mobile-mode {
   body.drawer-mode #search-holder.search-slide-up:focus-within {
     /* #400: keep a right gutter so the border is not clipped, but take it out of the box width (212 + 8 margin = the
        old 220 footprint) so the clock group does not shrink further and clip LIVE. */
-    flex: 0 0 min(212px, calc(60vw - 8px));
-    width: min(212px, calc(60vw - 8px)) !important;
+    flex: 0 0 min(212px, calc(55vw - 8px));
+    width: min(212px, calc(55vw - 8px)) !important;
     box-sizing: border-box;
     max-width: calc(100vw - 16px);
     margin-right: 8px;

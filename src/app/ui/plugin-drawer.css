@@ -1807,9 +1807,10 @@ body.is-mobile-mode {
   /* Expand to a readable field while focused; the clock group shrinks to make room. */
   body.drawer-mode #search-holder:focus-within,
   body.drawer-mode #search-holder.search-slide-up:focus-within {
-    flex: 0 0 min(220px, 60vw);
-    width: min(220px, 60vw) !important;
-    /* #400: the expanded box sat flush with the screen edge and its right border was clipped; keep a gutter. */
+    /* #400: keep a right gutter so the border is not clipped, but take it out of the box width (212 + 8 margin = the
+       old 220 footprint) so the clock group does not shrink further and clip LIVE. */
+    flex: 0 0 min(212px, calc(60vw - 8px));
+    width: min(212px, calc(60vw - 8px)) !important;
     box-sizing: border-box;
     max-width: calc(100vw - 16px);
     margin-right: 8px;

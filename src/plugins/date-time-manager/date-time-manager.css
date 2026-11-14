@@ -117,6 +117,53 @@
   font-weight: bold;
 }
 
+/* #405: Chromium's native popup paints hovered and selected rows in its own blue. Where customizable selects exist
+   (Chromium 135+), switch the picker to author-styled rows with theme tokens; other browsers keep the native list above.
+   The closed chip keeps field-sizing: content (#318) and the 12 px font (#321). */
+@supports (appearance: base-select) {
+  #datetime-zone,
+  #datetime-zone::picker(select) {
+    appearance: base-select;
+  }
+
+  #datetime-zone::picker-icon {
+    display: none;
+  }
+
+  #datetime-zone::picker(select) {
+    color: var(--kt-text-primary, #fff);
+    background: var(--kt-bg-elevated, #1e1e1e);
+    border: 1px solid var(--kt-border, #555);
+    border-radius: 8px;
+    padding: 2px;
+    font-size: max(12px, 0.75rem);
+  }
+
+  #datetime-zone option {
+    padding: 6px 10px;
+    min-height: 32px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+
+  #datetime-zone option::checkmark {
+    display: none;
+  }
+
+  #datetime-zone option:hover,
+  #datetime-zone option:focus {
+    color: var(--kt-text-primary, #fff);
+    background-color: var(--kt-bg-hover, #333);
+  }
+
+  #datetime-zone option:checked {
+    color: var(--kt-text-primary, #fff);
+    background-color: var(--kt-bg-active, #444);
+    font-weight: bold;
+  }
+}
+
 #datetime-zone[data-zone='other'] {
   color: var(--colorCaution, #ffb300);
   border-color: var(--colorCaution, #ffb300);

@@ -284,4 +284,12 @@
   body #datetime #datetime-zone {
     max-width: 72px;
   }
+
+  /* #405: the rule above sets appearance: none for the chip; keep the themed customizable picker where supported. */
+  @supports (appearance: base-select) {
+    body #datetime #datetime-zone,
+    body.drawer-mode #datetime #datetime-zone {
+      appearance: base-select;
+    }
+  }
 }

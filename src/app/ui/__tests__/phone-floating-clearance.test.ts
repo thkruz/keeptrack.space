@@ -19,10 +19,19 @@ describe('phone floating clearance CSS', () => {
     const box = /body #sat-infobox \{([^}]*)\}/u.exec(css)?.[1] ?? '';
 
     expect(box).toMatch(/bottom: 0;/u);
-    expect(box).toMatch(/border-bottom: var\(--pill-clearance\) solid/u);
+    expect(box).toMatch(/border-bottom: calc\(var\(--sat-infobox-footer-height\)[^;]*\) solid/u);
+    expect(box).toMatch(/padding-bottom: 0;/u);
     expect(box).toMatch(/max-height: 45dvh/u);
     expect(box).not.toMatch(/^\s*bottom: var\(--pill-clearance\)/mu);
     expect(css).toMatch(/mobile-zoom-raised \{[^}]*bottom: calc\(45% \+ 12px\)/u);
+  });
+
+  it('keeps the footer strip at most 48px with a 48px pill and 44px icon inside it (#464)', () => {
+    const strip = /--sat-infobox-footer-height: (\d+)px/u.exec(css)?.[1];
+
+    expect(Number(strip)).toBeLessThanOrEqual(48);
+    expect(css).toMatch(/\.drawer-utility-footer \{[^}]*bottom: env\(safe-area-inset-bottom[^}]*min-width: 48px[^}]*min-height: 48px/u);
+    expect(css).toMatch(/\.drawer-utility-footer::before \{[^}]*width: 44px[^}]*height: 44px/u);
   });
 
   it('keeps header icon buttons 32px and the title text shrinkable', () => {
@@ -55,7 +64,7 @@ describe('phone floating clearance CSS', () => {
     expect(info).toMatch(/\.sat-info-key--help,\s*#sat-infobox \.sat-info-key\[kt-tooltip\] \{[^}]*min-width: 44px[^}]*min-height: 44px/u);
     expect(info).toMatch(/\.sat-info-row:has\([^)]*\) \{[^}]*min-height: 44px/u);
     expect(css).toMatch(/\.drawer-utility-icon \{[^}]*width: 44px !important[^}]*height: 44px !important/u);
-    expect(css).toMatch(/\.drawer-utility-footer \{[^}]*min-width: 54px[^}]*min-height: 54px/u);
+    expect(css).toMatch(/\.drawer-utility-footer \{[^}]*min-width: 48px[^}]*min-height: 48px/u);
     expect(css).toMatch(/#datetime #datetime-zone \{[^}]*width: auto[^}]*outline-offset: -5px/u);
   });
 });

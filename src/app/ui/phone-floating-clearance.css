@@ -8,6 +8,7 @@
  */
 :root {
   --pill-clearance: calc(68px + env(safe-area-inset-bottom, 0px));
+  --sat-infobox-footer-height: 48px;
 }
 
 @media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
@@ -91,15 +92,15 @@
   body #sat-infobox {
     bottom: 0;
     box-sizing: border-box;
-    border-bottom: var(--pill-clearance) solid var(--color-dark-background);
-    padding-bottom: 8px;
+    border-bottom: calc(var(--sat-infobox-footer-height) + env(safe-area-inset-bottom, 0px)) solid var(--color-dark-background);
+    padding-bottom: 0;
     max-height: 45vh;
     max-height: 45dvh;
     overscroll-behavior: contain;
   }
 
   body #sat-infobox::after {
-    height: 8px;
+    height: 4px;
   }
 
   /* Zoom buttons sit above the docked info box (45% tall at most). */
@@ -198,12 +199,14 @@
     background-color: rgba(255, 255, 255, 0.12);
   }
 
-  /* Utility pill: collapsed square and expanded icons are 44 px; padding trimmed so it still fits the 68 px band. */
+  /* Utility pill (#464): collapsed square and expanded icons are 44 px; the pill is 48 px with 1 px padding and
+     sits on the bottom edge, so the 48 px strip under the sat info box holds it exactly. */
   body .drawer-utility-footer {
-    max-width: 54px;
-    min-width: 54px;
-    min-height: 54px;
-    padding: 4px;
+    bottom: env(safe-area-inset-bottom, 0px);
+    max-width: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 1px;
     box-sizing: border-box;
   }
 
@@ -216,7 +219,7 @@
   body .drawer-utility-footer:hover,
   body .drawer-utility-footer.expanded {
     max-width: 90vw;
-    padding: 4px 8px;
+    padding: 1px 8px;
   }
 
   body .drawer-utility-icons {

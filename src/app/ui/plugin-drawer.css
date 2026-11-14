@@ -1913,3 +1913,35 @@ body.is-mobile-mode {
   padding: 0 16px;
   cursor: pointer;
 }
+
+/* ===================================================================
+   #380: desktop user agent in a phone-width window (<= 640px).
+   Layout only, the plugin set is unchanged. The 60px rail takes 15 percent of a
+   390px viewport, so it narrows to a 44px strip; hover/focus still expands it as
+   an overlay (rail-hover is position fixed and does not push content), and menus
+   keep their existing --drawer-offset gap.
+   =================================================================== */
+@media (max-width: 640px) {
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) {
+    width: 44px;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-icon {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Toasts sit right of the narrow rail and below the top bar, never full width. */
+  body:not(.is-mobile-mode) #toast-container {
+    min-width: 0;
+    left: 52px;
+    right: 8px;
+    top: calc(var(--top-menu-height, 50px) + 8px);
+    max-width: calc(100vw - 60px);
+  }
+
+  body.search-results-open:not(.is-mobile-mode) #toast-container {
+    top: auto;
+    bottom: 7%;
+  }
+}

@@ -70,6 +70,15 @@ describe('phone floating clearance CSS', () => {
     expect(phoneInfo).toMatch(/@media \(max-width: 639px\)/u);
   });
 
+  it('drops the subtitle under the satellite name inside the phone media query only (#464)', () => {
+    expect(css).toMatch(/body #sat-infobox #sat-summary\.sat-summary \{\s*display: none !important;/u);
+
+    const ruleAt = css.indexOf('#sat-summary.sat-summary');
+    const mediaAt = css.lastIndexOf('@media', ruleAt);
+
+    expect(css.slice(mediaAt, mediaAt + 70)).toMatch(/^@media \(max-width: 639px\)/u);
+  });
+
   it('keeps key help areas, utility icons and the pill at 44px and rows apart (#157)', () => {
     const info = readFileSync(resolve(__dirname, '../../../plugins/sat-info-box/sat-info-box.css'), 'utf8');
 

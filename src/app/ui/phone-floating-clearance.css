@@ -103,6 +103,12 @@
     height: 4px;
   }
 
+  /* The plain-words subtitle under the satellite name is dropped on phones (#464): it costs ~30 px of the 45% box, and
+     the data rows below carry the same facts. The element sets inline display, hence !important. */
+  body #sat-infobox #sat-summary.sat-summary {
+    display: none !important;
+  }
+
   /* Zoom buttons sit above the docked info box (45% tall at most). */
   #mobile-zoom-buttons.mobile-zoom-raised {
     bottom: calc(45% + 12px);

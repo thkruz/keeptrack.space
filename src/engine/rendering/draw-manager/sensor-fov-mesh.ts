@@ -41,6 +41,7 @@ export class SensorFovMesh extends CustomMesh {
     u_gmst: null as unknown as WebGLUniformLocation,
     u_earthRadius: null as unknown as WebGLUniformLocation,
     u_meshRefFlatX: null as unknown as WebGLUniformLocation,
+    u_maxFlatDx: null as unknown as WebGLUniformLocation,
   };
   /**
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
@@ -102,6 +103,8 @@ export class SensorFovMesh extends CustomMesh {
       const meshRefFlatX = camCenterX + (((d % mapW) + mapW) % mapW) - mapW / 2;
 
       gl.uniform1f(this.uniforms_.u_meshRefFlatX, meshRefFlatX);
+      // Longest legitimate horizontal reach of the footprint; polar vertices beyond it are clamped (no full-width bands)
+      gl.uniform1f(this.uniforms_.u_maxFlatDx, Math.max(this.sensor.maxRng ?? 0, 1) * 1.5);
       gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getTimeManager().gmst);
       gl.uniform1f(this.uniforms_.u_earthRadius, RADIUS_OF_EARTH);
       gl.uniform1f(this.uniforms_.logDepthBufFC, 0.0);
@@ -446,6 +449,7 @@ export class SensorFovMesh extends CustomMesh {
       uniform float u_gmst;
       uniform float u_earthRadius;
       uniform float u_meshRefFlatX;
+      uniform float u_maxFlatDx;
 
       in vec3 a_position;
 
@@ -464,6 +468,12 @@ export class SensorFovMesh extends CustomMesh {
           float mapW = 2.0 * PI * u_earthRadius;
           float flatX = lon * u_earthRadius;
           flatX = u_meshRefFlatX + mod(flatX - u_meshRefFlatX + mapW * 0.5, mapW) - mapW * 0.5;
+
+          // Near the poles longitude is degenerate: clamp so triangles cannot stretch across the whole map
+          flatX = u_meshRefFlatX + clamp(flatX - u_meshRefFlatX, -u_maxFlatDx, u_maxFlatDx);
+          if (abs(lat) > 1.5533) {
+            flatX = u_meshRefFlatX;
+          }
 
           vec3 flatPos = vec3(flatX, lat * u_earthRadius, alt * 0.001);
           gl_Position = u_pMatrix * u_camMatrix * vec4(flatPos, 1.0);

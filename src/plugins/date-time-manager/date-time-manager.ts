@@ -191,6 +191,8 @@ export class DateTimeManager extends KeepTrackPlugin {
       .join('');
     chip.value = zone;
     chip.dataset.zone = isUtcZone(zone) ? 'utc' : 'other';
+    // #318: the active zone stays readable even where the select is narrow
+    chip.title = isUtcZone(zone) ? 'UTC' : describeZoneAt(ServiceLocator.getTimeManager().simulationTimeObj.getTime(), zone);
   }
 
   /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" (plus the playback rate when simulated) under the clock; skips the DOM write unless the text changed. */

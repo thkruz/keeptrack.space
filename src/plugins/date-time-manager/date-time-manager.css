@@ -59,7 +59,8 @@
 
 /* Clock status line: UTC date plus a live/paused/simulated label (text, not color alone). */
 #datetime-status {
-  font-size: 0.7rem;
+  /* #321: 0.7rem rendered about 9 px at 1920; never below 12 px */
+  font-size: max(12px, 0.75rem);
   line-height: 1;
   text-align: center;
   white-space: nowrap;
@@ -76,9 +77,11 @@
   display: block;
   margin: 2px auto 0;
   width: auto;
+  /* #318: size the chip to the active zone's label, not to the longest option in the list */
+  field-sizing: content;
   height: auto;
   padding: 0 4px;
-  font-size: 0.7rem;
+  font-size: max(12px, 0.75rem);
   line-height: 1.2;
   color: inherit;
   background: transparent;

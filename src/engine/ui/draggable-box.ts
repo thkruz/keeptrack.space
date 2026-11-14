@@ -17,6 +17,7 @@ export abstract class DraggableBox {
   protected boxId: string;
   protected boxEl: HTMLElement | null = null;
   protected draggie: Draggabilly | null = null;
+  private lastZIndex_: number | null = null;
   protected width: string | null = null;
   protected title: string = '';
   private static zIndexCounter_ = 10000;
@@ -131,7 +132,15 @@ export abstract class DraggableBox {
   }
 
   private sendToFront() {
-    getEl(`${this.boxId}`)!.style.zIndex = DraggableBox.increaseMaxZIndex().toString();
+    const el = getEl(`${this.boxId}`)!;
+
+    // #360: every pointerDown used to write a new z-index, invalidating style right before Draggabilly's containment
+    // measure and forcing a full synchronous recalc at drag start. Skip the write when this box is already on top.
+    if (this.lastZIndex_ !== null && this.lastZIndex_ === DraggableBox.zIndexCounter_ && el.style.zIndex === String(this.lastZIndex_)) {
+      return;
+    }
+    this.lastZIndex_ = DraggableBox.increaseMaxZIndex();
+    el.style.zIndex = this.lastZIndex_.toString();
   }
 
   close(cb?: () => void) {

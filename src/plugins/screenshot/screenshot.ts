@@ -353,9 +353,17 @@ export class Screenshot extends KeepTrackPlugin {
     const boxWidth = Math.max(...fitted.map((line) => ctx.measureText(line).width)) + 2 * boxPad;
     const boxHeight = fitted.length * lineHeight + 2 * boxPad - gap;
 
+    // #325: reset every canvas state that can hide or tint the box, so each capture gets the identical backdrop
     ctx.globalAlpha = 1.0;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.shadowBlur = 0;
+    ctx.shadowColor = 'transparent';
+    ctx.filter = 'none';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     ctx.fillRect(padding, top, boxWidth, boxHeight);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.lineWidth = Math.max(1, Math.round(fontPx / 18));
+    ctx.strokeRect(padding, top, boxWidth, boxHeight);
     ctx.fillStyle = '#ffffff';
     ctx.textBaseline = 'top';
     fitted.forEach((line, i) => {

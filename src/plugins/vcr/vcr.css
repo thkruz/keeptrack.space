@@ -14,7 +14,7 @@
     z-index: 100000;
     gap: 4px;
     padding: 4px;
-    background: var(--kt-surface, rgba(20, 24, 32, 0.96));
+    background: #141820;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);

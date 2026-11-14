@@ -1766,8 +1766,9 @@ body.is-mobile-mode {
     width: auto;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #search-holder,
-  body.drawer-mode:not(.is-mobile-mode) #search-holder.search-slide-up {
+  /* #371: the phone UA (is-mobile-mode) gets the same collapsed 44 px search icon as desktop UA; it expands on focus. */
+  body.drawer-mode #search-holder,
+  body.drawer-mode #search-holder.search-slide-up {
     flex: 0 0 44px;
     width: 44px !important;
     min-width: 44px;
@@ -1777,8 +1778,8 @@ body.is-mobile-mode {
     padding: 0;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #search-holder input[type='search'],
-  body.drawer-mode:not(.is-mobile-mode) #search-holder.search-slide-up input[type='search'] {
+  body.drawer-mode #search-holder input[type='search'],
+  body.drawer-mode #search-holder.search-slide-up input[type='search'] {
     width: 44px !important;
     min-width: 44px;
     min-height: 44px;
@@ -1788,18 +1789,18 @@ body.is-mobile-mode {
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") center / 20px no-repeat;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #search-holder input[type='search']::placeholder {
+  body.drawer-mode #search-holder input[type='search']::placeholder {
     color: transparent;
   }
 
   /* Expand to a readable field while focused; the clock group shrinks to make room. */
-  body.drawer-mode:not(.is-mobile-mode) #search-holder:focus-within,
-  body.drawer-mode:not(.is-mobile-mode) #search-holder.search-slide-up:focus-within {
+  body.drawer-mode #search-holder:focus-within,
+  body.drawer-mode #search-holder.search-slide-up:focus-within {
     flex: 0 0 min(220px, 60vw);
     width: min(220px, 60vw) !important;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #search-holder:focus-within input[type='search'] {
+  body.drawer-mode #search-holder:focus-within input[type='search'] {
     width: 100% !important;
     padding: 0 10px !important;
     color: inherit;
@@ -1807,7 +1808,7 @@ body.is-mobile-mode {
     cursor: text;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #search-holder:focus-within input[type='search']::placeholder {
+  body.drawer-mode #search-holder:focus-within input[type='search']::placeholder {
     color: inherit;
   }
 }

@@ -162,10 +162,13 @@ export class VcrPlugin extends KeepTrackPlugin {
 
     document.addEventListener('click', (evt) => {
       const target = evt.target as Element | null;
+      // A button handler may swap its own icon, detaching the click target before this runs; use the path taken at dispatch (#370).
+      const path = evt.composedPath();
+      const inVcr = path.some((n) => (n as Element).id === 'vcr-container');
 
       if (target?.closest('#datetime-status')) {
         toggle();
-      } else if (!target?.closest('#vcr-container')) {
+      } else if (!inVcr) {
         close();
       }
     });

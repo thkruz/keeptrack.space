@@ -90,6 +90,31 @@
   opacity: 0.85;
   cursor: pointer;
   appearance: auto;
+  /* #405: one outline only (the border); the browser focus ring is replaced by a ring that shows for keyboard focus */
+  outline: none;
+  color-scheme: dark;
+}
+
+#datetime-zone:focus-visible {
+  outline: 2px solid var(--kt-accent-light, #e01a0e);
+  outline-offset: 1px;
+}
+
+/* #405: the open list used the white native popup (white text on white until hovered); give every option the theme
+   surface and text colour, and use theme tints for hover and the selected row. */
+#datetime-zone option {
+  color: var(--kt-text-primary, #fff);
+  background-color: var(--kt-bg-elevated, #1e1e1e);
+}
+
+#datetime-zone option:hover,
+#datetime-zone option:focus {
+  background-color: var(--kt-bg-hover, #333);
+}
+
+#datetime-zone option:checked {
+  background-color: var(--kt-bg-active, #444);
+  font-weight: bold;
 }
 
 #datetime-zone[data-zone='other'] {

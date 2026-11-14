@@ -220,3 +220,53 @@
     min-height: 44px;
   }
 }
+
+/*
+ * Phone top bar (#404): menu, logo, clock + LIVE, zone and Search share one row at 360 to 430 px with nothing cut
+ * off. The zone control is a borderless text chip ("UTC", no arrow, no outline) that stays a 44 px touch target; a
+ * non-UTC zone keeps the caution colour. The sensor name leaves the bar (the Sensors tab shows it). Phone only.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  body #datetime #datetime-zone,
+  body.drawer-mode #datetime #datetime-zone {
+    width: auto;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 2px;
+    font-size: max(12px, 0.75rem);
+    text-align: center;
+    text-align-last: center;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  body #datetime #datetime-zone:focus-visible {
+    outline: 2px solid var(--kt-accent-light, #e01a0e);
+    outline-offset: -4px;
+  }
+
+  body #datetime-status {
+    font-size: max(12px, 0.75rem);
+  }
+
+  body.drawer-mode #sensor-selected-container,
+  body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container,
+  body.drawer-mode.is-mobile-mode #sensor-selected-container {
+    display: none !important;
+  }
+
+  /* 360 px: the logo (flex-shrink 0, margin-right auto) used to overlap the clock slot; it keeps its own width and the
+     clock slot takes the rest, so the two cannot overlap. */
+  body.drawer-mode .nav-logo {
+    margin-right: 0;
+    padding-left: 0.25rem;
+  }
+
+  body.drawer-mode #nav-top-center {
+    flex: 1 1 0;
+    margin-left: 6px;
+  }
+}

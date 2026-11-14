@@ -46,7 +46,7 @@ export class WebpackManager {
     const packAssets = `${dirName}/../src/plugins-pro/solar-system-pack/assets`;
 
     if (!existsSync(packAssets)) {
-      reporter.warn('Solar System Pack assets not found - the pro build will render its bodies untextured.');
+      reporter.log('Solar System Pack assets not found - the pro build will render its bodies untextured.', 'warn');
 
       return [];
     }
@@ -84,7 +84,7 @@ export class WebpackManager {
     const proMeshes = `${dirName}/../src/plugins-pro/public/meshes`;
 
     if (!existsSync(proMeshes)) {
-      reporter.warn('Pro mesh pack not found - named hero spacecraft will fall back to generic models.');
+      reporter.log('Pro mesh pack not found - named hero spacecraft will fall back to generic models.', 'warn');
 
       return [];
     }

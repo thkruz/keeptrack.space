@@ -113,6 +113,7 @@ export class WebpackManager {
       __EDITION__: JSON.stringify(this.config.edition),
       __PROPAGATOR_BACKEND__: JSON.stringify(this.config.propagatorBackend),
       __DEV_API_KEY__: JSON.stringify(resolveDevApiKey(config.mode ?? 'development', isWatch || config.isWatch, `./${config.envFilePath}`)),
+      __TURNSTILE_SITE_KEY__: JSON.stringify(config.PUBLIC_TURNSTILE_SITE_KEY ?? ''),
     });
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);

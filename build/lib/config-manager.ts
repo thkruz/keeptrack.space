@@ -44,6 +44,8 @@ export interface BuildConfig {
 
   PUBLIC_SUPABASE_URL?: string;
   PUBLIC_SUPABASE_ANON_KEY?: string;
+  /** Cloudflare Turnstile public site key (build-time). Empty or unset disables captcha. */
+  PUBLIC_TURNSTILE_SITE_KEY?: string;
 }
 
 /**
@@ -231,6 +233,7 @@ export class ConfigManager {
 
     this.config.PUBLIC_SUPABASE_URL = process.env.PUBLIC_SUPABASE_URL ?? envVars.PUBLIC_SUPABASE_URL;
     this.config.PUBLIC_SUPABASE_ANON_KEY = process.env.PUBLIC_SUPABASE_ANON_KEY ?? envVars.PUBLIC_SUPABASE_ANON_KEY;
+    this.config.PUBLIC_TURNSTILE_SITE_KEY = process.env.PUBLIC_TURNSTILE_SITE_KEY ?? envVars.PUBLIC_TURNSTILE_SITE_KEY;
 
     this.config.isPro = isPro === 'true';
     this.config.edition = process.env.EDITION ?? envVars.EDITION ?? (this.config.isPro ? 'pro' : 'oss');

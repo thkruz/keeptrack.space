@@ -32,6 +32,7 @@ export default defineConfig({
     __EDITION__: JSON.stringify('oss'),
     __PROPAGATOR_BACKEND__: JSON.stringify('sgp4'),
     __DEV_API_KEY__: JSON.stringify(''),
+    __TURNSTILE_SITE_KEY__: JSON.stringify(''),
   },
   plugins: [
     {

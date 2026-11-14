@@ -9,6 +9,8 @@ declare global {
   const __PROPAGATOR_BACKEND__: 'sgp4' | 'sgp4-wasm' | 'sgp4-xp-wasm';
   /** KEEPTRACK_DEV_API_KEY for dev/watch/test builds; always '' in production builds. */
   const __DEV_API_KEY__: string;
+  /** PUBLIC_TURNSTILE_SITE_KEY (public Cloudflare Turnstile site key); '' disables captcha. */
+  const __TURNSTILE_SITE_KEY__: string;
 
   interface Window {
     keepTrack: KeepTrack;

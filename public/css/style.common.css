@@ -4405,6 +4405,18 @@ input:focus {
   top: 75px;
 }
 
+/* #320: the full-width stack ran over the left side menu's header buttons (Close Approaches' rightmost control at
+   1366x768). From 1024 px dock the stack to the right edge, clear of the 400 px side menu column. */
+@media (min-width: 1024px) {
+  #toast-container {
+    min-width: 0;
+    width: auto;
+    left: auto;
+    right: 16px;
+    max-width: calc(100vw - 440px);
+  }
+}
+
 /*
  * Keep toasts off the open search results (SearchManager toggles the class).
  * Below 1024px the results list spans the full width under the header, so the

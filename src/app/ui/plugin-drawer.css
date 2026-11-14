@@ -328,6 +328,13 @@ body.drawer-mode {
 
   .drawer-group.collapsed .drawer-group-items {
     max-height: 0;
+    /* #326: max-height 0 + overflow hidden left collapsed rows hit-testable under the next header on phones.
+       visibility flips after the collapse transition so the animation still plays, and rows leave the tab order. */
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      visibility 0s linear var(--kt-duration-slow, 300ms);
   }
 
   /* ---- Drawer Items ---- */
@@ -968,7 +975,16 @@ body.drawer-mode:not(.is-mobile-mode) {
   @media (min-width: 1200px) {
     #search-holder,
     #search-holder.search-slide-up {
-      min-width: 260px;
+      min-width: 300px;
+    }
+  }
+
+  /* #403: at 1280 px (Access Timeline open) 260 px still cut the hint to "Search... (Shift+"; a 300 px floor plus a
+     slightly smaller placeholder keeps the full "Search... (Shift+F)" visible at 1280 and 1366, live and simulated. */
+  @media (min-width: 1200px) and (max-width: 1400px) {
+    #search-holder input[type='search']::placeholder {
+      font-size: 13px;
+      text-overflow: clip;
     }
   }
 
@@ -1191,11 +1207,15 @@ body.drawer-mode:not(.is-mobile-mode) {
   /* Collapsed groups should still show icons in rail mode */
   .plugin-drawer.rail-mode .drawer-group.collapsed .drawer-group-items {
     max-height: 2000px;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   /* Restore normal collapse behavior when rail is hovered (expanded) */
   .plugin-drawer.rail-mode.rail-hover .drawer-group.collapsed .drawer-group-items {
     max-height: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   /* Rail mode hover expansion — triggered by JS class on .drawer-inner hover */
@@ -1759,17 +1779,22 @@ body.is-mobile-mode {
   /* #157: the desktop block above nests these under body.drawer-mode:not(.is-mobile-mode), which outranks the
      rules just above and left the clock group at max-content (290 px), pushing Search to x=451 at 390 px.
      Same row, same order: the sensor name shrinks and ellipsizes, Search keeps a 44 px icon target. */
-  body.drawer-mode:not(.is-mobile-mode) #nav-top-center {
+  body.drawer-mode:not(.is-mobile-mode) #nav-top-center,
+  body.drawer-mode.is-mobile-mode #nav-top-center {
     min-width: 0;
     flex: 1 1 0;
     overflow: hidden;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #datetime {
+  body.drawer-mode:not(.is-mobile-mode) #datetime,
+  body.drawer-mode.is-mobile-mode #datetime {
     flex: 0 0 auto;
   }
 
-  body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container {
+  /* #307: the phone UA (is-mobile-mode) was left out of this rule, so its chip (overflow hidden, max-content width)
+     had an automatic min-width of 0 and collapsed to 1 px beside the clock. Same row for both UAs now. */
+  body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container,
+  body.drawer-mode.is-mobile-mode #sensor-selected-container {
     flex: 1 1 0;
     /* #371: a 0 floor let the chip squeeze to one letter ("C.") at 390 px desktop UA; keep room for a short name. */
     min-width: 72px;

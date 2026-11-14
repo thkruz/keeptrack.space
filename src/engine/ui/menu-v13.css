@@ -135,6 +135,13 @@
   z-index: 3;
 }
 
+/* Lists opened inside a data-select-container="body" ancestor attach to the click-through #kt-select-portal layer
+   (material-select.ts). The list itself must take clicks, whichever plugin's CSS is loaded (#350, #266). */
+#kt-select-portal > .dropdown-content.select-dropdown {
+  min-width: max-content;
+  pointer-events: auto;
+}
+
 /* Full-bleed hairline between sub-groups within a card. */
 .kt-ui-v13 .kt-divider {
   height: 1px;

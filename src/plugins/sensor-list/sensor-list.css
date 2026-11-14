@@ -104,6 +104,50 @@
   line-height: 1.3;
 }
 
+/* #306: on a phone the fixed-width system tag and operator chip left the name no room, and overflow-wrap: anywhere
+ * then broke it one letter per line ("n o w") or mid-word ("Hartebeesthoo / k"). Let the label wrap so the system tag
+ * drops under the name, give the name a readable floor, and break only between words (break-word only splits a word
+ * that cannot fit a whole line). */
+@media (max-width: 639px) {
+  #sensor-list-content .sensor-row .kt-action-label {
+    flex-wrap: wrap;
+    align-items: baseline;
+    row-gap: 0;
+  }
+
+  #sensor-list-content .sensor-row .sensor-name {
+    flex: 1 1 9ch;
+    min-width: min(9ch, 100%);
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  #sensor-list-content .sensor-row .sensor-system {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+
+  #sensor-list-content .sensor-row .sensor-badge {
+    flex: 0 1 auto;
+    min-width: 0;
+    max-width: 38%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  #sensor-list-content .sensor-row,
+  #sensor-list-content .sensor-mark-toggle {
+    min-height: 44px;
+  }
+
+  #sensor-list-content .sensor-mark-toggle {
+    min-width: 44px;
+    width: 44px;
+    height: 44px;
+  }
+}
+
 #sensor-list-content .sensor-system {
   flex-shrink: 0;
   font-size: 0.8em;

@@ -105,15 +105,26 @@
   cursor: pointer;
 }
 
-.kt-picker-item:hover,
-.kt-picker-item:focus-visible {
+.kt-picker-item:not(.kt-picker-item-selected):hover,
+.kt-picker-item:not(.kt-picker-item-selected):focus-visible {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.kt-picker-item-selected,
-.kt-picker-item-selected:hover,
-.kt-picker-item-selected:focus-visible {
+/* #329: a selected row must keep its selected colour under hover, focus and press. Higher specificity than any
+ * generic button:hover / :active / .waves rule, and the :not() above keeps the grey hover off selected rows. */
+.kt-picker-item.kt-picker-item-selected,
+.kt-picker-item.kt-picker-item-selected:hover,
+.kt-picker-item.kt-picker-item-selected:active,
+.kt-picker-item.kt-picker-item-selected:focus,
+.kt-picker-item.kt-picker-item-selected:focus-visible,
+.kt-picker-item[aria-pressed='true'],
+.kt-picker-item[aria-pressed='true']:hover,
+.kt-picker-item[aria-pressed='true']:active,
+.kt-picker-item[aria-pressed='true']:focus,
+.kt-picker-item[aria-current='true']:hover,
+.kt-picker-item[aria-current='true']:active {
   background: var(--color-primary, #1e88e5);
+  background-color: var(--color-primary, #1e88e5);
 }
 
 .kt-picker-item:focus-visible,

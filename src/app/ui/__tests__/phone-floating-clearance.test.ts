@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, it } from 'vitest';
+import { MobileManager } from '../mobileManager';
 
 /** Pro issues #143 #171 #195 #231 #292 #293 #294: static CSS guards for the phone clearance rules. */
 describe('phone floating clearance CSS', () => {
@@ -77,6 +78,16 @@ describe('phone floating clearance CSS', () => {
     const mediaAt = css.lastIndexOf('@media', ruleAt);
 
     expect(css.slice(mediaAt, mediaAt + 70)).toMatch(/^@media \(max-width: 639px\)/u);
+  });
+
+  it('drops the sponsor ad from the phone info box (#464)', () => {
+    expect(css).toMatch(/body #sat-infobox \.sat-sponsor-section \{\s*display: none !important;/u);
+
+    const ruleAt = css.indexOf('.sat-sponsor-section');
+    const mediaAt = css.lastIndexOf('@media', ruleAt);
+
+    expect(css.slice(mediaAt, mediaAt + 70)).toMatch(/^@media \(max-width: 639px\)/u);
+    expect(MobileManager.MOBILE_PLUGINS).not.toContain('SatInfoBoxSponsor');
   });
 
   it('keeps key help areas, utility icons and the pill at 44px and rows apart (#157)', () => {

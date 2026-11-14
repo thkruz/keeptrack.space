@@ -27,7 +27,6 @@ export class MobileManager {
     'SatInfoBoxObject',
     'SatInfoBoxOrbital',
     'SatInfoBoxMission',
-    'SatInfoBoxSponsor',
     'SatInfoBoxLinks',
     'TopMenu',
     'DateTimeManager',

@@ -109,6 +109,12 @@
     display: none !important;
   }
 
+  /* The sponsor ad is dropped from the phone info box (#464, Ted 2026-11-14): its ~362 px block pushed every row past
+     the 5th out of the 45% box. MobileManager also leaves SatInfoBoxSponsor off on phones; this covers narrow windows. */
+  body #sat-infobox .sat-sponsor-section {
+    display: none !important;
+  }
+
   /* Zoom buttons sit above the docked info box (45% tall at most). */
   #mobile-zoom-buttons.mobile-zoom-raised {
     bottom: calc(45% + 12px);

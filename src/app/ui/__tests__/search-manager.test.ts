@@ -814,6 +814,35 @@ describe('SearchManager interactions', () => {
     expect(toggleSpy).toHaveBeenCalled();
   });
 
+  it('phone: a pointerdown outside the search box collapses the results list but keeps the query', () => {
+    p().addListeners_();
+    const input = document.getElementById('search') as HTMLInputElement;
+    const results = document.getElementById('search-results')!;
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    input.value = 'ISS';
+    results.innerHTML = '<div class="search-result"></div>';
+    mgr.isResultsOpen = true;
+
+    // Inside the list: stays open.
+    results.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(mgr.isResultsOpen).toBe(true);
+
+    // On the map: closes the list, keeps the query.
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(mgr.isResultsOpen).toBe(false);
+    expect(results.innerHTML).toBe('');
+    expect(input.value).toBe('ISS');
+
+    // Desktop: untouched.
+    settingsManager.isMobileModeEnabled = false;
+    mgr.isResultsOpen = true;
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(mgr.isResultsOpen).toBe(true);
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
   // #855: clicking any search result rotates the camera toward the object.
   const clickFirstResult = (objId: number) => {
     p().addListeners_();

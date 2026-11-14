@@ -271,6 +271,20 @@ export class SearchManager {
       // Force shift key to be released when search box is exited to prevent getting stuck in shift mode after using shift + click to select text in the search box
       ServiceLocator.getInputManager().keyboard.keyStates.set('Shift', false);
     });
+    // Phone: a tap on the map (anywhere outside the search box and its list) folds the list away with the
+    // keyboard, so the list never stays open without a visible query. The query is kept; refocusing restores it.
+    document.addEventListener('pointerdown', (evt: Event) => {
+      if (!settingsManager.isMobileModeEnabled || !this.isResultsOpen) {
+        return;
+      }
+      const target = evt.target as Element | null;
+
+      if (target?.closest?.('#search-holder, #search-results, #search-icon')) {
+        return;
+      }
+      this.collapseResults_();
+      (getEl('search', true) as HTMLInputElement | null)?.blur();
+    });
     getEl('search-icon')?.addEventListener('click', () => {
       this.toggleSearch();
     });

@@ -27,18 +27,29 @@ export const parseDisplayTimeZone = (value: unknown): string => {
   return normalizeTimeZone(value) ?? UTC_ZONE;
 };
 
+/** Choice made this page load; used when persistence is blocked (QA, STEM presets, ?block-persistence) so the chip does not snap back to UTC. */
+let sessionZone_: string | null = null;
+
 /** The saved display zone ("UTC" when nothing valid is saved). */
 export const getDisplayTimeZone = (): string => {
   try {
-    return parseDisplayTimeZone(PersistenceManager.getInstance().getItem(StorageKey.DISPLAY_TIME_ZONE));
+    const stored = PersistenceManager.getInstance().getItem(StorageKey.DISPLAY_TIME_ZONE);
+
+    if (stored === null && sessionZone_ !== null) {
+      return sessionZone_;
+    }
+
+    return parseDisplayTimeZone(stored);
   } catch {
-    return UTC_ZONE;
+    return sessionZone_ ?? UTC_ZONE;
   }
 };
 
 /** Saves the display zone (invalid names are stored as UTC) and returns what was stored. */
 export const setDisplayTimeZone = (zone: string): string => {
   const next = parseDisplayTimeZone(zone);
+
+  sessionZone_ = next;
 
   try {
     PersistenceManager.getInstance().saveItem(StorageKey.DISPLAY_TIME_ZONE, next);
@@ -73,6 +84,18 @@ export const describeZoneAt = (ms: number, zone: string): string => {
     const abbr = new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'short' }).formatToParts(new Date(ms)).find((p) => p.type === 'timeZoneName')?.value ?? zone;
 
     return `${abbr} (${zoneOffsetLabel(ms, zone)})`;
+  } catch {
+    return zone;
+  }
+};
+
+/** Shortest label for a narrow chip: the zone abbreviation ("EST", "CET", "GMT+5:30"), or "UTC". */
+export const describeZoneShort = (ms: number, zone: string): string => {
+  if (isUtcZone(zone)) {
+    return UTC_ZONE;
+  }
+  try {
+    return new Intl.DateTimeFormat('en-US', { timeZone: zone, timeZoneName: 'short' }).formatToParts(new Date(ms)).find((p) => p.type === 'timeZoneName')?.value ?? zone;
   } catch {
     return zone;
   }

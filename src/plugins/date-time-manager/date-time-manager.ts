@@ -1,4 +1,4 @@
-import { describeZoneAt, getDisplayTimeZone, getDisplayZoneChoices, isUtcZone, setDisplayTimeZone } from '@app/app/sensors/display-time-zone';
+import { describeZoneAt, describeZoneShort, getDisplayTimeZone, getDisplayZoneChoices, isUtcZone, setDisplayTimeZone } from '@app/app/sensors/display-time-zone';
 import { formatInTimeZone } from '@app/app/sensors/site-time-zone';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -186,8 +186,16 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
     const zone = this.displayZone_;
 
+    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+    // #404: on a phone the closed chip shows only the abbreviation; the full name stays in each option's title and the chip title
+    const narrow = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 639px)').matches;
+
     chip.innerHTML = getDisplayZoneChoices(zone)
-      .map((z) => `<option value="${z}">${isUtcZone(z) ? 'UTC' : describeZoneAt(ServiceLocator.getTimeManager().simulationTimeObj.getTime(), z)}</option>`)
+      .map((z) => {
+        const full = isUtcZone(z) ? 'UTC' : describeZoneAt(nowMs, z);
+
+        return `<option value="${z}" title="${full}">${narrow ? describeZoneShort(nowMs, z) : full}</option>`;
+      })
       .join('');
     chip.value = zone;
     chip.dataset.zone = isUtcZone(zone) ? 'utc' : 'other';
@@ -309,6 +317,7 @@ export class DateTimeManager extends KeepTrackPlugin {
 
     this.displayZone_ = getDisplayTimeZone();
     this.syncZoneChip_();
+    window.matchMedia?.('(max-width: 639px)')?.addEventListener?.('change', () => this.syncZoneChip_());
     document.getElementById('datetime-zone')?.addEventListener('change', (e) => {
       this.displayZone_ = setDisplayTimeZone((e.target as HTMLSelectElement).value);
       this.displayZoneReadAt_ = Date.now();

@@ -164,7 +164,10 @@
   /* Time-zone chip: 44 px tall select; the visible chip is the outline drawn at the old content edge. */
   body #datetime #datetime-zone {
     box-sizing: border-box;
-    width: 52px;
+    /* #404: size to the short label (EST, CET, GMT+5:30); a fixed 52 px clipped "EST (UTC-05:00)" and overlapped LIVE */
+    field-sizing: content;
+    width: auto;
+    max-width: 76px;
     min-width: 44px;
     height: 44px;
     margin: 0;

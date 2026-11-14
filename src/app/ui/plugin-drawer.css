@@ -1811,23 +1811,10 @@ body.is-mobile-mode {
     width: min(220px, 60vw) !important;
   }
 
-  /* #381: no native or inherited border/rounding on the expanded field; a rounded left edge drew a stray "(". */
-  body.drawer-mode #search-holder input[type='search'] {
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  body.drawer-mode #search-holder:focus-within,
-  body.drawer-mode #search-holder.search-slide-up:focus-within {
-    border-left: 0;
-  }
-
-  body.drawer-mode #sensor-selected-container {
-    border-left: 0;
+  /* #381: the stray "(" beside the expanded search was the rounded outline of the #datetime-zone select peeking out
+     next to the holder. Hide the select only while the search is expanded; collapsed, it stays visible. */
+  body.drawer-mode:has(#search-holder:focus-within) #datetime-zone {
+    display: none;
   }
 
   body.drawer-mode #search-holder:focus-within input[type='search'] {

@@ -105,3 +105,22 @@ describe('DateTimeManager_playback_rate_readout', () => {
     expect(status()).not.toContain('×');
   });
 });
+
+describe('DateTimeManager_zone_chip_labels', () => {
+  it('shows abbreviations while closed on a phone and full names while open', () => {
+    (DateTimeManager.prototype as unknown as { uiManagerFinal_: () => void }).uiManagerFinal_ = vi.fn();
+    setupStandardEnvironment([TopMenu]);
+    const dtm = new DateTimeManager() as unknown as { setZoneChipOpen_: (c: HTMLSelectElement, open: boolean) => void };
+    const chip = document.createElement('select');
+
+    chip.innerHTML = '<option value="a" data-full="CST (UTC-06:00)" data-short="CST">x</option><option value="b" data-full="CST (UTC+08:00)" data-short="GMT+8">x</option>';
+    window.matchMedia = (() => ({ matches: true })) as unknown as typeof window.matchMedia;
+    dtm.setZoneChipOpen_(chip, false);
+    expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST', 'GMT+8']);
+    dtm.setZoneChipOpen_(chip, true);
+    expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST (UTC-06:00)', 'CST (UTC+08:00)']);
+    window.matchMedia = (() => ({ matches: false })) as unknown as typeof window.matchMedia;
+    dtm.setZoneChipOpen_(chip, false);
+    expect(chip.options[0].textContent).toBe('CST (UTC-06:00)');
+  });
+});

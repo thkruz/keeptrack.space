@@ -187,20 +187,43 @@ export class DateTimeManager extends KeepTrackPlugin {
     const zone = this.displayZone_;
 
     const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
-    // #404: on a phone the closed chip shows only the abbreviation; the full name stays in each option's title and the chip title
-    const narrow = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 639px)').matches;
-
+    // #404/#455: every option carries its full name; on a phone the closed chip shows the abbreviations (data-short) and
+    // the open list shows the full names, so zones sharing an abbreviation (CST, IST) stay distinguishable.
     chip.innerHTML = getDisplayZoneChoices(zone)
       .map((z) => {
         const full = isUtcZone(z) ? 'UTC' : describeZoneAt(nowMs, z);
 
-        return `<option value="${z}" title="${full}">${narrow ? describeZoneShort(nowMs, z) : full}</option>`;
+        return `<option value="${z}" title="${full}" data-full="${full}" data-short="${describeZoneShort(nowMs, z)}">${full}</option>`;
       })
       .join('');
     chip.value = zone;
     chip.dataset.zone = isUtcZone(zone) ? 'utc' : 'other';
     // #318: the active zone stays readable even where the select is narrow
     chip.title = isUtcZone(zone) ? 'UTC' : describeZoneAt(ServiceLocator.getTimeManager().simulationTimeObj.getTime(), zone);
+    this.setZoneChipOpen_(chip, this.zoneChipOpen_);
+  }
+
+  /** True while the phone zone list is open (option texts are full names then). */
+  private zoneChipOpen_ = false;
+
+  /** #455: closed on a phone, option texts are abbreviations so the chip stays narrow; open (or wide screens), full names. The width is pinned while open so the chip does not grow. */
+  private setZoneChipOpen_(chip: HTMLSelectElement, open: boolean): void {
+    const narrow = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 639px)').matches;
+    const useShort = narrow && !open;
+
+    if (open && narrow && !chip.style.width) {
+      chip.style.width = `${chip.offsetWidth}px`;
+    } else if (!open) {
+      chip.style.width = '';
+    }
+    this.zoneChipOpen_ = open;
+    Array.from(chip.options).forEach((o) => {
+      const text = (useShort ? o.dataset.short : o.dataset.full) ?? o.textContent ?? '';
+
+      if (o.textContent !== text) {
+        o.textContent = text;
+      }
+    });
   }
 
   /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" (plus the playback rate when simulated) under the clock; skips the DOM write unless the text changed. */
@@ -318,7 +341,12 @@ export class DateTimeManager extends KeepTrackPlugin {
     this.displayZone_ = getDisplayTimeZone();
     this.syncZoneChip_();
     window.matchMedia?.('(max-width: 639px)')?.addEventListener?.('change', () => this.syncZoneChip_());
+    const zoneChip = document.getElementById('datetime-zone') as HTMLSelectElement | null;
+
+    (['focus', 'pointerdown', 'touchstart'] as const).forEach((evt) => zoneChip?.addEventListener(evt, () => this.setZoneChipOpen_(zoneChip, true), { passive: true }));
+    zoneChip?.addEventListener('blur', () => this.setZoneChipOpen_(zoneChip, false));
     document.getElementById('datetime-zone')?.addEventListener('change', (e) => {
+      this.zoneChipOpen_ = false;
       this.displayZone_ = setDisplayTimeZone((e.target as HTMLSelectElement).value);
       this.displayZoneReadAt_ = Date.now();
       this.simulationTimeSerialized_ = null;

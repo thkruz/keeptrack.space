@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
 import { describe, expect, it } from 'vitest';
 import { MobileManager } from '../mobileManager';
@@ -58,7 +58,13 @@ describe('phone drawer and touch targets', () => {
     expect(drawerCss).not.toMatch(/\.drawer-search \{\s*display: none !important;/u);
     expect(tail).toMatch(/\.drawer-item \{\s*min-height: 44px/u);
     expect(tail).toMatch(/#search-holder \{\s*min-height: 44px/u);
-    const tl = read('../../../plugins-pro/access-timeline/access-timeline.css');
+    const tlPath = resolve(__dirname, '../../../plugins-pro/access-timeline/access-timeline.css');
+
+    // The OSS-only CI job runs without the plugins-pro submodule.
+    if (!existsSync(tlPath)) {
+      return;
+    }
+    const tl = readFileSync(tlPath, 'utf8');
 
     expect(tl).toMatch(/__mode-btn \{\s*min-height: 44px/u);
     expect(tl).toMatch(/__tool-btn \{\s*width: 44px;\s*height: 44px/u);

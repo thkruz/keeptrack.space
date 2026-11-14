@@ -7,7 +7,12 @@ import { parseSymbologyConfig, serializeSymbologyConfig } from '@app/plugins-pro
 import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Vector3D } from '@ootk/src/main';
 import { OdmExporter } from '@ootk/src/parsers/OdmExporter';
 import { OemParser } from '@ootk/src/parsers/OemParser';
+import { existsSync } from 'fs';
+import { resolve } from 'path';
 import { describe, expect, it } from 'vitest';
+
+// The OSS-only CI job runs without the plugins-pro submodule, where pro imports resolve to stubs.
+const HAS_PRO = existsSync(resolve(__dirname, '../../../plugins-pro/stk-file-handler/stk-ephemeris-parser.ts'));
 
 describe('branding for machine formats', () => {
   it('withBrandComment is idempotent and keeps existing comments after the brand line', () => {
@@ -28,9 +33,9 @@ describe('branding for machine formats', () => {
 
     expect(text.split('\n')[0]).toBe('stk.v.11.0');
     expect(text).toContain(`# ${BRAND_COMMENT}`);
-    const parsed = parseEphemeris(text);
-
-    expect(parsed.points).toHaveLength(2);
+    if (HAS_PRO) {
+      expect(parseEphemeris(text).points).toHaveLength(2);
+    }
   });
 
   it('OEM carries a COMMENT line and round-trips through OemParser', () => {
@@ -53,7 +58,7 @@ describe('branding for machine formats', () => {
     expect(parsed.dataBlocks[0].ephemeris).toHaveLength(2);
   });
 
-  it('JSON exports with an object root carry meta and still load; the TLE-free bare array case is untouched', () => {
+  it.skipIf(!HAS_PRO)('JSON exports with an object root carry meta and still load; the TLE-free bare array case is untouched', () => {
     expect(brandJsonMeta().url).toBe('https://keeptrack.space');
 
     const filters = serializeFilterConfig([]);

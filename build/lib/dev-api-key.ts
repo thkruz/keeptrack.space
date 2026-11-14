@@ -78,7 +78,8 @@ export function findLeakedSecrets(distDir: string, secrets: string[]): string[] 
 
 /**
  * Post-build guard for non-dev builds: throws (names files only) if the value
- * of KEEPTRACK_DEV_API_KEY or KEEPTRACK_API_KEY appears anywhere in dist.
+ * of KEEPTRACK_DEV_API_KEY appears anywhere in dist. KEEPTRACK_API_KEY is not
+ * checked: production builds embed it on purpose (DataSettings.apiKey).
  * Skipped for builds that are allowed to carry the dev key.
  */
 export function assertNoApiKeyInDist(distDir: string, mode: string, isWatch: boolean, envFilePath: string, env: NodeJS.ProcessEnv = process.env): void {
@@ -86,7 +87,7 @@ export function assertNoApiKeyInDist(distDir: string, mode: string, isWatch: boo
     return;
   }
 
-  const secrets = ['KEEPTRACK_DEV_API_KEY', 'KEEPTRACK_API_KEY'].flatMap((name) => [env[name] ?? '', readEnvFileVar(envFilePath, name)]);
+  const secrets = [env[DEV_API_KEY_VAR] ?? '', readEnvFileVar(envFilePath, DEV_API_KEY_VAR)];
   const leaks = findLeakedSecrets(distDir, [...new Set(secrets)]);
 
   if (leaks.length > 0) {

@@ -32,20 +32,23 @@ describe('dev api key build guard', () => {
     expect(resolveDevApiKey('development', false, envFile, {})).toBe(KEY);
   });
 
-  it('fails a production build whose dist contains either key, without printing it', () => {
+  it('fails a production build whose dist contains the dev key, without printing it', () => {
     writeFileSync(join(dir, 'js', 'main.js'), `var a="${KEY}";`);
 
-    for (const name of ['KEEPTRACK_DEV_API_KEY', 'KEEPTRACK_API_KEY']) {
-      let message = '';
+    let message = '';
 
-      try {
-        assertNoApiKeyInDist(dir, 'production', false, './none', { [name]: KEY });
-      } catch (e) {
-        message = (e as Error).message;
-      }
-      expect(message).toContain('main.js');
-      expect(message).not.toContain(KEY);
+    try {
+      assertNoApiKeyInDist(dir, 'production', false, './none', { KEEPTRACK_DEV_API_KEY: KEY });
+    } catch (e) {
+      message = (e as Error).message;
     }
+    expect(message).toContain('main.js');
+    expect(message).not.toContain(KEY);
+  });
+
+  it('allows the production KEEPTRACK_API_KEY in a production dist (embedded on purpose)', () => {
+    writeFileSync(join(dir, 'js', 'main.js'), `var a="${KEY}";`);
+    expect(() => assertNoApiKeyInDist(dir, 'production', false, './none', { KEEPTRACK_API_KEY: KEY })).not.toThrow();
   });
 
   it('passes a clean production dist and skips allowed builds', () => {

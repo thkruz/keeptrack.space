@@ -26,7 +26,7 @@ import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
-import { refinePeakMs } from '@app/app/sensors/pass-peak';
+import { findPassPeakMs, refinePeakMs } from '@app/app/sensors/pass-peak';
 import type { BurnSummary, MissionImpact, ScreeningDiff } from '@app/engine/conjunction/analysis-state';
 import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
@@ -1041,7 +1041,17 @@ export class ReportsPlugin extends KeepTrackPlugin {
       return { inView: SatMath.checkIsInView(sensor, rae as Parameters<typeof SatMath.checkIsInView>[1]), el: rae.el };
     };
 
-    return addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC), sampleAt);
+    const passes = addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC), sampleAt);
+
+    // Peaks on a grid fixed to the UTC clock, not to the report window start, so a pass reads the same in every window (#313).
+    // Window-clipped passes (edge) are re-peaked too: their scan samples sit on the window-start phase.
+    const elAt = (ms: number) => SatMath.getRae(new Date(ms), satrec, sensor, true).el;
+
+    return passes.map((pass) => {
+      const peak = findPassPeakMs(elAt, pass.aos.getTime(), pass.los.getTime());
+
+      return peak ? { ...pass, maxEl: peak.el, maxElTime: new Date(peak.ms) } : pass;
+    });
   }
 
   /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */

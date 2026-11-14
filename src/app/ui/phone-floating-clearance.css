@@ -280,6 +280,24 @@
     object-fit: contain;
   }
 
+  /* #404 desktop UA: the collapsed Search icon sat in a holder that still carried the 5 px left border and the input's
+     3 px side margins, so the 44 px icon overran the right edge by 4 px at 360 to 430 px. Zero both. */
+  body.drawer-mode #search-holder,
+  body.drawer-mode #search-holder.search-slide-up {
+    border-left: 0 !important;
+  }
+
+  body.drawer-mode #search-holder input[type='search'] {
+    margin: 0;
+  }
+
+  /* #404: centre the zone text vertically in its 44 px box so it lines up with the clock and LIVE label. */
+  body #datetime #datetime-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   /* A non-UTC zone label ("EST (UTC-05:00)") is about 95 px wide; the chip is capped so it cannot push Search off. */
   body #datetime #datetime-zone {
     max-width: 72px;

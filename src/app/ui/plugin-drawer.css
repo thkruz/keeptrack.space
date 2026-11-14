@@ -1809,6 +1809,10 @@ body.is-mobile-mode {
   body.drawer-mode #search-holder.search-slide-up:focus-within {
     flex: 0 0 min(220px, 60vw);
     width: min(220px, 60vw) !important;
+    /* #400: the expanded box sat flush with the screen edge and its right border was clipped; keep a gutter. */
+    box-sizing: border-box;
+    max-width: calc(100vw - 16px);
+    margin-right: 8px;
   }
 
   /* #381: the stray "(" beside the expanded search was the rounded outline of the #datetime-zone select peeking out

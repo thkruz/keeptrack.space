@@ -23,6 +23,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { getStationModule, STATION_HOST_LABELS } from '@app/app/data/station-modules';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -34,7 +35,7 @@ import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } f
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { t7e } from '@app/locales/keys';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import firePng from '@public/img/icons/fire.png';
 import i18next from 'i18next';
@@ -429,9 +430,25 @@ export class MostTracked extends KeepTrackPlugin {
     label.className = 'most-tracked-label';
 
     const nameEl = document.createElement('span');
+    // Attached station modules (#459) resolve to their host; name the module so the row is not a second "ISS (ZARYA)".
+    const stationModule = getStationModule(entry.norad);
 
     nameEl.className = 'most-tracked-name';
-    nameEl.textContent = name || tr('unknownObject');
+    if (stationModule) {
+      const hostLabel = STATION_HOST_LABELS[stationModule.host] ?? name ?? stationModule.host;
+      const hint = t7e('searchManager.moduleOf' as TranslationKey)
+        .replace('{module}', `${stationModule.name} ${entry.norad}`)
+        .replace('{host}', hostLabel);
+
+      nameEl.textContent = `${stationModule.name} (${hostLabel})`;
+      label.setAttribute('aria-label', hint);
+      if (id !== null) {
+        label.setAttribute('kt-tooltip', hint);
+        PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(label);
+      }
+    } else {
+      nameEl.textContent = name || tr('unknownObject');
+    }
 
     const noradEl = document.createElement('span');
 

@@ -220,6 +220,27 @@ describe('MostTracked fetching and rendering', () => {
     expect(count?.getAttribute('aria-label')).toBe(count?.getAttribute('kt-tooltip'));
   });
 
+  it('names attached station modules instead of showing a second host row (#459)', async () => {
+    // 49044 (Nauka) is merged into the ISS (25544); map the ISS to the test object.
+    ServiceLocator.getCatalogManager().sccIndex = { 5: 0, 25544: 0 };
+    fetchMock.mockResolvedValue(okResponse({ top: [{ rank: 1, norad_cat_id: '49044', count: 4, users: 2 }], trending: [] }));
+    const selectSat = vi.fn();
+
+    await internals(plugin).fetchData_();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectSat } as any);
+
+    const row = getEl('most-tracked-top-list')?.querySelector<HTMLButtonElement>('button.most-tracked-row');
+
+    expect(row?.querySelector('.most-tracked-name')?.textContent).toBe('Nauka (ISS)');
+    expect(row?.querySelector('.most-tracked-norad')?.textContent).toBe('NORAD 49044');
+    expect(row?.querySelector('.most-tracked-label')?.getAttribute('aria-label')).toContain('Nauka');
+    expect(row?.disabled).toBe(false);
+
+    row?.click();
+    expect(selectSat).toHaveBeenCalledWith(0);
+  });
+
   it('greys out rows for objects that are not in the loaded catalog', async () => {
     await internals(plugin).fetchData_();
 

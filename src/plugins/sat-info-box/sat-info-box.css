@@ -333,6 +333,16 @@
   justify-self: end;
 }
 
+/* #357: public/css/responsive-lg.css gives every .sat-info-value `padding: 0 25px; width: 220px` from 1024 px up. That
+   padding pulled the circle in 25 px for values that hold the circle (x 1306) while the wrap rows (sensor rows) kept it at
+   the wrap edge (x 1331): two columns. Circle rows drop the inline padding so all circles share the row's right edge. */
+@media (min-width: 1024px) {
+  .sat-info-value:has(.sat-info-circle),
+  .sat-info-value-wrap > .sat-info-value {
+    padding-inline: 0;
+  }
+}
+
 /* Phone: the drawer utility footer (bottom 12px + ~64px tall) overlays the bottom of the box; --bottom-menu-height is 0 there, so reserve the same 96px (#223) the side menus use */
 /* Phone touch targets (#157): 44x44 px hit areas for every tappable control in the info box. Padding with an equal
    negative margin keeps the compact row layout; the visible glyph sizes are unchanged. */

@@ -315,12 +315,22 @@
 /* #357: the padding is cancelled by an equal negative margin so these rows are not 8 px taller than their neighbours;
    the circle sits at the right edge so every row's circle shares one x. */
 .sat-info-value:has(.sat-info-circle) {
-  display: flex;
+  /* Grid, not flex: the bare text is an anonymous item, and as a flex item a long value ("0.0750 km (default)") could not
+     shrink and pushed the circle out of the column (#357). minmax(0, 1fr) lets the text wrap inside its track. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px;
+  column-gap: 4px;
   padding-block: 4px;
   margin-block: -4px;
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+.sat-info-value:has(.sat-info-circle) > .sat-info-circle {
+  justify-self: end;
 }
 
 /* Phone: the drawer utility footer (bottom 12px + ~64px tall) overlays the bottom of the box; --bottom-menu-height is 0 there, so reserve the same 96px (#223) the side menus use */

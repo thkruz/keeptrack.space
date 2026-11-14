@@ -269,4 +269,19 @@
     flex: 1 1 0;
     margin-left: 6px;
   }
+
+  /* Desktop UA at 360 to 430 px keeps the wordmark logo (111 px wide), which pushed Search 4 px past the right edge.
+     Cap it so the bar fits; the icon logo on the phone UA is already narrower than the cap. */
+  body.drawer-mode .nav-logo img {
+    width: auto;
+    height: auto;
+    max-height: 20px;
+    max-width: 64px;
+    object-fit: contain;
+  }
+
+  /* A non-UTC zone label ("EST (UTC-05:00)") is about 95 px wide; the chip is capped so it cannot push Search off. */
+  body #datetime #datetime-zone {
+    max-width: 72px;
+  }
 }

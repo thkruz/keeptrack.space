@@ -9,6 +9,7 @@ import {
   lat2pitch,
   localToZulu,
   lon2yaw,
+  modelAwareStandoffKm,
   normalizeAngle,
   targetStandoffDistanceKm,
 } from '@app/engine/utils/transforms';
@@ -668,5 +669,26 @@ describe('dateToLocalInIso_function', () => {
     const date = new Date('invalid date');
 
     expect(() => dateToLocalInIso(date)).toThrow();
+  });
+});
+
+describe('modelAwareStandoffKm (#389)', () => {
+  it('uses the model radius when the catalog estimate is tiny (ISS: 55 m model vs 5 m estimate)', () => {
+    const r = modelAwareStandoffKm(<Kilometers>0.005, 0.055);
+
+    expect(r?.minStandoff).toBeCloseTo(0.165, 6);
+    expect(r?.framing).toBeCloseTo(0.33, 6);
+  });
+
+  it('keeps the catalog floors for a CubeSat mesh', () => {
+    const r = modelAwareStandoffKm(<Kilometers>0.0005, 0.0003);
+
+    expect(r?.minStandoff).toBeCloseTo(0.002, 6);
+  });
+
+  it('is null with neither a catalog radius nor a model, and ignores bad model radii', () => {
+    expect(modelAwareStandoffKm(null, undefined)).toBeNull();
+    expect(modelAwareStandoffKm(null, 0)).toBeNull();
+    expect(modelAwareStandoffKm(<Kilometers>0.01, Number.NaN)?.minStandoff).toBeCloseTo(0.03, 6);
   });
 });

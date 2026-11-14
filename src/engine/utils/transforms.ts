@@ -128,6 +128,23 @@ export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers => Ma
  */
 export const initialFramingDistanceKm = (radiusKm: Kilometers): Kilometers => Math.max(6 * radiusKm, 0.03) as Kilometers;
 
+/**
+ * Camera floors for an object whose 3D model is loaded (#389). The catalog size estimate can be far
+ * smaller than the drawn mesh (the ISS has no span in most catalogs), so the model's own bounding radius
+ * (km) wins whenever it is larger. Objects without a model keep the catalog-derived floors, and the
+ * result is never below them, so a CubeSat mesh can still be approached closely.
+ */
+export const modelAwareStandoffKm = (catalogRadiusKm: Kilometers | null, modelRadiusKm: number | null | undefined): { minStandoff: Kilometers; framing: Kilometers } | null => {
+  const hasModel = typeof modelRadiusKm === 'number' && Number.isFinite(modelRadiusKm) && modelRadiusKm > 0;
+
+  if (!hasModel && catalogRadiusKm === null) {
+    return null;
+  }
+  const radiusKm = Math.max(catalogRadiusKm ?? 0, hasModel ? modelRadiusKm : 0) as Kilometers;
+
+  return { minStandoff: targetStandoffDistanceKm(radiusKm), framing: initialFramingDistanceKm(radiusKm) };
+};
+
 const isLeapYear_ = (dateIn: Date) => {
   const year = dateIn.getUTCFullYear();
 

@@ -2,6 +2,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { refinePassEdgeMs } from '@app/app/sensors/pass-edge';
+import { refinePeakMs } from '@app/app/sensors/pass-peak';
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -584,6 +585,16 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     if (outMs !== null) {
       row.passRiseMs = refinePassEdgeMs(isIn, outMs, earliestInMs);
     }
+    // The 5 s search-back grid sits on the simulation clock's phase; take the whole-second peak shared with the pass card and reports (#313)
+    if (peak.ms !== startMs) {
+      const refined = refinePeakMs((ms) => getAer(ms).el, peak.ms, stepMs, earliestInMs, startMs);
+
+      if (refined) {
+        const aer = getAer(refined.ms);
+
+        peak = { ms: refined.ms, el: refined.el, rng: aer.rng, az: aer.az };
+      }
+    }
     // Only an object already past its peak has a stale "Max El" first row; a rising one keeps the forward-found peak
     const first = looksArray[0];
     const isStalePeak =
@@ -729,10 +740,11 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tr.setAttribute('class', 'link');
 
       tdT = tr.insertCell();
-      // An in-progress row shows when the pass began (searched back), not the time the table was computed
-      // The column header says UTC, so a Date must be formatted with the utc flag (browser local time was 5 h off, #71)
-      const shownTime =
-        entry.inProgress && typeof entry.passRiseMs === 'number' ? dateFormat(new Date(entry.passRiseMs), 'isoDateTime', true) : dateFormat(entry.time, 'isoDateTime', false);
+      /*
+       * Every row, the "In view now" row included, shows the instant its el/az/range were sampled (#343). The
+       * searched-back rise (passRiseMs) is only used for the Set row's time-in-view, never shown beside current values.
+       */
+      const shownTime = dateFormat(entry.time, 'isoDateTime', false);
 
       tdT.appendChild(document.createTextNode(shownTime));
 

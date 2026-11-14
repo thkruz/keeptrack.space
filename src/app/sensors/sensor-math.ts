@@ -31,6 +31,7 @@ import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
 import { DetailedSensor } from './DetailedSensor';
 import { refinePassEdgeMs } from './pass-edge';
+import { refinePeakMs } from './pass-peak';
 
 export enum TearrType {
   RISE,
@@ -120,7 +121,11 @@ export class SensorMath {
 
         // if elevation is going down then it is a peak
         if (!isMaxElFound && aerNext.el && aerNext.el < aer.el) {
-          const edge = rise ?? { date: now, aer };
+          // The sample at `now` sits on the simulation clock's phase; the peak is the whole second of highest elevation
+          // within one step either side (shared with the pass card and the reports, pass-peak.ts), so it does not move with sim time.
+          const peak = rise ? null : refinePeakMs((ms) => SatMath.getRae(new Date(ms), satrec, sensor, true).el, Number(now), 1000);
+          const peakAer = peak ? SatMath.getRae(new Date(peak.ms), satrec, sensor, true) : aer;
+          const edge = rise ?? { date: peak ? new Date(peak.ms) : now, aer: peakAer };
 
           return {
             time: dateFormat(edge.date, 'isoDateTime', true),

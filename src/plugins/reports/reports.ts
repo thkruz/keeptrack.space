@@ -26,6 +26,7 @@ import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { refinePeakMs } from '@app/app/sensors/pass-peak';
 import type { BurnSummary, MissionImpact, ScreeningDiff } from '@app/engine/conjunction/analysis-state';
 import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
@@ -1097,30 +1098,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
    * snapped to a whole second so it matches Look Angles and Best Passes.
    */
   static refinePeak_(elAt: (ms: number) => number | null, sampledMs: number, sampledEl: number, stepMs: number, aosMs: number, losMs: number): { ms: number; el: number } {
-    let lo = Math.max(aosMs, sampledMs - stepMs);
-    let hi = Math.min(losMs, sampledMs + stepMs);
-
-    while (hi - lo > 1000) {
-      const m1 = lo + (hi - lo) / 3;
-      const m2 = hi - (hi - lo) / 3;
-
-      if ((elAt(m1) ?? -90) < (elAt(m2) ?? -90)) {
-        lo = m1;
-      } else {
-        hi = m2;
-      }
-    }
-    let best = { ms: sampledMs, el: sampledEl };
-
-    for (const ms of [Math.floor(lo / 1000) * 1000, Math.ceil(hi / 1000) * 1000]) {
-      const el = elAt(ms);
-
-      if (el !== null && el > best.el) {
-        best = { ms, el };
-      }
-    }
-
-    return best;
+    // One shared rule with Look Angles and the pass card (app/sensors/pass-peak.ts): the whole second of highest elevation.
+    return refinePeakMs(elAt, sampledMs, stepMs, aosMs, losMs) ?? { ms: sampledMs, el: sampledEl };
   }
 
   /** Computes the satellite's sun-illumination state and sun angle at a given time. */

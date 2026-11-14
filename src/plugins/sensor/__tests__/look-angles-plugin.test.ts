@@ -90,6 +90,28 @@ describe('LookAnglesPlugin look-angle computation', () => {
     expect(getEl('looks')!.textContent).toContain('In view now');
   });
 
+  it('the "In view now" row prints the instant its el/az/range were sampled, not the searched-back rise (#343)', () => {
+    const entry = {
+      time: '2026-01-01 22:06:00',
+      az: 191 as Degrees,
+      el: 14.2 as Degrees,
+      rng: 1247 as Kilometers,
+      objName: 'EGL',
+      inProgress: true,
+      passRiseMs: Date.parse('2026-01-01T22:03:59Z'),
+    };
+
+    p().populateSideMenuTable_([entry], ServiceLocator.getTimeManager());
+
+    const row = getEl('looks')!.querySelectorAll('tr')[1];
+    const cells = Array.from(row.querySelectorAll('td')).map((td) => td.textContent);
+
+    expect(cells[0]).toContain('22:06:00');
+    expect(cells[0]).not.toContain('22:03:59');
+    expect(cells).toContain('14.2');
+    expect(cells).toContain('1247');
+  });
+
   it('rise/set mode adds no "In view now" row when the first row is a Rise', () => {
     p().lengthOfLookAngles_ = 0.002;
     p().isRiseSetOnly_ = true;

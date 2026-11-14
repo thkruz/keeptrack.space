@@ -35,6 +35,7 @@ import { CatalogManager } from './catalog-manager';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { orgDataService } from './catalogs/org-data-service';
+import { refreshDockedVehicles } from './docked-vehicles';
 import { isStationModule } from './station-modules';
 import { hasRealSccNum, isSyntheticVimpel } from './synthetic-vimpel';
 
@@ -382,6 +383,10 @@ export class CatalogLoader {
       const catalogManagerInstance = ServiceLocator.getCatalogManager();
 
       catalogManagerInstance.numObjects = catalogManagerInstance.objectCache.length;
+
+      // Vehicles whose elset still matches the ISS or Tiangong are docked: hide their dots (#463).
+      // Runs on every parse, so catalog and elset reloads re-evaluate it.
+      refreshDockedVehicles(catalogManagerInstance.objectCache as Satellite[]);
 
       const satDataString = CatalogLoader.getSatDataString_(catalogManagerInstance.objectCache);
 

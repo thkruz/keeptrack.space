@@ -335,6 +335,7 @@
     "decayed": "Désintégré",
     "partialMatch": "Partial match",
     "moduleOf": "{module} fait partie de {host}",
+    "dockedTo": "amarré à {host}",
     "typeStar": "Étoile",
     "typeSensor": "Capteur",
     "typeLaunchSite": "Site de lancement",

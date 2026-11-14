@@ -618,6 +618,7 @@
     "decayed": "Verglüht",
     "partialMatch": "Partial match",
     "moduleOf": "{module} ist Teil von {host}",
+    "dockedTo": "angedockt an {host}",
     "typeStar": "Stern",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Startplatz",

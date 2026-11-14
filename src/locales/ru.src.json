@@ -335,6 +335,7 @@
     "decayed": "Сошёл с орбиты",
     "partialMatch": "Partial match",
     "moduleOf": "{module} входит в состав {host}",
+    "dockedTo": "пристыкован к {host}",
     "typeStar": "Звезда",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовая площадка",

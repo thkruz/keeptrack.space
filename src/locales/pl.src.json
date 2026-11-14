@@ -335,6 +335,7 @@
     "decayed": "Spłonął",
     "partialMatch": "Partial match",
     "moduleOf": "{module} jest częścią {host}",
+    "dockedTo": "zadokowany do {host}",
     "typeStar": "Gwiazda",
     "typeSensor": "Czujnik",
     "typeLaunchSite": "Miejsce startu",

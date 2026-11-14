@@ -335,6 +335,7 @@
     "decayed": "落下済み",
     "partialMatch": "Partial match",
     "moduleOf": "{module} は {host} の一部です",
+    "dockedTo": "{host} にドッキング中",
     "typeStar": "恒星",
     "typeSensor": "センサー",
     "typeLaunchSite": "発射場",

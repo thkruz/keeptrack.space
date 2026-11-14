@@ -335,6 +335,7 @@
     "decayed": "Reingresado",
     "partialMatch": "Partial match",
     "moduleOf": "{module} forma parte de {host}",
+    "dockedTo": "acoplado a {host}",
     "typeStar": "Estrella",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Sitio de lanzamiento",

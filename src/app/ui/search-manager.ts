@@ -23,6 +23,7 @@ import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { getDockedHostLabel, isDocked } from '../data/docked-vehicles';
 import { getHostLabel } from '../data/station-modules';
 import { getSearchAlias, isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
 
@@ -678,6 +679,17 @@ export class SearchManager {
   }
 
   /** Result types whose match landed on the object's name, so the name should be highlighted. */
+  /** A docked vehicle keeps its own row; the note says which station it is folded into (#463). */
+  private static dockedNoteHtml_(id: number, searchType: SearchResultType): string {
+    const hostLabel = getDockedHostLabel(id);
+
+    if (!hostLabel || searchType === SearchResultType.MODULE) {
+      return '';
+    }
+
+    return ` <span class="search-partial-badge search-module-note">${t7e('searchManager.dockedTo').replace('{host}', hostLabel)}</span>`;
+  }
+
   private static isNameHighlightType_(searchType: SearchResultType): boolean {
     return (
       searchType === SearchResultType.OBJECT_NAME ||
@@ -729,7 +741,7 @@ export class SearchManager {
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;
       html += `<span class="search-type-badge">${searchTypeBadgeLabel(result.searchType)}</span>`;
       // A module row carries a note that has to be readable in full, so it wraps instead of truncating.
-      html += result.searchType === SearchResultType.MODULE ? '<div class="truncate-search search-module-row">' : '<div class="truncate-search">';
+      html += result.searchType === SearchResultType.MODULE || isDocked(obj.id) ? '<div class="truncate-search search-module-row">' : '<div class="truncate-search">';
 
       // Left half of search results
       if (obj.isMissile()) {
@@ -771,6 +783,7 @@ export class SearchManager {
         // If not, just write the name
         html += obj.name;
       }
+      html += SearchManager.dockedNoteHtml_(obj.id, result.searchType);
       html += '</div>';
       html += '<div class="search-result-scc">';
 

@@ -1,6 +1,7 @@
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { setDockedVehicles } from '@app/app/data/docked-vehicles';
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { SearchManager, SearchResultType, searchTypeBadgeLabel } from '@app/app/ui/search-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -782,6 +783,32 @@ describe('SearchManager interactions', () => {
     expect(moduleName.querySelector('.search-module-note')!.textContent).toContain('Zvezda 26400');
     // Other rows keep the single-line truncating name column.
     expect(rows[1].querySelector('.truncate-search')!.classList.contains('search-module-row')).toBe(false);
+  });
+
+  it('fillResultBox adds a "docked to" note to a docked vehicle row and leaves others alone (#463)', () => {
+    const dragon = new Satellite({ ...defaultSat, id: 3, name: 'CREW DRAGON 12', sccNum: '67796' });
+    const other = new Satellite({ ...defaultSat, id: 4, name: 'ISS OBJECT XZ', sccNum: '67683' });
+
+    ServiceLocator.getCatalogManager().objectCache = [undefined, undefined, undefined, dragon, other] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    setDockedVehicles(new Map([[3, '25544']]));
+    try {
+      mgr.fillResultBox(
+        [
+          { id: 3, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 5 },
+          { id: 4, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 },
+        ],
+        ServiceLocator.getCatalogManager(),
+        2
+      );
+      const rows = document.getElementById('search-results')!.querySelectorAll('.search-result');
+
+      expect(rows[0].querySelector('.search-module-note')!.textContent).toBe('docked to the ISS');
+      expect(rows[0].querySelector('.truncate-search')!.classList.contains('search-module-row')).toBe(true);
+      expect(rows[1].querySelector('.search-module-note')).toBeNull();
+    } finally {
+      setDockedVehicles(new Map());
+    }
   });
 
   it('fillResultBox always shows how many objects matched, even below the limit', () => {

@@ -340,6 +340,7 @@
     "decayed": "Зійшов з орбіти",
     "partialMatch": "Partial match",
     "moduleOf": "{module} входить до складу {host}",
+    "dockedTo": "приєднаний до {host}",
     "typeStar": "Зоря",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовий майданчик",

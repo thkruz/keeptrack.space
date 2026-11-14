@@ -330,6 +330,7 @@
     "decayed": "Decayed",
     "partialMatch": "Partial match",
     "moduleOf": "{module} is part of the {host}",
+    "dockedTo": "docked to the {host}",
     "typeStar": "Star",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Launch Site",

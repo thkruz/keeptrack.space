@@ -335,6 +335,7 @@
     "decayed": "已陨落",
     "partialMatch": "Partial match",
     "moduleOf": "{module} 是 {host} 的一部分",
+    "dockedTo": "已对接 {host}",
     "typeStar": "恒星",
     "typeSensor": "传感器",
     "typeLaunchSite": "发射场",

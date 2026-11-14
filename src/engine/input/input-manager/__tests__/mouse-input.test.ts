@@ -187,6 +187,23 @@ describe('MouseInput handlers', () => {
       document.body.innerHTML = '';
     });
 
+    it('ignores a dialog box whose overlay is hidden (closed account modals) once an account dialog was opened and dismissed', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      document.body.innerHTML = '<div id="modal-login-container" style="display:none"><div id="modal-login" role="dialog" style="display:block"></div></div>';
+      const box = document.getElementById('modal-login')!;
+
+      // A browser reports a size for the box only while the overlay is shown; mock a stale size to prove the ancestor check.
+      box.getBoundingClientRect = () => ({ width: 400, height: 300 }) as DOMRect;
+      (box as unknown as { checkVisibility: () => boolean }).checkVisibility = () => false;
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      (box as unknown as { checkVisibility: () => boolean }).checkVisibility = () => true;
+      press();
+      expect(selectSat).not.toHaveBeenCalled();
+      document.body.innerHTML = '';
+    });
+
     it('leaves the selection while the right-click menu is open or a field has focus', () => {
       vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
       inputManager.isRmbMenuOpen = true;

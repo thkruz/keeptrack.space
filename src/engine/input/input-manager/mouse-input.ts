@@ -345,6 +345,10 @@ export class MouseInput {
     }
 
     return Array.from(document.querySelectorAll('[role="dialog"]:not([hidden])')).some((el) => {
+      // A closed modal keeps its role=dialog box inside a display:none overlay; the box's own style still says block.
+      if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) {
+        return false;
+      }
       const style = window.getComputedStyle(el);
 
       if (style.display === 'none' || style.visibility === 'hidden' || Number.parseFloat(style.opacity) === 0 || el.hasAttribute('inert')) {

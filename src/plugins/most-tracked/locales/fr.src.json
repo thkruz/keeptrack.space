@@ -9,8 +9,6 @@
       },
       "status": {
         "loading": "Chargement…",
-        "error": "Impossible de charger les listes. Essayez Actualiser.",
-        "unavailable": "Non disponible dans cette version de KeepTrack.",
         "window": "Dernières {{hours}} heures",
         "updated": "mis à jour {{time}}"
       },
@@ -21,7 +19,8 @@
       "refresh": "Actualiser",
       "unknownObject": "Objet inconnu",
       "notInCatalog": "Absent du catalogue chargé",
-      "privacyNote": "Les décomptes sont anonymes et agrégés sur l'ensemble des utilisateurs de KeepTrack.",
+      "unavailable": "Les plus suivis est indisponible pour le moment. Réessayez dans quelques minutes.",
+      "privacyNote": "Nombre approximatif de personnes ayant sélectionné chaque objet dans KeepTrack. Anonyme et agrégé.",
       "help": {
         "overview": "Les plus suivis affiche les objets que les utilisateurs de KeepTrack regardent le plus en ce moment, comme les listes de vols les plus suivis des sites de suivi aérien. C'est un moyen rapide de trouver les lancements, les rentrées atmosphériques et les autres objets d'actualité.",
         "tabsHeading": "Les deux listes",

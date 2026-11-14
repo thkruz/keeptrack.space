@@ -9,8 +9,6 @@
       },
       "status": {
         "loading": "Načítání…",
-        "error": "Seznamy se nepodařilo načíst. Zkuste Obnovit.",
-        "unavailable": "V této verzi KeepTrack není k dispozici.",
         "window": "Posledních {{hours}} hodin",
         "updated": "aktualizováno {{time}}"
       },
@@ -21,7 +19,8 @@
       "refresh": "Obnovit",
       "unknownObject": "Neznámý objekt",
       "notInCatalog": "Není v načteném katalogu",
-      "privacyNote": "Počty jsou anonymní a souhrnné za všechny uživatele KeepTrack.",
+      "unavailable": "Nejsledovanější teď není k dispozici. Za pár minut bude zpět.",
+      "privacyNote": "Přibližný počet lidí, kteří objekt v KeepTrack vybrali. Anonymní a souhrnné.",
       "help": {
         "overview": "Nejsledovanější zobrazuje objekty, které si uživatelé KeepTrack právě teď prohlížejí nejvíce, podobně jako seznamy nejsledovanějších letů u sledovačů letadel. Je to rychlý způsob, jak najít starty, návraty do atmosféry a další objekty ze zpráv.",
         "tabsHeading": "Dva seznamy",

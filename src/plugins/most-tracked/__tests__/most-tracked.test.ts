@@ -2,7 +2,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { hasBottomIcon, hasHelp, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
-import { formatListAge, MOST_TRACKED_CACHE_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
+import { formatListAge, MOST_TRACKED_RETRY_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
 import { MOST_TRACKED_MAX_ROWS, parseMostTrackedList, parseMostTrackedResponse, relativePopularity } from '@app/plugins/most-tracked/most-tracked-data';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -13,14 +13,15 @@ import { vi } from 'vitest';
 const KNOWN_NORAD = '00005';
 const MISSING_NORAD = '99999';
 
+// Same shape as GET https://api.keeptrack.space/v4/stats/most-tracked (#1463).
 const payload = {
-  generatedAt: '2026-11-14T12:00:00Z',
-  windowHours: 24,
+  generated_at: '2026-11-14T12:00:00Z',
+  window_hours: 24,
   top: [
-    { rank: 1, norad: KNOWN_NORAD, count: 400 },
-    { rank: 2, norad: MISSING_NORAD, count: 100 },
+    { rank: 1, norad_cat_id: KNOWN_NORAD, count: 400 },
+    { rank: 2, norad_cat_id: MISSING_NORAD, count: 100 },
   ],
-  trending: [{ rank: 1, norad: KNOWN_NORAD, count: 50 }],
+  trending: [{ rank: 1, norad_cat_id: KNOWN_NORAD, count: 50 }],
 };
 
 const okResponse = (body: unknown) => ({ ok: true, status: 200, json: () => Promise.resolve(body) }) as unknown as Response;
@@ -82,7 +83,7 @@ describe('MostTracked data parsing', () => {
   });
 
   it('accepts a payload with only one list', () => {
-    const data = parseMostTrackedResponse({ top: [{ norad: 25544, count: 3 }] });
+    const data = parseMostTrackedResponse({ top: [{ norad_cat_id: '25544', count: 3 }] });
 
     expect(data?.top).toEqual([{ rank: 1, norad: '25544', count: 3 }]);
     expect(data?.trending).toEqual([]);
@@ -90,8 +91,8 @@ describe('MostTracked data parsing', () => {
     expect(data?.windowHours).toBeNull();
   });
 
-  it('ignores an unparseable generatedAt and a non-positive window', () => {
-    const data = parseMostTrackedResponse({ ...payload, generatedAt: 'not a date', windowHours: 0 });
+  it('ignores an unparseable generated_at and a non-positive window_hours', () => {
+    const data = parseMostTrackedResponse({ ...payload, generated_at: 'not a date', window_hours: 0 });
 
     expect(data?.generatedAt).toBeNull();
     expect(data?.windowHours).toBeNull();
@@ -99,13 +100,13 @@ describe('MostTracked data parsing', () => {
 
   it('drops bad rows, keeps the best rank of duplicates and renumbers', () => {
     const list = parseMostTrackedList([
-      { rank: 3, norad: '1', count: 5 },
-      { rank: 1, norad: '', count: 9 },
-      { rank: 2, norad: '2', count: -1 },
-      { rank: 4, norad: '1', count: 7 },
-      { rank: 5, norad: '3', count: Number.NaN },
+      { rank: 3, norad_cat_id: '1', count: 5 },
+      { rank: 1, norad_cat_id: '', count: 9 },
+      { rank: 2, norad_cat_id: '2', count: -1 },
+      { rank: 4, norad_cat_id: '1', count: 7 },
+      { rank: 5, norad_cat_id: '3', count: Number.NaN },
       'junk',
-      { rank: 6, norad: '4', count: 2 },
+      { rank: 6, norad_cat_id: '4', count: 2 },
     ]);
 
     expect(list).toEqual([
@@ -114,17 +115,34 @@ describe('MostTracked data parsing', () => {
     ]);
   });
 
+  it('keeps NORAD ids as strings, including 6-digit ids', () => {
+    expect(parseMostTrackedList([{ rank: 1, norad_cat_id: '100855', count: 2 }])[0].norad).toBe('100855');
+  });
+
+  it('gives tied counts the same rank', () => {
+    // The live endpoint currently returns mostly count 1 (low traffic).
+    const list = parseMostTrackedList([
+      { rank: 1, norad_cat_id: '25544', count: 3 },
+      { rank: 2, norad_cat_id: '57770', count: 2 },
+      { rank: 3, norad_cat_id: '7213', count: 2 },
+      { rank: 4, norad_cat_id: '100533', count: 1 },
+      { rank: 5, norad_cat_id: '100855', count: 1 },
+    ]);
+
+    expect(list.map((e) => e.rank)).toEqual([1, 2, 2, 4, 4]);
+  });
+
   it('falls back to array order when rank is missing', () => {
     expect(
       parseMostTrackedList([
-        { norad: 'B', count: 1 },
-        { norad: 'A', count: 2 },
+        { norad_cat_id: 'B', count: 1 },
+        { norad_cat_id: 'A', count: 2 },
       ]).map((e) => e.norad)
     ).toEqual(['B', 'A']);
   });
 
   it('caps each list at the maximum row count', () => {
-    const rows = Array.from({ length: 40 }, (_, i) => ({ rank: i + 1, norad: String(i + 1), count: 40 - i }));
+    const rows = Array.from({ length: 40 }, (_, i) => ({ rank: i + 1, norad_cat_id: String(i + 1), count: 40 - i }));
 
     expect(parseMostTrackedList(rows)).toHaveLength(MOST_TRACKED_MAX_ROWS);
   });
@@ -225,44 +243,45 @@ describe('MostTracked fetching and rendering', () => {
     expect(selectSat).toHaveBeenCalledWith(0);
   });
 
-  it('shows an error status without a toast when the endpoint fails', async () => {
+  it('fetches the documented endpoint with a plain request (no API key header)', async () => {
+    await internals(plugin).fetchData_();
+
+    expect(fetchMock).toHaveBeenCalledWith('https://api.keeptrack.space/v4/stats/most-tracked');
+  });
+
+  it('makes the menu unavailable without a toast on 503, then recovers', async () => {
+    vi.useFakeTimers();
     const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
 
-    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({ error: 'Usage data unavailable' }) });
     await internals(plugin).fetchData_();
 
-    expect(getEl('most-tracked-status')?.dataset.status).toBe('error');
+    expect(plugin.isIconDisabled).toBe(true);
+    expect(plugin.getDisabledReason()).toBeTruthy();
     expect(toast).not.toHaveBeenCalled();
+
+    // While unavailable, opening again does not hammer the endpoint.
+    await internals(plugin).fetchData_();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    vi.advanceTimersByTime(MOST_TRACKED_RETRY_MS);
+    expect(plugin.isIconDisabled).toBe(false);
+    expect(plugin.getDisabledReason()).toBeNull();
+    vi.useRealTimers();
   });
 
-  it('explains a first-load failure inside the list card, not in an empty box', async () => {
-    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+  it('treats an unreachable endpoint as unavailable', async () => {
+    fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
     await internals(plugin).fetchData_();
 
-    const placeholder = getEl('most-tracked-top-empty');
-
-    expect(placeholder?.hidden).toBe(false);
-    expect(placeholder?.dataset.status).toBe('error');
-    expect(placeholder?.textContent).not.toBe('');
-    // The line above the tabs stays empty so the message is not repeated.
-    expect(getEl('most-tracked-status')?.textContent).toBe('');
+    expect(plugin.isIconDisabled).toBe(true);
   });
 
-  it('keeps the last good lists when a refresh fails', async () => {
-    await internals(plugin).fetchData_();
-    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
-    await internals(plugin).fetchData_();
-
-    expect(getEl('most-tracked-top-list')?.querySelectorAll('button.most-tracked-row')).toHaveLength(2);
-    expect(getEl('most-tracked-status')?.dataset.status).toBe('error');
-    expect(getEl('most-tracked-status')?.textContent).not.toBe('');
-  });
-
-  it('shows an error status for an unexpected payload', async () => {
+  it('treats an unexpected payload as unavailable', async () => {
     fetchMock.mockResolvedValue(okResponse({ unexpected: true }));
     await internals(plugin).fetchData_();
 
-    expect(getEl('most-tracked-status')?.dataset.status).toBe('error');
+    expect(plugin.isIconDisabled).toBe(true);
   });
 
   it('shows the empty state when a list comes back empty', async () => {
@@ -278,7 +297,6 @@ describe('MostTracked fetching and rendering', () => {
     await internals(plugin).fetchData_();
 
     expect(fetchMock).not.toHaveBeenCalled();
-    expect(getEl('most-tracked-status')?.dataset.status).toBe('unavailable');
   });
 
   it('disables Refresh while a fetch is in flight', async () => {
@@ -302,7 +320,7 @@ describe('MostTracked fetching and rendering', () => {
     expect(refreshBtn.disabled).toBe(false);
   });
 
-  it('re-resolves cached rows when the menu reopens', async () => {
+  it('shows the last lists immediately on reopen and refetches', async () => {
     await internals(plugin).fetchData_();
     getEl('most-tracked-top-list')?.replaceChildren();
 
@@ -310,16 +328,6 @@ describe('MostTracked fetching and rendering', () => {
     plugin.onBottomIconClick();
 
     expect(getEl('most-tracked-top-list')?.querySelectorAll('button.most-tracked-row')).toHaveLength(2);
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('reuses the cached lists until they are stale', async () => {
-    expect(internals(plugin).shouldFetch_()).toBe(true);
-    await internals(plugin).fetchData_();
-
-    const fetchedAt = Date.now();
-
-    expect(internals(plugin).shouldFetch_(fetchedAt + 1000)).toBe(false);
-    expect(internals(plugin).shouldFetch_(fetchedAt + MOST_TRACKED_CACHE_MS + 1000)).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 });

@@ -23,7 +23,6 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { apiFetch } from '@app/app/data/api-fetch';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -46,14 +45,17 @@ import './most-tracked.css';
 
 const TABS_ID = 'most-tracked-tabs';
 
-/** How long a fetched list is reused before reopening the menu fetches it again. */
-export const MOST_TRACKED_CACHE_MS = 5 * 60 * 1000;
+/**
+ * After the endpoint fails, the menu stays unavailable this long before the
+ * icon is re-enabled. Matches the endpoint's 10-minute edge cache.
+ */
+export const MOST_TRACKED_RETRY_MS = 10 * 60 * 1000;
 
 /** Which list a container shows. */
 export type MostTrackedListKind = 'top' | 'trending';
 
-/** Menu state shown in the status line above the lists. */
-export type MostTrackedStatus = 'idle' | 'loading' | 'ready' | 'error' | 'unavailable';
+/** Fetch state of the menu. Failures make the plugin unavailable instead (see markUnavailable_). */
+export type MostTrackedStatus = 'idle' | 'loading' | 'ready';
 
 type MostTrackedKey = Parameters<typeof t7e>[0];
 const tr = (key: string, params?: Record<string, string | number>): string => t7e(`plugins.MostTracked.${key}` as MostTrackedKey, params);
@@ -85,12 +87,19 @@ export class MostTracked extends KeepTrackPlugin {
   /** Uses the base plugin's offline handling: the icon is disabled or hidden while offline. */
   requiresInternet = true;
 
-  /** Aggregated, anonymous counts served by KeepTrack (endpoint shape: see issue #1463). */
-  protected readonly dataSrc_ = 'https://api.keeptrack.space/v4/most-tracked';
+  /**
+   * Distinct users per object over the last 24 hours (see #1463). Public, no
+   * API key, CORS open and cached 10 minutes at the edge, so a plain fetch on
+   * every open is fine. apiFetch is deliberately not used: it would attach the
+   * key header and can toast on a 401.
+   */
+  protected readonly dataSrc_ = 'https://api.keeptrack.space/v4/stats/most-tracked';
   protected data_: MostTrackedData | null = null;
   protected status_: MostTrackedStatus = 'idle';
-  private lastFetchMs_ = 0;
+  /** True after the endpoint failed, until MOST_TRACKED_RETRY_MS has passed. */
+  protected isUnavailable_ = false;
   private isFetching_ = false;
+  private retryTimer_: ReturnType<typeof setTimeout> | null = null;
 
   // =========================================================================
   // Composition-based configuration methods
@@ -112,13 +121,18 @@ export class MostTracked extends KeepTrackPlugin {
 
     updateSideMenuTabIndicator(TABS_ID);
 
-    if (this.shouldFetch_()) {
-      this.fetchData_();
-    } else if (this.data_) {
-      // Re-resolve cached rows (the catalog may have finished loading) and the list age.
+    if (this.data_) {
+      // Show the last lists straight away (re-resolved: the catalog may have finished loading), then refresh.
       this.renderLists_();
       this.renderStatus_();
     }
+
+    this.fetchData_();
+  }
+
+  /** Shown by the drawer and the disabled icon while the endpoint is unavailable. */
+  getDisabledReason(): string | null {
+    return this.isUnavailable_ ? tr('unavailable') : null;
   }
 
   bottomIconCallback = (): void => {
@@ -219,29 +233,14 @@ export class MostTracked extends KeepTrackPlugin {
   // Data
   // =========================================================================
 
-  /** True when there is no list yet or the cached one is older than MOST_TRACKED_CACHE_MS. */
-  protected shouldFetch_(now = Date.now()): boolean {
-    if (this.isFetching_) {
-      return false;
-    }
-
-    return this.data_ === null || now - this.lastFetchMs_ > MOST_TRACKED_CACHE_MS;
-  }
-
   /**
-   * Fetches both lists. Failures stay inside the menu (status line + retry via
-   * Refresh); this never toasts, because the menu is optional and the endpoint
-   * being down must not interrupt the user.
+   * Fetches both lists. Any failure (unreachable, non-2xx such as the
+   * documented `503 Usage data unavailable`, or an unexpected payload) makes
+   * the plugin unavailable without a toast, as agreed in #1463.
    */
   protected async fetchData_(): Promise<void> {
-    if (this.isFetching_) {
-      return;
-    }
-
-    // Embedded views and offline builds have no use for a live popularity feed.
-    if (settingsManager.isEmbedMode || settingsManager.offlineMode) {
-      this.setStatus_('unavailable');
-
+    // Embedded views and offline builds never fetch; the embed profile also disables the plugin.
+    if (this.isFetching_ || this.isUnavailable_ || settingsManager.isEmbedMode || settingsManager.offlineMode) {
       return;
     }
 
@@ -249,7 +248,7 @@ export class MostTracked extends KeepTrackPlugin {
     this.setStatus_('loading');
 
     try {
-      const response = await apiFetch(this.dataSrc_);
+      const response = await fetch(this.dataSrc_);
 
       if (!response.ok) {
         throw new Error(`Most Tracked endpoint returned ${response.status}`);
@@ -262,15 +261,37 @@ export class MostTracked extends KeepTrackPlugin {
       }
 
       this.data_ = data;
-      this.lastFetchMs_ = Date.now();
       this.renderLists_();
       this.setStatus_('ready');
     } catch (err) {
-      errorManagerInstance.log(`MostTracked: ${(err as Error).message}`);
-      this.setStatus_('error');
+      this.markUnavailable_((err as Error).message);
     } finally {
       this.isFetching_ = false;
     }
+  }
+
+  /**
+   * Closes the menu and disables the icon (the drawer row follows it and shows
+   * getDisabledReason on tap), then re-enables it after MOST_TRACKED_RETRY_MS
+   * so a short outage does not remove the menu for the whole session.
+   */
+  protected markUnavailable_(reason: string): void {
+    errorManagerInstance.log(`MostTracked: ${reason}`);
+    this.isUnavailable_ = true;
+    this.status_ = this.data_ ? 'ready' : 'idle';
+    this.setBottomIconToDisabled(true);
+
+    if (this.retryTimer_) {
+      clearTimeout(this.retryTimer_);
+    }
+    this.retryTimer_ = setTimeout(() => {
+      this.retryTimer_ = null;
+      this.isUnavailable_ = false;
+      // Leave the icon alone while the base plugin has it disabled for being offline.
+      if (navigator.onLine !== false) {
+        this.setBottomIconToEnabled();
+      }
+    }, MOST_TRACKED_RETRY_MS);
   }
 
   // =========================================================================
@@ -305,35 +326,13 @@ export class MostTracked extends KeepTrackPlugin {
    * state themselves, so the line stays empty instead of repeating them.
    */
   private statusLineText_(): string {
-    if (!this.data_) {
-      return '';
-    }
-
-    switch (this.status_) {
-      case 'loading':
-        return tr('status.loading');
-      case 'error':
-        // Keep showing the last good lists, but say they could not be refreshed.
-        return tr('status.error');
-      default:
-        return this.readyStatusText_();
-    }
+    // While a refresh runs, the previous lists and their age stay on screen; Refresh shows it is busy.
+    return this.data_ ? this.readyStatusText_() : '';
   }
 
-  /** Message shown inside a list card when it has no rows: loading, error, unavailable or genuinely empty. */
+  /** Message shown inside a list card when it has no rows: loading the first time, otherwise a real empty list. */
   private placeholderText_(kind: MostTrackedListKind): string {
-    if (this.data_) {
-      return tr(`empty.${kind}`);
-    }
-
-    switch (this.status_) {
-      case 'error':
-        return tr('status.error');
-      case 'unavailable':
-        return tr('status.unavailable');
-      default:
-        return tr('status.loading');
-    }
+    return this.data_ ? tr(`empty.${kind}`) : tr('status.loading');
   }
 
   private renderPlaceholders_(): void {

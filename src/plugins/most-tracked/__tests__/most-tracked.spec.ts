@@ -3,15 +3,16 @@ import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 // The endpoint is mocked so the spec never depends on live counts.
 const MOCK_RESPONSE = {
-  generatedAt: '2026-11-14T12:00:00Z',
-  windowHours: 24,
+  generated_at: '2026-11-14T12:00:00Z',
+  window_hours: 24,
   top: [
-    { rank: 1, norad: '25544', count: 1200 },
-    { rank: 2, norad: '20580', count: 640 },
-    { rank: 3, norad: '9999999', count: 300 },
+    { rank: 1, norad_cat_id: '25544', count: 12 },
+    { rank: 2, norad_cat_id: '20580', count: 6 },
+    { rank: 3, norad_cat_id: '9999999', count: 3 },
   ],
-  trending: [{ rank: 1, norad: '48274', count: 90 }],
+  trending: [{ rank: 1, norad_cat_id: '48274', count: 2 }],
 };
+const ENDPOINT = '**/v4/stats/most-tracked';
 
 test.describe('MostTracked Plugin', () => {
   /** Opens the menu from the drawer's CATALOG group (mode-0). */
@@ -31,7 +32,7 @@ test.describe('MostTracked Plugin', () => {
   };
 
   test('open side menu, switch tabs, then close', async ({ page }) => {
-    await page.route('**/v4/most-tracked', (route) => route.fulfill({ json: MOCK_RESPONSE }));
+    await page.route(ENDPOINT, (route) => route.fulfill({ json: MOCK_RESPONSE }));
 
     // Default e2e setup loads no satellite catalog, so every row is "not in the loaded catalog".
     await waitForAppReady(page, {
@@ -60,7 +61,7 @@ test.describe('MostTracked Plugin', () => {
   });
 
   test('clicking a row selects the object @local', async ({ page }) => {
-    await page.route('**/v4/most-tracked', (route) => route.fulfill({ json: MOCK_RESPONSE }));
+    await page.route(ENDPOINT, (route) => route.fulfill({ json: MOCK_RESPONSE }));
 
     await waitForAppReady(page, {
       plugins: { MostTracked: { enabled: true } },
@@ -82,15 +83,48 @@ test.describe('MostTracked Plugin', () => {
     await expect(page.locator('#sat-infobox')).toBeVisible({ timeout: 5_000 });
   });
 
-  test('endpoint failure shows an error status, not a crash', async ({ page }) => {
-    await page.route('**/v4/most-tracked', (route) => route.fulfill({ status: 503, body: '' }));
+  test('a 503 closes the menu and disables the icon, with no toast', async ({ page }) => {
+    await page.route(ENDPOINT, (route) => route.fulfill({ status: 503, json: { error: 'Usage data unavailable' } }));
 
     await waitForAppReady(page, {
       plugins: { MostTracked: { enabled: true } },
       settings: { isDisableLoginGate: true, isMobileModeEnabled: true },
     });
 
-    await page.locator('#most-tracked-bottom-icon').evaluate((el: HTMLElement) => el.click());
-    await expect(page.locator('#most-tracked-status')).toHaveAttribute('data-status', 'error', { timeout: 5_000 });
+    const toastBefore = await page.evaluate(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      () => (window as any).keepTrack.api.getUiManager().lastToast as string | undefined
+    );
+
+    await openMenu(page);
+
+    await expect(page.locator('#most-tracked-bottom-icon')).toHaveClass(/bmenu-item-disabled/u, { timeout: 5_000 });
+    // Closed side menus slide off-screen and become inert (src/engine/utils/slide.ts).
+    await expect(page.locator('#most-tracked-menu')).toHaveAttribute('inert', '', { timeout: 5_000 });
+    expect(
+      await page.evaluate(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        () => (window as any).keepTrack.api.getUiManager().lastToast as string | undefined
+      )
+    ).toBe(toastBefore);
+  });
+
+  test('renders the live endpoint @local', async ({ page }) => {
+    // No mock: talks to the real endpoint, so it only runs locally.
+    await waitForAppReady(page, {
+      plugins: { MostTracked: { enabled: true } },
+      settings: { noCatalogOnLoad: false, isDisableLoginGate: true, isMobileModeEnabled: true },
+    });
+    await page.waitForFunction(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      () => (window as any).keepTrack.api.getCatalogManager().sccNum2Id('25544') !== null,
+      undefined,
+      { timeout: 60_000 }
+    );
+
+    await openMenu(page);
+
+    await expect(page.locator('#most-tracked-status')).toHaveAttribute('data-status', 'ready', { timeout: 10_000 });
+    await expect(page.locator('#most-tracked-top-list button.most-tracked-row').first()).toBeVisible();
   });
 });

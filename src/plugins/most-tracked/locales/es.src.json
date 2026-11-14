@@ -9,8 +9,6 @@
       },
       "status": {
         "loading": "Cargando…",
-        "error": "No se pudieron cargar las listas. Prueba con Actualizar.",
-        "unavailable": "No disponible en esta versión de KeepTrack.",
         "window": "Últimas {{hours}} horas",
         "updated": "actualizado {{time}}"
       },
@@ -21,7 +19,8 @@
       "refresh": "Actualizar",
       "unknownObject": "Objeto desconocido",
       "notInCatalog": "No está en el catálogo cargado",
-      "privacyNote": "Los recuentos son anónimos y agregados de todos los usuarios de KeepTrack.",
+      "unavailable": "Más seguidos no está disponible ahora mismo. Volverá en unos minutos.",
+      "privacyNote": "Número aproximado de personas que seleccionaron cada objeto en KeepTrack. Anónimo y agregado.",
       "help": {
         "overview": "Más seguidos muestra los objetos que los usuarios de KeepTrack están mirando más ahora mismo, como las listas de vuelos más seguidos de los rastreadores de vuelos. Es una forma rápida de encontrar lanzamientos, reentradas y otros objetos de actualidad.",
         "tabsHeading": "Las dos listas",

@@ -11,9 +11,6 @@
   color: var(--kt-text-secondary);
 }
 
-.most-tracked-status[data-status='error'] {
-  color: var(--kt-red-400);
-}
 
 .most-tracked-list {
   margin: 0;
@@ -113,9 +110,6 @@
   color: var(--kt-text-secondary);
 }
 
-.most-tracked-empty[data-status='error'] {
-  color: var(--kt-red-400);
-}
 
 /* Placeholders and the status line take no space when they have nothing to say. */
 .most-tracked-empty:empty {

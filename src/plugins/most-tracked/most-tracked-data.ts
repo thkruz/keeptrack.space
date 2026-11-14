@@ -26,15 +26,21 @@ export const MOST_TRACKED_MAX_ROWS = 25;
 
 /** One ranked object in a Most Tracked list. */
 export interface MostTrackedEntry {
-  /** 1-based position in its list. */
+  /**
+   * 1-based display rank. Objects with the same count share a rank
+   * (1, 2, 2, 4), because tied counts are common while traffic is low.
+   */
   rank: number;
-  /** NORAD catalog number as sent by the server (numeric, alpha-5 or extended). */
+  /** NORAD catalog number as sent by the server (kept as a string, never parsed). */
   norad: string;
-  /** Aggregated, anonymous tracking count for the window (0 or more). */
+  /** Approximate number of distinct users who selected the object in the window (0 or more). */
   count: number;
 }
 
-/** Validated endpoint payload. */
+/**
+ * Validated endpoint payload. The server sends snake_case
+ * (`generated_at`, `window_hours`, `norad_cat_id`) like the rest of API v4.
+ */
 export interface MostTrackedData {
   /** When the server built the lists, or null when it did not say. */
   generatedAt: Date | null;
@@ -62,9 +68,10 @@ const toNorad_ = (value: unknown): string | null => {
 
 /**
  * Validates one list. Bad rows are dropped rather than failing the whole
- * payload, duplicates keep their best rank, and the result is sorted by rank
- * and capped at {@link MOST_TRACKED_MAX_ROWS}. Ranks are renumbered 1..n so
- * the UI never shows gaps left by dropped rows.
+ * payload, duplicates keep their best rank, and the result is sorted by the
+ * server's rank and capped at {@link MOST_TRACKED_MAX_ROWS}. Display ranks are
+ * then recomputed as competition ranks: dropped rows leave no gaps, and equal
+ * counts share a rank.
  */
 export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
   if (!Array.isArray(value)) {
@@ -78,7 +85,7 @@ export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
       return;
     }
 
-    const norad = toNorad_(row.norad);
+    const norad = toNorad_(row.norad_cat_id);
     const count = typeof row.count === 'number' && Number.isFinite(row.count) && row.count >= 0 ? row.count : null;
     const rank = typeof row.rank === 'number' && Number.isFinite(row.rank) ? row.rank : index + 1;
 
@@ -93,10 +100,13 @@ export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
     }
   });
 
-  return [...byNorad.values()]
-    .sort((a, b) => a.rank - b.rank)
-    .slice(0, MOST_TRACKED_MAX_ROWS)
-    .map((entry, i) => ({ ...entry, rank: i + 1 }));
+  const sorted = [...byNorad.values()].sort((a, b) => a.rank - b.rank).slice(0, MOST_TRACKED_MAX_ROWS);
+
+  return sorted.map((entry, i) => {
+    const firstWithCount = sorted.findIndex((other) => other.count === entry.count);
+
+    return { ...entry, rank: firstWithCount === -1 ? i + 1 : firstWithCount + 1 };
+  });
 };
 
 /**
@@ -110,13 +120,13 @@ export const parseMostTrackedResponse = (json: unknown): MostTrackedData | null 
 
   let generatedAt: Date | null = null;
 
-  if (typeof json.generatedAt === 'string') {
-    const date = new Date(json.generatedAt);
+  if (typeof json.generated_at === 'string') {
+    const date = new Date(json.generated_at);
 
     generatedAt = Number.isNaN(date.getTime()) ? null : date;
   }
 
-  const windowHours = typeof json.windowHours === 'number' && Number.isFinite(json.windowHours) && json.windowHours > 0 ? json.windowHours : null;
+  const windowHours = typeof json.window_hours === 'number' && Number.isFinite(json.window_hours) && json.window_hours > 0 ? json.window_hours : null;
 
   return {
     generatedAt,

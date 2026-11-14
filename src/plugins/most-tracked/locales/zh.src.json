@@ -9,8 +9,6 @@
       },
       "status": {
         "loading": "加载中…",
-        "error": "无法加载列表，请尝试刷新。",
-        "unavailable": "此版本的 KeepTrack 不提供该功能。",
         "window": "过去 {{hours}} 小时",
         "updated": "{{time}} 更新"
       },
@@ -21,7 +19,8 @@
       "refresh": "刷新",
       "unknownObject": "未知对象",
       "notInCatalog": "不在已加载的目录中",
-      "privacyNote": "计数为匿名数据，汇总自所有 KeepTrack 用户。",
+      "unavailable": "“最多追踪”暂时不可用，几分钟后会恢复。",
+      "privacyNote": "在 KeepTrack 中选择过该对象的大致人数。匿名汇总。",
       "help": {
         "overview": "“最多追踪”显示 KeepTrack 用户当前最常查看的对象，类似航班追踪网站上的“最多追踪航班”列表。可以快速找到发射、再入以及新闻中的其他对象。",
         "tabsHeading": "两个列表",

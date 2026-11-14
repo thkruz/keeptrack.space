@@ -9,8 +9,6 @@
       },
       "status": {
         "loading": "Wird geladen…",
-        "error": "Die Listen konnten nicht geladen werden. Bitte „Aktualisieren“ versuchen.",
-        "unavailable": "In dieser Version von KeepTrack nicht verfügbar.",
         "window": "Letzte {{hours}} Stunden",
         "updated": "aktualisiert {{time}}"
       },
@@ -21,7 +19,8 @@
       "refresh": "Aktualisieren",
       "unknownObject": "Unbekanntes Objekt",
       "notInCatalog": "Nicht im geladenen Katalog",
-      "privacyNote": "Die Zahlen sind anonym und über alle KeepTrack-Nutzer zusammengefasst.",
+      "unavailable": "Meistverfolgt ist gerade nicht verfügbar. In ein paar Minuten ist es wieder da.",
+      "privacyNote": "Ungefähre Anzahl der Personen, die das Objekt in KeepTrack ausgewählt haben. Anonym und zusammengefasst.",
       "help": {
         "overview": "Meistverfolgt zeigt die Objekte, die KeepTrack-Nutzer gerade am häufigsten ansehen, ähnlich wie die Listen der meistverfolgten Flüge bei Flugtrackern. So findest du schnell Starts, Wiedereintritte und andere Objekte aus den Nachrichten.",
         "tabsHeading": "Die zwei Listen",

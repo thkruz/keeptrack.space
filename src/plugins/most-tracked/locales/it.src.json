@@ -9,8 +9,6 @@
       },
       "status": {
         "loading": "Caricamento…",
-        "error": "Impossibile caricare gli elenchi. Prova Aggiorna.",
-        "unavailable": "Non disponibile in questa versione di KeepTrack.",
         "window": "Ultime {{hours}} ore",
         "updated": "aggiornato {{time}}"
       },
@@ -21,7 +19,8 @@
       "refresh": "Aggiorna",
       "unknownObject": "Oggetto sconosciuto",
       "notInCatalog": "Non presente nel catalogo caricato",
-      "privacyNote": "I conteggi sono anonimi e aggregati tra tutti gli utenti di KeepTrack.",
+      "unavailable": "Più seguiti non è disponibile al momento. Tornerà tra qualche minuto.",
+      "privacyNote": "Numero approssimativo di persone che hanno selezionato ogni oggetto in KeepTrack. Anonimo e aggregato.",
       "help": {
         "overview": "Più seguiti mostra gli oggetti che gli utenti di KeepTrack stanno guardando di più in questo momento, come gli elenchi dei voli più seguiti dei siti di tracciamento aereo. È un modo rapido per trovare lanci, rientri e altri oggetti di attualità.",
         "tabsHeading": "I due elenchi",

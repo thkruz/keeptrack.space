@@ -33,6 +33,24 @@ describe('SplashScreen_class', () => {
     expect(getEl('loading-screen')?.style.display).toBe('');
   });
 
+  // #383: the welcome tour waits for splashScreenHidden; phone boot hides the loading screen itself and must announce it.
+  it('emits splashScreenHidden once when mobile mode hides the loading screen without auto start', () => {
+    const emitSpy = vi.spyOn(EventBus.getInstance(), 'emit');
+    const prevAuto = settingsManager.isAutoStart;
+    const prevMobile = settingsManager.isMobileModeEnabled;
+    const prevCheck = MobileManager.checkMobileMode;
+
+    MobileManager.checkMobileMode = vi.fn();
+    settingsManager.isMobileModeEnabled = true;
+    settingsManager.isAutoStart = false;
+    SplashScreen.hideSplashScreen();
+    expect(emitSpy.mock.calls.filter((c) => c[0] === EventBusEvent.splashScreenHidden)).toHaveLength(1);
+    MobileManager.checkMobileMode = prevCheck;
+    settingsManager.isMobileModeEnabled = prevMobile;
+    settingsManager.isAutoStart = prevAuto;
+    emitSpy.mockRestore();
+  });
+
   // Tests that the loading screen is resized and hidden after a timeout when running on desktop
   it('test_hide_splash_screen_desktop', () => {
     SplashScreen.hideSplashScreen();

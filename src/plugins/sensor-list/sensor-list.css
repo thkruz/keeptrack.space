@@ -117,8 +117,11 @@
 
   #sensor-list-content .sensor-row .sensor-name {
     flex: 1 1 9ch;
-    /* max-content floor: a name that cannot share the line with the tag moves to its own line instead of splitting mid-word */
-    min-width: min(max-content, 100%);
+    /* min-content floor (the longest word): a name that cannot share the line with the tag moves to its own line instead of
+       splitting mid-word. `min(max-content, 100%)` was invalid CSS (a keyword is not allowed inside min()), so the browser
+       dropped it and the floor stayed 0 (#306: "Hartebeesthoe / k" at 390 px). */
+    min-width: min-content;
+    max-width: 100%;
     overflow-wrap: break-word;
     word-break: normal;
   }

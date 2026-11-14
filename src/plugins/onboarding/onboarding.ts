@@ -707,8 +707,12 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     if (isCelebrate) {
       keepTrackApi.toast(l('toasts.finished'), ToastMsgType.normal);
       this.pulseHamburger_();
-      // No dimming overlay: the globe and search stay usable with the drawer open
-      openDrawerWithoutOverlay();
+      // Phones: the overlay-free drawer is full width and covers the search magnifier, so leave it closed and
+      // let the pulsing hamburger point at it (#383).
+      if (!settingsManager.isMobileModeEnabled) {
+        // No dimming overlay: the globe and search stay usable with the drawer open
+        openDrawerWithoutOverlay();
+      }
     }
   }
 

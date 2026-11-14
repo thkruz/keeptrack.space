@@ -35,6 +35,14 @@
     box-sizing: border-box;
   }
 
+  /*
+   * The primary bar bleeds 1 rem past the menu padding on both sides (negative margins), but max-width: 100% capped
+   * its width at the content box, so it ended 1 rem short of the card column's right edge (#382).
+   */
+  body .side-menu-title-bar:not(.secondary-title-bar) {
+    max-width: none;
+  }
+
   body .side-menu-title-text {
     min-width: 0 !important;
   }

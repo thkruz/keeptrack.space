@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Nejsledovanější",
+      "title": "Nejsledovanější",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "Nové a populární"
+      },
+      "status": {
+        "loading": "Načítání…",
+        "error": "Seznamy se nepodařilo načíst. Zkuste Obnovit.",
+        "unavailable": "V této verzi KeepTrack není k dispozici.",
+        "window": "Posledních {{hours}} hodin",
+        "updated": "aktualizováno {{time}}"
+      },
+      "empty": {
+        "top": "Zatím žádná data o sledování.",
+        "trending": "Momentálně není nic nového v trendu."
+      },
+      "refresh": "Obnovit",
+      "unknownObject": "Neznámý objekt",
+      "notInCatalog": "Není v načteném katalogu",
+      "privacyNote": "Počty jsou anonymní a souhrnné za všechny uživatele KeepTrack.",
+      "help": {
+        "overview": "Nejsledovanější zobrazuje objekty, které si uživatelé KeepTrack právě teď prohlížejí nejvíce, podobně jako seznamy nejsledovanějších letů u sledovačů letadel. Je to rychlý způsob, jak najít starty, návraty do atmosféry a další objekty ze zpráv.",
+        "tabsHeading": "Dva seznamy",
+        "tabs": "<strong>Top 25</strong> řadí nejsledovanější objekty za poslední den. <strong>Nové a populární</strong> ukazuje nejoblíbenější objekty, které nebyly v Top 25 předchozího dne, aby nové a zajímavé objekty nezůstaly skryté za obvyklými favority.",
+        "howToUse": "<ol><li>Otevřete <strong>Nejsledovanější</strong> z panelu.</li><li>Přepínejte mezi <strong>Top 25</strong> a <strong>Nové a populární</strong>.</li><li>Kliknutím na řádek objekt vyberete a přeletíte k němu.</li><li>Kliknutím na <strong>Obnovit</strong> získáte nejnovější počty.</li></ol>",
+        "tip1": "Pruh ukazuje oblíbenost objektu v poměru k prvnímu řádku stejného seznamu.",
+        "tip2": "Šedé řádky jsou objekty, které nejsou v načteném katalogu, a proto je nelze vybrat."
+      }
+    }
+  }
+}

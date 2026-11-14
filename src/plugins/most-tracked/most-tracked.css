@@ -1,0 +1,117 @@
+/*
+ * Most Tracked menu styles. The menu opts into the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action); only the ranked list lives here.
+ */
+
+#most-tracked-menu {
+  width: 380px;
+}
+
+.most-tracked-status {
+  margin: 4px 6px 8px;
+  min-height: 1.4em;
+  font-size: 12px;
+  color: var(--kt-text-secondary);
+}
+
+.most-tracked-status[data-status='error'] {
+  color: var(--kt-red-400);
+}
+
+.most-tracked-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.most-tracked-row {
+  display: grid;
+  grid-template-columns: 2ch minmax(0, 1fr) 64px 6ch;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: var(--kt-radius-sm);
+  cursor: pointer;
+}
+
+.most-tracked-row:hover,
+.most-tracked-row:focus-visible {
+  background: var(--kt-bg-hover);
+  outline: none;
+}
+
+.most-tracked-row--missing {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.most-tracked-row--missing:hover {
+  background: none;
+}
+
+.most-tracked-rank {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--kt-text-tertiary);
+}
+
+.most-tracked-label {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.most-tracked-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--kt-text-primary);
+}
+
+.most-tracked-norad {
+  font-size: 11px;
+  color: var(--kt-text-tertiary);
+}
+
+/* Relative popularity within the list: the top row fills the track. */
+.most-tracked-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--kt-bg-active);
+  overflow: hidden;
+}
+
+.most-tracked-bar::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--most-tracked-pct, 0%);
+  border-radius: 3px;
+  background: var(--kt-accent);
+}
+
+.most-tracked-count {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  color: var(--kt-text-secondary);
+}
+
+.most-tracked-empty {
+  margin: 8px 6px;
+  font-size: 12px;
+  color: var(--kt-text-secondary);
+}
+
+.most-tracked-note {
+  display: block;
+  margin: 8px 6px 0;
+  color: var(--kt-text-tertiary);
+}
+
+@media (max-width: 639px) {
+  #most-tracked-menu {
+    width: auto;
+  }
+}

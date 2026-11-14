@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Najczęściej śledzone",
+      "title": "Najczęściej śledzone",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "Nowe i popularne"
+      },
+      "status": {
+        "loading": "Wczytywanie…",
+        "error": "Nie udało się wczytać list. Spróbuj Odśwież.",
+        "unavailable": "Niedostępne w tej wersji KeepTrack.",
+        "window": "Ostatnie {{hours}} godz.",
+        "updated": "zaktualizowano {{time}}"
+      },
+      "empty": {
+        "top": "Brak danych o śledzeniu.",
+        "trending": "Obecnie nic nowego nie zyskuje popularności."
+      },
+      "refresh": "Odśwież",
+      "unknownObject": "Nieznany obiekt",
+      "notInCatalog": "Brak w załadowanym katalogu",
+      "privacyNote": "Liczby są anonimowe i zbiorcze dla wszystkich użytkowników KeepTrack.",
+      "help": {
+        "overview": "Najczęściej śledzone pokazuje obiekty, które użytkownicy KeepTrack oglądają teraz najczęściej, podobnie jak listy najczęściej śledzonych lotów w serwisach śledzenia samolotów. To szybki sposób na znalezienie startów, wejść w atmosferę i innych obiektów z wiadomości.",
+        "tabsHeading": "Dwie listy",
+        "tabs": "<strong>Top 25</strong> to ranking najczęściej śledzonych obiektów z ostatniej doby. <strong>Nowe i popularne</strong> pokazuje najpopularniejsze obiekty, których nie było w Top 25 poprzedniego dnia, aby nowe i ciekawe obiekty nie ginęły za stałymi faworytami.",
+        "howToUse": "<ol><li>Otwórz <strong>Najczęściej śledzone</strong> z szuflady.</li><li>Przełączaj się między <strong>Top 25</strong> a <strong>Nowe i popularne</strong>.</li><li>Kliknij wiersz, aby wybrać obiekt i przelecieć do niego.</li><li>Kliknij <strong>Odśwież</strong>, aby pobrać najnowsze liczby.</li></ol>",
+        "tip1": "Pasek pokazuje popularność obiektu względem pierwszego wiersza tej samej listy.",
+        "tip2": "Wyszarzone wiersze to obiekty spoza załadowanego katalogu, więc nie można ich wybrać."
+      }
+    }
+  }
+}

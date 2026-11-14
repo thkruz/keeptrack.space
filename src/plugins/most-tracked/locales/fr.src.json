@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Les plus suivis",
+      "title": "Les plus suivis",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "Nouveautés et tendances"
+      },
+      "status": {
+        "loading": "Chargement…",
+        "error": "Impossible de charger les listes. Essayez Actualiser.",
+        "unavailable": "Non disponible dans cette version de KeepTrack.",
+        "window": "Dernières {{hours}} heures",
+        "updated": "mis à jour à {{time}}"
+      },
+      "empty": {
+        "top": "Pas encore de données de suivi.",
+        "trending": "Rien de nouveau en tendance pour le moment."
+      },
+      "refresh": "Actualiser",
+      "unknownObject": "Objet inconnu",
+      "notInCatalog": "Absent du catalogue chargé",
+      "privacyNote": "Les décomptes sont anonymes et agrégés sur l'ensemble des utilisateurs de KeepTrack.",
+      "help": {
+        "overview": "Les plus suivis affiche les objets que les utilisateurs de KeepTrack regardent le plus en ce moment, comme les listes de vols les plus suivis des sites de suivi aérien. C'est un moyen rapide de trouver les lancements, les rentrées atmosphériques et les autres objets d'actualité.",
+        "tabsHeading": "Les deux listes",
+        "tabs": "<strong>Top 25</strong> classe les objets les plus suivis de la dernière journée. <strong>Nouveautés et tendances</strong> affiche les objets les plus populaires qui n'étaient pas dans le Top 25 de la veille, pour que les objets nouveaux et intéressants ne soient pas masqués par les favoris habituels.",
+        "howToUse": "<ol><li>Ouvrez <strong>Les plus suivis</strong> depuis le tiroir.</li><li>Passez de <strong>Top 25</strong> à <strong>Nouveautés et tendances</strong>.</li><li>Cliquez sur une ligne pour sélectionner cet objet et vous y rendre.</li><li>Cliquez sur <strong>Actualiser</strong> pour obtenir les derniers décomptes.</li></ol>",
+        "tip1": "La barre indique la popularité de chaque objet par rapport à la première ligne de la même liste.",
+        "tip2": "Les lignes grisées sont des objets absents du catalogue chargé : ils ne peuvent pas être sélectionnés."
+      }
+    }
+  }
+}

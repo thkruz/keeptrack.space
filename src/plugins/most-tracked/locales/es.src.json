@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Más seguidos",
+      "title": "Más seguidos",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "Nuevos y en tendencia"
+      },
+      "status": {
+        "loading": "Cargando…",
+        "error": "No se pudieron cargar las listas. Prueba con Actualizar.",
+        "unavailable": "No disponible en esta versión de KeepTrack.",
+        "window": "Últimas {{hours}} horas",
+        "updated": "actualizado {{time}}"
+      },
+      "empty": {
+        "top": "Aún no hay datos de seguimiento.",
+        "trending": "No hay nada nuevo en tendencia ahora mismo."
+      },
+      "refresh": "Actualizar",
+      "unknownObject": "Objeto desconocido",
+      "notInCatalog": "No está en el catálogo cargado",
+      "privacyNote": "Los recuentos son anónimos y agregados de todos los usuarios de KeepTrack.",
+      "help": {
+        "overview": "Más seguidos muestra los objetos que los usuarios de KeepTrack están mirando más ahora mismo, como las listas de vuelos más seguidos de los rastreadores de vuelos. Es una forma rápida de encontrar lanzamientos, reentradas y otros objetos de actualidad.",
+        "tabsHeading": "Las dos listas",
+        "tabs": "<strong>Top 25</strong> clasifica los objetos más seguidos del último día. <strong>Nuevos y en tendencia</strong> muestra los objetos más populares que no estaban en el Top 25 del día anterior, para que los objetos nuevos e interesantes no queden ocultos tras los favoritos habituales.",
+        "howToUse": "<ol><li>Abre <strong>Más seguidos</strong> desde el panel.</li><li>Cambia entre <strong>Top 25</strong> y <strong>Nuevos y en tendencia</strong>.</li><li>Haz clic en una fila para seleccionar ese objeto y volar hasta él.</li><li>Haz clic en <strong>Actualizar</strong> para ver los recuentos más recientes.</li></ol>",
+        "tip1": "La barra muestra la popularidad de cada objeto en relación con la primera fila de la misma lista.",
+        "tip2": "Las filas en gris son objetos que no están en el catálogo cargado, por lo que no se pueden seleccionar."
+      }
+    }
+  }
+}

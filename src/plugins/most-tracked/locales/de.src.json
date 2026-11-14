@@ -1,0 +1,35 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Meistverfolgt",
+      "title": "Meistverfolgt",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "Neu & im Trend"
+      },
+      "status": {
+        "loading": "Wird geladen…",
+        "error": "Die Listen konnten nicht geladen werden. Bitte „Aktualisieren“ versuchen.",
+        "unavailable": "In dieser Version von KeepTrack nicht verfügbar.",
+        "window": "Letzte {{hours}} Stunden",
+        "updated": "aktualisiert {{time}}"
+      },
+      "empty": {
+        "top": "Noch keine Tracking-Daten.",
+        "trending": "Gerade ist nichts Neues im Trend."
+      },
+      "refresh": "Aktualisieren",
+      "unknownObject": "Unbekanntes Objekt",
+      "notInCatalog": "Nicht im geladenen Katalog",
+      "privacyNote": "Die Zahlen sind anonym und über alle KeepTrack-Nutzer zusammengefasst.",
+      "help": {
+        "overview": "Meistverfolgt zeigt die Objekte, die KeepTrack-Nutzer gerade am häufigsten ansehen, ähnlich wie die Listen der meistverfolgten Flüge bei Flugtrackern. So findest du schnell Starts, Wiedereintritte und andere Objekte aus den Nachrichten.",
+        "tabsHeading": "Die zwei Listen",
+        "tabs": "<strong>Top 25</strong> listet die am häufigsten verfolgten Objekte des letzten Tages. <strong>Neu &amp; im Trend</strong> zeigt die beliebtesten Objekte, die am Vortag nicht in den Top 25 waren, damit neue und interessante Objekte nicht hinter den üblichen Favoriten verschwinden.",
+        "howToUse": "<ol><li>Öffne <strong>Meistverfolgt</strong> in der Seitenleiste.</li><li>Wechsle zwischen <strong>Top 25</strong> und <strong>Neu &amp; im Trend</strong>.</li><li>Klicke auf eine Zeile, um das Objekt auszuwählen und dorthin zu fliegen.</li><li>Klicke auf <strong>Aktualisieren</strong> für die neuesten Zahlen.</li></ol>",
+        "tip1": "Der Balken zeigt die Beliebtheit eines Objekts im Verhältnis zur ersten Zeile derselben Liste.",
+        "tip2": "Ausgegraute Zeilen sind Objekte, die nicht im geladenen Katalog sind und daher nicht ausgewählt werden können."
+      }
+    }
+  }
+}

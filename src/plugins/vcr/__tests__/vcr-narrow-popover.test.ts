@@ -21,10 +21,19 @@ describe('VcrPlugin narrow-width popover (#367)', () => {
     expect(status.getAttribute('role')).toBe('button');
     status.click();
     expect(vcr.classList.contains('vcr-popover-open')).toBe(true);
+    // Stacking: while open it sits under <body>, outside #nav-wrapper's stacking context (the Pro timeline is z 10001 inside it).
+    expect(vcr.parentElement).toBe(document.body);
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(vcr.classList.contains('vcr-popover-open')).toBe(false);
+    expect(vcr.parentElement?.id).toBe('nav-wrapper');
     status.click();
     document.body.click();
     expect(vcr.classList.contains('vcr-popover-open')).toBe(false);
+  });
+
+  it('keeps VcrPlugin enabled on phones (#367)', async () => {
+    const { MobileManager } = await import('@app/app/ui/mobileManager');
+
+    expect(MobileManager.MOBILE_PLUGINS).toContain('VcrPlugin');
   });
 });

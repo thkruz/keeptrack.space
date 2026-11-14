@@ -119,8 +119,46 @@ export class VcrPlugin extends KeepTrackPlugin {
       status.setAttribute('tabindex', '0');
       status.dataset.vcrToggle = 'true';
     }
-    const toggle = () => document.getElementById('vcr-container')?.classList.toggle('vcr-popover-open');
-    const close = () => document.getElementById('vcr-container')?.classList.remove('vcr-popover-open');
+    // #nav-wrapper is its own stacking context, so the Pro access timeline (z 10001) paints over anything inside it.
+    // While open the container lives directly under <body> (z-index in vcr.css), and goes back to the bar on close.
+    const open = (vcr: HTMLElement) => {
+      if (!vcr.dataset.vcrHome) {
+        vcr.dataset.vcrHome = 'nav';
+        document.body.appendChild(vcr);
+      }
+      vcr.classList.add('vcr-popover-open');
+    };
+    const close = () => {
+      const vcr = document.getElementById('vcr-container');
+
+      if (!vcr) {
+        return;
+      }
+      vcr.classList.remove('vcr-popover-open');
+      if (vcr.dataset.vcrHome) {
+        delete vcr.dataset.vcrHome;
+        const navRight = document.getElementById(TopMenu.TOP_RIGHT_ID);
+        const navWrapper = document.getElementById(TopMenu.NAV_WRAPPER_ID);
+
+        if (navRight?.parentElement) {
+          navRight.before(vcr);
+        } else {
+          navWrapper?.appendChild(vcr);
+        }
+      }
+    };
+    const toggle = () => {
+      const vcr = document.getElementById('vcr-container');
+
+      if (!vcr) {
+        return;
+      }
+      if (vcr.classList.contains('vcr-popover-open')) {
+        close();
+      } else {
+        open(vcr);
+      }
+    };
 
     document.addEventListener('click', (evt) => {
       const target = evt.target as Element | null;

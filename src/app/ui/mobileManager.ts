@@ -72,6 +72,8 @@ export class MobileManager {
     'SatInfoBoxDoppler',
     // Added 2026-11-13 (#157): the access timeline strip has no other entry point; phone CSS gives it 44 px targets.
     'AccessTimelinePlugin',
+    // Added 2026-11-14 (#367): the clock label opens the rewind/play/forward popover; the plugin must exist on phones.
+    'VcrPlugin',
   ];
 
   static checkMobileMode() {

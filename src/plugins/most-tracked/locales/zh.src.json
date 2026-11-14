@@ -20,7 +20,9 @@
       "unknownObject": "未知对象",
       "notInCatalog": "不在已加载的目录中",
       "unavailable": "“最多追踪”暂时不可用，几分钟后会恢复。",
-      "privacyNote": "在 KeepTrack 中选择过该对象的大致人数。匿名汇总。",
+      "selections": "选择次数：{{value}}",
+      "people": "人数：{{value}}",
+      "privacyNote": "统计的是过去一天在 KeepTrack 中的选择次数，每人每个对象最多计 3 次。为近似的匿名数据。",
       "help": {
         "overview": "“最多追踪”显示 KeepTrack 用户当前最常查看的对象，类似航班追踪网站上的“最多追踪航班”列表。可以快速找到发射、再入以及新闻中的其他对象。",
         "tabsHeading": "两个列表",

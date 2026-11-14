@@ -27,14 +27,20 @@ export const MOST_TRACKED_MAX_ROWS = 25;
 /** One ranked object in a Most Tracked list. */
 export interface MostTrackedEntry {
   /**
-   * 1-based display rank. Objects with the same count share a rank
-   * (1, 2, 2, 4), because tied counts are common while traffic is low.
+   * 1-based display rank. The server ranks by count, then users, then NORAD;
+   * rows with the same count and users are a real tie and share a rank
+   * (1, 2, 2, 4). The NORAD tie-break only makes the order stable.
    */
   rank: number;
   /** NORAD catalog number as sent by the server (kept as a string, never parsed). */
   norad: string;
-  /** Approximate number of distinct users who selected the object in the window (0 or more). */
+  /**
+   * In-app selections in the window, each user (by IP) counted at most 3
+   * times per object. Approximate (sampled). Drives the rank and the bar.
+   */
   count: number;
+  /** Distinct users who selected the object, or null when the server did not send it. */
+  users: number | null;
 }
 
 /**
@@ -70,8 +76,8 @@ const toNorad_ = (value: unknown): string | null => {
  * Validates one list. Bad rows are dropped rather than failing the whole
  * payload, duplicates keep their best rank, and the result is sorted by the
  * server's rank and capped at {@link MOST_TRACKED_MAX_ROWS}. Display ranks are
- * then recomputed as competition ranks: dropped rows leave no gaps, and equal
- * counts share a rank.
+ * then recomputed as competition ranks: dropped rows leave no gaps, and rows
+ * with equal count and users share a rank.
  */
 export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
   if (!Array.isArray(value)) {
@@ -88,6 +94,7 @@ export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
     const norad = toNorad_(row.norad_cat_id);
     const count = typeof row.count === 'number' && Number.isFinite(row.count) && row.count >= 0 ? row.count : null;
     const rank = typeof row.rank === 'number' && Number.isFinite(row.rank) ? row.rank : index + 1;
+    const users = typeof row.users === 'number' && Number.isInteger(row.users) && row.users >= 0 ? row.users : null;
 
     if (norad === null || count === null) {
       return;
@@ -96,16 +103,16 @@ export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
     const existing = byNorad.get(norad);
 
     if (!existing || rank < existing.rank) {
-      byNorad.set(norad, { rank, norad, count });
+      byNorad.set(norad, { rank, norad, count, users });
     }
   });
 
   const sorted = [...byNorad.values()].sort((a, b) => a.rank - b.rank).slice(0, MOST_TRACKED_MAX_ROWS);
 
   return sorted.map((entry, i) => {
-    const firstWithCount = sorted.findIndex((other) => other.count === entry.count);
+    const firstTied = sorted.findIndex((other) => other.count === entry.count && other.users === entry.users);
 
-    return { ...entry, rank: firstWithCount === -1 ? i + 1 : firstWithCount + 1 };
+    return { ...entry, rank: firstTied === -1 ? i + 1 : firstTied + 1 };
   });
 };
 

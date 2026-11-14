@@ -6,11 +6,11 @@ const MOCK_RESPONSE = {
   generated_at: '2026-11-14T12:00:00Z',
   window_hours: 24,
   top: [
-    { rank: 1, norad_cat_id: '25544', count: 12 },
-    { rank: 2, norad_cat_id: '20580', count: 6 },
-    { rank: 3, norad_cat_id: '9999999', count: 3 },
+    { rank: 1, norad_cat_id: '25544', count: 12, users: 4 },
+    { rank: 2, norad_cat_id: '20580', count: 6, users: 2 },
+    { rank: 3, norad_cat_id: '9999999', count: 3, users: 1 },
   ],
-  trending: [{ rank: 1, norad_cat_id: '48274', count: 2 }],
+  trending: [{ rank: 1, norad_cat_id: '48274', count: 2, users: 1 }],
 };
 const ENDPOINT = '**/v4/stats/most-tracked';
 
@@ -81,6 +81,19 @@ test.describe('MostTracked Plugin', () => {
     await expect(issRow).toBeEnabled();
     await issRow.click();
     await expect(page.locator('#sat-infobox')).toBeVisible({ timeout: 5_000 });
+  });
+
+  test('is available on real phones (mobile plugin allowlist)', async ({ page }) => {
+    await page.route(ENDPOINT, (route) => route.fulfill({ json: MOCK_RESPONSE }));
+
+    // isForceMobileMode runs the real phone path, where plugins outside MobileManager.MOBILE_PLUGINS are switched off.
+    // The plugin is deliberately not force-enabled here.
+    await waitForAppReady(page, {
+      settings: { isDisableLoginGate: true, isForceMobileMode: true },
+    });
+
+    await openMenu(page);
+    await expect(page.locator('#most-tracked-top-list button.most-tracked-row')).toHaveCount(3);
   });
 
   test('a 503 closes the menu and disables the icon, with no toast', async ({ page }) => {

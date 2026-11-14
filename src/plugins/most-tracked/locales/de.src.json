@@ -20,7 +20,9 @@
       "unknownObject": "Unbekanntes Objekt",
       "notInCatalog": "Nicht im geladenen Katalog",
       "unavailable": "Meistverfolgt ist gerade nicht verfügbar. In ein paar Minuten ist es wieder da.",
-      "privacyNote": "Ungefähre Anzahl der Personen, die das Objekt in KeepTrack ausgewählt haben. Anonym und zusammengefasst.",
+      "selections": "Auswahlen: {{value}}",
+      "people": "Personen: {{value}}",
+      "privacyNote": "Gezählt werden Auswahlen in KeepTrack am letzten Tag, höchstens 3 pro Person und Objekt. Ungefähr und anonym.",
       "help": {
         "overview": "Meistverfolgt zeigt die Objekte, die KeepTrack-Nutzer gerade am häufigsten ansehen, ähnlich wie die Listen der meistverfolgten Flüge bei Flugtrackern. So findest du schnell Starts, Wiedereintritte und andere Objekte aus den Nachrichten.",
         "tabsHeading": "Die zwei Listen",

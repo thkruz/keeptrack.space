@@ -20,7 +20,9 @@
       "unknownObject": "Objet inconnu",
       "notInCatalog": "Absent du catalogue chargé",
       "unavailable": "Les plus suivis est indisponible pour le moment. Réessayez dans quelques minutes.",
-      "privacyNote": "Nombre approximatif de personnes ayant sélectionné chaque objet dans KeepTrack. Anonyme et agrégé.",
+      "selections": "Sélections : {{value}}",
+      "people": "Personnes : {{value}}",
+      "privacyNote": "Les décomptes sont les sélections dans KeepTrack sur la dernière journée, 3 au maximum par personne et par objet. Approximatif et anonyme.",
       "help": {
         "overview": "Les plus suivis affiche les objets que les utilisateurs de KeepTrack regardent le plus en ce moment, comme les listes de vols les plus suivis des sites de suivi aérien. C'est un moyen rapide de trouver les lancements, les rentrées atmosphériques et les autres objets d'actualité.",
         "tabsHeading": "Les deux listes",

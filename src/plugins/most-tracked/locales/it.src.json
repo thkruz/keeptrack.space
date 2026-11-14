@@ -20,7 +20,9 @@
       "unknownObject": "Oggetto sconosciuto",
       "notInCatalog": "Non presente nel catalogo caricato",
       "unavailable": "Più seguiti non è disponibile al momento. Tornerà tra qualche minuto.",
-      "privacyNote": "Numero approssimativo di persone che hanno selezionato ogni oggetto in KeepTrack. Anonimo e aggregato.",
+      "selections": "Selezioni: {{value}}",
+      "people": "Persone: {{value}}",
+      "privacyNote": "Si contano le selezioni in KeepTrack nell'ultimo giorno, al massimo 3 per persona e oggetto. Approssimativo e anonimo.",
       "help": {
         "overview": "Più seguiti mostra gli oggetti che gli utenti di KeepTrack stanno guardando di più in questo momento, come gli elenchi dei voli più seguiti dei siti di tracciamento aereo. È un modo rapido per trovare lanci, rientri e altri oggetti di attualità.",
         "tabsHeading": "I due elenchi",

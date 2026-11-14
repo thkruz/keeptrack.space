@@ -20,7 +20,9 @@
       "unknownObject": "Unknown object",
       "notInCatalog": "Not in the loaded catalog",
       "unavailable": "Most Tracked is unavailable right now. It will be back in a few minutes.",
-      "privacyNote": "Approximate number of people who selected each object in KeepTrack. Anonymous and aggregated.",
+      "selections": "Selections: {{value}}",
+      "people": "People: {{value}}",
+      "privacyNote": "Counts are selections in KeepTrack over the last day, at most 3 per person per object. Approximate and anonymous.",
       "help": {
         "overview": "Most Tracked shows the objects KeepTrack users are looking at most right now, like the most-tracked lists on flight trackers. It is a quick way to find launches, reentries and other objects in the news.",
         "tabsHeading": "The Two Lists",

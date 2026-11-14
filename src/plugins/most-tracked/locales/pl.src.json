@@ -20,7 +20,9 @@
       "unknownObject": "Nieznany obiekt",
       "notInCatalog": "Brak w załadowanym katalogu",
       "unavailable": "Najczęściej śledzone są teraz niedostępne. Wrócą za kilka minut.",
-      "privacyNote": "Przybliżona liczba osób, które wybrały dany obiekt w KeepTrack. Anonimowo i zbiorczo.",
+      "selections": "Wybrania: {{value}}",
+      "people": "Osoby: {{value}}",
+      "privacyNote": "Liczone są wybrania w KeepTrack z ostatniej doby, maksymalnie 3 na osobę i obiekt. Wartości przybliżone i anonimowe.",
       "help": {
         "overview": "Najczęściej śledzone pokazuje obiekty, które użytkownicy KeepTrack oglądają teraz najczęściej, podobnie jak listy najczęściej śledzonych lotów w serwisach śledzenia samolotów. To szybki sposób na znalezienie startów, wejść w atmosferę i innych obiektów z wiadomości.",
         "tabsHeading": "Dwie listy",

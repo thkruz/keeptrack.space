@@ -2,7 +2,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { hasBottomIcon, hasHelp, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
-import { formatListAge, MOST_TRACKED_RETRY_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
+import { formatListAge, MOST_TRACKED_RETRY_MS, MOST_TRACKED_TIMEOUT_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
 import { MOST_TRACKED_MAX_ROWS, parseMostTrackedList, parseMostTrackedResponse, relativePopularity } from '@app/plugins/most-tracked/most-tracked-data';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -18,10 +18,10 @@ const payload = {
   generated_at: '2026-11-14T12:00:00Z',
   window_hours: 24,
   top: [
-    { rank: 1, norad_cat_id: KNOWN_NORAD, count: 400 },
-    { rank: 2, norad_cat_id: MISSING_NORAD, count: 100 },
+    { rank: 1, norad_cat_id: KNOWN_NORAD, count: 9, users: 3 },
+    { rank: 2, norad_cat_id: MISSING_NORAD, count: 4, users: 2 },
   ],
-  trending: [{ rank: 1, norad_cat_id: KNOWN_NORAD, count: 50 }],
+  trending: [{ rank: 1, norad_cat_id: KNOWN_NORAD, count: 3, users: 1 }],
 };
 
 const okResponse = (body: unknown) => ({ ok: true, status: 200, json: () => Promise.resolve(body) }) as unknown as Response;
@@ -85,7 +85,8 @@ describe('MostTracked data parsing', () => {
   it('accepts a payload with only one list', () => {
     const data = parseMostTrackedResponse({ top: [{ norad_cat_id: '25544', count: 3 }] });
 
-    expect(data?.top).toEqual([{ rank: 1, norad: '25544', count: 3 }]);
+    // users is optional: missing means null, not 0.
+    expect(data?.top).toEqual([{ rank: 1, norad: '25544', count: 3, users: null }]);
     expect(data?.trending).toEqual([]);
     expect(data?.generatedAt).toBeNull();
     expect(data?.windowHours).toBeNull();
@@ -110,8 +111,8 @@ describe('MostTracked data parsing', () => {
     ]);
 
     expect(list).toEqual([
-      { rank: 1, norad: '1', count: 5 },
-      { rank: 2, norad: '4', count: 2 },
+      { rank: 1, norad: '1', count: 5, users: null },
+      { rank: 2, norad: '4', count: 2, users: null },
     ]);
   });
 
@@ -119,17 +120,28 @@ describe('MostTracked data parsing', () => {
     expect(parseMostTrackedList([{ rank: 1, norad_cat_id: '100855', count: 2 }])[0].norad).toBe('100855');
   });
 
-  it('gives tied counts the same rank', () => {
-    // The live endpoint currently returns mostly count 1 (low traffic).
+  it('shares a rank only when count and users both tie', () => {
+    // Shape and values from the live endpoint (2026-11-14 22:03Z): ranked by count, then users, then NORAD.
     const list = parseMostTrackedList([
-      { rank: 1, norad_cat_id: '25544', count: 3 },
-      { rank: 2, norad_cat_id: '57770', count: 2 },
-      { rank: 3, norad_cat_id: '7213', count: 2 },
-      { rank: 4, norad_cat_id: '100533', count: 1 },
-      { rank: 5, norad_cat_id: '100855', count: 1 },
+      { rank: 1, norad_cat_id: '25544', count: 9, users: 3 },
+      { rank: 2, norad_cat_id: '57770', count: 4, users: 2 },
+      { rank: 3, norad_cat_id: '7213', count: 4, users: 2 },
+      { rank: 4, norad_cat_id: '100855', count: 3, users: 2 },
+      { rank: 5, norad_cat_id: '125', count: 3, users: 1 },
+      { rank: 6, norad_cat_id: '1293', count: 3, users: 1 },
     ]);
 
-    expect(list.map((e) => e.rank)).toEqual([1, 2, 2, 4, 4]);
+    expect(list.map((e) => e.rank)).toEqual([1, 2, 2, 4, 5, 5]);
+  });
+
+  it('parses users and ignores invalid values', () => {
+    const list = parseMostTrackedList([
+      { rank: 1, norad_cat_id: '1', count: 9, users: 3 },
+      { rank: 2, norad_cat_id: '2', count: 4, users: -1 },
+      { rank: 3, norad_cat_id: '3', count: 4, users: 1.5 },
+    ]);
+
+    expect(list.map((e) => e.users)).toEqual([3, null, null]);
   });
 
   it('falls back to array order when rank is missing', () => {
@@ -197,6 +209,17 @@ describe('MostTracked fetching and rendering', () => {
     expect(getEl('most-tracked-top-empty')?.hidden).toBe(true);
   });
 
+  it('puts selections and people in the count tooltip and accessible label', async () => {
+    await internals(plugin).fetchData_();
+
+    const count = getEl('most-tracked-top-list')?.querySelector('button.most-tracked-row:not(:disabled) .most-tracked-count');
+
+    expect(count?.textContent).toBe('9');
+    expect(count?.getAttribute('kt-tooltip')).toContain('9');
+    expect(count?.getAttribute('kt-tooltip')).toContain('3');
+    expect(count?.getAttribute('aria-label')).toBe(count?.getAttribute('kt-tooltip'));
+  });
+
   it('greys out rows for objects that are not in the loaded catalog', async () => {
     await internals(plugin).fetchData_();
 
@@ -246,7 +269,42 @@ describe('MostTracked fetching and rendering', () => {
   it('fetches the documented endpoint with a plain request (no API key header)', async () => {
     await internals(plugin).fetchData_();
 
-    expect(fetchMock).toHaveBeenCalledWith('https://api.keeptrack.space/v4/stats/most-tracked');
+    expect(fetchMock).toHaveBeenCalledWith('https://api.keeptrack.space/v4/stats/most-tracked', expect.objectContaining({ signal: expect.any(AbortSignal) }));
+    const init = fetchMock.mock.calls[0][1] as RequestInit;
+
+    expect(init.headers).toBeUndefined();
+  });
+
+  it('gives up on a hung request and makes the menu unavailable', async () => {
+    vi.useFakeTimers();
+    fetchMock.mockImplementation(
+      (_url: string, init: RequestInit) =>
+        new Promise((_resolve, reject) => {
+          init.signal?.addEventListener('abort', () => reject(new DOMException('Aborted', 'AbortError')));
+        })
+    );
+
+    const pending = internals(plugin).fetchData_();
+
+    await vi.advanceTimersByTimeAsync(MOST_TRACKED_TIMEOUT_MS);
+    await pending;
+
+    expect(plugin.isIconDisabled).toBe(true);
+    expect((getEl('most-tracked-refresh-btn') as HTMLButtonElement).disabled).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it('keeps the icon disabled if something re-enables it inside the retry window', async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+    await internals(plugin).fetchData_();
+
+    // e.g. the base plugin's connectivity handler after the network comes back
+    plugin.setBottomIconToEnabled();
+    plugin.isMenuButtonActive = true;
+    plugin.onBottomIconClick();
+
+    expect(plugin.isIconDisabled).toBe(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('makes the menu unavailable without a toast on 503, then recovers', async () => {

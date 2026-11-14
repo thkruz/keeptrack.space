@@ -51,6 +51,9 @@ const TABS_ID = 'most-tracked-tabs';
  */
 export const MOST_TRACKED_RETRY_MS = 10 * 60 * 1000;
 
+/** A request that has not answered by then counts as unavailable, so Refresh never stays busy forever. */
+export const MOST_TRACKED_TIMEOUT_MS = 15_000;
+
 /** Which list a container shows. */
 export type MostTrackedListKind = 'top' | 'trending';
 
@@ -88,7 +91,7 @@ export class MostTracked extends KeepTrackPlugin {
   requiresInternet = true;
 
   /**
-   * Distinct users per object over the last 24 hours (see #1463). Public, no
+   * Selections per object over the last 24 hours, plus distinct users (see #1463). Public, no
    * API key, CORS open and cached 10 minutes at the edge, so a plain fetch on
    * every open is fine. apiFetch is deliberately not used: it would attach the
    * key header and can toast on a 401.
@@ -116,6 +119,13 @@ export class MostTracked extends KeepTrackPlugin {
 
   onBottomIconClick(): void {
     if (!this.isMenuButtonActive) {
+      return;
+    }
+
+    // The base plugin can re-enable the icon (e.g. when the connection comes back) inside the retry window.
+    if (this.isUnavailable_) {
+      this.setBottomIconToDisabled(true);
+
       return;
     }
 
@@ -247,8 +257,11 @@ export class MostTracked extends KeepTrackPlugin {
     this.isFetching_ = true;
     this.setStatus_('loading');
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), MOST_TRACKED_TIMEOUT_MS);
+
     try {
-      const response = await fetch(this.dataSrc_);
+      const response = await fetch(this.dataSrc_, { signal: controller.signal });
 
       if (!response.ok) {
         throw new Error(`Most Tracked endpoint returned ${response.status}`);
@@ -266,6 +279,7 @@ export class MostTracked extends KeepTrackPlugin {
     } catch (err) {
       this.markUnavailable_((err as Error).message);
     } finally {
+      clearTimeout(timeout);
       this.isFetching_ = false;
     }
   }
@@ -278,7 +292,8 @@ export class MostTracked extends KeepTrackPlugin {
   protected markUnavailable_(reason: string): void {
     errorManagerInstance.log(`MostTracked: ${reason}`);
     this.isUnavailable_ = true;
-    this.status_ = this.data_ ? 'ready' : 'idle';
+    // Re-render so Refresh is not left disabled from the 'loading' state when the menu comes back.
+    this.setStatus_(this.data_ ? 'ready' : 'idle');
     this.setBottomIconToDisabled(true);
 
     if (this.retryTimer_) {
@@ -434,6 +449,8 @@ export class MostTracked extends KeepTrackPlugin {
 
     count.className = 'most-tracked-count';
     count.textContent = entry.count.toLocaleString(i18next.language);
+    // Also the accessible name of the cell, so screen readers hear "Selections: 9 · People: 3", not just "9".
+    count.setAttribute('aria-label', MostTracked.countDetail_(entry));
 
     row.append(rank, label, bar, count);
     item.appendChild(row);
@@ -443,9 +460,20 @@ export class MostTracked extends KeepTrackPlugin {
       item.classList.add('most-tracked-item--missing');
       item.setAttribute('kt-tooltip', tr('notInCatalog'));
       PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(item);
+    } else {
+      // Disabled rows get no pointer events, so only selectable rows carry the count tooltip.
+      count.setAttribute('kt-tooltip', MostTracked.countDetail_(entry));
+      PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(count);
     }
 
     return item;
+  }
+
+  /** "Selections: 9 · People: 3" (people omitted when the server did not send users). Plural-free in every locale. */
+  private static countDetail_(entry: MostTrackedEntry): string {
+    const selections = tr('selections', { value: entry.count.toLocaleString(i18next.language) });
+
+    return entry.users === null ? selections : `${selections} · ${tr('people', { value: entry.users.toLocaleString(i18next.language) })}`;
   }
 
   // =========================================================================

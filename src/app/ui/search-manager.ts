@@ -89,6 +89,8 @@ export class SearchManager {
   static readonly RESULTS_OPEN_BODY_CLASS = 'search-results-open';
 
   isSearchOpen = false;
+  /** Set by Watchlist while its list owns the highlight group, so an empty search box does not drop the group (#349). */
+  isGroupHighlightHeld = false;
   private isResultsOpen_ = false;
 
   get isResultsOpen(): boolean {
@@ -548,6 +550,8 @@ export class SearchManager {
 
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     this.selectedIndex_ = -1;
+    // Any new search replaces the group the watchlist was holding; the watchlist re-asserts it after its own call.
+    this.isGroupHighlightHeld = false;
 
     const searchInput = getEl('search', true);
     const isUserTyping = typeof document !== 'undefined' && searchInput !== null && document.activeElement === searchInput;

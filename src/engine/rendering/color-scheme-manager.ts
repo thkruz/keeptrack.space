@@ -1088,6 +1088,7 @@ export class ColorSchemeManager {
 
       if (
         ServiceLocator.getUiManager().searchManager.getCurrentSearch() === '' &&
+        !ServiceLocator.getUiManager().searchManager.isGroupHighlightHeld &&
         watchlistTransform !== 'translateX(0px)' &&
         !PluginRegistry.getPlugin(TimeMachine)?.isMenuButtonActive &&
         !(<TimeMachine>PluginRegistry.getPlugin(TimeMachine))?.isTimeMachineRunning

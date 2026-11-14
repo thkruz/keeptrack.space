@@ -74,6 +74,8 @@ export class MobileManager {
     'AccessTimelinePlugin',
     // Added 2026-11-14 (#367): the clock label opens the rewind/play/forward popover; the plugin must exist on phones.
     'VcrPlugin',
+    // Added 2026-11-14 (#383): without it the welcome tour never starts on phones (plugin config was forced to false).
+    'OnboardingPlugin',
   ];
 
   static checkMobileMode() {

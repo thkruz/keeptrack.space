@@ -21,6 +21,10 @@ describe('phone drawer and touch targets', () => {
     }
   });
 
+  it('#383 keeps the onboarding plugin on phones so the welcome tour can start', () => {
+    expect(MobileManager.MOBILE_PLUGINS).toContain('OnboardingPlugin');
+  });
+
   it('#153 puts the account row first in the phone drawer', () => {
     expect(tail).toMatch(/\.plugin-drawer\.mobile-mode \.drawer-user-account \{\s*order: -2;/u);
   });

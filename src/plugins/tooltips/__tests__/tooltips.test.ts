@@ -258,4 +258,46 @@ describe('TooltipsPlugin behavior', () => {
     expect(div.innerHTML).toBe('Medium Earth orbit');
     expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
   });
+  it('refreshes a visible tooltip when its target text changes with no pointer movement (#354)', async () => {
+    vi.clearAllTimers();
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="420.1234 km" id="tt-apogee"></div>');
+    const el = document.getElementById('tt-apogee') as HTMLElement;
+
+    plugin.createTooltip(el);
+    vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ width: 10, height: 10, top: 0, left: 0, right: 10, bottom: 10, x: 0, y: 0, toJSON: () => '' });
+    vi.spyOn(el, 'matches').mockImplementation((sel: string) => sel === ':hover');
+
+    el.dispatchEvent(new Event('mouseenter'));
+    vi.advanceTimersByTime(200);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    expect(div.innerHTML).toBe('420.1234 km');
+
+    // Selection change: the info box rewrites the attribute in place, nobody calls refreshTooltip
+    el.setAttribute('kt-tooltip', '35786.0000 km');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(div.innerHTML).toBe('35786.0000 km');
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    // A second change is still observed after the re-render re-armed the watchdog
+    el.setAttribute('kt-tooltip', '1200.0000 km');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(div.innerHTML).toBe('1200.0000 km');
+  });
+  it('shows the text current when the show delay ends, not the text at mouseenter (#354)', () => {
+    vi.clearAllTimers();
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="old" id="tt-delay"></div>');
+    const el = document.getElementById('tt-delay') as HTMLElement;
+
+    plugin.createTooltip(el);
+    el.dispatchEvent(new Event('mouseenter'));
+    el.setAttribute('kt-tooltip', 'new');
+    vi.advanceTimersByTime(200);
+    expect((document.getElementById('tooltip') as HTMLElement).innerHTML).toBe('new');
+  });
 });

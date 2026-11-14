@@ -46,6 +46,12 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   /** The element the visible tooltip belongs to, so a watchdog can clear it when that element stops being hovered or shown (#287). */
   private activeTarget_: HTMLElement | null = null;
   private watchTimer_: ReturnType<typeof setInterval> | null = null;
+  /**
+   * Watches the visible tooltip's target for kt-tooltip changes. Values like the info box's stored-digit tooltips are
+   * rewritten in place when the selection changes while the pointer stays still; no mouseenter fires, so without this
+   * the bubble kept the previous object's value (#354).
+   */
+  private attrObserver_: MutationObserver | null = null;
 
   addHtml(): void {
     super.addHtml();
@@ -162,8 +168,14 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         if (!isHovered || !(el as HTMLElement).isConnected) {
           return;
         }
+        // Read the text again: the selection may have changed during the delay (#354)
+        const currentText = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
 
-        this.showTooltip(el as HTMLElement, text);
+        if (!currentText) {
+          return;
+        }
+
+        this.showTooltip(el as HTMLElement, currentText);
         this.isVisible_ = true;
       }, TooltipsPlugin.SHOW_DELAY_);
     });
@@ -290,7 +302,23 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       clearInterval(this.watchTimer_);
       this.watchTimer_ = null;
     }
+    this.attrObserver_?.disconnect();
     this.activeTarget_ = null;
+  }
+
+  /** Re-renders the visible tooltip whenever its target's kt-tooltip attribute changes (#354). */
+  private observeTarget_(targetEl: HTMLElement): void {
+    if (typeof MutationObserver === 'undefined') {
+      return;
+    }
+    this.attrObserver_ ??= new MutationObserver(() => {
+      const target = this.activeTarget_;
+
+      if (target) {
+        this.refreshTooltip(target);
+      }
+    });
+    this.attrObserver_.observe(targetEl, { attributes: true, attributeFilter: [this.tooltipTag] });
   }
 
   hideTooltip() {
@@ -391,6 +419,19 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       }
     }
 
+    // Collisions probability badge: open beside the side menu so the long probability text never covers the Export
+    // buttons or the neighbouring cards (#356)
+    const probMenuEl = targetEl.matches('.cp-prob') ? targetEl.closest<HTMLElement>('.side-menu-parent') : null;
+
+    if (probMenuEl) {
+      const menuRight = probMenuEl.getBoundingClientRect().right;
+
+      if (menuRight + 8 + tooltipRect.width + 8 <= viewportWidth) {
+        left = menuRight + 8;
+        top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
+      }
+    }
+
     tooltipDiv.style.left = `${left}px`;
     tooltipDiv.style.top = `${top}px`;
     tooltipDiv.classList.add('kt-tooltip-visible');
@@ -398,5 +439,6 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     // bubble at its first tick (#277) and refreshTooltip never matches (#274).
     this.startWatchdog_();
     this.activeTarget_ = targetEl;
+    this.observeTarget_(targetEl);
   }
 }

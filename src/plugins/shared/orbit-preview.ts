@@ -208,8 +208,14 @@ export class OrbitPreview {
       const sv = Sgp4.propagate(satrec, minutesAfterEpoch);
       const pos = sv.position as TemeVec3 | boolean;
 
-      if (!pos || typeof pos === 'boolean') {
-        continue;
+      /*
+       * One failed sample means SGP4 cannot propagate this element set over its own
+       * period (e.g. e=0.999 at 16 rev/day puts perigee inside the Earth). Joining
+       * only the samples that succeeded drew jagged orange segments for an orbit the
+       * import then rejects (#336), so draw nothing instead.
+       */
+      if (!pos || typeof pos === 'boolean' || satrec.error) {
+        return [];
       }
 
       points.push([pos.x, pos.y, pos.z]);

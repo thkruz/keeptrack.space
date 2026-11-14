@@ -30,8 +30,20 @@ describe('phone floating clearance CSS', () => {
     const strip = /--sat-infobox-footer-height: (\d+)px/u.exec(css)?.[1];
 
     expect(Number(strip)).toBeLessThanOrEqual(48);
-    expect(css).toMatch(/\.drawer-utility-footer \{[^}]*bottom: env\(safe-area-inset-bottom[^}]*min-width: 48px[^}]*min-height: 48px/u);
-    expect(css).toMatch(/\.drawer-utility-footer::before \{[^}]*width: 44px[^}]*height: 44px/u);
+    expect(css).toMatch(/#drawer-utility-footer \{[^}]*bottom: env\(safe-area-inset-bottom[^}]*min-width: 48px[^}]*min-height: 48px[^}]*height: 48px/u);
+    expect(css).toMatch(/#drawer-utility-footer::before \{[^}]*width: 44px[^}]*height: 44px/u);
+  });
+
+  it('beats the plugin-drawer pill rules by id so the pill sits in the strip, not 12px above it (#464)', () => {
+    expect(css).toMatch(/body #drawer-utility-footer:not\(\.expanded\):hover \{[^}]*max-width: 48px[^}]*padding: 1px/u);
+    expect(css).not.toMatch(/body \.drawer-utility-footer \{/u);
+  });
+
+  it('tightens read-only info rows to 30px and trims row padding (#464)', () => {
+    const info = readFileSync(resolve(__dirname, '../../../plugins/sat-info-box/sat-info-box.css'), 'utf8');
+
+    expect(info).toMatch(/#sat-infobox \.sat-info-row \{\s*padding-block: 0;/u);
+    expect(info).toMatch(/\.sat-info-row:not\(:has\([^{]*\{\s*min-height: 30px/u);
   });
 
   it('keeps header icon buttons 32px and the title text shrinkable', () => {
@@ -51,7 +63,7 @@ describe('phone floating clearance CSS', () => {
 
     expect(css).toMatch(/#datetime #datetime-zone \{[^}]*height: 44px/u);
     expect(css).toMatch(/\.drawer-utility-icon \{[^}]*width: 44px[^}]*height: 44px/u);
-    expect(css).toMatch(/\.drawer-utility-footer::before \{[^}]*width: 44px[^}]*height: 44px/u);
+    expect(css).toMatch(/#drawer-utility-footer::before \{[^}]*width: 44px[^}]*height: 44px/u);
     expect(phoneInfo).toMatch(/\.sat-watchlist-icon \{[^}]*padding: 13px/u);
     expect(phoneInfo).toMatch(/\.sat-info-copy-values \{[^}]*min-height: 44px/u);
     expect(phoneInfo).toMatch(/\.sat-info-circle \{[^}]*width: 44px[^}]*height: 44px/u);
@@ -64,7 +76,7 @@ describe('phone floating clearance CSS', () => {
     expect(info).toMatch(/\.sat-info-key--help,\s*#sat-infobox \.sat-info-key\[kt-tooltip\] \{[^}]*min-width: 44px[^}]*min-height: 44px/u);
     expect(info).toMatch(/\.sat-info-row:has\([^)]*\) \{[^}]*min-height: 44px/u);
     expect(css).toMatch(/\.drawer-utility-icon \{[^}]*width: 44px !important[^}]*height: 44px !important/u);
-    expect(css).toMatch(/\.drawer-utility-footer \{[^}]*min-width: 48px[^}]*min-height: 48px/u);
+    expect(css).toMatch(/#drawer-utility-footer \{[^}]*min-width: 48px[^}]*min-height: 48px/u);
     expect(css).toMatch(/#datetime #datetime-zone \{[^}]*width: auto[^}]*outline-offset: -5px/u);
   });
 });

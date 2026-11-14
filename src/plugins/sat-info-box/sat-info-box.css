@@ -398,6 +398,16 @@
   #sat-infobox .sat-info-row .sat-info-circle {
     margin-block: 0;
   }
+
+  /* Row density (#464): rows with a 44 px key hit area need no extra vertical padding (45 px with the divider, was 49).
+     Read-only label/value rows have nothing to tap, so they drop to a 30 px row. */
+  #sat-infobox .sat-info-row {
+    padding-block: 0;
+  }
+
+  #sat-infobox .sat-info-row:not(:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle, .sat-info-copy-values)) {
+    min-height: 30px;
+  }
 }
 
 @media (max-width: 639px) {

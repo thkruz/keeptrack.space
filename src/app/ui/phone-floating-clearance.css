@@ -201,23 +201,31 @@
 
   /* Utility pill (#464): collapsed square and expanded icons are 44 px; the pill is 48 px with 1 px padding and
      sits on the bottom edge, so the 48 px strip under the sat info box holds it exactly. */
-  body .drawer-utility-footer {
+  /* Id selectors: plugin-drawer.css restates bottom/padding for the pill (12px lift, the touch :not(.expanded):hover
+     reset to 6px padding), and the class selector here lost to it, leaving a 58 px pill 12 px above the edge that
+     covered the last row above the 48 px strip. */
+  body #drawer-utility-footer {
     bottom: env(safe-area-inset-bottom, 0px);
     max-width: 48px;
     min-width: 48px;
     min-height: 48px;
+    height: 48px;
     padding: 1px;
     box-sizing: border-box;
   }
 
-  body .drawer-utility-footer::before {
+  body #drawer-utility-footer::before {
     width: 44px;
     height: 44px;
     flex: 0 0 44px;
   }
 
-  body .drawer-utility-footer:hover,
-  body .drawer-utility-footer.expanded {
+  body #drawer-utility-footer:not(.expanded):hover {
+    max-width: 48px;
+    padding: 1px;
+  }
+
+  body #drawer-utility-footer.expanded {
     max-width: 90vw;
     padding: 1px 8px;
   }

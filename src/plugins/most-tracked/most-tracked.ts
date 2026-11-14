@@ -38,7 +38,9 @@ import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import firePng from '@public/img/icons/fire.png';
+import i18next from 'i18next';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { TooltipsPlugin } from '../tooltips/tooltips';
 import { MostTrackedData, MostTrackedEntry, parseMostTrackedResponse, relativePopularity } from './most-tracked-data';
 import './most-tracked.css';
 
@@ -55,6 +57,27 @@ export type MostTrackedStatus = 'idle' | 'loading' | 'ready' | 'error' | 'unavai
 
 type MostTrackedKey = Parameters<typeof t7e>[0];
 const tr = (key: string, params?: Record<string, string | number>): string => t7e(`plugins.MostTracked.${key}` as MostTrackedKey, params);
+
+const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ['day', 86_400_000],
+  ['hour', 3_600_000],
+  ['minute', 60_000],
+];
+
+/**
+ * Localized "5 minutes ago" for when the lists were built. Relative, so it
+ * never disagrees with the app clock's UTC/local choice.
+ */
+export const formatListAge = (generatedAt: Date, now = Date.now(), locale?: string): string => {
+  const diff = Math.max(0, now - generatedAt.getTime());
+  const [unit, ms] = RELATIVE_UNITS.find(([, size]) => diff >= size) ?? RELATIVE_UNITS[2];
+
+  try {
+    return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(-Math.floor(diff / ms), unit);
+  } catch {
+    return `${Math.floor(diff / ms)} ${unit}`;
+  }
+};
 
 export class MostTracked extends KeepTrackPlugin {
   readonly id = 'MostTracked';
@@ -92,8 +115,9 @@ export class MostTracked extends KeepTrackPlugin {
     if (this.shouldFetch_()) {
       this.fetchData_();
     } else if (this.data_) {
-      // Re-resolve cached rows: the catalog may have finished loading since the last render.
+      // Re-resolve cached rows (the catalog may have finished loading) and the list age.
       this.renderLists_();
+      this.renderStatus_();
     }
   }
 
@@ -138,7 +162,7 @@ export class MostTracked extends KeepTrackPlugin {
     const listCard = (kind: MostTrackedListKind) => html`
       <section class="kt-section">
         <ol id="most-tracked-${kind}-list" class="most-tracked-list" aria-label="${tr(`tabs.${kind}`)}"></ol>
-        <p id="most-tracked-${kind}-empty" class="most-tracked-empty" hidden>${tr(`empty.${kind}`)}</p>
+        <p id="most-tracked-${kind}-empty" class="most-tracked-empty"></p>
       </section>
     `;
 
@@ -151,10 +175,10 @@ export class MostTracked extends KeepTrackPlugin {
       <div id="most-tracked-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="most-tracked-content" class="side-menu">
           <p id="most-tracked-status" class="most-tracked-status" role="status"></p>
-          ${tabsHtml}
           <button id="most-tracked-refresh-btn" class="kt-action waves-effect" type="button">
             <span class="kt-action-label">${tr('refresh')}</span>
           </button>
+          ${tabsHtml}
           <sub class="most-tracked-note">${tr('privacyNote')}</sub>
         </div>
       </div>
@@ -180,9 +204,9 @@ export class MostTracked extends KeepTrackPlugin {
 
     for (const kind of ['top', 'trending'] as const) {
       getEl(`most-tracked-${kind}-list`, true)?.addEventListener('click', (evt: Event) => {
-        const row = (evt.target as HTMLElement | null)?.closest<HTMLElement>('.most-tracked-row');
+        const row = (evt.target as HTMLElement | null)?.closest<HTMLButtonElement>('button.most-tracked-row');
 
-        if (row?.dataset.norad && !row.classList.contains('most-tracked-row--missing')) {
+        if (row?.dataset.norad && !row.disabled) {
           this.selectByNorad_(row.dataset.norad);
         }
       });
@@ -259,29 +283,73 @@ export class MostTracked extends KeepTrackPlugin {
   }
 
   private renderStatus_(): void {
-    const statusEl = getEl('most-tracked-status', true);
+    const refreshBtn = getEl('most-tracked-refresh-btn', true) as HTMLButtonElement | null;
 
-    if (!statusEl) {
-      return;
+    if (refreshBtn) {
+      refreshBtn.disabled = this.status_ === 'loading';
+      refreshBtn.setAttribute('aria-busy', String(this.status_ === 'loading'));
     }
 
-    statusEl.dataset.status = this.status_;
+    const statusEl = getEl('most-tracked-status', true);
+
+    if (statusEl) {
+      statusEl.dataset.status = this.status_;
+      statusEl.textContent = this.statusLineText_();
+    }
+
+    this.renderPlaceholders_();
+  }
+
+  /**
+   * Text for the line above the tabs. With no lists yet the cards explain the
+   * state themselves, so the line stays empty instead of repeating them.
+   */
+  private statusLineText_(): string {
+    if (!this.data_) {
+      return '';
+    }
 
     switch (this.status_) {
       case 'loading':
-        statusEl.textContent = tr('status.loading');
-        break;
+        return tr('status.loading');
       case 'error':
-        statusEl.textContent = tr('status.error');
-        break;
-      case 'unavailable':
-        statusEl.textContent = tr('status.unavailable');
-        break;
-      case 'ready':
-        statusEl.textContent = this.readyStatusText_();
-        break;
+        // Keep showing the last good lists, but say they could not be refreshed.
+        return tr('status.error');
       default:
-        statusEl.textContent = '';
+        return this.readyStatusText_();
+    }
+  }
+
+  /** Message shown inside a list card when it has no rows: loading, error, unavailable or genuinely empty. */
+  private placeholderText_(kind: MostTrackedListKind): string {
+    if (this.data_) {
+      return tr(`empty.${kind}`);
+    }
+
+    switch (this.status_) {
+      case 'error':
+        return tr('status.error');
+      case 'unavailable':
+        return tr('status.unavailable');
+      default:
+        return tr('status.loading');
+    }
+  }
+
+  private renderPlaceholders_(): void {
+    for (const kind of ['top', 'trending'] as const) {
+      const listEl = getEl(`most-tracked-${kind}-list`, true);
+      const emptyEl = getEl(`most-tracked-${kind}-empty`, true);
+
+      if (!emptyEl) {
+        continue;
+      }
+
+      const hasRows = (listEl?.childElementCount ?? 0) > 0;
+
+      emptyEl.hidden = hasRows;
+      emptyEl.dataset.status = this.data_ ? 'empty' : this.status_;
+      emptyEl.textContent = hasRows ? '' : this.placeholderText_(kind);
     }
   }
 
@@ -294,9 +362,7 @@ export class MostTracked extends KeepTrackPlugin {
       return windowText;
     }
 
-    const time = generatedAt.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-
-    return `${windowText} · ${tr('status.updated', { time })}`;
+    return `${windowText} · ${tr('status.updated', { time: formatListAge(generatedAt, Date.now(), i18next.language) })}`;
   }
 
   private renderLists_(): void {
@@ -307,29 +373,35 @@ export class MostTracked extends KeepTrackPlugin {
   /** Rebuilds one list. Built with DOM APIs (textContent), never innerHTML, since names come from catalog data. */
   protected renderList_(kind: MostTrackedListKind, entries: MostTrackedEntry[]): void {
     const listEl = getEl(`most-tracked-${kind}-list`, true);
-    const emptyEl = getEl(`most-tracked-${kind}-empty`, true);
 
     if (!listEl) {
       return;
     }
 
     listEl.replaceChildren();
-    if (emptyEl) {
-      emptyEl.hidden = entries.length > 0;
-    }
 
     const maxCount = entries.reduce((max, entry) => Math.max(max, entry.count), 0);
 
     for (const entry of entries) {
       listEl.appendChild(this.buildRow_(entry, maxCount));
     }
+
+    this.renderPlaceholders_();
   }
 
+  /**
+   * One list item holding a native button, so keyboard and screen-reader
+   * behaviour come from the browser. Objects missing from the loaded catalog
+   * get a disabled button; the tooltip sits on the list item because disabled
+   * buttons receive no pointer events.
+   */
   private buildRow_(entry: MostTrackedEntry, maxCount: number): HTMLLIElement {
     const id = MostTracked.findObjectId_(entry.norad);
     const name = id === null ? null : ServiceLocator.getCatalogManager().getObject(id)?.name;
-    const row = document.createElement('li');
+    const item = document.createElement('li');
+    const row = document.createElement('button');
 
+    row.type = 'button';
     row.className = 'most-tracked-row';
     row.dataset.norad = entry.norad;
 
@@ -345,7 +417,7 @@ export class MostTracked extends KeepTrackPlugin {
     const nameEl = document.createElement('span');
 
     nameEl.className = 'most-tracked-name';
-    nameEl.textContent = name ?? tr('unknownObject');
+    nameEl.textContent = name || tr('unknownObject');
 
     const noradEl = document.createElement('span');
 
@@ -362,26 +434,19 @@ export class MostTracked extends KeepTrackPlugin {
     const count = document.createElement('span');
 
     count.className = 'most-tracked-count';
-    count.textContent = entry.count.toLocaleString();
+    count.textContent = entry.count.toLocaleString(i18next.language);
 
     row.append(rank, label, bar, count);
+    item.appendChild(row);
 
     if (id === null) {
-      row.classList.add('most-tracked-row--missing');
-      row.setAttribute('kt-tooltip', tr('notInCatalog'));
-      row.setAttribute('aria-disabled', 'true');
-    } else {
-      row.tabIndex = 0;
-      row.setAttribute('role', 'button');
-      row.addEventListener('keydown', (evt: KeyboardEvent) => {
-        if (evt.key === 'Enter' || evt.key === ' ') {
-          evt.preventDefault();
-          this.selectByNorad_(entry.norad);
-        }
-      });
+      row.disabled = true;
+      item.classList.add('most-tracked-item--missing');
+      item.setAttribute('kt-tooltip', tr('notInCatalog'));
+      PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(item);
     }
 
-    return row;
+    return item;
   }
 
   // =========================================================================

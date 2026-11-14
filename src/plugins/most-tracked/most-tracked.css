@@ -1,11 +1,8 @@
 /*
  * Most Tracked menu styles. The menu opts into the shared v13 card system
- * (.kt-ui-v13 + kt-section/kt-action); only the ranked list lives here.
+ * (.kt-ui-v13 + kt-section/kt-action) and keeps the app's side-menu sizing
+ * (400px from 640px up, full width on phones); only the ranked list lives here.
  */
-
-#most-tracked-menu {
-  width: 380px;
-}
 
 .most-tracked-status {
   margin: 4px 6px 8px;
@@ -24,28 +21,39 @@
   list-style: none;
 }
 
+/* Each row is a native button inside its list item. */
 .most-tracked-row {
   display: grid;
-  grid-template-columns: 2ch minmax(0, 1fr) 64px 6ch;
+  /* Fixed bar and count columns so bars line up across rows whatever the count's width. */
+  grid-template-columns: 2.5ch minmax(0, 1fr) clamp(36px, 18%, 64px) 7ch;
   gap: 8px;
   align-items: center;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
   padding: 6px 8px;
+  border: 0;
   border-radius: var(--kt-radius-sm);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
-.most-tracked-row:hover,
+.most-tracked-row:hover {
+  background: var(--kt-bg-hover);
+}
+
 .most-tracked-row:focus-visible {
   background: var(--kt-bg-hover);
-  outline: none;
+  outline: 2px solid var(--kt-accent);
+  outline-offset: -2px;
 }
 
-.most-tracked-row--missing {
+.most-tracked-row:disabled {
   cursor: default;
   opacity: 0.5;
-}
-
-.most-tracked-row--missing:hover {
   background: none;
 }
 
@@ -92,6 +100,7 @@
 }
 
 .most-tracked-count {
+  white-space: nowrap;
   font-size: 12px;
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -104,14 +113,30 @@
   color: var(--kt-text-secondary);
 }
 
+.most-tracked-empty[data-status='error'] {
+  color: var(--kt-red-400);
+}
+
+/* Placeholders and the status line take no space when they have nothing to say. */
+.most-tracked-empty:empty {
+  display: none;
+}
+
+.most-tracked-status:empty {
+  display: none;
+}
+
 .most-tracked-note {
   display: block;
   margin: 8px 6px 0;
   color: var(--kt-text-tertiary);
 }
 
-@media (max-width: 639px) {
-  #most-tracked-menu {
-    width: auto;
-  }
+#most-tracked-refresh-btn {
+  margin-bottom: 8px;
+}
+
+#most-tracked-refresh-btn[aria-busy='true'] {
+  opacity: 0.6;
+  cursor: progress;
 }

@@ -12,7 +12,7 @@
         "error": "Impossible de charger les listes. Essayez Actualiser.",
         "unavailable": "Non disponible dans cette version de KeepTrack.",
         "window": "Dernières {{hours}} heures",
-        "updated": "mis à jour à {{time}}"
+        "updated": "mis à jour {{time}}"
       },
       "empty": {
         "top": "Pas encore de données de suivi.",

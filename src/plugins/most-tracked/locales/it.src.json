@@ -12,7 +12,7 @@
         "error": "Impossibile caricare gli elenchi. Prova Aggiorna.",
         "unavailable": "Non disponibile in questa versione di KeepTrack.",
         "window": "Ultime {{hours}} ore",
-        "updated": "aggiornato alle {{time}}"
+        "updated": "aggiornato {{time}}"
       },
       "empty": {
         "top": "Ancora nessun dato di tracciamento.",

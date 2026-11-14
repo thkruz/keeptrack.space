@@ -46,14 +46,14 @@ test.describe('MostTracked Plugin', () => {
 
     await openMenu(page);
 
-    const topRows = page.locator('#most-tracked-top-list .most-tracked-row');
+    const topRows = page.locator('#most-tracked-top-list button.most-tracked-row');
 
     await expect(page.locator('#most-tracked-status')).toHaveAttribute('data-status', 'ready');
     await expect(topRows).toHaveCount(3);
-    await expect(topRows.nth(2)).toHaveClass(/most-tracked-row--missing/u);
+    await expect(topRows.nth(2)).toBeDisabled();
 
     await page.locator('a[href="#most-tracked-trending-tab"]').click();
-    await expect(page.locator('#most-tracked-trending-list .most-tracked-row')).toHaveCount(1);
+    await expect(page.locator('#most-tracked-trending-list button.most-tracked-row')).toHaveCount(1);
 
     await page.locator('#most-tracked-menu-close-btn').click();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 5_000 });
@@ -75,9 +75,9 @@ test.describe('MostTracked Plugin', () => {
 
     await openMenu(page);
 
-    const issRow = page.locator('#most-tracked-top-list .most-tracked-row[data-norad="25544"]');
+    const issRow = page.locator('#most-tracked-top-list button.most-tracked-row[data-norad="25544"]');
 
-    await expect(issRow).not.toHaveClass(/most-tracked-row--missing/u);
+    await expect(issRow).toBeEnabled();
     await issRow.click();
     await expect(page.locator('#sat-infobox')).toBeVisible({ timeout: 5_000 });
   });

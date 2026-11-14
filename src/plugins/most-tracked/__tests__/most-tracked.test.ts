@@ -2,7 +2,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { hasBottomIcon, hasHelp, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
 import { getEl } from '@app/engine/utils/get-el';
-import { MOST_TRACKED_CACHE_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
+import { formatListAge, MOST_TRACKED_CACHE_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
 import { MOST_TRACKED_MAX_ROWS, parseMostTrackedList, parseMostTrackedResponse, relativePopularity } from '@app/plugins/most-tracked/most-tracked-data';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -129,6 +129,16 @@ describe('MostTracked data parsing', () => {
     expect(parseMostTrackedList(rows)).toHaveLength(MOST_TRACKED_MAX_ROWS);
   });
 
+  it('formats the list age relative to now', () => {
+    const now = Date.parse('2026-11-14T12:00:00Z');
+
+    expect(formatListAge(new Date(now - 5 * 60_000), now, 'en')).toBe('5 minutes ago');
+    expect(formatListAge(new Date(now - 2 * 3_600_000), now, 'en')).toBe('2 hours ago');
+    expect(formatListAge(new Date(now - 10_000), now, 'en')).toBe('this minute');
+    // A server clock slightly ahead never yields "in 1 minute".
+    expect(formatListAge(new Date(now + 30_000), now, 'en')).toBe('this minute');
+  });
+
   it('computes relative popularity as a whole percent', () => {
     expect(relativePopularity(50, 100)).toBe(50);
     expect(relativePopularity(100, 100)).toBe(100);
@@ -172,11 +182,11 @@ describe('MostTracked fetching and rendering', () => {
   it('greys out rows for objects that are not in the loaded catalog', async () => {
     await internals(plugin).fetchData_();
 
-    const rows = getEl('most-tracked-top-list')?.querySelectorAll<HTMLElement>('.most-tracked-row') ?? [];
+    const rows = getEl('most-tracked-top-list')?.querySelectorAll<HTMLButtonElement>('button.most-tracked-row') ?? [];
 
-    expect(rows[0].classList.contains('most-tracked-row--missing')).toBe(false);
-    expect(rows[1].classList.contains('most-tracked-row--missing')).toBe(true);
-    expect(rows[1].getAttribute('aria-disabled')).toBe('true');
+    expect(rows[0].disabled).toBe(false);
+    expect(rows[1].disabled).toBe(true);
+    expect(rows[1].closest('li')?.getAttribute('kt-tooltip')).toBeTruthy();
   });
 
   it('writes catalog text with textContent, never as HTML', async () => {
@@ -200,13 +210,15 @@ describe('MostTracked fetching and rendering', () => {
   it('selects the object when a row is clicked, and ignores missing rows', async () => {
     const selectSat = vi.fn();
 
+    await internals(plugin).fetchData_();
+    // Mock after rendering so the tooltip lookup during render gets the real registry.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectSat } as any);
-    await internals(plugin).fetchData_();
 
-    const rows = getEl('most-tracked-top-list')?.querySelectorAll<HTMLElement>('.most-tracked-row') ?? [];
+    const rows = getEl('most-tracked-top-list')?.querySelectorAll<HTMLButtonElement>('button.most-tracked-row') ?? [];
 
-    rows[1].click();
+    // A disabled button never fires click; dispatch directly to prove the handler also ignores it.
+    rows[1].dispatchEvent(new MouseEvent('click', { bubbles: true }));
     expect(selectSat).not.toHaveBeenCalled();
 
     rows[0].click();
@@ -221,6 +233,29 @@ describe('MostTracked fetching and rendering', () => {
 
     expect(getEl('most-tracked-status')?.dataset.status).toBe('error');
     expect(toast).not.toHaveBeenCalled();
+  });
+
+  it('explains a first-load failure inside the list card, not in an empty box', async () => {
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+    await internals(plugin).fetchData_();
+
+    const placeholder = getEl('most-tracked-top-empty');
+
+    expect(placeholder?.hidden).toBe(false);
+    expect(placeholder?.dataset.status).toBe('error');
+    expect(placeholder?.textContent).not.toBe('');
+    // The line above the tabs stays empty so the message is not repeated.
+    expect(getEl('most-tracked-status')?.textContent).toBe('');
+  });
+
+  it('keeps the last good lists when a refresh fails', async () => {
+    await internals(plugin).fetchData_();
+    fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+    await internals(plugin).fetchData_();
+
+    expect(getEl('most-tracked-top-list')?.querySelectorAll('button.most-tracked-row')).toHaveLength(2);
+    expect(getEl('most-tracked-status')?.dataset.status).toBe('error');
+    expect(getEl('most-tracked-status')?.textContent).not.toBe('');
   });
 
   it('shows an error status for an unexpected payload', async () => {
@@ -244,6 +279,38 @@ describe('MostTracked fetching and rendering', () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(getEl('most-tracked-status')?.dataset.status).toBe('unavailable');
+  });
+
+  it('disables Refresh while a fetch is in flight', async () => {
+    let resolveFetch: (value: Response) => void = () => undefined;
+
+    fetchMock.mockReturnValue(
+      new Promise<Response>((resolve) => {
+        resolveFetch = resolve;
+      })
+    );
+
+    const pending = internals(plugin).fetchData_();
+    const refreshBtn = getEl('most-tracked-refresh-btn') as HTMLButtonElement;
+
+    expect(refreshBtn.disabled).toBe(true);
+    expect(refreshBtn.getAttribute('aria-busy')).toBe('true');
+
+    resolveFetch(okResponse(payload));
+    await pending;
+
+    expect(refreshBtn.disabled).toBe(false);
+  });
+
+  it('re-resolves cached rows when the menu reopens', async () => {
+    await internals(plugin).fetchData_();
+    getEl('most-tracked-top-list')?.replaceChildren();
+
+    plugin.isMenuButtonActive = true;
+    plugin.onBottomIconClick();
+
+    expect(getEl('most-tracked-top-list')?.querySelectorAll('button.most-tracked-row')).toHaveLength(2);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
   it('reuses the cached lists until they are stale', async () => {

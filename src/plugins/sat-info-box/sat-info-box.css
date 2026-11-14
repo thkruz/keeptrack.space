@@ -391,7 +391,7 @@
 
   /* Rows with a help key or info circle are 44 px tall so neighbouring rows' hit areas never overlap (a tap used to
      land on the wrong row's help or circle). The circle's negative margins no longer need to reach past the row. */
-  #sat-infobox .sat-info-row:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle) {
+  #sat-infobox .sat-info-row:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle, .sat-info-copyable) {
     min-height: 44px;
   }
 
@@ -405,8 +405,46 @@
     padding-block: 0;
   }
 
-  #sat-infobox .sat-info-row:not(:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle, .sat-info-copy-values)) {
+  #sat-infobox .sat-info-row:not(:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle, .sat-info-copy-values, .sat-info-copyable)) {
     min-height: 30px;
+  }
+
+  /* Phone help icon (#464): the label tooltip moved here (phone-help-icons.ts), so the label is no longer a tap
+     target. The icon is a 44 px wide, full-row-height hit area; the visible "?" is the ::before ring. Negative
+     vertical margins let it fill the row's padding, so a row's icon never reaches the next row's icon. */
+  #sat-infobox .sat-info-key .sat-info-help-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 44px;
+    height: 30px;
+    margin: -8px -22px -8px -12px;
+    vertical-align: middle;
+    cursor: help;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #sat-infobox .sat-info-key .sat-info-help-icon::before {
+    content: '?';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 50%;
+    font-size: 9px;
+    font-style: normal;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  #sat-infobox .sat-info-key .sat-info-help-icon:focus-visible {
+    outline: 2px solid var(--color-dark-text-accent, #6cf);
+    outline-offset: -2px;
   }
 }
 

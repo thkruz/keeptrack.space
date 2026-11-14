@@ -23,6 +23,7 @@ import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { INFO_CIRCLE_CLASS, plainValueText } from './info-value';
+import { watchPhoneHelpIcons } from './phone-help-icons';
 import { isPlaceholderIntlDes } from './placeholder-intl-des';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
@@ -476,6 +477,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     this.initDraggabilly();
 
     this.isHtmlReady_ = true;
+
+    const box = getEl(CONTAINER_ID, true);
+
+    if (box) {
+      watchPhoneHelpIcons(box);
+    }
   }
 
   private createHeader(): string {

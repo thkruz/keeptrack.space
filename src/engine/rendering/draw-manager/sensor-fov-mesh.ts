@@ -42,6 +42,7 @@ export class SensorFovMesh extends CustomMesh {
     u_earthRadius: null as unknown as WebGLUniformLocation,
     u_meshRefFlatX: null as unknown as WebGLUniformLocation,
     u_maxFlatDx: null as unknown as WebGLUniformLocation,
+    u_meshRefFlatY: null as unknown as WebGLUniformLocation,
   };
   /**
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
@@ -104,7 +105,13 @@ export class SensorFovMesh extends CustomMesh {
 
       gl.uniform1f(this.uniforms_.u_meshRefFlatX, meshRefFlatX);
       // Longest legitimate horizontal reach of the footprint; polar vertices beyond it are clamped (no full-width bands)
-      gl.uniform1f(this.uniforms_.u_maxFlatDx, Math.max(this.sensor.maxRng ?? 0, 1) * 1.5);
+      // Ground reach of a footprint with slant range r (el >= 0) is the arc 2R*asin(r/2R); long ranges (GEO radars)
+      // must not let vertices high above the sensor project to the poles or the far side of the map.
+      const maxRng = Math.max(this.sensor.maxRng ?? 0, this.sensor.maxRng2 ?? 0, 1);
+      const reach = 2 * RADIUS_OF_EARTH * Math.asin(Math.min(maxRng / (2 * RADIUS_OF_EARTH), 1)) * 1.1;
+
+      gl.uniform1f(this.uniforms_.u_maxFlatDx, reach);
+      gl.uniform1f(this.uniforms_.u_meshRefFlatY, this.sensor.lat * (Math.PI / 180) * RADIUS_OF_EARTH);
       gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getTimeManager().gmst);
       gl.uniform1f(this.uniforms_.u_earthRadius, RADIUS_OF_EARTH);
       gl.uniform1f(this.uniforms_.logDepthBufFC, 0.0);
@@ -450,6 +457,7 @@ export class SensorFovMesh extends CustomMesh {
       uniform float u_earthRadius;
       uniform float u_meshRefFlatX;
       uniform float u_maxFlatDx;
+      uniform float u_meshRefFlatY;
 
       in vec3 a_position;
 
@@ -475,7 +483,10 @@ export class SensorFovMesh extends CustomMesh {
             flatX = u_meshRefFlatX;
           }
 
-          vec3 flatPos = vec3(flatX, lat * u_earthRadius, alt * 0.001);
+          // Same bound vertically so tall/long-range meshes cannot reach the map's top and bottom edges
+          float flatY = u_meshRefFlatY + clamp(lat * u_earthRadius - u_meshRefFlatY, -u_maxFlatDx, u_maxFlatDx);
+
+          vec3 flatPos = vec3(flatX, flatY, alt * 0.001);
           gl_Position = u_pMatrix * u_camMatrix * vec4(flatPos, 1.0);
         } else {
           worldPosition.xyz += u_worldOffset;

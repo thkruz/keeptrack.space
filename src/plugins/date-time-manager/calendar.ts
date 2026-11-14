@@ -667,6 +667,10 @@ export class Calendar {
     this.attachEvents();
   }
 
+  get isPickerVisible(): boolean {
+    return this.isVisible;
+  }
+
   toggleDatePicker(): void {
     if (!ServiceLocator.getTimeManager().isTimeChangingEnabled) {
       ServiceLocator.getUiManager().toast(t7e('errorMsgs.catalogNotFullyInitialized'), ToastMsgType.caution, true);

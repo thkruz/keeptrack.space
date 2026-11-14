@@ -223,6 +223,18 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
   }
 
+  private closePickerForPopover_(): void {
+    if (this.calendar?.isPickerVisible) {
+      this.calendar.hideDatePicker();
+    }
+    const datetimeInput = getEl('datetime-input', true);
+
+    if (datetimeInput) {
+      datetimeInput.style.display = 'none';
+    }
+    this.isEditTimeOpen = false;
+  }
+
   datetimeTextClick(): void {
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
@@ -290,6 +302,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     this.calendar = new Calendar('datetime-input-form');
 
     document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
+    // The phone VCR popover and the date picker never show together (#388).
+    document.addEventListener('kt-vcr-popover-open', () => this.closePickerForPopover_());
 
     this.displayZone_ = getDisplayTimeZone();
     this.syncZoneChip_();

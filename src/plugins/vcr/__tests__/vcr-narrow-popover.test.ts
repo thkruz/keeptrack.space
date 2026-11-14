@@ -31,6 +31,17 @@ describe('VcrPlugin narrow-width popover (#367)', () => {
     expect(vcr.classList.contains('vcr-popover-open')).toBe(false);
   });
 
+  it('opening the popover closes the date picker, and text taps leave it closed (#388)', () => {
+    const onOpen = vi.fn();
+
+    document.addEventListener('kt-vcr-popover-open', onOpen);
+    document.body.click();
+    expect(onOpen).not.toHaveBeenCalled();
+    document.getElementById('datetime-status')!.click();
+    expect(onOpen).toHaveBeenCalledTimes(1);
+    document.removeEventListener('kt-vcr-popover-open', onOpen);
+  });
+
   it('keeps VcrPlugin enabled on phones (#367)', async () => {
     const { MobileManager } = await import('@app/app/ui/mobileManager');
 

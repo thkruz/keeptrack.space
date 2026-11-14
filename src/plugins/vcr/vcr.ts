@@ -127,6 +127,8 @@ export class VcrPlugin extends KeepTrackPlugin {
         document.body.appendChild(vcr);
       }
       vcr.classList.add('vcr-popover-open');
+      // One tap, one panel: the clock's date picker yields to the popover (#388).
+      document.dispatchEvent(new CustomEvent('kt-vcr-popover-open'));
     };
     const close = () => {
       const vcr = document.getElementById('vcr-container');

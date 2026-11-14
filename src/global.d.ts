@@ -7,6 +7,8 @@ declare global {
   const __IS_PRO__: boolean;
   const __EDITION__: string;
   const __PROPAGATOR_BACKEND__: 'sgp4' | 'sgp4-wasm' | 'sgp4-xp-wasm';
+  /** KEEPTRACK_DEV_API_KEY for dev/watch/test builds; always '' in production builds. */
+  const __DEV_API_KEY__: string;
 
   interface Window {
     keepTrack: KeepTrack;

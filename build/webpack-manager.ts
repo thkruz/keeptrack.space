@@ -10,6 +10,7 @@ import {
 } from '@rspack/core';
 import { execSync } from 'node:child_process';
 import DotEnv from 'dotenv-webpack';
+import { resolveDevApiKey } from './lib/dev-api-key';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -111,6 +112,7 @@ export class WebpackManager {
       __IS_PRO__: JSON.stringify(this.config.isPro),
       __EDITION__: JSON.stringify(this.config.edition),
       __PROPAGATOR_BACKEND__: JSON.stringify(this.config.propagatorBackend),
+      __DEV_API_KEY__: JSON.stringify(resolveDevApiKey(config.mode ?? 'development', isWatch || config.isWatch, `./${config.envFilePath}`)),
     });
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);

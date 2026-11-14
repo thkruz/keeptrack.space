@@ -35,6 +35,7 @@ import { CatalogManager } from './catalog-manager';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { orgDataService } from './catalogs/org-data-service';
+import { isStationModule } from './station-modules';
 import { hasRealSccNum, isSyntheticVimpel } from './synthetic-vimpel';
 
 export interface JsSat {
@@ -1418,6 +1419,11 @@ export class CatalogLoader {
       return;
     }
 
+    // Attached station modules (Unity, Zvezda, ...) are merged into their host object (#459).
+    if (isStationModule(resp[i].sccNum)) {
+      return;
+    }
+
     // If pulling from celestrak.org directly or TLE source is the celestrak endpoint of our API, assume Celestrak source
     if (settingsManager.dataSources.externalTLEs.includes('celestrak.org') || settingsManager.dataSources.tle.includes('sats/celestrak')) {
       resp[i].source = CatalogSource.CELESTRAK;
@@ -1589,6 +1595,10 @@ export class CatalogLoader {
   }
 
   private static processAsciiCatalogUnknown_(element: AsciiTleSat, tempSatData: BaseObject[], catalogManagerInstance: CatalogManager) {
+    if (isStationModule(element.SCC)) {
+      return;
+    }
+
     if (CatalogLoader.shouldSkipRegime_(element.TLE2)) {
       return;
     }
@@ -1725,6 +1735,9 @@ export class CatalogLoader {
       if (!element.SCC || !element.TLE1 || !element.TLE2) {
         continue;
       } // Don't Process Bad Satellite Information
+      if (isStationModule(element.SCC)) {
+        continue;
+      }
       const canonicalKey = CatalogLoader.canonicalSccKey(element.SCC) ?? element.SCC.toString();
 
       if (typeof catalogManagerInstance.sccIndex[canonicalKey] !== 'undefined') {
@@ -1790,6 +1803,10 @@ export class CatalogLoader {
         scc = Tle.convertA5to6Digit(element.TLE1.substring(2, 7).trim());
       } catch (err) {
         errorManagerInstance.info(`Skipping jsCatalog entry with malformed SCC in TLE1: ${JSON.stringify(element.TLE1.substring(2, 7))} — ${(err as Error).message}`);
+        continue;
+      }
+
+      if (isStationModule(scc)) {
         continue;
       }
 

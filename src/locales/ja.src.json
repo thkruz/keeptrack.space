@@ -334,6 +334,7 @@
     "noResults": "結果が見つかりません",
     "decayed": "落下済み",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} は {host} の一部です",
     "typeStar": "恒星",
     "typeSensor": "センサー",
     "typeLaunchSite": "発射場",

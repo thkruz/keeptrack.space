@@ -23,6 +23,7 @@ import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { getHostLabel } from '../data/station-modules';
 import { getSearchAlias, isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
 
 export interface SearchResult {
@@ -31,6 +32,8 @@ export interface SearchResult {
   strIndex: number; // Index of the search string in the name
   patlen: number; // Length of the search string
   partial?: boolean; // NORAD id only partially matches a numeric query
+  moduleName?: string; // MODULE results: the merged station module that matched (e.g. "Unity")
+  moduleScc?: string; // MODULE results: that module's NORAD id
 }
 
 export enum SearchResultType {
@@ -49,6 +52,8 @@ export enum SearchResultType {
   NORAD_ID_A5,
   /** Matched a user-assigned alias (provided by a plugin such as the watchlist). */
   ALIAS,
+  /** Matched an attached station module (Unity, Zvezda...) that is merged into this host row. */
+  MODULE,
 }
 
 /**
@@ -62,6 +67,7 @@ const SEARCH_TYPE_LABELS: Partial<Record<SearchResultType, string>> = {
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
   [SearchResultType.ALIAS]: 'ALIAS',
+  [SearchResultType.MODULE]: 'MODULE',
   [SearchResultType.NORAD_ID]: 'NORAD',
   [SearchResultType.NORAD_ID_A5]: 'NORAD',
   [SearchResultType.INTLDES]: 'INTL',
@@ -752,6 +758,14 @@ export class SearchManager {
         html += alias.substring(result.strIndex, result.strIndex + result.patlen);
         html += '</span>';
         html += `${alias.substring(result.strIndex + result.patlen)})`;
+      } else if (result.searchType === SearchResultType.MODULE) {
+        // A merged station module matched: show the host row with a hint that the module is part of it
+        const hostLabel = getHostLabel(String((obj as Satellite).sccNum));
+        const hint = t7e('searchManager.moduleOf' as TranslationKey)
+          .replace('{module}', `${result.moduleName ?? ''} ${result.moduleScc ?? ''}`.trim())
+          .replace('{host}', hostLabel);
+
+        html += `${obj.name} <span class="search-partial-badge">${hint}</span>`;
       } else {
         // If not, just write the name
         html += obj.name;

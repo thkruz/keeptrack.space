@@ -334,6 +334,7 @@
     "noResults": "Nie znaleziono wyników",
     "decayed": "Spłonął",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} jest częścią {host}",
     "typeStar": "Gwiazda",
     "typeSensor": "Czujnik",
     "typeLaunchSite": "Miejsce startu",

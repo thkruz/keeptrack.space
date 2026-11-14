@@ -334,6 +334,7 @@
     "noResults": "검색 결과가 없습니다",
     "decayed": "소멸됨",
     "partialMatch": "Partial match",
+    "moduleOf": "{module}은(는) {host}의 일부입니다",
     "typeStar": "항성",
     "typeSensor": "센서",
     "typeLaunchSite": "발사장",

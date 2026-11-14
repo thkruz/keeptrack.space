@@ -334,6 +334,7 @@
     "noResults": "No se encontraron resultados",
     "decayed": "Reingresado",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} forma parte de {host}",
     "typeStar": "Estrella",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Sitio de lanzamiento",

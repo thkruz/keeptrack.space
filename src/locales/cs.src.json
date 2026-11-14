@@ -334,6 +334,7 @@
     "noResults": "Nebyly nalezeny žádné výsledky",
     "decayed": "Zaniklý",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} je součástí objektu {host}",
     "typeStar": "Hvězda",
     "typeSensor": "Senzor",
     "typeLaunchSite": "Místo startu",

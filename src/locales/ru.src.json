@@ -334,6 +334,7 @@
     "noResults": "Ничего не найдено",
     "decayed": "Сошёл с орбиты",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} входит в состав {host}",
     "typeStar": "Звезда",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовая площадка",

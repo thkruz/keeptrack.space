@@ -3,6 +3,7 @@ import { SearchableFields } from '@app/settings/core-settings';
 import { settingsManager } from '@app/settings/settings';
 import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { getModulesOfHost, StationModule } from '../data/station-modules';
 import { OemSatellite } from '../objects/oem-satellite';
 import { SearchResult, SearchResultType } from './search-manager';
 
@@ -37,6 +38,17 @@ function noradHighlight(sat: Satellite, term: string): { strIndex: number; patle
   const idx = display.indexOf(stripped);
 
   return idx < 0 ? { strIndex: 0, patlen: 0 } : { strIndex: idx, patlen: stripped.length };
+}
+
+/** The merged station module of this object whose name contains the (upper-case) query, if any. */
+export function findModuleByName(sat: Satellite, term: string): StationModule | undefined {
+  const modules = getModulesOfHost(sat.sccNum);
+
+  if (modules.length === 0 || term.length === 0) {
+    return undefined;
+  }
+
+  return modules.find((m) => m.name.toUpperCase().includes(term.toUpperCase()));
 }
 
 /** Supplies user-assigned aliases (object id to alias text); registered by a plugin such as the watchlist. */
@@ -150,6 +162,14 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
         // A common name ("INTERNATIONAL SPACE STATION") never appears in the catalog name, so add the row it maps to.
         if (totalFound === before && currentRank === 0) {
           addResult_({ strIndex: 0, searchType: SearchResultType.OBJECT_NAME, patlen: 0, id: obj.id });
+        }
+        // An attached module (Unity, Zvezda...) is merged into its host: typing its name finds the host row.
+        if (totalFound === before) {
+          const module = findModuleByName(obj as Satellite, searchStringIn);
+
+          if (module) {
+            addResult_({ strIndex: 0, searchType: SearchResultType.MODULE, patlen: len, id: obj.id, moduleName: module.name, moduleScc: module.sccNum });
+          }
         }
         // Name, alt name and the other fields win; an alias hit only fills in when none matched.
         if (alias && totalFound === before && alias.toUpperCase().includes(searchStringIn)) {
@@ -410,6 +430,19 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
 
     for (const sat of satsByKey.get(exactKey) ?? []) {
       addResult(sat, term);
+    }
+
+    // A merged module number ("26400") finds the host row (the ISS) with a hint that it is a module.
+    for (const sat of satData) {
+      const module = getModulesOfHost(sat.sccNum).find((m) => m.sccNum.padStart(6, '0') === exactKey);
+
+      if (module && !seenIds.has(sat.id)) {
+        seenIds.add(sat.id);
+        totalFound++;
+        if (results.length < limit) {
+          results.push({ strIndex: 0, patlen: 0, id: sat.id, searchType: SearchResultType.MODULE, moduleName: module.name, moduleScc: module.sccNum });
+        }
+      }
     }
 
     if (!isSingleTerm) {

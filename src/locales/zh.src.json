@@ -334,6 +334,7 @@
     "noResults": "未找到结果",
     "decayed": "已陨落",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} 是 {host} 的一部分",
     "typeStar": "恒星",
     "typeSensor": "传感器",
     "typeLaunchSite": "发射场",

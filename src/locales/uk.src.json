@@ -339,6 +339,7 @@
     "noResults": "Нічого не знайдено",
     "decayed": "Зійшов з орбіти",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} входить до складу {host}",
     "typeStar": "Зоря",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовий майданчик",

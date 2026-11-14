@@ -617,6 +617,7 @@
     "noResults": "Keine Ergebnisse gefunden",
     "decayed": "Verglüht",
     "partialMatch": "Partial match",
+    "moduleOf": "{module} ist Teil von {host}",
     "typeStar": "Stern",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Startplatz",

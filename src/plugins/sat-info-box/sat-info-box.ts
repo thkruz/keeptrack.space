@@ -562,6 +562,11 @@ export class SatInfoBox extends KeepTrackPlugin {
       const container = getEl(SatInfoBox.containerId_, true);
 
       container?.querySelectorAll('.sat-info-value').forEach((element) => {
+        // Rows holding a form control (Doppler Ref Preset select, Ref Frequency input + unit) are settings, not
+        // per-object values: blanking them emptied the select's option labels and the " MHz" unit (#350).
+        if (element.querySelector('select, input, textarea')) {
+          return;
+        }
         // Preserve nested identity fields (for example launch site/pad IDs).
         const textNodes = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
         let node = textNodes.nextNode();

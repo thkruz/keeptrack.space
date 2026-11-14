@@ -299,8 +299,12 @@
   float: none;
   width: auto;
   min-width: 0;
-  flex: 0 1 auto;
-  white-space: nowrap;
+  /* #357: the value takes the free width so the info circle always sits at the wrap's right edge (one column) */
+  flex: 1 1 auto;
+  /* #355: long localized values ("Außerhalb des Sichtfelds") wrap instead of ending in an ellipsis */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
 }
 
 .sat-info-value-wrap > .sat-info-circle {
@@ -308,8 +312,15 @@
 }
 
 /* Room for the 24 px circle inside the clipped value box */
+/* #357: the padding is cancelled by an equal negative margin so these rows are not 8 px taller than their neighbours;
+   the circle sits at the right edge so every row's circle shares one x. */
 .sat-info-value:has(.sat-info-circle) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
   padding-block: 4px;
+  margin-block: -4px;
 }
 
 /* Phone: the drawer utility footer (bottom 12px + ~64px tall) overlays the bottom of the box; --bottom-menu-height is 0 there, so reserve the same 96px (#223) the side menus use */

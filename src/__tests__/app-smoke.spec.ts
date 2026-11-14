@@ -93,8 +93,14 @@ test.describe('App smoke tests', () => {
     // Close — clicking the same drawer item again slides the side menu off-screen.
     // The close animation uses translateX(-120%); the element stays in the DOM with
     // display: block, so check viewport intersection rather than visibility.
+    //
+    // The close is asserted in two steps because the CI runner (SwiftShader) renders one frame
+    // every few seconds: first the state slideOutLeft writes synchronously (inert + off-screen
+    // transform), then the viewport check, which needs two rendered frames (start and end of the
+    // 300 ms transition) and overran the old 5 s limit in run 43643396334, twice.
     await drawerItem.click();
-    await expect(sideMenu).not.toBeInViewport({ timeout: 5_000 });
+    await expect(sideMenu).toHaveAttribute('inert', '', { timeout: 30_000 });
+    await expect(sideMenu).not.toBeInViewport({ timeout: 30_000 });
   });
 
   test('time display is visible', async ({ page }) => {

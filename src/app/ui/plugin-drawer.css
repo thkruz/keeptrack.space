@@ -1961,6 +1961,17 @@ body.is-mobile-mode {
     margin-right: auto;
   }
 
+  /* #385: the rail scrollbar (up to 15px) overlapped the 44px buttons and clipped their right border.
+     Hide it; the rail still scrolls by wheel/touch, and the strip keeps full-width 44px targets. */
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-inner {
+    scrollbar-width: none;
+    overflow-x: hidden;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-inner::-webkit-scrollbar {
+    display: none;
+  }
+
   /* Toasts sit right of the narrow rail and below the top bar, never full width. */
   body:not(.is-mobile-mode) #toast-container {
     min-width: 0;

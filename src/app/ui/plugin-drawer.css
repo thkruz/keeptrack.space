@@ -962,6 +962,16 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   }
 
+  /* #353: the SIMULATED clock label widens the center group (min-width max-content), and the search box shrank to
+     about 150 px, clipping its placeholder to "Search... (Shift+". Keep a floor that fits the whole hint; the box
+     still shrinks from 420 down to it. Below 1200 px the original shrink-to-fit rule applies. */
+  @media (min-width: 1200px) {
+    #search-holder,
+    #search-holder.search-slide-up {
+      min-width: 260px;
+    }
+  }
+
   #search-holder.search-slide-up input[type='search'] {
     width: 100% !important;
     padding-left: 10px !important;
@@ -1761,7 +1771,8 @@ body.is-mobile-mode {
 
   body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container {
     flex: 1 1 0;
-    min-width: 0;
+    /* #371: a 0 floor let the chip squeeze to one letter ("C.") at 390 px desktop UA; keep room for a short name. */
+    min-width: 72px;
     max-width: 160px;
     width: auto;
   }
@@ -1798,6 +1809,25 @@ body.is-mobile-mode {
   body.drawer-mode #search-holder.search-slide-up:focus-within {
     flex: 0 0 min(220px, 60vw);
     width: min(220px, 60vw) !important;
+  }
+
+  /* #381: no native or inherited border/rounding on the expanded field; a rounded left edge drew a stray "(". */
+  body.drawer-mode #search-holder input[type='search'] {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  body.drawer-mode #search-holder:focus-within,
+  body.drawer-mode #search-holder.search-slide-up:focus-within {
+    border-left: 0;
+  }
+
+  body.drawer-mode #sensor-selected-container {
+    border-left: 0;
   }
 
   body.drawer-mode #search-holder:focus-within input[type='search'] {

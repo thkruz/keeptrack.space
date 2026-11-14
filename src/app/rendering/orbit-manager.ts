@@ -296,6 +296,8 @@ export class OrbitManager {
     }
   }
 
+  private isShortcutsRegistered_ = false;
+
   drawOrbitsSettingChanged(): void {
     // We may have skipped initialization on boot and now need to do it
     if (!this.isInitialized_) {
@@ -304,6 +306,7 @@ export class OrbitManager {
   }
 
   init(lineManagerInstance: LineManager, gl: WebGL2RenderingContext, orbitWorkerOverride?: Worker): void {
+    this.registerShortcuts_();
     if (this.isInitialized_) {
       return;
     } // Only initialize once
@@ -353,6 +356,32 @@ export class OrbitManager {
 
     this.isInitialized_ = true;
 
+    EventBus.getInstance().on(EventBusEvent.highPerformanceRender, () => {
+      this.updateAllVisibleOrbits();
+    });
+
+    // Re-request active orbits when time jumps while in ECF mode,
+    // because ECF coordinates depend on GMST (Earth rotation)
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+      // The dimmed eclipse arc also depends on the Sun direction at the new time.
+      if (settingsManager.isOrbitCruncherInEcf || settingsManager.isDrawOrbitEclipse) {
+        this.reRequestActiveOrbits_();
+      }
+    });
+
+    EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
+  }
+
+  /**
+   * Register the orbit shortcuts once. Called before the isDrawOrbits early return in init()
+   * so Shift+L still works when orbit lines start disabled (#384).
+   */
+  private registerShortcuts_(): void {
+    if (this.isShortcutsRegistered_) {
+      return;
+    }
+    this.isShortcutsRegistered_ = true;
+
     new KeyboardComponent('OrbitManager', [
       {
         key: 'L',
@@ -378,21 +407,6 @@ export class OrbitManager {
         },
       },
     ]).init();
-
-    EventBus.getInstance().on(EventBusEvent.highPerformanceRender, () => {
-      this.updateAllVisibleOrbits();
-    });
-
-    // Re-request active orbits when time jumps while in ECF mode,
-    // because ECF coordinates depend on GMST (Earth rotation)
-    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
-      // The dimmed eclipse arc also depends on the Sun direction at the new time.
-      if (settingsManager.isOrbitCruncherInEcf || settingsManager.isDrawOrbitEclipse) {
-        this.reRequestActiveOrbits_();
-      }
-    });
-
-    EventBus.getInstance().emit(EventBusEvent.orbitManagerInit);
   }
 
   private toggleOrbitLines_() {

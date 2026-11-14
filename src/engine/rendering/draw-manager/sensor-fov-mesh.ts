@@ -38,12 +38,15 @@ export class SensorFovMesh extends CustomMesh {
     u_worldOffset: null as unknown as WebGLUniformLocation,
     logDepthBufFC: null as unknown as WebGLUniformLocation,
     u_flatMapMode: null as unknown as WebGLUniformLocation,
-    u_gmst: null as unknown as WebGLUniformLocation,
     u_earthRadius: null as unknown as WebGLUniformLocation,
-    u_meshRefFlatX: null as unknown as WebGLUniformLocation,
-    u_maxFlatDx: null as unknown as WebGLUniformLocation,
-    u_meshRefFlatY: null as unknown as WebGLUniformLocation,
+    u_sensorLatLon: null as unknown as WebGLUniformLocation,
+    u_azLimits: null as unknown as WebGLUniformLocation,
+    u_elLimits: null as unknown as WebGLUniformLocation,
+    u_rngLimits: null as unknown as WebGLUniformLocation,
   };
+  /** Map-sized quad used on the flat map, where coverage is evaluated per fragment instead of projecting the mesh */
+  private flatQuadVao_: WebGLVertexArrayObject | null = null;
+  private flatQuadBuf_: WebGLBuffer | null = null;
   /**
    * A typed array that stores the indices for the bottom part of the sensor field of view mesh.
    * This is used when wanting to display on the bottom of the sensor.
@@ -96,24 +99,10 @@ export class SensorFovMesh extends CustomMesh {
     gl.uniform4fv(this.uniforms_.u_color, color);
 
     gl.uniform1i(this.uniforms_.u_flatMapMode, isFlatMap ? 1 : 0);
+    const isFullVolume = isFovDrawn || this.sensor.isVolumetric;
+
     if (isFlatMap) {
-      const sensorLonRad = this.sensor.lon * (Math.PI / 180);
-      const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
-      const camCenterX = ServiceLocator.getMainCamera().flatMapPanX;
-      const d = sensorLonRad * RADIUS_OF_EARTH - camCenterX + mapW / 2;
-      const meshRefFlatX = camCenterX + (((d % mapW) + mapW) % mapW) - mapW / 2;
-
-      gl.uniform1f(this.uniforms_.u_meshRefFlatX, meshRefFlatX);
-      // Longest legitimate horizontal reach of the footprint; polar vertices beyond it are clamped (no full-width bands)
-      // Ground reach of a footprint with slant range r (el >= 0) is the arc 2R*asin(r/2R); long ranges (GEO radars)
-      // must not let vertices high above the sensor project to the poles or the far side of the map.
-      const maxRng = Math.max(this.sensor.maxRng ?? 0, this.sensor.maxRng2 ?? 0, 1);
-      const reach = 2 * RADIUS_OF_EARTH * Math.asin(Math.min(maxRng / (2 * RADIUS_OF_EARTH), 1)) * 1.1;
-
-      gl.uniform1f(this.uniforms_.u_maxFlatDx, reach);
-      gl.uniform1f(this.uniforms_.u_meshRefFlatY, this.sensor.lat * (Math.PI / 180) * RADIUS_OF_EARTH);
-      gl.uniform1f(this.uniforms_.u_gmst, ServiceLocator.getTimeManager().gmst);
-      gl.uniform1f(this.uniforms_.u_earthRadius, RADIUS_OF_EARTH);
+      this.setFlatMapUniforms_(isFullVolume);
       gl.uniform1f(this.uniforms_.logDepthBufFC, 0.0);
     } else {
       gl.uniform1f(this.uniforms_.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
@@ -125,9 +114,17 @@ export class SensorFovMesh extends CustomMesh {
     gl.enable(gl.DEPTH_TEST);
     gl.depthMask(false); // Disable depth writing
 
+    if (isFlatMap) {
+      this.drawFlatMapCoverage_();
+      gl.depthMask(true);
+      gl.disable(gl.BLEND);
+
+      return;
+    }
+
     gl.bindVertexArray(this.vao_);
 
-    const indicies = isFovDrawn || this.sensor.isVolumetric ? this.sortedIndices : this.indiciesBottom_;
+    const indicies = isFullVolume ? this.sortedIndices : this.indiciesBottom_;
 
     // Use the pre-sorted indices
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.gl_.createBuffer());
@@ -138,6 +135,54 @@ export class SensorFovMesh extends CustomMesh {
 
     gl.depthMask(true); // Re-enable depth writing
     gl.disable(gl.BLEND);
+  }
+
+  /**
+   * Flat map coverage (#280). Projecting the 3D volume vertex by vertex breaks for footprints that contain a pole
+   * (every longitude is inside, so some triangles always straddle the map seam and smear into straight bands) and
+   * for footprints wider than the map. Instead a map-sized quad is drawn and the fragment shader keeps the ground
+   * points under which some point of the FOV volume lies: the az/el/range box seen from the sensor.
+   */
+  private setFlatMapUniforms_(isFullVolume: boolean): void {
+    const gl = this.gl_;
+    const DEG2RAD = Math.PI / 180;
+    const { minAz, azRange, minEl, maxEl, minRange, maxRange } = this.getSensorFovParams_();
+    // The bottom-only footprint (surveillance fence, STF) is the subpoint set of the minimum-elevation surface
+    const elTop = isFullVolume ? maxEl : minEl;
+
+    gl.uniform2f(this.uniforms_.u_sensorLatLon, this.sensor.lat * DEG2RAD, this.sensor.lon * DEG2RAD);
+    gl.uniform2f(this.uniforms_.u_azLimits, minAz, this.sensor.maxAz - minAz >= 360 ? 360 : azRange);
+    gl.uniform2f(this.uniforms_.u_elLimits, minEl, elTop);
+    gl.uniform2f(this.uniforms_.u_rngLimits, minRange, maxRange);
+    gl.uniform1f(this.uniforms_.u_earthRadius, RADIUS_OF_EARTH);
+  }
+
+  private drawFlatMapCoverage_(): void {
+    const gl = this.gl_;
+
+    if (!this.flatQuadVao_) {
+      this.flatQuadBuf_ = gl.createBuffer();
+      this.flatQuadVao_ = gl.createVertexArray();
+      gl.bindVertexArray(this.flatQuadVao_);
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.flatQuadBuf_);
+      gl.enableVertexAttribArray(this.attribs_.a_position.location);
+      gl.vertexAttribPointer(this.attribs_.a_position.location, 3, gl.FLOAT, false, 0, 0);
+      gl.bindVertexArray(null);
+    }
+
+    // Cover three map widths around the camera so a panned view never shows an edge; the shader wraps longitude
+    const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
+    const camX = ServiceLocator.getMainCamera().flatMapPanX;
+    const x0 = camX - 1.5 * mapW;
+    const x1 = camX + 1.5 * mapW;
+    const yTop = (Math.PI / 2) * RADIUS_OF_EARTH;
+    const z = 0.01;
+
+    gl.bindVertexArray(this.flatQuadVao_);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.flatQuadBuf_);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([x0, -yTop, z, x1, -yTop, z, x0, yTop, z, x1, yTop, z]), gl.DYNAMIC_DRAW);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindVertexArray(null);
   }
 
   protected verticesTmp_: number[] = [];
@@ -437,11 +482,81 @@ export class SensorFovMesh extends CustomMesh {
 
       uniform vec4 u_color;
       uniform float logDepthBufFC;
+      uniform bool u_flatMapMode;
+      uniform float u_earthRadius;
+      uniform vec2 u_sensorLatLon;
+      uniform vec2 u_azLimits;
+      uniform vec2 u_elLimits;
+      uniform vec2 u_rngLimits;
+
+      in vec2 v_flatXY;
 
       out vec4 fragColor;
 
+      const float PI = 3.14159265359;
+      const float RAD2DEG = 57.2957795131;
+
+      bool inAz(float azDeg) {
+        return u_azLimits.y >= 360.0 || mod(azDeg - u_azLimits.x, 360.0) <= u_azLimits.y;
+      }
+
+      // Elevation (deg) seen from the sensor of the point at geocentric radius rho above a ground point theta away
+      float elAt(float rho, float theta) {
+        return atan(rho * cos(theta) - u_earthRadius, rho * sin(theta)) * RAD2DEG;
+      }
+
+      // Geocentric radius of the point above the ground point at slant range rng (larger root)
+      float rhoAtRange(float rng, float theta) {
+        float s = u_earthRadius * sin(theta);
+
+        return u_earthRadius * cos(theta) + sqrt(max(rng * rng - s * s, 0.0));
+      }
+
+      // Is some point straight above the ground point inside the elevation window [el0, el1] and the range limits?
+      bool isElWindowCovered(float theta, float el0, float el1) {
+        // Range to the ground point itself; points above it are farther (range and elevation grow with height)
+        float groundRng = 2.0 * u_earthRadius * sin(theta * 0.5);
+
+        if (u_rngLimits.y < groundRng) {
+          return false;
+        }
+        float rhoLo = u_rngLimits.x <= groundRng ? u_earthRadius : rhoAtRange(u_rngLimits.x, theta);
+        float rhoHi = rhoAtRange(u_rngLimits.y, theta);
+
+        return max(elAt(rhoLo, theta), el0) <= min(elAt(rhoHi, theta), el1);
+      }
+
+      bool isCovered() {
+        float lon = v_flatXY.x / u_earthRadius;
+        float lat = v_flatXY.y / u_earthRadius;
+        float dLon = lon - u_sensorLatLon.y;
+        float lat0 = u_sensorLatLon.x;
+        float cosTheta = sin(lat0) * sin(lat) + cos(lat0) * cos(lat) * cos(dLon);
+        float theta = acos(clamp(cosTheta, -1.0, 1.0));
+
+        if (theta < 1.0e-5) {
+          return u_elLimits.y >= 89.9 && u_rngLimits.x <= u_rngLimits.y;
+        }
+        float az = atan(sin(dLon) * cos(lat), cos(lat0) * sin(lat) - sin(lat0) * cos(lat) * cos(dLon)) * RAD2DEG;
+
+        if (inAz(az) && isElWindowCovered(theta, u_elLimits.x, min(u_elLimits.y, 90.0))) {
+          return true;
+        }
+
+        // Elevation limits past 90 deg look back over the zenith toward the opposite azimuth
+        return u_elLimits.y > 90.0 && inAz(az + 180.0) && isElWindowCovered(theta, 180.0 - u_elLimits.y, 90.0);
+      }
+
       void main(void) {
-        fragColor = vec4(u_color.rgb, 0.15);
+        if (u_flatMapMode) {
+          if (abs(v_flatXY.y) > 0.5 * PI * u_earthRadius || !isCovered()) {
+            discard;
+          }
+          // One layer here; the projected 3D volume overlapped top and bottom surfaces (about 0.28 combined)
+          fragColor = vec4(u_color.rgb, 0.28);
+        } else {
+          fragColor = vec4(u_color.rgb, 0.15);
+        }
 
         ${DepthManager.getLogDepthFragCode()}
       }
@@ -453,42 +568,20 @@ export class SensorFovMesh extends CustomMesh {
       uniform vec3 u_worldOffset;
       uniform float logDepthBufFC;
       uniform bool u_flatMapMode;
-      uniform float u_gmst;
-      uniform float u_earthRadius;
-      uniform float u_meshRefFlatX;
-      uniform float u_maxFlatDx;
-      uniform float u_meshRefFlatY;
 
       in vec3 a_position;
+
+      out vec2 v_flatXY;
 
       void main(void) {
         vec4 worldPosition = u_mvMatrix * vec4(a_position, 1.0);
 
         if (u_flatMapMode) {
-          float PI = 3.14159265359;
-          vec3 eciPos = worldPosition.xyz;
-          float eciDist = length(eciPos);
-          float lon = atan(eciPos.y, eciPos.x) - u_gmst;
-          float lat = atan(eciPos.z, length(eciPos.xy));
-          float alt = eciDist - u_earthRadius;
-
-          // Wrap X relative to mesh center to keep all mesh vertices contiguous
-          float mapW = 2.0 * PI * u_earthRadius;
-          float flatX = lon * u_earthRadius;
-          flatX = u_meshRefFlatX + mod(flatX - u_meshRefFlatX + mapW * 0.5, mapW) - mapW * 0.5;
-
-          // Near the poles longitude is degenerate: clamp so triangles cannot stretch across the whole map
-          flatX = u_meshRefFlatX + clamp(flatX - u_meshRefFlatX, -u_maxFlatDx, u_maxFlatDx);
-          if (abs(lat) > 1.5533) {
-            flatX = u_meshRefFlatX;
-          }
-
-          // Same bound vertically so tall/long-range meshes cannot reach the map's top and bottom edges
-          float flatY = u_meshRefFlatY + clamp(lat * u_earthRadius - u_meshRefFlatY, -u_maxFlatDx, u_maxFlatDx);
-
-          vec3 flatPos = vec3(flatX, flatY, alt * 0.001);
-          gl_Position = u_pMatrix * u_camMatrix * vec4(flatPos, 1.0);
+          // Flat map: a_position is the map quad in flat coordinates; coverage is decided per fragment
+          v_flatXY = a_position.xy;
+          gl_Position = u_pMatrix * u_camMatrix * vec4(a_position, 1.0);
         } else {
+          v_flatXY = vec2(0.0);
           worldPosition.xyz += u_worldOffset;
           gl_Position = u_pMatrix * u_camMatrix * worldPosition;
         }

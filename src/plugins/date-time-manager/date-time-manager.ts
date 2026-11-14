@@ -206,10 +206,13 @@ export class DateTimeManager extends KeepTrackPlugin {
   /** True while the phone zone list is open (option texts are full names then). */
   private zoneChipOpen_ = false;
 
-  /** #455: closed on a phone, option texts are abbreviations so the chip stays narrow; open (or wide screens), full names. The width is pinned while open so the chip does not grow. */
+  /**
+   * #455: closed on a phone, option texts are abbreviations so the chip stays narrow; open (or wide screens), full names.
+   * The selected option keeps its abbreviation on a phone even while open, because the chip renders its text and a full
+   * name would be cut mid-string in the pinned width. The width is pinned while open so the chip does not grow.
+   */
   private setZoneChipOpen_(chip: HTMLSelectElement, open: boolean): void {
     const narrow = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 639px)').matches;
-    const useShort = narrow && !open;
 
     if (open && narrow && !chip.style.width) {
       chip.style.width = `${chip.offsetWidth}px`;
@@ -218,7 +221,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
     this.zoneChipOpen_ = open;
     Array.from(chip.options).forEach((o) => {
-      const text = (useShort ? o.dataset.short : o.dataset.full) ?? o.textContent ?? '';
+      const short = narrow && (!open || o.selected);
+      const text = (short ? o.dataset.short : o.dataset.full) ?? o.textContent ?? '';
 
       if (o.textContent !== text) {
         o.textContent = text;

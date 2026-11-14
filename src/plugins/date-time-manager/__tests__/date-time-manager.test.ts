@@ -107,7 +107,7 @@ describe('DateTimeManager_playback_rate_readout', () => {
 });
 
 describe('DateTimeManager_zone_chip_labels', () => {
-  it('shows abbreviations while closed on a phone and full names while open', () => {
+  it('shows abbreviations while closed on a phone and full names while open, keeping the selected chip text short', () => {
     (DateTimeManager.prototype as unknown as { uiManagerFinal_: () => void }).uiManagerFinal_ = vi.fn();
     setupStandardEnvironment([TopMenu]);
     const dtm = new DateTimeManager() as unknown as { setZoneChipOpen_: (c: HTMLSelectElement, open: boolean) => void };
@@ -117,8 +117,10 @@ describe('DateTimeManager_zone_chip_labels', () => {
     window.matchMedia = (() => ({ matches: true })) as unknown as typeof window.matchMedia;
     dtm.setZoneChipOpen_(chip, false);
     expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST', 'GMT+8']);
+    chip.value = 'b';
     dtm.setZoneChipOpen_(chip, true);
-    expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST (UTC-06:00)', 'CST (UTC+08:00)']);
+    // The chip renders the selected option, so it stays short; the other rows show full names (#455 review)
+    expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST (UTC-06:00)', 'GMT+8']);
     window.matchMedia = (() => ({ matches: false })) as unknown as typeof window.matchMedia;
     dtm.setZoneChipOpen_(chip, false);
     expect(chip.options[0].textContent).toBe('CST (UTC-06:00)');

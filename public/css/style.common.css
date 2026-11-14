@@ -3174,6 +3174,20 @@ nav a.sidenav-trigger i {
   white-space: nowrap;
 }
 
+/* Module rows (Unity, Zvezda...) wrap so the "is part of the ISS" note is never cut off. */
+.truncate-search.search-module-row {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+.search-module-row .search-module-note {
+  display: block;
+  margin-left: 0;
+  white-space: normal;
+}
+
 .search-slide-down {
   width: 160px;
   transition: width var(--kt-duration-normal, 200ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));

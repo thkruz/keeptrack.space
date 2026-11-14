@@ -728,7 +728,8 @@ export class SearchManager {
 
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;
       html += `<span class="search-type-badge">${searchTypeBadgeLabel(result.searchType)}</span>`;
-      html += '<div class="truncate-search">';
+      // A module row carries a note that has to be readable in full, so it wraps instead of truncating.
+      html += result.searchType === SearchResultType.MODULE ? '<div class="truncate-search search-module-row">' : '<div class="truncate-search">';
 
       // Left half of search results
       if (obj.isMissile()) {
@@ -765,7 +766,7 @@ export class SearchManager {
           .replace('{module}', `${result.moduleName ?? ''} ${result.moduleScc ?? ''}`.trim())
           .replace('{host}', hostLabel);
 
-        html += `${obj.name} <span class="search-partial-badge">${hint}</span>`;
+        html += `${obj.name} <span class="search-partial-badge search-module-note">${hint}</span>`;
       } else {
         // If not, just write the name
         html += obj.name;

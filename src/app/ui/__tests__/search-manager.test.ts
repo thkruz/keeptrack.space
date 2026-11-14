@@ -764,6 +764,26 @@ describe('SearchManager interactions', () => {
     expect(document.getElementById('search-results')!.querySelector('.search-result-count')!.textContent).toContain('50');
   });
 
+  it('fillResultBox renders a module row whose note wraps instead of truncating (#461)', () => {
+    const sat = new Satellite({ ...defaultSat, id: 0, name: 'ISS (ZARYA)', sccNum: '25544' });
+
+    ServiceLocator.getCatalogManager().objectCache = [sat] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    const results = [
+      { id: 0, searchType: SearchResultType.MODULE, strIndex: 0, patlen: 5, moduleName: 'Zvezda', moduleScc: '26400' },
+      { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 },
+    ];
+
+    mgr.fillResultBox(results, ServiceLocator.getCatalogManager(), 2);
+    const rows = document.getElementById('search-results')!.querySelectorAll('.search-result');
+    const moduleName = rows[0].querySelector('.truncate-search')!;
+
+    expect(moduleName.classList.contains('search-module-row')).toBe(true);
+    expect(moduleName.querySelector('.search-module-note')!.textContent).toContain('Zvezda 26400');
+    // Other rows keep the single-line truncating name column.
+    expect(rows[1].querySelector('.truncate-search')!.classList.contains('search-module-row')).toBe(false);
+  });
+
   it('fillResultBox always shows how many objects matched, even below the limit', () => {
     const sat = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
 

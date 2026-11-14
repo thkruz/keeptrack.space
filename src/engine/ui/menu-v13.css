@@ -140,6 +140,9 @@
 #kt-select-portal > .dropdown-content.select-dropdown {
   min-width: max-content;
   pointer-events: auto;
+  /* The global .dropdown-content cap (40vh) clipped a 6-item list at 768 px tall (#350); the portal list has the
+     whole viewport, so let it show every item and scroll only when it truly cannot fit. */
+  max-height: calc(100vh - 24px) !important;
 }
 
 /* Full-bleed hairline between sub-groups within a card. */

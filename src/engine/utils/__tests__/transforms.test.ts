@@ -686,6 +686,16 @@ describe('modelAwareStandoffKm (#389)', () => {
     expect(r?.minStandoff).toBeCloseTo(0.002, 6);
   });
 
+  it('fits the bounding sphere in the narrower FOV axis (aspect-aware) and never lowers the 3x floor', () => {
+    const wide = modelAwareStandoffKm(null, 0.0716, { fovRad: 0.6, aspect: 1366 / 768 });
+    const tall = modelAwareStandoffKm(null, 0.0716, { fovRad: 0.6, aspect: 0.5 });
+
+    expect(wide!.minStandoff).toBeCloseTo((1.1 * 0.0716) / Math.sin(0.3), 6);
+    expect(wide!.minStandoff).toBeGreaterThan(0.0716 * 3);
+    expect(tall!.minStandoff).toBeGreaterThan(wide!.minStandoff);
+    expect(modelAwareStandoffKm(null, 0.0003, { fovRad: 0.6, aspect: 1.78 })!.minStandoff).toBeLessThan(0.005);
+  });
+
   it('is null with neither a catalog radius nor a model, and ignores bad model radii', () => {
     expect(modelAwareStandoffKm(null, undefined)).toBeNull();
     expect(modelAwareStandoffKm(null, 0)).toBeNull();

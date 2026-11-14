@@ -330,7 +330,10 @@ export class MeshManager {
       return;
     }
 
-    const standoff = modelAwareStandoffKm(null, radiusKm);
+    const aspect = this.gl_ ? cam.getAspectRatio(this.gl_) : NaN;
+    // Use the narrowest FOV the camera will settle on so the fit holds after the FOV lerp.
+    const fovRad = Math.min(cam.fov, settingsManager.fieldOfViewSatellite ?? cam.fov);
+    const standoff = modelAwareStandoffKm(null, radiusKm, { fovRad, aspect });
 
     if (!standoff) {
       return;

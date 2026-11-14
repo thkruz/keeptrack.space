@@ -175,6 +175,16 @@
     0 24px 0 0 var(--color-dark-background, #1f1f1f);
 }
 
+/*
+ * #369: the sticky Add bar's lower box-shadow (the #281 bottom fill) is 24px tall and painted over Replace's top
+ * margin and border, so Replace looked borderless and flush. Draw Replace above the shadow and give it a clear gap.
+ */
+#custom-sensor-menu-form > #cs-replace {
+  position: relative;
+  z-index: 3;
+  margin-top: 16px;
+}
+
 /* Destructive action: set apart from Add / Replace and drawn in the accent colour */
 #custom-sensor-menu-form > #cs-clear {
   margin-top: 28px;

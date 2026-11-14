@@ -117,7 +117,8 @@
 
   #sensor-list-content .sensor-row .sensor-name {
     flex: 1 1 9ch;
-    min-width: min(9ch, 100%);
+    /* max-content floor: a name that cannot share the line with the tag moves to its own line instead of splitting mid-word */
+    min-width: min(max-content, 100%);
     overflow-wrap: break-word;
     word-break: normal;
   }

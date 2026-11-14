@@ -145,6 +145,9 @@ export abstract class KeepTrackPlugin {
    */
   sideMenuSecondaryHtml: string;
 
+  /** Optional title shown in the secondary pane's title bar. */
+  sideMenuSecondaryTitle?: string;
+
   sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 400,
     leftOffset: null,
@@ -560,6 +563,7 @@ export abstract class KeepTrackPlugin {
       const config = this.getSecondaryMenuConfig();
 
       this.sideMenuSecondaryHtml = config.html;
+      this.sideMenuSecondaryTitle = config.title;
       this.sideMenuSecondaryOptions = {
         width: config.width ?? 300,
         leftOffset: config.leftOffset ?? null,
@@ -737,6 +741,7 @@ export abstract class KeepTrackPlugin {
           <div id="${this.sideMenuElementName}-secondary-content" class="side-menu-settings" style="padding: 0px 10px;">
             <div class="side-menu-title-bar secondary-title-bar">
               <div class="side-menu-title-left"></div>
+              ${this.sideMenuSecondaryTitle ? html`<h5 class="side-menu-title-text secondary-title-text">${this.sideMenuSecondaryTitle}</h5>` : ''}
               <div class="side-menu-title-right">
                 <button id="${this.sideMenuElementName}-secondary-close-btn"
                   class="center-align btn btn-ui waves-effect waves-light icon-btn"

@@ -232,6 +232,12 @@ export interface ISecondaryMenuConfig {
   html: string;
 
   /**
+   * Optional title text for the secondary pane's title bar (#315: the Best Passes settings pane showed only the
+   * close button). Omit it to keep the title-less bar.
+   */
+  title?: string;
+
+  /**
    * Width of the secondary menu in pixels.
    * @default 300
    */

@@ -579,3 +579,17 @@ describe('ReportsPlugin batch reports', () => {
     expect(saveBatch).not.toHaveBeenCalled();
   });
 });
+
+describe('ReportsPlugin.walkOutOfView_ (#465)', () => {
+  it('walks to the last in-view whole second, not the last scan-grid sample', () => {
+    const setMs = 100_500;
+    const inView = (ms: number) => ms <= setMs;
+
+    expect(ReportsPlugin.walkOutOfView_(inView, 90_000, 1, 1000)).toBe(100_000);
+    expect(ReportsPlugin.walkOutOfView_(inView, 90_000, 1)).toBe(100_000);
+  });
+
+  it('walks backwards for a pass already in view at the window end', () => {
+    expect(ReportsPlugin.walkOutOfView_((ms) => ms >= 10_200, 20_000, -1, 1000)).toBe(11_000);
+  });
+});

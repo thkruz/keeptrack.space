@@ -174,8 +174,8 @@
         },
         "passEdge": {
           "continuous": "continuo",
-          "start": "visibile all'inizio",
-          "end": "visibile alla fine"
+          "start": "visibile all'inizio; massimo nella finestra",
+          "end": "visibile alla fine; massimo nella finestra"
         },
         "illumination": {
           "sun": "Sì",

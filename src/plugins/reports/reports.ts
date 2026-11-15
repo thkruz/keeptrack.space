@@ -1047,21 +1047,24 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Window-clipped passes (edge) are re-peaked too: their scan samples sit on the window-start phase.
     const elAt = (ms: number) => SatMath.getRae(new Date(ms), satrec, sensor, true).el;
 
-    // A pass cut by the window edge keeps its true peak: the peak is searched over the whole pass, not just the part inside the window (#414).
+    // A pass cut by the window edge reports the peak inside the window, like Best Passes and the pass plan CSV (#466),
+    // so Max El is never earlier than Rise or later than Set (#465). The Note column says the pass is cut by the window.
     const inView = (ms: number): boolean => sampleAt(new Date(ms))?.inView === true;
 
     return passes.map((pass) => {
-      const fromMs = pass.edge === 'start' ? ReportsPlugin.walkOutOfView_(inView, pass.aos.getTime(), -1) : pass.aos.getTime();
-      const toMs = pass.edge === 'end' ? ReportsPlugin.walkOutOfView_(inView, pass.los.getTime(), 1) : pass.los.getTime();
-      const peak = findPassPeakMs(elAt, fromMs, toMs);
+      // The edge scan steps from the window start, so the far edge lands on that phase: walk it to the whole second
+      // so Set (or Rise) reads the same whatever the window start (#465).
+      const aosMs = pass.edge === 'end' ? ReportsPlugin.walkOutOfView_(inView, pass.aos.getTime(), -1, 1000) : pass.aos.getTime();
+      const losMs = pass.edge === 'start' ? ReportsPlugin.walkOutOfView_(inView, pass.los.getTime(), 1, 1000) : pass.los.getTime();
+      const peak = findPassPeakMs(elAt, aosMs, losMs);
+      const timed = { ...pass, aos: new Date(aosMs), los: new Date(losMs) };
 
-      return peak ? { ...pass, maxEl: peak.el, maxElTime: new Date(peak.ms) } : pass;
+      return peak ? { ...timed, maxEl: peak.el, maxElTime: new Date(peak.ms) } : timed;
     });
   }
 
   /** Walks from an in-view instant in one direction (-1 earlier, 1 later) to the last in-view instant, capped at four hours. */
-  static walkOutOfView_(inView: (ms: number) => boolean, fromMs: number, dir: -1 | 1): number {
-    const stepMs = REPORT_PASS_DETECT_STEP_SEC * 1000;
+  static walkOutOfView_(inView: (ms: number) => boolean, fromMs: number, dir: -1 | 1, stepMs: number = REPORT_PASS_DETECT_STEP_SEC * 1000): number {
     const maxSteps = Math.floor((4 * 3600 * 1000) / stepMs);
     let lastIn = fromMs;
 

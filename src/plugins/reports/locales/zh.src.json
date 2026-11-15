@@ -174,8 +174,8 @@
         },
         "passEdge": {
           "continuous": "持续可见",
-          "start": "开始时可见",
-          "end": "结束时可见"
+          "start": "开始时可见; 峰值取窗口内",
+          "end": "结束时可见; 峰值取窗口内"
         },
         "illumination": {
           "sun": "是",

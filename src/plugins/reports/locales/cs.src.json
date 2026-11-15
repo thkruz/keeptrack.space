@@ -174,8 +174,8 @@
         },
         "passEdge": {
           "continuous": "nepřetržitě",
-          "start": "viditelný na začátku",
-          "end": "viditelný na konci"
+          "start": "viditelný na začátku; maximum v okně",
+          "end": "viditelný na konci; maximum v okně"
         },
         "illumination": {
           "sun": "Ano",

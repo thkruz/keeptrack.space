@@ -174,8 +174,8 @@
         },
         "passEdge": {
           "continuous": "연속",
-          "start": "시작 시 가시",
-          "end": "종료 시 가시"
+          "start": "시작 시 가시; 최대 고도는 창 내",
+          "end": "종료 시 가시; 최대 고도는 창 내"
         },
         "illumination": {
           "sun": "예",

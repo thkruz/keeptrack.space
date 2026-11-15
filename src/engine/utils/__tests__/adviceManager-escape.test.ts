@@ -127,4 +127,18 @@ describe('AdviceManager help overlay (Shift+F1)', () => {
     expect(outer.style.display).toBe('none');
     expect(document.activeElement).toBe(input);
   });
+
+  it('mounts the figure lightbox on document.body, outside the help panel stacking context', () => {
+    mgr.showAdvice('Figures', '<button class="help-figure-zoom" aria-label="Fig"><img src="a.png" alt="Fig"></button>');
+    const zoom = outer.querySelector<HTMLElement>('.help-figure-zoom')!;
+
+    zoom.querySelector('img')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    const box = document.querySelector('.help-lightbox')!;
+
+    expect(box).not.toBeNull();
+    expect(box.parentElement).toBe(document.body);
+    expect(outer.contains(box)).toBe(false);
+    mgr.closeAdvice();
+    expect(document.querySelector('.help-lightbox')).toBeNull();
+  });
 });

@@ -4203,7 +4203,7 @@ input:focus {
 .help-lightbox {
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 30000; /* above #help-outer (20000) and its #help-screen (99) */
   display: block;
   margin: 0;
   padding: 16px;

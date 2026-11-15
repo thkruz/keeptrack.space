@@ -69,7 +69,8 @@ export class AdviceManager {
     image.alt = '';
     box.appendChild(image);
     box.addEventListener('click', () => this.closeLightbox_(true));
-    this.helpOuterDOM.appendChild(box);
+    // Mount on body so no help-panel stacking context can cap the lightbox.
+    document.body.appendChild(box);
     this.lightboxEl_ = box;
     this.lightboxReturnEl_ = opener;
     box.focus();

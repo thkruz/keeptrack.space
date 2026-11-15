@@ -125,6 +125,14 @@ describe('UiManager toast teardown (#1425, #1433)', () => {
     expect(toast.teardown).toHaveBeenCalledTimes(1);
   });
 
+  it('marks the toast as dismissing so the fade runs on transform instead of margin', () => {
+    const toast = makeToast();
+
+    expect(toast.el.classList.contains('kt-toast-dismissing')).toBe(false);
+    toast.dismiss();
+    expect(toast.el.classList.contains('kt-toast-dismissing')).toBe(true);
+  });
+
   it('dismisses exactly once when clicked and the auto-expire timer then fires', () => {
     const toast = makeToast();
 

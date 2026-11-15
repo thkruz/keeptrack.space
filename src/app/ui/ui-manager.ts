@@ -169,6 +169,12 @@ export class UiManager {
         return;
       }
       this.dismissedToasts_.add(toast);
+      /*
+       * Materialize fades the toast out by transitioning `margin` and `opacity` inline, and margin cannot be
+       * composited (every dismissal was a main-thread animation). This class makes materialize-local.css
+       * override those inline styles with a transform + opacity transition of the same length and look.
+       */
+      toast.el?.classList.add('kt-toast-dismissing');
       try {
         libraryDismiss();
       } catch {

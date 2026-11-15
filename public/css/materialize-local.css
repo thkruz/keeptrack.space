@@ -147,6 +147,18 @@ textarea.materialize-textarea {
     outline-offset: 2px;
 }
 
+/*
+ * Dismissal: Materialize transitions `margin` + `opacity` inline (outDuration 375ms, margin-top -40px), which cannot
+ * run on the compositor. Same motion with transform instead; the inline values are beaten by !important.
+ */
+.toast.kt-toast-dismissing {
+    animation: none !important;
+    margin-top: 0 !important;
+    opacity: 0 !important;
+    transform: translateY(-40px);
+    transition: transform 375ms ease, opacity 375ms ease !important;
+}
+
 @keyframes kt-toast-enter {
     from {
         opacity: 0;

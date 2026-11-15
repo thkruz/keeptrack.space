@@ -158,6 +158,18 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
       expect(tbl.querySelectorAll('a.iframe').length).toBeGreaterThan(0);
     });
 
+    it('gives mission, location and agency cells a tooltip with the full untruncated text', () => {
+      const tbl = document.createElement('table');
+
+      TheSpaceDevLaunchCalendarPlugin.initTable(tbl, [futureLaunch()]);
+
+      const cells = tbl.rows[1].cells;
+
+      expect(cells[1].title).toBe('A Very Long Mission Name That Truncates / Falcon 9');
+      expect(cells[2].title).toBe('Cape Canaveral');
+      expect(cells[3].title).toBe('SpaceX');
+    });
+
     it('renders the TBD placeholder for a launch window more than a day in the past', () => {
       const tbl = document.createElement('table');
 

@@ -169,12 +169,19 @@ describe('Reentries narrow-screen layout', () => {
     for (const row of [table.rows[0], table.rows[1]]) {
       expect(row.cells[0].classList.contains('re-col-pin')).toBe(true);
       expect(row.cells[0].classList.contains('re-col-pin-last')).toBe(true);
-      expect(
-        Array.from(row.cells)
-          .filter((c) => c.classList.contains('re-col-low'))
-          .map((c) => c.dataset.col)
-      ).toEqual(['nextReport', 'rcs', 'gpAge', 'dryMass', 'volume']);
     }
+    expect(
+      Array.from(table.rows[0].cells)
+        .filter((c) => c.classList.contains('re-col-low'))
+        .map((c) => c.dataset.col)
+    ).toEqual(['nextReport', 'rcs', 'gpAge', 'dryMass', 'volume']);
+    // The test object is not in the catalog, so its physical columns collapse into one merged cell.
+    expect(
+      Array.from(table.rows[1].cells)
+        .filter((c) => c.classList.contains('re-col-low'))
+        .map((c) => c.dataset.col)
+    ).toEqual(['nextReport']);
+    expect(table.rows[1].querySelector('.re-reentered-cell')).not.toBeNull();
   });
 
   it('pins NORAD and Name on Reentry Analysis rows and marks Name as the last pin', () => {

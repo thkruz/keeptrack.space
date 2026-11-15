@@ -27,7 +27,7 @@
         "rcs": "RCS (m^2)",
         "gpAge": "Età GP (ore)",
         "dryMass": "Massa a secco (kg)",
-        "volume": "Volume (m^3)",
+        "volume": "Volume (m³, stima)",
         "name": "Nome",
         "type": "Tipo",
         "perigee": "Perigeo (km)",

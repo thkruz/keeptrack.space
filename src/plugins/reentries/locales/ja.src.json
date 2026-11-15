@@ -27,7 +27,7 @@
         "rcs": "RCS (m^2)",
         "gpAge": "GP経過時間 (時間)",
         "dryMass": "乾燥質量 (kg)",
-        "volume": "体積 (m^3)",
+        "volume": "体積 (m³、推定)",
         "name": "名前",
         "type": "種類",
         "perigee": "近地点 (km)",

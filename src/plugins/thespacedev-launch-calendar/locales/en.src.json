@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} is Unavailable!",
         "noLaunches": "No upcoming launches returned.",
         "rateLimited": "The Space Devs is limiting requests right now. Try again in a few minutes.",
-        "nothingToExport": "No launches to export. Load the launch list first."
+        "nothingToExport": "No launches to export. Load the launch list first.",
+        "timeTbd": "time TBD"
       },
       "help": {
         "overview": "Launch Calendar lists the next 20 orbital launches worldwide, pulled live from The Space Devs launch library: the launch window, mission, rocket, launch site, agency and country for each. Mission, rocket, site and agency names link to further reading where available.",

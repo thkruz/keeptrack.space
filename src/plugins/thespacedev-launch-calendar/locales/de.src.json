@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} ist nicht erreichbar!",
         "noLaunches": "Keine bevorstehenden Starts erhalten.",
         "rateLimited": "The Space Devs begrenzt gerade die Anfragen. Versuchen Sie es in einigen Minuten erneut.",
-        "nothingToExport": "Keine Starts zum Exportieren. Laden Sie zuerst die Startliste."
+        "nothingToExport": "Keine Starts zum Exportieren. Laden Sie zuerst die Startliste.",
+        "timeTbd": "Uhrzeit offen"
       },
       "help": {
         "overview": "Startkalender listet die nächsten 20 orbitalen Starts weltweit auf, live aus der Startdatenbank von The Space Devs: Startfenster, Mission, Rakete, Startplatz, Agentur und Land für jeden Start. Namen von Mission, Rakete, Startplatz und Agentur verlinken, wo verfügbar, auf weiterführende Informationen.",

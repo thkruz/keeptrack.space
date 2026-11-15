@@ -27,7 +27,7 @@
         "rcs": "RCS (m^2)",
         "gpAge": "GP-Alter (Std)",
         "dryMass": "Trockenmasse (kg)",
-        "volume": "Volumen (m^3)",
+        "volume": "Volumen (m³, gesch.)",
         "name": "Name",
         "type": "Typ",
         "perigee": "Perigäum (km)",

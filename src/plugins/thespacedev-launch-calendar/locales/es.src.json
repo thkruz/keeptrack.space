@@ -27,7 +27,8 @@
         "apiUnavailable": "¡{url} no está disponible!",
         "noLaunches": "No se recibieron próximos lanzamientos.",
         "rateLimited": "The Space Devs está limitando las solicitudes en este momento. Vuelva a intentarlo en unos minutos.",
-        "nothingToExport": "No hay lanzamientos para exportar. Cargue primero la lista de lanzamientos."
+        "nothingToExport": "No hay lanzamientos para exportar. Cargue primero la lista de lanzamientos.",
+        "timeTbd": "hora por confirmar"
       },
       "help": {
         "overview": "Calendario de Lanzamientos muestra los próximos 20 lanzamientos orbitales de todo el mundo, obtenidos en directo de la biblioteca de lanzamientos de The Space Devs: la ventana de lanzamiento, la misión, el cohete, el sitio de lanzamiento, la agencia y el país de cada uno. Los nombres de misión, cohete, sitio y agencia enlazan a más información cuando está disponible.",

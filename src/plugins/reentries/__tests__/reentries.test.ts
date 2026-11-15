@@ -6,6 +6,7 @@ import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import en from '@app/plugins/reentries/locales/en.src.json';
 import { isRealNorad, normalizeTipLon, parseTipUtc, Reentries, TipMsg } from '@app/plugins/reentries/reentries';
 import { settingsManager } from '@app/settings/settings';
 import { CatalogSource, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
@@ -298,6 +299,44 @@ describe('Reentries_class', () => {
       const headerRow = table.rows[0];
 
       expect(headerRow.cells.length).toBe(8);
+    });
+  });
+
+  describe('menu layout and TIP rows', () => {
+    const tipMsg = (id: string) => ({ NORAD_CAT_ID: id, DECAY_EPOCH: '2026-11-15 10:00:00', LAT: '10', LON: '20', WINDOW: '60', NEXT_REPORT: '12' }) as any;
+
+    it('puts Results before Data Actions on the TIP tab', () => {
+      websiteInit(new Reentries());
+
+      const results = document.getElementById('reentries-tip-table')!.closest('.kt-section')!;
+      const actions = document.getElementById('reentries-fetch-btn')!.closest('.kt-section')!;
+
+      expect(results.compareDocumentPosition(actions) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('marks only Volume as an estimate in its header', () => {
+      expect(en.plugins.Reentries.table.volume).toBe('Volume (m³, est.)');
+      expect(en.plugins.Reentries.table.dryMass).toBe('Dry Mass (kg)');
+    });
+
+    it('merges the physical columns of a reentered row into one cell and follows the fold state', () => {
+      const plugin = new Reentries();
+
+      websiteInit(plugin);
+      (plugin as any).tipList_ = [tipMsg('99999')];
+      vi.spyOn(Reentries as any, 'tipSat_').mockReturnValue(null);
+
+      const table = document.getElementById('reentries-tip-table') as HTMLTableElement;
+      const row = (plugin as any).createTipRow_(table, 0) as HTMLTableRowElement;
+      const merged = row.querySelector('.re-reentered-cell') as HTMLTableCellElement;
+
+      expect(row.cells).toHaveLength(7);
+      expect(merged.textContent).toBe('Reentered');
+      expect(merged.colSpan).toBe(5);
+
+      document.getElementById('reentries-menu')!.classList.add('re-cols-folded');
+      (plugin as any).updateColumnFold_(300);
+      expect(merged.colSpan).toBe(1);
     });
   });
 

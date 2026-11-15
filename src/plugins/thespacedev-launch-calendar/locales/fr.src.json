@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} est indisponible !",
         "noLaunches": "Aucun lancement à venir reçu.",
         "rateLimited": "The Space Devs limite actuellement les requêtes. Réessayez dans quelques minutes.",
-        "nothingToExport": "Aucun lancement à exporter. Chargez d'abord la liste des lancements."
+        "nothingToExport": "Aucun lancement à exporter. Chargez d'abord la liste des lancements.",
+        "timeTbd": "heure à confirmer"
       },
       "help": {
         "overview": "Calendrier des lancements répertorie les 20 prochains lancements orbitaux dans le monde, récupérés en direct depuis la base de lancements de The Space Devs : la fenêtre de lancement, la mission, la fusée, le site de lancement, l'agence et le pays de chacun. Les noms de mission, de fusée, de site et d'agence renvoient vers des informations complémentaires lorsqu'elles existent.",

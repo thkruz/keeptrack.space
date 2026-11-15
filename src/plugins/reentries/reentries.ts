@@ -65,6 +65,9 @@ export const TIP_COLUMNS: readonly ReentriesColumn[] = [
   { key: 'volume', isLowPriority: true },
 ];
 
+/** Index of the first TIP column (Reentry Angle) a reentered row replaces with one merged cell. */
+const TIP_REENTERED_FIRST_COL = 6;
+
 /**
  * Reentry Analysis columns in display order. Identity, type and the altitudes
  * that drive the risk shading always show; inclination and RCS fold away.
@@ -348,6 +351,14 @@ export class Reentries extends KeepTrackPlugin {
     const lbl = (key: string) => t7e(`plugins.Reentries.labels.${key}` as Parameters<typeof t7e>[0]);
     const tipMessagesContent = html`
       <section class="kt-section">
+        <div class="kt-section-label">${lbl('results')}</div>
+        ${Reentries.columnsSwitchHtml_('reentries-show-all-cols-tip')}
+        <div class="re-table-scroll">
+          <table id="reentries-tip-table" class="reentries-table center-align"></table>
+        </div>
+        <sub class="reentries-attribution">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
+      </section>
+      <section class="kt-section">
         <div class="kt-section-label">${lbl('dataActions')}</div>
         <button id="reentries-fetch-btn" class="kt-action waves-effect" type="button">
           <span class="kt-action-label">${tb('fetchData')}</span>
@@ -364,14 +375,6 @@ export class Reentries extends KeepTrackPlugin {
           </label>
         </div>
         <p id="reentries-corridor-note" class="re-corridor-note">${tb('corridorNote')}</p>
-      </section>
-      <section class="kt-section">
-        <div class="kt-section-label">${lbl('results')}</div>
-        ${Reentries.columnsSwitchHtml_('reentries-show-all-cols-tip')}
-        <div class="re-table-scroll">
-          <table id="reentries-tip-table" class="reentries-table center-align"></table>
-        </div>
-        <sub class="reentries-attribution">*${t7e('plugins.Reentries.dataSource' as Parameters<typeof t7e>[0])}</sub>
       </section>
     `;
 
@@ -782,6 +785,13 @@ export class Reentries extends KeepTrackPlugin {
     applyReentriesColumnClasses(tr, columns);
   }
 
+  /** Visible columns a merged "Reentered" cell replaces: the angle always, the four folding columns unless folded. */
+  protected reenteredSpan_(): number {
+    const isFolded = getEl(this.sideMenuElementName, true)?.classList.contains('re-cols-folded') ?? false;
+
+    return isFolded ? 1 : TIP_COLUMNS.length - TIP_REENTERED_FIRST_COL;
+  }
+
   private createTipRow_(tbl: HTMLTableElement, i: number): HTMLTableRowElement {
     const tr = tbl.insertRow();
 
@@ -821,6 +831,19 @@ export class Reentries extends KeepTrackPlugin {
     Reentries.createCell_(tr, this.lon2degrees_(this.tipList_[i].LON));
     Reentries.createCell_(tr, Reentries.formatTipWindow_(this.tipList_[i].WINDOW));
     Reentries.createCell_(tr, this.tipList_[i].NEXT_REPORT);
+    if (!sat) {
+      // One merged cell replaces the five physical columns instead of repeating "Reentered" in each.
+      const merged = tr.insertCell();
+
+      merged.appendChild(document.createTextNode(reentered));
+      merged.classList.add('re-reentered-cell');
+      merged.colSpan = this.reenteredSpan_();
+      tr.dataset.reentered = 'true';
+      applyReentriesColumnClasses(tr, TIP_COLUMNS.slice(0, TIP_REENTERED_FIRST_COL));
+
+      return tr;
+    }
+
     Reentries.createCell_(tr, gammaDegrees);
     Reentries.createCell_(tr, rcs);
     Reentries.createCell_(tr, age);
@@ -956,7 +979,7 @@ export class Reentries extends KeepTrackPlugin {
       const rowIdx = tr.dataset.row;
       const tip = typeof rowIdx === 'string' ? this.tipList_[parseInt(rowIdx, 10)] : undefined;
 
-      if (!tip || tr.cells.length < 2) {
+      if (!tip || tr.cells.length < 2 || tr.dataset.reentered === 'true') {
         continue;
       }
 
@@ -1163,6 +1186,10 @@ export class Reentries extends KeepTrackPlugin {
 
     menuEl.classList.toggle('re-cols-narrow', isCompact);
     menuEl.classList.toggle('re-cols-folded', isCompact && !this.isShowAllColumns_);
+
+    for (const cell of Array.from(menuEl.querySelectorAll<HTMLTableCellElement>('td.re-reentered-cell'))) {
+      cell.colSpan = this.reenteredSpan_();
+    }
   }
 
   // =========================================================================

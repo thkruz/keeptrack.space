@@ -187,11 +187,11 @@ describe('KtocNoticesPlugin', () => {
 
       expect(pageText()).toBe('Page 1 of 3');
       expect(rows()).toHaveLength(20);
-      expect(rows()[0].cells[0].textContent).toBe('Event 1');
+      expect(rows()[0].cells[0].textContent).toBe('#1');
 
       getEl(KTOC_MENU_IDS.NEXT_PAGE)!.click();
       expect(pageText()).toBe('Page 2 of 3');
-      expect(rows()[0].cells[0].textContent).toBe('Event 21');
+      expect(rows()[0].cells[0].textContent).toBe('#21');
 
       getEl(KTOC_MENU_IDS.NEXT_PAGE)!.click();
       expect(rows()).toHaveLength(5);
@@ -209,7 +209,7 @@ describe('KtocNoticesPlugin', () => {
       const [inCatalog, relocation] = rows();
       const cells = [...relocation.cells].map((c) => c.textContent);
 
-      expect(cells.slice(0, 5)).toEqual(['Event 16', '2026-06-24 23:45', '28158', 'Relocation', 'Confirmed']);
+      expect(cells.slice(0, 5)).toEqual(['#16', '2026-06-24 23:45', '28158', 'Relocation', 'Confirmed']);
       expect(inCatalog.cells[2].textContent).toBe('5 ISS (ZARYA)');
       expect(inCatalog.cells[4].textContent).toBe('Potential');
       expect(relocation.id).toBe(`ktoc-notice-row-${NOTICE_RELOCATION.notice_id}`);
@@ -219,6 +219,20 @@ describe('KtocNoticesPlugin', () => {
       expect(link.href).toBe(NOTICE_RELOCATION.url);
       expect(link.target).toBe('_blank');
       expect(link.rel).toBe('noopener noreferrer');
+    });
+
+    it('leaves the notice column header empty with an aria-label and shows the issuer line once at the top', async () => {
+      init(okResult([NOTICE_IN_CATALOG]));
+      openMenu();
+      await flush();
+
+      const headers = [...document.querySelectorAll<HTMLTableCellElement>(`#${KTOC_MENU_IDS.TABLE} tr.ktoc-notices-header th`)];
+
+      expect(headers).toHaveLength(6);
+      expect(headers[5].textContent).toBe('');
+      expect(headers[5].getAttribute('aria-label')).toBe('Notice');
+      expect(document.querySelectorAll('#ktoc-notices-menu .ktoc-attribution')).toHaveLength(1);
+      expect(document.querySelector('#ktoc-notices-menu .ktoc-attribution')!.textContent).toBe('Issued by KTOC (KeepTrack Operations Center)');
     });
 
     it('marks canceled rows as retracted with the escaped reason as a tooltip', async () => {

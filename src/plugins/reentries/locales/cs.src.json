@@ -27,7 +27,7 @@
         "rcs": "RCS (m^2)",
         "gpAge": "Stáří GP (hod)",
         "dryMass": "Suchá hmotnost (kg)",
-        "volume": "Objem (m^3)",
+        "volume": "Objem (m³, odh.)",
         "name": "Název",
         "type": "Typ",
         "perigee": "Perigeum (km)",

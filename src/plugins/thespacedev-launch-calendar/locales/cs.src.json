@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} není dostupné!",
         "noLaunches": "Nebyly vráceny žádné nadcházející starty.",
         "rateLimited": "The Space Devs právě omezuje počet požadavků. Zkuste to znovu za několik minut.",
-        "nothingToExport": "Žádné starty k exportu. Nejprve načtěte seznam startů."
+        "nothingToExport": "Žádné starty k exportu. Nejprve načtěte seznam startů.",
+        "timeTbd": "čas bude upřesněn"
       },
       "help": {
         "overview": "Kalendář startů zobrazuje 20 nejbližších orbitálních startů na světě, načítaných živě z knihovny startů The Space Devs: startovní okno, misi, raketu, startovní místo, agenturu a zemi u každého z nich. Názvy misí, raket, míst a agentur odkazují na další informace, pokud jsou k dispozici.",

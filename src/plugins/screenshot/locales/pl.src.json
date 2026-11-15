@@ -20,7 +20,8 @@
         "site": "Stanowisko: {site}",
         "source": "Źródło: {source}",
         "utc": "{time} UTC",
-        "computed": "Widok obliczony: elementy orbity mają w tej chwili {age}"
+        "computed": "Widok obliczony: elementy orbity mają w tej chwili {age}",
+        "computedBeforeEpoch": "Widok obliczony: ten czas jest {age} przed epoką elementów orbitalnych"
       }
     }
   }

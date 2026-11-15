@@ -20,7 +20,8 @@
         "site": "Standort: {site}",
         "source": "Quelle: {source}",
         "utc": "{time} UTC",
-        "computed": "Berechnete Ansicht: Bahnelemente zu diesem Zeitpunkt {age} alt"
+        "computed": "Berechnete Ansicht: Bahnelemente zu diesem Zeitpunkt {age} alt",
+        "computedBeforeEpoch": "Berechnete Ansicht: dieser Zeitpunkt liegt {age} vor der Epoche der Bahnelemente"
       }
     }
   }

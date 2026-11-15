@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -209,6 +210,24 @@ describe('Screenshot behavior', () => {
       expect(lines[3]).toContain('3.3 d');
       expect(lines[3].toLowerCase()).toContain('computed');
       expect(lines[4]).toContain('USSF');
+    });
+
+    it('words a negative element age as before the epoch instead of a negative age', () => {
+      stubSources({ name: 'ISS (ZARYA)', sccNum: '25544', source: 'spacetrack', ageOfElset: () => -145.4 }, new Date('2026-06-01T00:00:00Z'), null);
+
+      // The generated locale files are refreshed by generate-t7e; read the source JSON so the test does not depend on it.
+      const tpl = (JSON.parse(readFileSync('src/plugins/screenshot/locales/en.src.json', 'utf8')) as { plugins: { Screenshot: { caption: Record<string, string> } } }).plugins
+        .Screenshot.caption;
+
+      vi.spyOn(plugin as unknown as { t_: (k: string) => string }, 't_').mockImplementation((k: string) => tpl[k.replace('caption.', '')] ?? k);
+
+      const lines = plugin.gatherCaptionLines_();
+      const line = lines.find((l) => l.toLowerCase().includes('computed')) ?? '';
+
+      expect(line).toContain('145.4 d');
+      expect(line).not.toContain('-145.4');
+      expect(line.toLowerCase()).toContain('before');
+      expect(line.toLowerCase()).not.toContain('old at this time');
     });
 
     it('omits object and source lines when nothing is selected, and the site line when no sensor is set', () => {

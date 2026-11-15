@@ -304,9 +304,11 @@ export class Screenshot extends KeepTrackPlugin {
         const ageDays = ageOfElset.call(sat, simTime);
 
         if (Number.isFinite(ageDays)) {
-          const ageText = Math.abs(ageDays) >= 1 ? `${ageDays.toFixed(1)} d` : `${(ageDays * 24).toFixed(1)} h`;
+          const ageText = Math.abs(ageDays) >= 1 ? `${Math.abs(ageDays).toFixed(1)} d` : `${Math.abs(ageDays * 24).toFixed(1)} h`;
+          // Negative age: sim time precedes the element epoch, so say so instead of printing "-145.4 d old".
+          const key = ageDays < 0 ? 'caption.computedBeforeEpoch' : 'caption.computed';
 
-          lines.push(this.t_('caption.computed').replace('{age}', ageText));
+          lines.push(this.t_(key).replace('{age}', ageText));
         }
       }
 

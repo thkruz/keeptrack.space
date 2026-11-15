@@ -20,7 +20,8 @@
         "site": "站点:{site}",
         "source": "来源:{source}",
         "utc": "{time} UTC",
-        "computed": "计算视图:此刻轨道要素已有 {age}"
+        "computed": "计算视图:此刻轨道要素已有 {age}",
+        "computedBeforeEpoch": "计算视图：此时间比轨道根数历元早 {age}"
       }
     }
   }

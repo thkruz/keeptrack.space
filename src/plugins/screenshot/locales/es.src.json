@@ -20,7 +20,8 @@
         "site": "Sitio: {site}",
         "source": "Fuente: {source}",
         "utc": "{time} UTC",
-        "computed": "Vista calculada: elementos orbitales con {age} de antigüedad en este momento"
+        "computed": "Vista calculada: elementos orbitales con {age} de antigüedad en este momento",
+        "computedBeforeEpoch": "Vista calculada: esta hora es {age} anterior a la época de los elementos orbitales"
       }
     }
   }

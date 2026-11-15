@@ -20,7 +20,8 @@
         "site": "観測地: {site}",
         "source": "ソース: {source}",
         "utc": "{time} UTC",
-        "computed": "計算された表示: この時点で軌道要素は {age} 前のもの"
+        "computed": "計算された表示: この時点で軌道要素は {age} 前のもの",
+        "computedBeforeEpoch": "計算ビュー: この時刻は軌道要素のエポックの {age} 前です"
       }
     }
   }

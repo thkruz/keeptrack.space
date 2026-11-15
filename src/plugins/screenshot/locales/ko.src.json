@@ -20,7 +20,8 @@
         "site": "관측지: {site}",
         "source": "출처: {source}",
         "utc": "{time} UTC",
-        "computed": "계산된 화면: 이 시점에서 궤도 요소는 {age} 전 자료"
+        "computed": "계산된 화면: 이 시점에서 궤도 요소는 {age} 전 자료",
+        "computedBeforeEpoch": "계산된 보기: 이 시각은 궤도 요소 기준 시각보다 {age} 앞섭니다"
       }
     }
   }

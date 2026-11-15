@@ -20,7 +20,8 @@
         "site": "Site: {site}",
         "source": "Source: {source}",
         "utc": "{time} UTC",
-        "computed": "Computed view: orbital elements {age} old at this time"
+        "computed": "Computed view: orbital elements {age} old at this time",
+        "computedBeforeEpoch": "Computed view: this time is {age} before the orbital element epoch"
       }
     }
   }

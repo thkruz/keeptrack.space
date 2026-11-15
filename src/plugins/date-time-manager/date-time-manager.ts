@@ -73,6 +73,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj));
     EventBus.getInstance().on(EventBusEvent.selectedDateChange, (date: Date) => this.updateDateTime(date));
+    EventBus.getInstance().on(EventBusEvent.setSensor, () => this.syncZoneChip_());
+    EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.syncZoneChip_());
   }
 
   updateDateTime(date: Date) {
@@ -177,6 +179,15 @@ export class DateTimeManager extends KeepTrackPlugin {
     return this.displayZone_;
   }
 
+  /** IANA zone of the selected sensor (first of a multi-sensor selection), if it has one. */
+  private selectedSiteZone_(): string | undefined {
+    try {
+      return ServiceLocator.getSensorManager().currentSensors?.[0]?.timeZone;
+    } catch {
+      return undefined;
+    }
+  }
+
   /** Shows the zone beside the clock: neutral for UTC, caution colour for anything else. */
   private syncZoneChip_(): void {
     const chip = getEl('datetime-zone', true) as HTMLSelectElement | null;
@@ -189,7 +200,7 @@ export class DateTimeManager extends KeepTrackPlugin {
     const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
     // #404/#455: every option carries its full name; on a phone the closed chip shows the abbreviations (data-short) and
     // the open list shows the full names, so zones sharing an abbreviation (CST, IST) stay distinguishable.
-    chip.innerHTML = getDisplayZoneChoices(zone)
+    chip.innerHTML = getDisplayZoneChoices(zone, this.selectedSiteZone_())
       .map((z) => {
         const full = isUtcZone(z) ? 'UTC' : describeZoneAt(nowMs, z);
 

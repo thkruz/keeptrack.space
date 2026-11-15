@@ -94,6 +94,28 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       true
     );
     document.addEventListener('pointerdown', wireLate, true);
+    // #480: the pointer left the hovered target but its own mouseleave never ran (target re-laid out under the bubble,
+    // listener wired mid-hover). A document-level mouseout is the backstop for hover-shown bubbles.
+    document.addEventListener(
+      'mouseout',
+      (e: MouseEvent) => {
+        const target = this.activeTarget_;
+
+        if (!target || target === this.shownFor_ || !this.isVisible_) {
+          return;
+        }
+        const to = e.relatedTarget as Node | null;
+
+        if (to && (target.contains(to) || document.getElementById('tooltip')?.contains(to))) {
+          return;
+        }
+        if (e.target instanceof Node && target.contains(e.target)) {
+          this.hideTooltip();
+          this.isVisible_ = false;
+        }
+      },
+      true
+    );
     document.addEventListener('mouseover', wireLate, true);
 
     // A tap-shown tooltip stays until the next tap elsewhere
@@ -456,6 +478,23 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, maxTop));
       } else {
         top = Math.max(8, Math.min(top, maxTop));
+      }
+    }
+
+    // Custom Sensor form fields: open beside the side menu so the bubble never covers the field's own label or the row
+    // above it (#495, #496)
+    const customSensorEl = targetEl.closest<HTMLElement>('#custom-sensor-menu-form');
+    const customMenuEl = customSensorEl?.closest<HTMLElement>('.side-menu-parent') ?? null;
+
+    if (customMenuEl) {
+      const menuRight = customMenuEl.getBoundingClientRect().right;
+
+      if (menuRight + 8 + tooltipRect.width + 8 <= viewportWidth) {
+        left = menuRight + 8;
+        top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
+      } else {
+        // No room beside the menu: drop below the field instead of rising over the row above
+        top = Math.max(8, Math.min(targetRect.bottom + window.scrollY + 8, viewportHeight + window.scrollY - tooltipRect.height - 8));
       }
     }
 

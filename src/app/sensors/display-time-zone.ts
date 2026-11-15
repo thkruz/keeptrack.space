@@ -67,12 +67,19 @@ export const setDisplayTimeZone = (zone: string): string => {
   return next;
 };
 
-/** Choices offered in the header chip: UTC and the browser's own zone. A saved named zone is added so it stays selectable. */
-export const getDisplayZoneChoices = (current: string = getDisplayTimeZone()): string[] => {
+/**
+ * Choices offered in the header chip: UTC, the selected sensor's own site zone (#478, so Eglin offers Central even when the
+ * browser is Eastern) and the browser's zone. A saved named zone is added so it stays selectable.
+ */
+export const getDisplayZoneChoices = (current: string = getDisplayTimeZone(), siteZone?: string | null): string[] => {
   const choices = [UTC_ZONE];
+  const site = normalizeTimeZone(siteZone);
   const browser = browserTimeZone();
 
-  if (!isUtcZone(browser)) {
+  if (site && !isUtcZone(site)) {
+    choices.push(site);
+  }
+  if (!isUtcZone(browser) && !choices.includes(browser)) {
     choices.push(browser);
   }
   if (!choices.includes(current)) {

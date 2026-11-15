@@ -50,3 +50,19 @@ describe('display time zone', () => {
     expect(listener).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('getDisplayZoneChoices site zone (#478)', () => {
+  it('offers the selected sensor site zone alongside UTC', async () => {
+    const { getDisplayZoneChoices } = await import('../display-time-zone');
+    const choices = getDisplayZoneChoices('UTC', 'America/Chicago');
+
+    expect(choices).toContain('America/Chicago');
+    expect(choices[0]).toBe('UTC');
+  });
+
+  it('ignores an invalid site zone', async () => {
+    const { getDisplayZoneChoices } = await import('../display-time-zone');
+
+    expect(getDisplayZoneChoices('UTC', 'Not/AZone')).not.toContain('Not/AZone');
+  });
+});

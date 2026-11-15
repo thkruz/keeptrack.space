@@ -530,6 +530,18 @@ describe('SearchManager', () => {
         expect(toast).toHaveBeenCalledTimes(1);
       });
 
+      it('closing the search before the pause cancels the pending toast', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        const ui = ServiceLocator.getUiManager() as unknown as { hideSideMenus?: () => void };
+
+        ui.hideSideMenus ??= () => undefined;
+        searchManager.doSearch('QQQ');
+        searchManager.closeSearch(true);
+        flushMissToast();
+        expect(toast).not.toHaveBeenCalled();
+      });
+
       it('a hit before the pause cancels the pending toast', () => {
         const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
@@ -1018,6 +1030,27 @@ describe('SearchManager interactions', () => {
     expect(p().isResultsOpen).toBe(true);
     expect(document.querySelector('.search-result')).not.toBeNull();
     expect((document.getElementById('search') as HTMLInputElement).value).toBe('ISS');
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
+  it('phone: clicking a result closes the list, keeps the query and drops the keyboard', () => {
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSensor);
+    vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+    vi.spyOn(PluginRegistry.getPlugin(SelectSatManager)!, 'selectSat').mockImplementation(() => undefined);
+    const input = document.getElementById('search') as HTMLInputElement;
+    const blur = vi.spyOn(input, 'blur');
+
+    input.value = 'ISS';
+    p().isResultsOpen = true;
+
+    clickFirstResult(defaultSensor.id);
+
+    expect(p().isResultsOpen).toBe(false);
+    expect(input.value).toBe('ISS');
+    expect(blur).toHaveBeenCalled();
     settingsManager.isMobileModeEnabled = wasMobile;
   });
 

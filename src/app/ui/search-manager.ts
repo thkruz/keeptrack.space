@@ -1031,6 +1031,8 @@ export class SearchManager {
     }
 
     this.isSearchOpen = false;
+    // A miss still waiting to be reported is moot once the search is closed.
+    this.cancelNoResultsToast_();
     getEl('search-holder')?.classList.remove('search-slide-down');
     getEl('search-holder')?.classList.add('search-slide-up');
     ServiceLocator.getUiManager().hideSideMenus();

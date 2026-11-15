@@ -4180,10 +4180,43 @@ input:focus {
 }
 
 #help-text .help-figure img {
+  display: block;
   max-width: 100%;
-  max-height: 45vh;
+  max-height: 60vh;
   border: 1px solid var(--color-dark-border);
   border-radius: 4px;
+}
+
+#help-text .help-figure-zoom {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+#help-text .help-figure-zoom:focus-visible {
+  outline: 2px solid var(--color-primary, #4aa3ff);
+  outline-offset: 2px;
+}
+
+.help-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: block;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  overflow: auto;
+  text-align: center;
+  cursor: zoom-out;
+  background: rgb(0 0 0 / 88%);
+}
+
+.help-lightbox img {
+  max-width: 100%;
+  height: auto;
 }
 
 #help-text .help-figure figcaption {

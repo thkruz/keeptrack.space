@@ -78,6 +78,32 @@ describe('PersistenceManager', () => {
       pm.saveItem(StorageKey.COLOR_SCHEME, 'after');
       expect(pm.getItem(StorageKey.COLOR_SCHEME)).toBeNull();
     });
+
+    it('#494: onboarding state still saves and reads back while blocked (phone mode), settings do not', async () => {
+      settingsManager.isBlockPersistence = true;
+      await pm.initialize();
+
+      pm.saveItem(StorageKey.ONBOARDING_STATE, '{"status":"done"}');
+      pm.saveItem(StorageKey.COLOR_SCHEME, 'x');
+
+      expect(pm.getItem(StorageKey.ONBOARDING_STATE)).toBe('{"status":"done"}');
+      expect(pm.getItem(StorageKey.COLOR_SCHEME)).toBeNull();
+      expect(localStorage.getItem(StorageKey.ONBOARDING_STATE)).toBe('{"status":"done"}');
+      expect(localStorage.getItem(StorageKey.COLOR_SCHEME)).toBeNull();
+    });
+
+    it('#494: a stored onboarding state survives a blocked reload, other stored keys are hidden', async () => {
+      localStorage.setItem(StorageKey.ONBOARDING_STATE, '{"status":"done"}');
+      localStorage.setItem(StorageKey.COLOR_SCHEME, 'old');
+      PersistenceManager.resetInstance();
+      settingsManager.isBlockPersistence = true;
+      const fresh = PersistenceManager.getInstance();
+
+      await fresh.initialize();
+
+      expect(fresh.getItem(StorageKey.ONBOARDING_STATE)).toBe('{"status":"done"}');
+      expect(fresh.getItem(StorageKey.COLOR_SCHEME)).toBeNull();
+    });
   });
 
   describe('clear', () => {

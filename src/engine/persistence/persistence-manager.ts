@@ -23,6 +23,8 @@ export class PersistenceManager {
   /** Per-key last-modified stamps (epoch ms) for account-scoped keys, persisted as SYNC_META. */
   private syncMeta_: Record<string, number> = {};
   private primary_: StorageProvider;
+  /** Real provider kept while persistence is blocked, used only for BLOCK_EXEMPT_KEYS_. */
+  private exemptProvider_: StorageProvider | null = null;
   private accountProvider_: AccountSyncProvider | null = null;
   private pendingAccountWrites_: Set<StorageKey> = new Set();
   private accountFlushTimeout_: ReturnType<typeof setTimeout> | null = null;
@@ -96,9 +98,17 @@ export class PersistenceManager {
     const sm = getSettingsManager_();
 
     if (sm?.isBlockPersistence) {
+      this.exemptProvider_ = this.primary_;
       this.primary_ = new NullStorageProvider();
       await this.primary_.initialize();
+      const kept = PersistenceManager.BLOCK_EXEMPT_KEYS_.map((k) => [k, this.cache_.get(k as StorageKey)] as const);
+
       this.cache_.clear();
+      for (const [k, v] of kept) {
+        if (typeof v === 'string') {
+          this.cache_.set(k as StorageKey, v);
+        }
+      }
       this.isInitialized_ = true;
 
       return;
@@ -126,9 +136,7 @@ export class PersistenceManager {
   // ---------------------------------------------------------------------------
 
   getItem(key: string): string | null {
-    const sm = getSettingsManager_();
-
-    if (sm?.isBlockPersistence) {
+    if (this.isBlocked_(key)) {
       return null;
     }
     PersistenceManager.verifyKey_(key);
@@ -149,9 +157,7 @@ export class PersistenceManager {
   }
 
   saveItem(key: string, value: string): void {
-    const sm = getSettingsManager_();
-
-    if (sm?.isBlockPersistence) {
+    if (this.isBlocked_(key)) {
       return;
     }
 
@@ -178,7 +184,7 @@ export class PersistenceManager {
     this.stampSyncMeta_(key as StorageKey);
 
     // Write-through to primary (localStorage) immediately
-    this.primary_.write(key, value).catch((e) => {
+    (PersistenceManager.BLOCK_EXEMPT_KEYS_.includes(key) && this.exemptProvider_ ? this.exemptProvider_ : this.primary_).write(key, value).catch((e) => {
       errorManagerInstance.debug(`Failed to write to primary storage: ${key}=${value}, error: ${e}`);
     });
 
@@ -197,7 +203,7 @@ export class PersistenceManager {
     // Removals keep a stamp: they act as local tombstones so a deletion on this
     // device can win LWW against an older value on another device.
     this.stampSyncMeta_(key as StorageKey);
-    this.primary_.remove(key);
+    (PersistenceManager.BLOCK_EXEMPT_KEYS_.includes(key) && this.exemptProvider_ ? this.exemptProvider_ : this.primary_).remove(key);
     this.scheduleAccountFlush_(key as StorageKey);
   }
 
@@ -217,6 +223,17 @@ export class PersistenceManager {
    * Keys that survive the version-bump wipe. Onboarding progress must not reset
    * on every release, or the tour would replay for every existing user.
    */
+  /**
+   * Device-scope UX state that still persists when isBlockPersistence is set (phone mode, embeds).
+   * The block exists so settings from another session do not override the phone/kiosk preset; the
+   * onboarding state is not a setting, and without it the phone tour replays on every visit (#494).
+   */
+  private static readonly BLOCK_EXEMPT_KEYS_: readonly string[] = [StorageKey.ONBOARDING_STATE];
+
+  private isBlocked_(key: string): boolean {
+    return !!getSettingsManager_()?.isBlockPersistence && !PersistenceManager.BLOCK_EXEMPT_KEYS_.includes(key);
+  }
+
   private static readonly PRESERVED_KEYS_: readonly StorageKey[] = [StorageKey.ONBOARDING_STATE, StorageKey.PLUGIN_ENABLE_OVERRIDES];
 
   validateStorage(): void {

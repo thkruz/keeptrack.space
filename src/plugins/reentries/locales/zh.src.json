@@ -24,7 +24,7 @@
         "window": "窗口（±分钟）",
         "nextReport": "下次报告（小时）",
         "reentryAngle": "再入角（度）",
-        "rcs": "雷达截面积 (m^2)",
+        "rcs": "雷达截面积 (m²)",
         "gpAge": "GP年龄（小时）",
         "dryMass": "干质量（千克）",
         "volume": "体积 (m³，估算)",

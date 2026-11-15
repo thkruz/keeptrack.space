@@ -214,6 +214,8 @@ export interface ReportCoreDeps {
   findPasses: (sensor: DetailedSensor, opts: ReportOptions) => ReportPass[];
   /** Satellite sun-illumination + sun angle at a time (null when unavailable). */
   sunStatusAt: (date: Date) => { illumination: SunIllumination; sunAngleDeg: number } | null;
+  /** Active sensors or sites besides the one the report covers (omitted or 0 when none). */
+  otherSensorCount?: number;
 }
 
 /** Sensible defaults; the menu lets the user override window and step. */
@@ -319,6 +321,15 @@ export const wrapReportText = (text: string, columns: number): string => {
  */
 export const buildPassCaveatLine = (sensor: Pick<DetailedSensor, 'timeZone'>, tr: ReportText = doc): string =>
   `${wrapReportText(fillDoc(tr(normalizeTimeZone(sensor.timeZone) ? 'header.passCaveat' : 'header.passCaveatDisplay'), { zone: resolveSiteTimeZone(sensor.timeZone) }), REPORT_HEADER_WRAP_COLUMNS)}
+
+`;
+
+/**
+ * One header line naming the single sensor a pass report covers and, when other sensors or
+ * sites are active, stating that they are not included.
+ */
+export const buildSensorCoverageLine = (sensor: Pick<DetailedSensor, 'name'>, otherSensorCount: number, tr: ReportText = doc): string =>
+  `${wrapReportText(fillDoc(tr(otherSensorCount > 0 ? 'header.sensorCoverageOthers' : 'header.sensorCoverage'), { sensor: sensor.name, count: otherSensorCount }), REPORT_HEADER_WRAP_COLUMNS)}
 
 `;
 
@@ -510,8 +521,14 @@ export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Da
 
 /** Rise/set visibility windows over a sensor for the report window. */
 export const generateVisibilityWindowsReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader(doc('titles.visibility'), sat, sensor, generatedAt) + buildReportWindowLine(opts) + buildPassCaveatLine(sensor);
-  const csvHeader = buildReportHeader(docEn('titles.visibility'), sat, sensor, generatedAt, docEn) + buildReportWindowLine(opts, docEn) + buildPassCaveatLine(sensor, docEn);
+  const otherCount = deps.otherSensorCount ?? 0;
+  const header =
+    buildReportHeader(doc('titles.visibility'), sat, sensor, generatedAt) + buildReportWindowLine(opts) + buildSensorCoverageLine(sensor, otherCount) + buildPassCaveatLine(sensor);
+  const csvHeader =
+    buildReportHeader(docEn('titles.visibility'), sat, sensor, generatedAt, docEn) +
+    buildReportWindowLine(opts, docEn) +
+    buildSensorCoverageLine(sensor, otherCount, docEn) +
+    buildPassCaveatLine(sensor, docEn);
   const passes = deps.findPasses(sensor, opts);
   // A Note column only when a window is clipped by the report interval (e.g. a GEO that never sets)
   const hasNotes = passes.some((pass) => typeof pass.edge !== 'undefined');

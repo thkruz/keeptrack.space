@@ -202,6 +202,16 @@ describe('reports-core', () => {
       expect(data.emptyMessage).toBeTruthy();
     });
 
+    it('Visibility Windows header names the covered sensor and notes other active sensors', () => {
+      const single = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, deps, generatedAt);
+      const multi = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, { ...deps, otherSensorCount: 2 }, generatedAt);
+
+      expect(single.header).toContain(`Covers sensor ${fakeSensor.name} only.`);
+      expect(single.header).not.toContain('not included');
+      expect(multi.header).toContain('2 other active sensors or sites are not included');
+      expect(multi.csvHeader).toContain('2 other active sensors or sites are not included');
+    });
+
     it('Visibility Windows emits one row per pass with rise/set/duration', () => {
       const data = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, deps, generatedAt);
 

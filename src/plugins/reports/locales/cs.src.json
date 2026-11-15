@@ -115,7 +115,9 @@
           "appVersion": "Verze KeepTrack",
           "ricConvention": "Konvence RIC",
           "passCaveat": "Místní časy stanoviště používají pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu.",
-          "passCaveatDisplay": "Místní časy používají zobrazované pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu."
+          "passCaveatDisplay": "Místní časy používají zobrazované pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu.",
+          "sensorCoverage": "Pokrývá pouze senzor {sensor}.",
+          "sensorCoverageOthers": "Pokrývá pouze senzor {sensor}. Dalších aktivních senzorů nebo stanovišť ({count}) zahrnuto není."
         },
         "titles": {
           "aer": "Zpráva azimut, elevace, vzdálenost",

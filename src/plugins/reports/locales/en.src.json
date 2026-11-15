@@ -115,7 +115,9 @@
           "appVersion": "KeepTrack version",
           "ricConvention": "RIC convention",
           "passCaveat": "Site-local times use the {zone} zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second.",
-          "passCaveatDisplay": "Local times use the {zone} display zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second."
+          "passCaveatDisplay": "Local times use the {zone} display zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second.",
+          "sensorCoverage": "Covers sensor {sensor} only.",
+          "sensorCoverageOthers": "Covers sensor {sensor} only. {count} other active sensors or sites are not included."
         },
         "titles": {
           "aer": "Azimuth Elevation Range Report",

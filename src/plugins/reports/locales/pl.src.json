@@ -115,7 +115,9 @@
           "appVersion": "Wersja KeepTrack",
           "ricConvention": "Konwencja RIC",
           "passCaveat": "Czasy lokalne stanowiska używają strefy {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja jest doprecyzowana do najbliższej sekundy.",
-          "passCaveatDisplay": "Czasy lokalne używają strefy wyświetlania {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja jest doprecyzowana do najbliższej sekundy."
+          "passCaveatDisplay": "Czasy lokalne używają strefy wyświetlania {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja jest doprecyzowana do najbliższej sekundy.",
+          "sensorCoverage": "Dotyczy wyłącznie czujnika {sensor}.",
+          "sensorCoverageOthers": "Dotyczy wyłącznie czujnika {sensor}. Pozostałe aktywne czujniki lub stanowiska ({count}) nie są uwzględnione."
         },
         "titles": {
           "aer": "Raport azymut, elewacja, odległość",

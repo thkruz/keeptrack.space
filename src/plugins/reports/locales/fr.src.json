@@ -115,7 +115,9 @@
           "appVersion": "Version de KeepTrack",
           "ricConvention": "Convention RIC",
           "passCaveat": "Les heures locales du site utilisent le fuseau {zone}. Les fenêtres montrent seulement l'accès géométrique, pas la preuve qu'un signal peut être reçu. L'élévation maximale est affinée à la seconde près.",
-          "passCaveatDisplay": "Les heures locales utilisent le fuseau d’affichage {zone}. Les fenêtres montrent seulement l'accès géométrique, pas la preuve qu'un signal peut être reçu. L'élévation maximale est affinée à la seconde près."
+          "passCaveatDisplay": "Les heures locales utilisent le fuseau d’affichage {zone}. Les fenêtres montrent seulement l'accès géométrique, pas la preuve qu'un signal peut être reçu. L'élévation maximale est affinée à la seconde près.",
+          "sensorCoverage": "Couvre uniquement le capteur {sensor}.",
+          "sensorCoverageOthers": "Couvre uniquement le capteur {sensor}. {count} autres capteurs ou sites actifs ne sont pas inclus."
         },
         "titles": {
           "aer": "Rapport azimut, élévation, distance",

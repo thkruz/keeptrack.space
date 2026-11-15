@@ -1021,6 +1021,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
       // sensor reports are gated to those, this guard just keeps the closure total.
       findPasses: (sensor, opts) => (sat instanceof Satellite ? this.findReportPasses_(sat, sensor, opts) : []),
       sunStatusAt: (date) => ReportsPlugin.sunStatusAt_(sat, date),
+      otherSensorCount: Math.max(0, (ServiceLocator.getSensorManager().currentSensors?.length ?? 0) - 1),
     };
   }
 

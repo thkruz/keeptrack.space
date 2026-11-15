@@ -115,7 +115,9 @@
           "appVersion": "KeepTrack-Version",
           "ricConvention": "RIC-Konvention",
           "passCaveat": "Ortszeiten der Station verwenden die Zone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet.",
-          "passCaveatDisplay": "Ortszeiten verwenden die Anzeigezone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet."
+          "passCaveatDisplay": "Ortszeiten verwenden die Anzeigezone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet.",
+          "sensorCoverage": "Gilt nur für den Sensor {sensor}.",
+          "sensorCoverageOthers": "Gilt nur für den Sensor {sensor}. {count} weitere aktive Sensoren oder Standorte sind nicht enthalten."
         },
         "titles": {
           "aer": "Bericht Azimut, Elevation, Entfernung",

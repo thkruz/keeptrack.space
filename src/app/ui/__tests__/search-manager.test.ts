@@ -954,8 +954,8 @@ describe('SearchManager interactions', () => {
     (document.querySelector('.search-result') as HTMLElement).dispatchEvent(new Event('click', { bubbles: true }));
   };
 
-  // #481: a chosen result closes the list on desktop too, so it no longer covers the info box.
-  it('desktop: clicking a result closes the list but keeps the query', () => {
+  // Desktop keeps the list open so users can browse several results (reverses #481 at Ted's request).
+  it('desktop: clicking a result keeps the list open and the query', () => {
     const wasMobile = settingsManager.isMobileModeEnabled;
 
     settingsManager.isMobileModeEnabled = false;
@@ -967,8 +967,8 @@ describe('SearchManager interactions', () => {
 
     clickFirstResult(defaultSensor.id);
 
-    expect(p().isResultsOpen).toBe(false);
-    expect(document.getElementById('search-results')!.innerHTML).toBe('');
+    expect(p().isResultsOpen).toBe(true);
+    expect(document.querySelector('.search-result')).not.toBeNull();
     expect((document.getElementById('search') as HTMLInputElement).value).toBe('ISS');
     settingsManager.isMobileModeEnabled = wasMobile;
   });

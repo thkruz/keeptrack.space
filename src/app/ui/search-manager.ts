@@ -227,10 +227,10 @@ export class SearchManager {
 
       if (obj) {
         SearchManager.lookAtSearchResult_(obj, satId);
-        // A chosen result closes the list (it covers the info box); the query stays in the box and the group stays
-        // highlighted. A phone also drops the keyboard; refocusing restores the list.
-        this.collapseResults_();
+        // Desktop keeps the list open so users can click through several results in a row. A phone closes it (it
+        // covers the info box there) and drops the keyboard; the query stays and refocusing restores the list.
         if (settingsManager.isMobileModeEnabled) {
+          this.collapseResults_();
           (getEl('search', true) as HTMLInputElement | null)?.blur();
         }
       }

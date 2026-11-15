@@ -224,7 +224,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       return;
     }
-    const result = computeFraming(this.lastlooksArray_, input.startMs, input.lengthSec);
+    const result = computeFraming(this.lastlooksArray_, input.startMs, input.lengthSec, this.isRiseSetOnly_ ? undefined : this.angleCalculationInterval_);
 
     out.textContent = describeFraming(result, {
       inFrame: l('framing.inFrame'),

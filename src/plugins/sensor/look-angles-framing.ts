@@ -52,10 +52,51 @@ export const parseExposureStart = (text: string, referenceMs: number): number =>
 };
 
 /**
+ * Sampled rows ("Show rise/set only" off) carry no type: each row is an in-view sample. Consecutive
+ * samples (gap up to 1.5 sample steps) form one interval. The step is `sampleSec`, else the smallest gap.
+ */
+const sampledIntervals_ = (looks: FramingLook[], sampleSec?: number): Array<[number, number]> => {
+  const times = looks
+    .map((look) => lookTimeToMs(look.time))
+    .filter((ms) => Number.isFinite(ms))
+    .sort((a, b) => a - b);
+  let stepMs = sampleSec && sampleSec > 0 ? sampleSec * 1000 : Number.POSITIVE_INFINITY;
+
+  if (!Number.isFinite(stepMs)) {
+    for (let i = 1; i < times.length; i++) {
+      const gap = times[i] - times[i - 1];
+
+      if (gap > 0) {
+        stepMs = Math.min(stepMs, gap);
+      }
+    }
+  }
+  const intervals: Array<[number, number]> = [];
+  let from = times[0];
+  let prev = times[0];
+
+  for (let i = 1; i < times.length; i++) {
+    if (times[i] - prev > stepMs * 1.5) {
+      intervals.push([from, prev]);
+      from = times[i];
+    }
+    prev = times[i];
+  }
+  if (times.length > 1 && prev > from) {
+    intervals.push([from, prev]);
+  }
+
+  return intervals;
+};
+
+/**
  * In-view intervals (ms) from look-angle rows: an interval opens at a Rise row (or the in-progress
  * row) and closes at the next Set row. A pass still open at the last row is closed there.
  */
-export const inViewIntervals = (looks: FramingLook[]): Array<[number, number]> => {
+export const inViewIntervals = (looks: FramingLook[], sampleSec?: number): Array<[number, number]> => {
+  if (looks.length > 0 && looks.every((look) => look.type === undefined && !look.inProgress)) {
+    return sampledIntervals_(looks, sampleSec);
+  }
   const intervals: Array<[number, number]> = [];
   let openMs: number | null = null;
   let lastMs = Number.NaN;
@@ -82,13 +123,13 @@ export const inViewIntervals = (looks: FramingLook[]): Array<[number, number]> =
 };
 
 /** Seconds of [startMs, startMs + lengthSec] spent in view, plus the entry and exit instants inside the window. */
-export const computeFraming = (looks: FramingLook[], startMs: number, lengthSec: number): FramingResult => {
+export const computeFraming = (looks: FramingLook[], startMs: number, lengthSec: number, sampleSec?: number): FramingResult => {
   const endMs = startMs + lengthSec * 1000;
   let inFrameMs = 0;
   let exitMs: number | null = null;
   let entryMs: number | null = null;
 
-  for (const [from, to] of inViewIntervals(looks)) {
+  for (const [from, to] of inViewIntervals(looks, sampleSec)) {
     const overlapFrom = Math.max(from, startMs);
     const overlapTo = Math.min(to, endMs);
 

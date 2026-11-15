@@ -51,6 +51,18 @@ describe('look-angles framing plan', () => {
     expect(r.inFrameSec).toBe(30);
   });
 
+  it('frames sampled rows (no type) as in view across consecutive samples', () => {
+    const sampled = ['05:33:00', '05:33:10', '05:33:20', '05:33:30', '05:33:40', '05:33:50', '05:34:00'].map((t) => ({ time: `2026-11-04 ${t}` }));
+    const r = computeFraming(sampled, Date.UTC(2026, 10, 4, 5, 33, 10), 30, 10);
+
+    expect(r.inFrameSec).toBe(30);
+    expect(computeFraming(sampled, Date.UTC(2026, 10, 4, 5, 33, 10), 30).inFrameSec).toBe(30);
+    // A gap between samples splits the pass
+    const gap = [{ time: '2026-11-04 05:33:00' }, { time: '2026-11-04 05:33:10' }, { time: '2026-11-04 06:00:00' }, { time: '2026-11-04 06:00:10' }];
+
+    expect(computeFraming(gap, Date.UTC(2026, 10, 4, 5, 40, 0), 30, 10).inFrameSec).toBe(0);
+  });
+
   it('describes the result', () => {
     const labels = { inFrame: 'in frame', enters: 'enters', leaves: 'leaves', none: 'none' };
     const text = describeFraming(computeFraming(looks, Date.UTC(2026, 10, 4, 5, 33, 30), 30), labels);

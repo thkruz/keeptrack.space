@@ -1364,6 +1364,7 @@ export abstract class KeepTrackPlugin {
     this.bottomIconComponent_?.disable(false);
     getEl(this.bottomIconElementName, true)?.classList.add('bmenu-item-disabled');
     getEl(`${this.id}-utility-icon`, true)?.classList.add('bmenu-item-disabled');
+    this.syncUtilityIconReason_(true);
   }
 
   setBottomIconToEnabled(): void {
@@ -1374,6 +1375,43 @@ export abstract class KeepTrackPlugin {
     this.bottomIconComponent_?.enable();
     getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-disabled');
     getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-disabled');
+    this.syncUtilityIconReason_(false);
+  }
+
+  /**
+   * Keep the drawer footer copy's aria-disabled, tooltip and aria-label in step with the icon state. Utility-only
+   * plugins have no bottom icon element for the drawer's observer to follow, so the plugin updates its footer icon
+   * directly. The plain label lives in data-drawer-label (set by the drawer).
+   */
+  private syncUtilityIconReason_(isDisabled: boolean): void {
+    const el = getEl(`${this.id}-utility-icon`, true);
+
+    if (!el) {
+      return;
+    }
+    el.setAttribute('aria-disabled', String(isDisabled));
+    const baseLabel = el.dataset.drawerLabel;
+
+    if (!baseLabel) {
+      return;
+    }
+    const reason = isDisabled ? this.silentDisabledReason_() : '';
+    const text = reason ? `${baseLabel}: ${reason}` : baseLabel;
+
+    el.setAttribute('kt-tooltip', text);
+    el.setAttribute('aria-label', text);
+  }
+
+  /** The reason explainDisabledIcon() would give, without showing a toast. */
+  private silentDisabledReason_(): string {
+    if (this.isRequireSensorSelected && !ServiceLocator.getSensorManager()?.isSensorSelected()) {
+      return t7e('pluginDrawer.reasonSelectSensor' as TranslationKey);
+    }
+    if (this.isRequireSatelliteSelected && !this.verifySatelliteSelected(false)) {
+      return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
+    }
+
+    return this.getDisabledReason() ?? '';
   }
 
   /**

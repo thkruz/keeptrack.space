@@ -25,6 +25,10 @@ describe('phone drawer and touch targets', () => {
     expect(MobileManager.MOBILE_PLUGINS).toContain('OnboardingPlugin');
   });
 
+  it('R20-F8 (#544) hides the Pro lock badge in the collapsed rail but not on rail-hover', () => {
+    expect(drawerCss).toMatch(/\.plugin-drawer\.rail-mode:not\(\.rail-hover\) \.drawer-item \.drawer-item-lock \{\s*display: none !important;/u);
+  });
+
   it('#153 puts the account row first in the phone drawer', () => {
     expect(tail).toMatch(/\.plugin-drawer\.mobile-mode \.drawer-user-account \{\s*order: -2;/u);
   });

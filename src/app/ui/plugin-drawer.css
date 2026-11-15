@@ -533,6 +533,12 @@ body.drawer-mode {
     display: inline-block;
   }
 
+  /* R20-F8 (#544): the collapsed rail hides the lock so locked rows match the others in height;
+     the gold icon tint already marks them. Expanded drawer and .rail-hover keep the lock. */
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item .drawer-item-lock {
+    display: none !important;
+  }
+
   /* ---- User Account (pinned above utility footer) ---- */
   .drawer-user-account:empty {
     display: none;

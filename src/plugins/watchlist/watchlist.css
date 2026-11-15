@@ -38,6 +38,12 @@
 .watchlist-add-row .input-field {
   flex: 1 1 auto;
   margin: 12px 0 0;
+  /* #499: Materialize v2 side padding pushed the input text 15 px right of its label (the label is pinned to left:0
+     by menu-v13.css). Zero it like the flush fields above so label and text share the card edge; min-width lets the
+     input shrink on a 390 px phone instead of pushing the add icon out. */
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 0;
 }
 
 .watchlist-add-row .icon-btn {

@@ -19,7 +19,7 @@ import { saveAs } from 'file-saver';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
-import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc, getFreeAnalystSccs } from './create-sat-actions';
+import { applyOrbitPreset, applySunSyncInclination, buildActivePreviewTle, cloneSelectedSatellite, getFreeAnalystScc, getFreeAnalystSccs } from './create-sat-actions';
 import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
@@ -370,6 +370,13 @@ export class CreateSat extends KeepTrackPlugin {
       getEl(`${p}-${id}`)?.addEventListener('input', () => this.updatePreview_());
     }
 
+    // The Basic tab drives the preview while it is active, so its fields redraw it too.
+    for (const id of ['basic-inc', 'basic-apogee', 'basic-perigee']) {
+      getEl(`${p}-${id}`)?.addEventListener('input', () => this.updatePreview_());
+    }
+    // Switching tabs switches which form the preview reads (after Materialize flips the active tab).
+    getEl('createSat-tabs')?.addEventListener('click', () => setTimeout(() => this.updatePreview_(), 0));
+
     CreateSat.wireEpochTimestamp_(p, () => this.updatePreview_());
     wireInlineValidation(p);
   }
@@ -431,7 +438,7 @@ export class CreateSat extends KeepTrackPlugin {
       return;
     }
 
-    const tle = buildPreviewTleFromForm(CreateSat.elementPrefix);
+    const tle = buildActivePreviewTle(CreateSat.elementPrefix);
 
     if (tle) {
       this.orbitPreview_.update(tle.tle1, tle.tle2);

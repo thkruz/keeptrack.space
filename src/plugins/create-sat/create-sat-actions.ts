@@ -7,7 +7,7 @@
 import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { selectSideMenuTab } from '@app/engine/ui/side-menu-tabs';
+import { getActiveTabId, selectSideMenuTab } from '@app/engine/ui/side-menu-tabs';
 import { getEl } from '@app/engine/utils/get-el';
 import { Earth, FormatTle, Satellite, SpaceObjectType, TleLine1, TleLine2 } from '@ootk/src/main';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
@@ -211,6 +211,56 @@ export function cloneSelectedSatellite(prefix: string): boolean {
   selectSideMenuTab('createSat-tabs', 'createSat-advanced-tab');
 
   return true;
+}
+
+const PREVIEW_EARTH_RADIUS_KM = 6378.137;
+const PREVIEW_EARTH_MU = 398600.4418;
+
+/**
+ * Build a preview TLE from the Basic tab (inclination plus apogee/perigee
+ * altitudes, the same derivation the Basic submit uses). RAAN, argument of
+ * perigee and mean anomaly are 0 like the submitted satellite; the epoch comes
+ * from the shared epoch fields. Returns null when the values are not an orbit.
+ */
+export function buildBasicPreviewTleFromForm(prefix: string): { tle1: TleLine1; tle2: TleLine2 } | null {
+  const v = (id: string): string => (getEl(`${prefix}-${id}`, true) as HTMLInputElement | null)?.value?.trim() ?? '';
+  const inc = parseFloat(v('basic-inc'));
+  const apogee = parseFloat(v('basic-apogee'));
+  const perigee = parseFloat(v('basic-perigee'));
+
+  if ([inc, apogee, perigee].some(isNaN) || perigee < 0 || apogee < perigee) {
+    return null;
+  }
+
+  const ra = apogee + PREVIEW_EARTH_RADIUS_KM;
+  const rp = perigee + PREVIEW_EARTH_RADIUS_KM;
+  const a = (ra + rp) / 2;
+  const ecen = (ra - rp) / (ra + rp);
+  const meanmo = (Math.sqrt(PREVIEW_EARTH_MU / (a * a * a)) * 86400) / (2 * Math.PI);
+
+  try {
+    const { tle1, tle2 } = FormatTle.createTle({
+      scc: '90000',
+      inc,
+      meanmo,
+      rasc: 0,
+      argPe: 0,
+      meana: 0,
+      ecen,
+      epochyr: v('year') || '24',
+      epochday: v('day') || '001.00000000',
+      intl: '00000A',
+    });
+
+    return (tle1 as string) === 'Error' ? null : { tle1, tle2 };
+  } catch {
+    return null;
+  }
+}
+
+/** The preview TLE for whichever tab (Basic or Advanced) the user is on. */
+export function buildActivePreviewTle(prefix: string, tabsId = 'createSat-tabs'): { tle1: TleLine1; tle2: TleLine2 } | null {
+  return getActiveTabId(tabsId) === 'createSat-basic-tab' ? buildBasicPreviewTleFromForm(prefix) : buildPreviewTleFromForm(prefix);
 }
 
 /**

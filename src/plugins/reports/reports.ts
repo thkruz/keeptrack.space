@@ -1519,7 +1519,9 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const payload = buildDownloadPayload(data, this.format_);
     // The window shows the chosen format: text keeps the metadata header and
     // aligned table, CSV/JSON show exactly what the download and copy produce.
-    const preview = this.format_ === 'text' ? buildPreviewText(data) : payload.content;
+    // A narrow window (phone, small popup) gets the last column wrapped under its row so a long note stays readable (#502).
+    const maxChars = typeof win.innerWidth === 'number' && win.innerWidth > 0 ? Math.floor((win.innerWidth - 20) / 7.3) : undefined;
+    const preview = this.format_ === 'text' ? buildPreviewText(data, maxChars) : payload.content;
     const blob = payload.ext === 'csv' ? createBrandedCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
     const url = URL.createObjectURL(blob);
 

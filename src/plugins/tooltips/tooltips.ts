@@ -482,8 +482,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     }
 
     // Custom Sensor form fields: open beside the side menu so the bubble never covers the field's own label or the row
-    // above it (#495, #496)
-    const customSensorEl = targetEl.closest<HTMLElement>('#custom-sensor-menu-form');
+    // above it (#495, #496) and Settings rows (#488)
+    const customSensorEl = targetEl.closest<HTMLElement>('#custom-sensor-menu-form, #settings-menu');
     const customMenuEl = customSensorEl?.closest<HTMLElement>('.side-menu-parent') ?? null;
 
     if (customMenuEl) {

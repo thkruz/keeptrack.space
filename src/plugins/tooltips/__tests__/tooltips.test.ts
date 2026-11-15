@@ -300,4 +300,29 @@ describe('TooltipsPlugin behavior', () => {
     vi.advanceTimersByTime(200);
     expect((document.getElementById('tooltip') as HTMLElement).innerHTML).toBe('new');
   });
+  it('opens Settings tooltips beside the side menu, clear of its right edge (#488)', () => {
+    const menu = document.createElement('div');
+
+    menu.id = 'settings-menu';
+    menu.className = 'side-menu-parent';
+    const row = document.createElement('div');
+
+    row.setAttribute('data-tooltip', 'Disable this to hide the camera widget');
+    menu.appendChild(row);
+    document.body.appendChild(menu);
+    menu.getBoundingClientRect = () => ({ left: 0, right: 320, top: 0, bottom: 700, width: 320, height: 700, x: 0, y: 0, toJSON: () => '' });
+    row.getBoundingClientRect = () => ({ left: 10, right: 300, top: 300, bottom: 340, width: 290, height: 40, x: 10, y: 300, toJSON: () => '' });
+    Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true });
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    div.getBoundingClientRect = () => ({ left: 0, right: 200, top: 0, bottom: 60, width: 200, height: 60, x: 0, y: 0, toJSON: () => '' });
+    document.body.appendChild(div);
+
+    plugin.showTooltip(row, 'Disable this to hide the camera widget');
+
+    expect(parseFloat(div.style.left)).toBe(328);
+    menu.remove();
+  });
 });

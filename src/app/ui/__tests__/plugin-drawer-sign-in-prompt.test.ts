@@ -1,4 +1,4 @@
-import { drawerRowFeatureName, isSignedOutGatedRow, showSignInPrompt } from '@app/app/ui/plugin-drawer-helpers';
+import { drawerRowFeatureName, isSignedOutGatedRow, showSignInPrompt, syncDrawerItemReason } from '@app/app/ui/plugin-drawer-helpers';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import * as keys from '@app/locales/keys';
@@ -65,5 +65,32 @@ describe('drawer signed-out sign-in prompt', () => {
     (prompt.querySelector('.drawer-sign-in-prompt__cancel') as HTMLButtonElement).click();
     expect(openModal).not.toHaveBeenCalled();
     expect(document.getElementById('drawer-sign-in-prompt')).toBeNull();
+  });
+
+  it('#438: the account hint follows the gate on enabled and disabled rows, and re-syncs after the tokens change', () => {
+    let gateOpen = false;
+
+    PluginRegistry.addPlugin({ bottomIconElementName: 'best-pass-bottom-icon', isLoginRequired: true, isLoginGateValid_: () => gateOpen, getDisabledReason: () => null } as never);
+    const row = makeRow(true);
+
+    row.insertAdjacentHTML('beforeend', '<span class="drawer-item-account-hint" id="hint-bp">Free account unlocks this</span>');
+    const hint = row.querySelector<HTMLElement>('.drawer-item-account-hint')!;
+
+    // Real order: userLogin used to fire before the tokens were distributed.
+    syncDrawerItemReason(row, false);
+    expect(hint.hidden).toBe(false);
+
+    gateOpen = true;
+    syncDrawerItemReason(row, false);
+    expect(hint.hidden).toBe(true);
+
+    // A disabled row (waiting for a sensor) must update its hint too, not keep a stale value.
+    hint.hidden = false;
+    syncDrawerItemReason(row, true);
+    expect(hint.hidden).toBe(true);
+
+    gateOpen = false;
+    syncDrawerItemReason(row, true);
+    expect(hint.hidden).toBe(false);
   });
 });

@@ -138,18 +138,20 @@ export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void
   }
 
   el.setAttribute('aria-disabled', String(isDisabled));
+
+  // #438: the "Free account unlocks this" line follows the plugin's own gate on every row, disabled or not,
+  // so a signed-in row that is only waiting for a sensor shows just its reason.
+  const hintEl = el.querySelector<HTMLElement>(':scope > .drawer-item-account-hint');
+
+  if (hintEl) {
+    hintEl.hidden = !isSignedOutGatedRow(el);
+  }
+
   if (isDisabled && text && reasonEl) {
     el.setAttribute('aria-describedby', reasonEl.id);
   } else {
     // Locked (Pro) rows keep pointing at their "Free account unlocks this" line.
-    const hintEl = el.querySelector<HTMLElement>(':scope > .drawer-item-account-hint');
     const hintId = hintEl?.id;
-
-    // #214: accounts that already have access never see the "Free account unlocks this" line
-    // (the CSS keys off a body class; the plugin's own gate is the source of truth).
-    if (hintEl) {
-      hintEl.hidden = !isSignedOutGatedRow(el);
-    }
 
     if (hintId && hintEl && !hintEl.hidden) {
       el.setAttribute('aria-describedby', hintId);

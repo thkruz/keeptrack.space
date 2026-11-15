@@ -129,6 +129,16 @@ export function himawariUrl(slot: Date): string {
 }
 
 /**
+ * EUMETSAT View WMS GetMap URL (public, no key). eumetview.eumetsat.int is gone;
+ * view.eumetsat.int/geoserver serves the same MSG natural-colour products.
+ * bbox is EPSG:4326 in WMS 1.3.0 order (minLat,minLon,maxLat,maxLon). Natural
+ * colour is daylight-only, so the night side renders black.
+ */
+export function eumetsatWmsUrl(layer: string, bbox: string): string {
+  return `https://view.eumetsat.int/geoserver/wms?service=WMS&version=1.3.0&request=GetMap&layers=${layer}&styles=&crs=EPSG:4326&bbox=${bbox}&width=1024&height=1024&format=image/jpeg`;
+}
+
+/**
  * Fixed geostationary imagery feeds. Each is a single public CDN/agency JPEG of
  * the latest full disk. To add a feed, append an entry here; the menu row and
  * click handler are generated from it.
@@ -146,7 +156,7 @@ export const IMAGERY_SOURCES: ImagerySource[] = [
     sccNum: 28912,
     buildImage: () => ({
       // IODC = Indian Ocean Data Coverage (Meteosat 9 since 2022).
-      url: 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSGIODC_RGBNatColour_LowResolution.jpg',
+      url: eumetsatWmsUrl('msg_iodc:rgb_natural', '-90,-44.5,90,135.5'),
     }),
   },
   {
@@ -155,7 +165,7 @@ export const IMAGERY_SOURCES: ImagerySource[] = [
     sccNum: 40732,
     buildImage: () => ({
       // Meteosat 11 provides 0° full-earth images every 15 minutes.
-      url: 'https://eumetview.eumetsat.int/static-images/latestImages/EUMETSAT_MSG_RGBNatColour_LowResolution.jpg',
+      url: eumetsatWmsUrl('msg_fes:rgb_natural', '-90,-90,90,90'),
     }),
   },
   {

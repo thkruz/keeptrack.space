@@ -1985,8 +1985,13 @@ body.is-mobile-mode {
 
   /* #456: --drawer-offset stays 60px while the rail is 44px here, which left a 16px strip of the satellite info box
      visible between the rail and the open menu. Start menus at the rail's real edge. */
+  /* Round 16: the phone block (max-width 639px, ~1579) sets left, width and max-width with !important, which beat the
+     plain `left: 44px`. Match it with !important and recompute the width so the menu fills to the right edge. */
   body.drawer-mode:not(.is-mobile-mode):has(.plugin-drawer.rail-mode) .side-menu-parent:not([id$='-secondary']) {
-    left: 44px;
+    --drawer-offset: 44px;
+    left: 44px !important;
+    width: calc(100vw - 44px) !important;
+    max-width: calc(100vw - 44px) !important;
   }
 
   body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-icon {

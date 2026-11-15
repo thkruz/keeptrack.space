@@ -202,7 +202,8 @@ export class GroupedPicker {
       const labels = Array.from(this.select_.selectedOptions).map(cleanText_);
 
       this.trigger_.textContent = labels.length === 0 ? (this.options_.emptyText ?? this.options_.title) : (this.options_.summarize?.(labels) ?? labels.join(', '));
-      this.trigger_.title = this.options_.title;
+      // Full selection as the tooltip: the trigger text is ellipsised when several items are chosen (#500).
+      this.trigger_.title = labels.length === 0 ? this.options_.title : `${this.options_.title}: ${labels.join(', ')}`;
 
       return;
     }

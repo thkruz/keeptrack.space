@@ -173,6 +173,15 @@
   float: none;
   margin: 6px 0 0;
   padding: 0;
+  /* A flex item defaults to min-width:auto, so a nowrap child (picker trigger, long value) stretched the column
+     wider than its card (#500). Let the column shrink to the card. */
+  min-width: 0;
+}
+
+/* Materialize v2 parks a floating label at left:16px, but KeepTrack zeroes the input/select text padding, so every
+   v13 label sat 16px right of its own field text and the card text edge (#499, #503). Align label to the text. */
+.kt-ui-v13 .input-field > label {
+  left: 0;
 }
 
 /* ===== Action rows ===== */

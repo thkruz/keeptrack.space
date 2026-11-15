@@ -677,10 +677,12 @@ export class SearchManager {
         // A sensor name that the Filter menu or Search Settings hides would otherwise read as a bare miss (#497).
         let noResultsKey = 'searchManager.noResults';
 
-        if (settingsManager.isDisableSensors) {
-          noResultsKey = 'searchManager.noResultsSensors';
-        } else if (SearchManager.sensorMatchHidden_(searchString_, catalogManagerInstance)) {
+        // The Filter menu also sets isDisableSensors, so test for a hidden sensor match first (it needs loaded
+        // sensors); only then fall back to the phone wording, where sensors never load.
+        if (SearchManager.sensorMatchHidden_(searchString_, catalogManagerInstance)) {
           noResultsKey = 'searchManager.noResultsSensorsHidden';
+        } else if (settingsManager.isDisableSensors) {
+          noResultsKey = 'searchManager.noResultsSensors';
         }
 
         uiManagerInstance.toast(t7e(noResultsKey as TranslationKey), ToastMsgType.serious, false);

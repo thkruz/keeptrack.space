@@ -942,7 +942,7 @@ export abstract class KeepTrackPlugin {
         type="button" hidden
         aria-label="${t7e('Common.menuHelp' as TranslationKey)}"
         kt-tooltip="${t7e('Common.menuHelp' as TranslationKey)}">
-        <span class="side-menu-help-glyph" style="--side-menu-help-icon: url('${helpPng}')"></span>
+        <img src="${helpPng}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>`;
     const closeIconHtml = html`
       <button id="${this.sideMenuElementName}-close-btn"

@@ -5,7 +5,8 @@
   top: calc(var(--top-menu-height, 50px) + 32px);
   left: 50%;
   transform: translateX(-50%);
-  z-index: 9000;
+  /* #511: below the side menus (z-index 5 to 10) so the banner never covers a menu's header buttons (help, close, pop-out) */
+  z-index: 4;
   box-sizing: border-box;
   max-width: min(560px, calc(100vw - 32px));
   padding: 6px 14px;
@@ -17,6 +18,14 @@
   line-height: 1.4;
   text-align: center;
   pointer-events: none;
+}
+
+/* #511: a side menu fills the left ~460 px; centre the banner in the space to its right instead of behind the menu. */
+@media (min-width: 900px) {
+  .kt-offline-banner {
+    left: calc(50% + 230px);
+    max-width: min(560px, calc(50vw - 262px));
+  }
 }
 
 .kt-offline-banner[hidden] {

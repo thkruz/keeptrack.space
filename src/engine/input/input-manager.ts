@@ -5,6 +5,7 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
+import { CameraType } from '../camera/camera-type';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { Engine } from '../engine';
@@ -20,6 +21,7 @@ import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
 import { TouchInput } from './input-manager/touch-input';
+import { type PickCandidate, resolvePickCandidate } from './pick-resolve';
 
 export type LatLon = {
   lat: Degrees;
@@ -459,8 +461,7 @@ export class InputManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const buf = dotsManagerInstance.pickReadPixelBuffer;
     const { x0, y0, size, cx, cy } = pickBox;
-    let bestId = -1;
-    let bestDistance = Number.POSITIVE_INFINITY;
+    const found = new Map<number, number>();
 
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -479,15 +480,49 @@ export class InputManager {
         const dx = x0 + col - cx;
         const dy = y0 + row - cy;
         const distance = dx * dx + dy * dy;
+        const prev = found.get(id);
 
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          bestId = id;
+        if (prev === undefined || distance < prev) {
+          found.set(id, distance);
         }
       }
     }
 
-    return bestId;
+    const candidates: PickCandidate[] = Array.from(found, ([id, pixelDistance2]) => ({ id, pixelDistance2 }));
+
+    /*
+     * Pick squares are much larger than the visible dot, so in a dense belt the id under the
+     * cursor pixel is whichever square won the depth test. Resolve overlaps by dot centre.
+     */
+    return resolvePickCandidate(candidates, { x: cx, y: cy }, (id) => this.getPickCentre_(id));
+  }
+
+  /** Dot centre of a catalog id in drawing-buffer pixels (y from the bottom), or null when it cannot be projected. */
+  private getPickCentre_(id: number): { x: number; y: number } | null {
+    // Polar and flat-map shaders reproject in the GPU; the CPU projection only matches the 3D view
+    const camType = ServiceLocator.getMainCamera().cameraType;
+
+    if (camType === CameraType.POLAR_VIEW) {
+      return null;
+    }
+
+    const obj = ServiceLocator.getCatalogManager().getObject(id);
+
+    if (!obj) {
+      return null;
+    }
+
+    const { gl } = ServiceLocator.getRenderer();
+    const screen = ServiceLocator.getRenderer().getScreenCoords(obj);
+
+    if (screen.error || !window.innerWidth || !window.innerHeight) {
+      return null;
+    }
+
+    return {
+      x: (screen.x * gl.drawingBufferWidth) / window.innerWidth,
+      y: gl.drawingBufferHeight - (screen.y * gl.drawingBufferHeight) / window.innerHeight,
+    };
   }
 
   /**

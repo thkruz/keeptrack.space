@@ -35,9 +35,15 @@
   margin: 6px 0 0;
 }
 
-/* #520: Materialize gives the input an 8 px bottom margin and the form/input-field a bottom margin, which stacked a
-   ~37 px empty band under the row. Zero them so the card's own padding is the only gap (#499 alignment untouched). */
-.watchlist-add-row .input-field input {
+/* #520 (second fix): the first attempt used `.watchlist-add-row .input-field input` (0,2,1), which loses to
+   materialize-local.css `.input-field input[type='text']:not(.browser-default):not(.select-dropdown)` (0,4,1,
+   margin 0 0 8px) and to `.side-menu .input-field` (0,2,0, margin-bottom 1.5rem) on order. The #watchlist-menu id
+   (shared by the OSS and Pro menus) adds (1,0,0), so these win without !important. */
+#watchlist-menu .watchlist-add-row .input-field input {
+  margin-bottom: 0;
+}
+
+#watchlist-menu .watchlist-add-row .input-field {
   margin-bottom: 0;
 }
 

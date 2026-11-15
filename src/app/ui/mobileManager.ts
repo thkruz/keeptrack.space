@@ -75,6 +75,8 @@ export class MobileManager {
     'VcrPlugin',
     // Added 2026-11-14 (#383): without it the welcome tour never starts on phones (plugin config was forced to false).
     'OnboardingPlugin',
+    // Added 2026-11-15 (#539): Reset to Start sits in the clock popover; long-press opens Reset / Set / Clear.
+    'ResetToStart',
   ];
 
   static checkMobileMode() {

@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Название датчика",
-        "latitude": "Широта",
-        "longitude": "Долгота",
+        "latitude": "Широта (°)",
+        "longitude": "Долгота (°)",
         "elevation": "Высота над уровнем моря (км)",
         "sensorType": "Тип датчика",
         "typeObserver": "Наблюдатель",
@@ -103,7 +103,10 @@
         "maskStep": "Ступенчатые интервалы (угол места действует до следующего азимута)",
         "tooltipMaskStep": "Выкл.: минимальный угол места интерполируется между точками. Вкл.: каждый азимут начинает интервал с этим углом места до следующего азимута, с переходом через 360 (0,10 и 90,35 означает 10 градусов от 0 до 90, затем 35 градусов).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "напр. 41.75",
+        "lonPlaceholder": "напр. -70.54",
+        "telescopeHint": "Вкл.: полный азимут 360°, маска возвышения 10° и неограниченная дальность. Выкл.: пределы азимута, возвышения и дальности задаются вручную."
       },
       "rmbMenu": {
         "title": "Создать",

@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "传感器名称",
-        "latitude": "纬度",
-        "longitude": "经度",
+        "latitude": "纬度 (°)",
+        "longitude": "经度 (°)",
         "elevation": "海拔高度（公里）",
         "sensorType": "传感器类型",
         "typeObserver": "观测者",
@@ -103,7 +103,10 @@
         "maskStep": "阶梯分段(仰角保持到下一个方位角)",
         "tooltipMaskStep": "关闭:最小仰角在各点之间插值。开启:每个方位角开始一个分段,保持其仰角直到下一个方位角,并在360度处回绕(0,10 和 90,35 表示0到90度为10度,之后为35度)。",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "例如 41.75",
+        "lonPlaceholder": "例如 -70.54",
+        "telescopeHint": "开启：方位角完整360°，仰角遮罩10°，距离不限。关闭：自行设置方位角、仰角和距离范围。"
       },
       "rmbMenu": {
         "title": "创建",

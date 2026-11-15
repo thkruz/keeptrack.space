@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Назва сенсора",
-        "latitude": "Широта",
-        "longitude": "Довгота",
+        "latitude": "Широта (°)",
+        "longitude": "Довгота (°)",
         "elevation": "Висота над рівнем моря (км)",
         "sensorType": "Тип сенсора",
         "typeObserver": "Спостерігач",
@@ -103,7 +103,10 @@
         "maskStep": "Ступінчасті інтервали (кут місця діє до наступного азимута)",
         "tooltipMaskStep": "Вимк.: мінімальний кут місця інтерполюється між точками. Увімк.: кожен азимут починає інтервал із цим кутом місця до наступного азимута, з переходом через 360 (0,10 і 90,35 означає 10 градусів від 0 до 90, потім 35 градусів).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "напр. 41.75",
+        "lonPlaceholder": "напр. -70.54",
+        "telescopeHint": "Увімк.: повний азимут 360°, маска висоти 10° і необмежена дальність. Вимк.: межі азимуту, висоти й дальності задаються вручну."
       },
       "rmbMenu": {
         "title": "Створити",

@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Sensor Name",
-        "latitude": "Latitude",
-        "longitude": "Longitude",
+        "latitude": "Latitude (°)",
+        "longitude": "Longitude (°)",
         "elevation": "Altitude Above Sea Level (km)",
         "sensorType": "Type of Sensor",
         "typeObserver": "Observer",
@@ -103,7 +103,10 @@
         "maskStep": "Step bins (hold elevation until next azimuth)",
         "tooltipMaskStep": "Off: the minimum elevation is interpolated between points. On: each azimuth starts a bin that holds its elevation until the next azimuth, wrapping at 360 (0,10 and 90,35 means 10 degrees from 0 to 90, then 35 degrees from 90 on).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "e.g. 41.75",
+        "lonPlaceholder": "e.g. -70.54",
+        "telescopeHint": "On: full 360° azimuth, 10° elevation mask and unlimited range. Off: set the azimuth, elevation and range limits yourself."
       },
       "rmbMenu": {
         "title": "Create",

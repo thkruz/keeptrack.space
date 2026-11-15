@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "センサー名",
-        "latitude": "緯度",
-        "longitude": "経度",
+        "latitude": "緯度 (°)",
+        "longitude": "経度 (°)",
         "elevation": "海抜高度（km）",
         "sensorType": "センサータイプ",
         "typeObserver": "観測者",
@@ -103,7 +103,10 @@
         "maskStep": "階段状ビン(次の方位角まで仰角を保持)",
         "tooltipMaskStep": "オフ: 最小仰角は点の間で補間されます。オン: 各方位角が、次の方位角までその仰角を保つビンを開始し、360度で折り返します(0,10 と 90,35 は 0〜90度が10度、その後は35度)。",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "例: 41.75",
+        "lonPlaceholder": "例: -70.54",
+        "telescopeHint": "オン：方位角360°全周、仰角マスク10°、距離無制限。オフ：方位角・仰角・距離の範囲を自分で設定します。"
       },
       "rmbMenu": {
         "title": "作成",

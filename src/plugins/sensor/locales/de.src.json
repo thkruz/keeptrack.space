@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Sensorname",
-        "latitude": "Breitengrad",
-        "longitude": "Längengrad",
+        "latitude": "Breitengrad (°)",
+        "longitude": "Längengrad (°)",
         "elevation": "Höhe über dem Meeresspiegel (km)",
         "sensorType": "Sensortyp",
         "typeObserver": "Beobachter",
@@ -103,7 +103,10 @@
         "maskStep": "Stufen (Elevation gilt bis zum nächsten Azimut)",
         "tooltipMaskStep": "Aus: Die Mindestelevation wird zwischen den Punkten interpoliert. An: Jeder Azimut beginnt einen Bereich mit dieser Elevation bis zum nächsten Azimut, über 360 hinaus umlaufend (0,10 und 90,35 heißt 10 Grad von 0 bis 90, danach 35 Grad).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "z. B. 41.75",
+        "lonPlaceholder": "z. B. -70.54",
+        "telescopeHint": "An: voller Azimut von 360°, Elevationsmaske 10° und unbegrenzte Reichweite. Aus: Azimut-, Elevations- und Reichweitengrenzen selbst festlegen."
       },
       "rmbMenu": {
         "title": "Erstellen",

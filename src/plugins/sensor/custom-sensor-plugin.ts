@@ -128,11 +128,11 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         <div class="kt-section-label">${s('location')}</div>
         <div class="kt-field-row">
           <div class="input-field col s6" kt-tooltip="${l('tooltipLatitude')}">
-            <input id="cs-lat" type="text" value="0" />
+            <input id="cs-lat" type="text" value="0" placeholder="${l('latPlaceholder')}" />
             <label for="cs-lat" class="active">${l('latitude')}</label>
           </div>
           <div class="input-field col s6" kt-tooltip="${l('tooltipLongitude')}">
-            <input id="cs-lon" type="text" value="0" />
+            <input id="cs-lon" type="text" value="0" placeholder="${l('lonPlaceholder')}" />
             <label for="cs-lon" class="active">${l('longitude')}</label>
           </div>
         </div>
@@ -154,6 +154,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             ${l('telescope')}
           </label>
         </div>
+        <div id="cs-telescope-hint" class="kt-hint">${l('telescopeHint')}</div>
         <div class="kt-field-row">
           <div id="cs-minaz-div" class="input-field col s6" kt-tooltip="${l('tooltipMinAz')}">
             <input id="cs-minaz" type="text" value="0" />

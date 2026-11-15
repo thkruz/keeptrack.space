@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Nom du capteur",
-        "latitude": "Latitude",
-        "longitude": "Longitude",
+        "latitude": "Latitude (°)",
+        "longitude": "Longitude (°)",
         "elevation": "Altitude au-dessus du niveau de la mer (km)",
         "sensorType": "Type de capteur",
         "typeObserver": "Observateur",
@@ -103,7 +103,10 @@
         "maskStep": "Paliers (l'élévation vaut jusqu'à l'azimut suivant)",
         "tooltipMaskStep": "Désactivé : l'élévation minimale est interpolée entre les points. Activé : chaque azimut ouvre un palier qui garde son élévation jusqu'à l'azimut suivant, avec bouclage à 360 (0,10 et 90,35 donne 10 degrés de 0 à 90, puis 35 degrés).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "p. ex. 41.75",
+        "lonPlaceholder": "p. ex. -70.54",
+        "telescopeHint": "Activé : azimut complet de 360°, masque d'élévation de 10° et portée illimitée. Désactivé : définissez vous-même les limites d'azimut, d'élévation et de portée."
       },
       "rmbMenu": {
         "title": "Créer",

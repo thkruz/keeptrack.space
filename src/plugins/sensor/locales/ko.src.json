@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "센서 이름",
-        "latitude": "위도",
-        "longitude": "경도",
+        "latitude": "위도 (°)",
+        "longitude": "경도 (°)",
         "elevation": "해발 고도 (km)",
         "sensorType": "센서 유형",
         "typeObserver": "관측자",
@@ -103,7 +103,10 @@
         "maskStep": "계단식 구간(다음 방위각까지 고도 유지)",
         "tooltipMaskStep": "끔: 최소 고도가 점 사이에서 보간됩니다. 켬: 각 방위각이 다음 방위각까지 해당 고도를 유지하는 구간을 시작하며 360도에서 이어집니다(0,10 및 90,35는 0~90도는 10도, 이후 35도).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "예: 41.75",
+        "lonPlaceholder": "예: -70.54",
+        "telescopeHint": "켜짐: 방위각 360° 전체, 고도각 마스크 10°, 거리 제한 없음. 꺼짐: 방위각, 고도각, 거리 한계를 직접 설정합니다."
       },
       "rmbMenu": {
         "title": "생성",

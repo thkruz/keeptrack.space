@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Název senzoru",
-        "latitude": "Zeměpisná šířka",
-        "longitude": "Zeměpisná délka",
+        "latitude": "Zeměpisná šířka (°)",
+        "longitude": "Zeměpisná délka (°)",
         "elevation": "Nadmořská výška (km)",
         "sensorType": "Typ senzoru",
         "typeObserver": "Pozorovatel",
@@ -103,7 +103,10 @@
         "maskStep": "Stupňovité pásy (elevace platí do dalšího azimutu)",
         "tooltipMaskStep": "Vypnuto: elevace se mezi body interpoluje. Zapnuto: každý azimut začíná pás s danou elevací až do dalšího azimutu, přes 360 se pokračuje (0,10 a 90,35 znamená 10 stupňů od 0 do 90, poté 35 stupňů).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "např. 41.75",
+        "lonPlaceholder": "např. -70.54",
+        "telescopeHint": "Zapnuto: celý azimut 360°, elevační maska 10° a neomezený dosah. Vypnuto: meze azimutu, elevace a dosahu nastavíte sami."
       },
       "rmbMenu": {
         "title": "Vytvořit",

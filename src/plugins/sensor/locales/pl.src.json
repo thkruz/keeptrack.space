@@ -63,8 +63,8 @@
       },
       "labels": {
         "sensorName": "Nazwa czujnika",
-        "latitude": "Szerokość geograficzna",
-        "longitude": "Długość geograficzna",
+        "latitude": "Szerokość geograficzna (°)",
+        "longitude": "Długość geograficzna (°)",
         "elevation": "Wysokość nad poziomem morza (km)",
         "sensorType": "Typ czujnika",
         "typeObserver": "Obserwator",
@@ -103,7 +103,10 @@
         "maskStep": "Przedziały schodkowe (elewacja obowiązuje do następnego azymutu)",
         "tooltipMaskStep": "Wyłączone: minimalna elewacja jest interpolowana między punktami. Włączone: każdy azymut rozpoczyna przedział o danej elewacji do następnego azymutu, z zawinięciem na 360 (0,10 i 90,35 oznacza 10 stopni od 0 do 90, potem 35 stopni).",
         "timeZone": "Time zone (IANA, optional)",
-        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default."
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "np. 41.75",
+        "lonPlaceholder": "np. -70.54",
+        "telescopeHint": "Włączone: pełny azymut 360°, maska elewacji 10° i nieograniczony zasięg. Wyłączone: granice azymutu, elewacji i zasięgu ustawiasz samodzielnie."
       },
       "rmbMenu": {
         "title": "Utwórz",

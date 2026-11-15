@@ -668,6 +668,7 @@ export class UiManager {
 
       if (toastMsg) {
         this.activeToastList_.push(toastMsg);
+        this.trackPrerequisiteToast_(toastText, toastMsg);
       }
     } catch {
       errorManagerInstance.debug('toast failed');
@@ -675,6 +676,49 @@ export class UiManager {
   }
 
   private activeToastList_ = [] as Toast[];
+  /** #483: "Select a satellite/sensor first!" toasts by text, so they clear once the prerequisite is met. */
+  private readonly prerequisiteToasts_ = new Map<string, Toast[]>();
+
+  private trackPrerequisiteToast_(toastText: string, toast: Toast): void {
+    if (toastText !== t7e('errorMsgs.SelectSatelliteFirst') && toastText !== t7e('errorMsgs.SelectSensorFirst')) {
+      return;
+    }
+    this.prerequisiteToasts_.set(toastText, [...(this.prerequisiteToasts_.get(toastText) ?? []), toast]);
+    this.bindPrerequisiteListeners_();
+  }
+
+  private prerequisiteListenersBound_ = false;
+
+  private bindPrerequisiteListeners_(): void {
+    if (this.prerequisiteListenersBound_) {
+      return;
+    }
+    this.prerequisiteListenersBound_ = true;
+    EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: unknown) => {
+      if (obj) {
+        this.dismissPrerequisiteToasts_(t7e('errorMsgs.SelectSatelliteFirst'));
+      }
+    });
+    EventBus.getInstance().on(EventBusEvent.setSensor, (sensor?: unknown) => {
+      if (sensor) {
+        this.dismissPrerequisiteToasts_(t7e('errorMsgs.SelectSensorFirst'));
+      }
+    });
+  }
+
+  /** Dismisses the lingering prerequisite toast(s) with this text. */
+  dismissPrerequisiteToasts_(toastText: string): void {
+    const toasts = this.prerequisiteToasts_.get(toastText) ?? [];
+
+    this.prerequisiteToasts_.delete(toastText);
+    toasts.forEach((toast) => {
+      try {
+        toast.dismiss();
+      } catch {
+        // already gone
+      }
+    });
+  }
   private readonly recentToastAt_ = new Map<string, number>();
   private static readonly TOAST_DEDUPE_MS_ = 2000;
 

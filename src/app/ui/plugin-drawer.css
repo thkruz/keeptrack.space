@@ -1913,6 +1913,11 @@ body.is-mobile-mode {
   }
 
   /* #153: sign-in / account row first, right under the close button. */
+  /* #471: the sticky close X (48 px wide, top right) covered the chevron of a group header scrolled under it. */
+  .plugin-drawer.mobile-mode .drawer-group-header {
+    padding-right: 56px;
+  }
+
   .plugin-drawer.mobile-mode .drawer-user-account {
     order: -2;
     border-top: none;

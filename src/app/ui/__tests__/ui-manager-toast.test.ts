@@ -1,6 +1,8 @@
 import { ToastAction, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { t7e } from '@app/locales/keys';
 import type { Toast } from '@materializecss/materialize';
 import { Mock, vi } from 'vitest';
 import { UiManager } from '../ui-manager';
@@ -25,6 +27,7 @@ type UiManagerInternals = {
   guardDismiss_: (toast: Toast) => void;
   makeToast_: (text: string, type: ToastMsgType, isLong?: boolean) => MockToast | null;
   activeToastList_: Toast[];
+  trackPrerequisiteToast_: (text: string, toast: Toast) => void;
 };
 
 const library: { toasts: Toast[]; container: { remove: () => void } | null } = { toasts: [], container: null };
@@ -91,6 +94,24 @@ describe('UiManager toast teardown (#1425, #1433)', () => {
     toast.wasSwiped = true;
     toast.dismiss();
   };
+
+  it('dismisses the "Select a satellite first!" toast once a satellite is selected (#483)', () => {
+    const toast = makeToast();
+
+    internals.trackPrerequisiteToast_(t7e('errorMsgs.SelectSatelliteFirst'), toast);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, { id: 1 } as never, 1);
+    expect(toast.teardown).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the "Select a sensor first!" toast when only a satellite is selected (#483)', () => {
+    const toast = makeToast();
+
+    internals.trackPrerequisiteToast_(t7e('errorMsgs.SelectSensorFirst'), toast);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, { id: 1 } as never, 1);
+    expect(toast.teardown).not.toHaveBeenCalled();
+    EventBus.getInstance().emit(EventBusEvent.setSensor, 'COD' as never, 1);
+    expect(toast.teardown).toHaveBeenCalledTimes(1);
+  });
 
   it('dismisses exactly once when the toast auto-expires and is then clicked', () => {
     const toast = makeToast();

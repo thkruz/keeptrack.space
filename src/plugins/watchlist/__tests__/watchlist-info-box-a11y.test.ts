@@ -59,6 +59,20 @@ describe('WatchlistPlugin info-box toggle accessibility', () => {
     expect(el.getAttribute('aria-label')).toBe('Add to Watchlist');
   });
 
+  it('does not touch the DOM when the state is unchanged (runs on every selection)', () => {
+    const el = toggle();
+
+    p().applyToggleState_(el, true);
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(el, { attributes: true, childList: true });
+    p().applyToggleState_(el, true);
+    const records = observer.takeRecords();
+
+    observer.disconnect();
+    expect(records).toHaveLength(0);
+  });
+
   it('Enter and Space activate the toggle; other keys do not', () => {
     const el = toggle();
     const click = vi.spyOn(el, 'click').mockImplementation(() => undefined);

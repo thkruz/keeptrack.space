@@ -93,6 +93,20 @@ describe('SatInfoBoxOrbital data population', () => {
     expect(getEl(EL.APOGEE)!.textContent).toBeTruthy();
   });
 
+  it('does not mutate the section on a repeat refresh with unchanged values', () => {
+    p().updateOrbitData_(defaultSat);
+
+    const section = getEl(EL.APOGEE)!.closest('.sat-info-section') ?? document.body;
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(section, { childList: true, characterData: true, attributes: true, subtree: true });
+    p().updateOrbitData_(defaultSat);
+    const records = observer.takeRecords();
+
+    observer.disconnect();
+    expect(records.map((r) => `${r.type}:${(r.target as HTMLElement).id ?? ''}`)).toEqual([]);
+  });
+
   it('shows the regime of a satellite in plain words', () => {
     vi.stubGlobal('requestIdleCallback', (cb: IdleRequestCallback) => cb({ didTimeout: false, timeRemaining: () => 50 }));
     p().updateOrbitData_(defaultSat);

@@ -122,15 +122,10 @@ export const setInnerHtml = (id: string, html: string) => {
  * @param value - The value to set for the display style (default: 'block').
  */
 export const showEl = (id: string | HTMLElement, value = 'block') => {
-  if (typeof id === 'object') {
-    id.style.display = value;
+  const el = typeof id === 'object' ? id : getEl(id, true);
 
-    return;
-  }
-
-  const el = getEl(id, true);
-
-  if (el) {
+  // An identical inline display write still invalidates style (and layout for the subtree); skip it.
+  if (el && el.style.display !== value) {
     el.style.display = value;
   }
 };
@@ -140,16 +135,10 @@ export const showEl = (id: string | HTMLElement, value = 'block') => {
  * @param id - The ID of the element to hide.
  */
 export const hideEl = (id: string | HTMLElement) => {
-  if (typeof id === 'object') {
-    id.style.display = 'none';
+  if (typeof id === 'object' || typeof id === 'string') {
+    const el = typeof id === 'object' ? id : getEl(id, true);
 
-    return;
-  }
-
-  if (typeof id === 'string') {
-    const el = getEl(id, true);
-
-    if (el) {
+    if (el && el.style.display !== 'none') {
       el.style.display = 'none';
     }
 

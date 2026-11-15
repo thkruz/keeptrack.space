@@ -32,7 +32,7 @@ import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sa
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeAttrIfChanged } from '@app/engine/utils/get-el';
 import {
   formatGpAge,
   getStaleGpThresholdHours,
@@ -449,11 +449,18 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   protected applyToggleState_(toggleEl: HTMLImageElement, isOnWatchlist: boolean): void {
     const label = WatchlistPlugin.tInfoBox_(isOnWatchlist ? 'removeLabel' : 'addLabel');
 
-    toggleEl.src = isOnWatchlist ? bookmarkRemovePng : bookmarkAddPng;
-    toggleEl.classList.replace(isOnWatchlist ? 'off-watchlist' : 'on-watchlist', isOnWatchlist ? 'on-watchlist' : 'off-watchlist');
-    toggleEl.alt = label;
-    toggleEl.setAttribute('aria-label', label);
-    toggleEl.setAttribute('kt-tooltip', label);
+    // Runs on every selection. Re-assigning an identical src restarts the image update steps and every attribute write
+    // dirties style, so each write is skipped when the value is already there.
+    writeAttrIfChanged(toggleEl, 'src', isOnWatchlist ? bookmarkRemovePng : bookmarkAddPng);
+    const cls = toggleEl.classList;
+    const onClass = isOnWatchlist ? 'on-watchlist' : 'off-watchlist';
+
+    if (!cls.contains(onClass)) {
+      cls.replace(isOnWatchlist ? 'off-watchlist' : 'on-watchlist', onClass);
+    }
+    writeAttrIfChanged(toggleEl, 'alt', label);
+    writeAttrIfChanged(toggleEl, 'aria-label', label);
+    writeAttrIfChanged(toggleEl, 'kt-tooltip', label);
   }
 
   protected selectSatData_(obj?: BaseObject) {

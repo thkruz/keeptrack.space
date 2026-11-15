@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { writeAttrIfChanged, writeHtmlIfChanged, writeTextIfChanged, writeTitleIfChanged } from '../get-el';
+import { hideEl, showEl, writeAttrIfChanged, writeHtmlIfChanged, writeTextIfChanged, writeTitleIfChanged } from '../get-el';
 
 const countMutations = (el: HTMLElement, fn: () => void): number => {
   const observer = new MutationObserver(() => undefined);
@@ -71,5 +71,25 @@ describe('writeTitleIfChanged', () => {
     expect(writeTitleIfChanged(el, '12.5')).toBe(true);
     expect(writeTitleIfChanged(el, '12.5')).toBe(false);
     expect(el.title).toBe('12.5');
+  });
+});
+
+describe('showEl / hideEl', () => {
+  it('skip an inline display write that would not change anything', () => {
+    const el = document.createElement('div');
+    const observe = (fn: () => void): number => {
+      const observer = new MutationObserver(() => undefined);
+
+      observer.observe(el, { attributes: true });
+      fn();
+
+      return observer.takeRecords().length;
+    };
+
+    expect(observe(() => showEl(el))).toBe(1);
+    expect(observe(() => showEl(el))).toBe(0);
+    expect(observe(() => hideEl(el))).toBe(1);
+    expect(observe(() => hideEl(el))).toBe(0);
+    expect(el.style.display).toBe('none');
   });
 });

@@ -12,7 +12,7 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeAttrIfChanged } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
@@ -130,10 +130,10 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       if (toggleEl) {
         if (isOnList) {
-          toggleEl.src = bookmarkRemovePng;
+          writeAttrIfChanged(toggleEl, 'src', bookmarkRemovePng);
           toggleEl.classList.replace('off-watchlist', 'on-watchlist');
         } else {
-          toggleEl.src = bookmarkAddPng;
+          writeAttrIfChanged(toggleEl, 'src', bookmarkAddPng);
           toggleEl.classList.replace('on-watchlist', 'off-watchlist');
         }
       }

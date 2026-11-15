@@ -35,6 +35,15 @@ export class PersistenceManager {
   private static readonly ACCOUNT_FLUSH_DEBOUNCE_MS_ = 3000;
 
   /**
+   * A failed push re-queues its keys and retries on its own (#426: the failure toast promises an
+   * automatic retry, so one must actually run, not wait for the next unrelated settings change).
+   * First retry after 5 s, doubling to a 60 s ceiling; a successful push resets the delay.
+   */
+  private static readonly ACCOUNT_RETRY_BASE_MS_ = 5000;
+  private static readonly ACCOUNT_RETRY_MAX_MS_ = 60000;
+  private accountRetryCount_ = 0;
+
+  /**
    * Constructor synchronously hydrates the cache from localStorage.
    * This preserves the original behavior where getInstance() returns a
    * fully-populated manager that settingsManager.init() can read from immediately.
@@ -469,6 +478,7 @@ export class PersistenceManager {
         for (const key of toPush.keys()) {
           this.pendingAccountWrites_.add(key);
         }
+        this.scheduleAccountRetry_();
       }
     }
 
@@ -576,13 +586,26 @@ export class PersistenceManager {
 
     try {
       await provider.push(batch);
+      this.accountRetryCount_ = 0;
     } catch (e) {
       errorManagerInstance.debug(`Failed to push account settings batch: ${e}`);
       // Re-queue failed keys for the next flush
       for (const key of batch.keys()) {
         this.pendingAccountWrites_.add(key);
       }
+      this.scheduleAccountRetry_();
     }
+  }
+
+  private scheduleAccountRetry_(): void {
+    if (this.accountFlushTimeout_ || !this.accountProvider_) {
+      return;
+    }
+
+    const delay = Math.min(PersistenceManager.ACCOUNT_RETRY_BASE_MS_ * 2 ** this.accountRetryCount_, PersistenceManager.ACCOUNT_RETRY_MAX_MS_);
+
+    this.accountRetryCount_++;
+    this.accountFlushTimeout_ = setTimeout(() => this.flushAccountWrites_(), delay);
   }
 
   private compareSemver_(a: string, b: string): number {

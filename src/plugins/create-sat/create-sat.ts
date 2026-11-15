@@ -67,6 +67,11 @@ interface CreateRequest {
 export class CreateSat extends KeepTrackPlugin {
   readonly id = 'CreateSat';
   static readonly elementPrefix = 'createSat';
+  /**
+   * Extra sentence the Pro TLE/OMM import sets while it submits, appended to the one "created" toast
+   * (a renumbered NORAD ID) instead of raising a second toast on top of it (#429). Cleared by the importer.
+   */
+  protected static createdToastNote_ = '';
   dependencies_ = [SelectSatManager.name];
   /** The menu button works with no satellite selected */
   isRequireSatelliteSelected = false;
@@ -1229,13 +1234,11 @@ export class CreateSat extends KeepTrackPlugin {
       ServiceLocator.getUiManager().doSearch(inputParams.scc);
 
       // Show success message
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.CreateSat.successMsgs.satCreated' as T7eKey)
-          .replace('{name}', inputParams.name)
-          .replace('{scc}', inputParams.scc),
-        ToastMsgType.normal,
-        true
-      );
+      const createdText = t7e('plugins.CreateSat.successMsgs.satCreated' as T7eKey)
+        .replace('{name}', inputParams.name)
+        .replace('{scc}', inputParams.scc);
+
+      ServiceLocator.getUiManager().toast(CreateSat.createdToastNote_ ? `${createdText} ${CreateSat.createdToastNote_}` : createdText, ToastMsgType.normal, true);
       EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'CreateSat', { satId });
     } catch (error) {
       // ootk rejects an out-of-range element with a ParseError; name the field and its range instead.

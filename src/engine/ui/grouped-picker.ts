@@ -37,6 +37,9 @@ export class GroupedPicker {
   private searchEl_: HTMLInputElement | null = null;
   private bodyEl_: HTMLElement | null = null;
   private groups_: PickerGroup[] = [];
+  /** Group open/closed state the user left behind, so a re-render (choosing an item) keeps expanded groups open (#450). */
+  private readonly groupOpen_ = new Map<string, boolean>();
+  private lastQuery_ = '';
   private readonly onSelectChange_ = (): void => this.updateTrigger_();
   private readonly onKeyDown_ = (e: KeyboardEvent): void => {
     // Keep typed letters and arrows from reaching the global shortcut handlers.
@@ -146,6 +149,8 @@ export class GroupedPicker {
     }
     this.drawer_.remove();
     this.drawer_ = null;
+    this.groupOpen_.clear();
+    this.lastQuery_ = '';
     this.searchEl_ = null;
     this.bodyEl_ = null;
     this.trigger_.setAttribute('aria-expanded', 'false');
@@ -247,6 +252,19 @@ export class GroupedPicker {
       return;
     }
     const query = (this.searchEl_?.value ?? '').trim().toLowerCase();
+    const prevScroll = this.bodyEl_.scrollTop;
+
+    // Remember what the user expanded or collapsed before the DOM is rebuilt (search-driven opens are not the user's choice).
+    if (this.lastQuery_ === '') {
+      this.bodyEl_.querySelectorAll<HTMLDetailsElement>('details.kt-picker-group').forEach((d) => {
+        const label = d.dataset.groupLabel;
+
+        if (label !== undefined) {
+          this.groupOpen_.set(label, d.open);
+        }
+      });
+    }
+    this.lastQuery_ = query;
     const selectedSet = new Set(this.options_.multiple ? Array.from(this.select_.selectedOptions).map((o) => o.value) : [this.select_.value]);
     const frag = document.createDocumentFragment();
     let shown = 0;
@@ -267,7 +285,8 @@ export class GroupedPicker {
       details.className = 'kt-picker-group';
       if (group.label) {
         // Collapsed by default; a search or the group holding the current choice opens it.
-        details.open = query !== '' || opts.some((o) => selectedSet.has(o.value));
+        details.dataset.groupLabel = group.label;
+        details.open = query !== '' || (this.groupOpen_.get(group.label) ?? opts.some((o) => selectedSet.has(o.value)));
         const summary = document.createElement('summary');
 
         summary.textContent = `${group.label} (${opts.length})`;
@@ -299,5 +318,6 @@ export class GroupedPicker {
       frag.appendChild(empty);
     }
     this.bodyEl_.replaceChildren(frag);
+    this.bodyEl_.scrollTop = prevScroll;
   }
 }

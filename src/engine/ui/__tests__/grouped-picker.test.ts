@@ -72,6 +72,23 @@ describe('GroupedPicker', () => {
   });
 });
 
+describe('GroupedPicker expanded groups', () => {
+  it('keeps expanded groups open across a re-render in multiple mode', () => {
+    document.body.innerHTML = `<div><select id="m" multiple>
+      <optgroup label="USA"><option value="a">Cape</option></optgroup>
+      <optgroup label="Kazakhstan"><option value="c">Site 45</option><option value="d">Site 31</option></optgroup></select></div>`;
+    const picker = new GroupedPicker(document.getElementById('m') as HTMLSelectElement, { title: 'Sites', multiple: true });
+
+    picker.open();
+    const kaz = document.querySelectorAll<HTMLDetailsElement>('.kt-picker-group')[1];
+
+    kaz.open = true;
+    (document.querySelector('[data-picker-value="a"]') as HTMLElement).click();
+
+    expect(document.querySelectorAll<HTMLDetailsElement>('.kt-picker-group')[1].open).toBe(true);
+  });
+});
+
 describe('GroupedPicker keyboard and multi-select', () => {
   it('marks the search box keyboard-priority and stops typed keys at the drawer', () => {
     const { picker } = build();

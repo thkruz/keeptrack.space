@@ -278,6 +278,23 @@ describe('PersistenceManager account sync (per-key LWW)', () => {
     expect(provider.pushed[0].has(StorageKey.FAVORITES_LIST)).toBe(true);
   });
 
+  it('retries a failed push on its own within 9 s (the failure toast promises it, #426)', async () => {
+    vi.useFakeTimers();
+    pm = PersistenceManager.getInstance();
+    await pm.attachAccountSyncProvider(provider);
+
+    // eslint-disable-next-line require-atomic-updates -- test setup, not a race
+    provider.failNextPush = true;
+    pm.saveItem(StorageKey.WATCHLIST_LIST, '["a"]');
+    await vi.advanceTimersByTimeAsync(3100);
+    expect(provider.pushed).toHaveLength(0);
+
+    // No further save: the retry alone must push the re-queued key.
+    await vi.advanceTimersByTimeAsync(5100);
+    expect(provider.pushed).toHaveLength(1);
+    expect(provider.pushed[0].has(StorageKey.WATCHLIST_LIST)).toBe(true);
+  });
+
   it('syncAccountNow runs a full cycle immediately', async () => {
     seedLocal(StorageKey.WATCHLIST_LIST, '["local"]', 100);
     pm = PersistenceManager.getInstance();

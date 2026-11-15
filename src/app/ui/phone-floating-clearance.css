@@ -347,3 +347,23 @@
     }
   }
 }
+
+/*
+ * Phone toasts (#449, #457): the stack used to sit at top: 75px, over the top bar controls (search, clock) and the
+ * Watchlist / Sensors row for its whole 5 s life. On a phone it docks to the bottom, above the floating pill, where it
+ * covers only globe. The search-results rule in style.common.css (bottom: 7%) keeps working because it sets the same
+ * edge; this one is more specific and also clears the pill.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  body.is-mobile-mode #toast-container,
+  body.is-mobile-mode.search-results-open #toast-container {
+    top: auto;
+    bottom: calc(var(--pill-clearance) + 8px);
+    left: 0;
+    right: 0;
+    min-width: 0;
+    max-width: 100vw;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+}

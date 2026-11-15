@@ -401,6 +401,25 @@ describe('onboarding account step gating', () => {
     overlayEl.remove();
   });
 
+  it('phone: the tour end defers the account card to the next visit instead of showing it (#457)', () => {
+    KeepTrackPlugin.loginGateOpenModal = vi.fn();
+    const internal = bootPlugin() as unknown as Internal;
+    const previous = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    try {
+      internal.showBridge_();
+      (document.querySelector('[data-tour-button="finish"]') as HTMLElement).click();
+
+      expect(document.querySelector('[data-tour-button="create"]')).toBeNull();
+      expect(document.getElementById('kt-tour-root')).toBeNull();
+      expect(internal.state_.status).toBe('done');
+      expect(internal.state_.accountPrompt).toBe('later');
+    } finally {
+      settingsManager.isMobileModeEnabled = previous;
+    }
+  });
+
   it('signing in from the tour-end card means no second showing', () => {
     KeepTrackPlugin.loginGateOpenModal = vi.fn();
     const internal = bootPlugin() as unknown as Internal;

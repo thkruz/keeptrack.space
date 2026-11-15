@@ -132,12 +132,39 @@
     overflow-wrap: break-word;
   }
 
+  /* #448: the 38%-wide ellipsis badge read "C...", "KO...", "CON..." and rows mixed side-by-side and stacked org text.
+     Every row now uses the same two-line grid: name + system tag on top, the full organisation chip under it (left
+     aligned, wraps if it must), chevron in the right column. */
+  #sensor-list-content .sensor-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'label chev'
+      'badge chev';
+    align-items: center;
+    justify-items: start;
+    row-gap: 4px;
+  }
+
+  #sensor-list-content .sensor-row .kt-action-label {
+    grid-area: label;
+    width: 100%;
+  }
+
   #sensor-list-content .sensor-row .sensor-badge {
-    flex: 0 1 auto;
+    grid-area: badge;
+    margin-left: 0;
     min-width: 0;
-    max-width: 38%;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+    overflow: visible;
+  }
+
+  #sensor-list-content .sensor-row::after {
+    grid-area: chev;
+    align-self: center;
   }
 
   #sensor-list-content .sensor-row,

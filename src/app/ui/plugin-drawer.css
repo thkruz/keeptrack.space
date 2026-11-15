@@ -456,7 +456,8 @@ body.drawer-mode {
     filter: var(--filter-icon-blue) !important;
   }
 
-  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-account-hint {
+  /* #438: the `hidden` attribute (set from each plugin's own gate) decides, not the body class alone */
+  .drawer-item.bmenu-item-pro .drawer-item-account-hint:not([hidden]) {
     display: block;
   }
 
@@ -907,6 +908,12 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.desktop-mode {
     width: 420px;
+    top: var(--top-menu-height);
+    height: calc(100% - var(--top-menu-height));
+  }
+
+  /* #451: the scrim starts below the top bar like the drawer, so a focused zone chip and its ring stay at full brightness */
+  .drawer-overlay {
     top: var(--top-menu-height);
     height: calc(100% - var(--top-menu-height));
   }
@@ -1888,7 +1895,10 @@ body.is-mobile-mode {
     position: sticky;
     top: 0;
     z-index: 5;
-    background: var(--color-dark-background, #1a1a1a);
+    /* #407: no opaque tile. It hid the right end of whichever row scrolled under it (chevrons, badges); the glyph
+       carries a dark halo instead so it stays readable over row text, and the 48 px touch target is unchanged. */
+    background: transparent;
+    text-shadow: 0 0 2px #000, 0 0 5px #000, 0 0 9px #000;
     order: -3;
     align-self: flex-end;
     align-items: center;
@@ -1971,6 +1981,12 @@ body.is-mobile-mode {
 @media (max-width: 640px) {
   body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) {
     width: 44px;
+  }
+
+  /* #456: --drawer-offset stays 60px while the rail is 44px here, which left a 16px strip of the satellite info box
+     visible between the rail and the open menu. Start menus at the rail's real edge. */
+  body.drawer-mode:not(.is-mobile-mode):has(.plugin-drawer.rail-mode) .side-menu-parent:not([id$='-secondary']) {
+    left: 44px;
   }
 
   body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-icon {

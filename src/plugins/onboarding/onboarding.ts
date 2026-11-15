@@ -609,6 +609,17 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   private showAccount_(isNextVisit = false): void {
     const isOfferable = this.isAccountStepAvailable_() && this.state_.accountPrompt === (isNextVisit ? 'later' : 'none');
 
+    // #457: on a phone the card covers the globe and zoom buttons and stacks with the "Tour complete" toast seconds
+    // after the tour. Defer the one offer to the next visit instead (the 'later' state already does that).
+    if (isOfferable && !isNextVisit && settingsManager.isMobileModeEnabled) {
+      this.state_.accountPrompt = 'later';
+      this.saveState_();
+      this.track_('onboarding_account_deferred', { source: 'phone-tour-end' });
+      this.finishTour_(true);
+
+      return;
+    }
+
     if (!isOfferable) {
       if (!isNextVisit) {
         this.finishTour_(true);

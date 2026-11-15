@@ -304,7 +304,9 @@
     "resetCamera": "Reset Camera",
     "clearLines": "Clear Lines",
     "clearScreen": "Clear Screen",
-    "startClock": "Start Clock"
+    "startClock": "Start Clock",
+    "groupObject": "Satellite",
+    "groupMore": "More"
   },
   "urlManager": {
     "satNotFound": "Satellite \"{val}\" was not found!",

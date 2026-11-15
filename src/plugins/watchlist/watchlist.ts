@@ -80,6 +80,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'watchlist-rmb',
+      group: 'object',
       level1Html: html`<li class="rmb-menu-item" id="watchlist-rmb"><a href="#">${WatchlistPlugin.tRmb_('addToWatchlist')}</a></li>`,
       order: 4,
       isVisible: (ctx: RmbMenuContext) => ctx.target instanceof Satellite,

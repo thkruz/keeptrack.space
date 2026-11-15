@@ -23,7 +23,8 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { getEl } from '@app/engine/utils/get-el';
-import { IContextMenuConfig, RmbMenuContext } from '../../core/plugin-capabilities';
+import { ContextMenuGroupId, IContextMenuConfig, RmbMenuContext } from '../../core/plugin-capabilities';
+import { addContextMenuGroupLevel1, addContextMenuGroupLevel2, registerContextMenuGroup } from './context-menu-groups';
 
 /**
  * Default values for context menu configuration.
@@ -51,6 +52,14 @@ export interface ContextMenuItemInfo {
    * Overrides the boolean flags when provided.
    */
   isVisible?: (ctx: RmbMenuContext) => boolean;
+  /**
+   * Shared group submenu this item lives in, if any.
+   */
+  group?: ContextMenuGroupId;
+  /**
+   * True for a group's own top-level entry.
+   */
+  isGroup?: boolean;
 }
 
 /**
@@ -79,7 +88,7 @@ export interface ContextMenuCallbacks {
  * - Handling menu item actions
  */
 export class ContextMenuComponent {
-  private readonly config: Required<Omit<IContextMenuConfig, 'isVisible'>> & Pick<IContextMenuConfig, 'isVisible'>;
+  private readonly config: Required<Omit<IContextMenuConfig, 'isVisible' | 'group'>> & Pick<IContextMenuConfig, 'isVisible' | 'group'>;
   private readonly pluginId: string;
   private readonly callbacks: ContextMenuCallbacks;
 
@@ -105,6 +114,7 @@ export class ContextMenuComponent {
       level2ElementName: config.level2ElementName ?? '',
       order: config.order ?? DEFAULTS.ORDER,
       isVisible: config.isVisible,
+      group: config.group,
       isVisibleOnEarth: config.isVisibleOnEarth ?? false,
       isVisibleOffEarth: config.isVisibleOffEarth ?? false,
       isVisibleOnSatellite: config.isVisibleOnSatellite ?? false,
@@ -123,6 +133,7 @@ export class ContextMenuComponent {
       isRmbOffEarth: this.config.isVisibleOffEarth,
       isRmbOnSat: this.config.isVisibleOnSatellite,
       isVisible: this.config.isVisible,
+      ...(this.config.group ? { group: this.config.group } : {}),
     };
   }
 
@@ -184,6 +195,14 @@ export class ContextMenuComponent {
 
     const lastChild = item.lastChild;
 
+    if (lastChild && this.config.group) {
+      // Grouped: the entry becomes a row (or a section heading) of the group's submenu.
+      addContextMenuGroupLevel1(this.config.group, this.config.level1ElementName, this.config.order, lastChild as HTMLElement, !!this.config.level2ElementName);
+      this.level1Element = lastChild as HTMLElement;
+
+      return;
+    }
+
     if (lastChild) {
       const container = getEl(DEFAULTS.L1_CONTAINER_ID);
 
@@ -215,6 +234,13 @@ export class ContextMenuComponent {
     item.id = this.config.level2ElementName;
     item.className = 'right-btn-menu';
     item.innerHTML = this.config.level2Html;
+
+    if (this.config.group) {
+      addContextMenuGroupLevel2(this.config.group, this.config.level1ElementName, this.config.order, item);
+      this.level2Element = item;
+
+      return;
+    }
 
     const container = getEl(DEFAULTS.L2_CONTAINER_ID);
 
@@ -253,6 +279,9 @@ export class ContextMenuComponent {
 
     if (inputManager) {
       inputManager.rmbMenuItems.push(this.getMenuItemInfo());
+      if (this.config.group) {
+        registerContextMenuGroup(inputManager.rmbMenuItems, this.config.group);
+      }
     }
   }
 

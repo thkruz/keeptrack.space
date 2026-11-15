@@ -120,6 +120,7 @@ export class EditSat extends KeepTrackPlugin {
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'edit-rmb',
+      group: 'object',
       level1Html: html`
         <li class="rmb-menu-item" id="edit-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSat' as T7eKey)} &#x27A4;</a></li>`,
       level2ElementName: 'edit-rmb-menu',

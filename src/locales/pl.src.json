@@ -309,7 +309,9 @@
     "resetCamera": "Zresetuj kamerę",
     "clearLines": "Wyczyść linie",
     "clearScreen": "Wyczyść ekran",
-    "startClock": "Uruchom zegar"
+    "startClock": "Uruchom zegar",
+    "groupObject": "Satelita",
+    "groupMore": "Więcej"
   },
   "urlManager": {
     "satNotFound": "Satelita \"{val}\" nie został znaleziony!",

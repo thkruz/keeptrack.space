@@ -314,7 +314,9 @@
     "resetCamera": "Скинути камеру",
     "clearLines": "Очистити лінії",
     "clearScreen": "Очистити екран",
-    "startClock": "Запустити годинник"
+    "startClock": "Запустити годинник",
+    "groupObject": "Супутник",
+    "groupMore": "Більше"
   },
   "urlManager": {
     "satNotFound": "Супутник \"{val}\" не знайдено!",

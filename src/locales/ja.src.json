@@ -309,7 +309,9 @@
     "resetCamera": "カメラをリセット",
     "clearLines": "ラインを消去",
     "clearScreen": "画面を消去",
-    "startClock": "時計を開始"
+    "startClock": "時計を開始",
+    "groupObject": "衛星",
+    "groupMore": "その他"
   },
   "urlManager": {
     "satNotFound": "衛星「{val}」が見つかりませんでした!",

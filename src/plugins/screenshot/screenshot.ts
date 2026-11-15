@@ -89,6 +89,7 @@ export class Screenshot extends KeepTrackPlugin {
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'save-rmb',
+      group: 'more',
       level1Html: html`<li class="rmb-menu-item" id="save-rmb"><a href="#">${this.t_('rmbMenu.title')}</a></li>`,
       order: 20,
       isVisible: () => true,

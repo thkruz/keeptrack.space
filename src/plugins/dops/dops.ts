@@ -200,6 +200,7 @@ export class DopsPlugin extends KeepTrackPlugin {
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'dops-rmb',
+      group: 'more',
       level1Html: html`
         <li class="rmb-menu-item" id="dops-rmb"><a href="#">${t7e('plugins.DopsPlugin.rmb.dops')} &#x27A4;</a></li>`,
       level2ElementName: 'dops-rmb-menu',

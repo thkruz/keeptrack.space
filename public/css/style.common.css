@@ -2734,6 +2734,36 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   background-color: var(--kt-bg-hover, rgba(255, 255, 255, 0.08)) !important;
 }
 
+/*
+ * Group submenus ("Satellite", "More") hold other plugins' entries. A member that
+ * has its own submenu is flattened into a headed section; the heading is a label,
+ * not an action.
+ */
+.right-btn-menu .rmb-group-sub {
+  display: block;
+}
+
+.right-btn-menu ul li.rmb-group-header {
+  min-height: 0;
+  padding: 6px 12px 2px;
+  cursor: default;
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.right-btn-menu ul li.rmb-group-header a {
+  cursor: default;
+}
+
+.rmb-group-entry.rmb-group-divider {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--kt-border-default, rgba(255, 255, 255, 0.12));
+}
+
 .side-menu {
   position: absolute;
   inset: 0;

@@ -13,6 +13,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { eci2lla, Kilometers } from '@ootk/src/main';
 import { userActionGate } from '../../core/user-action-gate';
+import { isContextMenuGroupMember } from '../../plugins/components/context-menu/context-menu-groups';
 import { closeColorbox } from '../../utils/colorbox';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
@@ -103,20 +104,30 @@ export class MouseInput {
 
       // Create Event Listeners for Right Menu Buttons.
       // Single-action items (no submenu) are clicked directly on their L1 element.
-      ServiceLocator.getInputManager()
-        .rmbMenuItems.map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
-        .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
-        .forEach((el) => {
-          el?.addEventListener('click', (e: MouseEvent) => {
-            // If the element is hiddeen ignore the click
-            if (el.style.display === 'none') {
-              return;
-            }
-            this.rmbMenuActions_(e);
-          });
-        });
+      // A group's own submenu gets no listener: its members already have one, and a click
+      // bubbling to the group as well would fire the action twice.
+      const rmbClickTargets = ServiceLocator.getInputManager()
+        .rmbMenuItems.filter((item) => !item.isGroup)
+        .map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
+        .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM]);
 
-      ServiceLocator.getInputManager().rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
+      // A built-in moved into a group is also a registered item; listen once per element.
+      Array.from(new Set(rmbClickTargets)).forEach((el) => {
+        el?.addEventListener('click', (e: MouseEvent) => {
+          // If the element is hiddeen ignore the click
+          if (el.style.display === 'none') {
+            return;
+          }
+          this.rmbMenuActions_(e);
+        });
+      });
+
+      ServiceLocator.getInputManager().rmbMenuItems.forEach((item) => {
+        // Group members sit inside their group's submenu, which opens from the group's entry.
+        if (isContextMenuGroupMember(item)) {
+          return;
+        }
+        const { elementIdL1, elementIdL2 } = item;
         const el1 = getEl(elementIdL1, true);
         const el2 = elementIdL2 ? getEl(elementIdL2, true) : null;
 

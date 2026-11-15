@@ -309,7 +309,9 @@
     "resetCamera": "重置相机",
     "clearLines": "清除线条",
     "clearScreen": "清除屏幕",
-    "startClock": "启动时钟"
+    "startClock": "启动时钟",
+    "groupObject": "卫星",
+    "groupMore": "更多"
   },
   "urlManager": {
     "satNotFound": "未找到卫星\"{val}\"!",

@@ -309,7 +309,9 @@
     "resetCamera": "Obnovit kameru",
     "clearLines": "Vymazat čáry",
     "clearScreen": "Vymazat obrazovku",
-    "startClock": "Spustit hodiny"
+    "startClock": "Spustit hodiny",
+    "groupObject": "Satelit",
+    "groupMore": "Další"
   },
   "urlManager": {
     "satNotFound": "Družice \"{val}\" nebyla nalezena!",

@@ -309,7 +309,9 @@
     "resetCamera": "카메라 초기화",
     "clearLines": "선 지우기",
     "clearScreen": "화면 지우기",
-    "startClock": "시계 시작"
+    "startClock": "시계 시작",
+    "groupObject": "위성",
+    "groupMore": "더 보기"
   },
   "urlManager": {
     "satNotFound": "위성 \"{val}\"을(를) 찾을 수 없습니다!",

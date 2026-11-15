@@ -309,7 +309,9 @@
     "resetCamera": "Réinitialiser la caméra",
     "clearLines": "Effacer les lignes",
     "clearScreen": "Effacer l'écran",
-    "startClock": "Démarrer l'horloge"
+    "startClock": "Démarrer l'horloge",
+    "groupObject": "Satellite",
+    "groupMore": "Plus"
   },
   "urlManager": {
     "satNotFound": "Le satellite \"{val}\" est introuvable !",

@@ -319,9 +319,28 @@ export interface RmbMenuContext {
 }
 
 /**
+ * Shared top-level submenus that keep the right-click menu short.
+ *
+ * - `object`: actions on the clicked object (edit, watchlist, tagging, analysis).
+ * - `more`: less frequent actions (create, export, display presets, ground-point tools).
+ *
+ * The labels and order of each group are defined by the engine
+ * (see context-menu-groups.ts), so plugins only name the group they belong to.
+ */
+export type ContextMenuGroupId = 'object' | 'more';
+
+/**
  * Configuration for a plugin's context menu entry.
  */
 export interface IContextMenuConfig {
+  /**
+   * Put this entry inside a shared group submenu instead of the top level.
+   * A single-action entry becomes a row of the group's submenu; an entry with
+   * a level 2 submenu becomes a headed section of it (its level 1 label is the
+   * section heading). Omit to keep the entry at the top level.
+   */
+  group?: ContextMenuGroupId;
+
   /**
    * HTML for the level 1 (main) context menu item.
    * @example '<li class="rmb-menu-item">View Info</li>'

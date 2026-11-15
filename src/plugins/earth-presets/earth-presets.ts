@@ -220,6 +220,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
 
     return {
       level1ElementName: 'earth-rmb',
+      group: 'more',
       level1Html: html`<li class="rmb-menu-item" id="earth-rmb"><a href="#">${EarthPresetsPlugin.t_('rmbMenu.title')} &#x27A4;</a></li>`,
       level2ElementName: 'earth-rmb-menu',
       level2Html: html`<ul class='dropdown-contents'>${items}</ul>`,

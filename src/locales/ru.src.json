@@ -309,7 +309,9 @@
     "resetCamera": "Сбросить камеру",
     "clearLines": "Очистить линии",
     "clearScreen": "Очистить экран",
-    "startClock": "Запустить часы"
+    "startClock": "Запустить часы",
+    "groupObject": "Спутник",
+    "groupMore": "Ещё"
   },
   "urlManager": {
     "satNotFound": "Спутник \"{val}\" не найден!",

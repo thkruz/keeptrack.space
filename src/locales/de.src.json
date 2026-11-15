@@ -592,7 +592,9 @@
     "resetCamera": "Kamera zurücksetzen",
     "clearLines": "Linien löschen",
     "clearScreen": "Bildschirm löschen",
-    "startClock": "Uhr starten"
+    "startClock": "Uhr starten",
+    "groupObject": "Satellit",
+    "groupMore": "Mehr"
   },
   "urlManager": {
     "satNotFound": "Satellit \"{val}\" wurde nicht gefunden!",

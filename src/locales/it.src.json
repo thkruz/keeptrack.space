@@ -309,7 +309,9 @@
     "resetCamera": "Reimposta la fotocamera",
     "clearLines": "Cancella le linee",
     "clearScreen": "Cancella lo schermo",
-    "startClock": "Avvia orologio"
+    "startClock": "Avvia orologio",
+    "groupObject": "Satellite",
+    "groupMore": "Altro"
   },
   "urlManager": {
     "satNotFound": "Satellite \"{val}\" non trovato!",

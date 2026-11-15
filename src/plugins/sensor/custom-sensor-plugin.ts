@@ -88,6 +88,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'create-rmb',
+      group: 'more',
       level1Html: CustomSensorPlugin.buildRmbL1Html_(),
       level2ElementName: 'create-rmb-menu',
       level2Html: CustomSensorPlugin.buildRmbL2Html_(),

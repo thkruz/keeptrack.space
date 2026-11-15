@@ -61,6 +61,13 @@
     padding-top: 0px;
   }
 
+  /* #489: the 120 px camera widget is fixed at the top right and sat on the NORAD number of the first result rows
+     (the list is 360 px wide, flush right). Move the widget left of the open list; the inline right offset needs
+     !important. */
+  body.search-results-open:not(.is-mobile-mode) #camera-control-widget {
+    right: 370px !important;
+  }
+
   .share-icons {
     position: absolute;
     left: 0px;

@@ -51,7 +51,11 @@ const tooltipAttrs_ = (helpText?: string): string => {
     return '';
   }
 
-  return ` data-position="top" data-delay="50" data-tooltip="${escapeAttr_(helpText)}"`;
+  // #488: a tip above the row covers the previous row's label. On wide screens the side menu hugs the left edge, so put
+  // the tip beside the row (over the canvas). Phones have no room beside the full-width menu and keep the tip on top.
+  const position = typeof window !== 'undefined' && window.innerWidth >= 640 ? 'right' : 'top';
+
+  return ` data-position="${position}" data-delay="50" data-tooltip="${escapeAttr_(helpText)}"`;
 };
 
 const disabledAttr_ = (control: ISettingControl): string => (control.isDisabled?.() ? ' disabled' : '');

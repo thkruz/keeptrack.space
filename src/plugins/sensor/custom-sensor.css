@@ -286,12 +286,10 @@
   }
 }
 
-/* #537: keep a field label and its unit "(°)" on one line. Labels truncate with an ellipsis instead of wrapping, and the
-   label may use the full column width (the shared floating-label width is capped, which wrapped the unit). */
+/* #537: a field label may use the full column width (the shared floating-label width is capped) and wraps normally.
+   The locale strings bind each unit to the word before it with U+00A0, so "(°)" never lands on a line of its own. */
 #custom-sensor-menu .input-field > label {
   width: 100%;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  white-space: normal;
 }

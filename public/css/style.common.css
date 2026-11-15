@@ -399,7 +399,7 @@ textarea {
 .ui-datepicker-calendar tbody tr td a {
   display: flex;
   font-weight: bold;
-  color: var(--color-primary);
+  color: var(--color-dark-text-accent); /* the global a !important used to force this; #ba160c is 2.5:1 here (#534) */
   background: var(--color-dark-background);
   border: 1px solid rgba(0, 0, 0, 0);
   height: 45px;

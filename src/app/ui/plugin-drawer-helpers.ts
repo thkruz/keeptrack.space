@@ -402,7 +402,11 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const idAttr = item.pluginId ? ` id="${item.pluginId}-utility-icon"` : '';
 
-      html += `<div class="drawer-utility-icon${disabledClass}${proClass}"${idAttr} ${dataAttr}${proAttr} kt-tooltip="${item.label}">`;
+      const reason = item.isDisabled && item.pluginId ? drawerDisabledReasonText(item.pluginId) : '';
+      const tip = reason ? `${item.label}: ${reason}` : item.label;
+      const ariaAttr = item.isDisabled ? ` aria-disabled="true" aria-label="${tip}"` : '';
+
+      html += `<div class="drawer-utility-icon${disabledClass}${proClass}"${idAttr} ${dataAttr}${proAttr}${ariaAttr} data-drawer-label="${item.label}" kt-tooltip="${tip}">`;
       html += `<img src="${item.imgSrc}" alt="${item.label}" />`;
       html += '</div>';
     }
@@ -600,6 +604,25 @@ export function explainDisabledPluginReason(bottomIconId: string): boolean {
 
 // ---- Utility Footer Sync ----
 
+/**
+ * Mirror a disabled state onto a utility footer icon: aria-disabled, plus the reason in the tooltip and
+ * aria-label ("Watchlist filter: Add satellites to the watchlist first"). The plain label is kept in data-drawer-label.
+ */
+export function syncUtilityIconReason(el: HTMLElement, isDisabled: boolean, reasonOverride?: string): void {
+  const baseLabel = el.dataset.drawerLabel ?? el.getAttribute('kt-tooltip') ?? '';
+  const reason = isDisabled ? (reasonOverride ?? drawerDisabledReasonText(el.dataset.pluginId)) : '';
+
+  el.setAttribute('aria-disabled', String(isDisabled));
+  if (!baseLabel) {
+    return;
+  }
+  el.dataset.drawerLabel = baseLabel;
+  const text = reason ? `${baseLabel}: ${reason}` : baseLabel;
+
+  el.setAttribute('kt-tooltip', text);
+  el.setAttribute('aria-label', text);
+}
+
 /** Sync utility footer icon selection state with bottom menu. */
 export function syncUtilityFooterState(): void {
   const footerEl = getEl('drawer-utility-footer', true);
@@ -612,8 +635,11 @@ export function syncUtilityFooterState(): void {
       return;
     }
     const isSelected = bottomIcon.classList.contains('bmenu-item-selected');
+    const isDisabled = bottomIcon.classList.contains('bmenu-item-disabled');
 
     el.classList.toggle('bmenu-item-selected', isSelected);
+    el.classList.toggle('bmenu-item-disabled', isDisabled);
+    syncUtilityIconReason(el as HTMLElement, isDisabled);
   });
 
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {

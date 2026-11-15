@@ -1303,6 +1303,15 @@ export abstract class KeepTrackPlugin {
   }
 
   /**
+   * Whether the current satellite selection can be used by this plugin. Only consulted when
+   * isRequireSatelliteSelected is set; override to reject selections the plugin cannot handle
+   * (e.g. an OEM object that has no TLE).
+   */
+  protected isSelectionSupported_(_obj: BaseObject): boolean {
+    return true;
+  }
+
+  /**
    * Why this plugin's icon is disabled, for gates other than the sensor/satellite
    * selection (e.g. "Add satellites to the watchlist first"). Override it in a
    * plugin that disables its own icon; null means no explanation.
@@ -1447,6 +1456,13 @@ export abstract class KeepTrackPlugin {
       if (!selectSatManager || (selectSatManager as unknown as { selectedSat: number }).selectedSat === -1) {
         return;
       }
+
+      // An unsupported selection (e.g. an OEM object for a TLE-only plugin) keeps the icon disabled
+      const selectedObj = (selectSatManager as unknown as { getSelectedSat?: () => BaseObject | null }).getSelectedSat?.();
+
+      if (selectedObj && !this.isSelectionSupported_(selectedObj)) {
+        return;
+      }
     }
 
     if (settingsManager.offlineIconBehavior === OfflineIconBehavior.HIDE) {
@@ -1526,7 +1542,7 @@ export abstract class KeepTrackPlugin {
     }
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
       EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject): void => {
-        if (!obj) {
+        if (!obj || !this.isSelectionSupported_(obj)) {
           this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();

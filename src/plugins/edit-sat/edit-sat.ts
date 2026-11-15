@@ -159,6 +159,10 @@ export class EditSat extends KeepTrackPlugin {
   // Lifecycle
   // =========================================================================
 
+  protected override isSelectionSupported_(obj: BaseObject): boolean {
+    return obj instanceof Satellite;
+  }
+
   /** Disabled with a selection that has no TLE (OEM object, sensor, launch site...): say what to select. */
   getDisabledReason(): string | null {
     const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
@@ -254,10 +258,11 @@ export class EditSat extends KeepTrackPlugin {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
-      if (!obj) {
+      if (!obj || !(obj instanceof Satellite)) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
         }
+        this.setBottomIconToUnselected();
         this.setBottomIconToDisabled();
       } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
         this.populateSideMenu_();

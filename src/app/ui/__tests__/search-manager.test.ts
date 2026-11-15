@@ -764,6 +764,19 @@ describe('SearchManager interactions', () => {
     expect(mgr.getCurrentSearch()).toBe('ISS');
   });
 
+  it('getCurrentSearch keeps the query after a phone collapse and drops it on hideResults', () => {
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+    mgr.isResultsOpen = true;
+    (mgr as unknown as { collapseResults_: () => void }).collapseResults_();
+
+    expect(mgr.isResultsOpen).toBe(false);
+    expect(mgr.getCurrentSearch()).toBe('ISS');
+
+    mgr.hideResults();
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+    expect(mgr.getCurrentSearch()).toBe('');
+  });
+
   it('mirrors the open results list onto the body so toasts can move off it', () => {
     // Toast cards covered the first result rows and swallowed their clicks (zoom QA 2026-10-24)
     mgr.isResultsOpen = true;

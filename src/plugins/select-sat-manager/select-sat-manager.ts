@@ -145,7 +145,9 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
 
   checkIfSelectSatVisible() {
     if (PluginRegistry.getPlugin(TopMenu)) {
-      const currentSearch = ServiceLocator.getUiManager().searchManager.getCurrentSearch();
+      const searchManager = ServiceLocator.getUiManager().searchManager;
+      // Dropdown visibility, not the retained query: a folded list must not leave an empty box showing
+      const currentSearch = searchManager.isResultsOpen ? searchManager.getCurrentSearch() : '';
 
       // Base CSS Style based on if the search box is open or not
       let cssStyle = currentSearch.length > 0 ? 'display: block; max-height:auto;' : 'display: none; max-height:auto;';

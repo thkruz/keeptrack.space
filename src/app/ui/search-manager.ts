@@ -99,6 +99,8 @@ export class SearchManager {
   /** Set by Watchlist while its list owns the highlight group, so an empty search box does not drop the group (#349). */
   isGroupHighlightHeld = false;
   private isResultsOpen_ = false;
+  /** True after a phone collapse: the list is folded away but the query and group highlight are still active. */
+  private isQueryRetained_ = false;
 
   get isResultsOpen(): boolean {
     return this.isResultsOpen_;
@@ -112,6 +114,9 @@ export class SearchManager {
    */
   set isResultsOpen(isOpen: boolean) {
     this.isResultsOpen_ = isOpen;
+    if (isOpen) {
+      this.isQueryRetained_ = false;
+    }
     document.body?.classList.toggle(SearchManager.RESULTS_OPEN_BODY_CLASS, isOpen);
   }
 
@@ -484,10 +489,11 @@ export class SearchManager {
   }
 
   /**
-   * Returns the current search string entered by the user.
+   * Returns the active search string. Stays set while the list is folded away on a phone (the query and group
+   * highlight are kept); use `isResultsOpen` when the question is whether the dropdown is visible.
    */
   getCurrentSearch(): string {
-    if (this.isResultsOpen) {
+    if (this.isResultsOpen || this.isQueryRetained_) {
       const searchDom = <HTMLInputElement>getEl('search', true);
 
       if (searchDom) {
@@ -510,6 +516,7 @@ export class SearchManager {
       resultsEl.innerHTML = '';
     }
     this.isResultsOpen = false;
+    this.isQueryRetained_ = true;
   }
 
   /**
@@ -533,6 +540,7 @@ export class SearchManager {
       }
       groupManagerInstance.clearSelect();
       this.isResultsOpen = false;
+      this.isQueryRetained_ = false;
 
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];

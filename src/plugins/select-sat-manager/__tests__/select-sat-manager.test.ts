@@ -116,6 +116,21 @@ describe('SelectSatManager_class', () => {
     expect(selectSatManager.selectedSat).toBe(-1);
   });
 
+  it('clears isZoomIn on deselect so the zoom-out to Earth is not cancelled (#514)', () => {
+    selectSatManager.selectSat(0);
+    const cam = ServiceLocator.getMainCamera();
+
+    cam.state.isZoomIn = true;
+    cam.state.camZoomSnappedOnSat = false;
+    const exitSpy = vi.spyOn(cam, 'exitFixedToSat').mockImplementation(() => undefined);
+
+    selectSatManager.selectSat(-1);
+
+    expect(exitSpy).toHaveBeenCalled();
+    expect(cam.state.isZoomIn).toBe(false);
+    expect(selectSatManager.selectedSat).toBe(-1);
+  });
+
   it('clears primary identity when the requested object is inactive', () => {
     selectSatManager.selectSat(0);
     const inactive = ServiceLocator.getCatalogManager().objectCache[1];

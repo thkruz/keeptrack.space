@@ -407,6 +407,11 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       this.beginCameraTransition_();
       cam.exitFixedToSat();
 
+      // The zoom-out to Earth is programmatic. A selection zoom-in leaves isZoomIn true, and the
+      // zoom direction guard in updateZoom_ then cancels the zoom-out (camera stuck close on empty
+      // space, black scene), so clear it whether or not the zoom was snapped to the satellite.
+      cam.state.isZoomIn = false;
+
       // exitFixedToSat handles camDistBuffer and zoomTarget for SAT modes only.
       // For FIXED_TO_EARTH (most common), clean up snap state here so zoom works.
       if (cam.state.camZoomSnappedOnSat) {

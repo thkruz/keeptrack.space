@@ -104,6 +104,7 @@ export class PluginDrawer {
       this.wireEventListeners_();
       this.observeBottomIconState_();
       this.observeTopMenuState_();
+      this.observeSideMenuClearance_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -788,6 +789,59 @@ export class PluginDrawer {
     });
 
     observer.observe(bottomIcons, { attributes: true, attributeFilter: ['class'], subtree: true });
+  }
+
+  /**
+   * Keep the floating utility button clear of open side menus (#513). The pill sits at the
+   * horizontal centre of the viewport, which at 1366 px lands on the right edge (and scrollbar)
+   * of any wide menu such as the Optical Observability Planner. While a menu covers the centre,
+   * centre the pill in the free space to the right of the menu instead.
+   */
+  private observeSideMenuClearance_(): void {
+    const footer = getEl('drawer-utility-footer', true);
+
+    if (!footer) {
+      return;
+    }
+
+    let rafId = 0;
+    const update = () => {
+      rafId = 0;
+      let menuRight = 0;
+
+      document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((menu) => {
+        const style = getComputedStyle(menu);
+
+        if (style.display === 'none' || style.visibility === 'hidden') {
+          return;
+        }
+        const rect = menu.getBoundingClientRect();
+
+        if (rect.width > 0 && rect.height > 0) {
+          menuRight = Math.max(menuRight, rect.right);
+        }
+      });
+
+      // Half the collapsed pill plus a gap; the expanded pill grows around its centre.
+      const clearance = 32;
+      const viewportWidth = window.innerWidth;
+      const left = menuRight + clearance > viewportWidth / 2 ? (menuRight + viewportWidth) / 2 : viewportWidth / 2;
+
+      footer.style.setProperty('--drawer-footer-left', `${Math.round(left)}px`);
+    };
+    const schedule = () => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(update);
+      }
+    };
+    const observer = new MutationObserver(schedule);
+
+    document.querySelectorAll('.side-menu-parent').forEach((menu) => {
+      observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
+      menu.addEventListener('transitionend', schedule);
+    });
+    window.addEventListener('resize', schedule);
+    schedule();
   }
 
   /**

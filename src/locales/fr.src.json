@@ -332,6 +332,8 @@
     "resultCount": "{count} résultats",
     "resultCountLimited": "Affichage de {shown} sur {total} résultats",
     "noResults": "Aucun résultat trouvé",
+    "noResultsSensors": "Aucun résultat. Les capteurs ne sont pas recherchables dans cette vue.",
+    "noResultsSensorsHidden": "Aucun résultat. Les capteurs au sol sont masqués par le menu Filtre ou les Paramètres de recherche.",
     "decayed": "Désintégré",
     "partialMatch": "Partial match",
     "moduleOf": "{module} fait partie de {host}",

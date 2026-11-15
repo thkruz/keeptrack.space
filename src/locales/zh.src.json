@@ -332,6 +332,8 @@
     "resultCount": "{count} 个结果",
     "resultCountLimited": "显示 {total} 个结果中的 {shown} 个",
     "noResults": "未找到结果",
+    "noResultsSensors": "未找到结果。此视图中无法搜索传感器。",
+    "noResultsSensorsHidden": "未找到结果。地面传感器已在筛选菜单或搜索设置中隐藏。",
     "decayed": "已陨落",
     "partialMatch": "Partial match",
     "moduleOf": "{module} 是 {host} 的一部分",

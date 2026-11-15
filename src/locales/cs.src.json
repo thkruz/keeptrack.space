@@ -332,6 +332,8 @@
     "resultCount": "Výsledků: {count}",
     "resultCountLimited": "Zobrazeno {shown} z {total} výsledků",
     "noResults": "Nebyly nalezeny žádné výsledky",
+    "noResultsSensors": "Nic nenalezeno. Senzory se v tomto zobrazení nevyhledávají.",
+    "noResultsSensorsHidden": "Nic nenalezeno. Pozemní senzory jsou skryty v nabídce Filtr nebo v Nastavení vyhledávání.",
     "decayed": "Zaniklý",
     "partialMatch": "Partial match",
     "moduleOf": "{module} je součástí objektu {host}",

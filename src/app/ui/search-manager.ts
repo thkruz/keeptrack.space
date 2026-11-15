@@ -222,9 +222,10 @@ export class SearchManager {
 
       if (obj) {
         SearchManager.lookAtSearchResult_(obj, satId);
-        // On a phone the open list covers the globe: fold it away but keep the query in the box.
+        // A chosen result closes the list (it covers the info box); the query stays in the box and the group stays
+        // highlighted. A phone also drops the keyboard; refocusing restores the list.
+        this.collapseResults_();
         if (settingsManager.isMobileModeEnabled) {
-          this.collapseResults_();
           (getEl('search', true) as HTMLInputElement | null)?.blur();
         }
       }
@@ -672,10 +673,36 @@ export class SearchManager {
     if (idList.length === 0) {
       // lastSearch is the term list, so test the typed string's length instead.
       if (searchString_.length >= settingsManager.minimumSearchCharacters) {
-        uiManagerInstance.toast(t7e('searchManager.noResults' as TranslationKey), ToastMsgType.serious, false);
+        // Sensors are not loaded when the build disables them (phone mode, embeds): say so instead of a bare miss.
+        // A sensor name that the Filter menu or Search Settings hides would otherwise read as a bare miss (#497).
+        let noResultsKey = 'searchManager.noResults';
+
+        if (settingsManager.isDisableSensors) {
+          noResultsKey = 'searchManager.noResultsSensors';
+        } else if (SearchManager.sensorMatchHidden_(searchString_, catalogManagerInstance)) {
+          noResultsKey = 'searchManager.noResultsSensorsHidden';
+        }
+
+        uiManagerInstance.toast(t7e(noResultsKey as TranslationKey), ToastMsgType.serious, false);
       }
       this.hideResults();
     }
+  }
+
+  /** True when a sensor name contains the query but ground sensors are hidden from search by the Filter menu or Search Settings. */
+  private static sensorMatchHidden_(query: string, catalogManager: CatalogManager): boolean {
+    const hidden = (settingsManager.filter as Record<string, boolean | undefined> | undefined)?.groundSensors === false || settingsManager.searchableTypes?.sensor === false;
+
+    if (!hidden) {
+      return false;
+    }
+    const terms = query
+      .toUpperCase()
+      .split(',')
+      .map((term) => term.trim())
+      .filter((term) => term.length > 0);
+
+    return catalogManager.objectCache.some((obj) => obj?.isSensor() && terms.some((term) => obj.name.toUpperCase().includes(term)));
   }
 
   /** Result types whose match landed on the object's name, so the name should be highlighted. */

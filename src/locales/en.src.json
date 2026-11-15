@@ -327,6 +327,8 @@
     "resultCount": "{count} results",
     "resultCountLimited": "Showing {shown} of {total} results",
     "noResults": "No Results Found",
+    "noResultsSensors": "No Results Found. Sensors are not searchable in this view.",
+    "noResultsSensorsHidden": "No Results Found. Ground sensors are hidden by the Filter menu or Search Settings.",
     "decayed": "Decayed",
     "partialMatch": "Partial match",
     "moduleOf": "{module} is part of the {host}",

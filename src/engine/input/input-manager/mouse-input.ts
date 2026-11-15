@@ -303,7 +303,8 @@ export class MouseInput {
   /**
    * Escape on the bare scene deselects the selected object (closing the info box).
    * Anything else that Escape closes takes the press instead, so one Escape never
-   * closes search and drops the selection in the same keystroke.
+   * closes search and drops the selection in the same keystroke. Decision (#482): Escape drops only the selected
+   * object; the observing sensor stays until Reset Sensor.
    */
   private deselectOnEscape_(evt: KeyboardEvent): void {
     if (evt.key !== 'Escape' || evt.defaultPrevented) {

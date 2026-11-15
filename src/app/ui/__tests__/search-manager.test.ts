@@ -489,6 +489,20 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults).toEqual([3]);
     });
 
+    it('lists a sensor once when comma terms both match it (#497)', () => {
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: true };
+      searchManager.doSearch('CAPE COD, MASSACHUSETTS');
+      expect(settingsManager.lastSearchResults).toEqual([3]);
+    });
+
+    it('a hidden sensor match shows the sensors-hidden hint instead of a bare miss (#497)', () => {
+      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: false };
+      searchManager.doSearch('CAPE');
+      expect(toast).toHaveBeenCalledWith(expect.stringContaining('noResultsSensorsHidden'), expect.anything(), false);
+    });
+
     it('disabling the satellite type removes satellites from results', () => {
       settingsManager.searchableTypes = { ...settingsManager.searchableTypes, satellite: false };
       searchManager.doSearch('ZARYA');
@@ -896,6 +910,25 @@ describe('SearchManager interactions', () => {
     document.getElementById('search-results')!.innerHTML = `<div class="search-result" data-obj-id="${objId}"></div>`;
     (document.querySelector('.search-result') as HTMLElement).dispatchEvent(new Event('click', { bubbles: true }));
   };
+
+  // #481: a chosen result closes the list on desktop too, so it no longer covers the info box.
+  it('desktop: clicking a result closes the list but keeps the query', () => {
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = false;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSensor);
+    vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+    vi.spyOn(PluginRegistry.getPlugin(SelectSatManager)!, 'selectSat').mockImplementation(() => undefined);
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+    p().isResultsOpen = true;
+
+    clickFirstResult(defaultSensor.id);
+
+    expect(p().isResultsOpen).toBe(false);
+    expect(document.getElementById('search-results')!.innerHTML).toBe('');
+    expect((document.getElementById('search') as HTMLInputElement).value).toBe('ISS');
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
 
   it('clicking a star result rotates the camera via lookAtStar', () => {
     const star = new Star({ id: 5, name: 'VEGA', ra: 0 as Radians, dec: 0 as Radians });

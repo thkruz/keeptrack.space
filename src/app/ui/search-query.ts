@@ -134,6 +134,8 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
   // The built-in star list and the HR star catalog both carry the bright stars, so one name can
   // reach the catalog twice. Keep one STAR row per name and term.
   const seenStarNames = new Set<string>();
+  // Comma terms such as "Eglin AFB, Florida" each match the same sensor or launch site; list it once.
+  const seenOtherIds = new Set<number>();
 
   // Update last search with the most recent search results
   settingsManager.lastSearch = searchList;
@@ -182,12 +184,15 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
         currentRank = SEARCH_RANK_OTHER;
         const starKey = obj.isStar() ? `${searchStringIn}|${obj.name.trim().toUpperCase()}` : null;
 
-        if (starKey !== null && seenStarNames.has(starKey)) {
+        if ((starKey !== null && seenStarNames.has(starKey)) || (!obj.isStar() && seenOtherIds.has(obj.id))) {
           continue;
         }
         const beforeOther = totalFound;
 
         matchOtherObject(obj, searchStringIn, len, addResult_);
+        if (!obj.isStar() && totalFound !== beforeOther) {
+          seenOtherIds.add(obj.id);
+        }
         if (starKey !== null && totalFound !== beforeOther) {
           seenStarNames.add(starKey);
         }

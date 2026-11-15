@@ -332,6 +332,8 @@
     "resultCount": "Wyniki: {count}",
     "resultCountLimited": "Wyświetlono {shown} z {total} wyników",
     "noResults": "Nie znaleziono wyników",
+    "noResultsSensors": "Brak wyników. W tym widoku nie można wyszukiwać sensorów.",
+    "noResultsSensorsHidden": "Brak wyników. Czujniki naziemne są ukryte w menu Filtr lub w Ustawieniach wyszukiwania.",
     "decayed": "Spłonął",
     "partialMatch": "Partial match",
     "moduleOf": "{module} jest częścią {host}",

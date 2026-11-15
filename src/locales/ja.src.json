@@ -332,6 +332,8 @@
     "resultCount": "{count} 件の結果",
     "resultCountLimited": "{total} 件中 {shown} 件を表示",
     "noResults": "結果が見つかりません",
+    "noResultsSensors": "結果が見つかりません。この表示ではセンサーは検索できません。",
+    "noResultsSensorsHidden": "結果が見つかりません。地上センサーはフィルターメニューまたは検索設定で非表示になっています。",
     "decayed": "落下済み",
     "partialMatch": "Partial match",
     "moduleOf": "{module} は {host} の一部です",

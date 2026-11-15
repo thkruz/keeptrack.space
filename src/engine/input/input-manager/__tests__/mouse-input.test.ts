@@ -160,6 +160,17 @@ describe('MouseInput handlers', () => {
       expect(selectSat).toHaveBeenCalledWith(-1);
     });
 
+    // #482 decision: Escape closes the topmost UI first, then drops only the selected object. The observing sensor stays.
+    it('deselecting on Escape never resets the selected sensor', () => {
+      const resetSensorSelected = vi.fn();
+
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      vi.spyOn(ServiceLocator, 'getSensorManager').mockReturnValue({ resetSensorSelected } as never);
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      expect(resetSensorSelected).not.toHaveBeenCalled();
+    });
+
     it('ignores a role=dialog that is display:none but yields to a visible one', () => {
       vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
       document.body.innerHTML = '<div id="launchpad" role="dialog" style="display:none"></div>';

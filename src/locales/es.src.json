@@ -332,6 +332,8 @@
     "resultCount": "{count} resultados",
     "resultCountLimited": "Mostrando {shown} de {total} resultados",
     "noResults": "No se encontraron resultados",
+    "noResultsSensors": "No se encontraron resultados. Los sensores no se pueden buscar en esta vista.",
+    "noResultsSensorsHidden": "No se encontraron resultados. Los sensores terrestres están ocultos por el menú Filtro o los Ajustes de búsqueda.",
     "decayed": "Reingresado",
     "partialMatch": "Partial match",
     "moduleOf": "{module} forma parte de {host}",

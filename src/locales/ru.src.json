@@ -332,6 +332,8 @@
     "resultCount": "Результатов: {count}",
     "resultCountLimited": "Показано {shown} из {total} результатов",
     "noResults": "Ничего не найдено",
+    "noResultsSensors": "Ничего не найдено. В этом режиме поиск датчиков недоступен.",
+    "noResultsSensorsHidden": "Ничего не найдено. Наземные датчики скрыты в меню «Фильтр» или в настройках поиска.",
     "decayed": "Сошёл с орбиты",
     "partialMatch": "Partial match",
     "moduleOf": "{module} входит в состав {host}",

@@ -332,6 +332,8 @@
     "resultCount": "결과 {count}개",
     "resultCountLimited": "{total}개 중 {shown}개 표시",
     "noResults": "검색 결과가 없습니다",
+    "noResultsSensors": "결과가 없습니다. 이 화면에서는 센서를 검색할 수 없습니다.",
+    "noResultsSensorsHidden": "결과를 찾을 수 없습니다. 지상 센서가 필터 메뉴 또는 검색 설정에서 숨겨져 있습니다.",
     "decayed": "소멸됨",
     "partialMatch": "Partial match",
     "moduleOf": "{module}은(는) {host}의 일부입니다",

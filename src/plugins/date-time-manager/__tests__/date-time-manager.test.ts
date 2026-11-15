@@ -126,3 +126,22 @@ describe('DateTimeManager_zone_chip_labels', () => {
     expect(chip.options[0].textContent).toBe('CST (UTC-06:00)');
   });
 });
+
+describe('DateTimeManager_zone_chip_markup', () => {
+  it('renders a hostile zone string as option text, never as elements', () => {
+    (DateTimeManager.prototype as unknown as { uiManagerFinal_: () => void }).uiManagerFinal_ = vi.fn();
+    setupStandardEnvironment([TopMenu]);
+    const hostile = '"><img src=x>';
+    const dtm = new DateTimeManager() as unknown as { syncZoneChip_: () => void; displayZone_: string };
+    const chip = document.createElement('select');
+
+    chip.id = 'datetime-zone';
+    document.body.appendChild(chip);
+    dtm.displayZone_ = hostile;
+    dtm.syncZoneChip_();
+    expect(chip.querySelector('img')).toBeNull();
+    expect(chip.children.length).toBeGreaterThan(0);
+    expect(Array.from(chip.children).every((c) => c.tagName === 'OPTION')).toBe(true);
+    chip.remove();
+  });
+});

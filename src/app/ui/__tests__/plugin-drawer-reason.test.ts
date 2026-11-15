@@ -115,4 +115,27 @@ describe('drawer reason ids (pro issue #193)', () => {
     expect(describedBy).toMatch(/^[^\s]+$/u);
     expect(document.getElementById(describedBy)).not.toBeNull();
   });
+
+  it('gives rows with an unusable id token distinct fallback ids without randomness', () => {
+    const random = vi.spyOn(Math, 'random');
+
+    PluginRegistry.addPlugin({
+      bottomIconElementName: '!!!',
+      isRequireSensorSelected: true,
+      isRequireSatelliteSelected: false,
+      getDisabledReason: () => null,
+      verifySatelliteSelected: () => true,
+    } as never);
+    document.body.innerHTML = `<div id="!!!" class="bmenu-item-disabled"></div>
+      <div class="drawer-item" data-plugin-id="!!!"></div><div class="drawer-item" data-plugin-id="!!!"></div>`;
+    const rows = Array.from(document.querySelectorAll<HTMLElement>('.drawer-item'));
+
+    rows.forEach((r) => syncDrawerItemState(r));
+    const ids = rows.map((r) => r.querySelector('.drawer-item-reason')?.id);
+
+    expect(ids[0]).toMatch(/^drawer-reason-r\d+$/u);
+    expect(ids[1]).toMatch(/^drawer-reason-r\d+$/u);
+    expect(ids[0]).not.toBe(ids[1]);
+    expect(random).not.toHaveBeenCalled();
+  });
 });

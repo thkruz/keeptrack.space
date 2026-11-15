@@ -200,13 +200,20 @@ export class DateTimeManager extends KeepTrackPlugin {
     const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
     // #404/#455: every option carries its full name; on a phone the closed chip shows the abbreviations (data-short) and
     // the open list shows the full names, so zones sharing an abbreviation (CST, IST) stay distinguishable.
-    chip.innerHTML = getDisplayZoneChoices(zone, this.selectedSiteZone_())
-      .map((z) => {
+    chip.replaceChildren(
+      ...getDisplayZoneChoices(zone, this.selectedSiteZone_()).map((z) => {
         const full = isUtcZone(z) ? 'UTC' : describeZoneAt(nowMs, z);
+        const option = document.createElement('option');
 
-        return `<option value="${z}" title="${full}" data-full="${full}" data-short="${describeZoneShort(nowMs, z)}">${full}</option>`;
+        option.value = z;
+        option.title = full;
+        option.dataset.full = full;
+        option.dataset.short = describeZoneShort(nowMs, z);
+        option.textContent = full;
+
+        return option;
       })
-      .join('');
+    );
     chip.value = zone;
     chip.dataset.zone = isUtcZone(zone) ? 'utc' : 'other';
     // #318: the active zone stays readable even where the select is narrow

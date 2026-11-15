@@ -119,6 +119,9 @@ export function drawerDisabledReasonText(pluginId: string | undefined): string {
   return plugin.getDisabledReason() ?? '';
 }
 
+/** Counter for fallback reason-line ids when a row has no plugin id. */
+let reasonIdSeq_ = 0;
+
 /**
  * Keep a drawer row's visible "why disabled" line, aria-disabled and aria-describedby in step with its disabled state.
  * The line is created on first use so rows copied elsewhere (Favorites) get it too.
@@ -130,9 +133,9 @@ export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void
   if (!reasonEl && text) {
     reasonEl = document.createElement('span');
     reasonEl.className = 'drawer-item-reason';
-    const idSource = drawerItemPluginId(el) ?? el.dataset.topMenuId ?? Math.random().toString(36).slice(2);
+    const idSource = drawerItemPluginId(el) ?? el.dataset.topMenuId ?? `r${++reasonIdSeq_}`;
 
-    reasonEl.id = `drawer-reason-${sanitizeDrawerIdToken(idSource) || Math.random().toString(36).slice(2)}${el.hasAttribute('data-recent-plugin-id') ? '-recent' : ''}`;
+    reasonEl.id = `drawer-reason-${sanitizeDrawerIdToken(idSource) || `r${++reasonIdSeq_}`}${el.hasAttribute('data-recent-plugin-id') ? '-recent' : ''}`;
     el.appendChild(reasonEl);
   }
   if (reasonEl) {

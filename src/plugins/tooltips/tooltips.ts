@@ -39,6 +39,8 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   /** Attribute that opts a target into tap-to-toggle on touch devices. */
   tapAttr = 'kt-tooltip-tap';
   private shownFor_: HTMLElement | null = null;
+  /** True while keyboard was the last input; a focused control only keeps its tooltip then (#422). */
+  private lastInputWasKeyboard_ = false;
   private readonly wired_ = new WeakSet<HTMLElement>();
 
   private static readonly SHOW_DELAY_ = 150;
@@ -77,6 +79,20 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       }
     };
 
+    document.addEventListener(
+      'pointerdown',
+      () => {
+        this.lastInputWasKeyboard_ = false;
+      },
+      true
+    );
+    document.addEventListener(
+      'keydown',
+      () => {
+        this.lastInputWasKeyboard_ = true;
+      },
+      true
+    );
     document.addEventListener('pointerdown', wireLate, true);
     document.addEventListener('mouseover', wireLate, true);
 
@@ -283,7 +299,9 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       return true;
     }
 
-    return target.matches(':hover') || target.matches(':focus-visible');
+    // #422: a mouse click focuses the control and some browsers keep matching :focus-visible, which kept the bubble
+    // alive after the pointer left. Focus only counts while the last input was the keyboard.
+    return target.matches(':hover') || (this.lastInputWasKeyboard_ && target.matches(':focus-visible'));
   }
 
   private startWatchdog_(): void {
@@ -397,7 +415,10 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         return;
       }
       left = sideLeft;
-      top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
+      // Never rise above the drawer's top edge: the strip over it (Access Timeline chip, nav bar) is not part of the drawer (#434)
+      const minTop = Math.max(8, drawerRect.top + window.scrollY + 4);
+
+      top = Math.max(minTop, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
     }
 
     // Info box rows: open beside the box (left, else right) so the popup never hides the neighbouring values (#273)
@@ -426,10 +447,23 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     if (probMenuEl) {
       const menuRight = probMenuEl.getBoundingClientRect().right;
 
+      // The floating bottom-center pill occupies the lowest ~68px of the viewport: keep the bubble above that band (#420)
+      const pillBand = 68;
+      const maxTop = viewportHeight + window.scrollY - pillBand - tooltipRect.height - 8;
+
       if (menuRight + 8 + tooltipRect.width + 8 <= viewportWidth) {
         left = menuRight + 8;
-        top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
+        top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, maxTop));
+      } else {
+        top = Math.max(8, Math.min(top, maxTop));
       }
+    }
+
+    // Access Timeline pass bars: keep the bubble over the lane so a long bar's centred tooltip never covers the row's sensor name (#431)
+    const passLaneEl = targetEl.matches('.access-timeline__pass') ? targetEl.closest<HTMLElement>('.access-timeline__lane') : null;
+
+    if (passLaneEl) {
+      left = Math.max(left, passLaneEl.getBoundingClientRect().left + 4);
     }
 
     tooltipDiv.style.left = `${left}px`;

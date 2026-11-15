@@ -62,7 +62,7 @@ export class TopMenu extends KeepTrackPlugin {
               )
               .join('')}
             <div id="search-holder" class="menu-item search-slide-up">
-              <input id="search" type="search" name="search" placeholder="${t7e('TopMenu.searchPlaceholder')}" required />
+              <input id="search" type="search" name="search" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off" placeholder="${t7e('TopMenu.searchPlaceholder')}" required />
             </div>
           </ul>
               </div>

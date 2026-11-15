@@ -39,6 +39,11 @@ export const slideOutLeft = (el: HTMLElement | null, duration: number, callback?
     if (!isCurrentTransition_(el, transition)) {
       return;
     }
+    // #439: once the slide finished, a closed side menu leaves layout and the accessibility tree.
+    // A newer open or close supersedes this timer (isCurrentTransition_), and slideInRight sets display back to block.
+    if (transition !== null) {
+      el.style.display = 'none';
+    }
     if (callback) {
       callback();
     }

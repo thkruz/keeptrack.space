@@ -129,6 +129,10 @@ export class PluginDrawer {
       this.syncDisabledState_();
     });
 
+    // #438: the lock hint follows each plugin's own gate, so re-sync it whenever the account state changes.
+    EventBus.getInstance().on(EventBusEvent.userLogin, () => this.syncDisabledState_());
+    EventBus.getInstance().on(EventBusEvent.userLogout, () => this.syncDisabledState_());
+
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => {
       // Selecting a secondary satellite can enable plugins (e.g. RIC plots) without
       // firing selectSatData, so re-sync the drawer item disabled state here too.
@@ -716,8 +720,20 @@ export class PluginDrawer {
 
         evt.preventDefault();
         this.toggle();
+
+        // #453: Tab from the scene still opens the drawer (#202), but focus now moves into it so the next Tab keeps going.
+        if (this.isOpen_) {
+          this.focusFirstItem_();
+        }
       }
     });
+  }
+
+  /** Move keyboard focus to the first enabled drawer row (after a keyboard open from the scene). */
+  private focusFirstItem_(): void {
+    const first = getEl('drawer-content', true)?.querySelector<HTMLElement>('.drawer-item[tabindex="0"]:not(.disabled)');
+
+    first?.focus({ preventScroll: true });
   }
 
   private syncActiveState_(): void {

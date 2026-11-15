@@ -112,6 +112,17 @@
   background-color: var(--kt-bg-hover, #333);
 }
 
+/* #454: the app-wide accent-color tints the browser's focus ring on the hovered row red; it drew a line under the row
+   across the popup border. The hover fill already marks the row, so no ring on any option state. */
+#datetime-zone option,
+#datetime-zone option:hover,
+#datetime-zone option:focus,
+#datetime-zone option:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border: 0;
+}
+
 #datetime-zone option:checked {
   background-color: var(--kt-bg-active, #444);
   font-weight: bold;

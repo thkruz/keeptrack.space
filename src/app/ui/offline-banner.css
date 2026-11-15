@@ -1,7 +1,8 @@
 /* Offline notice shown to everyone (signed in or not). Top-centre, non-blocking, never covers the bottom menu. */
 .kt-offline-banner {
   position: fixed;
-  top: 8px;
+  /* #452: below the top bar (clock and title) and the epoch-age badge, never over them */
+  top: calc(var(--top-menu-height, 50px) + 32px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 9000;

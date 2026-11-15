@@ -91,8 +91,9 @@ test.describe('App smoke tests', () => {
     await expect(sideMenu).toBeVisible({ timeout: 5_000 });
 
     // Close — clicking the same drawer item again slides the side menu off-screen.
-    // The close animation uses translateX(-120%); the element stays in the DOM with
-    // display: block, so check viewport intersection rather than visibility.
+    // The close animation uses translateX(-120%) and, once it finishes, slideOutLeft sets display: none (#439),
+    // so the menu leaves the accessibility tree. Until then it is only off-screen, so the viewport check
+    // stays as the first assertion after inert and display: none is asserted last.
     //
     // The close is asserted in two steps because the CI runner (SwiftShader) renders one frame
     // every few seconds: first the state slideOutLeft writes synchronously (inert + off-screen
@@ -101,6 +102,7 @@ test.describe('App smoke tests', () => {
     await drawerItem.click();
     await expect(sideMenu).toHaveAttribute('inert', '', { timeout: 30_000 });
     await expect(sideMenu).not.toBeInViewport({ timeout: 30_000 });
+    await expect(sideMenu).toHaveCSS('display', 'none', { timeout: 30_000 });
   });
 
   test('time display is visible', async ({ page }) => {

@@ -495,42 +495,90 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults).toEqual([3]);
     });
 
-    it('a hidden sensor match shows the sensors-hidden hint instead of a bare miss (#497)', () => {
-      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+    // The no-results toast waits for typing to pause; start each case from a clean miss state.
+    const flushMissToast = (): void => {
+      vi.advanceTimersByTime(SearchManager.NO_RESULTS_TOAST_DELAY_MS);
+    };
 
-      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: false };
-      searchManager.doSearch('CAPE');
-      expect(toast).toHaveBeenCalledWith(expect.stringContaining('Ground sensors are hidden'), expect.anything(), false);
-    });
+    describe('no-results toast', () => {
+      beforeEach(() => {
+        vi.useFakeTimers();
+        searchManager.doSearch('');
+      });
+      afterEach(() => {
+        vi.useRealTimers();
+      });
 
-    it('Filter menu sensors-off (which also sets isDisableSensors) shows the Filter hint, not the phone wording (#497)', () => {
-      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
-      const savedFilter = settingsManager.filter;
-      const savedDisable = settingsManager.isDisableSensors;
+      it('typing a miss raises one toast after the pause, not one per keystroke', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
 
-      settingsManager.filter = { ...settingsManager.filter, groundSensors: false } as typeof settingsManager.filter;
-      settingsManager.isDisableSensors = true;
-      try {
+        searchManager.doSearch('QQQ');
+        searchManager.doSearch('QQQX');
+        searchManager.doSearch('QQQXZ');
+        expect(toast).not.toHaveBeenCalled();
+        flushMissToast();
+        expect(toast).toHaveBeenCalledTimes(1);
+      });
+
+      it('typing more after a reported miss does not report it again', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        searchManager.doSearch('QQQ');
+        flushMissToast();
+        searchManager.doSearch('QQQX');
+        flushMissToast();
+        expect(toast).toHaveBeenCalledTimes(1);
+      });
+
+      it('a hit before the pause cancels the pending toast', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        searchManager.doSearch('QQQ');
+        searchManager.doSearch('ZARYA');
+        flushMissToast();
+        expect(toast).not.toHaveBeenCalled();
+      });
+
+      it('a hidden sensor match shows the sensors-hidden hint instead of a bare miss (#497)', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: false };
         searchManager.doSearch('CAPE');
+        flushMissToast();
         expect(toast).toHaveBeenCalledWith(expect.stringContaining('Ground sensors are hidden'), expect.anything(), false);
-        expect(toast).not.toHaveBeenCalledWith(expect.stringContaining('not searchable in this view'), expect.anything(), false);
-      } finally {
-        settingsManager.filter = savedFilter;
-        settingsManager.isDisableSensors = savedDisable;
-      }
-    });
+      });
 
-    it('phone mode (no sensors loaded, isDisableSensors) keeps the phone wording (#497)', () => {
-      const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
-      const savedDisable = settingsManager.isDisableSensors;
+      it('Filter menu sensors-off (which also sets isDisableSensors) shows the Filter hint, not the phone wording (#497)', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+        const savedFilter = settingsManager.filter;
+        const savedDisable = settingsManager.isDisableSensors;
 
-      settingsManager.isDisableSensors = true;
-      try {
-        searchManager.doSearch('NOSUCHSENSORNAME');
-        expect(toast).toHaveBeenCalledWith(expect.stringContaining('not searchable in this view'), expect.anything(), false);
-      } finally {
-        settingsManager.isDisableSensors = savedDisable;
-      }
+        settingsManager.filter = { ...settingsManager.filter, groundSensors: false } as typeof settingsManager.filter;
+        settingsManager.isDisableSensors = true;
+        try {
+          searchManager.doSearch('CAPE');
+          flushMissToast();
+          expect(toast).toHaveBeenCalledWith(expect.stringContaining('Ground sensors are hidden'), expect.anything(), false);
+          expect(toast).not.toHaveBeenCalledWith(expect.stringContaining('not searchable in this view'), expect.anything(), false);
+        } finally {
+          settingsManager.filter = savedFilter;
+          settingsManager.isDisableSensors = savedDisable;
+        }
+      });
+
+      it('phone mode (no sensors loaded, isDisableSensors) keeps the phone wording (#497)', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+        const savedDisable = settingsManager.isDisableSensors;
+
+        settingsManager.isDisableSensors = true;
+        try {
+          searchManager.doSearch('NOSUCHSENSORNAME');
+          flushMissToast();
+          expect(toast).toHaveBeenCalledWith(expect.stringContaining('not searchable in this view'), expect.anything(), false);
+        } finally {
+          settingsManager.isDisableSensors = savedDisable;
+        }
+      });
     });
 
     it('disabling the satellite type removes satellites from results', () => {

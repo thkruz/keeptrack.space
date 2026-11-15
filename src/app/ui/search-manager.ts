@@ -568,6 +568,8 @@ export class SearchManager {
     this.selectedIndex_ = -1;
     // Any new search replaces the group the watchlist was holding; the watchlist re-asserts it after its own call.
     this.isGroupHighlightHeld = false;
+    // A newer keystroke supersedes any miss still waiting to be reported.
+    this.cancelNoResultsToast_();
 
     const searchInput = getEl('search', true);
     const isUserTyping = typeof document !== 'undefined' && searchInput !== null && document.activeElement === searchInput;
@@ -581,6 +583,7 @@ export class SearchManager {
       if (emptiedDom && emptiedDom.value.trim().replace(/,/gu, '') === '') {
         emptiedDom.value = '';
       }
+      this.lastMissToasted_ = '';
       this.hideResults();
       EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
@@ -678,6 +681,11 @@ export class SearchManager {
       this.fillResultBox(results, catalogManagerInstance, totalFound);
     }
 
+    if (idList.length > 0) {
+      this.cancelNoResultsToast_();
+      this.lastMissToasted_ = '';
+    }
+
     if (idList.length === 0) {
       // lastSearch is the term list, so test the typed string's length instead.
       if (searchString_.length >= settingsManager.minimumSearchCharacters) {
@@ -693,10 +701,35 @@ export class SearchManager {
           noResultsKey = 'searchManager.noResultsSensors';
         }
 
-        uiManagerInstance.toast(t7e(noResultsKey as TranslationKey), ToastMsgType.serious, false);
+        this.scheduleNoResultsToast_(searchString_, noResultsKey, uiManagerInstance);
       }
       this.hideResults();
     }
+  }
+
+  /** Idle time after the last keystroke before a miss is reported, so typing does not raise a toast per key. */
+  static readonly NO_RESULTS_TOAST_DELAY_MS = 800;
+  private noResultsTimer_: ReturnType<typeof setTimeout> | null = null;
+  /** The last query a miss was reported for; typing more characters after it does not report again. */
+  private lastMissToasted_ = '';
+
+  private cancelNoResultsToast_(): void {
+    if (this.noResultsTimer_ !== null) {
+      clearTimeout(this.noResultsTimer_);
+      this.noResultsTimer_ = null;
+    }
+  }
+
+  private scheduleNoResultsToast_(query: string, key: string, uiManager: { toast: (msg: string, type: ToastMsgType, isLong?: boolean) => void }): void {
+    this.cancelNoResultsToast_();
+    if (this.lastMissToasted_ !== '' && query.startsWith(this.lastMissToasted_)) {
+      return;
+    }
+    this.noResultsTimer_ = setTimeout(() => {
+      this.noResultsTimer_ = null;
+      this.lastMissToasted_ = query;
+      uiManager.toast(t7e(key as TranslationKey), ToastMsgType.serious, false);
+    }, SearchManager.NO_RESULTS_TOAST_DELAY_MS);
   }
 
   /** True when a sensor name contains the query but ground sensors are hidden from search by the Filter menu or Search Settings. */

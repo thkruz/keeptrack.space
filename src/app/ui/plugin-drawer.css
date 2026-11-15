@@ -561,6 +561,12 @@ body.drawer-mode {
     background: rgba(255, 255, 255, 0.08);
   }
 
+  /* The logged-out Login / Sign Up row is a link: keep the accent link colour (R20-F7). */
+  a.drawer-user-account__row,
+  a.drawer-user-account__row:hover {
+    color: var(--color-dark-text-accent);
+  }
+
   .drawer-user-account__avatar {
     width: 32px;
     height: 32px;

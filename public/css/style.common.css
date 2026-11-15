@@ -4585,6 +4585,10 @@ a {
   color: var(--color-dark-text-accent);
 }
 
+a:hover {
+  color: var(--color-dark-text-accent);
+}
+
 
 /* ========== Micro-Interactions & Focus ========== */
 

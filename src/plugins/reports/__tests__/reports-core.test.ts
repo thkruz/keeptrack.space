@@ -208,8 +208,8 @@ describe('reports-core', () => {
 
       expect(single.header).toContain(`Covers sensor ${fakeSensor.name} only.`);
       expect(single.header).not.toContain('not included');
-      expect(multi.header).toContain('2 other active sensors or sites are not included');
-      expect(multi.csvHeader).toContain('2 other active sensors or sites are not included');
+      expect(multi.header).toContain('not included: 2');
+      expect(multi.csvHeader).toContain('not included: 2');
     });
 
     it('Visibility Windows emits one row per pass with rise/set/duration', () => {

@@ -500,7 +500,7 @@ describe('SearchManager', () => {
 
       settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: false };
       searchManager.doSearch('CAPE');
-      expect(toast).toHaveBeenCalledWith(expect.stringContaining('noResultsSensorsHidden'), expect.anything(), false);
+      expect(toast).toHaveBeenCalledWith(expect.stringContaining('Ground sensors are hidden'), expect.anything(), false);
     });
 
     it('disabling the satellite type removes satellites from results', () => {

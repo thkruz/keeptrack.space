@@ -9,7 +9,8 @@
         "dscovrImage": "DSCOVR 影像 {index}",
         "dscovrLoading": "正在加载 DSCOVR 影像…",
         "refresh": "刷新最新影像",
-        "imageAtUtc": "{name}，{time} UTC"
+        "imageAtUtc": "{name}，{time} UTC",
+        "hint": "点击卫星即可飞向它,并打开其最新的全圆盘图像"
       },
       "sections": {
         "geostationary": "地球静止轨道",

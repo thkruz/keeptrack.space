@@ -9,7 +9,8 @@
         "dscovrImage": "Zdjęcie DSCOVR {index}",
         "dscovrLoading": "Ładowanie zdjęć DSCOVR…",
         "refresh": "Odśwież najnowsze zdjęcie",
-        "imageAtUtc": "{name} o {time} UTC"
+        "imageAtUtc": "{name} o {time} UTC",
+        "hint": "Kliknij satelitę, aby do niej przelecieć i otworzyć jej najnowszy obraz całej tarczy"
       },
       "sections": {
         "geostationary": "Geostacjonarne",

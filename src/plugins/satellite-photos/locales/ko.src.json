@@ -9,7 +9,8 @@
         "dscovrImage": "DSCOVR 영상 {index}",
         "dscovrLoading": "DSCOVR 영상 불러오는 중…",
         "refresh": "최신 영상 새로고침",
-        "imageAtUtc": "{name} {time} UTC"
+        "imageAtUtc": "{name} {time} UTC",
+        "hint": "위성을 클릭하면 해당 위성으로 이동하고 최신 전구 영상을 엽니다"
       },
       "sections": {
         "geostationary": "정지궤도",

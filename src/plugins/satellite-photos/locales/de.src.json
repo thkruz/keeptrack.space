@@ -9,7 +9,8 @@
         "dscovrImage": "DSCOVR-Bild {index}",
         "dscovrLoading": "DSCOVR-Bilder werden geladen…",
         "refresh": "Neuestes Bild aktualisieren",
-        "imageAtUtc": "{name} um {time} UTC"
+        "imageAtUtc": "{name} um {time} UTC",
+        "hint": "Klicke auf einen Satelliten, um zu ihm zu fliegen und sein aktuelles Vollbild der Erdscheibe zu öffnen"
       },
       "sections": {
         "geostationary": "Geostationär",

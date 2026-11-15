@@ -9,7 +9,8 @@
         "dscovrImage": "Знімок DSCOVR {index}",
         "dscovrLoading": "Завантаження знімків DSCOVR…",
         "refresh": "Оновити останній знімок",
-        "imageAtUtc": "{name} о {time} UTC"
+        "imageAtUtc": "{name} о {time} UTC",
+        "hint": "Натисніть на супутник, щоб перелетіти до нього й відкрити його найновіший знімок повного диска"
       },
       "sections": {
         "geostationary": "Геостаціонарні",

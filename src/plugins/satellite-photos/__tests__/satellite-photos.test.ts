@@ -96,6 +96,9 @@ describe('SatellitePhotos', () => {
 
       expect(menuHtml).toContain('kt-ui-v13');
       expect(menuHtml).toContain('sat-photo-menu-content');
+      // One hint line at the top says what a click does.
+      expect(menuHtml).toContain('sat-photo-hint');
+      expect(menuHtml.indexOf('sat-photo-hint')).toBeLessThan(menuHtml.indexOf('sat-photo-geo-list'));
       expect(menuHtml).toContain('meteosat9-link');
       expect(menuHtml).toContain('goes19-link');
       expect(menuHtml).toContain('goes18-link');

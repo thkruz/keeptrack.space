@@ -9,7 +9,8 @@
         "dscovrImage": "Snímek DSCOVR {index}",
         "dscovrLoading": "Načítání snímků DSCOVR…",
         "refresh": "Obnovit nejnovější snímek",
-        "imageAtUtc": "{name} v {time} UTC"
+        "imageAtUtc": "{name} v {time} UTC",
+        "hint": "Kliknutím na družici k ní přeletíte a otevřete její nejnovější snímek celého disku"
       },
       "sections": {
         "geostationary": "Geostacionární",

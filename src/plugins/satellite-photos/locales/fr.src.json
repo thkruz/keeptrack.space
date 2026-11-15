@@ -9,7 +9,8 @@
         "dscovrImage": "Image DSCOVR {index}",
         "dscovrLoading": "Chargement des images DSCOVR…",
         "refresh": "Actualiser la dernière image",
-        "imageAtUtc": "{name} à {time} UTC"
+        "imageAtUtc": "{name} à {time} UTC",
+        "hint": "Cliquez sur un satellite pour vous y rendre et ouvrir sa dernière image du disque complet"
       },
       "sections": {
         "geostationary": "Géostationnaire",

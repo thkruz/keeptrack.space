@@ -7,6 +7,7 @@ import { InputManager } from '@app/engine/input/input-manager';
 import { MouseInput } from '@app/engine/input/input-manager/mouse-input';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -330,6 +331,28 @@ describe('MouseInput handlers', () => {
       expect(inputManager.openRmbMenu).toHaveBeenCalledWith(-1, { x: 420, y: 310 });
       expect(camera.state.mouseX).toBe(420);
       expect(camera.state.mouseY).toBe(310);
+    });
+  });
+
+  describe('getCanvasCoords layout caching', () => {
+    it('reads container layout once, not per mouse event, and again after invalidation', () => {
+      const container = KeepTrack.getInstance().containerRoot;
+      const offsetLeft = vi.fn(() => 5);
+
+      Object.defineProperty(container, 'offsetLeft', { configurable: true, get: offsetLeft });
+      MouseInput.invalidateContainerOffset();
+      const evt = { clientX: 100, clientY: 50 } as MouseEvent;
+
+      expect(MouseInput.getCanvasCoords(evt).x).toBe(95);
+      MouseInput.getCanvasCoords(evt);
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(1);
+
+      window.dispatchEvent(new Event('resize'));
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(2);
+      delete (container as unknown as Record<string, unknown>).offsetLeft;
+      MouseInput.invalidateContainerOffset();
     });
   });
 

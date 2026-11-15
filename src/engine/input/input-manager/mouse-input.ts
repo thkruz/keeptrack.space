@@ -232,11 +232,54 @@ export class MouseInput {
 
   /** Canvas-relative cursor coordinates (y from top) for a mouse event. */
   static getCanvasCoords(evt: MouseEvent): { x: number; y: number } {
-    const container = KeepTrack.getInstance().containerRoot;
-    const offsetX = container.scrollLeft - window.scrollX + container.offsetLeft;
-    const offsetY = container.scrollTop - window.scrollY + container.offsetTop;
+    const offset = MouseInput.getContainerOffset_();
 
-    return { x: evt.clientX - offsetX, y: evt.clientY - offsetY };
+    return { x: evt.clientX - offset.x, y: evt.clientY - offset.y };
+  }
+
+  private static containerOffset_: { x: number; y: number } | null = null;
+  private static containerOffsetRoot_: HTMLElement | null = null;
+  private static containerOffsetResizeObserver_: ResizeObserver | null = null;
+  private static isContainerOffsetListening_ = false;
+
+  /** Drops the cached container offset; the next mouse event measures it again. */
+  static invalidateContainerOffset(): void {
+    MouseInput.containerOffset_ = null;
+  }
+
+  /**
+   * Container offset used for canvas coords. Reading scroll/offset properties forces a layout when the
+   * DOM was written earlier in the frame (hover card), so it is measured once and invalidated on
+   * window resize, scroll, and container resize instead of on every mousemove.
+   */
+  private static getContainerOffset_(): { x: number; y: number } {
+    const container = KeepTrack.getInstance().containerRoot;
+
+    if (MouseInput.containerOffset_ && MouseInput.containerOffsetRoot_ === container) {
+      return MouseInput.containerOffset_;
+    }
+
+    if (!MouseInput.isContainerOffsetListening_ && typeof window !== 'undefined') {
+      MouseInput.isContainerOffsetListening_ = true;
+      window.addEventListener('resize', MouseInput.invalidateContainerOffset);
+      // Capture so scrolls of the container itself (which do not bubble) are seen too.
+      window.addEventListener('scroll', MouseInput.invalidateContainerOffset, true);
+    }
+    if (MouseInput.containerOffsetRoot_ !== container) {
+      MouseInput.containerOffsetResizeObserver_?.disconnect();
+      MouseInput.containerOffsetRoot_ = container;
+      if (container && typeof ResizeObserver !== 'undefined') {
+        MouseInput.containerOffsetResizeObserver_ = new ResizeObserver(MouseInput.invalidateContainerOffset);
+        MouseInput.containerOffsetResizeObserver_.observe(container);
+      }
+    }
+
+    MouseInput.containerOffset_ = {
+      x: container.scrollLeft - window.scrollX + container.offsetLeft,
+      y: container.scrollTop - window.scrollY + container.offsetTop,
+    };
+
+    return MouseInput.containerOffset_;
   }
 
   /** Canvas coords for an event, or null when the event carries no usable client position. */

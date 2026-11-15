@@ -164,8 +164,9 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
     }
     let queued = false;
 
-    new MutationObserver(() => {
-      if (queued) {
+    new MutationObserver((mutations) => {
+      // Only side-menu changes move the badge; the sat info box and other subtree mutations must not trigger a layout read.
+      if (queued || !mutations.some((m) => m.target instanceof Element && m.target.matches('.side-menu-parent'))) {
         return;
       }
       queued = true;
@@ -186,16 +187,20 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
     if (!badge || badge.style.display === 'none') {
       return;
     }
-    badge.style.left = '';
-    if (window.innerWidth < 768) {
+    const openMenus = Array.from(document.querySelectorAll<HTMLElement>('.side-menu-parent')).filter((el) => el.style.display === 'block');
+
+    // Inline-style checks only: with no menu open there is nothing to measure, so never touch layout.
+    if (openMenus.length === 0 || window.innerWidth < 768) {
+      if (badge.style.left !== '') {
+        badge.style.left = '';
+      }
+
       return;
     }
+    badge.style.left = '';
     let menusRight = 0;
 
-    document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((el) => {
-      if (el.style.display !== 'block') {
-        return;
-      }
+    openMenus.forEach((el) => {
       const rect = el.getBoundingClientRect();
 
       if (rect.width > 0 && rect.left < window.innerWidth / 2) {

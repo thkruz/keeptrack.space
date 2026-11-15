@@ -841,7 +841,11 @@ export class PluginDrawer {
     };
     const schedule = () => {
       if (!rafId) {
-        rafId = requestAnimationFrame(update);
+        // Two frames: the rects below are read after the frame that applied the menu/info box change has laid out,
+        // so the reads never force a synchronous layout (a single rAF runs before that frame's layout).
+        rafId = requestAnimationFrame(() => {
+          rafId = requestAnimationFrame(update);
+        });
       }
     };
     const observer = new MutationObserver(schedule);

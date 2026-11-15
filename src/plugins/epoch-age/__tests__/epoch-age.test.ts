@@ -67,6 +67,17 @@ describe('EpochAge behavior', () => {
     expect(badge().dataset.level).toBeUndefined();
   });
 
+  it('does not read layout when placing the badge with no side menu open', () => {
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date(EPOCH_MS + 10 * DAY);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, selected as Satellite, 0);
+    const rectSpy = vi.spyOn(Element.prototype, 'getBoundingClientRect');
+
+    (plugin as unknown as { placeBadge_(): void }).placeBadge_();
+    setSimTime(EPOCH_MS + 11 * DAY);
+
+    expect(rectSpy).not.toHaveBeenCalled();
+  });
+
   it('mounts the badge inside #ui-wrapper so side menus (same stacking context) cover it', () => {
     document.getElementById(EpochAge.BADGE_ID)?.remove();
     let wrapper = document.getElementById('ui-wrapper');

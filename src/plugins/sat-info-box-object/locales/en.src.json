@@ -119,6 +119,7 @@
         }
       },
       "crewedStation": "Crewed space station",
+      "simulated": "Simulated object (what-if burn)",
       "rocketBody": "Rocket body left in orbit",
       "debris": "Debris left in orbit",
       "special": "Special tracked object",

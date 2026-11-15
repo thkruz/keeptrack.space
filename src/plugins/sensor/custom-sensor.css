@@ -249,3 +249,23 @@
   flex: 0 0 auto;
   margin: 0 4px 0 0;
 }
+
+/* #437: with three header buttons the long "Custom Sensor Menu" title filled the space left of them, so it read as
+   left-aligned and touched the buttons. A 1fr / auto / 1fr grid centres the title on the bar like other menus and keeps a
+   gap on both sides. */
+@media (min-width: 640px) {
+  #custom-sensor-menu .side-menu-title-bar {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    column-gap: 0.75rem;
+  }
+
+  #custom-sensor-menu .side-menu-title-text {
+    margin-left: 0;
+    text-align: center;
+  }
+
+  #custom-sensor-menu .side-menu-title-right {
+    justify-self: end;
+  }
+}

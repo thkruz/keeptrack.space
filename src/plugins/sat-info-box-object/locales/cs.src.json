@@ -119,6 +119,7 @@
         }
       },
       "crewedStation": "Vesmírná stanice s posádkou",
+      "simulated": "Simulovaný objekt (hypotetický manévr)",
       "rocketBody": "Raketový stupeň ponechaný na oběžné dráze",
       "debris": "Trosky na oběžné dráze",
       "special": "Zvláštní sledovaný objekt",

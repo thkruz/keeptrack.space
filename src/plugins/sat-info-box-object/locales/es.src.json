@@ -119,6 +119,7 @@
         }
       },
       "crewedStation": "Estación espacial tripulada",
+      "simulated": "Objeto simulado (maniobra hipotética)",
       "rocketBody": "Cuerpo de cohete abandonado en órbita",
       "debris": "Desechos abandonados en órbita",
       "special": "Objeto especial en seguimiento",

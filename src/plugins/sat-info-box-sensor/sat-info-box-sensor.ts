@@ -14,6 +14,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { formatLocaleNumber } from '@app/engine/utils/format-locale-number';
 import { getEl, hideEl, showEl, writeHtmlIfChanged, writeTitleIfChanged } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
@@ -556,8 +557,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       return l('values.outOfFov');
     }
 
-    const deg = (v: number) => `${v.toFixed(1)}°`;
-    const km = (v: number) => `${v.toFixed(0)} km`;
+    const deg = (v: number) => `${formatLocaleNumber(v, 1)}°`;
+    const km = (v: number) => `${formatLocaleNumber(v, 0)} km`;
 
     switch (reason.kind) {
       case 'minRange':
@@ -660,7 +661,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     const tearr = ServiceLocator.getSensorManager().currentTEARR;
 
     if (elements.vmag) {
-      writeHtmlIfChanged(elements.vmag, l('values.outOfFov'));
+      writeHtmlIfChanged(elements.vmag, '-');
     }
 
     /*
@@ -669,15 +670,15 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
      * hiding them behind a tooltip.
      */
     if (elements.az) {
-      writeHtmlIfChanged(elements.az, tearr.az ? `${tearr.az.toFixed(0)}°` : l('values.unknown'));
+      writeHtmlIfChanged(elements.az, tearr.az ? `${formatLocaleNumber(tearr.az, 0)}°` : l('values.unknown'));
       writeTitleIfChanged(elements.az, '');
     }
     if (elements.el) {
-      writeHtmlIfChanged(elements.el, tearr.el ? `${tearr.el.toFixed(1)}°` : l('values.unknown'));
+      writeHtmlIfChanged(elements.el, tearr.el ? `${formatLocaleNumber(tearr.el, 1)}°` : l('values.unknown'));
       writeTitleIfChanged(elements.el, '');
     }
     if (elements.rng) {
-      writeHtmlIfChanged(elements.rng, tearr.rng ? `${tearr.rng.toFixed(2)} km` : l('values.unknown'));
+      writeHtmlIfChanged(elements.rng, tearr.rng ? `${formatLocaleNumber(tearr.rng, 2)} km` : l('values.unknown'));
       writeTitleIfChanged(elements.rng, '');
     }
 
@@ -685,10 +686,10 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     SatInfoBoxSensor.appendReasonExtras_(false);
 
     if (elements.ra) {
-      writeHtmlIfChanged(elements.ra, l('values.outOfFov'));
+      writeHtmlIfChanged(elements.ra, '-');
     }
     if (elements.dec) {
-      writeHtmlIfChanged(elements.dec, l('values.outOfFov'));
+      writeHtmlIfChanged(elements.dec, '-');
     }
 
     let beamwidthString = l('values.unknown');
@@ -697,13 +698,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       beamwidthString = sensorManagerInstance.currentSensors[0]?.beamwidth ? `${sensorManagerInstance.currentSensors[0].beamwidth}°` : l('values.unknown');
     }
     if (elements.beamwidth) {
-      writeHtmlIfChanged(elements.beamwidth, l('values.outOfFov'));
+      writeHtmlIfChanged(elements.beamwidth, '-');
     }
     if (elements.beamwidth) {
       writeTitleIfChanged(elements.beamwidth, beamwidthString);
     }
     if (elements.maxTmx) {
-      writeHtmlIfChanged(elements.maxTmx, l('values.outOfFov'));
+      writeHtmlIfChanged(elements.maxTmx, '-');
     }
   }
 

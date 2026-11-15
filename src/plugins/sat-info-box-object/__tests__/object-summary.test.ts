@@ -76,4 +76,10 @@ describe('object summary', () => {
     registerObjectSummaryProvider(() => 'AI text');
     expect(getProvidedObjectSummary(obj)).toBe('AI text');
   });
+
+  it('labels a maneuver what-if clone as simulated, not as its crewed-station parent', () => {
+    const clone = fakeObj(SpaceObjectType.PAYLOAD, { name: 'ISS (ZARYA) (burn 1)', derivedFromSccNum: '25544' });
+
+    expect(getObjectSummaryKey(clone)).toBe('SatInfoBoxObject.Summary.simulated');
+  });
 });

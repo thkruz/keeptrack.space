@@ -68,6 +68,11 @@ export const getObjectSummaryKey = (obj: BaseObject | null | undefined): string 
     return 'SatInfoBoxObject.Summary.missile';
   }
 
+  // A what-if clone (burn simulation) copies its parent's name, so it must not inherit the parent's description (#408).
+  if ((obj as Satellite).derivedFromSccNum) {
+    return 'SatInfoBoxObject.Summary.simulated';
+  }
+
   switch (obj.type) {
     case SpaceObjectType.PAYLOAD: {
       const sat = obj as Satellite;

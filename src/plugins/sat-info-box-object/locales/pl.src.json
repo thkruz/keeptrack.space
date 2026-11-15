@@ -119,6 +119,7 @@
         }
       },
       "crewedStation": "Załogowa stacja kosmiczna",
+      "simulated": "Obiekt symulowany (manewr hipotetyczny)",
       "rocketBody": "Człon rakiety pozostawiony na orbicie",
       "debris": "Śmieci kosmiczne na orbicie",
       "special": "Specjalny śledzony obiekt",

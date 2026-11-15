@@ -119,6 +119,7 @@
         }
       },
       "crewedStation": "Bemannte Raumstation",
+      "simulated": "Simuliertes Objekt (Was-wäre-wenn-Manöver)",
       "rocketBody": "Im Orbit verbliebene Raketenstufe",
       "debris": "Trümmerteil im Orbit",
       "special": "Besonderes verfolgtes Objekt",

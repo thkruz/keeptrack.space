@@ -119,6 +119,7 @@
         }
       },
       "crewedStation": "Stazione spaziale con equipaggio",
+      "simulated": "Oggetto simulato (manovra ipotetica)",
       "rocketBody": "Stadio di razzo lasciato in orbita",
       "debris": "Detriti lasciati in orbita",
       "special": "Oggetto speciale tracciato",

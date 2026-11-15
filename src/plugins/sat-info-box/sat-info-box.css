@@ -150,6 +150,12 @@
   overflow-y: auto;
   scrollbar-gutter: auto;
   z-index: 4;
+  /* Section headers (Actions etc.) snap to the top edge when a scroll ends near them, so a header is never left half cut (#423) */
+  scroll-snap-type: y proximity;
+}
+
+#sat-infobox .sat-info-section-header {
+  scroll-snap-align: start;
 }
 
 /* At native browser zoom the desktop CSS viewport may drop below 1024px.
@@ -336,10 +342,44 @@
 /* #357: public/css/responsive-lg.css gives every .sat-info-value `padding: 0 25px; width: 220px` from 1024 px up. That
    padding pulled the circle in 25 px for values that hold the circle (x 1306) while the wrap rows (sensor rows) kept it at
    the wrap edge (x 1331): two columns. Circle rows drop the inline padding so all circles share the row's right edge. */
-@media (min-width: 1024px) {
+/* #446: one value column. A circle row used two layouts (45% flex wrap for sensor rows, a grid for the rest), so its text
+   centred 26 px right / 10 px left of a plain row's. Desktop and tablet now give every circle row the SAME box as a plain
+   row (same width and padding, so the same text centre) and take the circle out of the flow at the box's right edge.
+   Phones keep their own 44 px layout below. */
+@media (min-width: 640px) and (min-height: 501px) {
   .sat-info-value:has(.sat-info-circle),
   .sat-info-value-wrap > .sat-info-value {
-    padding-inline: 0;
+    display: block;
+    position: relative;
+    padding-inline: 0 24px;
+    text-align: left;
+  }
+
+  .sat-info-value-wrap {
+    display: block;
+    position: relative;
+    width: 45%;
+  }
+
+  .sat-info-value:has(.sat-info-circle) > .sat-info-circle,
+  .sat-info-value-wrap > .sat-info-circle {
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 501px) {
+  .sat-info-value:has(.sat-info-circle),
+  .sat-info-value-wrap > .sat-info-value {
+    padding-inline: 25px;
+    text-align: center;
+  }
+
+  .sat-info-value-wrap {
+    width: 220px;
   }
 }
 

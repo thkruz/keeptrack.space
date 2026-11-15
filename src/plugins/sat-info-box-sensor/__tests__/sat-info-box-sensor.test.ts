@@ -191,7 +191,7 @@ describe('SatInfoBoxSensor', () => {
 
       const reasonEl = getEl('sat-fov-reason')!;
 
-      expect(reasonEl.innerHTML).toBe('Elevation 1.2° below min 3.0°');
+      expect(reasonEl.innerHTML).toBe('Elevation below min 3.0°');
       expect(reasonEl.parentElement!.style.display).toBe('flex');
       // Look angles stay visible instead of the old "Out of FOV" placeholder.
       expect(getEl('sat-elevation')!.innerHTML).not.toBe('Out of FOV');
@@ -208,7 +208,7 @@ describe('SatInfoBoxSensor', () => {
       setupSensorAndSat(defaultSensor);
       triggerFrameUpdate();
 
-      expect(getEl('sat-fov-reason')!.innerHTML).toBe('Elevation 14.0° below horizon mask 15.0°');
+      expect(getEl('sat-fov-reason')!.innerHTML).toBe('Elevation below horizon mask 15.0°');
     });
 
     it('hides the row while the object is in view', () => {

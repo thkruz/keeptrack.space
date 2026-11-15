@@ -1238,7 +1238,11 @@ export class CreateSat extends KeepTrackPlugin {
         .replace('{name}', inputParams.name)
         .replace('{scc}', inputParams.scc);
 
-      ServiceLocator.getUiManager().toast(CreateSat.createdToastNote_ ? `${createdText} ${CreateSat.createdToastNote_}` : createdText, ToastMsgType.normal, true);
+      const note = CreateSat.createdToastNote_;
+      // Two sentences need a full stop between them (satCreated has none); CJK text takes a full-width stop.
+      const stop = /[.!。]$/u.test(createdText) ? '' : /[　-鿿＀-￯]$/u.test(createdText) ? '。' : '.';
+
+      ServiceLocator.getUiManager().toast(note ? `${createdText}${stop} ${note}` : createdText, ToastMsgType.normal, true);
       EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'CreateSat', { satId });
     } catch (error) {
       // ootk rejects an out-of-range element with a ParseError; name the field and its range instead.

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { describeZoneAt, displayZoneColumns, displayZoneHeaders, parseDisplayTimeZone, zoneOffsetLabel } from '../display-time-zone';
+import { describe, expect, it, vi } from 'vitest';
+import { DISPLAY_TIME_ZONE_EVENT, describeZoneAt, displayZoneColumns, displayZoneHeaders, parseDisplayTimeZone, setDisplayTimeZone, zoneOffsetLabel } from '../display-time-zone';
 
 const WINTER = Date.UTC(2026, 0, 15, 12, 0, 0);
 const SUMMER = Date.UTC(2026, 6, 15, 12, 0, 0);
@@ -37,5 +37,16 @@ describe('display time zone', () => {
   it('labels the chip', () => {
     expect(describeZoneAt(WINTER, 'UTC')).toBe('UTC');
     expect(describeZoneAt(WINTER, 'America/New_York')).toContain('UTC-05:00');
+  });
+
+  it('announces a zone change so the timeline marker can re-render (#458)', () => {
+    const listener = vi.fn();
+
+    window.addEventListener(DISPLAY_TIME_ZONE_EVENT, listener);
+    setDisplayTimeZone('America/New_York');
+    window.removeEventListener(DISPLAY_TIME_ZONE_EVENT, listener);
+    setDisplayTimeZone('UTC');
+
+    expect(listener).toHaveBeenCalledTimes(1);
   });
 });

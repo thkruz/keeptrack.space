@@ -15,6 +15,9 @@ import { browserTimeZone, formatInTimeZone, normalizeTimeZone } from './site-tim
 
 export const UTC_ZONE = 'UTC';
 
+/** Window event fired after the display zone is set, so views that bake the zone into markup can re-render. */
+export const DISPLAY_TIME_ZONE_EVENT = 'keeptrack-display-time-zone-changed';
+
 /** True for the neutral default: the zone is UTC (any spelling Intl treats as UTC). */
 export const isUtcZone = (zone: string): boolean => zone === UTC_ZONE || zone === 'Etc/UTC' || zone === 'Etc/GMT';
 
@@ -55,6 +58,10 @@ export const setDisplayTimeZone = (zone: string): string => {
     PersistenceManager.getInstance().saveItem(StorageKey.DISPLAY_TIME_ZONE, next);
   } catch {
     // Storage unavailable: the choice just does not persist.
+  }
+
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(DISPLAY_TIME_ZONE_EVENT, { detail: next }));
   }
 
   return next;

@@ -593,3 +593,21 @@ describe('ReportsPlugin.walkOutOfView_ (#465)', () => {
     expect(ReportsPlugin.walkOutOfView_((ms) => ms >= 10_200, 20_000, -1, 1000)).toBe(11_000);
   });
 });
+
+describe('ReportsPlugin.otherSensorCount_ (pro issue #540)', () => {
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+  });
+
+  it('counts the other primary sensors and every secondary sensor', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [{ name: 'A' }, { name: 'B' }] as never;
+    sensorManager.secondarySensors = [{ name: 'C' }] as never;
+    expect(ReportsPlugin.otherSensorCount_()).toBe(2);
+
+    sensorManager.currentSensors = [{ name: 'A' }] as never;
+    sensorManager.secondarySensors = [];
+    expect(ReportsPlugin.otherSensorCount_()).toBe(0);
+  });
+});

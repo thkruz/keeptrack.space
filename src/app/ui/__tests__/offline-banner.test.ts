@@ -74,3 +74,14 @@ describe('OfflineBanner', () => {
     expect(formatCatalogAge(now - 5 * 60_000, now, 'en')).toBe('5 minutes ago');
   });
 });
+
+describe('offline banner phone menu yield (#518)', () => {
+  it('yields only on a phone with a menu open', async () => {
+    const { shouldYieldToMenu } = await import('@app/app/ui/offline-banner');
+
+    expect(shouldYieldToMenu(390, true)).toBe(true);
+    expect(shouldYieldToMenu(360, true)).toBe(true);
+    expect(shouldYieldToMenu(390, false)).toBe(false);
+    expect(shouldYieldToMenu(1366, true)).toBe(false);
+  });
+});

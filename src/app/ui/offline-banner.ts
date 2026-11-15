@@ -29,6 +29,24 @@ export const formatCatalogAge = (cachedAt: number, now = Date.now(), locale?: st
   }
 };
 
+/** Viewport width below which side menus fill the screen (matches the phone layout breakpoint). */
+export const PHONE_MAX_WIDTH = 639;
+
+/** #518: on a phone an open side menu fills the screen, so the banner steps aside instead of covering its title and fields. */
+export const shouldYieldToMenu = (viewportWidth: number, menuOpen: boolean): boolean => viewportWidth <= PHONE_MAX_WIDTH && menuOpen;
+
+const isMenuOpen_ = (): boolean =>
+  Array.from(document.querySelectorAll<HTMLElement>('.side-menu-parent')).some((menu) => {
+    const style = getComputedStyle(menu);
+
+    if (style.display === 'none' || style.visibility === 'hidden') {
+      return false;
+    }
+    const rect = menu.getBoundingClientRect();
+
+    return rect.width > 0 && rect.height > 0;
+  });
+
 /**
  * Persistent, non-blocking notice while the browser is offline. Not tied to an account: it is
  * shown to anonymous and signed-in users alike. When the service worker serves the catalog from
@@ -40,6 +58,17 @@ export class OfflineBanner {
   private cachedAt_: number | null = null;
   private readonly onOnline_ = (): void => this.render_();
   private readonly onOffline_ = (): void => this.render_();
+  private menuObserver_: MutationObserver | null = null;
+  private rafId_ = 0;
+  private readonly syncMenu_ = (): void => {
+    this.rafId_ = 0;
+    this.el_?.classList.toggle('kt-offline-banner--behind-menu', shouldYieldToMenu(window.innerWidth, isMenuOpen_()));
+  };
+  private readonly scheduleSyncMenu_ = (): void => {
+    if (!this.rafId_) {
+      this.rafId_ = requestAnimationFrame(this.syncMenu_);
+    }
+  };
   private readonly onMessage_ = (event: MessageEvent): void => {
     const data = event.data as Partial<CatalogFromCacheMessage> | null;
 
@@ -57,6 +86,13 @@ export class OfflineBanner {
     window.addEventListener('online', this.onOnline_);
     window.addEventListener('offline', this.onOffline_);
     navigator.serviceWorker?.addEventListener('message', this.onMessage_);
+    window.addEventListener('resize', this.scheduleSyncMenu_);
+    this.menuObserver_ = new MutationObserver((mutations) => {
+      if (mutations.some((m) => m.target instanceof Element && m.target.matches('.side-menu-parent'))) {
+        this.scheduleSyncMenu_();
+      }
+    });
+    this.menuObserver_.observe(document.body, { attributes: true, attributeFilter: ['class', 'style'], subtree: true });
     this.render_();
   }
 
@@ -64,6 +100,9 @@ export class OfflineBanner {
     window.removeEventListener('online', this.onOnline_);
     window.removeEventListener('offline', this.onOffline_);
     navigator.serviceWorker?.removeEventListener('message', this.onMessage_);
+    window.removeEventListener('resize', this.scheduleSyncMenu_);
+    this.menuObserver_?.disconnect();
+    this.menuObserver_ = null;
     this.el_?.remove();
     this.el_ = null;
     this.catalogEl_ = null;
@@ -97,6 +136,7 @@ export class OfflineBanner {
     const el = this.ensureElement_();
 
     el.hidden = false;
+    this.syncMenu_();
     (el.querySelector('.kt-offline-banner-message') as HTMLElement).textContent = t7e('offlineBanner.message');
 
     if (this.catalogEl_) {

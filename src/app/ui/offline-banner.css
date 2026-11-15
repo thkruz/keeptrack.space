@@ -40,3 +40,9 @@
 .kt-offline-banner-catalog[hidden] {
   display: none;
 }
+
+/* #518: the banner sits outside the UI wrapper's stacking context, so z-index cannot put it behind a menu.
+   On a phone an open menu fills the screen; the banner hides until the menu closes. */
+.kt-offline-banner.kt-offline-banner--behind-menu {
+  visibility: hidden;
+}

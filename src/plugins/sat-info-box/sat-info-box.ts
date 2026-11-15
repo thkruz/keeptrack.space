@@ -183,6 +183,9 @@ export class SatInfoBox extends KeepTrackPlugin {
     if (isShow) {
       satInfoboxDom.style.display = 'block';
     }
+    if (satInfoboxDom.id === SatInfoBox.containerId_) {
+      document.body?.classList.toggle('kt-satinfo-open', isShow);
+    }
 
     const searchBoxHeight = satInfoboxDom?.getBoundingClientRect().height ?? 0;
     const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
@@ -845,6 +848,8 @@ export class SatInfoBox extends KeepTrackPlugin {
       SatInfoBox.releaseStalePointer_(this.draggie_ as unknown as Parameters<typeof SatInfoBox.releaseStalePointer_>[0]);
     }
     hideEl(SatInfoBox.containerId_);
+    // CSS keys off this class instead of body:has(#sat-infobox[style*=...]), which rescans the body on every DOM change.
+    document.body?.classList.remove('kt-satinfo-open');
     this.isVisible_ = false;
   }
 
@@ -853,6 +858,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
     showEl(SatInfoBox.containerId_);
+    document.body?.classList.add('kt-satinfo-open');
     this.isVisible_ = true;
     EventBus.getInstance().emit(EventBusEvent.satInfoBoxShown);
   }

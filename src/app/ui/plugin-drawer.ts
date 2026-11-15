@@ -843,21 +843,29 @@ export class PluginDrawer {
       if (!rafId) {
         // Two frames: the rects below are read after the frame that applied the menu/info box change has laid out,
         // so the reads never force a synchronous layout (a single rAF runs before that frame's layout).
+        // Then a macrotask: a rAF callback runs before the frame's style/layout, so reading rects there forces a
+        // synchronous layout of everything the selection just dirtied (measured at 160 ms). After the frame has been
+        // rendered the layout is clean and the reads are free.
         rafId = requestAnimationFrame(() => {
-          rafId = requestAnimationFrame(update);
+          setTimeout(update, 0);
         });
       }
     };
-    const observer = new MutationObserver(schedule);
+    // Skip attribute writes that did not change the value (selection hide/show can re-apply the same class/style).
+    const observer = new MutationObserver((mutations) => {
+      if (mutations.some((m) => m.attributeName && (m.target as HTMLElement).getAttribute(m.attributeName) !== m.oldValue)) {
+        schedule();
+      }
+    });
 
     document.querySelectorAll('.side-menu-parent').forEach((menu) => {
-      observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
+      observer.observe(menu, { attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style'] });
       menu.addEventListener('transitionend', schedule);
     });
     const infoEl = document.getElementById('sat-infobox');
 
     if (infoEl) {
-      observer.observe(infoEl, { attributes: true, attributeFilter: ['class', 'style'] });
+      observer.observe(infoEl, { attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style'] });
       if (typeof ResizeObserver !== 'undefined') {
         new ResizeObserver(schedule).observe(infoEl);
       }

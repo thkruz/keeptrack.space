@@ -5,6 +5,7 @@ import { setupStandardEnvironment } from '@test/environment/standard-env';
 describe('utility footer side menu clearance', () => {
   beforeEach(() => {
     setupStandardEnvironment();
+    vi.useFakeTimers();
     document.body.innerHTML = '<div id="ui-wrapper"><div id="drawer-utility-footer"></div><div id="wide-menu" class="side-menu-parent"></div></div>';
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
       cb(0);
@@ -14,6 +15,7 @@ describe('utility footer side menu clearance', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllGlobals();
     document.body.innerHTML = '';
   });
@@ -29,6 +31,7 @@ describe('utility footer side menu clearance', () => {
     setMenuRight_(800);
     Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
     (new PluginDrawer() as unknown as { observeSideMenuClearance_: () => void }).observeSideMenuClearance_();
+    vi.runAllTimers();
 
     expect(footerLeft_()).toBe('1083px');
   });
@@ -37,7 +40,39 @@ describe('utility footer side menu clearance', () => {
     setMenuRight_(300);
     Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
     (new PluginDrawer() as unknown as { observeSideMenuClearance_: () => void }).observeSideMenuClearance_();
+    vi.runAllTimers();
 
     expect(footerLeft_()).toBe('683px');
+  });
+
+  it('reads layout in a macrotask after the frame, not inside the rAF callback', () => {
+    setMenuRight_(800);
+    Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
+    (new PluginDrawer() as unknown as { observeSideMenuClearance_: () => void }).observeSideMenuClearance_();
+
+    expect(footerLeft_()).toBe('');
+    vi.runAllTimers();
+    expect(footerLeft_()).toBe('1083px');
+  });
+
+  it('ignores attribute writes that left the value unchanged', async () => {
+    setMenuRight_(800);
+    Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
+    const menu = document.getElementById('wide-menu') as HTMLElement;
+
+    menu.className = 'side-menu-parent';
+    (new PluginDrawer() as unknown as { observeSideMenuClearance_: () => void }).observeSideMenuClearance_();
+    vi.runAllTimers();
+    const spy = vi.spyOn(menu, 'getBoundingClientRect');
+
+    menu.className = 'side-menu-parent';
+    await Promise.resolve();
+    vi.runAllTimers();
+    expect(spy).not.toHaveBeenCalled();
+
+    menu.className = 'side-menu-parent open';
+    await Promise.resolve();
+    vi.runAllTimers();
+    expect(spy).toHaveBeenCalled();
   });
 });

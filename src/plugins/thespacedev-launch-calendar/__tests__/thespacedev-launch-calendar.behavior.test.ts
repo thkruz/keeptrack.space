@@ -131,6 +131,19 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
       expect(plugin.launchList).toHaveLength(2);
       expect(plugin.launchList[1].name).toBe('Second');
     });
+
+    it('sorts stale (TBD) windows after dated launches and keeps feed order within each group', () => {
+      plugin.processData({
+        results: [
+          launchResult({ name: 'Stale', window_start: '2000-01-01T00:00:00Z' }),
+          launchResult({ name: 'Soon', window_start: '2098-01-01T12:00:00Z' }),
+          launchResult({ name: 'Bad', window_start: 'not-a-date' }),
+          launchResult({ name: 'Later', window_start: '2099-01-01T12:00:00Z' }),
+        ] as any,
+      });
+
+      expect(plugin.launchList.map((x) => x.name)).toEqual(['Soon', 'Later', 'Stale', 'Bad']);
+    });
   });
 
   describe('static table builders', () => {

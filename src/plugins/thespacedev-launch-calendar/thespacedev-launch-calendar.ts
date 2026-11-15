@@ -407,6 +407,11 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
         rocketURL: text(rocket?.wiki_url),
       };
     });
+
+    // Rows that render as TBD (stale or unparseable window) go after the dated ones. Array.sort is stable, so the feed order is kept within each group.
+    const isTbd = (launch: LaunchInfoObject): boolean => TheSpaceDevLaunchCalendarPlugin.formatWindow(launch.windowStart) === l('msgs.tbd');
+
+    this.launchList.sort((a, b) => Number(isTbd(a)) - Number(isTbd(b)));
   }
 
   static makeTableHeaders(tbl: HTMLTableElement): void {

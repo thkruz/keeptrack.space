@@ -129,6 +129,28 @@ describe('GroupedPicker keyboard and multi-select', () => {
     expect(Array.from(select.selectedOptions).map((o) => o.value)).toEqual(['b']);
   });
 
+  it('renders the +N count in its own span via summarizeParts', () => {
+    document.body.innerHTML = `<select id="m" multiple>
+      <optgroup label="USA"><option value="a">Cape</option><option value="b">Vandenberg</option><option value="c">Wallops</option></optgroup></select>`;
+    const select = document.getElementById('m') as HTMLSelectElement;
+    const picker = new GroupedPicker(select, {
+      title: 'Sites',
+      multiple: true,
+      summarizeParts: (l) => ({ label: l[0] ?? '', count: l.length > 1 ? `+${l.length - 1}` : undefined }),
+    });
+    const trigger = document.querySelector('.kt-picker-trigger') as HTMLElement;
+
+    picker.open();
+    document.querySelectorAll<HTMLElement>('.kt-picker-item')[0].click();
+    expect(trigger.querySelector('.kt-picker-trigger-count')).toBeNull();
+    expect(trigger.classList.contains('kt-picker-trigger--count')).toBe(false);
+    document.querySelectorAll<HTMLElement>('.kt-picker-item')[1].click();
+    document.querySelectorAll<HTMLElement>('.kt-picker-item')[2].click();
+    expect(trigger.querySelector('.kt-picker-trigger-label')?.textContent).toBe('Cape');
+    expect(trigger.querySelector('.kt-picker-trigger-count')?.textContent).toBe('+2');
+    expect(trigger.title).toBe('Sites: Cape, Vandenberg, Wallops');
+  });
+
   it('moves focus with arrow keys from the search box through headings and items', () => {
     const { picker } = build();
 

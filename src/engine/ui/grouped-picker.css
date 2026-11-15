@@ -19,6 +19,26 @@
   position: relative;
 }
 
+.kt-picker-trigger--count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kt-picker-trigger-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kt-picker-trigger-count {
+  flex: 0 0 auto;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .kt-picker-trigger::after {
   content: '\25BE';
   position: absolute;

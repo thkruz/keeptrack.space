@@ -22,6 +22,8 @@ export interface GroupedPickerOptions {
   emptyText?: string;
   /** Trigger summary in multiple mode; receives the selected labels. Defaults to a comma list. */
   summarize?: (labels: string[]) => string;
+  /** Like summarize, but the optional count (e.g. "+3") renders in a non-shrinking span the ellipsis cannot hide. */
+  summarizeParts?: (labels: string[]) => { label: string; count?: string };
 }
 
 interface PickerGroup {
@@ -200,8 +202,22 @@ export class GroupedPicker {
   private updateTrigger_(): void {
     if (this.options_.multiple) {
       const labels = Array.from(this.select_.selectedOptions).map(cleanText_);
+      const parts = labels.length > 0 ? this.options_.summarizeParts?.(labels) : undefined;
 
-      this.trigger_.textContent = labels.length === 0 ? (this.options_.emptyText ?? this.options_.title) : (this.options_.summarize?.(labels) ?? labels.join(', '));
+      this.trigger_.classList.toggle('kt-picker-trigger--count', Boolean(parts?.count));
+      if (parts) {
+        // The count lives in its own non-shrinking span so the label ellipsis can never hide it (#521).
+        const label = document.createElement('span');
+        const count = document.createElement('span');
+
+        label.className = 'kt-picker-trigger-label';
+        label.textContent = parts.label;
+        count.className = 'kt-picker-trigger-count';
+        count.textContent = parts.count;
+        this.trigger_.replaceChildren(label, ...(parts.count ? [count] : []));
+      } else {
+        this.trigger_.textContent = labels.length === 0 ? (this.options_.emptyText ?? this.options_.title) : (this.options_.summarize?.(labels) ?? labels.join(', '));
+      }
       // Full selection as the tooltip: the trigger text is ellipsised when several items are chosen (#500).
       this.trigger_.title = labels.length === 0 ? this.options_.title : `${this.options_.title}: ${labels.join(', ')}`;
 

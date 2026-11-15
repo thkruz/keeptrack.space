@@ -41,6 +41,14 @@ export class HoverManager {
 
   /** Drop the hover card and forget the hovered object (pointer left the canvas, or the selection changed). */
   clearHover(): void {
+    // Reset the cached id, hover orbit and highlighted dot together, or a re-entry over the same object is skipped
+    if (this.currentHoverId !== -1) {
+      if (settingsManager.enableHoverOrbits) {
+        this.updateHover_(-1);
+      } else {
+        this.currentHoverId = -1;
+      }
+    }
     const box = getEl('sat-hoverbox');
 
     if (box) {

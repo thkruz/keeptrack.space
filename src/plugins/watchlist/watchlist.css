@@ -32,7 +32,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+  margin: 6px 0 0;
+}
+
+/* #520: Materialize gives the input an 8 px bottom margin and the form/input-field a bottom margin, which stacked a
+   ~37 px empty band under the row. Zero them so the card's own padding is the only gap (#499 alignment untouched). */
+.watchlist-add-row .input-field input {
+  margin-bottom: 0;
+}
+
+.watchlist-add-row .input-field + .icon-btn,
+.watchlist-add-row .watchlist-add {
+  margin-bottom: 0;
 }
 
 .watchlist-add-row .input-field {

@@ -1263,14 +1263,21 @@ export abstract class KeepTrackPlugin {
     }
   }
 
+  /** Toggles a class only when the element does not already have that state, so redundant calls never invalidate style. */
+  private static setIconClass_(el: HTMLElement | null, className: string, isOn: boolean): void {
+    if (el && el.classList.contains(className) !== isOn) {
+      el.classList.toggle(className, isOn);
+    }
+  }
+
   setBottomIconToSelected(): void {
     if (this.isMenuButtonActive) {
       return;
     }
     this.isMenuButtonActive = true;
     this.bottomIconComponent_?.select();
-    getEl(this.bottomIconElementName, true)?.classList.add('bmenu-item-selected');
-    getEl(`${this.id}-utility-icon`, true)?.classList.add('bmenu-item-selected');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-selected', true);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-selected', true);
   }
 
   setBottomIconToUnselected(isHideSideMenus = true): void {
@@ -1285,8 +1292,8 @@ export abstract class KeepTrackPlugin {
     if (isHideSideMenus) {
       EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
     }
-    getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-selected');
-    getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-selected');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-selected', false);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-selected', false);
   }
 
   /**
@@ -1362,8 +1369,8 @@ export abstract class KeepTrackPlugin {
     this.setBottomIconToUnselected(isHideSideMenus);
     this.isIconDisabled = true;
     this.bottomIconComponent_?.disable(false);
-    getEl(this.bottomIconElementName, true)?.classList.add('bmenu-item-disabled');
-    getEl(`${this.id}-utility-icon`, true)?.classList.add('bmenu-item-disabled');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-disabled', true);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-disabled', true);
     this.syncUtilityIconReason_(true);
   }
 
@@ -1373,8 +1380,8 @@ export abstract class KeepTrackPlugin {
     }
     this.isIconDisabled = false;
     this.bottomIconComponent_?.enable();
-    getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-disabled');
-    getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-disabled');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-disabled', false);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-disabled', false);
     this.syncUtilityIconReason_(false);
   }
 

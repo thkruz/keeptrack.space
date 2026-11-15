@@ -274,16 +274,23 @@ export class MouseInput {
       MouseInput.isContainerOffsetListening_ = true;
       window.addEventListener('resize', MouseInput.invalidateContainerOffset);
       // Capture so scrolls of the container itself (which do not bubble) are seen too.
-      window.addEventListener('scroll', MouseInput.invalidateContainerOffset, true);
+      window.addEventListener('scroll', MouseInput.onScrollInvalidate_, true);
     }
     if (MouseInput.containerOffsetRoot_ !== container) {
       MouseInput.containerOffsetResizeObserver_?.disconnect();
       MouseInput.containerOffsetRoot_ = container;
       if (container && typeof ResizeObserver !== 'undefined') {
-        MouseInput.containerOffsetResizeObserver_ = new ResizeObserver(MouseInput.invalidateContainerOffset);
+        // Observer callbacks run after layout, so measuring here is free and keeps mousemove read-free.
+        MouseInput.containerOffsetResizeObserver_ = new ResizeObserver(() => MouseInput.measureContainerOffset_());
         MouseInput.containerOffsetResizeObserver_.observe(container);
       }
     }
+
+    return MouseInput.measureContainerOffset_();
+  }
+
+  private static measureContainerOffset_(): { x: number; y: number } {
+    const container = MouseInput.containerOffsetRoot_ ?? KeepTrack.getInstance().containerRoot;
 
     MouseInput.containerOffset_ = {
       x: container.scrollLeft - window.scrollX + container.offsetLeft,
@@ -292,6 +299,16 @@ export class MouseInput {
 
     return MouseInput.containerOffset_;
   }
+
+  /** Scrolls inside side menus, lists, etc. cannot move the container; only window/ancestor scrolls matter. */
+  private static readonly onScrollInvalidate_ = (evt: Event): void => {
+    const target = evt.target;
+    const container = MouseInput.containerOffsetRoot_;
+
+    if (target === document || target === window || target === container || (target instanceof Node && container && target.contains(container))) {
+      MouseInput.invalidateContainerOffset();
+    }
+  };
 
   /** Canvas coords for an event, or null when the event carries no usable client position. */
   private static getEventCanvasCoords_(evt: MouseEvent): { x: number; y: number } | null {

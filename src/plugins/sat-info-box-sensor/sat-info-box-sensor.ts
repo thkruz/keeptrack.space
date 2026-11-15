@@ -53,6 +53,10 @@ const l = (key: string): string => t7e(`plugins.SatInfoBoxSensor.${key}` as Para
 
 /** Real-time floor between two Next Pass searches for the same object and sensor (the search is heavy). */
 const NEXT_PASS_MIN_REAL_INTERVAL_MS = 1000;
+/** Floor when the last search returned a pass that was already started at search time (not in view): searching again would give the same answer. */
+const NEXT_PASS_STALE_RESULT_REAL_INTERVAL_MS = 30000;
+/** The stale-result floor only applies while the sim clock stays this close to the search time; a bigger jump searches again at once. */
+const NEXT_PASS_STALE_RESULT_MAX_SIM_ADVANCE_MS = 600e3;
 /** A backwards sim-clock move larger than this invalidates the cached Next Pass. */
 const NEXT_PASS_BACKWARD_TOLERANCE_MS = 1000;
 /** With no pass found, search again once the sim clock has used up this much of the 2-day horizon. */
@@ -492,6 +496,19 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
 
     if (now.realNowMs - cache.calcRealMs < NEXT_PASS_MIN_REAL_INTERVAL_MS) {
+      return false;
+    }
+
+    // The search itself answered with a start time at or before the clock it ran for; asking again every second
+    // (the pass is "over" by the rule below) re-runs the same heavy search in the draw loop for the same answer.
+    const isResultAlreadyStale = cache.resultMs !== null && cache.resultMs <= cache.calcSimMs;
+
+    if (
+      isResultAlreadyStale &&
+      now.simNowMs >= cache.calcSimMs - NEXT_PASS_BACKWARD_TOLERANCE_MS &&
+      now.simNowMs - cache.calcSimMs < NEXT_PASS_STALE_RESULT_MAX_SIM_ADVANCE_MS &&
+      now.realNowMs - cache.calcRealMs < NEXT_PASS_STALE_RESULT_REAL_INTERVAL_MS
+    ) {
       return false;
     }
 

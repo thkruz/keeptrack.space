@@ -78,6 +78,33 @@ describe('EpochAge behavior', () => {
     expect(rectSpy).not.toHaveBeenCalled();
   });
 
+  it('defers placement out of the selection path, and skips it when the badge is unchanged', () => {
+    const menu = document.createElement('div');
+
+    menu.className = 'side-menu-parent';
+    menu.style.display = 'block';
+    document.body.appendChild(menu);
+    const rectSpy = vi.spyOn(Element.prototype, 'getBoundingClientRect');
+    const rafSpy = vi.fn(() => 1);
+
+    vi.stubGlobal('requestAnimationFrame', rafSpy);
+
+    // A placement queued by init (real rAF never ran under test) must not mask the one asserted here.
+    (plugin as unknown as { isPlaceQueued_: boolean }).isPlaceQueued_ = false;
+
+    ServiceLocator.getTimeManager().simulationTimeObj = new Date(EPOCH_MS + 10 * DAY);
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, selected as Satellite, 0);
+
+    expect(rectSpy).not.toHaveBeenCalled();
+    expect(rafSpy).toHaveBeenCalledTimes(1);
+
+    // Same text and level again: no write, no new placement request.
+    EventBus.getInstance().emit(EventBusEvent.selectSatData, selected as Satellite, 0);
+    expect(rafSpy).toHaveBeenCalledTimes(1);
+    menu.remove();
+    vi.unstubAllGlobals();
+  });
+
   it('mounts the badge inside #ui-wrapper so side menus (same stacking context) cover it', () => {
     document.getElementById(EpochAge.BADGE_ID)?.remove();
     let wrapper = document.getElementById('ui-wrapper');

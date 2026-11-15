@@ -356,6 +356,32 @@ describe('MouseInput handlers', () => {
     });
   });
 
+  describe('getCanvasCoords scroll invalidation', () => {
+    it('ignores scrolls inside unrelated elements but re-measures after a window or ancestor scroll', () => {
+      const container = KeepTrack.getInstance().containerRoot;
+      const offsetLeft = vi.fn(() => 5);
+      const sideMenu = document.createElement('div');
+
+      document.body.appendChild(sideMenu);
+      Object.defineProperty(container, 'offsetLeft', { configurable: true, get: offsetLeft });
+      MouseInput.invalidateContainerOffset();
+      const evt = { clientX: 100, clientY: 50 } as MouseEvent;
+
+      MouseInput.getCanvasCoords(evt);
+      sideMenu.dispatchEvent(new Event('scroll'));
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(1);
+
+      document.dispatchEvent(new Event('scroll'));
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(2);
+
+      sideMenu.remove();
+      delete (container as unknown as Record<string, unknown>).offsetLeft;
+      MouseInput.invalidateContainerOffset();
+    });
+  });
+
   describe('canvasMouseMoveFire_', () => {
     it('updates the camera mouse position and flags drag movement', () => {
       camera.state.isDragging = true;

@@ -136,6 +136,16 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       expect(SatInfoBoxSensor.shouldRecalcNextPass_(base, now({ simNowMs: base.resultMs! + 2 * 3600e3, isInView: true }))).toBe(true);
     });
 
+    it('does not re-search every second when the last answer was already a started pass and the object is not in view', () => {
+      const started = { ...base, calcRealMs: 0, resultMs: base.calcSimMs - 120e3 };
+
+      // 1 s real floor passed, pass "over" by the usual rule, but the answer cannot change: wait 30 s real.
+      expect(SatInfoBoxSensor.shouldRecalcNextPass_(started, now({ realNowMs: 2000, simNowMs: base.calcSimMs + 2000 }))).toBe(false);
+      expect(SatInfoBoxSensor.shouldRecalcNextPass_(started, now({ realNowMs: 31_000, simNowMs: base.calcSimMs + 31_000 }))).toBe(true);
+      // A big sim jump still searches at once.
+      expect(SatInfoBoxSensor.shouldRecalcNextPass_(started, now({ realNowMs: 2000, simNowMs: base.calcSimMs + 86400e3 }))).toBe(true);
+    });
+
     it('throttles repeated searches in real time', () => {
       expect(SatInfoBoxSensor.shouldRecalcNextPass_(base, now({ simNowMs: base.calcSimMs - 86400e3, realNowMs: 500 }))).toBe(false);
     });

@@ -218,11 +218,32 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
     if (!this.badge_) {
       return;
     }
-    this.badge_.textContent = t7e(`plugins.EpochAge.badge.${level}` as TranslationKey).replace('{days}', formatDays(days));
+    const text = t7e(`plugins.EpochAge.badge.${level}` as TranslationKey).replace('{days}', formatDays(days));
+    const wasHidden = this.badge_.style.display === 'none';
+
+    // Unchanged content cannot move the badge, so skip both the writes and the placement.
+    if (!wasHidden && this.badge_.textContent === text && this.badge_.dataset.level === level) {
+      return;
+    }
+    this.badge_.textContent = text;
     this.badge_.dataset.level = level;
     this.badge_.style.display = '';
-    this.placeBadge_();
+    this.schedulePlaceBadge_();
   }
+
+  /** Placement measures layout, so it never runs in the same task as the text/display writes (selectSat). */
+  private schedulePlaceBadge_(): void {
+    if (this.isPlaceQueued_) {
+      return;
+    }
+    this.isPlaceQueued_ = true;
+    requestAnimationFrame(() => {
+      this.isPlaceQueued_ = false;
+      this.placeBadge_();
+    });
+  }
+
+  private isPlaceQueued_ = false;
 
   private hideBadge_(): void {
     if (!this.badge_) {

@@ -4582,7 +4582,7 @@ body.search-results-open #toast-container {
 
 a {
   text-decoration: none;
-  color: var(--color-dark-text-accent) !important;
+  color: var(--color-dark-text-accent);
 }
 
 

@@ -7,7 +7,8 @@
  * scroll position. Selectors carry a `body` prefix to win over plugin-drawer.css without editing it.
  */
 :root {
-  --pill-clearance: calc(68px + env(safe-area-inset-bottom, 0px));
+  /* Pill is 48 px tall on the bottom edge (#464); 68 px left a 20 px band where info-box rows showed through (#469). */
+  --pill-clearance: calc(48px + env(safe-area-inset-bottom, 0px));
   --sat-infobox-footer-height: 48px;
 }
 

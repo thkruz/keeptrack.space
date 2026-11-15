@@ -742,8 +742,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       try {
         const { ra, dec } = SatInfoBoxSensor.computeTopocentricRaDec_(obj, sensor, simTime);
 
-        raText = `${ra.toFixed(4)}°`;
-        decText = `${dec.toFixed(4)}°`;
+        raText = `${formatLocaleNumber(ra, 4)}°`;
+        decText = `${formatLocaleNumber(dec, 4)}°`;
       } catch {
         raText = l('values.unableToCalculate');
         decText = raText;
@@ -781,7 +781,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const az = ServiceLocator.getSensorManager().currentTEARR.az;
 
       if (az) {
-        writeHtmlIfChanged(elements.az, `${az.toFixed(0)}°`);
+        writeHtmlIfChanged(elements.az, `${formatLocaleNumber(az, 0)}°`);
       } else {
         writeHtmlIfChanged(elements.az, l('values.unknown'));
       }
@@ -790,7 +790,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const el = ServiceLocator.getSensorManager().currentTEARR.el;
 
       if (el) {
-        writeHtmlIfChanged(elements.el, `${el.toFixed(1)}°`);
+        writeHtmlIfChanged(elements.el, `${formatLocaleNumber(el, 1)}°`);
       } else {
         writeHtmlIfChanged(elements.el, l('values.unknown'));
       }
@@ -799,7 +799,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const rng = ServiceLocator.getSensorManager().currentTEARR.rng;
 
       if (rng) {
-        writeHtmlIfChanged(elements.rng, `${rng.toFixed(2)} km`);
+        writeHtmlIfChanged(elements.rng, `${formatLocaleNumber(rng, 2)} km`);
       } else {
         writeHtmlIfChanged(elements.rng, l('values.unknown'));
       }
@@ -827,7 +827,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
         writeHtmlIfChanged(
           elements.vmag,
-          reading.kind === 'notSunlit' ? l('values.notSunlit') : `${reading.value.toFixed(2)}${reading.assumed ? ` ${l('values.assumedSuffix')}` : ''}`
+          reading.kind === 'notSunlit' ? l('values.notSunlit') : `${formatLocaleNumber(reading.value, 2)}${reading.assumed ? ` ${l('values.assumedSuffix')}` : ''}`
         );
       }
     }
@@ -838,7 +838,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
       beamwidthString =
         sensorManagerInstance.currentSensors[0].beamwidth && currentRange
-          ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
+          ? `${formatLocaleNumber(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth), 2)} km`
           : l('values.unknown');
     }
     if (elements.beamwidth) {
@@ -848,7 +848,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
       // Time for RF to hit target and bounce back
 
-      writeHtmlIfChanged(elements.maxTmx, currentRange ? `${((currentRange / cKmPerMs) * 2).toFixed(2)} ms` : l('values.unknown'));
+      writeHtmlIfChanged(elements.maxTmx, currentRange ? `${formatLocaleNumber((currentRange / cKmPerMs) * 2, 2)} ms` : l('values.unknown'));
     }
   }
 }

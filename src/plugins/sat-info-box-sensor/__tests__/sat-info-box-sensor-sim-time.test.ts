@@ -37,12 +37,18 @@ const frame_ = () => {
   EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
 };
 
+/** The pass search runs in an idle callback (requestIdleWrite, at most 100 ms away); wait it out. */
+const flushIdle_ = () => {
+  vi.advanceTimersByTime(150);
+};
+
 describe('SatInfoBoxSensor sim-time correctness', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     vi.restoreAllMocks();
   });
 
@@ -174,6 +180,12 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       // Selected while the sim clock is at the wall clock...
       setSimTime_(new Date(Date.UTC(2026, 9, 17, 4, 0)));
       frame_();
+      // The search is off the frame: nothing computed yet, the row says Loading...
+      expect(nextpassSpy).not.toHaveBeenCalled();
+      expect(getEl('sat-nextpass')!.innerHTML).toBe('Loading…');
+      frame_();
+      expect(nextpassSpy).not.toHaveBeenCalled();
+      flushIdle_();
       expect(nextpassSpy).toHaveBeenCalledTimes(1);
       expect(getEl('sat-nextpass')!.innerHTML).toBe('2026-10-17 05:27:45 UTC');
 
@@ -186,9 +198,28 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       nowSpy.mockReturnValue(Date.UTC(2026, 9, 17, 4, 0, 5));
       setSimTime_(new Date(Date.UTC(2026, 9, 15, 6, 39)));
       frame_();
+      // Old value stays until the new search finishes
+      expect(getEl('sat-nextpass')!.innerHTML).toBe('2026-10-17 05:27:45 UTC');
+      flushIdle_();
 
       expect(nextpassSpy).toHaveBeenCalledTimes(2);
       expect(getEl('sat-nextpass')!.innerHTML).toBe('2026-10-15 07:10:00 UTC');
+    });
+
+    it('drops a queued Next Pass search when the sensor is deselected before it runs', () => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(false);
+      const nextpassSpy = vi.spyOn(SensorMath, 'nextpass').mockReturnValue('2026-10-17 05:27:45');
+
+      setupSensorAndSat_();
+      setSimTime_(new Date(Date.UTC(2026, 9, 17, 4, 0)));
+      frame_();
+      ServiceLocator.getSensorManager().currentSensors = [];
+      flushIdle_();
+
+      expect(nextpassSpy).not.toHaveBeenCalled();
     });
   });
 

@@ -15,7 +15,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { formatLocaleNumber } from '@app/engine/utils/format-locale-number';
-import { getEl, hideEl, showEl, writeHtmlIfChanged, writeTitleIfChanged } from '@app/engine/utils/get-el';
+import { getEl, hideEl, requestIdleWrite, showEl, writeHtmlIfChanged, writeTitleIfChanged } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
@@ -101,6 +101,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   private readonly isSensorSectionCollapsed_ = true;
   private nextPassCache_: NextPassCache | null = null;
   private nextPassText_ = '';
+  private nextPassPending_: { satId: number; sensorName: string } | null = null;
   private static readonly reasonProviders_: FovReasonProvider[] = [];
 
   /** Lets an add-on contribute reasons to the Not in View row. Registering the same provider twice is a no-op. */
@@ -455,6 +456,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
     if (!sensorManagerInstance.isSensorSelected()) {
       this.nextPassCache_ = null;
+      this.nextPassPending_ = null;
       if (nextPassElement) {
         writeHtmlIfChanged(nextPassElement, l('values.unavailable'));
       }
@@ -473,20 +475,74 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     const isInView = !!sensorManagerInstance.currentTEARR?.inView;
 
     if (SatInfoBoxSensor.shouldRecalcNextPass_(this.nextPassCache_, { satId, sensorName, simNowMs, realNowMs, isInView })) {
-      const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
-      const parsedMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
-
-      this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: realNowMs, resultMs: parsedMs };
-      this.nextPassText_ = parsedMs === null ? nextPassText : `${nextPassText} UTC`;
+      this.scheduleNextPassSearch_(obj, satId, sensorName);
     }
 
     if (!nextPassElement) {
       return;
     }
-    // The cached time is the rise of a pass that has already begun: while the object is in view say so instead of a past time
+
+    // While the first search for this object and sensor is still pending there is nothing correct to show yet.
+    const isCacheForSelection = this.nextPassCache_?.satId === satId && this.nextPassCache_.sensorName === sensorName;
+
+    if (!isCacheForSelection) {
+      writeHtmlIfChanged(nextPassElement, t7e('Common.loading'));
+
+      return;
+    }
+
+    this.writeNextPassRow_(nextPassElement, isInView, simNowMs);
+  }
+
+  /** Writes the cached Next Pass, or "in progress" when the cached rise time is already behind the clock and the object is in view. */
+  private writeNextPassRow_(nextPassElement: HTMLElement, isInView: boolean, simNowMs: number): void {
     const cachedMs = this.nextPassCache_?.resultMs ?? null;
 
     writeHtmlIfChanged(nextPassElement, isInView && cachedMs !== null && cachedMs <= simNowMs ? t7e('plugins.LookAnglesPlugin.msgs.inProgress') : this.nextPassText_);
+  }
+
+  /**
+   * The pass search takes tens of milliseconds, so it never runs inside the draw loop: it is queued for an idle period
+   * and the row keeps its previous value (or "Loading…" for a new object) until it finishes.
+   */
+  private scheduleNextPassSearch_(obj: BaseObject, satId: number, sensorName: string): void {
+    if (this.nextPassPending_?.satId === satId && this.nextPassPending_.sensorName === sensorName) {
+      return;
+    }
+
+    const job = { satId, sensorName };
+
+    this.nextPassPending_ = job;
+    requestIdleWrite(() => {
+      if (this.nextPassPending_ !== job) {
+        return;
+      }
+      this.nextPassPending_ = null;
+
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
+      const isStillCurrent =
+        sensorManagerInstance.isSensorSelected() &&
+        (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? obj.id) === satId &&
+        (sensorManagerInstance.currentSensors[0]?.objName ?? '') === sensorName;
+
+      if (!isStillCurrent) {
+        return;
+      }
+
+      const timeManagerInstance = ServiceLocator.getTimeManager();
+      const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
+      const parsedMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
+      const simNowMs = timeManagerInstance.simulationTimeObj.getTime();
+
+      this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: Date.now(), resultMs: parsedMs };
+      this.nextPassText_ = parsedMs === null ? nextPassText : `${nextPassText} UTC`;
+
+      const nextPassElement = getEl(EL.NEXT_PASS, true);
+
+      if (nextPassElement) {
+        this.writeNextPassRow_(nextPassElement, !!sensorManagerInstance.currentTEARR?.inView, simNowMs);
+      }
+    });
   }
 
   /** Decides whether the cached Next Pass is stale for the current object, sensor and sim time. */

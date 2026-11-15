@@ -635,7 +635,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       KeepTrack.getInstance()
         .containerRoot.querySelectorAll('.sat-only-info')
         ?.forEach((el) => {
-          (<HTMLElement>el).style.display = 'flex';
+          showEl(el as HTMLElement, 'flex');
         });
     }
 
@@ -813,13 +813,13 @@ export class SatInfoBox extends KeepTrackPlugin {
     const satMissionData = getEl('sat-mission-data', true);
 
     if (satMissionData) {
-      satMissionData.style.display = 'none';
+      hideEl(satMissionData);
     }
 
     const satIdentifierData = getEl('sat-identifier-data', true);
 
     if (satIdentifierData) {
-      satIdentifierData.style.display = 'none';
+      hideEl(satIdentifierData);
     }
   }
 
@@ -832,14 +832,14 @@ export class SatInfoBox extends KeepTrackPlugin {
         if (!el?.parentElement) {
           return;
         }
-        el.parentElement.style.display = 'flex';
+        showEl(el.parentElement, 'flex');
       }
     );
 
     const satIdentifierData = getEl('sat-identifier-data', true);
 
     if (satIdentifierData) {
-      satIdentifierData.style.display = 'block';
+      showEl(satIdentifierData);
     }
   }
 

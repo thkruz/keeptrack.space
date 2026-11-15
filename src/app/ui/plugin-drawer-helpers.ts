@@ -402,7 +402,7 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const idAttr = item.pluginId ? ` id="${item.pluginId}-utility-icon"` : '';
 
-      const reason = item.isDisabled && item.pluginId ? drawerDisabledReasonText(item.pluginId) : '';
+      const reason = item.isDisabled && !item.isTopMenu ? drawerDisabledReasonText(item.id) : '';
       const tip = reason ? `${item.label}: ${reason}` : item.label;
       const ariaAttr = item.isDisabled ? ` aria-disabled="true" aria-label="${tip}"` : '';
 
@@ -689,6 +689,7 @@ export function syncInitialUtilityState(): void {
     if (plugin.isIconDisabled) {
       utilityIcon.classList.add('bmenu-item-disabled');
     }
+    syncUtilityIconReason(utilityIcon, plugin.isIconDisabled);
   }
 
   const footerEl = getEl('drawer-utility-footer', true);

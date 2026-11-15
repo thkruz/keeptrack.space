@@ -119,7 +119,8 @@
   transition: max-height 0.5s ease-in-out;
   max-height: 1000px;
   /* Set this to a value larger than the content's height */
-  overflow: hidden;
+  /* clip, not hidden: hidden makes the wrapper the headers' scroll container so #sat-infobox snap never applies (#423) */
+  overflow: clip;
   margin: 0px;
 }
 

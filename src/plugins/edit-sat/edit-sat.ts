@@ -630,11 +630,20 @@ export class EditSat extends KeepTrackPlugin {
 
     const formScc = (getEl(`${EditSat.elementPrefix}-scc`) as HTMLInputElement | null)?.value.trim();
 
-    if (formScc && catalogManagerInstance.sccNum2Id(formScc) !== sat.id) {
+    // Catalog aliases (attached station modules resolve to their host) are fine for navigation, but imported
+    // elements may only be applied to the satellite whose own catalog number the file carries.
+    const canonicalScc = (scc: string): string =>
+      scc
+        .trim()
+        .replace(/^0+(?=\d)/u, '')
+        .toUpperCase();
+    const isAliasMismatch = canonicalScc(parsed.sccNum) !== canonicalScc(sat.sccNum);
+
+    if (isAliasMismatch || (formScc && catalogManagerInstance.sccNum2Id(formScc) !== sat.id)) {
       errorManagerInstance.warn(
         t7e('plugins.EditSat.errorMsgs.sccMismatch' as T7eKey)
           .replace(/\{fileScc\}/gu, parsed.sccNum)
-          .replace(/\{selectedScc\}/gu, formScc)
+          .replace(/\{selectedScc\}/gu, formScc || sat.sccNum)
       );
 
       return;

@@ -79,7 +79,7 @@ export class PluginDrawer {
    * click only "expanded the drawer". With the delay, an aimed click activates the icon it was
    * aimed at, and resting on the rail still expands it to show labels.
    */
-  private static readonly RAIL_HOVER_INTENT_MS = 250;
+  private static readonly RAIL_HOVER_INTENT_MS = 150;
   /** A press older than this is not used to resolve a click. */
   private static readonly PRESS_MEMORY_MS = 1000;
 

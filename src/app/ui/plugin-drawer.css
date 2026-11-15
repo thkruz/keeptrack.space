@@ -320,21 +320,21 @@ body.drawer-mode {
     outline-offset: -2px;
   }
 
+  /* Groups fold and unfold instantly. A max-height animation from the 2000px cap spent most of its time on
+     invisible height, so collapses looked late and the drawer felt unresponsive. */
   .drawer-group-items {
     overflow: hidden;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: none;
     max-height: 2000px;
   }
 
   .drawer-group.collapsed .drawer-group-items {
     max-height: 0;
-    /* #326: max-height 0 + overflow hidden left collapsed rows hit-testable under the next header on phones.
-       visibility flips after the collapse transition so the animation still plays, and rows leave the tab order. */
+    /* #326: max-height 0 + overflow hidden left collapsed rows hit-testable under the next header on phones;
+       hidden rows also leave the tab order. */
     visibility: hidden;
     pointer-events: none;
-    transition:
-      max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      visibility 0s linear var(--kt-duration-slow, 300ms);
+    transition: none;
   }
 
   /* ---- Drawer Items ---- */
@@ -1061,8 +1061,8 @@ body.drawer-mode:not(.is-mobile-mode) {
     transform: translateX(0);
     width: 60px;
     overflow: hidden;
-    transition: width var(--kt-duration-slow, 300ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1)),
-      box-shadow var(--kt-duration-slow, 300ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
+    transition: width var(--kt-duration-fast, 100ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1)),
+      box-shadow var(--kt-duration-fast, 100ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
   }
 
   /* The whole top-actions row collapses in rail mode so plugin-injected
@@ -1071,7 +1071,7 @@ body.drawer-mode:not(.is-mobile-mode) {
   .plugin-drawer.rail-mode .drawer-top-actions {
     max-height: 0;
     overflow: hidden;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: max-height var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-top-actions {
@@ -1085,9 +1085,9 @@ body.drawer-mode:not(.is-mobile-mode) {
     margin: 0;
     border: none;
     opacity: 0;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+    transition: max-height var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      margin var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
@@ -1098,8 +1098,8 @@ body.drawer-mode:not(.is-mobile-mode) {
     border: none;
     opacity: 0;
     overflow: hidden;
-    transition: max-width var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+    transition: max-width var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      margin var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
@@ -1138,7 +1138,7 @@ body.drawer-mode:not(.is-mobile-mode) {
     position: relative;
     padding: 8px 12px;
     justify-content: center;
-    transition: padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-item-label {
@@ -1147,7 +1147,7 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.rail-mode .drawer-item-icon {
     margin-right: 0;
-    transition: margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: margin var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-item-shortcut {
@@ -1183,7 +1183,7 @@ body.drawer-mode:not(.is-mobile-mode) {
      vertically under the cursor. */
   .plugin-drawer.rail-mode .drawer-user-account {
     padding: 16px 10px;
-    transition: padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-user-account__row {
@@ -1200,9 +1200,9 @@ body.drawer-mode:not(.is-mobile-mode) {
     padding: 0;
     border: none;
     overflow: hidden;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+    transition: max-height var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+      padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-rail-toggle {

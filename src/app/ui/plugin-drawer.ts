@@ -40,6 +40,7 @@ import {
   renderBadge,
   renderStatusFooter,
   renderUtilityFooter,
+  sanitizeDrawerIdToken,
   showSignInPrompt,
   syncBadgesFromEvents,
   syncDrawerItemReason,
@@ -1036,7 +1037,7 @@ export class PluginDrawer {
       const tabIdx = item.isDisabled ? '' : ' tabindex="0"';
       const shortcutBadge = item.shortcutHint ? `<span class="drawer-item-shortcut">${item.shortcutHint}</span>` : '';
 
-      const hintId = `drawer-hint-${key}-${item.id}`;
+      const hintId = `drawer-hint-${sanitizeDrawerIdToken(`${key}-${item.id}`)}`;
       const hintAttr = proClass ? ` aria-describedby="${hintId}"` : '';
 
       html += `<div class="drawer-item${disabledClass}${proClass}" ${dataAttr}${proAttr}${tabIdx}${hintAttr} role="button" kt-tooltip="${item.label}">`;

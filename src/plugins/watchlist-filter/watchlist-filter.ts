@@ -53,6 +53,12 @@ export class WatchlistFilterPlugin extends KeepTrackPlugin {
     ];
   }
 
+  getDisabledReason(): string | null {
+    const watchlistPlugin = PluginRegistry.getPlugin(WatchlistPlugin);
+
+    return !watchlistPlugin || watchlistPlugin.watchlistList.length === 0 ? t7e('pluginDrawer.reasonAddToWatchlist') : null;
+  }
+
   addJs(): void {
     super.addJs();
 

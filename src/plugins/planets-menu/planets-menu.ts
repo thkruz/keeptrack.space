@@ -384,6 +384,10 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
     super.showBottomIcon();
   }
 
+  getDisabledReason(): string | null {
+    return settingsManager.isDisablePlanets ? t7e('pluginDrawer.reasonEnablePlanets') : null;
+  }
+
   addHtml(): void {
     super.addHtml();
     this.isPlanetsDisabled_ = settingsManager.isDisablePlanets;

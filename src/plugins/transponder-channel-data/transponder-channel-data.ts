@@ -220,6 +220,13 @@ export class TransponderChannelData extends KeepTrackPlugin {
       return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
     }
 
+    // A satellite is selected but the icon is still disabled: it has no channel data (or is not a satellite).
+    const selectedSat = selectSatManager.primarySatObj;
+
+    if (!selectedSat || selectedSat.id === -1 || !selectedSat.isSatellite() || !this.satsWithChannels_.includes((selectedSat as Satellite).sccNum)) {
+      return t7e('plugins.TransponderChannelData.errorMsgs.NoChannelInfo' as Parameters<typeof t7e>[0]);
+    }
+
     return null;
   }
 

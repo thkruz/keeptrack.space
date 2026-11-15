@@ -94,6 +94,14 @@ export function syncDrawerItemState(el: HTMLElement): void {
   syncDrawerItemReason(el, isDisabled);
 }
 
+/** A single valid id token: whitespace and other unsafe characters collapse to hyphens. */
+export function sanitizeDrawerIdToken(raw: string): string {
+  return raw
+    .trim()
+    .replace(/[^A-Za-z0-9_-]+/gu, '-')
+    .replace(/^-+|-+$/gu, '');
+}
+
 /** Why a disabled drawer row is unavailable: missing sensor, missing satellite, or the plugin's own reason. */
 export function drawerDisabledReasonText(pluginId: string | undefined): string {
   const plugin = pluginId ? PluginRegistry.plugins.find((p) => p.bottomIconElementName === pluginId) : undefined;
@@ -122,7 +130,9 @@ export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void
   if (!reasonEl && text) {
     reasonEl = document.createElement('span');
     reasonEl.className = 'drawer-item-reason';
-    reasonEl.id = `drawer-reason-${drawerItemPluginId(el) ?? el.dataset.topMenuId ?? Math.random().toString(36).slice(2)}${el.hasAttribute('data-recent-plugin-id') ? '-recent' : ''}`;
+    const idSource = drawerItemPluginId(el) ?? el.dataset.topMenuId ?? Math.random().toString(36).slice(2);
+
+    reasonEl.id = `drawer-reason-${sanitizeDrawerIdToken(idSource) || Math.random().toString(36).slice(2)}${el.hasAttribute('data-recent-plugin-id') ? '-recent' : ''}`;
     el.appendChild(reasonEl);
   }
   if (reasonEl) {

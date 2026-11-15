@@ -159,6 +159,17 @@ export class EditSat extends KeepTrackPlugin {
   // Lifecycle
   // =========================================================================
 
+  /** Disabled with a selection that has no TLE (OEM object, sensor, launch site...): say what to select. */
+  getDisabledReason(): string | null {
+    const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+
+    if (obj && !(obj instanceof Satellite)) {
+      return t7e('pluginDrawer.reasonSelectTleSatellite');
+    }
+
+    return null;
+  }
+
   addHtml(): void {
     super.addHtml();
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));

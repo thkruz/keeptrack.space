@@ -729,6 +729,17 @@ export class NewLaunch extends KeepTrackPlugin {
     return [tle1, tle2];
   }
 
+  /** Disabled with a selection that is neither a satellite nor a launch site: say what to select. */
+  getDisabledReason(): string | null {
+    const obj = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
+
+    if (obj && !obj.isSatellite() && obj.type !== SpaceObjectType.LAUNCH_SITE) {
+      return t7e('pluginDrawer.reasonSelectSatelliteOrLaunchSite');
+    }
+
+    return null;
+  }
+
   addJs(): void {
     super.addJs();
     this.registerSelectSatListener_();

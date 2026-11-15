@@ -1,4 +1,4 @@
-import { syncDrawerItemState } from '@app/app/ui/plugin-drawer-helpers';
+import { sanitizeDrawerIdToken, syncDrawerItemState } from '@app/app/ui/plugin-drawer-helpers';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
@@ -75,5 +75,44 @@ describe('drawer row disabled reason (pro issue #193)', () => {
     document.getElementById('look-angles-bottom-icon')!.classList.remove('bmenu-item-disabled');
     syncDrawerItemState(row);
     expect(row.getAttribute('kt-tooltip')).toBe('Look Angles');
+  });
+});
+
+describe('drawer reason ids (pro issue #193)', () => {
+  beforeEach(() => {
+    setupStandardEnvironment();
+    PluginRegistry.unregisterAllPlugins();
+    vi.spyOn(ServiceLocator, 'getSensorManager').mockReturnValue({ isSensorSelected: () => false } as never);
+  });
+
+  afterEach(() => {
+    PluginRegistry.unregisterAllPlugins();
+    vi.restoreAllMocks();
+  });
+
+  it('sanitizes whitespace and unsafe characters into a single token', () => {
+    expect(sanitizeDrawerIdToken('short-term fence-bottom-icon')).toBe('short-term-fence-bottom-icon');
+    expect(sanitizeDrawerIdToken('  a b\tc/d  ')).toBe('a-b-c-d');
+    expect(sanitizeDrawerIdToken('plain_id-1')).toBe('plain_id-1');
+  });
+
+  it('gives a plugin id with a space a reason id that aria-describedby can resolve', () => {
+    PluginRegistry.addPlugin({
+      id: 'ShortTermFences',
+      bottomIconElementName: 'short-term fence-bottom-icon',
+      isRequireSensorSelected: true,
+      isRequireSatelliteSelected: false,
+      getDisabledReason: () => null,
+      verifySatelliteSelected: () => true,
+    } as never);
+    document.body.innerHTML = `<div id="short-term fence-bottom-icon" class="bmenu-item-disabled"></div>
+      <div class="drawer-item" data-plugin-id="short-term fence-bottom-icon"><span class="drawer-item-label">Short Term Fence</span></div>`;
+    const row = document.querySelector('.drawer-item') as HTMLElement;
+
+    syncDrawerItemState(row);
+    const describedBy = row.getAttribute('aria-describedby') as string;
+
+    expect(describedBy).toMatch(/^[^\s]+$/u);
+    expect(document.getElementById(describedBy)).not.toBeNull();
   });
 });

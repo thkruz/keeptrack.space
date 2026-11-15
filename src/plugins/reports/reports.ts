@@ -1047,11 +1047,34 @@ export class ReportsPlugin extends KeepTrackPlugin {
     // Window-clipped passes (edge) are re-peaked too: their scan samples sit on the window-start phase.
     const elAt = (ms: number) => SatMath.getRae(new Date(ms), satrec, sensor, true).el;
 
+    // A pass cut by the window edge keeps its true peak: the peak is searched over the whole pass, not just the part inside the window (#414).
+    const inView = (ms: number): boolean => sampleAt(new Date(ms))?.inView === true;
+
     return passes.map((pass) => {
-      const peak = findPassPeakMs(elAt, pass.aos.getTime(), pass.los.getTime());
+      const fromMs = pass.edge === 'start' ? ReportsPlugin.walkOutOfView_(inView, pass.aos.getTime(), -1) : pass.aos.getTime();
+      const toMs = pass.edge === 'end' ? ReportsPlugin.walkOutOfView_(inView, pass.los.getTime(), 1) : pass.los.getTime();
+      const peak = findPassPeakMs(elAt, fromMs, toMs);
 
       return peak ? { ...pass, maxEl: peak.el, maxElTime: new Date(peak.ms) } : pass;
     });
+  }
+
+  /** Walks from an in-view instant in one direction (-1 earlier, 1 later) to the last in-view instant, capped at four hours. */
+  static walkOutOfView_(inView: (ms: number) => boolean, fromMs: number, dir: -1 | 1): number {
+    const stepMs = REPORT_PASS_DETECT_STEP_SEC * 1000;
+    const maxSteps = Math.floor((4 * 3600 * 1000) / stepMs);
+    let lastIn = fromMs;
+
+    for (let i = 1; i <= maxSteps; i++) {
+      const ms = fromMs + dir * i * stepMs;
+
+      if (!inView(ms)) {
+        break;
+      }
+      lastIn = ms;
+    }
+
+    return lastIn;
   }
 
   /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */
@@ -1523,6 +1546,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const pre = win.document.createElement('pre');
 
     pre.textContent = preview;
+    // Wide tables (Visibility Windows has nine or ten columns): smaller type so they fit a 1366 px window, and a scroll
+    // box with room under the last row so the sideways scrollbar never covers it (#442).
+    pre.style.cssText = 'font-size:12px;line-height:1.35;margin:8px 0 0;padding:0 0 18px;overflow-x:auto;max-width:100%;box-sizing:border-box';
+    win.document.body.style.margin = '8px';
     win.document.body.appendChild(pre);
 
     win.document.title = data.filename;

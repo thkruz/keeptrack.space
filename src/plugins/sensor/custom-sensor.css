@@ -256,8 +256,7 @@
 @media (min-width: 640px) {
   /* #437 round 16: a 1fr / auto / 1fr grid cannot centre the title because the right column keeps the three buttons
      (~126 px). One grid cell instead: the title spans the bar, centred on it, with padding equal to the button width on
-     both sides so it never touches the buttons; the buttons sit in the same cell at the end. A smaller font fits the
-     title in the 389 px menu; ellipsis is the fallback. */
+     both sides so it never touches the buttons; the buttons sit in the same cell at the end. The title keeps the shared size (#533). */
   #custom-sensor-menu .side-menu-title-bar {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -271,14 +270,28 @@
 
   #custom-sensor-menu .side-menu-title-text {
     margin: 0;
-    padding: 0 8.25rem;
+    /* #533: no smaller font, so the title matches other v13 menu titles. Reserve only the button width on the
+       right and centre the title in the space left of the buttons; ellipsis is the fallback. */
+    padding: 0 8.25rem 0 0.5rem;
     box-sizing: border-box;
     text-align: center;
-    font-size: 0.8125rem;
     min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   #custom-sensor-menu .side-menu-title-right {
     justify-self: end;
   }
+}
+
+/* #537: keep a field label and its unit "(°)" on one line. Labels truncate with an ellipsis instead of wrapping, and the
+   label may use the full column width (the shared floating-label width is capped, which wrapped the unit). */
+#custom-sensor-menu .input-field > label {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

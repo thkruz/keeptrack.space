@@ -31,19 +31,32 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
     return;
   }
 
-  const handleClick = (event: MouseEvent) => {
-    if (event.target === colorboxHeader || event.target === getEl('colorbox-hint', true)) {
-      return;
-    }
-
+  const dismiss = (): void => {
     closeColorbox();
     if (options.callback) {
       options.callback();
     }
     colorboxDom.removeEventListener('click', handleClick);
+    document.removeEventListener('keydown', handleKeydown, true);
+  };
+  const handleClick = (event: MouseEvent) => {
+    if (event.target === colorboxHeader || event.target === getEl('colorbox-hint', true)) {
+      return;
+    }
+    dismiss();
+  };
+  // Escape closes the viewer like a click outside the image does
+  const handleKeydown = (event: KeyboardEvent) => {
+    if (event.key !== 'Escape' || colorboxDom.style.display !== 'block') {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    dismiss();
   };
 
   colorboxDom.addEventListener('click', handleClick);
+  document.addEventListener('keydown', handleKeydown, true);
 
   showLoading(() => {
     colorboxDom.style.display = 'block';

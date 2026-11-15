@@ -164,6 +164,21 @@ describe('openColorbox_function', () => {
 
     expect(cb).toHaveBeenCalled();
   });
+
+  it('closes on Escape, runs the callback once and stops listening', () => {
+    const cb = vi.fn();
+
+    openColorbox('https://www.example.com', { callback: cb });
+    vi.advanceTimersByTime(2000);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    vi.advanceTimersByTime(1000);
+
+    expect(cb).toHaveBeenCalledTimes(1);
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    (<HTMLElement>getEl('colorbox-div')).click();
+    expect(cb).toHaveBeenCalledTimes(1);
+  });
 });
 
 describe('colorbox new tab and blank-page hint', () => {

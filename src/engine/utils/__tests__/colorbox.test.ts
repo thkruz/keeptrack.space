@@ -1,4 +1,4 @@
-import { createColorbox, openColorbox } from '@app/engine/utils/colorbox';
+import { closeColorbox, createColorbox, openColorbox } from '@app/engine/utils/colorbox';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as getElAll from '@app/engine/utils/get-el';
 import { getEl } from '@app/engine/utils/get-el';
@@ -178,6 +178,39 @@ describe('openColorbox_function', () => {
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     (<HTMLElement>getEl('colorbox-div')).click();
     expect(cb).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops the Escape listener when closed through closeColorbox, so reopening does not stack handlers', () => {
+    const first = vi.fn();
+    const second = vi.fn();
+
+    openColorbox('https://www.example.com', { callback: first });
+    vi.advanceTimersByTime(2000);
+    closeColorbox();
+    vi.advanceTimersByTime(1000);
+
+    openColorbox('https://www.example.com', { callback: second });
+    vi.advanceTimersByTime(2000);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    vi.advanceTimersByTime(1000);
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it('disposes the previous viewer handlers when another viewer opens without a close', () => {
+    const first = vi.fn();
+    const second = vi.fn();
+
+    openColorbox('https://www.example.com', { callback: first });
+    vi.advanceTimersByTime(2000);
+    openColorbox('https://www.example.org', { callback: second });
+    vi.advanceTimersByTime(2000);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    vi.advanceTimersByTime(1000);
+
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledTimes(1);
   });
 });
 

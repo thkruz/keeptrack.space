@@ -17,6 +17,13 @@ interface ColorboxOptions {
 }
 
 let isColorBoxReady = false;
+/** Removes the click and Escape listeners of the viewer that is currently open (if any). */
+let disposeListeners_: (() => void) | null = null;
+
+const disposeListeners = (): void => {
+  disposeListeners_?.();
+  disposeListeners_ = null;
+};
 
 export const openColorbox = (url: string, options: ColorboxOptions = {}): void => {
   // Rebuild when the DOM was replaced since the first build (a re-rendered root, or a fresh test DOM).
@@ -31,13 +38,14 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
     return;
   }
 
+  // A previous viewer may still be listening if it was closed without a click or Escape
+  disposeListeners();
+
   const dismiss = (): void => {
     closeColorbox();
     if (options.callback) {
       options.callback();
     }
-    colorboxDom.removeEventListener('click', handleClick);
-    document.removeEventListener('keydown', handleKeydown, true);
   };
   const handleClick = (event: MouseEvent) => {
     if (event.target === colorboxHeader || event.target === getEl('colorbox-hint', true)) {
@@ -57,6 +65,10 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
 
   colorboxDom.addEventListener('click', handleClick);
   document.addEventListener('keydown', handleKeydown, true);
+  disposeListeners_ = () => {
+    colorboxDom.removeEventListener('click', handleClick);
+    document.removeEventListener('keydown', handleKeydown, true);
+  };
 
   showLoading(() => {
     colorboxDom.style.display = 'block';
@@ -83,6 +95,9 @@ export const openColorbox = (url: string, options: ColorboxOptions = {}): void =
 };
 
 export const closeColorbox = (): void => {
+  // Every close path (click, Escape, hideSideMenus, load failure) ends here, so listeners go here too
+  disposeListeners();
+
   const colorboxDom = getEl('colorbox-div');
 
   if (!colorboxDom) {

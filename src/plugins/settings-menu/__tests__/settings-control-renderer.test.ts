@@ -90,12 +90,13 @@ describe('renderSettingControl - toggle', () => {
 
     const html = renderSettingControl(ctrl, 'sec');
 
-    expect(html).toContain('data-tooltip="&quot;breakout&quot; &amp; &lt;bad&gt;"');
+    expect(html).toContain('kt-tooltip="&quot;breakout&quot; &amp;amp; &amp;lt;bad&amp;gt;"');
   });
 
   it('omits tooltip attributes entirely when helpText is absent', () => {
     const ctrl: ISettingToggleControl = { type: 'toggle', id: 'x', label: 'X', get: () => false, set: vi.fn() };
 
+    expect(renderSettingControl(ctrl, 'sec')).not.toContain('kt-tooltip');
     expect(renderSettingControl(ctrl, 'sec')).not.toContain('data-tooltip');
   });
 

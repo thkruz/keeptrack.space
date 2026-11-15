@@ -51,11 +51,13 @@ const tooltipAttrs_ = (helpText?: string): string => {
     return '';
   }
 
-  // #488: a tip above the row covers the previous row's label. On wide screens the side menu hugs the left edge, so put
-  // the tip beside the row (over the canvas). Phones have no room beside the full-width menu and keep the tip on top.
-  const position = typeof window !== 'undefined' && window.innerWidth >= 640 ? 'right' : 'top';
+  // #488: `data-tooltip` draws a CSS pseudo-element inside the row, which the side menu's overflow clips. `kt-tooltip` is
+  // drawn by the global tooltip layer (a body-level div placed beside the menu and clamped to the viewport). Touch has no
+  // hover, so there the row also opts into tap-to-toggle.
+  const isTouch = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(hover: none)').matches;
+  const tap = isTouch ? ' kt-tooltip-tap' : '';
 
-  return ` data-position="${position}" data-delay="50" data-tooltip="${escapeAttr_(helpText)}"`;
+  return ` kt-tooltip="${escapeAttr_(escapeText_(helpText))}"${tap}`;
 };
 
 const disabledAttr_ = (control: ISettingControl): string => (control.isDisabled?.() ? ' disabled' : '');

@@ -27,6 +27,38 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+export interface SideTooltipRects {
+  /** Side menu rect (viewport coordinates). */
+  menu: { right: number };
+  target: { top: number; bottom: number; height: number };
+  tip: { width: number; height: number };
+  viewport: { width: number; height: number };
+  scrollY: number;
+}
+
+/**
+ * Places a body-level tooltip beside a side menu (never inside it, so the menu's overflow cannot clip it), vertically
+ * centred on the target; when there is no room beside the menu (phones) it drops below the target, flipping above when
+ * the bottom edge would be crossed. The result is always clamped inside the viewport (#488).
+ */
+export const computeSideTooltipPlacement = ({ menu, target, tip, viewport, scrollY }: SideTooltipRects): { left: number; top: number } => {
+  const margin = 8;
+  const clampTop = (t: number) => Math.max(margin + scrollY, Math.min(t, viewport.height + scrollY - tip.height - margin));
+  const clampLeft = (l: number) => Math.max(margin, Math.min(l, viewport.width - tip.width - margin));
+
+  if (menu.right + margin + tip.width + margin <= viewport.width) {
+    return { left: menu.right + margin, top: clampTop(target.top + scrollY + target.height / 2 - tip.height / 2) };
+  }
+
+  let top = target.bottom + scrollY + margin;
+
+  if (top + tip.height + margin > viewport.height + scrollY) {
+    top = target.top + scrollY - tip.height - margin;
+  }
+
+  return { left: clampLeft(margin), top: clampTop(top) };
+};
+
 export class TooltipsPlugin extends KeepTrackPlugin {
   readonly id = 'TooltipsPlugin';
   dependencies_ = [];
@@ -81,8 +113,10 @@ export class TooltipsPlugin extends KeepTrackPlugin {
 
     document.addEventListener(
       'pointerdown',
-      () => {
+      (e: Event) => {
         this.lastInputWasKeyboard_ = false;
+        // Touch fires pointerup before any mouseover, so wire the target now or the first tap shows nothing (#488)
+        wireLate(e);
       },
       true
     );
@@ -272,7 +306,12 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       }
     });
     // Tap-to-toggle targets toggle on click for any pointer type (phone harnesses and hybrid devices send mouse events)
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e: MouseEvent) => {
+      // A label forwards its tap to its input as a second click; that echo must not toggle the tooltip again (#488)
+      if (e.target !== el && (e.target as HTMLElement | null)?.tagName === 'INPUT' && el.tagName === 'LABEL') {
+        return;
+      }
+
       if (handledByTouch) {
         handledByTouch = false;
 
@@ -487,15 +526,16 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     const customMenuEl = customSensorEl?.closest<HTMLElement>('.side-menu-parent') ?? null;
 
     if (customMenuEl) {
-      const menuRight = customMenuEl.getBoundingClientRect().right;
+      const placed = computeSideTooltipPlacement({
+        menu: customMenuEl.getBoundingClientRect(),
+        target: targetRect,
+        tip: tooltipRect,
+        viewport: { width: viewportWidth, height: viewportHeight },
+        scrollY: window.scrollY,
+      });
 
-      if (menuRight + 8 + tooltipRect.width + 8 <= viewportWidth) {
-        left = menuRight + 8;
-        top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
-      } else {
-        // No room beside the menu: drop below the field instead of rising over the row above
-        top = Math.max(8, Math.min(targetRect.bottom + window.scrollY + 8, viewportHeight + window.scrollY - tooltipRect.height - 8));
-      }
+      left = placed.left;
+      top = placed.top;
     }
 
     // Access Timeline pass bars: keep the bubble over the lane so a long bar's centred tooltip never covers the row's sensor name (#431)

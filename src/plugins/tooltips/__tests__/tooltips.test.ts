@@ -2,7 +2,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as isThisNodeMod from '@app/engine/utils/isThisNode';
-import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
+import { computeSideTooltipPlacement, TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -324,5 +324,38 @@ describe('TooltipsPlugin behavior', () => {
 
     expect(parseFloat(div.style.left)).toBe(328);
     menu.remove();
+  });
+});
+
+describe('computeSideTooltipPlacement (#488)', () => {
+  const tip = { width: 200, height: 40 };
+  const target = { top: 300, bottom: 330, height: 30 };
+
+  it('sits beside the menu, centred on the row, on a wide viewport', () => {
+    const r = computeSideTooltipPlacement({ menu: { right: 400 }, target, tip, viewport: { width: 1366, height: 768 }, scrollY: 0 });
+
+    expect(r).toEqual({ left: 408, top: 295 });
+  });
+
+  it('clamps vertically inside the viewport beside the menu', () => {
+    const low = computeSideTooltipPlacement({ menu: { right: 400 }, target: { top: 750, bottom: 780, height: 30 }, tip, viewport: { width: 1366, height: 768 }, scrollY: 0 });
+    const high = computeSideTooltipPlacement({ menu: { right: 400 }, target: { top: 0, bottom: 30, height: 30 }, tip, viewport: { width: 1366, height: 768 }, scrollY: 0 });
+
+    expect(low.top).toBe(768 - 40 - 8);
+    expect(high.top).toBe(8);
+  });
+
+  it('drops below the row on a phone and stays inside the viewport', () => {
+    const r = computeSideTooltipPlacement({ menu: { right: 390 }, target, tip, viewport: { width: 390, height: 844 }, scrollY: 0 });
+
+    expect(r.top).toBe(338);
+    expect(r.left).toBeGreaterThanOrEqual(8);
+    expect(r.left + tip.width).toBeLessThanOrEqual(390 - 8);
+  });
+
+  it('flips above the row when below would cross the bottom edge on a phone', () => {
+    const r = computeSideTooltipPlacement({ menu: { right: 390 }, target: { top: 800, bottom: 830, height: 30 }, tip, viewport: { width: 390, height: 844 }, scrollY: 0 });
+
+    expect(r.top).toBe(800 - 40 - 8);
   });
 });

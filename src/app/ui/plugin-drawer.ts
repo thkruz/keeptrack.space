@@ -21,6 +21,7 @@ import {
   ALL_DRAWER_PLUGIN_ITEMS_SELECTOR,
   buildRecentGroupFromCache,
   collectDrawerItems,
+  computeFooterPlacement,
   type DrawerBadge,
   type DrawerGroup,
   type DrawerItemData,
@@ -822,12 +823,20 @@ export class PluginDrawer {
         }
       });
 
-      // Half the collapsed pill plus a gap; the expanded pill grows around its centre.
-      const clearance = 32;
-      const viewportWidth = window.innerWidth;
-      const left = menuRight + clearance > viewportWidth / 2 ? (menuRight + viewportWidth) / 2 : viewportWidth / 2;
+      const infoEl = document.getElementById('sat-infobox');
+      let infoBox: { left: number; top: number; right: number } | null = null;
 
-      footer.style.setProperty('--drawer-footer-left', `${Math.round(left)}px`);
+      if (infoEl && window.innerWidth >= 640 && getComputedStyle(infoEl).display !== 'none') {
+        const r = infoEl.getBoundingClientRect();
+
+        if (r.width > 0 && r.height > 0) {
+          infoBox = { left: r.left, top: r.top, right: r.right };
+        }
+      }
+      const placement = computeFooterPlacement({ viewportWidth: window.innerWidth, viewportHeight: window.innerHeight, menuRight, infoBox });
+
+      footer.style.setProperty('--drawer-footer-left', `${placement.left}px`);
+      footer.style.setProperty('--drawer-footer-bottom', `${placement.bottom}px`);
     };
     const schedule = () => {
       if (!rafId) {
@@ -840,6 +849,14 @@ export class PluginDrawer {
       observer.observe(menu, { attributes: true, attributeFilter: ['class', 'style'] });
       menu.addEventListener('transitionend', schedule);
     });
+    const infoEl = document.getElementById('sat-infobox');
+
+    if (infoEl) {
+      observer.observe(infoEl, { attributes: true, attributeFilter: ['class', 'style'] });
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(schedule).observe(infoEl);
+      }
+    }
     window.addEventListener('resize', schedule);
     schedule();
   }

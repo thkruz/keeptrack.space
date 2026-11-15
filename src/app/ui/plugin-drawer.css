@@ -734,7 +734,7 @@ body.drawer-mode {
 
   .drawer-utility-footer {
     position: fixed;
-    bottom: 12px;
+    bottom: var(--drawer-footer-bottom, 12px);
     left: var(--drawer-footer-left, 50%);
     transform: translateX(-50%);
     z-index: 10000;

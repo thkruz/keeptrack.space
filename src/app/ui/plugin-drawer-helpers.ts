@@ -842,3 +842,60 @@ export function showSignInPrompt(featureName: string): HTMLElement {
 export function drawerRowFeatureName(el: HTMLElement): string {
   return el.querySelector('.drawer-item-label')?.textContent?.trim() || el.getAttribute('kt-tooltip') || el.querySelector('img')?.getAttribute('alt') || '';
 }
+
+/** Collapsed pill width, in px. */
+export const FOOTER_PILL_SIZE = 48;
+/** Gap kept between the pill and the menu / info box, in px. */
+export const FOOTER_PILL_GAP = 8;
+/** Default distance of the pill from the bottom edge, in px. */
+export const FOOTER_PILL_BOTTOM = 12;
+
+export interface FooterPlacementInput {
+  viewportWidth: number;
+  viewportHeight: number;
+  /** Right edge of the right-most visible side menu (0 when none) */
+  menuRight: number;
+  /** Visible satellite info box rect, or null when hidden */
+  infoBox: { left: number; top: number; right: number } | null;
+}
+
+export interface FooterPlacement {
+  /** Horizontal centre of the pill, px */
+  left: number;
+  /** Distance of the pill's bottom edge from the viewport bottom, px */
+  bottom: number;
+}
+
+/**
+ * Pick where the floating utility pill sits (#513, #519). It stays at the viewport centre unless a
+ * side menu covers it; then it is centred in the gap between the menu and the info box. When that
+ * gap is too narrow for the pill, it keeps the menu-clear position but rides above the info box.
+ */
+export const computeFooterPlacement = ({ viewportWidth, viewportHeight, menuRight, infoBox }: FooterPlacementInput): FooterPlacement => {
+  const half = FOOTER_PILL_SIZE / 2;
+  const needed = FOOTER_PILL_SIZE + 2 * FOOTER_PILL_GAP;
+  const regionLeft = menuRight > 0 ? menuRight : 0;
+  // Info box is on the right; only treat it as a limit when it sits right of the menu.
+  const regionRight = infoBox && infoBox.left > regionLeft ? infoBox.left : viewportWidth;
+  const centre = viewportWidth / 2;
+  const defaultBottom = FOOTER_PILL_BOTTOM;
+
+  let left = centre;
+
+  if (menuRight + half + FOOTER_PILL_GAP > centre || (infoBox && centre + half + FOOTER_PILL_GAP > infoBox.left)) {
+    left = (regionLeft + regionRight) / 2;
+  }
+
+  // Keep the pill off the info box vertically when it cannot clear it horizontally.
+  const overlapsInfo = infoBox !== null && left + half + FOOTER_PILL_GAP > infoBox.left && left - half - FOOTER_PILL_GAP < infoBox.right;
+
+  if (regionRight - regionLeft >= needed || !overlapsInfo || !infoBox) {
+    return { left: Math.round(left), bottom: defaultBottom };
+  }
+
+  // Gap too narrow: sit just right of the menu edge, above the info box top.
+  return {
+    left: Math.round(Math.min(regionLeft + half + FOOTER_PILL_GAP, viewportWidth - half)),
+    bottom: Math.max(defaultBottom, Math.round(viewportHeight - infoBox.top + FOOTER_PILL_GAP)),
+  };
+};

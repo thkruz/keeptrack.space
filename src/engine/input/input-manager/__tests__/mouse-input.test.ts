@@ -358,6 +358,18 @@ describe('MouseInput handlers', () => {
       expect(ServiceLocator.getSoundManager()!.play).not.toHaveBeenCalled();
     });
 
+    it('always closes the menu (so hover works again) even when the action throws', () => {
+      const input = ServiceLocator.getInputManager();
+
+      input.isRmbMenuOpen = true;
+      vi.spyOn(lineManagerInstance, 'clear').mockImplementation(() => {
+        throw new Error('action failed');
+      });
+
+      expect(() => fire('clear-lines-rmb')).toThrow('action failed');
+      expect(input.isRmbMenuOpen).toBe(false);
+    });
+
     it('clears lines via the line manager', () => {
       const clearSpy = vi.spyOn(lineManagerInstance, 'clear').mockImplementation(() => undefined);
 

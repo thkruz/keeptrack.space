@@ -532,50 +532,54 @@ export class MouseInput {
       targetId = (<HTMLElement>target.firstChild).id;
     }
 
-    switch (targetId) {
-      case 'reset-camera-rmb':
-        if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
-          ServiceLocator.getMainCamera().resetRotation();
-        } else {
-          ServiceLocator.getMainCamera().state.reset();
-        }
-        break;
-      case 'clear-lines-rmb':
-        lineManagerInstance.clear();
-        break;
-      case 'toggle-time-rmb':
-        timeManagerInstance.toggleTime();
-        break;
-      case 'clear-screen-rmb':
-        if (PluginRegistry.getPlugin(TimeMachine)) {
-          PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
-        }
-        uiManagerInstance.doSearch('');
-        uiManagerInstance.searchManager.closeSearch();
-        uiManagerInstance.hideSideMenus();
+    // The menu must always close: a throwing action otherwise left isRmbMenuOpen true, and hover is a no-op while it is set.
+    try {
+      switch (targetId) {
+        case 'reset-camera-rmb':
+          if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
+            ServiceLocator.getMainCamera().resetRotation();
+          } else {
+            ServiceLocator.getMainCamera().state.reset();
+          }
+          break;
+        case 'clear-lines-rmb':
+          lineManagerInstance.clear();
+          break;
+        case 'toggle-time-rmb':
+          timeManagerInstance.toggleTime();
+          break;
+        case 'clear-screen-rmb':
+          if (PluginRegistry.getPlugin(TimeMachine)) {
+            PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
+          }
+          uiManagerInstance.doSearch('');
+          uiManagerInstance.searchManager.closeSearch();
+          uiManagerInstance.hideSideMenus();
 
-        // Revert any group color scheme back to a non group scheme
-        colorSchemeManagerInstance.isUseGroupColorScheme = false;
+          // Revert any group color scheme back to a non group scheme
+          colorSchemeManagerInstance.isUseGroupColorScheme = false;
 
-        // Clear Screen is a full reset, so drop the secondary (reference) object too -
-        // deselecting only the primary left the secondary object and its orbit on screen.
-        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
-        if (userActionGate.allowSelection(-1)) {
-          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
-        }
-        break;
-      default:
-        EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
-        break;
+          // Clear Screen is a full reset, so drop the secondary (reference) object too -
+          // deselecting only the primary left the secondary object and its orbit on screen.
+          PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
+          if (userActionGate.allowSelection(-1)) {
+            PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+          }
+          break;
+        default:
+          EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
+          break;
+      }
+    } finally {
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+
+      const rightButtonMenuElement = getEl('right-btn-menu');
+
+      if (rightButtonMenuElement) {
+        rightButtonMenuElement.style.display = 'none';
+      }
+      ServiceLocator.getInputManager().clearRMBSubMenu();
+      ServiceLocator.getInputManager().isRmbMenuOpen = false;
     }
-    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-
-    const rightButtonMenuElement = getEl('right-btn-menu');
-
-    if (rightButtonMenuElement) {
-      rightButtonMenuElement.style.display = 'none';
-    }
-    ServiceLocator.getInputManager().clearRMBSubMenu();
-    ServiceLocator.getInputManager().isRmbMenuOpen = false;
   }
 }

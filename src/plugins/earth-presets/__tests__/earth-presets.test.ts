@@ -57,6 +57,20 @@ describe('EarthPresetsPlugin onContextMenuAction', () => {
     expect(EarthPresetsPlugin.lastAppliedPresetId).toBe('satellite');
   });
 
+  it('a texture that fails to start loading does not abort the preset (Ops Center)', () => {
+    changeEarthTextureStyle.mockImplementation(() => {
+      throw new Error('texture load failed');
+    });
+    new NightToggle().init();
+
+    expect(() => plugin.onContextMenuAction('earth-opscenter-rmb')).not.toThrow();
+    expect(settingsManager.earthTextureStyle).toBe('flat');
+    expect(settingsManager.isEarthGrayScale).toBe(true);
+    expect(settingsManager.isDrawNightAsDay).toBe(true);
+    expect(EarthPresetsPlugin.lastAppliedPresetId).toBe('opscenter');
+    expect(PersistenceManager.getInstance().getItem(StorageKey.EARTH_PRESET)).toBe('opscenter');
+  });
+
   it('Engineering Tool turns the political map off and dims its icon, and lights the Night icon', () => {
     const political = new PoliticalMapToggle();
     const night = new NightToggle();

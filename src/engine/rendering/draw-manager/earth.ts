@@ -67,6 +67,21 @@ import { RELIEF_NORMAL_GLSL } from './relief-shading';
  */
 export const getCloudFadeZoom = (isEarthCenterBody: boolean, zoomLevel: number): number => (isEarthCenterBody ? zoomLevel : 1.0);
 
+/**
+ * Texture file base (no quality suffix) of the night map to pair with a day style, or null when
+ * none ships. Only `earthmap-night*` exists in public/textures, so the alternate map reuses it
+ * (same geography) and the flat map has no night side at all.
+ */
+export const getEarthNightTextureBase = (style: string): string | null => {
+  switch (style) {
+    case EarthTextureStyle.BLUE_MARBLE:
+    case EarthTextureStyle.NADIR:
+      return `${EarthTextureStyle.BLUE_MARBLE}-night`;
+    default:
+      return null;
+  }
+};
+
 export class Earth {
   private gl_: WebGL2RenderingContext;
   private glowDirection_ = 1;
@@ -931,8 +946,11 @@ export class Earth {
 
     const nightKey = sm.earthTextureStyle + sm.earthNightTextureQuality;
 
-    if (!this.textureNight[nightKey]) {
-      this.loadChannel_('night', this.textureNight, nightKey, `${this.getSrc_(`${sm.earthTextureStyle}-night`, sm.earthNightTextureQuality)}`);
+    const nightBase = getEarthNightTextureBase(sm.earthTextureStyle);
+
+    // Styles without a night map (flat) never request one: the 404 raised a toast on every switch.
+    if (nightBase && !this.textureNight[nightKey]) {
+      this.loadChannel_('night', this.textureNight, nightKey, `${this.getSrc_(nightBase, sm.earthNightTextureQuality)}`);
     }
     if (!this.textureBump[sm.earthBumpTextureQuality] && sm.earthBumpTextureQuality && sm.earthBumpTextureQuality !== EarthBumpTextureQuality.OFF) {
       this.loadChannel_('bump', this.textureBump, sm.earthBumpTextureQuality, `${this.getSrc_(this.BUMP_SRC_BASE, sm.earthBumpTextureQuality)}`);

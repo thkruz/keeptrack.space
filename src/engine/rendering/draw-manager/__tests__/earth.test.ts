@@ -1,5 +1,9 @@
 /* eslint-disable dot-notation */
-import { Earth, getCloudFadeZoom } from '@app/engine/rendering/draw-manager/earth';
+
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { Earth, getCloudFadeZoom, getEarthNightTextureBase } from '@app/engine/rendering/draw-manager/earth';
+import { EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { GreenwichMeanSiderealTime } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 
@@ -28,5 +32,30 @@ describe('getCloudFadeZoom', () => {
 
   it('keeps clouds fully visible for other center bodies', () => {
     expect(getCloudFadeZoom(false, 0.1)).toBe(1.0);
+  });
+});
+
+describe('getEarthNightTextureBase', () => {
+  const textures = resolve(__dirname, '../../../../../public/textures');
+
+  it('never names a night texture that is not shipped (Ops Center / flat requested a 404)', () => {
+    for (const style of Object.values(EarthTextureStyle)) {
+      const base = getEarthNightTextureBase(style);
+
+      if (base === null) {
+        continue;
+      }
+      for (const quality of Object.values(EarthNightTextureQuality)) {
+        const file = `${base}${quality}.jpg`;
+
+        expect(existsSync(resolve(textures, file)), file).toBe(true);
+      }
+    }
+  });
+
+  it('has no night map for the flat style and reuses the Blue Marble one for Nadir', () => {
+    expect(getEarthNightTextureBase(EarthTextureStyle.FLAT)).toBeNull();
+    expect(getEarthNightTextureBase(EarthTextureStyle.NADIR)).toBe('earthmap-night');
+    expect(getEarthNightTextureBase(EarthTextureStyle.BLUE_MARBLE)).toBe('earthmap-night');
   });
 });

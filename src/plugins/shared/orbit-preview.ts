@@ -25,6 +25,23 @@ const ORBIT_SAMPLES = 128;
 /** Minimal shape of the LineManager line object we hold (for removal). */
 interface RemovableLine {
   isGarbage: boolean;
+  isEcefData?: boolean;
+  viewFilter?: 'flat' | 'other';
+}
+
+/**
+ * Rotate TEME (inertial) positions into the Earth-fixed frame, one GMST per sample. The flat map shows
+ * longitude, so an inertial ring drawn there is a sinusoid that ignores Earth rotation; for a geostationary
+ * orbit it collapses to a horizontal line across the whole map (#476). Earth-fixed samples give the real
+ * ground track.
+ */
+export function rotateToEcef(points: [number, number, number][], gmsts: number[]): [number, number, number][] {
+  return points.map(([x, y, z], i) => {
+    const c = Math.cos(gmsts[i]);
+    const s = Math.sin(gmsts[i]);
+
+    return [x * c + y * s, -x * s + y * c, z] as [number, number, number];
+  });
 }
 
 export class OrbitPreview {
@@ -47,9 +64,13 @@ export class OrbitPreview {
    */
   update(tle1: TleLine1, tle2: TleLine2): void {
     let points: [number, number, number][];
+    let groundTrack: [number, number, number][];
 
     try {
-      points = OrbitPreview.buildOrbitPoints_(tle1, tle2);
+      const built = OrbitPreview.buildOrbitPoints_(tle1, tle2);
+
+      points = built.points;
+      groundTrack = rotateToEcef(built.points, built.gmsts);
     } catch {
       this.clear();
 
@@ -65,10 +86,19 @@ export class OrbitPreview {
     this.clearLines_();
 
     try {
-      const orbit = ServiceLocator.getLineManager().createOrbitPath(points, LineColors.ORANGE, SolarBody.Earth) as RemovableLine | null;
+      const lineManager = ServiceLocator.getLineManager();
+      // Inertial ring for the 3D views, Earth-fixed ground track for the flat map.
+      const orbit = lineManager.createOrbitPath(points, LineColors.ORANGE, SolarBody.Earth) as RemovableLine | null;
+      const track = lineManager.createOrbitPath(groundTrack, LineColors.ORANGE, SolarBody.Earth) as RemovableLine | null;
 
       if (orbit) {
+        orbit.viewFilter = 'other';
         this.lines_.push(orbit);
+      }
+      if (track) {
+        track.viewFilter = 'flat';
+        track.isEcefData = true;
+        this.lines_.push(track);
       }
     } catch {
       // Line manager unavailable (e.g. in tests) -- the dot below still works.
@@ -179,12 +209,13 @@ export class OrbitPreview {
    * Sample one orbital period of TEME ECI positions (km) from a TLE. The first
    * point is at the current simulation time, the rest sweep forward one period.
    */
-  private static buildOrbitPoints_(tle1: TleLine1, tle2: TleLine2): [number, number, number][] {
+  private static buildOrbitPoints_(tle1: TleLine1, tle2: TleLine2): { points: [number, number, number][]; gmsts: number[] } {
+    const none = { points: [], gmsts: [] };
     const satrec = Sgp4.createSatrec(tle1, tle2);
     const meanMotion = Tle.meanMotion(tle2); // rev/day
 
     if (!(meanMotion > 0)) {
-      return [];
+      return none;
     }
 
     const periodMin = 1440 / meanMotion;
@@ -202,6 +233,7 @@ export class OrbitPreview {
     const startMinutesAfterEpoch = (jdNow - satrec.jdsatepoch) * 1440;
 
     const points: [number, number, number][] = [];
+    const gmsts: number[] = [];
 
     for (let i = 0; i <= ORBIT_SAMPLES; i++) {
       const minutesAfterEpoch = startMinutesAfterEpoch + (periodMin * i) / ORBIT_SAMPLES;
@@ -215,12 +247,13 @@ export class OrbitPreview {
        * import then rejects (#336), so draw nothing instead.
        */
       if (!pos || typeof pos === 'boolean' || satrec.error) {
-        return [];
+        return none;
       }
 
       points.push([pos.x, pos.y, pos.z]);
+      gmsts.push(Sgp4.gstime(jdNow + (periodMin * i) / ORBIT_SAMPLES / 1440));
     }
 
-    return points;
+    return { points, gmsts };
   }
 }

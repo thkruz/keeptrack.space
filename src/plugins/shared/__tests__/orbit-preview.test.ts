@@ -1,5 +1,5 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { OrbitPreview } from '@app/plugins/shared/orbit-preview';
+import { OrbitPreview, rotateToEcef } from '@app/plugins/shared/orbit-preview';
 import { TleLine1, TleLine2 } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -33,7 +33,7 @@ describe('OrbitPreview propagation failures (#336)', () => {
   it('draws the orbit for a TLE that propagates', () => {
     new OrbitPreview().update(ISS_1, ISS_2);
 
-    expect(createOrbitPath).toHaveBeenCalledTimes(1);
+    expect(createOrbitPath).toHaveBeenCalledTimes(2);
     expect((createOrbitPath.mock.calls[0] as unknown[])[0]).toHaveLength(129);
   });
 
@@ -45,7 +45,38 @@ describe('OrbitPreview propagation failures (#336)', () => {
 
     preview.update(BAD_1, BAD_2);
 
-    expect(createOrbitPath).toHaveBeenCalledTimes(1);
+    expect(createOrbitPath).toHaveBeenCalledTimes(2);
     expect(earlier.isGarbage).toBe(true);
+  });
+
+  it('draws an inertial ring for 3D views and an Earth-fixed ground track for the flat map (#476)', () => {
+    new OrbitPreview().update(ISS_1, ISS_2);
+
+    const ring = createOrbitPath.mock.results[0].value as { viewFilter?: string; isEcefData?: boolean };
+    const track = createOrbitPath.mock.results[1].value as { viewFilter?: string; isEcefData?: boolean };
+
+    expect(ring.viewFilter).toBe('other');
+    expect(ring.isEcefData).toBeUndefined();
+    expect(track.viewFilter).toBe('flat');
+    expect(track.isEcefData).toBe(true);
+  });
+
+  it('a geostationary ring does not sweep the whole map once rotated to ECEF (#476)', () => {
+    const r = 42164;
+    const n = 100;
+    const ring: [number, number, number][] = [];
+    const gmsts: number[] = [];
+
+    for (let i = 0; i <= n; i++) {
+      const a = (2 * Math.PI * i) / n;
+
+      ring.push([r * Math.cos(a), r * Math.sin(a), 0]);
+      gmsts.push(a); // GEO: Earth turns exactly as fast as the satellite
+    }
+    const lons = (pts: [number, number, number][]) => pts.map(([x, y]) => Math.atan2(y, x));
+    const span = (v: number[]) => Math.max(...v) - Math.min(...v);
+
+    expect(span(lons(ring))).toBeGreaterThan(Math.PI);
+    expect(span(lons(rotateToEcef(ring, gmsts)))).toBeLessThan(0.01);
   });
 });

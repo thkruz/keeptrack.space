@@ -93,7 +93,7 @@ export class NewLaunch extends KeepTrackPlugin {
     this.preValidate_(sat);
 
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-    (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
+    (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4);
   };
 
   menuMode: MenuMode[] = [MenuMode.CREATE, MenuMode.ALL];
@@ -170,13 +170,13 @@ export class NewLaunch extends KeepTrackPlugin {
 
     for (const country of countryKeys) {
       grouped[country].sort((a, b) => {
-        const siteCompare = a.site.localeCompare(b.site);
+        const siteCompare = a.site.localeCompare(b.site, undefined, { numeric: true });
 
         if (siteCompare !== 0) {
           return siteCompare;
         }
 
-        return a.name.localeCompare(b.name);
+        return a.name.localeCompare(b.name, undefined, { numeric: true });
       });
     }
 

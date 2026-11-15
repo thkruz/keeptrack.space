@@ -1,3 +1,5 @@
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { describe, expect, it, vi } from 'vitest';
 import { GroupedPicker } from '../grouped-picker';
 
@@ -144,5 +146,21 @@ describe('GroupedPicker keyboard and multi-select', () => {
     press('ArrowUp');
     press('ArrowUp');
     expect(document.activeElement).toBe(search);
+  });
+
+  it('closes on Escape from anywhere in the document (#486)', () => {
+    const { picker } = build();
+
+    picker.open();
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(picker.isOpen()).toBe(false);
+  });
+
+  it('closes when the side menus are hidden (#486)', () => {
+    const { picker } = build();
+
+    picker.open();
+    EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
+    expect(picker.isOpen()).toBe(false);
   });
 });

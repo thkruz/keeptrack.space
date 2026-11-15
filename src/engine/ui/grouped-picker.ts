@@ -5,6 +5,8 @@
  * it opens a drawer with a search box and collapsible groups. Choosing an entry sets the select's value and
  * dispatches `change`. Options are re-read each time the drawer opens. No dependency on any plugin.
  */
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import './grouped-picker.css';
 
 export interface GroupedPickerOptions {
@@ -41,6 +43,13 @@ export class GroupedPicker {
   private readonly groupOpen_ = new Map<string, boolean>();
   private lastQuery_ = '';
   private readonly onSelectChange_ = (): void => this.updateTrigger_();
+  /** #486: Escape closes the drawer wherever focus is (the drawer-level handler only sees keys while focus is inside it). */
+  private readonly onDocKeyDown_ = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape' && this.drawer_) {
+      e.stopPropagation();
+      this.close();
+    }
+  };
   private readonly onKeyDown_ = (e: KeyboardEvent): void => {
     // Keep typed letters and arrows from reaching the global shortcut handlers.
     e.stopPropagation();
@@ -66,6 +75,8 @@ export class GroupedPicker {
     select.after(this.trigger_);
 
     select.addEventListener('change', this.onSelectChange_);
+    // #486: the drawer lives on <body>, so it must close with its parent menu and when another menu takes over.
+    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => this.close());
     this.updateTrigger_();
   }
 
@@ -134,6 +145,7 @@ export class GroupedPicker {
 
     drawer.append(head, search, body);
     drawer.addEventListener('keydown', this.onKeyDown_);
+    document.addEventListener('keydown', this.onDocKeyDown_, true);
     document.body.appendChild(drawer);
     this.drawer_ = drawer;
     this.searchEl_ = search;
@@ -147,6 +159,7 @@ export class GroupedPicker {
     if (!this.drawer_) {
       return;
     }
+    document.removeEventListener('keydown', this.onDocKeyDown_, true);
     this.drawer_.remove();
     this.drawer_ = null;
     this.groupOpen_.clear();

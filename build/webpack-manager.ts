@@ -271,6 +271,13 @@ export class WebpackManager {
             type: 'asset/source',
           },
           {
+            // Materialize's unused fieldset.form-field :has() rules restyle ~1000 elements after every DOM change
+            test: /materialize\.css$/iu,
+            include: [/@materializecss/u],
+            enforce: 'pre',
+            loader: `${dirName}/loaders/strip-unused-materialize-css.cjs`,
+          },
+          {
             test: /\.css$/iu,
             include: [/node_modules/u, /src/u, /public/u, /configs/u],
             use: ['style-loader', 'css-loader'],

@@ -17,7 +17,7 @@ describe('CustomSensorPlugin R18 layout (#215)', () => {
     const hint = document.getElementById('cs-telescope-hint')!;
     const sw = document.getElementById('cs-telescope')!.closest('.switch')!;
 
-    expect(hint.classList.contains('kt-hint')).toBe(true);
+    expect(hint.classList.contains('kt-note')).toBe(true);
     expect(sw.nextElementSibling).toBe(hint);
   });
 });

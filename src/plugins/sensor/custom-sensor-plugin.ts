@@ -154,7 +154,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
             ${l('telescope')}
           </label>
         </div>
-        <div id="cs-telescope-hint" class="kt-hint">${l('telescopeHint')}</div>
+        <div id="cs-telescope-hint" class="kt-note" style="margin-top: 8px;">${l('telescopeHint')}</div>
         <div class="kt-field-row">
           <div id="cs-minaz-div" class="input-field col s6" kt-tooltip="${l('tooltipMinAz')}">
             <input id="cs-minaz" type="text" value="0" />

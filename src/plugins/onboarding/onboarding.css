@@ -266,6 +266,14 @@
   transform: none;
 }
 
+/*
+ * #457: the "Save your progress?" card docks at the bottom of a phone. With the three-item benefit list it is tall enough to
+ * reach the zoom buttons (about y 500 to 590 on 390x844), so the phone card keeps the title, body and buttons only.
+ */
+.kt-tour-mobile .kt-tour-popover .kt-tour-account-recap {
+  display: none;
+}
+
 /* ---- Finish celebration ---- */
 
 .kt-onboarding-pulse {

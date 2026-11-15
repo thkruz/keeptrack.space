@@ -420,6 +420,24 @@ describe('onboarding account step gating', () => {
     }
   });
 
+  it('phone: the next-visit account card marks its benefit list so the phone CSS can keep it clear of the zoom buttons (#457)', () => {
+    KeepTrackPlugin.loginGateOpenModal = vi.fn();
+    const internal = bootPlugin() as unknown as Internal;
+    const previous = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    try {
+      internal.state_.status = 'done';
+      internal.state_.accountPrompt = 'later';
+      internal.showAccount_(true);
+
+      expect(document.getElementById('kt-tour-root')?.classList.contains('kt-tour-mobile')).toBe(true);
+      expect(document.querySelector('.kt-tour-popover .kt-tour-account-recap')).not.toBeNull();
+    } finally {
+      settingsManager.isMobileModeEnabled = previous;
+    }
+  });
+
   it('signing in from the tour-end card means no second showing', () => {
     KeepTrackPlugin.loginGateOpenModal = vi.fn();
     const internal = bootPlugin() as unknown as Internal;

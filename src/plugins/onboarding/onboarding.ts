@@ -660,7 +660,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('account.title'),
       body: isPowerDone ? l('account.bodyPower') : l('account.body'),
-      extraHtml: `<ul class="kt-tour-recap"><li>${l('account.benefit1')}</li><li>${l('account.benefit2')}</li><li>${l('account.benefit3')}</li></ul>`,
+      extraHtml: `<ul class="kt-tour-recap kt-tour-account-recap"><li>${l('account.benefit1')}</li><li>${l('account.benefit2')}</li><li>${l('account.benefit3')}</li></ul>`,
       buttons: [
         { id: 'create', label: l('buttons.createAccount'), isPrimary: true },
         { id: 'later', label: l('buttons.maybeLater') },

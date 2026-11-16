@@ -392,6 +392,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 92 },
   },
   {
+    configKey: 'MostTracked',
+    ossImport: () => import('./most-tracked/most-tracked'),
+    ossClassName: 'MostTracked',
+    defaultConfig: { enabled: true, order: 92.5 },
+  },
+  {
     configKey: 'Breakup',
     ossImport: () => import('./breakup/breakup'),
     ossClassName: 'Breakup',

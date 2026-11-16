@@ -130,6 +130,7 @@ Thanks to the contributors who have helped build and test KeepTrack:
 - [@Koroviev-and-Begemot](https://github.com/Koroviev-and-Begemot/) - Plugin development
 - [@RylandAdams](https://github.com/RylandAdams/) - Plugin development
 - [@cwang-pivotal](https://github.com/cwang-pivotal/) - Bug fixes and improvements
+- [@roop37](https://github.com/roop37/) - Most Tracked plugin
 
 KeepTrack began with James Yoder's [Stuff in Space](https://github.com/jeyoder/StuffInSpace/),
 originally released under the MIT License.

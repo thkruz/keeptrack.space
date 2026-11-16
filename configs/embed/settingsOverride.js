@@ -466,6 +466,9 @@ const settingsOverride = {
     VmagDatabasePlugin: {
       enabled: false,
     },
+    MostTracked: {
+      enabled: false,
+    },
   },
   dataSources: {
     tle: 'https://api.keeptrack.space/v4/sats',

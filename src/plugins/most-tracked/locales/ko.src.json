@@ -7,6 +7,10 @@
         "top": "Top 25",
         "trending": "신규 및 인기 상승"
       },
+      "labels": {
+        "results": "결과",
+        "dataActions": "데이터 작업"
+      },
       "status": {
         "loading": "불러오는 중…",
         "window": "최근 {{hours}}시간",

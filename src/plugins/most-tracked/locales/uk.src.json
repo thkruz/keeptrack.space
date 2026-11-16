@@ -7,6 +7,10 @@
         "top": "Топ-25",
         "trending": "Нове й популярне"
       },
+      "labels": {
+        "results": "Результати",
+        "dataActions": "Дії з даними"
+      },
       "status": {
         "loading": "Завантаження…",
         "window": "Останні {{hours}} год",

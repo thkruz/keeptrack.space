@@ -7,6 +7,10 @@
         "top": "トップ25",
         "trending": "新着・トレンド"
       },
+      "labels": {
+        "results": "結果",
+        "dataActions": "データ操作"
+      },
       "status": {
         "loading": "読み込み中…",
         "window": "過去{{hours}}時間",

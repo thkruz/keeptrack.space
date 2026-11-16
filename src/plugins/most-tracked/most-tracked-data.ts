@@ -109,10 +109,17 @@ export const parseMostTrackedList = (value: unknown): MostTrackedEntry[] => {
 
   const sorted = [...byNorad.values()].sort((a, b) => a.rank - b.rank).slice(0, MOST_TRACKED_MAX_ROWS);
 
-  return sorted.map((entry, i) => {
-    const firstTied = sorted.findIndex((other) => other.count === entry.count && other.users === entry.users);
+  // Competition ranks from the row above, so a tie never depends on where else an equal row sits.
+  let rank = 0;
 
-    return { ...entry, rank: firstTied === -1 ? i + 1 : firstTied + 1 };
+  return sorted.map((entry, i) => {
+    const prev = sorted[i - 1];
+
+    if (!prev || prev.count !== entry.count || prev.users !== entry.users) {
+      rank = i + 1;
+    }
+
+    return { ...entry, rank };
   });
 };
 

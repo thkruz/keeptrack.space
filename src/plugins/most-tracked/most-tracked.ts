@@ -23,14 +23,14 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { getStationModule, STATION_HOST_LABELS } from '@app/app/data/station-modules';
+import { getHostLabel, getStationModule } from '@app/app/data/station-modules';
 import { MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
-import { IBottomIconConfig, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { IBottomIconConfig, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -155,6 +155,15 @@ export class MostTracked extends KeepTrackPlugin {
       elementName: 'most-tracked-menu',
       title: tr('title'),
       html: this.buildSideMenuHtml_(),
+      dragOptions: this.getDragOptions_(),
+    };
+  }
+
+  private getDragOptions_(): IDragOptions {
+    return {
+      isDraggable: true,
+      minWidth: 400,
+      maxWidth: 550,
     };
   }
 
@@ -186,6 +195,7 @@ export class MostTracked extends KeepTrackPlugin {
   private buildSideMenuHtml_(): string {
     const listCard = (kind: MostTrackedListKind) => html`
       <section class="kt-section">
+        <div class="kt-section-label">${tr('labels.results')}</div>
         <ol id="most-tracked-${kind}-list" class="most-tracked-list" aria-label="${tr(`tabs.${kind}`)}"></ol>
         <p id="most-tracked-${kind}-empty" class="most-tracked-empty"></p>
       </section>
@@ -199,10 +209,13 @@ export class MostTracked extends KeepTrackPlugin {
     return html`
       <div id="most-tracked-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="most-tracked-content" class="side-menu">
-          <p id="most-tracked-status" class="most-tracked-status" role="status"></p>
-          <button id="most-tracked-refresh-btn" class="kt-action waves-effect" type="button">
-            <span class="kt-action-label">${tr('refresh')}</span>
-          </button>
+          <section class="kt-section">
+            <div class="kt-section-label">${tr('labels.dataActions')}</div>
+            <p id="most-tracked-status" class="most-tracked-status" role="status"></p>
+            <button id="most-tracked-refresh-btn" class="kt-action waves-effect" type="button">
+              <span class="kt-action-label">${tr('refresh')}</span>
+            </button>
+          </section>
           ${tabsHtml}
           <sub class="most-tracked-note">${tr('privacyNote')}</sub>
         </div>
@@ -435,7 +448,7 @@ export class MostTracked extends KeepTrackPlugin {
 
     nameEl.className = 'most-tracked-name';
     if (stationModule) {
-      const hostLabel = STATION_HOST_LABELS[stationModule.host] ?? name ?? stationModule.host;
+      const hostLabel = getHostLabel(stationModule.host);
       const hint = t7e('searchManager.moduleOf' as TranslationKey)
         .replace('{module}', `${stationModule.name} ${entry.norad}`)
         .replace('{host}', hostLabel);

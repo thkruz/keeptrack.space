@@ -7,6 +7,10 @@
         "top": "前 25 名",
         "trending": "新晋热门"
       },
+      "labels": {
+        "results": "结果",
+        "dataActions": "数据操作"
+      },
       "status": {
         "loading": "加载中…",
         "window": "过去 {{hours}} 小时",

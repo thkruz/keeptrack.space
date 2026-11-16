@@ -7,6 +7,10 @@
         "top": "Top 25",
         "trending": "Neu & im Trend"
       },
+      "labels": {
+        "results": "Ergebnisse",
+        "dataActions": "Datenaktionen"
+      },
       "status": {
         "loading": "Wird geladen…",
         "window": "Letzte {{hours}} Stunden",

@@ -7,6 +7,10 @@
         "top": "Top 25",
         "trending": "Nové a populární"
       },
+      "labels": {
+        "results": "Výsledky",
+        "dataActions": "Akce s daty"
+      },
       "status": {
         "loading": "Načítání…",
         "window": "Posledních {{hours}} hodin",

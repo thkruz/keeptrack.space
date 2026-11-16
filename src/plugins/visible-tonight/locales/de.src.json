@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "Heute Nacht sichtbar",
+      "title": "Heute Nacht sichtbar",
+      "useMyLocation": "Meinen Standort verwenden",
+      "location": {
+        "enter": "Stattdessen einen Ort eingeben",
+        "change": "Ändern",
+        "apply": "Diesen Ort verwenden",
+        "current": "Standort: {{coords}}",
+        "invalid": "Gib einen Breitengrad zwischen -90 und 90 und einen Längengrad zwischen -180 und 180 ein."
+      },
+      "status": {
+        "needLocation": "Sieh nach, welche Satelliten du von deinem Standort aus ohne Teleskop sehen kannst.",
+        "locating": "Standort wird ermittelt…",
+        "denied": "Der Standortzugriff ist aus. Erlaube ihn im Browser oder gib stattdessen einen Ort ein.",
+        "searching": "Suche nach hellen Überflügen…",
+        "noCatalog": "Der Satellitenkatalog lädt noch. Versuche es gleich noch einmal.",
+        "staleCatalog": "Die aktuell geladenen Satellitendaten sind zu alt für genaue Vorhersagen. Versuche es später erneut.",
+        "ready": "Helle Überflüge in den nächsten {{nights}} Nächten",
+        "none": "Keine hellen Überflüge über dir in den nächsten {{nights}} Nächten. Schau in ein oder zwei Tagen wieder vorbei."
+      },
+      "day": {
+        "today": "Heute",
+        "tonight": "Heute Nacht",
+        "tomorrow": "Morgen"
+      },
+      "compass": {
+        "N": "N",
+        "NE": "NO",
+        "E": "O",
+        "SE": "SO",
+        "S": "S",
+        "SW": "SW",
+        "W": "W",
+        "NW": "NW"
+      },
+      "height": {
+        "overhead": "hoch über dir",
+        "upTo": "bis {{deg}}°"
+      },
+      "path": "geht {{from}} auf → {{height}} → geht {{to}} unter",
+      "brightness": {
+        "veryBright": "Sehr hell",
+        "bright": "Hell",
+        "visible": "Sichtbar"
+      },
+      "minutes": "{{minutes}} Min.",
+      "addToCalendar": "Zum Kalender hinzufügen",
+      "ics": {
+        "summary": "{{name}} fliegt über dich hinweg",
+        "description": "Schau um {{time}} nach {{from}}. Er steigt {{height}} und geht {{to}} unter. {{brightness}}, etwa {{minutes}} Min. sichtbar. Ein ruhig wanderndes Licht, ohne Blinken. Von KeepTrack Heute Nacht sichtbar."
+      },
+      "privacyNote": "Dein Standort bleibt in diesem Browser-Tab und wird weder gespeichert noch gesendet. Die Helligkeit ist eine Schätzung.",
+      "help": {
+        "overview": "Heute Nacht sichtbar listet die hellen Satelliten, etwa die Internationale Raumstation, die du in den nächsten Nächten von deinem Standort aus sehen kannst – ohne Teleskop und ohne Einstellungen.",
+        "howToUse": "<ol><li>Öffne <strong>Heute Nacht sichtbar</strong> und tippe auf <strong>Meinen Standort verwenden</strong>.</li><li>Wähle einen Überflug: Du siehst, wann er stattfindet, wo er auf- und untergeht und wie hell er ist.</li><li>Tippe auf <strong>Zum Kalender hinzufügen</strong>, um eine Erinnerung zu bekommen.</li><li>Tippe auf den Überflug selbst, um ihn in KeepTrack zu verfolgen.</li></ol>",
+        "tip1": "Satelliten sind kurz nach Sonnenuntergang oder vor Sonnenaufgang am besten zu sehen, wenn dein Himmel dunkel ist, sie aber noch im Sonnenlicht stehen.",
+        "tip2": "Mehr Kontrolle, etwa andere Sensoren oder alle Überflüge? Probiere Beste Überflüge oder Blickwinkel."
+      }
+    }
+  }
+}

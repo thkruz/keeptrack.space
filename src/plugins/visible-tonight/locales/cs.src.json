@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "Viditelné dnes v noci",
+      "title": "Viditelné dnes v noci",
+      "useMyLocation": "Použít moji polohu",
+      "location": {
+        "enter": "Zadat místo ručně",
+        "change": "Změnit",
+        "apply": "Použít toto místo",
+        "current": "Poloha: {{coords}}",
+        "invalid": "Zadejte zeměpisnou šířku od -90 do 90 a délku od -180 do 180."
+      },
+      "status": {
+        "needLocation": "Zjistěte, které satelity uvidíte ze svého místa – bez dalekohledu.",
+        "locating": "Zjišťování polohy…",
+        "denied": "Přístup k poloze je vypnutý. Povolte ho v prohlížeči nebo zadejte místo ručně.",
+        "searching": "Hledání jasných průletů…",
+        "noCatalog": "Katalog satelitů se stále načítá. Zkuste to za chvíli znovu.",
+        "staleCatalog": "Načtená data satelitů jsou příliš stará na přesnou předpověď průletů. Zkuste to později.",
+        "ready": "Jasné průlety v příštích nocích: {{nights}}",
+        "none": "V příštích nocích ({{nights}}) nad vámi nejsou žádné jasné průlety. Podívejte se znovu za den či dva."
+      },
+      "day": {
+        "today": "Dnes",
+        "tonight": "Dnes v noci",
+        "tomorrow": "Zítra"
+      },
+      "compass": {
+        "N": "S",
+        "NE": "SV",
+        "E": "V",
+        "SE": "JV",
+        "S": "J",
+        "SW": "JZ",
+        "W": "Z",
+        "NW": "SZ"
+      },
+      "height": {
+        "overhead": "vysoko nad hlavou",
+        "upTo": "až {{deg}}°"
+      },
+      "path": "vychází na {{from}} → {{height}} → zapadá na {{to}}",
+      "brightness": {
+        "veryBright": "Velmi jasný",
+        "bright": "Jasný",
+        "visible": "Viditelný"
+      },
+      "minutes": "{{minutes}} min",
+      "addToCalendar": "Přidat do kalendáře",
+      "ics": {
+        "summary": "{{name}} přelétá nad vámi",
+        "description": "Dívejte se na {{from}} v {{time}}. Vystoupá {{height}} a zapadá na {{to}}. {{brightness}}, viditelný asi {{minutes}} min. Klidně se pohybující světlo, bez blikání. Z KeepTrack Viditelné dnes v noci."
+      },
+      "privacyNote": "Vaše poloha zůstává v této kartě prohlížeče a nikam se neukládá ani neodesílá. Jasnost je odhad.",
+      "help": {
+        "overview": "Viditelné dnes v noci ukazuje jasné satelity, například Mezinárodní vesmírnou stanici, které v příštích nocích uvidíte ze svého místa – bez dalekohledu a nastavení.",
+        "howToUse": "<ol><li>Otevřete <strong>Viditelné dnes v noci</strong> a klepněte na <strong>Použít moji polohu</strong>.</li><li>Vyberte průlet: uvidíte, kdy nastane, kde vychází a zapadá a jak je jasný.</li><li>Klepnutím na <strong>Přidat do kalendáře</strong> získáte připomenutí.</li><li>Klepnutím na samotný průlet ho sledujete v KeepTrack.</li></ol>",
+        "tip1": "Satelity jsou nejlépe vidět krátce po západu nebo před východem Slunce, kdy je vaše obloha tmavá, ale ony jsou ještě osvětlené.",
+        "tip2": "Potřebujete více možností, třeba jiné senzory nebo všechny průlety? Vyzkoušejte Nejlepší průlety nebo Úhly pohledu."
+      }
+    }
+  }
+}

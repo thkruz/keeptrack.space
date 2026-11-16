@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "Widoczne dziś w nocy",
+      "title": "Widoczne dziś w nocy",
+      "useMyLocation": "Użyj mojej lokalizacji",
+      "location": {
+        "enter": "Wpisz lokalizację",
+        "change": "Zmień",
+        "apply": "Użyj tej lokalizacji",
+        "current": "Lokalizacja: {{coords}}",
+        "invalid": "Podaj szerokość od -90 do 90 i długość od -180 do 180."
+      },
+      "status": {
+        "needLocation": "Sprawdź, które satelity zobaczysz ze swojego miejsca – bez teleskopu.",
+        "locating": "Ustalanie lokalizacji…",
+        "denied": "Dostęp do lokalizacji jest wyłączony. Zezwól na niego w przeglądarce lub wpisz lokalizację.",
+        "searching": "Szukanie jasnych przelotów…",
+        "noCatalog": "Katalog satelitów wciąż się wczytuje. Spróbuj ponownie za chwilę.",
+        "staleCatalog": "Wczytane dane satelitów są zbyt stare, by dokładnie przewidzieć przeloty. Spróbuj ponownie później.",
+        "ready": "Jasne przeloty w ciągu najbliższych nocy: {{nights}}",
+        "none": "Brak jasnych przelotów nad tobą w ciągu najbliższych nocy: {{nights}}. Zajrzyj ponownie za dzień lub dwa."
+      },
+      "day": {
+        "today": "Dziś",
+        "tonight": "Dziś w nocy",
+        "tomorrow": "Jutro"
+      },
+      "compass": {
+        "N": "N",
+        "NE": "NE",
+        "E": "E",
+        "SE": "SE",
+        "S": "S",
+        "SW": "SW",
+        "W": "W",
+        "NW": "NW"
+      },
+      "height": {
+        "overhead": "wysoko nad głową",
+        "upTo": "do {{deg}}°"
+      },
+      "path": "wschodzi na {{from}} → {{height}} → zachodzi na {{to}}",
+      "brightness": {
+        "veryBright": "Bardzo jasny",
+        "bright": "Jasny",
+        "visible": "Widoczny"
+      },
+      "minutes": "{{minutes}} min",
+      "addToCalendar": "Dodaj do kalendarza",
+      "ics": {
+        "summary": "{{name}} przelatuje nad tobą",
+        "description": "Patrz na {{from}} o {{time}}. Wznosi się {{height}} i zachodzi na {{to}}. {{brightness}}, widoczny przez około {{minutes}} min. Stałe, poruszające się światło, bez mrugania. Z KeepTrack Widoczne dziś w nocy."
+      },
+      "privacyNote": "Twoja lokalizacja zostaje w tej karcie przeglądarki i nie jest nigdzie zapisywana ani wysyłana. Jasność jest szacunkowa.",
+      "help": {
+        "overview": "Widoczne dziś w nocy pokazuje jasne satelity, takie jak Międzynarodowa Stacja Kosmiczna, które zobaczysz ze swojego miejsca w najbliższe noce – bez teleskopu i ustawień.",
+        "howToUse": "<ol><li>Otwórz <strong>Widoczne dziś w nocy</strong> i stuknij <strong>Użyj mojej lokalizacji</strong>.</li><li>Wybierz przelot: zobaczysz, kiedy nastąpi, gdzie wschodzi i zachodzi oraz jak jest jasny.</li><li>Stuknij <strong>Dodaj do kalendarza</strong>, aby dostać przypomnienie.</li><li>Stuknij sam przelot, aby obejrzeć go w KeepTrack.</li></ol>",
+        "tip1": "Satelity najłatwiej zobaczyć krótko po zachodzie lub przed wschodem Słońca, gdy niebo jest ciemne, a one wciąż są oświetlone.",
+        "tip2": "Potrzebujesz więcej opcji, np. innych sensorów lub wszystkich przelotów? Wypróbuj Najlepsze przeloty lub Kąty obserwacji."
+      }
+    }
+  }
+}

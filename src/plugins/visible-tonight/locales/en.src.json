@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "Visible Tonight",
+      "title": "Visible Tonight",
+      "useMyLocation": "Use my location",
+      "location": {
+        "enter": "Enter a location instead",
+        "change": "Change",
+        "apply": "Use this location",
+        "current": "Location: {{coords}}",
+        "invalid": "Enter a latitude between -90 and 90 and a longitude between -180 and 180."
+      },
+      "status": {
+        "needLocation": "See which satellites you can spot from where you are, with no telescope needed.",
+        "locating": "Finding your location…",
+        "denied": "Location access is off. Allow it in your browser, or enter a location instead.",
+        "searching": "Looking for bright passes…",
+        "noCatalog": "The satellite catalog is still loading. Try again in a moment.",
+        "staleCatalog": "The satellite data loaded right now is too old to predict passes accurately. Try again later.",
+        "ready": "Bright passes in the next {{nights}} nights",
+        "none": "No bright passes over you in the next {{nights}} nights. Check back in a day or two."
+      },
+      "day": {
+        "today": "Today",
+        "tonight": "Tonight",
+        "tomorrow": "Tomorrow"
+      },
+      "compass": {
+        "N": "N",
+        "NE": "NE",
+        "E": "E",
+        "SE": "SE",
+        "S": "S",
+        "SW": "SW",
+        "W": "W",
+        "NW": "NW"
+      },
+      "height": {
+        "overhead": "high overhead",
+        "upTo": "up to {{deg}}°"
+      },
+      "path": "rises {{from}} → {{height}} → sets {{to}}",
+      "brightness": {
+        "veryBright": "Very bright",
+        "bright": "Bright",
+        "visible": "Visible"
+      },
+      "minutes": "{{minutes}} min",
+      "addToCalendar": "Add to calendar",
+      "ics": {
+        "summary": "{{name}} passes overhead",
+        "description": "Look {{from}} at {{time}}. It climbs {{height}} and sets {{to}}. {{brightness}}, visible for about {{minutes}} min. A steady moving light, no blinking. From KeepTrack Visible Tonight."
+      },
+      "privacyNote": "Your location stays in this browser tab and is not saved or sent anywhere. Brightness is an estimate.",
+      "help": {
+        "overview": "Visible Tonight lists the bright satellites, like the International Space Station, that you can see from where you are over the next few nights, with no telescope or settings needed.",
+        "howToUse": "<ol><li>Open <strong>Visible Tonight</strong> and tap <strong>Use my location</strong>.</li><li>Pick a pass: it tells you when, where it rises and sets, and how bright it is.</li><li>Tap <strong>Add to calendar</strong> to get a reminder.</li><li>Tap the pass itself to watch it in KeepTrack.</li></ol>",
+        "tip1": "Satellites are easiest to see shortly after sunset or before sunrise, when your sky is dark but they are still in sunlight.",
+        "tip2": "Need more control, like other sensors or every pass? Try Best Passes or Look Angles."
+      }
+    }
+  }
+}

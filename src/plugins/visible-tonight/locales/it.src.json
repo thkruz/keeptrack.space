@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "Visibile stanotte",
+      "title": "Visibile stanotte",
+      "useMyLocation": "Usa la mia posizione",
+      "location": {
+        "enter": "Inserisci un luogo",
+        "change": "Cambia",
+        "apply": "Usa questo luogo",
+        "current": "Posizione: {{coords}}",
+        "invalid": "Inserisci una latitudine tra -90 e 90 e una longitudine tra -180 e 180."
+      },
+      "status": {
+        "needLocation": "Scopri quali satelliti puoi vedere da dove ti trovi, senza telescopio.",
+        "locating": "Ricerca della posizione…",
+        "denied": "L’accesso alla posizione è disattivato. Consentilo nel browser oppure inserisci un luogo.",
+        "searching": "Ricerca dei passaggi luminosi…",
+        "noCatalog": "Il catalogo dei satelliti è ancora in caricamento. Riprova tra un momento.",
+        "staleCatalog": "I dati dei satelliti caricati ora sono troppo vecchi per prevedere i passaggi con precisione. Riprova più tardi.",
+        "ready": "Passaggi luminosi nelle prossime {{nights}} notti",
+        "none": "Nessun passaggio luminoso sopra di te nelle prossime {{nights}} notti. Ricontrolla tra un giorno o due."
+      },
+      "day": {
+        "today": "Oggi",
+        "tonight": "Stanotte",
+        "tomorrow": "Domani"
+      },
+      "compass": {
+        "N": "N",
+        "NE": "NE",
+        "E": "E",
+        "SE": "SE",
+        "S": "S",
+        "SW": "SO",
+        "W": "O",
+        "NW": "NO"
+      },
+      "height": {
+        "overhead": "alto nel cielo",
+        "upTo": "fino a {{deg}}°"
+      },
+      "path": "sorge a {{from}} → {{height}} → tramonta a {{to}}",
+      "brightness": {
+        "veryBright": "Molto luminoso",
+        "bright": "Luminoso",
+        "visible": "Visibile"
+      },
+      "minutes": "{{minutes}} min",
+      "addToCalendar": "Aggiungi al calendario",
+      "ics": {
+        "summary": "{{name}} passa sopra di te",
+        "description": "Guarda verso {{from}} alle {{time}}. Sale {{height}} e tramonta a {{to}}. {{brightness}}, visibile per circa {{minutes}} min. Una luce che si muove in modo costante, senza lampeggiare. Da KeepTrack Visibile stanotte."
+      },
+      "privacyNote": "La tua posizione resta in questa scheda del browser e non viene salvata né inviata. La luminosità è una stima.",
+      "help": {
+        "overview": "Visibile stanotte elenca i satelliti luminosi, come la Stazione Spaziale Internazionale, che puoi vedere da dove ti trovi nelle prossime notti, senza telescopio né impostazioni.",
+        "howToUse": "<ol><li>Apri <strong>Visibile stanotte</strong> e tocca <strong>Usa la mia posizione</strong>.</li><li>Scegli un passaggio: ti dice quando avviene, dove sorge e tramonta e quanto è luminoso.</li><li>Tocca <strong>Aggiungi al calendario</strong> per ricevere un promemoria.</li><li>Tocca il passaggio per seguirlo in KeepTrack.</li></ol>",
+        "tip1": "I satelliti si vedono meglio poco dopo il tramonto o prima dell’alba, quando il tuo cielo è buio ma loro sono ancora illuminati dal Sole.",
+        "tip2": "Ti serve più controllo, come altri sensori o tutti i passaggi? Prova Migliori passaggi o Angoli di osservazione."
+      }
+    }
+  }
+}

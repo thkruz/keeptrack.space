@@ -398,6 +398,12 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 92.5 },
   },
   {
+    configKey: 'VisibleTonight',
+    ossImport: () => import('./visible-tonight/visible-tonight'),
+    ossClassName: 'VisibleTonight',
+    defaultConfig: { enabled: true, order: 92.6 },
+  },
+  {
     configKey: 'Breakup',
     ossImport: () => import('./breakup/breakup'),
     ossClassName: 'Breakup',

@@ -74,6 +74,7 @@ export type KeepTrackPluginsConfiguration = {
   KtocNoticesPlugin?: PluginConfiguration;
   Reentries?: PluginConfiguration;
   MostTracked?: PluginConfiguration;
+  VisibleTonight?: PluginConfiguration;
   Breakup?: PluginConfiguration;
   BreakupAnalysis?: PluginConfiguration;
   DebrisScreening?: PluginConfiguration;

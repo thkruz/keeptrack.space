@@ -145,6 +145,9 @@ const settingsOverride = {
       enabled: false,
       order: 92,
     },
+    VisibleTonight: {
+      enabled: false,
+    },
     StereoMap: {
       enabled: false,
       order: 150,

@@ -79,6 +79,8 @@ export class MobileManager {
     'ResetToStart',
     // Added 2026-11-15 (#1463): a ranked list that fits a narrow screen (44 px rows, no horizontal scroll at 320 px).
     'MostTracked',
+    // Added 2026-11-16 (#1468): built for phones first (casual users, 44 px rows, location from the phone).
+    'VisibleTonight',
   ];
 
   static checkMobileMode() {

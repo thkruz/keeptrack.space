@@ -49,6 +49,8 @@
 }
 
 .most-tracked-row:disabled {
+  /* Let taps and hovers reach the list item, which carries the "not in catalog" tooltip. */
+  pointer-events: none;
   cursor: default;
   opacity: 0.5;
   background: none;

@@ -1,9 +1,11 @@
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { hasBottomIcon, hasHelp, hasSideMenu } from '@app/engine/plugins/core/plugin-capabilities';
+import { errorManagerInstance, LogLevel } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { formatListAge, MOST_TRACKED_RETRY_MS, MOST_TRACKED_TIMEOUT_MS, MostTracked } from '@app/plugins/most-tracked/most-tracked';
 import { MOST_TRACKED_MAX_ROWS, parseMostTrackedList, parseMostTrackedResponse, relativePopularity } from '@app/plugins/most-tracked/most-tracked-data';
+import { OfflineIconBehavior } from '@app/settings/core-settings';
 import { settingsManager } from '@app/settings/settings';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginMenuButtonTests, standardPluginSuite, websiteInit } from '@test/generic-tests';
@@ -347,6 +349,91 @@ describe('MostTracked fetching and rendering', () => {
     expect(plugin.isIconDisabled).toBe(false);
     expect(plugin.getDisabledReason()).toBeNull();
     vi.useRealTimers();
+  });
+
+  it('does not toast a failure even with LOG output on (the localhost default)', async () => {
+    const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+    errorManagerInstance.setLogLevel(LogLevel.LOG);
+    try {
+      fetchMock.mockRejectedValue(new TypeError('Failed to fetch'));
+      await internals(plugin).fetchData_();
+    } finally {
+      errorManagerInstance.setLogLevel(LogLevel.WARN);
+    }
+
+    expect(plugin.isIconDisabled).toBe(true);
+    expect(toast).not.toHaveBeenCalled();
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('MostTracked'));
+  });
+
+  it('re-enables the icon at retry expiry while offline under HIDE, so it works after reconnecting', async () => {
+    vi.useFakeTimers();
+    const onLine = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    const originalBehavior = settingsManager.offlineIconBehavior;
+
+    settingsManager.offlineIconBehavior = OfflineIconBehavior.HIDE;
+    try {
+      fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+      await internals(plugin).fetchData_();
+      expect(plugin.isIconDisabled).toBe(true);
+
+      vi.advanceTimersByTime(MOST_TRACKED_RETRY_MS);
+      expect(plugin.isIconDisabled).toBe(false);
+    } finally {
+      settingsManager.offlineIconBehavior = originalBehavior;
+      onLine.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('leaves the icon disabled at retry expiry while offline under DISABLE (the base plugin re-enables it)', async () => {
+    vi.useFakeTimers();
+    const onLine = vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+    const originalBehavior = settingsManager.offlineIconBehavior;
+
+    settingsManager.offlineIconBehavior = OfflineIconBehavior.DISABLE;
+    try {
+      fetchMock.mockResolvedValue({ ok: false, status: 503, json: () => Promise.resolve({}) });
+      await internals(plugin).fetchData_();
+
+      vi.advanceTimersByTime(MOST_TRACKED_RETRY_MS);
+      expect(plugin.isIconDisabled).toBe(true);
+    } finally {
+      settingsManager.offlineIconBehavior = originalBehavior;
+      onLine.mockRestore();
+      vi.useRealTimers();
+    }
+  });
+
+  it('opts the count and missing-row tooltips into tap-to-toggle on touch-only screens', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => ({ matches: query === '(hover: none)', media: query }) as MediaQueryList);
+    const selectSat = vi.fn();
+
+    await internals(plugin).fetchData_();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectSat } as any);
+
+    const rows = getEl('most-tracked-top-list')?.querySelectorAll<HTMLButtonElement>('button.most-tracked-row') ?? [];
+    const count = rows[0].querySelector<HTMLElement>('.most-tracked-count');
+
+    expect(count?.hasAttribute('kt-tooltip-tap')).toBe(true);
+    expect(rows[1].closest('li')?.hasAttribute('kt-tooltip-tap')).toBe(true);
+
+    // Tapping the count opens its tooltip and does not select the object.
+    count?.click();
+    expect(selectSat).not.toHaveBeenCalled();
+  });
+
+  it('keeps hover-only tooltips on screens that can hover', async () => {
+    vi.spyOn(window, 'matchMedia').mockImplementation((query: string) => ({ matches: false, media: query }) as MediaQueryList);
+    await internals(plugin).fetchData_();
+
+    const rows = getEl('most-tracked-top-list')?.querySelectorAll<HTMLButtonElement>('button.most-tracked-row') ?? [];
+
+    expect(rows[0].querySelector('.most-tracked-count')?.hasAttribute('kt-tooltip-tap')).toBe(false);
+    expect(rows[1].closest('li')?.hasAttribute('kt-tooltip-tap')).toBe(false);
   });
 
   it('treats an unreachable endpoint as unavailable', async () => {

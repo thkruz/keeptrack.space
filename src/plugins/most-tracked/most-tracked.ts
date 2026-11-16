@@ -33,9 +33,9 @@ import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { IBottomIconConfig, IDragOptions, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
 import { buildSideMenuTabsHtml, initSideMenuTabs, updateSideMenuTabIndicator } from '@app/engine/ui/side-menu-tabs';
 import { html } from '@app/engine/utils/development/formatter';
-import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { TranslationKey, t7e } from '@app/locales/keys';
+import { OfflineIconBehavior } from '@app/settings/core-settings';
 import { settingsManager } from '@app/settings/settings';
 import firePng from '@public/img/icons/fire.png';
 import i18next from 'i18next';
@@ -63,6 +63,9 @@ export type MostTrackedStatus = 'idle' | 'loading' | 'ready';
 
 type MostTrackedKey = Parameters<typeof t7e>[0];
 const tr = (key: string, params?: Record<string, string | number>): string => t7e(`plugins.MostTracked.${key}` as MostTrackedKey, params);
+
+/** Touch-only screens have no hover, so tooltips there must opt into tap-to-toggle. */
+const isTouchOnly = (): boolean => typeof window.matchMedia === 'function' && window.matchMedia('(hover: none)').matches;
 
 const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
   ['day', 86_400_000],
@@ -242,7 +245,14 @@ export class MostTracked extends KeepTrackPlugin {
 
     for (const kind of ['top', 'trending'] as const) {
       getEl(`most-tracked-${kind}-list`, true)?.addEventListener('click', (evt: Event) => {
-        const row = (evt.target as HTMLElement | null)?.closest<HTMLButtonElement>('button.most-tracked-row');
+        const target = evt.target as HTMLElement | null;
+
+        // A tap on a tap-to-toggle tooltip (the count on phones) opens the tooltip; it must not also select the row.
+        if (target?.closest('[kt-tooltip-tap]')) {
+          return;
+        }
+
+        const row = target?.closest<HTMLButtonElement>('button.most-tracked-row');
 
         if (row?.dataset.norad && !row.disabled) {
           this.selectByNorad_(row.dataset.norad);
@@ -304,7 +314,8 @@ export class MostTracked extends KeepTrackPlugin {
    * so a short outage does not remove the menu for the whole session.
    */
   protected markUnavailable_(reason: string): void {
-    errorManagerInstance.log(`MostTracked: ${reason}`);
+    // Console only: errorManagerInstance.log toasts when LOG output is on (the localhost default), and #1463 wants no toast.
+    console.warn(`MostTracked: ${reason}`);
     this.isUnavailable_ = true;
     // Re-render so Refresh is not left disabled from the 'loading' state when the menu comes back.
     this.setStatus_(this.data_ ? 'ready' : 'idle');
@@ -316,8 +327,11 @@ export class MostTracked extends KeepTrackPlugin {
     this.retryTimer_ = setTimeout(() => {
       this.retryTimer_ = null;
       this.isUnavailable_ = false;
-      // Leave the icon alone while the base plugin has it disabled for being offline.
-      if (navigator.onLine !== false) {
+      /*
+       * Offline under DISABLE, the base plugin owns the disabled state and re-enables the icon on reconnect.
+       * Under HIDE it only hides and re-shows the icon, so clear our disabled state now or the icon comes back dead.
+       */
+      if (navigator.onLine !== false || settingsManager.offlineIconBehavior === OfflineIconBehavior.HIDE) {
         this.setBottomIconToEnabled();
       }
     }, MOST_TRACKED_RETRY_MS);
@@ -489,10 +503,16 @@ export class MostTracked extends KeepTrackPlugin {
       row.disabled = true;
       item.classList.add('most-tracked-item--missing');
       item.setAttribute('kt-tooltip', tr('notInCatalog'));
+      if (isTouchOnly()) {
+        item.setAttribute('kt-tooltip-tap', '');
+      }
       PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(item);
     } else {
       // Disabled rows get no pointer events, so only selectable rows carry the count tooltip.
       count.setAttribute('kt-tooltip', MostTracked.countDetail_(entry));
+      if (isTouchOnly()) {
+        count.setAttribute('kt-tooltip-tap', '');
+      }
       PluginRegistry.getPlugin(TooltipsPlugin)?.createTooltip(count);
     }
 

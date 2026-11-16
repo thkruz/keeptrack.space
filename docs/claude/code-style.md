@@ -57,3 +57,24 @@ rules below are the ones that slip past them or that agents repeatedly break any
   use `changeStaticOffset(targetMs - Date.now())`: it reads the wall clock twice and leaves a
   paused clock off by a millisecond. Jumps keep the current play or pause state.
 - Every new control must work on a phone-sized viewport (about 390 by 844) as well as a laptop.
+
+### v13 side-menu checklist
+
+A menu that works and passes its tests can still look out of place. Before opening a pull
+request, compare yours with `src/plugins/collisions/` and `src/plugins/reentries/`.
+
+- `getSideMenuConfig()` returns `dragOptions: this.getDragOptions_()` with
+  `{ isDraggable: true, minWidth: 400, maxWidth: 550 }`, so the menu can be resized. See
+  `src/plugins/catalog-management/` for the call.
+- Action buttons (`kt-action`) such as Refresh go in a `<section class="kt-section">` headed by
+  `<div class="kt-section-label">Data Actions</div>`. Status text belongs in that section too,
+  not loose above the tabs.
+- The data goes in its own `kt-section` headed "Results". Cards inside it get a
+  `kt-section-label` too.
+- Section labels are `<div class="kt-section-label">`, never `<h5>`.
+- For shared labels such as Results and Data Actions, reuse the translation keys another
+  plugin already has. The wording then matches in every language and you add no new strings.
+- Before writing a lookup or formatter, search `src/app/data` and `src/engine/utils` for an
+  existing helper (for example `getHostLabel()` in `src/app/data/station-modules.ts`).
+- When ranking rows, compare each row with the one before it. Don't call `findIndex` over the
+  whole list: it is only right when the server sorts ties next to each other, and it is O(n^2).

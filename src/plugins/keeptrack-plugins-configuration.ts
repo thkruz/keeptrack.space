@@ -73,6 +73,7 @@ export type KeepTrackPluginsConfiguration = {
   NeighborhoodWatch?: PluginConfiguration;
   KtocNoticesPlugin?: PluginConfiguration;
   Reentries?: PluginConfiguration;
+  MostTracked?: PluginConfiguration;
   Breakup?: PluginConfiguration;
   BreakupAnalysis?: PluginConfiguration;
   DebrisScreening?: PluginConfiguration;

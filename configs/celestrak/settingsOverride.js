@@ -112,6 +112,9 @@ const settingsOverride = {
     Reentries: {
       enabled: false,
     },
+    MostTracked: {
+      enabled: false,
+    },
     StereoMap: {
       enabled: false,
     },

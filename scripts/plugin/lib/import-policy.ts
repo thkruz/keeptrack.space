@@ -12,7 +12,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
-import ts from 'typescript';
+import ts from 'typescript-api';
 import { REPO_ROOT } from './paths';
 
 const require = createRequire(import.meta.url);

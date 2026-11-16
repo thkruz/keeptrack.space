@@ -77,6 +77,8 @@ export class MobileManager {
     'OnboardingPlugin',
     // Added 2026-11-15 (#539): Reset to Start sits in the clock popover; long-press opens Reset / Set / Clear.
     'ResetToStart',
+    // Added 2026-11-15 (#1463): a ranked list that fits a narrow screen (44 px rows, no horizontal scroll at 320 px).
+    'MostTracked',
   ];
 
   static checkMobileMode() {

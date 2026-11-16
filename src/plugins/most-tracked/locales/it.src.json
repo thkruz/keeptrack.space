@@ -1,0 +1,40 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Più seguiti",
+      "title": "Più seguiti",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "Nuovi e di tendenza"
+      },
+      "labels": {
+        "results": "Risultati",
+        "dataActions": "Azioni dati"
+      },
+      "status": {
+        "loading": "Caricamento…",
+        "window": "Ultime {{hours}} ore",
+        "updated": "aggiornato {{time}}"
+      },
+      "empty": {
+        "top": "Ancora nessun dato di tracciamento.",
+        "trending": "Al momento non c'è nulla di nuovo di tendenza."
+      },
+      "refresh": "Aggiorna",
+      "unknownObject": "Oggetto sconosciuto",
+      "notInCatalog": "Non presente nel catalogo caricato",
+      "unavailable": "Più seguiti non è disponibile al momento. Tornerà tra qualche minuto.",
+      "selections": "Selezioni: {{value}}",
+      "people": "Persone: {{value}}",
+      "privacyNote": "Si contano le selezioni in KeepTrack nell'ultimo giorno, al massimo 3 per persona e oggetto. Approssimativo e anonimo.",
+      "help": {
+        "overview": "Più seguiti mostra gli oggetti che gli utenti di KeepTrack stanno guardando di più in questo momento, come gli elenchi dei voli più seguiti dei siti di tracciamento aereo. È un modo rapido per trovare lanci, rientri e altri oggetti di attualità.",
+        "tabsHeading": "I due elenchi",
+        "tabs": "<strong>Top 25</strong> classifica gli oggetti più seguiti dell'ultimo giorno. <strong>Nuovi e di tendenza</strong> mostra gli oggetti più popolari che non erano nella Top 25 del giorno precedente, così gli oggetti nuovi e interessanti non restano nascosti dietro ai soliti preferiti.",
+        "howToUse": "<ol><li>Apri <strong>Più seguiti</strong> dal pannello.</li><li>Passa da <strong>Top 25</strong> a <strong>Nuovi e di tendenza</strong>.</li><li>Fai clic su una riga per selezionare l'oggetto e volare fino a esso.</li><li>Fai clic su <strong>Aggiorna</strong> per i conteggi più recenti.</li></ol>",
+        "tip1": "La barra mostra la popolarità di ogni oggetto rispetto alla prima riga dello stesso elenco.",
+        "tip2": "Le righe in grigio sono oggetti non presenti nel catalogo caricato, quindi non possono essere selezionati."
+      }
+    }
+  }
+}

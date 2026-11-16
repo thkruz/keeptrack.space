@@ -1,78 +1,88 @@
-# Regression Testing Guide for KeepTrack.space
+# Testing
 
-## Introduction
+Complete [development setup](../CONTRIBUTING.md#development-setup) first. Use the
+OSS build for public contributions; private Pro features are not required.
 
-KeepTrack.space is an open-source space exploration tool designed for visualizing satellites and space debris. It allows users to simulate space debris breakups, visualize debris patterns, search through a catalog of satellites, and much more.
+## Automated checks
 
-## Testing Objectives
+```bash
+pnpm run generate-t7e
+pnpm run lint
+pnpm run typecheck
+pnpm test
+```
 
-The primary objective of regression testing is to ensure that recent changes have not adversely affected existing functionalities or performance of the application.
+Vitest unit tests live next to plugins and other source modules in `__tests__/`
+folders. Shared setup and fixtures live in `test/`. Run a relevant test file
+while iterating, then run the checks required for your pull request.
 
-## Scope of Testing
+```bash
+pnpm exec vitest run path/to/changed.test.ts
+pnpm run test:coverage
+```
 
-- **Complete End-to-End Testing**: This includes testing all major functionalities of the application such as searching the catalog, simulating breakups, launching satellites, and visualizing debris patterns.
-- **Performance Checks**: Ensure the application still loads in under 2 seconds and maintains a smooth performance at 60 frames per second during simulations.
+The first command is a template: replace the path with the test you want to run.
 
-## Testing Environment
+## Browser tests
 
-- **Local Development Setup**: Tests will be conducted in the development environment hosted locally.
-- **Tools Required**: Visual Studio Code for code edits and debugging, and the Brave browser for interacting with the application.
+Playwright tests use Chromium and an application served on port 5544. Build the
+app first: the Playwright-managed server serves `dist/` without compiling it.
 
-## Test Cases
+```bash
+pnpm exec playwright install chromium
+pnpm run build
+pnpm run test:e2e:smoke
+```
 
-### Setup and Initial Checks
+Run the broader suite with `pnpm run test:e2e`, or target a relevant spec:
 
-- **Launch Application**: Ensure the application loads correctly and reaches the main interface within the expected time.
-- **Database Integrity**: Check that the database loads correctly, and all satellite and debris data are accessible.
+```bash
+pnpm exec playwright test path/to/changed.spec.ts
+```
 
-### Functionality Tests
+Replace the example path with a spec under `src/`. Specs are named
+`**/__tests__/*.spec.ts`. See [`playwright.config.ts`](../playwright.config.ts)
+for browser settings, retries, and artifact capture.
 
-- **Search Functionality**:
-  - Search for various satellites using name, NORAD ID, and international designator to ensure accuracy and responsiveness.
-  - Test sorting and filtering capabilities in the search results.
-- **Simulation Tests**:
-  - Simulate a debris breakup and verify the debris spreads as expected.
-  - Simulate a satellite launch and observe the visualization from different points on Earth.
-  - Test the responsiveness of the application when adjusting simulation parameters.
-- **Sensor Data Visualization**:
-  - Select different sensors and verify the output against expected results.
-  - Test the application's response to switching between multiple sensors rapidly.
-- **Debris Visualization**:
-  - Check various debris patterns and ensure they update and display correctly over time.
-  - Test the performance of the visualization under different scenarios (e.g., high debris density).
-- **User Interface Consistency**:
-  - Ensure that all UI elements are consistent across different pages.
-  - Test responsiveness and layout adjustments on different browser sizes.
-- **Presets**:
-  - Check that <http://localhost:5544?preset=debris> works.
-  - Check that <http://localhost:5544?preset=starlink> works.
-  - Check that <http://localhost:5544?preset=ops-center> works.
-  - Check that <http://localhost:5544?preset=education> works.
-  - Check that <http://localhost:5544?preset=epfl> works.
-  - Check that <http://localhost:5544?preset=outreach> works.
-  - Check that <http://localhost:5544?preset=million-year> works.
-  - Check that <http://localhost:5544?preset=million-year2> works.
-  - Check that <http://localhost:5544?preset=altitudes> works.
-  - Check that <http://localhost:5544?preset=facsat2> works.
+Locally, Playwright reuses a server already running on port 5544. Confirm that
+it serves the intended build and profile before interpreting a result. Use a
+fresh production build and stop an unrelated server when verifying a release.
+The local HTML report can be opened with `pnpm exec playwright show-report`.
 
-### Performance Tests
+Tests tagged `@local` depend on local graphics hardware or screenshot baselines
+and are excluded in CI. A CI pass does not establish performance on a user's GPU.
 
-- **Load Performance**:
-  - Verify that the application still loads within 2 seconds.
-  - Measure response times for critical actions.
-- **Simulation Performance**:
-  - Ensure simulations run smoothly at 60 fps with no noticeable drops in frame rate.
-  - Test the impact of long-duration simulations on performance.
+## Manual checks for UI changes
 
-## Reporting Issues
+Choose checks affected by the change. Record the commit, build profile, browser,
+viewport, and input data so someone else can reproduce your results.
 
-- **GitHub Tracking**: All issues discovered during testing should be reported and tracked using GitHub's issue tracking system.
+| Check | Steps | Expected result |
+| --- | --- | --- |
+| Search and selection | Search for a known NORAD ID from the loaded catalog, then select the result. | The selected object's ID matches the query and its information is displayed. |
+| Simulation time | Pause, change the simulation time, then resume. | The displayed time changes as requested; updates resume when playback resumes. |
+| Sensor analysis | Select a sensor and a satellite, then calculate look angles for a specified time. | Output identifies the selected objects, time, and units. Compare numerical changes against an independent reference or a known fixture. |
+| Menu layout | Open the changed menu at desktop and phone widths; use its inputs and close it. | Labels and controls remain readable and reachable, with no overlapping buttons or trapped scrolling. |
+| Data import | Load a known valid fixture, then a malformed file. | Valid objects appear as expected; invalid input produces an understandable error without breaking the app. |
 
-## Conclusion
+For simulation changes, record the inputs and compare the resulting objects or
+orbits with a known fixture. A plausible-looking orbit is not a numerical check.
 
-This regression testing guide should serve as a baseline for ensuring that KeepTrack.space maintains its functionality and performance after each update. Since testing is conducted by a solo developer, it's crucial to prioritize testing based on recent changes and known trouble areas, specifically unexpected settings combinations and concurrent feature usage.
+## Performance changes
 
-## Tips for Effective Testing
+Compare the same scenario before and after a change. Record browser version,
+CPU/GPU, viewport, catalog size, graphics settings, and whether caches were warm.
+Measure initial loading separately from interaction and rendering performance.
+Avoid a universal loading-time or frame-rate threshold without a defined test
+machine and workload.
 
-- Use diverse scenarios and settings to uncover hidden issues.
-- Regularly update test cases to reflect new functionalities and edge cases identified in previous tests.
+## Reporting failures
+
+Include reproduction steps, expected and observed behavior, build information,
+and relevant console errors. Attach a screenshot or Playwright trace for UI
+failures. Note whether the issue occurs in the OSS build, the hosted app, or both.
+Report security vulnerabilities through the [security policy](../SECURITY.md).
+
+Maintainers promoting a release can also consult the
+[local E2E merge gate](e2e-merge-gate.md). That workflow is separate from the
+checks expected for contributor pull requests.

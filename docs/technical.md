@@ -1,114 +1,85 @@
-# Technical Documentation
+# Architecture
 
-# Table of Contents
+KeepTrack separates rendering and shared services from satellite-specific logic
+and feature plugins. Start with [development setup](../CONTRIBUTING.md) if you
+want to run the app.
 
-- [Built With](#Built-With)
-- [Main Files](#main-files)
-- [Visualization of Codebase](#visualization-of-codebase)
-- [Main Files](#main-files)
-- [Libraries](#libraries)
-- [Artificial Intelligence](#artificial-intelligence)
-- [Tests](#Tests)
-- [Versioning](#versioning)
+## Source layout
 
-# Built With
+| Directory | Contents |
+| --- | --- |
+| [`src/engine/`](../src/engine/) | Rendering, cameras, input, shared services, and plugin infrastructure |
+| [`src/app/`](../src/app/) | Satellite catalogs, sensors, analysis, and application UI |
+| [`src/plugins/`](../src/plugins/) | Built-in feature plugins |
+| [`src/plugins-external/`](../src/plugins-external/) | Installed external plugins and development instructions |
+| [`src/webworker/`](../src/webworker/) | Background position, orbit, color, and analysis calculations |
+| [`src/settings/`](../src/settings/) | Settings definitions and build presets |
+| [`src/locales/`](../src/locales/) | Shared translations and generated translation keys |
+| [`build/`](../build/) | Build configuration, profiles, and the development server |
+| [`test/`](../test/) | Shared test fixtures, setup, and browser-test helpers |
 
-[![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)](https://code.visualstudio.com/)[![Git](https://img.shields.io/badge/git-%23F05033.svg?style=for-the-badge&logo=git&logoColor=white)](https://git-scm.com/)[![npm](https://img.shields.io/badge/npm-%23E5E5E5?style=for-the-badge&logo=npm&logoColor=058a5e)](https://www.npmjs.com/)[![WebGL](https://img.shields.io/badge/WebGL-990000?logo=webgl&logoColor=white&style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web/WebGL)[![Babel](https://img.shields.io/badge/Babel-F9DC3e?style=for-the-badge&logo=babel&logoColor=black)](https://babeljs.io/)[![Webpack](https://img.shields.io/badge/webpack-%238DD6F9.svg?style=for-the-badge&logo=webpack&logoColor=black)](https://webpack.js.org/)[![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)](https://eslint.org/)[![Jest](https://img.shields.io/badge/-jest-%23C21325?style=for-the-badge&logo=jest&logoColor=white)](https://jestjs.io/)[![cypress](https://img.shields.io/badge/-cypress-%23E5E5E5?style=for-the-badge&logo=cypress&logoColor=058a5e)](https://www.cypress.io/)[![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)](http://github.com)[![GitLab](https://img.shields.io/badge/gitlab-%23181717.svg?style=for-the-badge&logo=gitlab&logoColor=white)](https://gitlab.com)
+The public orbital mechanics library, OOTK, is a Git submodule at
+`src/engine/ootk/`. Commercial plugins live in a separate private submodule at
+`src/plugins-pro/`. The OSS build works without the private module.
 
-# Visualization of Codebase
+## Rendering and calculation
 
-[![Visualization of this repo](../diagram.svg)](https://mango-dune-07a8b7110.1.azurestaticapps.net/?repo=thkruz/keeptrack.space)
+The renderer uses WebGL 2 and custom shaders for points, orbit lines, meshes,
+and celestial bodies. Rendering code lives in `src/engine/rendering/`; camera
+controls live in `src/engine/camera/` and `src/engine/input/`.
 
-# Main Files
+Web Workers perform calculations outside the UI thread. Start with
+[`positionCruncher.ts`](../src/webworker/positionCruncher.ts) for position updates,
+[`orbitCruncher.ts`](../src/webworker/orbitCruncher.ts) for orbit paths, and
+[`colorCruncher.ts`](../src/webworker/colorCruncher.ts) for object colors.
+Message definitions sit alongside the workers.
 
-- index.html - Controls the structure of the front-end and loads all the CSS and JS files.
-- index.ts - Primary TS file that bootstraps all of the other files.
-- camera.ts - cameraManager is used to create cameraManager that serves as the interface from the UI and the webgl camera.
-- colorSchemeManager.ts - Handles the creation of color schemes for the dots.
-  - colorManager/ruleSets - These files handle the ruleset for how to color dots when enabled.
-- drawManager.ts - Controls the main draw loop.
-  - sceneManager.ts - Manages the sun, earth, moon, lines and atmosphere drawing.
-  - meshManager.ts - Controls the loading and drawing of .obj models of satellites.
-  - post-processing.js - Loads and draws post processing shaders like gausian blur. Not used at the moment.
-- groupsManager.ts - Manages creation and loading of satellite groups
-  - sat-group.ts - Manages individual satellite group
-- missileManager.ts - ICBM/SLBM simulator.
-- objectManager.ts - Used for extracting details from TLE.json and loading additional objects from other files.
-  - controlSiteManager.ts - Database of command and control locations.
-  - launchSiteManager.ts - Database of launch locations.
-- orbitManager.ts - Draws the orbit lines. Called from the main draw loop.
-- photoManager.ts - Handles the loading and displaying of satellite photography from external sources.
-- satSet.ts - Most of the manipulation of the local satellite catalogue occurs here.
-- sensorManager.ts - Database of sensor locations.
-- starManager.ts - Database of stars.
-  - constellations.ts - Add-on database of star constellations.
-- timeManager.ts - Tracks internal time and controls time manipulation.
-- uiManager.ts - Controls user keyboard/mouse inputs to the application.
-  - mapManager.ts - Modified version of [@juliuste](https://github.com/juliuste/projections)'s library for stereographic map projection.
-  - searchBox.ts - Functions for searching the catalog and manipulating the search drop-down.
-- orbitCruncher.ts - Web Worker that generates future orbits for satellites.
-- positionCruncher.ts - Web Worker that provides x, y, z coordinates of the satellites and if it is in a sensor's FOV.
-- TLE2.json - The main database on satellites. (Second edition)
+Catalog loading and object management live in `src/app/data/catalog-manager/`.
+The simulation clock is managed by
+[`TimeManager`](../src/engine/core/time-manager.ts). Displayed satellite positions
+are propagated from orbital data for that clock time; they are not a stream of
+measured positions.
 
-# Libraries
+## Services, events, and plugins
 
-- [ootk](https://github.com/thkruz/ootk) - [@thkruz](https://github.com/thkruz)'s TypeScript library for working with SGP4, sensor field of view, and Astronomical calculations.
-  - Credit to [@shashwata](https://github.com/shashwatak/)'s amazing library satellite.js and [@mourner](https://github.com/mourner/suncalc)'s library suncalc for laying the ground work.
+[`ServiceLocator`](../src/engine/core/service-locator.ts) provides access to shared
+managers. Events in `src/engine/events/` connect lifecycle steps and application
+actions to listeners. Plugin infrastructure lives in `src/engine/plugins/`;
+built-in plugins are registered in [`src/plugins/plugins.ts`](../src/plugins/plugins.ts).
 
-## Note on Performance
+Keep rendering and reusable infrastructure in the engine. Place
+satellite-specific behavior in the app layer or feature plugins. Put reusable
+astrodynamics calculations in OOTK.
 
-Performance optimization is a top priority for KeepTrack. We have made conscious decisions to avoid large libraries like three.js to fine-tune performance. As a result, KeepTrack is capable of modeling more than 2.5 million satellites in real-time using SGP4. This focus on optimization is part of our commitment to providing a powerful and efficient tool for users to explore and understand space operations.
+External plugins use the versioned [`@keeptrack/plugin-api`](plugin-api.md)
+interface. Follow the [external plugin guide](../src/plugins-external/README.md)
+for installation, scaffolding, and compatibility checks.
 
-# Artificial Intelligence
+## Builds and configuration
 
-Artificial intelligence plays a vital role in enhancing the development process and creating an engaging user experience in KeepTrack.Space. From boosting the efficiency of writing code and tests, assisting in documentation, to generating stunning graphics, several AI tools and models are actively being used.
+Rspack bundles the application. The configuration is assembled in
+[`build/webpack-manager.ts`](../build/webpack-manager.ts); its filename retains
+the older bundler name. [`build/build-manager.ts`](../build/build-manager.ts)
+coordinates builds and profiles.
 
-## GitHub Copilot
+- `pnpm start` runs the OSS watch build and development server.
+- `pnpm run build` writes a production build to `dist/`.
+- `pnpm run start:ci` serves the existing `dist/` without rebuilding it.
 
-[GitHub Copilot](https://copilot.github.com/) is an AI-powered coding assistant that helps in writing new lines of code and understanding the codebase. It provides relevant suggestions for building new features or debugging the existing code. In the development of KeepTrack.Space, GitHub Copilot has been instrumental in expediting the development process and enhancing the code quality.
+Build profiles select settings and content for different deployments. Some
+profiles require private modules or deployment-specific assets; use the OSS
+profile for public contributions. Publication commands require the maintainer's
+infrastructure credentials and are not part of local setup.
 
-## Codium AI
+## Translations
 
-[Codium AI](https://codium.ai/) is a robust tool that leverages artificial intelligence for generating unit tests and documentation. It assists in improving the code quality and ensures that all components of the software are well-tested and documented. It has been a great asset in maintaining the reliability of KeepTrack.Space and making the project's intricacies easily understandable for new contributors.
+Plugin locale sources live in each plugin's `locales/` folder as
+`<lang>.src.json`. `pnpm run generate-t7e` combines locale sources and generates
+the translation keys. See the [contributing guide](../CONTRIBUTING.md#plugin-architecture)
+for conventions when adding a plugin or translation.
 
-## Stable Diffusion
+## Verification
 
-To enhance the aesthetics of the loading screen, KeepTrack.Space uses [Stable Diffusion](https://www.midjourney.com/home/), an AI model used for creating images. Stable Diffusion helps in generating unique and captivating images that add to the overall user experience, making the loading screen visually appealing while the necessary data for the application is being loaded in the background.
-
-## ChatGPT-4
-
-The latest language model developed by OpenAI, [ChatGPT-4](https://openai.com/research/chatgpt), has been utilized for assisting in the documentation process and preparing this README file. By generating coherent and contextually relevant text, ChatGPT-4 streamlines the documentation process, ensuring that all aspects of the project are effectively communicated.
-
-# Tests
-
-## Unit/Functional
-
-Currently we are using Jest for unit and functional tests that should cover at least 80% of the functions. All of these tests can be run using:
-
-```bash
-npm run test
-```
-
-## End-To-End
-
-For end-to-end (E2E) testing we will be using the cypress framework. This is on the to-do list.
-
-## Fuzz
-
-For fuzz testing the user interface we use [gremlins.js](https://github.com/marmelab/gremlins.js/). You can unleash the gremlins using db.gremlins() in your web browser's console. By default it runs for 1000 interactions or 10 errors. You will need to ensure the debug plugin is enabled (see settingsManager.js).
-
-## Security
-
-For security testing we are using CodeQL and SonarCloud automatically in the CI/CD pipeline.
-
-# Versioning
-
-We use [SemVer](http://semver.org/) for versioning.
-
-# Style Guide
-
-We use Prettier and ESLint to enforce consistent readable code. Please refer to our [best practices](./contributing.md#best-practices) for more info on styling.
-
-# Contributing
-
-If you are interested in helping with this project, please reference the [Contributing Guidelines](./contributing.md).
+Use Biome for linting, TypeScript for type checks, Vitest for unit tests, and
+Playwright for browser tests. Commands and a manual checklist are in the
+[testing guide](regression-testing.md).

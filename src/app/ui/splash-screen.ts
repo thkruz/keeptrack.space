@@ -81,11 +81,13 @@ export abstract class SplashScreen {
         SplashScreen.handleStartAppButton();
       });
 
-      // Shortcut tips come from the registry, which plugins fill during init,
-      // so the hint is only picked once the UI is up.
+      /*
+       * The hint is set once and never swapped: replacing it here changed the text just as the start button
+       * appeared. Only an empty first pick (no static tips) is filled now that plugins have registered shortcuts.
+       */
       const hintText = getEl('loading-hint-text', true);
 
-      if (hintText) {
+      if (hintText && !hintText.textContent?.trim()) {
         hintText.textContent = SplashScreen.showHint();
       }
     });

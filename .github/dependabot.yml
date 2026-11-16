@@ -18,6 +18,13 @@ updates:
     cooldown:
       default-days: 3
       semver-major-days: 7
+    ignore:
+      # rspack 2.1.0 through 2.3.2 miscompile the production bundle and the app
+      # never boots (2.3.x: `static x = new Self()` becomes a TDZ ReferenceError;
+      # 2.1/2.2: "width is not defined"). Pinned at 2.0.8. Retest a newer
+      # release with the Boot Smoke Test before removing this.
+      - dependency-name: '@rspack/*'
+        versions: ['>=2.1.0']
     groups:
       minor-and-patch:
         update-types:

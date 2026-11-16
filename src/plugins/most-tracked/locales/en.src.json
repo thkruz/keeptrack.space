@@ -1,0 +1,40 @@
+{
+  "plugins": {
+    "MostTracked": {
+      "bottomIconLabel": "Most Tracked",
+      "title": "Most Tracked",
+      "tabs": {
+        "top": "Top 25",
+        "trending": "New & Trending"
+      },
+      "labels": {
+        "results": "Results",
+        "dataActions": "Data Actions"
+      },
+      "status": {
+        "loading": "Loading…",
+        "window": "Last {{hours}} hours",
+        "updated": "updated {{time}}"
+      },
+      "empty": {
+        "top": "No tracking data yet.",
+        "trending": "Nothing new is trending right now."
+      },
+      "refresh": "Refresh",
+      "unknownObject": "Unknown object",
+      "notInCatalog": "Not in the loaded catalog",
+      "unavailable": "Most Tracked is unavailable right now. It will be back in a few minutes.",
+      "selections": "Selections: {{value}}",
+      "people": "People: {{value}}",
+      "privacyNote": "Counts are selections in KeepTrack over the last day, at most 3 per person per object. Approximate and anonymous.",
+      "help": {
+        "overview": "Most Tracked shows the objects KeepTrack users are looking at most right now, like the most-tracked lists on flight trackers. It is a quick way to find launches, reentries and other objects in the news.",
+        "tabsHeading": "The Two Lists",
+        "tabs": "<strong>Top 25</strong> ranks the most-tracked objects over the last day. <strong>New &amp; Trending</strong> shows the most popular objects that were not in the previous day's Top 25, so new and interesting objects are not hidden behind the usual favorites.",
+        "howToUse": "<ol><li>Open <strong>Most Tracked</strong> from the drawer.</li><li>Switch between <strong>Top 25</strong> and <strong>New &amp; Trending</strong>.</li><li>Click a row to select that object and fly to it.</li><li>Click <strong>Refresh</strong> for the latest counts.</li></ol>",
+        "tip1": "The bar shows each object's popularity relative to the first row of the same list.",
+        "tip2": "Greyed-out rows are objects that are not in the catalog you have loaded, so they cannot be selected."
+      }
+    }
+  }
+}

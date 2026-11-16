@@ -89,13 +89,25 @@ describe('SplashScreen_class', () => {
       expect(hints.length).toBeGreaterThan(shortcutHints.length);
     });
 
-    it('fills the hint element once the UI is up', () => {
+    it('keeps the first hint when the UI comes up', () => {
+      const first = getEl('loading-hint-text')?.textContent;
+
       KeyboardShortcutRegistry.clear();
       KeyboardShortcutRegistry.register('OrbitManager', [{ key: 'L', description: 'Toggle orbit lines', callback: () => undefined }]);
       vi.spyOn(Math, 'random').mockReturnValue(0.999999);
-
-      expect(getEl('loading-hint-text')?.textContent?.trim().length).toBeGreaterThan(0);
       EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+
+      expect(first?.trim().length).toBeGreaterThan(0);
+      expect(getEl('loading-hint-text')?.textContent).toBe(first);
+    });
+
+    it('fills an empty hint once the UI is up', () => {
+      KeyboardShortcutRegistry.clear();
+      KeyboardShortcutRegistry.register('OrbitManager', [{ key: 'L', description: 'Toggle orbit lines', callback: () => undefined }]);
+      vi.spyOn(Math, 'random').mockReturnValue(0.999999);
+      getEl('loading-hint-text')!.textContent = '';
+      EventBus.getInstance().emit(EventBusEvent.uiManagerFinal);
+
       // An uppercase key is pressed with Shift, so the tip names the real chord.
       expect(getEl('loading-hint-text')?.textContent).toBe('Press Shift+L: Toggle orbit lines');
     });

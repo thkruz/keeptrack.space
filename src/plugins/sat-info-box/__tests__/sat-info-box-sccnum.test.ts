@@ -108,6 +108,18 @@ describe('SatInfoBox_header_OBJNUM_sccNumForms', () => {
     return getEl(EL.OBJNUM)!.innerHTML;
   };
 
+  it('restores rows hidden for a non-satellite but leaves self-managed rows to their owner', () => {
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      '<div id="t-plain" class="sat-only-info" style="display: none;"></div><div id="t-own" class="sat-only-info" data-kt-self-managed="true" style="display: none;"></div>'
+    );
+    // eslint-disable-next-line dot-notation
+    plugin['updateHeaderData_'](makeSat('25544'));
+
+    expect(getEl('t-plain')!.style.display).toBe('flex');
+    expect(getEl('t-own')!.style.display).toBe('none');
+  });
+
   it('renders a numeric5 sccNum verbatim', () => {
     const sat = makeSat('25544');
 

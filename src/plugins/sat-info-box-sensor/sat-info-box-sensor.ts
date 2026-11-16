@@ -173,6 +173,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           (row) => html`
         <div
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
+          ${row.id === EL.SUN ? 'data-kt-self-managed="true"' : ''}
         >
         <div class="sat-info-key" data-position="top" data-delay="50"
           kt-tooltip="${row.tooltip}"

@@ -12,7 +12,7 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl, writeAttrIfChanged } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeAttrIfChanged, writeHtmlIfChanged } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
@@ -557,7 +557,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (isVisible) {
       showEl(el.parentElement, 'flex');
-      el.innerHTML = value;
+      writeHtmlIfChanged(el, value);
     } else {
       hideEl(el.parentElement);
     }
@@ -632,10 +632,15 @@ export class SatInfoBox extends KeepTrackPlugin {
     setInnerHtml(EL.NAME, obj.name);
 
     if (obj instanceof Satellite || obj instanceof OemSatellite) {
+      /*
+       * Restore only the rows the mission plugin hid for a non-satellite. Rows that decide their own
+       * visibility per selection (apparent magnitude, sun) are skipped: forcing them to flex here and
+       * letting their owner hide them again later changed the box height twice on every selection.
+       */
       KeepTrack.getInstance()
-        .containerRoot.querySelectorAll('.sat-only-info')
-        ?.forEach((el) => {
-          showEl(el as HTMLElement, 'flex');
+        .containerRoot.querySelectorAll<HTMLElement>('.sat-only-info:not([data-kt-self-managed])')
+        .forEach((el) => {
+          showEl(el, 'flex');
         });
     }
 
@@ -645,10 +650,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       const countryCode = obj instanceof OemSatellite ? obj.country : (obj as Satellite).country;
       const sccNum5 = obj instanceof OemSatellite ? obj.sccNum5 : (obj as Satellite).sccNum5;
 
-      if (obj.isSatellite() && sccNum5 === '25544') {
-        flagEl.classList.value = 'fi fi-iss';
-      } else {
-        flagEl.classList.value = `fi ${country2flagIcon(countryCode)}`;
+      const flagClasses = obj.isSatellite() && sccNum5 === '25544' ? 'fi fi-iss' : `fi ${country2flagIcon(countryCode)}`;
+
+      if (flagEl.classList.value !== flagClasses) {
+        flagEl.classList.value = flagClasses;
       }
     }
 

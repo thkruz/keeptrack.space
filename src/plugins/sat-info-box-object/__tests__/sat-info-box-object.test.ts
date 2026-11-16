@@ -51,6 +51,62 @@ describe('SatInfoBoxObject data population', () => {
     vi.unstubAllGlobals();
   });
 
+  describe('deferred object data', () => {
+    const emitSelect = (obj: Satellite) => EventBus.getInstance().emit(EventBusEvent.selectSatData, obj);
+
+    it('does not fill the object card inside the click task and fills it two frames later', () => {
+      const frames: FrameRequestCallback[] = [];
+
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+      const fill = vi.spyOn(p(), 'updateObjectData_').mockImplementation(() => undefined);
+
+      emitSelect(defaultSat);
+      expect(fill).not.toHaveBeenCalled();
+      frames.shift()!(0);
+      expect(fill).not.toHaveBeenCalled();
+      frames.shift()!(0);
+      expect(fill).toHaveBeenCalledTimes(1);
+      expect(fill).toHaveBeenCalledWith(defaultSat);
+    });
+
+    it('runs only the last of several rapid selections', () => {
+      const frames: FrameRequestCallback[] = [];
+
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+      const fill = vi.spyOn(p(), 'updateObjectData_').mockImplementation(() => undefined);
+
+      emitSelect(defaultSat);
+      emitSelect(defaultSat);
+      while (frames.length > 0) {
+        frames.shift()!(0);
+      }
+      expect(fill).toHaveBeenCalledTimes(1);
+    });
+
+    it('drops a pending run when the selection changed', () => {
+      const frames: FrameRequestCallback[] = [];
+
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+      const fill = vi.spyOn(p(), 'updateObjectData_').mockImplementation(() => undefined);
+
+      emitSelect(defaultSat);
+      PluginRegistry.getPlugin(SelectSatManager)!.selectedSat = -1;
+      while (frames.length > 0) {
+        frames.shift()!(0);
+      }
+      expect(fill).not.toHaveBeenCalled();
+    });
+
+    it('builds the catalog RCS statistics once across selections', () => {
+      const catalog = ServiceLocator.getCatalogManager();
+      const getSats = vi.spyOn(catalog, 'getSats');
+
+      p().updateRcsData_(defaultSat);
+      p().updateRcsData_(defaultSat);
+      expect(getSats).toHaveBeenCalledTimes(1);
+    });
+  });
+
   it('registers the summary line right after the title header (order 0.5)', () => {
     const infoBox = PluginRegistry.getPlugin(SatInfoBox)!;
 

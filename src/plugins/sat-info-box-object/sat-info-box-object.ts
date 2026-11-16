@@ -33,6 +33,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
   readonly id = 'SatInfoBoxObject';
   dependencies_: string[] = [SatInfoBox.name];
 
+  private objectDataRevision_ = 0;
   private readonly isObjectDataSectionCollapsed_ = false;
   private readonly isSecondaryDataSectionCollapsed_ = false;
   /** Range of the flag size control, as a fraction of the model's bounding radius. */
@@ -100,7 +101,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
       if (SatInfoBox.isCurrentSelection(obj)) {
-        this.updateObjectData_(obj);
+        this.scheduleObjectData_(obj);
       }
     });
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, this.updateSecondaryVisibility_.bind(this));
@@ -239,7 +240,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
         ${
           settingsManager.plugins.SatInfoBoxObject?.isShowAppMag !== false
             ? html`
-        <div class="sat-info-row sat-only-info" id="${EL.APPMAG_ROW}" style="display: none;">
+        <div class="sat-info-row sat-only-info" id="${EL.APPMAG_ROW}" data-kt-self-managed="true" style="display: none;">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.AppMag.tooltip')}">${t7e('SatInfoBoxObject.AppMag.label')}
           </div>
@@ -302,6 +303,24 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
       hideEl('secondary-sat-info');
       hideEl('sec-angle-link');
     }
+  }
+
+  /**
+   * The object card sits below the header, so its fill (catalog correlation tables, magnitudes, RCS) waits two
+   * frames instead of running inside the click task. A newer selection supersedes a pending run, and a run whose
+   * selection changed in the meantime is dropped.
+   */
+  private scheduleObjectData_(obj?: BaseObject): void {
+    const revision = ++this.objectDataRevision_;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (revision !== this.objectDataRevision_ || !SatInfoBox.isCurrentSelection(obj)) {
+          return;
+        }
+        this.updateObjectData_(obj);
+      });
+    });
   }
 
   private updateObjectData_(obj?: BaseObject) {
@@ -667,6 +686,23 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     }
   }
 
+  /** Catalog RCS means, rebuilt only when the catalog is reloaded; a full-catalog pass per selection cost ~5 ms. */
+  private rcsStatsCache_: { objectCache: unknown; count: number; stats: ReturnType<typeof buildCatalogRcsStats> } | null = null;
+
+  private getRcsStats_() {
+    const catalog = ServiceLocator.getCatalogManager();
+    const cache = this.rcsStatsCache_;
+
+    if (cache && cache.objectCache === catalog.objectCache && cache.count === catalog.numSatellites) {
+      return cache.stats;
+    }
+    const stats = buildCatalogRcsStats(catalog.getSats());
+
+    this.rcsStatsCache_ = { objectCache: catalog.objectCache, count: catalog.numSatellites, stats };
+
+    return stats;
+  }
+
   private updateRcsData_(sat: Satellite) {
     const satRcsEl = getEl(EL.RCS);
 
@@ -693,7 +729,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     // Catalog-mining is the most expensive layer; build the stats snapshot
     // once on demand here. Slower than the color scheme's path (which caches
     // it per recolor) but the info box runs at most a few times per second.
-    const stats = buildCatalogRcsStats(ServiceLocator.getCatalogManager().getSats());
+    const stats = this.getRcsStats_();
     const result = estimateRcsWithSource(sat, stats);
 
     if (result === null) {

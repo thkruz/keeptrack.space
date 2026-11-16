@@ -807,8 +807,88 @@ export class PluginDrawer {
     }
 
     let rafId = 0;
+    let lastLeft = '';
+    let lastBottom = '';
+    let pendingObserver: IntersectionObserver | null = null;
+    const apply = (menuRight: number, infoBox: { left: number; top: number; right: number } | null) => {
+      const placement = computeFooterPlacement({ viewportWidth: window.innerWidth, viewportHeight: window.innerHeight, menuRight, infoBox });
+      const left = `${placement.left}px`;
+      const bottom = `${placement.bottom}px`;
+
+      if (left !== lastLeft) {
+        lastLeft = left;
+        footer.style.setProperty('--drawer-footer-left', left);
+      }
+      if (bottom !== lastBottom) {
+        lastBottom = bottom;
+        footer.style.setProperty('--drawer-footer-bottom', bottom);
+      }
+    };
+
+    /*
+     * A new IntersectionObserver reports every target once, with the rect the browser computed in its own
+     * layout pass. Nothing is read synchronously, so this never forces a style recalc or layout, whatever the
+     * rest of the app wrote since the last frame (#554: getComputedStyle here cost 269 ms in a short trace).
+     * A hidden menu or info box (display: none) reports an empty rect.
+     */
+    const measureWithObserver = () => {
+      pendingObserver?.disconnect();
+      const infoEl = document.getElementById('sat-infobox');
+      const observer = new IntersectionObserver((entries) => {
+        observer.disconnect();
+        if (pendingObserver === observer) {
+          pendingObserver = null;
+        }
+        let menuRight = 0;
+        let infoBox: { left: number; top: number; right: number } | null = null;
+
+        for (const entry of entries) {
+          const rect = entry.boundingClientRect;
+
+          if (rect.width <= 0 || rect.height <= 0) {
+            continue;
+          }
+          if (entry.target === infoEl) {
+            if (window.innerWidth >= 640) {
+              infoBox = { left: rect.left, top: rect.top, right: rect.right };
+            }
+          } else {
+            menuRight = Math.max(menuRight, rect.right);
+          }
+        }
+        apply(menuRight, infoBox);
+      });
+
+      let observed = 0;
+
+      document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((menu) => {
+        // Inline styles are plain attribute reads; a closed menu is skipped without asking for its rect.
+        if (menu.style.display !== 'none' && menu.style.visibility !== 'hidden') {
+          observer.observe(menu);
+          observed++;
+        }
+      });
+      if (infoEl && infoEl.style.display !== 'none') {
+        observer.observe(infoEl);
+        observed++;
+      }
+      if (observed === 0) {
+        // Nothing to measure, and an observer with no targets never calls back.
+        observer.disconnect();
+        apply(0, null);
+
+        return;
+      }
+      pendingObserver = observer;
+    };
     const update = () => {
       rafId = 0;
+      if (typeof IntersectionObserver !== 'undefined') {
+        measureWithObserver();
+
+        return;
+      }
+      // No IntersectionObserver (old browsers, jsdom): read the rects directly.
       let menuRight = 0;
 
       document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((menu) => {
@@ -834,10 +914,7 @@ export class PluginDrawer {
           infoBox = { left: r.left, top: r.top, right: r.right };
         }
       }
-      const placement = computeFooterPlacement({ viewportWidth: window.innerWidth, viewportHeight: window.innerHeight, menuRight, infoBox });
-
-      footer.style.setProperty('--drawer-footer-left', `${placement.left}px`);
-      footer.style.setProperty('--drawer-footer-bottom', `${placement.bottom}px`);
+      apply(menuRight, infoBox);
     };
     const schedule = () => {
       if (!rafId) {

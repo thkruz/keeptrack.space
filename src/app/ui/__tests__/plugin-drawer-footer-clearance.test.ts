@@ -75,4 +75,42 @@ describe('utility footer side menu clearance', () => {
     vi.runAllTimers();
     expect(spy).toHaveBeenCalled();
   });
+
+  it('measures through an IntersectionObserver without any synchronous style or rect read', () => {
+    setMenuRight_(800);
+    Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
+    const menu = document.getElementById('wide-menu') as HTMLElement;
+    const closed = document.createElement('div');
+
+    closed.className = 'side-menu-parent';
+    closed.style.display = 'none';
+    document.body.appendChild(closed);
+
+    const observed: Element[] = [];
+    let deliver: () => void = () => undefined;
+
+    class FakeIntersectionObserver {
+      constructor(private readonly cb_: (entries: { target: Element; boundingClientRect: DOMRect }[]) => void) {}
+      observe(el: Element) {
+        observed.push(el);
+        deliver = () => this.cb_(observed.map((target) => ({ target, boundingClientRect: { left: 0, top: 0, right: 800, bottom: 700, width: 800, height: 700 } as DOMRect })));
+      }
+      disconnect() {
+        // Nothing to release in the fake.
+      }
+    }
+    vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
+    const styleSpy = vi.spyOn(window, 'getComputedStyle');
+    const rectSpy = vi.spyOn(menu, 'getBoundingClientRect');
+
+    (new PluginDrawer() as unknown as { observeSideMenuClearance_: () => void }).observeSideMenuClearance_();
+    vi.runAllTimers();
+
+    expect(observed).toEqual([menu]);
+    expect(footerLeft_()).toBe('');
+    deliver();
+    expect(footerLeft_()).toBe('1083px');
+    expect(styleSpy).not.toHaveBeenCalled();
+    expect(rectSpy).not.toHaveBeenCalled();
+  });
 });

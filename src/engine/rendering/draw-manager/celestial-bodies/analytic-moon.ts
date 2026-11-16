@@ -84,8 +84,8 @@ export class AnalyticMoon extends PlanetMoon {
   declare readonly RADIUS: number;
   declare orbitalPeriod: Seconds;
   declare color: rgbaArray;
-  protected declare readonly shape?: IrregularBodyShape;
-  protected declare readonly primeMeridianOffsetRad: number;
+  declare protected readonly shape?: IrregularBodyShape;
+  declare protected readonly primeMeridianOffsetRad: number;
   readonly parentBody: SolarBody;
   readonly semiMajorAxisKm: number;
   readonly elements: MoonElements;

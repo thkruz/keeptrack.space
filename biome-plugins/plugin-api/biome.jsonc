@@ -3,7 +3,7 @@
 // not part of `npm run lint`, which excludes third-party plugin code. Only the
 // plugin-api-imports grit rule runs; every built-in rule is off.
 {
-  "$schema": "https://biomejs.dev/schemas/2.5.4/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.6.6/schema.json",
   "root": true,
   "vcs": { "enabled": false },
   "files": {
@@ -13,7 +13,7 @@
   "assist": { "enabled": false },
   "linter": {
     "enabled": true,
-    "rules": { "recommended": false }
+    "rules": { "preset": "none" }
   },
   "plugins": ["../plugin-api-imports.grit"]
 }

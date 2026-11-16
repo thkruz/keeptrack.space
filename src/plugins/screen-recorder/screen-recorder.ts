@@ -48,6 +48,10 @@ export class ScreenRecorder extends KeepTrackPlugin {
     ];
   }
 
+  getDisabledReason(): string | null {
+    return this.isCompatibilityIssue_ ? t7e('ScreenRecorder.recordingUnavailable') : null;
+  }
+
   onBottomIconClick(): void {
     if (this.isCompatibilityIssue_) {
       errorManagerInstance.warn(t7e('ScreenRecorder.recordingUnavailable'));

@@ -100,9 +100,88 @@ export class VcrPlugin extends KeepTrackPlugin {
       this.fastForwardBtn_?.addEventListener('click', this.handleFastForward.bind(this));
     });
 
+    EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => this.initNarrowPopover_());
+
     EventBus.getInstance().on(EventBusEvent.propRateChanged, this.onPropRateChanged_.bind(this));
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, this.onPropRateChanged_.bind(this));
     EventBus.getInstance().on(EventBusEvent.staticOffsetChange, this.onStaticOffsetChanged_.bind(this));
+  }
+
+  /**
+   * Narrow widths hide #vcr-container from the bar (vcr.css); the clock's mode label toggles it as a popover instead (#367).
+   * Delegated listeners, because the clock block is built by another plugin.
+   */
+  private initNarrowPopover_(): void {
+    const status = document.getElementById('datetime-status');
+
+    if (status) {
+      status.setAttribute('role', 'button');
+      status.setAttribute('tabindex', '0');
+      status.dataset.vcrToggle = 'true';
+    }
+    // #nav-wrapper is its own stacking context, so the Pro access timeline (z 10001) paints over anything inside it.
+    // While open the container lives directly under <body> (z-index in vcr.css), and goes back to the bar on close.
+    const open = (vcr: HTMLElement) => {
+      if (!vcr.dataset.vcrHome) {
+        vcr.dataset.vcrHome = 'nav';
+        document.body.appendChild(vcr);
+      }
+      vcr.classList.add('vcr-popover-open');
+      // One tap, one panel: the clock's date picker yields to the popover (#388).
+      document.dispatchEvent(new CustomEvent('kt-vcr-popover-open'));
+    };
+    const close = () => {
+      const vcr = document.getElementById('vcr-container');
+
+      if (!vcr) {
+        return;
+      }
+      vcr.classList.remove('vcr-popover-open');
+      if (vcr.dataset.vcrHome) {
+        delete vcr.dataset.vcrHome;
+        const navRight = document.getElementById(TopMenu.TOP_RIGHT_ID);
+        const navWrapper = document.getElementById(TopMenu.NAV_WRAPPER_ID);
+
+        if (navRight?.parentElement) {
+          navRight.before(vcr);
+        } else {
+          navWrapper?.appendChild(vcr);
+        }
+      }
+    };
+    const toggle = () => {
+      const vcr = document.getElementById('vcr-container');
+
+      if (!vcr) {
+        return;
+      }
+      if (vcr.classList.contains('vcr-popover-open')) {
+        close();
+      } else {
+        open(vcr);
+      }
+    };
+
+    document.addEventListener('click', (evt) => {
+      const target = evt.target as Element | null;
+      // A button handler may swap its own icon, detaching the click target before this runs; use the path taken at dispatch (#370).
+      const path = evt.composedPath();
+      const inVcr = path.some((n) => (n as Element).id === 'vcr-container');
+
+      if (target?.closest('#datetime-status')) {
+        toggle();
+      } else if (!inVcr) {
+        close();
+      }
+    });
+    document.addEventListener('keydown', (evt) => {
+      if (evt.key === 'Escape') {
+        close();
+      } else if ((evt.key === 'Enter' || evt.key === ' ') && (evt.target as Element | null)?.closest?.('#datetime-status')) {
+        evt.preventDefault();
+        toggle();
+      }
+    });
   }
 
   verifyTimeControl(): boolean {

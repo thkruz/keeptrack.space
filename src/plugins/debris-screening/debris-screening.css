@@ -152,3 +152,9 @@
     color: white;
   }
 }
+/* #214: the primary NORAD ID is a real value (read-only), not a dim placeholder */
+#debris-screening-menu-form input[disabled][id$='-scc'] {
+  color: var(--kt-text-primary, #fff);
+  -webkit-text-fill-color: currentcolor;
+  opacity: 1;
+}

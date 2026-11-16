@@ -48,6 +48,7 @@
       "downloadButton": "Descargar informe",
       "copyButton": "Copiar al portapapeles",
       "sensorNote": "Estos informes requieren tener un sensor seleccionado.",
+      "sensorLimitNote": "Usando {name}: elevación mínima {minEl}°. Los pasos por debajo no se informan.",
       "sections": {
         "orbitPosition": "Órbita y posición",
         "sensor": "Sensor",
@@ -112,7 +113,11 @@
           "windowLine": "Periodo del informe: {start} a {end} UTC, paso: {step} s",
           "generatedWallClock": "Generado (hora real)",
           "appVersion": "Versión de KeepTrack",
-          "ricConvention": "Convención RIC"
+          "ricConvention": "Convención RIC",
+          "passCaveat": "Las horas locales del sitio usan la zona {zone}. Las ventanas muestran solo acceso geométrico, no prueba de que se pueda recibir una señal. La elevación máxima está refinada al segundo más cercano.",
+          "passCaveatDisplay": "Las horas locales usan la zona de visualización {zone}. Las ventanas muestran solo acceso geométrico, no prueba de que se pueda recibir una señal. La elevación máxima está refinada al segundo más cercano.",
+          "sensorCoverage": "Cubre solo el sensor {sensor}.",
+          "sensorCoverageOthers": "Cubre solo el sensor {sensor}. No se incluyen otros {count} sensores o sitios activos."
         },
         "titles": {
           "aer": "Informe de azimut, elevación y alcance",
@@ -157,7 +162,11 @@
           "radialKm": "Radial (km)",
           "intrackKm": "En la trayectoria (km)",
           "crosstrackKm": "Transversal (km)",
-          "relSpeed": "Vel. rel. (km/s)"
+          "relSpeed": "Vel. rel. (km/s)",
+          "timeLocal": "Hora local",
+          "riseLocal": "Hora de salida (local)",
+          "setLocal": "Hora de puesta (local)",
+          "maxElTimeLocal": "Hora de elevación máx. (local)"
         },
         "empty": {
           "noPasses": "¡No se encontraron pases!",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "continuo",
-          "start": "visible al inicio",
-          "end": "visible al final"
+          "start": "visible al inicio; máximo dentro de la ventana",
+          "end": "visible al final; máximo dentro de la ventana"
         },
         "illumination": {
           "sun": "Sí",

@@ -10,6 +10,7 @@
         "inclination": "Нахил",
         "launchingNorthOrSouth": "Запуск на північ чи на південь",
         "launchFacility": "Місце запуску",
+        "searchFacilities": "Пошук майданчиків або країн...",
         "north": "Північ",
         "south": "Південь"
       },

@@ -50,6 +50,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, IKeyboardShortcut, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
+import { brandedCanvasDataUrl } from '@app/engine/utils/branding';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
@@ -222,6 +223,27 @@ export class StereoMap extends KeepTrackPlugin {
     };
   }
 
+  /**
+   * The Pro flat-earth map, when this build has it. The free 2D map is redundant next to it (#220), so every
+   * way of opening this map (M key, command palette) is handed to the flat map instead. Looked up by id
+   * because the Pro plugin is not importable from the OSS tree.
+   */
+  protected getFlatMapView_(): { bottomIconCallback: () => void } | null {
+    return PluginRegistry.getPluginByName<KeepTrackPlugin & { bottomIconCallback: () => void }>('FlatMapView');
+  }
+
+  /** Redirects to the Pro flat map when present (toggling it again returns to 3D); otherwise opens this map. */
+  override bottomMenuClicked(): void {
+    const flatMap = this.getFlatMapView_();
+
+    if (flatMap) {
+      flatMap.bottomIconCallback();
+
+      return;
+    }
+    super.bottomMenuClicked();
+  }
+
   getKeyboardShortcuts(): IKeyboardShortcut[] {
     return [
       {
@@ -255,7 +277,7 @@ export class StereoMap extends KeepTrackPlugin {
       return;
     }
 
-    const dataUrl = this.canvas_.toDataURL('image/png');
+    const dataUrl = brandedCanvasDataUrl(this.canvas_);
     const link = document.createElement('a');
 
     link.download = 'stereo-map.png';
@@ -267,6 +289,11 @@ export class StereoMap extends KeepTrackPlugin {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      // The Pro flat map replaces this map's bottom icon (#220); M and the palette redirect in bottomMenuClicked
+      if (this.getFlatMapView_()) {
+        hideEl(this.bottomIconElementName);
+      }
+
       // v13 marker: the wrapper (and the Pro secondary menu) are generated, not authored
       getEl('map-menu')?.classList.add('kt-ui-v13');
       getEl('map-menu-secondary', true)?.classList.add('kt-ui-v13');
@@ -624,6 +651,33 @@ export class StereoMap extends KeepTrackPlugin {
     });
     ctx.fillText(utc, originX, originY + contentH);
     ctx.restore();
+    this.clearMarkersUnderLegend_({
+      left: originX - 8,
+      top: originY - 18,
+      right: originX - 8 + Math.min(contentW, this.canvas_.width - 36) + 16,
+      bottom: originY - 18 + contentH + 24,
+    });
+  }
+
+  /**
+   * The ground-track markers are DOM images stacked above the canvas, so they
+   * drew over the legend text. Hide the ones whose box overlaps the legend box.
+   */
+  private clearMarkersUnderLegend_(box: { left: number; top: number; right: number; bottom: number }): void {
+    const half = this.halfDotSize_;
+
+    for (let i = 1; i <= 50; i++) {
+      const dot = getEl(`map-look${i}`, true) as HTMLImageElement | null;
+
+      if (!dot) {
+        continue;
+      }
+      const x = Number.parseFloat(dot.style.left);
+      const y = Number.parseFloat(dot.style.top);
+      const covered = Number.isFinite(x) && Number.isFinite(y) && x + 2 * half > box.left && x < box.right && y + 2 * half > box.top && y < box.bottom;
+
+      dot.style.visibility = covered ? 'hidden' : '';
+    }
   }
 
   /**

@@ -1,0 +1,370 @@
+/*
+ * Floating utility pill clearance and phone header layout (pro issues #143, #171, #195, #231, #292, #293, #294).
+ *
+ * The pill (.drawer-utility-footer) is fixed at the bottom centre: 12px offset + ~48px tall. Padding inside a
+ * scroll area only clears it at the last scroll position, so rows covered by it mid-scroll (Inclination,
+ * Maximum Range, Optical gate text). Instead the panels end ABOVE the pill band, so nothing is under it at any
+ * scroll position. Selectors carry a `body` prefix to win over plugin-drawer.css without editing it.
+ */
+:root {
+  /* Pill is 48 px tall on the bottom edge (#464); 68 px left a 20 px band where info-box rows showed through (#469). */
+  --pill-clearance: calc(48px + env(safe-area-inset-bottom, 0px));
+  --sat-infobox-footer-height: 48px;
+}
+
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  /* Side menus and panes stop above the pill band; the old 96px bottom padding is no longer needed. */
+  body .side-menu-parent,
+  body [id$="-secondary"].side-menu-parent {
+    bottom: var(--pill-clearance) !important;
+    max-height: calc(100dvh - var(--top-menu-height) - var(--pill-clearance)) !important;
+  }
+
+  body .side-menu {
+    padding-bottom: 16px !important;
+  }
+
+  /*
+   * Panel headers: the shared .btn class gave icon buttons 16px side padding (40px wide), and the title text had
+   * min-width 50%, so the 4th Look Angles button and the Best Passes close button ran past the right edge (#293).
+   * In a column flex pane the header also shrank (overflow hidden, min-height 0) so its buttons stuck out above
+   * the pane top under the nav bar (#171).
+   */
+  body .side-menu-title-bar,
+  body .secondary-title-bar {
+    flex: 0 0 auto;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+
+  /*
+   * The primary bar bleeds 1 rem past the menu padding on both sides (negative margins), but max-width: 100% capped
+   * its width at the content box, so it ended 1 rem short of the card column's right edge (#382).
+   */
+  body .side-menu-title-bar:not(.secondary-title-bar) {
+    max-width: none;
+  }
+
+  body .side-menu-title-text {
+    min-width: 0 !important;
+  }
+
+  body .side-menu-title-right {
+    gap: 4px;
+    margin-right: 8px;
+  }
+
+  body .side-menu-title-right .icon-btn {
+    flex: 0 0 32px;
+    width: 32px;
+    min-width: 0;
+    height: 32px;
+    padding: 6px;
+    line-height: normal;
+    box-sizing: border-box;
+  }
+
+  /* Hover tooltips stick after a tap on touch and paint a clipped dark box over the header (#294). */
+  [data-tooltip]::before,
+  [data-tooltip]::after {
+    display: none !important;
+  }
+
+  /* Toggle rows: label text wraps beside the lever, not under it (#294 "Step bins"). */
+  body .side-menu .switch label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  body .side-menu .switch label .lever {
+    flex: 0 0 auto;
+    margin: 0 4px 0 0;
+  }
+
+  /*
+   * Sat info box (#460, supersedes the #195 raised box): full width, docked to the bottom edge with no gap. The
+   * utility pill sits inside a non-scrolling strip at the bottom of the box (its own bottom border, painted in the
+   * box background), so box and controls read as one surface and scrolled rows never run under the pill. The box
+   * is capped at 45% of the viewport (dvh where supported) and scrolls inside.
+   */
+  body #sat-infobox {
+    bottom: 0;
+    box-sizing: border-box;
+    border-bottom: calc(var(--sat-infobox-footer-height) + env(safe-area-inset-bottom, 0px)) solid var(--color-dark-background);
+    padding-bottom: 0;
+    max-height: 45vh;
+    max-height: 45dvh;
+    overscroll-behavior: contain;
+  }
+
+  body #sat-infobox::after {
+    height: 4px;
+  }
+
+  /* The plain-words subtitle under the satellite name is dropped on phones (#464): it costs ~30 px of the 45% box, and
+     the data rows below carry the same facts. The element sets inline display, hence !important. */
+  body #sat-infobox #sat-summary.sat-summary {
+    display: none !important;
+  }
+
+  /* The sponsor ad is dropped from the phone info box (#464, Ted 2026-11-14): its ~362 px block pushed every row past
+     the 5th out of the 45% box. MobileManager also leaves SatInfoBoxSponsor off on phones; this covers narrow windows. */
+  body #sat-infobox .sat-sponsor-section {
+    display: none !important;
+  }
+
+  /* Zoom buttons sit above the docked info box (45% tall at most). */
+  #mobile-zoom-buttons.mobile-zoom-raised {
+    bottom: calc(45% + 12px);
+  }
+
+  /* Top bar (#231): the clock block may not outgrow its slot, so the date cannot run over the logo and the zone
+     chip stays inside the clock column instead of sliding under Search. */
+  body #nav-top-center {
+    flex: 2 1 0;
+    width: auto;
+    min-width: 0;
+    margin-left: 4px;
+    overflow: hidden;
+  }
+
+  body #datetime-text {
+    font-size: clamp(10px, 3vw, 13px);
+    white-space: nowrap;
+    padding: 0 !important;
+    border-left: 0 !important;
+  }
+
+  body #datetime-status {
+    font-size: 0.6rem;
+  }
+
+  body #datetime-zone {
+    max-width: 100%;
+  }
+
+  /* One-row clock (#234): at 390 px the slot holds the time, the mode label and the zone chip. The date leaves the
+     status line here (it is the one repeat-free piece the phone can lose; the date picker still shows it). */
+  body #datetime {
+    justify-content: flex-start;
+    column-gap: 4px;
+    max-width: 100%;
+  }
+
+  body #datetime .datetime-status-day {
+    display: none;
+  }
+
+  body #datetime-zone {
+    width: 48px;
+    font-size: 0.6rem;
+    padding: 0 2px;
+  }
+}
+
+/* Desktop: the pill is centred at the bottom and covered table cells in wide panes (Tip and Cue Cue LOS, #292). */
+@media (min-width: 640px) {
+  .side-menu::after {
+    content: '';
+    display: block;
+    height: 64px;
+  }
+
+  .side-menu-settings::after {
+    content: '';
+    flex: 0 0 56px;
+  }
+}
+
+/*
+ * Phone touch targets (#157): every tappable control reaches 44x44 px. Laptop is untouched (this block is phone
+ * only). Where a control must keep its small visual size, padding plus an equal negative margin (or an outline
+ * drawn at the old edge) enlarges the hit area without moving neighbours.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  /* Time-zone chip: 44 px tall select; the visible chip is the outline drawn at the old content edge. */
+  body #datetime #datetime-zone {
+    box-sizing: border-box;
+    /* #404: size to the short label (EST, CET, GMT+5:30); a fixed 52 px clipped "EST (UTC-05:00)" and overlapped LIVE */
+    field-sizing: content;
+    width: auto;
+    max-width: 76px;
+    min-width: 44px;
+    height: 44px;
+    margin: 0;
+    /* 10 px left clears the 5 px outline inset plus breathing room; the right side leaves the picker arrow room. */
+    padding: 0 4px 0 10px;
+    border: 0;
+    /* The outline is inset equally on all sides, so it must leave room for the whole select: a 52x44 box with a 5 px
+       inset draws a 42x34 chip that encloses the zone text and the picker arrow instead of cutting through them (#157). */
+    outline: 1px solid currentcolor;
+    outline-offset: -5px;
+    border-radius: 8px;
+  }
+
+  /* Keyboard/switch focus must differ from the resting 1 px chip: thicker accent ring plus a tint (#157). */
+  body #datetime #datetime-zone:focus-visible {
+    outline: 3px solid var(--kt-accent-light, #e01a0e);
+    outline-offset: -4px;
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+
+  /* Utility pill (#464): collapsed square and expanded icons are 44 px; the pill is 48 px with 1 px padding and
+     sits on the bottom edge, so the 48 px strip under the sat info box holds it exactly. */
+  /* Id selectors: plugin-drawer.css restates bottom/padding for the pill (12px lift, the touch :not(.expanded):hover
+     reset to 6px padding), and the class selector here lost to it, leaving a 58 px pill 12 px above the edge that
+     covered the last row above the 48 px strip. */
+  body #drawer-utility-footer {
+    bottom: env(safe-area-inset-bottom, 0px);
+    max-width: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    height: 48px;
+    padding: 1px;
+    box-sizing: border-box;
+  }
+
+  body #drawer-utility-footer::before {
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  body #drawer-utility-footer:not(.expanded):hover {
+    max-width: 48px;
+    padding: 1px;
+  }
+
+  body #drawer-utility-footer.expanded {
+    max-width: 90vw;
+    padding: 1px 8px;
+  }
+
+  body .drawer-utility-icons {
+    gap: 0;
+  }
+
+  /* Stated with !important and flex-basis: the 32 px desktop size was still winning the height on a phone (#157) */
+  body .drawer-utility-icon {
+    box-sizing: border-box;
+    flex: 0 0 44px;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/*
+ * Phone top bar (#404): menu, logo, clock + LIVE, zone and Search share one row at 360 to 430 px with nothing cut
+ * off. The zone control is a borderless text chip ("UTC", no arrow, no outline) that stays a 44 px touch target; a
+ * non-UTC zone keeps the caution colour. The sensor name leaves the bar (the Sensors tab shows it). Phone only.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  body #datetime #datetime-zone,
+  body.drawer-mode #datetime #datetime-zone {
+    width: auto;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 2px;
+    font-size: max(12px, 0.75rem);
+    text-align: center;
+    text-align-last: center;
+    border: 0;
+    outline: 0;
+    background-color: transparent;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  body #datetime #datetime-zone:focus-visible {
+    outline: 2px solid var(--kt-accent-light, #e01a0e);
+    outline-offset: -4px;
+  }
+
+  body #datetime-status {
+    font-size: max(12px, 0.75rem);
+  }
+
+  body.drawer-mode #sensor-selected-container,
+  body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container,
+  body.drawer-mode.is-mobile-mode #sensor-selected-container {
+    display: none !important;
+  }
+
+  /* 360 px: the logo (flex-shrink 0, margin-right auto) used to overlap the clock slot; it keeps its own width and the
+     clock slot takes the rest, so the two cannot overlap. */
+  body.drawer-mode .nav-logo {
+    margin-right: 0;
+    padding-left: 0.25rem;
+  }
+
+  body.drawer-mode #nav-top-center {
+    flex: 1 1 0;
+    margin-left: 6px;
+  }
+
+  /* Desktop UA at 360 to 430 px keeps the wordmark logo (111 px wide), which pushed Search 4 px past the right edge.
+     Cap it so the bar fits; the icon logo on the phone UA is already narrower than the cap. */
+  body.drawer-mode .nav-logo img {
+    width: auto;
+    height: auto;
+    max-height: 20px;
+    max-width: 64px;
+    object-fit: contain;
+  }
+
+  /* #404 desktop UA: the collapsed Search icon sat in a holder that still carried the 5 px left border and the input's
+     3 px side margins, so the 44 px icon overran the right edge by 4 px at 360 to 430 px. Zero both. */
+  body.drawer-mode #search-holder,
+  body.drawer-mode #search-holder.search-slide-up {
+    border-left: 0 !important;
+  }
+
+  body.drawer-mode #search-holder input[type='search'] {
+    margin: 0;
+  }
+
+  /* #404: centre the zone text vertically in its 44 px box so it lines up with the clock and LIVE label. */
+  body #datetime #datetime-zone {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* A non-UTC zone label ("EST (UTC-05:00)") is about 95 px wide; the chip is capped so it cannot push Search off. */
+  body #datetime #datetime-zone {
+    max-width: 72px;
+  }
+
+  /* #405: the rule above sets appearance: none for the chip; keep the themed customizable picker where supported. */
+  @supports (appearance: base-select) {
+    body #datetime #datetime-zone,
+    body.drawer-mode #datetime #datetime-zone {
+      appearance: base-select;
+    }
+  }
+}
+
+/*
+ * Phone toasts (#449, #457): the stack used to sit at top: 75px, over the top bar controls (search, clock) and the
+ * Watchlist / Sensors row for its whole 5 s life. On a phone it docks to the bottom, above the floating pill, where it
+ * covers only globe. The search-results rule in style.common.css (bottom: 7%) keeps working because it sets the same
+ * edge; this one is more specific and also clears the pill.
+ */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  body.is-mobile-mode #toast-container,
+  body.is-mobile-mode.search-results-open #toast-container {
+    top: auto;
+    bottom: calc(var(--pill-clearance) + 8px);
+    left: 0;
+    right: 0;
+    min-width: 0;
+    max-width: 100vw;
+    padding: 0 8px;
+    box-sizing: border-box;
+  }
+}

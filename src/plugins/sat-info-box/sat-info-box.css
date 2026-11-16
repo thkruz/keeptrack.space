@@ -51,10 +51,6 @@
   background: color-mix(in srgb, var(--color-dark-border) 85%, white);
 }
 
-#sat-infobox a {
-  color: white;
-}
-
 .sat-info-row {
   padding: 2px 6px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -117,9 +113,10 @@
 #sensor-sat-info,
 #sat-mission-data {
   transition: max-height 0.5s ease-in-out;
-  max-height: 1000px;
-  /* Set this to a value larger than the content's height */
-  overflow: hidden;
+  max-height: 5000px;
+  /* Larger than any section: 1000px clipped long mission sections such as ISS (GCAT row; #195 phone, #545 desktop) */
+  /* clip, not hidden: hidden makes the wrapper the headers' scroll container so #sat-infobox snap never applies (#423) */
+  overflow: clip;
   margin: 0px;
 }
 
@@ -150,6 +147,12 @@
   overflow-y: auto;
   scrollbar-gutter: auto;
   z-index: 4;
+  /* Section headers (Actions etc.) snap to the top edge when a scroll ends near them, so a header is never left half cut (#423) */
+  scroll-snap-type: y proximity;
+}
+
+#sat-infobox .sat-info-section-header {
+  scroll-snap-align: start;
 }
 
 /* At native browser zoom the desktop CSS viewport may drop below 1024px.
@@ -181,4 +184,341 @@
 .sat-info-copyable:hover {
   color: var(--color-dark-text-accent);
   text-decoration: underline dotted;
+}
+
+/* Keyboard users can focus and scroll the panel; the copy button sits in the title row. */
+#sat-infobox:focus-visible {
+  outline: 2px solid var(--kt-focus-ring, #4da3ff);
+  outline-offset: -2px;
+}
+
+.sat-info-copy-values {
+  margin-left: 8px;
+  padding: 0;
+  line-height: 0;
+  color: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.sat-info-copy-values:focus-visible {
+  outline: 2px solid var(--kt-focus-ring, #4da3ff);
+}
+
+/* Plain-language definitions under the orbit term keys (Period, Apogee, Right Asc. and so on) */
+.sat-info-row--help {
+  flex-wrap: wrap;
+}
+
+.sat-info-key--help {
+  cursor: help;
+  text-decoration: underline dotted rgba(255, 255, 255, 0.4);
+  text-underline-offset: 2px;
+}
+
+/* Every key with a tooltip reads as explainable, not only the orbit terms with a help line (#273) */
+#sat-infobox .sat-info-key[kt-tooltip]:not(.sat-info-key--help) {
+  cursor: help;
+  text-decoration: underline dotted rgba(255, 255, 255, 0.4);
+  text-underline-offset: 2px;
+}
+
+.sat-info-key--help:focus-visible {
+  outline: 2px solid var(--color-dark-text-accent, #6cf);
+  outline-offset: 1px;
+}
+
+.sat-info-help {
+  flex: 0 0 100%;
+  margin: 2px 0 1px;
+  font-size: 11px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.sat-info-help[hidden] {
+  display: none;
+}
+
+/* Info circle after a short value; the explanation lives in its kt-tooltip.
+   The element itself is the 24 px touch target (negative margins keep the row layout of a 12 px circle);
+   the visible 12 px ring is drawn by ::before. */
+.sat-info-circle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  margin: -6px -6px -6px -2px;
+  font-size: 9px;
+  font-style: italic;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: help;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sat-info-circle::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 12px;
+  height: 12px;
+  box-sizing: border-box;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.sat-info-circle:hover::before,
+.sat-info-circle:focus-visible::before {
+  opacity: 1;
+}
+
+.sat-info-circle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -4px;
+  border-radius: 50%;
+}
+
+/* One placement rule (#273): the info circle always follows the value, on the same line, never wrapped alone.
+   Rows whose value is rewritten wholesale (sensor rows) keep the circle as a sibling inside this wrapper. */
+.sat-info-value-wrap {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  float: right;
+  width: 45%;
+  min-width: 0;
+}
+
+.sat-info-value-wrap > .sat-info-value {
+  float: none;
+  width: auto;
+  min-width: 0;
+  /* #357: the value takes the free width so the info circle always sits at the wrap's right edge (one column) */
+  flex: 1 1 auto;
+  /* #355: long localized values ("Außerhalb des Sichtfelds") wrap instead of ending in an ellipsis */
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+.sat-info-value-wrap > .sat-info-circle {
+  flex: 0 0 auto;
+}
+
+/* Room for the 24 px circle inside the clipped value box */
+/* #357: the padding is cancelled by an equal negative margin so these rows are not 8 px taller than their neighbours;
+   the circle sits at the right edge so every row's circle shares one x. */
+.sat-info-value:has(.sat-info-circle) {
+  /* Grid, not flex: the bare text is an anonymous item, and as a flex item a long value ("0.0750 km (default)") could not
+     shrink and pushed the circle out of the column (#357). minmax(0, 1fr) lets the text wrap inside its track. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 4px;
+  padding-block: 4px;
+  margin-block: -4px;
+  overflow: visible;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+}
+
+.sat-info-value:has(.sat-info-circle) > .sat-info-circle {
+  justify-self: end;
+}
+
+/* #357: public/css/responsive-lg.css gives every .sat-info-value `padding: 0 25px; width: 220px` from 1024 px up. That
+   padding pulled the circle in 25 px for values that hold the circle (x 1306) while the wrap rows (sensor rows) kept it at
+   the wrap edge (x 1331): two columns. Circle rows drop the inline padding so all circles share the row's right edge. */
+/* #446: one value column. A circle row used two layouts (45% flex wrap for sensor rows, a grid for the rest), so its text
+   centred 26 px right / 10 px left of a plain row's. Desktop and tablet now give every circle row the SAME box as a plain
+   row (same width and padding, so the same text centre) and take the circle out of the flow at the box's right edge.
+   Phones keep their own 44 px layout below. */
+@media (min-width: 640px) and (min-height: 501px) {
+  .sat-info-value:has(.sat-info-circle),
+  .sat-info-value-wrap > .sat-info-value {
+    display: block;
+    position: relative;
+    padding-inline: 0 24px;
+    text-align: left;
+  }
+
+  .sat-info-value-wrap {
+    display: block;
+    position: relative;
+    width: 45%;
+  }
+
+  .sat-info-value:has(.sat-info-circle) > .sat-info-circle,
+  .sat-info-value-wrap > .sat-info-circle {
+    position: absolute;
+    top: 50%;
+    right: -6px;
+    margin: 0;
+    transform: translateY(-50%);
+  }
+}
+
+@media (min-width: 1024px) and (min-height: 501px) {
+  .sat-info-value:has(.sat-info-circle),
+  .sat-info-value-wrap > .sat-info-value {
+    padding-inline: 25px;
+    text-align: center;
+  }
+
+  .sat-info-value-wrap {
+    width: 220px;
+  }
+}
+
+/* Phone: the drawer utility footer (bottom 12px + ~64px tall) overlays the bottom of the box; --bottom-menu-height is 0 there, so reserve the same 96px (#223) the side menus use */
+/* Phone touch targets (#157): 44x44 px hit areas for every tappable control in the info box. Padding with an equal
+   negative margin keeps the compact row layout; the visible glyph sizes are unchanged. */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  #sat-infobox .sat-watchlist-icon {
+    box-sizing: content-box;
+    padding: 13px;
+    margin: -13px;
+  }
+
+  #sat-infobox .sat-info-copy-values {
+    box-sizing: border-box;
+    min-width: 44px;
+    min-height: 44px;
+    margin: -12px -12px -12px -4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #sat-infobox .sat-info-circle {
+    width: 44px;
+    height: 44px;
+    margin: -16px -16px -16px -12px;
+  }
+
+  #sat-infobox .sat-info-circle::before {
+    top: 16px;
+    left: 16px;
+  }
+
+  /* The value box clips overflow for ellipsis; let the enlarged circle hit area show. */
+  #sat-infobox .sat-info-value:has(.sat-info-circle) {
+    overflow: visible;
+  }
+
+  /* Keys that open a tooltip or help line: 14 px text, 44 px hit area. */
+  #sat-infobox .sat-info-key--help,
+  #sat-infobox .sat-info-key[kt-tooltip] {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Rows with a help key or info circle are 44 px tall so neighbouring rows' hit areas never overlap (a tap used to
+     land on the wrong row's help or circle). The circle's negative margins no longer need to reach past the row. */
+  #sat-infobox .sat-info-row:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle, .sat-info-copyable) {
+    min-height: 44px;
+  }
+
+  #sat-infobox .sat-info-row .sat-info-circle {
+    margin-block: 0;
+  }
+
+  /* Row density (#464): rows with a 44 px key hit area need no extra vertical padding (45 px with the divider, was 49).
+     Read-only label/value rows have nothing to tap, so they drop to a 30 px row. */
+  #sat-infobox .sat-info-row {
+    padding-block: 0;
+  }
+
+  #sat-infobox .sat-info-row:not(:has(.sat-info-key--help, .sat-info-key[kt-tooltip], .sat-info-circle, .sat-info-copy-values, .sat-info-copyable)) {
+    min-height: 30px;
+  }
+
+  /* Phone help icon (#464): the label tooltip moved here (phone-help-icons.ts), so the label is no longer a tap
+     target. The icon is a 44 px wide, full-row-height hit area; the visible "?" is the ::before ring. Negative
+     vertical margins let it fill the row's padding, so a row's icon never reaches the next row's icon. */
+  #sat-infobox .sat-info-key .sat-info-help-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: 44px;
+    height: 30px;
+    margin: -8px -22px -8px -12px;
+    vertical-align: middle;
+    cursor: help;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #sat-infobox .sat-info-key .sat-info-help-icon::before {
+    content: '?';
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 50%;
+    font-size: 9px;
+    font-style: normal;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  #sat-infobox .sat-info-key .sat-info-help-icon:focus-visible {
+    outline: 2px solid var(--color-dark-text-accent, #6cf);
+    outline-offset: -2px;
+  }
+}
+
+@media (max-width: 639px) {
+  #sat-infobox {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Some engines drop scroll-container bottom padding; a trailing spacer keeps the last row clear of the pill (#223) */
+  #sat-infobox::after {
+    content: '';
+    display: block;
+    height: 24px;
+  }
+
+  /* The 1000px section cap is for the collapse animation; at phone width long mission text wraps past it and the last rows (Data: GCAT) were clipped (#195) */
+  .sat-info-section,
+  #sat-identifier-data,
+  #orbital-section,
+  #secondary-sat-info,
+  #sensor-sat-info,
+  #sat-mission-data {
+    max-height: 5000px;
+  }
+
+  .sat-info-section.collapsed,
+  #sat-identifier-data.collapsed,
+  #orbital-section.collapsed,
+  #secondary-sat-info.collapsed,
+  #sensor-sat-info.collapsed,
+  #sat-mission-data.collapsed {
+    max-height: 20px;
+  }
+}
+
+/* Age of GP past the stale threshold (same setting as the watchlist STALE flag). The STALE word carries the meaning. */
+.sat-info-value.sat-info-stale {
+  color: var(--color-warning, #ffb300);
+  font-weight: 600;
 }

@@ -48,6 +48,7 @@
       "downloadButton": "レポートをダウンロード",
       "copyButton": "クリップボードにコピー",
       "sensorNote": "これらのレポートにはセンサーの選択が必要です。",
+      "sensorLimitNote": "{name} を使用: 最小仰角 {minEl}°。これ未満のパスは報告されません。",
       "sections": {
         "orbitPosition": "軌道と位置",
         "sensor": "センサー",
@@ -112,7 +113,11 @@
           "windowLine": "レポート期間: {start} から {end} UTC、ステップ: {step} 秒",
           "generatedWallClock": "生成日時 (実時間)",
           "appVersion": "KeepTrack バージョン",
-          "ricConvention": "RIC 規約"
+          "ricConvention": "RIC 規約",
+          "passCaveat": "サイトのローカル時刻はタイムゾーン {zone} を使用します。ウィンドウは幾何学的な可視性のみを示し、信号を受信できる証拠ではありません。最大仰角は最も近い秒まで精密化されています。",
+          "passCaveatDisplay": "ローカル時刻は表示タイムゾーン {zone} を使用します。ウィンドウは幾何学的な可視性のみを示し、信号を受信できる証拠ではありません。最大仰角は最も近い秒まで精密化されています。",
+          "sensorCoverage": "センサー {sensor} のみが対象です。",
+          "sensorCoverageOthers": "センサー {sensor} のみが対象です。他の有効なセンサーまたはサイト {count} 件は含まれていません。"
         },
         "titles": {
           "aer": "方位角・仰角・距離レポート",
@@ -157,7 +162,11 @@
           "radialKm": "径方向 (km)",
           "intrackKm": "軌道方向 (km)",
           "crosstrackKm": "軌道直交方向 (km)",
-          "relSpeed": "相対速度 (km/s)"
+          "relSpeed": "相対速度 (km/s)",
+          "timeLocal": "ローカル時刻",
+          "riseLocal": "出現時刻（ローカル）",
+          "setLocal": "消失時刻（ローカル）",
+          "maxElTimeLocal": "最大仰角時刻（ローカル）"
         },
         "empty": {
           "noPasses": "パスが見つかりません!",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "連続",
-          "start": "開始時に可視",
-          "end": "終了時に可視"
+          "start": "開始時に可視; 最大仰角はウィンドウ内",
+          "end": "終了時に可視; 最大仰角はウィンドウ内"
         },
         "illumination": {
           "sun": "はい",

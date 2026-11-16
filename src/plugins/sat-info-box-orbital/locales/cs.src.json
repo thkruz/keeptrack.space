@@ -3,27 +3,33 @@
     "title": "Orbitální data",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Nejvyšší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
+      "tooltip": "Nejvyšší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)",
+      "help": "Nejvyšší bod dráhy, udaný jako výška nad Zemí."
     },
     "Perigee": {
       "label": "Perigeum",
-      "tooltip": "Nejnižší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)"
+      "tooltip": "Nejnižší výška na oběžné dráze nad rovníkovým poloměrem (6378,137 km)",
+      "help": "Nejnižší bod dráhy, udaný jako výška nad Zemí."
     },
     "Inclination": {
       "label": "Inklinace",
-      "tooltip": "Úhel měřený od rovníku ve vzestupném uzlu"
+      "tooltip": "Úhel měřený od rovníku ve vzestupném uzlu",
+      "help": "O kolik je dráha nakloněna od rovníku. 0° obíhá rovník; 90° vede přes póly."
     },
     "Eccentricity": {
       "label": "Excentricita",
-      "tooltip": "Jak kruhová je oběžná dráha (0 je kruh)"
+      "tooltip": "Jak kruhová je oběžná dráha (0 je kruh)",
+      "help": "Jak je dráha protažená. 0 je dokonalá kružnice; hodnoty blízké 1 jsou dlouhé oválné dráhy."
     },
     "RightAsc": {
       "label": "Rektascenze",
-      "tooltip": "Kde stoupá nad rovník"
+      "tooltip": "Kde stoupá nad rovník",
+      "help": "Rektascenze výstupného uzlu: směr na obloze, kde dráha protíná rovník směrem na sever."
     },
     "ArgOfPerigee": {
       "label": "Arg. perigea",
-      "tooltip": "Kde se nachází nejnižší část oběžné dráhy"
+      "tooltip": "Kde se nachází nejnižší část oběžné dráhy",
+      "help": "Argument perigea: úhel podél dráhy od tohoto průsečíku s rovníkem k nejnižšímu bodu."
     },
     "Latitude": {
       "label": "Zem. šířka",
@@ -37,6 +43,29 @@
       "east": "V",
       "west": "Z"
     },
+    "Region": {
+      "label": "Nad",
+      "tooltip": "Stát pod podsatelitním bodem (hranice Natural Earth)",
+      "ocean": "Nad oceánem",
+      "Water": {
+        "arctic": "Severní ledový oceán",
+        "atlantic": "Atlantský oceán",
+        "pacific": "Tichý oceán",
+        "indian": "Indický oceán",
+        "southern": "Jižní oceán",
+        "mediterranean": "Středozemní moře",
+        "caribbean": "Karibské moře",
+        "gulfOfMexico": "Mexický záliv",
+        "redSea": "Rudé moře",
+        "blackSea": "Černé moře",
+        "northSea": "Severní moře",
+        "baltic": "Baltské moře",
+        "arabianSea": "Arabské moře",
+        "bayOfBengal": "Bengálský záliv",
+        "southChinaSea": "Jihočínské moře",
+        "persianGulf": "Perský záliv"
+      }
+    },
     "Altitude": {
       "label": "Výška",
       "tooltip": "Aktuální výška nad hladinou moře"
@@ -46,7 +75,8 @@
       "tooltip": "Čas jednoho úplného oběhu kolem Země",
       "meanMotion": "Střední pohyb",
       "revPerDay": "ob/den",
-      "min": "min"
+      "min": "min",
+      "help": "Jak dlouho trvá objektu jedno oběhnutí Země."
     },
     "Velocity": {
       "label": "Rychlost",
@@ -67,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radiální sigma",
-      "tooltip": "Radiální nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
+      "tooltip": "1-sigma radiální nejistota polohy (soustava RIC). Hodnota označená (výchozí) je předpokládaná výchozí hodnota aplikace, nikoli měření; jinak je odvozena z TLE v epoše GP. Pc a Zpráva o konjunkcích používají stejné hodnoty. Pro posouzení přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky navíc vyžaduje kovarianci druhého objektu a velikosti obou objektů."
     },
     "InTrackSigma": {
       "label": "Podélná sigma",
-      "tooltip": "Nejistota polohy ve směru letu 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
+      "tooltip": "1-sigma ve směru dráhy nejistota polohy (soustava RIC). Hodnota označená (výchozí) je předpokládaná výchozí hodnota aplikace, nikoli měření; jinak je odvozena z TLE v epoše GP. Pc a Zpráva o konjunkcích používají stejné hodnoty. Pro posouzení přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky navíc vyžaduje kovarianci druhého objektu a velikosti obou objektů."
     },
     "CrossTrackSigma": {
       "label": "Příčná sigma",
-      "tooltip": "Příčná nejistota polohy 1 sigma z kovariance odvozené z TLE v epoše GP (soustava RIC). Stejné hodnoty používá Pc i zpráva o konjunkci."
+      "tooltip": "1-sigma kolmá na směr dráhy nejistota polohy (soustava RIC). Hodnota označená (výchozí) je předpokládaná výchozí hodnota aplikace, nikoli měření; jinak je odvozena z TLE v epoše GP. Pc a Zpráva o konjunkcích používají stejné hodnoty. Pro posouzení přiblížení otevřete Zprávu o konjunkcích; pravděpodobnost srážky navíc vyžaduje kovarianci druhého objektu a velikosti obou objektů."
     },
     "meter": "m",
     "kilometer": "km",
@@ -87,8 +117,31 @@
       "tooltip": "Těleso, od kterého se měří polohy efemeridy (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Vztažná soustava",
-      "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)"
+      "label": "Souřadnice",
+      "tooltip": "Souřadnicová soustava efemeridy (OEM REF_FRAME)",
+      "teme": "TEME",
+      "temeInfo": "ze sady GP elementů"
+    },
+    "Regime": {
+      "label": "Režim",
+      "tooltip": "Výškové pásmo dráhy",
+      "help": "Výškové pásmo dráhy. LEO: nízká oběžná dráha, pod 2 000 km. MEO: střední dráha, až do výšky geostacionární dráhy. GEO: asi 35 786 km nad rovníkem, objekt zůstává nad jedním místem. HEO: silně eliptická nebo vyšší než GEO.",
+      "leo": "LEO",
+      "leoInfo": "Nízká oběžná dráha Země, do výšky 2 000 km.",
+      "meo": "MEO",
+      "meoInfo": "Střední oběžná dráha Země, mezi LEO a geostacionární výškou.",
+      "geo": "GEO",
+      "geoInfo": "Geostacionární dráha, asi 35 786 km nad rovníkem.",
+      "heo": "HEO",
+      "heoInfo": "Silně eliptická dráha nebo vyšší než geostacionární."
+    },
+    "LatitudeBand": {
+      "label": "Dosah šířky",
+      "tooltip": "Nejvyšší zeměpisná šířka, kam stopa na zemi dosáhne, na sever i na jih. Rovná se sklonu, u retrográdní dráhy 180 stupňů minus sklon. Mimo toto pásmo družice nikdy není nad hlavou."
+    },
+    "Sigma": {
+      "defaultTag": "výchozí",
+      "defaultNote": "Výchozí odhad aplikace pro tento druh dráhy. Nebyl změřen a nepřišel se zdrojovými daty."
     }
   }
 }

@@ -51,6 +51,11 @@
         "goToInvalid": "無効な日付です。UTC 形式 YYYY-MM-DD HH:MM:SS を使用してください。",
         "containerNotFound": "ID {id} のコンテナが見つかりません",
         "timeInvalid": "時刻の形式が無効です。HH:MM:SS、HH:MM:SS.s、または HHMMSS で入力してください"
+      },
+      "clock": {
+        "live": "ライブ",
+        "paused": "一時停止",
+        "simulated": "シミュレーション"
       }
     }
   }

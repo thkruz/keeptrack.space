@@ -5,7 +5,7 @@ import { dateToEpochFields } from '@app/plugins/create-sat/create-sat-orbits';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { websiteInit } from '@test/generic-tests';
-import { vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 describe('CreateSat basic tab', () => {
   let plugin: CreateSat;
@@ -183,5 +183,16 @@ describe('CreateSat basic tab', () => {
     expect(input('basic-inc').getAttribute('aria-invalid')).toBe('false');
     expect(getEl('unrelated-toast')?.textContent).toBe('Unrelated notification');
     expect(toast).not.toHaveBeenCalled();
+  });
+});
+
+describe('CreateSat menu: ID range hint and data source length', () => {
+  it('explains the analyst ID range and does not cut the data source at 24 characters', async () => {
+    const { buildAdvancedTabHtml, buildBasicTabHtml } = await import('@app/plugins/create-sat/create-sat-menu-html');
+    const advanced = buildAdvancedTabHtml();
+
+    expect(buildBasicTabHtml()).toContain('createSat-hint');
+    expect(advanced).toContain('createSat-hint');
+    expect(advanced).toMatch(/id="createSat-src"[^>]*maxlength="120"/u);
   });
 });

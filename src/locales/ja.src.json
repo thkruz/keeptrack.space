@@ -3,6 +3,8 @@
     "orbitPreview": "軌道プレビュー",
     "unknown": "不明",
     "close": "閉じる",
+    "dock": "ドッキング",
+    "menuHelp": "Help for this menu",
     "download": "ダウンロード",
     "downloadNamed": "{name} をダウンロード",
     "loading": "読み込み中…"
@@ -270,6 +272,13 @@
     "groupDevTools": "開発ツール",
     "groupAbout": "概要",
     "modeAll": "すべてのプラグイン",
+    "reasonSelectSensor": "先にセンサーを選択してください",
+    "reasonSelectSatellite": "先に衛星を選択してください",
+    "reasonSelectTleSatellite": "軌道情報（TLE）を持つ衛星を選択してください",
+    "reasonSelectSatelliteOrLaunchSite": "衛星または打ち上げ場を選択してください",
+    "reasonEnablePlanets": "設定で惑星を有効にしてください",
+    "reasonAddToWatchlist": "先にウォッチリストに衛星を追加してください",
+    "reasonFreeAccount": "無料アカウントで利用可能",
     "openPluginMenu": "プラグインメニューを開く",
     "openAppLauncher": "アプリランチャーを開く",
     "appLauncherTooltip": "アプリランチャー (Shift+Z)",
@@ -281,6 +290,10 @@
     "expand": "展開",
     "phoneLink": "スマートフォン連携",
     "phoneLinkSignIn": "スマートフォンを連携するにはサインインしてください",
+    "signInPromptTitle": "{{feature}}を使うにはサインインしてください",
+    "signInPromptBody": "{{feature}}は無料アカウントで利用できます。サインインしてご利用ください。",
+    "signInPromptAction": "サインイン",
+    "signInPromptCancel": "あとで",
     "connected": "接続済み",
     "offline": "オフライン",
     "footerLinks": {
@@ -296,7 +309,9 @@
     "resetCamera": "カメラをリセット",
     "clearLines": "ラインを消去",
     "clearScreen": "画面を消去",
-    "startClock": "時計を開始"
+    "startClock": "時計を開始",
+    "groupObject": "衛星",
+    "groupMore": "その他"
   },
   "urlManager": {
     "satNotFound": "衛星「{val}」が見つかりませんでした!",
@@ -323,7 +338,12 @@
     "resultCount": "{count} 件の結果",
     "resultCountLimited": "{total} 件中 {shown} 件を表示",
     "noResults": "結果が見つかりません",
+    "noResultsSensors": "結果が見つかりません。この表示ではセンサーは検索できません。",
+    "noResultsSensorsHidden": "結果が見つかりません。地上センサーはフィルターメニューまたは検索設定で非表示になっています。",
     "decayed": "落下済み",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} は {host} の一部です",
+    "dockedTo": "{host} にドッキング中",
     "typeStar": "恒星",
     "typeSensor": "センサー",
     "typeLaunchSite": "発射場",
@@ -362,6 +382,10 @@
   "layersManager": {
     "toggleLayers": "レイヤーの切り替え",
     "layers": "レイヤー"
+  },
+  "mobileZoom": {
+    "zoomIn": "拡大",
+    "zoomOut": "縮小"
   },
   "modalConfirm": {
     "confirmAction": "操作の確認",
@@ -402,5 +426,10 @@
       "breakup": "分裂破片",
       "created": "作成した衛星"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

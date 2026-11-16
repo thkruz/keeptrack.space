@@ -11,6 +11,7 @@ import { SplashScreen } from '../../app/ui/splash-screen';
 import { Scene } from '../core/scene';
 import { ServiceLocator } from '../core/service-locator';
 import { errorManagerInstance } from '../utils/errorManager';
+import { modelAwareStandoffKm } from '../utils/transforms';
 import { BufferAttribute } from './buffer-attribute';
 import { OcclusionProgram } from './draw-manager/post-processing';
 import { GlUtils } from './gl-utils';
@@ -241,6 +242,8 @@ export class MeshManager {
       this.loadMesh_(meshName);
     }
 
+    this.fitCameraToModel_(sat);
+
     // Use the RENDERED dot position (ground rotation applied) so the mesh sits on
     // the dot. For a low-altitude missile the shader rotates the dot by
     // (currentGmst - cruncherGmst) and the world shift is built from that same
@@ -304,6 +307,50 @@ export class MeshManager {
     // Assign the normal matrix the opposite of the this.mvMatrix_
     this.nMatrix_ = mat3.create();
     mat3.normalFromMat4(this.nMatrix_, this.mvMatrix_);
+  }
+
+  private framedModelKey_ = '';
+
+  /**
+   * #389: the camera's closest approach comes from catalog dimensions, which are missing or tiny for big
+   * models (ISS, HST). Once the drawn model's own bounds are known, raise the per-target floor to 3x the model
+   * radius and, once per selected object and model, move out to the framing distance if closer.
+   */
+  private fitCameraToModel_(sat: Satellite | OemSatellite | MissileObject): void {
+    const model = this.currentMeshObject.model;
+    const radiusKm = model?.bounds?.radius;
+
+    if (!model || typeof radiusKm !== 'number' || radiusKm <= 0) {
+      return;
+    }
+
+    const cam = ServiceLocator.getMainCamera?.();
+
+    if (!cam?.state) {
+      return;
+    }
+
+    const aspect = this.gl_ ? cam.getAspectRatio(this.gl_) : NaN;
+    // Use the narrowest FOV the camera will settle on so the fit holds after the FOV lerp.
+    const fovRad = Math.min(cam.fov, settingsManager.fieldOfViewSatellite ?? cam.fov);
+    const standoff = modelAwareStandoffKm(null, radiusKm, { fovRad, aspect });
+
+    if (!standoff) {
+      return;
+    }
+
+    if (cam.state.minDistanceFromTarget === null || standoff.minStandoff > cam.state.minDistanceFromTarget) {
+      cam.state.minDistanceFromTarget = standoff.minStandoff;
+    }
+
+    const key = `${sat.id}:${model.name}`;
+
+    if (key !== this.framedModelKey_) {
+      this.framedModelKey_ = key;
+      if (cam.state.camDistBuffer < standoff.framing) {
+        cam.state.camDistBuffer = standoff.framing;
+      }
+    }
   }
 
   private updateRotationToNadir_(drawPosition: EciArr3) {

@@ -45,6 +45,17 @@ describe('side-menu slide interaction lifecycle', () => {
     expect(Array.from(menu.querySelectorAll('button,input')).map((element) => (element as HTMLElement).tabIndex)).toEqual(originalTabIndexes);
   });
 
+  it('removes a closed side menu from layout once the slide finishes (#439)', () => {
+    const menu = makeMenu('closes-to-none');
+    slideOutLeft(menu, 300);
+    expect(menu.style.display).toBe('block');
+    vi.advanceTimersByTime(350);
+    expect(menu.style.display).toBe('none');
+    slideInRight(menu, 300);
+    vi.advanceTimersByTime(350);
+    expect(menu.style.display).toBe('block');
+  });
+
   it('keeps initially hidden menus hidden when asked to close', () => {
     const menu = makeMenu('never-opened', true);
     const callback = vi.fn();

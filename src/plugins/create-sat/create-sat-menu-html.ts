@@ -42,6 +42,7 @@ export function buildBasicTabHtml(): string {
           <div class="input-field col s12">
             <input value="90000" id="${P}-basic-scc" type="text" maxlength="9" />
             <label for="${P}-basic-scc" class="active">${l('noradId')}</label>
+            <small class="createSat-hint">${l('noradIdHint')}</small>
           </div>
         </div>
         <div class="kt-field-row">
@@ -71,6 +72,43 @@ export function buildBasicTabHtml(): string {
         </div>
         <div id="${P}-basic-error" class="create-sat-form-error" role="alert" hidden></div>
         ${createSatActionButton('createSat-basic-submit', b('createSatellite'))}
+      </section>
+      <section class="kt-section" id="${P}-walker-section">
+        <div class="kt-section-label">${l('sectionWalker')}</div>
+        <small class="createSat-hint">${l('walkerHint')}</small>
+        <div class="kt-field-row">
+          <div class="input-field col s6">
+            <input value="550" id="${P}-walker-alt" type="text" />
+            <label for="${P}-walker-alt" class="active">${l('walkerAltKm')}</label>
+          </div>
+          <div class="input-field col s6">
+            <input value="53" id="${P}-walker-inc" type="text" />
+            <label for="${P}-walker-inc" class="active">${l('inclinationDeg')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s4">
+            <input value="24" id="${P}-walker-total" type="text" />
+            <label for="${P}-walker-total" class="active">${l('walkerTotal')}</label>
+          </div>
+          <div class="input-field col s4">
+            <input value="3" id="${P}-walker-planes" type="text" />
+            <label for="${P}-walker-planes" class="active">${l('walkerPlanes')}</label>
+          </div>
+          <div class="input-field col s4">
+            <input value="1" id="${P}-walker-phasing" type="text" />
+            <label for="${P}-walker-phasing" class="active">${l('walkerPhasing')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input value="WALKER" id="${P}-walker-prefix" type="text" maxlength="12" />
+            <label for="${P}-walker-prefix" class="active">${l('walkerPrefix')}</label>
+          </div>
+        </div>
+        <small class="createSat-hint">${l('walkerTpfHelp')}</small>
+        <div id="${P}-walker-error" class="create-sat-form-error" role="alert" hidden></div>
+        ${createSatActionButton('createSat-walker-submit', b('createWalker'))}
       </section>
     </form>
   `;
@@ -107,6 +145,7 @@ export function buildAdvancedTabHtml(): string {
           <div class="input-field col s12">
             <input value="90000" id="${P}-scc" type="text" maxlength="9" />
             <label for="${P}-scc" class="active">${l('noradId')}</label>
+            <small class="createSat-hint">${l('noradIdHint')}</small>
           </div>
         </div>
         <div class="kt-field-row">
@@ -132,7 +171,7 @@ export function buildAdvancedTabHtml(): string {
             <label for="${P}-name" class="active">${l('satelliteName')}</label>
           </div>
           <div class="input-field col s6">
-            <input placeholder="" id="${P}-src" type="text" maxlength="24" />
+            <input placeholder="" id="${P}-src" type="text" maxlength="120" />
             <label for="${P}-src" class="active">${l('dataSource')}</label>
           </div>
         </div>
@@ -142,12 +181,18 @@ export function buildAdvancedTabHtml(): string {
         <div class="kt-section-label">${l('sectionEpoch')}</div>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="AA" id="${P}-year" type="text" maxlength="2" />
+            <input placeholder="AA" id="${P}-year" type="text" maxlength="4" />
             <label for="${P}-year" class="active">${l('epochYear')}</label>
           </div>
           <div class="input-field col s6">
             <input placeholder="AAA.AAAAAAAA" id="${P}-day" type="text" maxlength="12" />
             <label for="${P}-day" class="active">${l('epochDay')}</label>
+          </div>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12">
+            <input placeholder="YYYY-MM-DDTHH:MM:SSZ" id="${P}-epochiso" type="text" autocomplete="off" />
+            <label for="${P}-epochiso" class="active">${l('epochTimestamp')}</label>
           </div>
         </div>
       </section>
@@ -166,8 +211,9 @@ export function buildAdvancedTabHtml(): string {
         </div>
         <div class="kt-field-row">
           <div class="input-field col s6">
-            <input placeholder="AA.AAAAAAAA" id="${P}-ecen" type="text" maxlength="7" />
+            <input placeholder="AA.AAAAAAAA" id="${P}-ecen" type="text" maxlength="9" />
             <label for="${P}-ecen" class="active">${l('eccentricity')}</label>
+            <span id="${P}-ecen-hint" class="helper-text"></span>
           </div>
           <div class="input-field col s6">
             <input placeholder="AA.AAAAAAAA" id="${P}-argPe" type="text" maxlength="8" />
@@ -195,6 +241,7 @@ export function buildAdvancedTabHtml(): string {
 
       <section class="kt-section" id="createSat-derived">
         <div class="kt-section-label">${l('calculatedParameters')}</div>
+        <div id="${P}-calc-note" class="create-sat-calc-note" role="status" hidden></div>
         <div class="kt-field-row">
           <div class="input-field col s6">
             <input disabled id="${P}-calc-apogee" type="text" />

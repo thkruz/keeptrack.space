@@ -10,6 +10,7 @@
         "inclination": "Inclinaison",
         "launchingNorthOrSouth": "Lancement vers le nord ou le sud",
         "launchFacility": "Site de lancement",
+        "searchFacilities": "Rechercher un site ou un pays...",
         "north": "Nord",
         "south": "Sud"
       },

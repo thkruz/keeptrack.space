@@ -1,15 +1,16 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Immagini Satellitari",
-      "title": "Immagini Satellitari",
+      "bottomIconLabel": "Immagini meteo",
+      "title": "Immagini meteo",
       "defaultImageTitle": "Ultima Immagine Satellitare",
       "labels": {
         "dscovrUnavailable": "DSCOVR temporaneamente non disponibile",
         "dscovrImage": "Immagine DSCOVR {index}",
         "dscovrLoading": "Caricamento immagini DSCOVR…",
         "refresh": "Aggiorna ultima immagine",
-        "imageAtUtc": "{name} alle {time} UTC"
+        "imageAtUtc": "{name} alle {time} UTC",
+        "hint": "Fai clic su un satellite per raggiungerlo e aprire la sua ultima immagine del disco intero"
       },
       "sections": {
         "geostationary": "Geostazionari",

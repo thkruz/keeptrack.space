@@ -3,27 +3,33 @@
     "title": "Orbitale Daten",
     "Apogee": {
       "label": "Apogäum",
-      "tooltip": "Höchste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
+      "tooltip": "Höchste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)",
+      "help": "Der höchste Punkt der Umlaufbahn, angegeben als Höhe über der Erde."
     },
     "Perigee": {
       "label": "Perigäum",
-      "tooltip": "Niedrigste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)"
+      "tooltip": "Niedrigste Höhe der Umlaufbahn über dem Äquatorradius (6378,137 km)",
+      "help": "Der niedrigste Punkt der Umlaufbahn, angegeben als Höhe über der Erde."
     },
     "Inclination": {
       "label": "Inklination",
-      "tooltip": "Winkel vom Äquator am aufsteigenden Knoten gemessen"
+      "tooltip": "Winkel vom Äquator am aufsteigenden Knoten gemessen",
+      "help": "Wie stark die Bahn gegen den Äquator geneigt ist. 0° umkreist den Äquator; 90° führt über die Pole."
     },
     "Eccentricity": {
       "label": "Exzentrizität",
-      "tooltip": "Wie kreisförmig die Umlaufbahn ist (0 ist ein Kreis)"
+      "tooltip": "Wie kreisförmig die Umlaufbahn ist (0 ist ein Kreis)",
+      "help": "Wie gestreckt die Bahn ist. 0 ist ein perfekter Kreis; Werte nahe 1 sind lange Ovale."
     },
     "RightAsc": {
       "label": "Rektaszension",
-      "tooltip": "Wo sie über dem Äquator aufsteigt"
+      "tooltip": "Wo sie über dem Äquator aufsteigt",
+      "help": "Rektaszension des aufsteigenden Knotens: die Richtung am Himmel, in der die Bahn den Äquator nach Norden kreuzt."
     },
     "ArgOfPerigee": {
       "label": "Argument des Perigäums",
-      "tooltip": "Wo der tiefste Teil der Umlaufbahn ist"
+      "tooltip": "Wo der tiefste Teil der Umlaufbahn ist",
+      "help": "Argument des Perigäums: der Winkel entlang der Bahn von diesem Äquatordurchgang bis zum tiefsten Punkt."
     },
     "Latitude": {
       "label": "Breitengrad",
@@ -37,6 +43,29 @@
       "east": "O",
       "west": "W"
     },
+    "Region": {
+      "label": "Über",
+      "tooltip": "Land unter dem Subsatellitenpunkt (Natural-Earth-Grenzen)",
+      "ocean": "Über dem Ozean",
+      "Water": {
+        "arctic": "Arktischer Ozean",
+        "atlantic": "Atlantischer Ozean",
+        "pacific": "Pazifischer Ozean",
+        "indian": "Indischer Ozean",
+        "southern": "Südlicher Ozean",
+        "mediterranean": "Mittelmeer",
+        "caribbean": "Karibisches Meer",
+        "gulfOfMexico": "Golf von Mexiko",
+        "redSea": "Rotes Meer",
+        "blackSea": "Schwarzes Meer",
+        "northSea": "Nordsee",
+        "baltic": "Ostsee",
+        "arabianSea": "Arabisches Meer",
+        "bayOfBengal": "Golf von Bengalen",
+        "southChinaSea": "Südchinesisches Meer",
+        "persianGulf": "Persischer Golf"
+      }
+    },
     "Altitude": {
       "label": "Höhe",
       "tooltip": "Aktuelle Höhe über dem Meeresspiegel"
@@ -46,7 +75,8 @@
       "tooltip": "Zeit für eine vollständige Umrundung der Erde",
       "meanMotion": "Mittlere Bewegung",
       "revPerDay": "Uml./Tag",
-      "min": "Min."
+      "min": "Min.",
+      "help": "Wie lange das Objekt für einen Umlauf um die Erde braucht."
     },
     "Velocity": {
       "label": "Geschwindigkeit",
@@ -67,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Radiale Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit radial aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
+      "tooltip": "1-Sigma-Positionsunsicherheit radiale (RIC-System). Ein mit (Standard) markierter Wert ist ein angenommener Standardwert der App und keine Messung; andernfalls wird er aus dem TLE zur GP-Epoche abgeleitet. Pc und der Konjunktionsbericht nutzen dieselben Werte. Um eine Annäherung zu beurteilen, öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "InTrackSigma": {
       "label": "In-Track Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
+      "tooltip": "1-Sigma-Positionsunsicherheit in Flugrichtung (RIC-System). Ein mit (Standard) markierter Wert ist ein angenommener Standardwert der App und keine Messung; andernfalls wird er aus dem TLE zur GP-Epoche abgeleitet. Pc und der Konjunktionsbericht nutzen dieselben Werte. Um eine Annäherung zu beurteilen, öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "CrossTrackSigma": {
       "label": "Cross-Track Sigma",
-      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung aus der TLE-basierten Kovarianz zur GP-Epoche (RIC-System). Dieselben Werte nutzen Pc und der Konjunktionsbericht."
+      "tooltip": "1-Sigma-Positionsunsicherheit quer zur Flugrichtung (RIC-System). Ein mit (Standard) markierter Wert ist ein angenommener Standardwert der App und keine Messung; andernfalls wird er aus dem TLE zur GP-Epoche abgeleitet. Pc und der Konjunktionsbericht nutzen dieselben Werte. Um eine Annäherung zu beurteilen, öffnen Sie den Konjunktionsbericht; eine Kollisionswahrscheinlichkeit benötigt außerdem die Kovarianz des anderen Objekts und beide Objektgrößen."
     },
     "meter": "m",
     "kilometer": "km",
@@ -87,8 +117,31 @@
       "tooltip": "Körper, von dem aus die Ephemeridenpositionen gemessen werden (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Bezugssystem",
-      "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)"
+      "label": "Bezugssys.",
+      "tooltip": "Koordinatensystem der Ephemeride (OEM REF_FRAME)",
+      "teme": "TEME",
+      "temeInfo": "aus dem GP-Elementsatz"
+    },
+    "Regime": {
+      "label": "Bahnregime",
+      "tooltip": "Das Höhenband der Bahn",
+      "help": "Das Höhenband der Bahn. LEO: niedrige Erdumlaufbahn, unter 2.000 km. MEO: mittlere Erdumlaufbahn, bis zur geostationären Höhe. GEO: etwa 35.786 km über dem Äquator, das Objekt bleibt über einem Punkt. HEO: stark elliptisch oder höher als GEO.",
+      "leo": "LEO",
+      "leoInfo": "Niedrige Erdumlaufbahn, unter 2.000 km Höhe.",
+      "meo": "MEO",
+      "meoInfo": "Mittlere Erdumlaufbahn, zwischen LEO und geostationärer Höhe.",
+      "geo": "GEO",
+      "geoInfo": "Geostationäre Bahn, etwa 35.786 km über dem Äquator.",
+      "heo": "HEO",
+      "heoInfo": "Stark elliptisch oder höher als geostationär."
+    },
+    "LatitudeBand": {
+      "label": "Breitenreichweite",
+      "tooltip": "Höchste Breite, die die Bodenspur nach Norden und Süden erreicht. Sie entspricht der Inklination, bei einer rückläufigen Bahn 180 Grad minus Inklination. Außerhalb dieses Bandes steht der Satellit nie über einem Ort."
+    },
+    "Sigma": {
+      "defaultTag": "Standard",
+      "defaultNote": "Standardschätzung der App für diese Art von Bahn. Sie wurde nicht gemessen und kam nicht mit den Quelldaten."
     }
   }
 }

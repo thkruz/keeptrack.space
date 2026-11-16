@@ -4,6 +4,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
+import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { buildMissions, sortMissionsForPersona, wireMissionAutoChecks } from '@app/plugins/onboarding/checklist';
 import { OnboardingPlugin } from '@app/plugins/onboarding/onboarding';
 import { settingsManager } from '@app/settings/settings';
@@ -48,13 +49,24 @@ describe('OnboardingPlugin behavior', () => {
   it('exposes commands, settings contribution, and help', () => {
     const commands = plugin.getCommandPaletteCommands();
 
-    expect(commands.map((c) => c.id)).toEqual(['OnboardingPlugin.startTour', 'OnboardingPlugin.startPowerTour', 'OnboardingPlugin.openChecklist']);
+    expect(commands.map((c) => c.id)).toEqual(['OnboardingPlugin.startTour', 'OnboardingPlugin.startPowerTour', 'OnboardingPlugin.openChecklist', 'OnboardingPlugin.helpForMenu']);
 
     const contribution = plugin.getSettingsContribution();
 
     expect(contribution.sectionId).toBe('OnboardingPlugin');
     expect(contribution.controls.map((c) => c.type)).toEqual(['toggle', 'button']);
     expect(plugin.getHelpConfig().title.length).toBeGreaterThan(0);
+  });
+
+  it('the help-for-this-menu command reuses the Shift+F1 path', () => {
+    const spy = vi.spyOn(adviceManagerInstance, 'showContextHelp').mockImplementation(() => undefined);
+    const cmd = plugin.getCommandPaletteCommands().find((c) => c.id === 'OnboardingPlugin.helpForMenu');
+
+    cmd?.callback();
+
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(cmd?.shortcutHint).toBe('Shift+F1');
+    spy.mockRestore();
   });
 
   it('the settings toggle inverts the isDisableOnboarding setting', () => {
@@ -387,6 +399,43 @@ describe('onboarding account step gating', () => {
     expect(overlayEl.classList.contains('open')).toBe(false);
     drawerEl.remove();
     overlayEl.remove();
+  });
+
+  it('phone: the tour end defers the account card to the next visit instead of showing it (#457)', () => {
+    KeepTrackPlugin.loginGateOpenModal = vi.fn();
+    const internal = bootPlugin() as unknown as Internal;
+    const previous = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    try {
+      internal.showBridge_();
+      (document.querySelector('[data-tour-button="finish"]') as HTMLElement).click();
+
+      expect(document.querySelector('[data-tour-button="create"]')).toBeNull();
+      expect(document.getElementById('kt-tour-root')).toBeNull();
+      expect(internal.state_.status).toBe('done');
+      expect(internal.state_.accountPrompt).toBe('later');
+    } finally {
+      settingsManager.isMobileModeEnabled = previous;
+    }
+  });
+
+  it('phone: the next-visit account card marks its benefit list so the phone CSS can keep it clear of the zoom buttons (#457)', () => {
+    KeepTrackPlugin.loginGateOpenModal = vi.fn();
+    const internal = bootPlugin() as unknown as Internal;
+    const previous = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    try {
+      internal.state_.status = 'done';
+      internal.state_.accountPrompt = 'later';
+      internal.showAccount_(true);
+
+      expect(document.getElementById('kt-tour-root')?.classList.contains('kt-tour-mobile')).toBe(true);
+      expect(document.querySelector('.kt-tour-popover .kt-tour-account-recap')).not.toBeNull();
+    } finally {
+      settingsManager.isMobileModeEnabled = previous;
+    }
   });
 
   it('signing in from the tour-end card means no second showing', () => {

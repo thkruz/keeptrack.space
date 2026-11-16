@@ -208,6 +208,9 @@ export const ChinaICBM = [
  * 3: Name
  * 4: Range
  */
+/** Iranian launch sites (hypothetical long-range missile from a space-launch site). Same 4-element record layout. */
+export const IranBM = [35.234, 53.921, 'Semnan (hypothetical ICBM)', 12000];
+
 export const NorthKoreanBM = [
   40,
   128.3,

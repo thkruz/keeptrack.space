@@ -141,19 +141,109 @@ export class EpochAge extends KeepTrackPlugin implements ISettingsContributor {
     badge.setAttribute('role', 'status');
     badge.setAttribute('kt-tooltip', t7e('plugins.EpochAge.tooltip'));
     badge.style.display = 'none';
-    KeepTrack.getInstance().containerRoot.appendChild(badge);
+    /*
+     * Mount inside #ui-wrapper (under #canvas-holder, z-index -2) next to #left-menus. A child of the
+     * root sits in a higher stacking context than every side menu, so z-index could never put the
+     * menus above it (#204).
+     */
+    (document.getElementById('ui-wrapper') ?? KeepTrack.getInstance().containerRoot).appendChild(badge);
     this.badge_ = badge;
+    this.watchMenus_();
     this.refresh();
+  }
+
+  /** Re-places the badge whenever a side menu opens, closes or resizes (#256). */
+  private watchMenus_(): void {
+    if (typeof MutationObserver === 'undefined') {
+      return;
+    }
+    const target = document.getElementById('ui-wrapper');
+
+    if (!target) {
+      return;
+    }
+    let queued = false;
+
+    new MutationObserver((mutations) => {
+      // Only side-menu changes move the badge; the sat info box and other subtree mutations must not trigger a layout read.
+      if (queued || !mutations.some((m) => m.target instanceof Element && m.target.matches('.side-menu-parent'))) {
+        return;
+      }
+      queued = true;
+      requestAnimationFrame(() => {
+        queued = false;
+        this.placeBadge_();
+      });
+    }).observe(target, { attributes: true, attributeFilter: ['style', 'class'], subtree: true });
+  }
+
+  /**
+   * A wide side menu (Best Passes is 695 px) covers the centred badge, leaving only its right end showing (#256).
+   * On desktop widths, move the badge into the free strip right of the open menus when the centred spot is covered.
+   */
+  private placeBadge_(): void {
+    const badge = this.badge_;
+
+    if (!badge || badge.style.display === 'none') {
+      return;
+    }
+    const openMenus = Array.from(document.querySelectorAll<HTMLElement>('.side-menu-parent')).filter((el) => el.style.display === 'block');
+
+    // Inline-style checks only: with no menu open there is nothing to measure, so never touch layout.
+    if (openMenus.length === 0 || window.innerWidth < 768) {
+      if (badge.style.left !== '') {
+        badge.style.left = '';
+      }
+
+      return;
+    }
+    badge.style.left = '';
+    let menusRight = 0;
+
+    openMenus.forEach((el) => {
+      const rect = el.getBoundingClientRect();
+
+      if (rect.width > 0 && rect.left < window.innerWidth / 2) {
+        menusRight = Math.max(menusRight, rect.right);
+      }
+    });
+    const half = badge.offsetWidth / 2;
+
+    if (menusRight > window.innerWidth / 2 - half) {
+      badge.style.left = `${Math.round(menusRight + 12 + half)}px`;
+    }
   }
 
   private showBadge_(level: EpochAgeLevel, days: number): void {
     if (!this.badge_) {
       return;
     }
-    this.badge_.textContent = t7e(`plugins.EpochAge.badge.${level}` as TranslationKey).replace('{days}', formatDays(days));
+    const text = t7e(`plugins.EpochAge.badge.${level}` as TranslationKey).replace('{days}', formatDays(days));
+    const wasHidden = this.badge_.style.display === 'none';
+
+    // Unchanged content cannot move the badge, so skip both the writes and the placement.
+    if (!wasHidden && this.badge_.textContent === text && this.badge_.dataset.level === level) {
+      return;
+    }
+    this.badge_.textContent = text;
     this.badge_.dataset.level = level;
     this.badge_.style.display = '';
+    this.schedulePlaceBadge_();
   }
+
+  /** Placement measures layout, so it never runs in the same task as the text/display writes (selectSat). */
+  private schedulePlaceBadge_(): void {
+    if (this.isPlaceQueued_) {
+      return;
+    }
+    this.isPlaceQueued_ = true;
+    requestAnimationFrame(() => {
+      this.isPlaceQueued_ = false;
+      this.placeBadge_();
+    });
+  }
+
+  private isPlaceQueued_ = false;
 
   private hideBadge_(): void {
     if (!this.badge_) {

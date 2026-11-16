@@ -127,6 +127,13 @@ export abstract class DraggableModal extends DraggableBox {
     if (getEl('help-outer-container', true)?.style.display === 'block') {
       return false;
     }
+    // The command palette is a higher layer than any modal; without this the focus
+    // trap steals its keystrokes and Enter activates the modal's focused button.
+    const palette = getEl('command-palette-overlay', true);
+
+    if (palette && palette.style.display !== 'none') {
+      return false;
+    }
     const visible = Array.from(document.querySelectorAll<HTMLElement>('.draggable-modal-overlay')).filter((element) => element.style.display !== 'none');
 
     visible.sort(

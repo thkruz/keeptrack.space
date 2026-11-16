@@ -23,13 +23,18 @@ import { TopMenu } from '../../plugins/top-menu/top-menu';
 import { CatalogManager } from '../data/catalog-manager';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
-import { isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
+import { getDockedHostLabel, isDocked } from '../data/docked-vehicles';
+import { getHostLabel } from '../data/station-modules';
+import { getSearchAlias, isNeverDecayed, runNumOnlySearch, runRegularSearch } from './search-query';
 
 export interface SearchResult {
   id: number; // Catalog Index
   searchType: SearchResultType; // Type of search result
   strIndex: number; // Index of the search string in the name
   patlen: number; // Length of the search string
+  partial?: boolean; // NORAD id only partially matches a numeric query
+  moduleName?: string; // MODULE results: the merged station module that matched (e.g. "Unity")
+  moduleScc?: string; // MODULE results: that module's NORAD id
 }
 
 export enum SearchResultType {
@@ -46,6 +51,10 @@ export enum SearchResultType {
   PLANET,
   /** Matched the alpha-5 designation (sccNum5, e.g. "A0000" for 100000). */
   NORAD_ID_A5,
+  /** Matched a user-assigned alias (provided by a plugin such as the watchlist). */
+  ALIAS,
+  /** Matched an attached station module (Unity, Zvezda...) that is merged into this host row. */
+  MODULE,
 }
 
 /**
@@ -58,6 +67,8 @@ const SEARCH_TYPE_LABELS: Partial<Record<SearchResultType, string>> = {
   [SearchResultType.BUS]: 'BUS',
   [SearchResultType.OBJECT_NAME]: 'NAME',
   [SearchResultType.ALT_NAME]: 'ALT',
+  [SearchResultType.ALIAS]: 'ALIAS',
+  [SearchResultType.MODULE]: 'MODULE',
   [SearchResultType.NORAD_ID]: 'NORAD',
   [SearchResultType.NORAD_ID_A5]: 'NORAD',
   [SearchResultType.INTLDES]: 'INTL',
@@ -85,7 +96,11 @@ export class SearchManager {
   static readonly RESULTS_OPEN_BODY_CLASS = 'search-results-open';
 
   isSearchOpen = false;
+  /** Set by Watchlist while its list owns the highlight group, so an empty search box does not drop the group (#349). */
+  isGroupHighlightHeld = false;
   private isResultsOpen_ = false;
+  /** True after a phone collapse: the list is folded away but the query and group highlight are still active. */
+  private isQueryRetained_ = false;
 
   get isResultsOpen(): boolean {
     return this.isResultsOpen_;
@@ -99,6 +114,9 @@ export class SearchManager {
    */
   set isResultsOpen(isOpen: boolean) {
     this.isResultsOpen_ = isOpen;
+    if (isOpen) {
+      this.isQueryRetained_ = false;
+    }
     document.body?.classList.toggle(SearchManager.RESULTS_OPEN_BODY_CLASS, isOpen);
   }
 
@@ -123,6 +141,32 @@ export class SearchManager {
   /** The chord that toggles and focuses search (Shift+F); also named in the search box placeholder. */
   private static readonly SEARCH_SHORTCUT_: Pick<IKeyboardShortcut, 'key' | 'ctrl'> = { key: 'F', ctrl: false };
 
+  /**
+   * The chord's keydown moves focus into the box while Shift is held (so the app does not
+   * preventDefault), and the browser then inserts the chord letter into the freshly focused
+   * input. Cancel that one insertion; the guard removes itself after the first input event
+   * or a short timeout.
+   */
+  private static swallowChordCharacter_() {
+    const searchEl = getEl('search', true);
+
+    if (!searchEl) {
+      return;
+    }
+    const chordLetter = SearchManager.SEARCH_SHORTCUT_.key?.toString().toLowerCase();
+    const guard = (evt: Event): void => {
+      const data = (evt as InputEvent).data;
+
+      if (typeof data === 'string' && data.toLowerCase() === chordLetter) {
+        evt.preventDefault();
+      }
+      searchEl.removeEventListener('beforeinput', guard);
+    };
+
+    searchEl.addEventListener('beforeinput', guard);
+    setTimeout(() => searchEl.removeEventListener('beforeinput', guard), 300);
+  }
+
   private setupKeyboardShortcut_() {
     const keyboard = new KeyboardComponent('SearchManager', [
       {
@@ -131,8 +175,17 @@ export class SearchManager {
         callback: () => {
           this.toggleSearch();
           if (this.isSearchOpen) {
+            // Focus now so letters typed straight after the chord go into the box
+            // instead of firing single-key shortcuts; the delayed call covers a
+            // box that is still animating open.
+            SearchManager.swallowChordCharacter_();
+            getEl('search')?.focus();
             setTimeout(() => {
-              getEl('search')?.focus();
+              const searchEl = getEl('search', true);
+
+              if (searchEl && document.activeElement !== searchEl) {
+                searchEl.focus();
+              }
             }, 200);
           }
         },
@@ -174,6 +227,12 @@ export class SearchManager {
 
       if (obj) {
         SearchManager.lookAtSearchResult_(obj, satId);
+        // Desktop keeps the list open so users can click through several results in a row. A phone closes it (it
+        // covers the info box there) and drops the keyboard; the query stays and refocusing restores the list.
+        if (settingsManager.isMobileModeEnabled) {
+          this.collapseResults_();
+          (getEl('search', true) as HTMLInputElement | null)?.blur();
+        }
       }
     });
     getEl('search-results')?.addEventListener('mouseover', (evt) => {
@@ -208,6 +267,17 @@ export class SearchManager {
 
       this.doSearch(searchStr);
     });
+    // Tapping the box again after a collapse brings the list for the kept query back.
+    getEl('search')?.addEventListener('focus', () => {
+      if (!settingsManager.isMobileModeEnabled || this.isResultsOpen) {
+        return;
+      }
+      const value = (<HTMLInputElement>getEl('search')).value;
+
+      if (value.length >= settingsManager.minimumSearchCharacters) {
+        this.doSearch(value);
+      }
+    });
     getEl('search')?.addEventListener('blur', () => {
       if (this.isSearchOpen && this.getCurrentSearch().length === 0) {
         this.toggleSearch();
@@ -215,6 +285,20 @@ export class SearchManager {
 
       // Force shift key to be released when search box is exited to prevent getting stuck in shift mode after using shift + click to select text in the search box
       ServiceLocator.getInputManager().keyboard.keyStates.set('Shift', false);
+    });
+    // Phone: a tap on the map (anywhere outside the search box and its list) folds the list away with the
+    // keyboard, so the list never stays open without a visible query. The query is kept; refocusing restores it.
+    document.addEventListener('pointerdown', (evt: Event) => {
+      if (!settingsManager.isMobileModeEnabled || !this.isResultsOpen) {
+        return;
+      }
+      const target = evt.target as Element | null;
+
+      if (target?.closest?.('#search-holder, #search-results, #search-icon')) {
+        return;
+      }
+      this.collapseResults_();
+      (getEl('search', true) as HTMLInputElement | null)?.blur();
     });
     getEl('search-icon')?.addEventListener('click', () => {
       this.toggleSearch();
@@ -240,6 +324,10 @@ export class SearchManager {
           this.updateSelectedResult_(results);
           break;
         case 'Enter':
+          // With nothing highlighted, a single result is unambiguous: select it.
+          if (this.selectedIndex_ < 0 && results.length === 1) {
+            this.selectedIndex_ = 0;
+          }
           if (this.selectedIndex_ >= 0 && this.selectedIndex_ < results.length) {
             evt.preventDefault();
             (results[this.selectedIndex_] as HTMLElement).click();
@@ -401,10 +489,11 @@ export class SearchManager {
   }
 
   /**
-   * Returns the current search string entered by the user.
+   * Returns the active search string. Stays set while the list is folded away on a phone (the query and group
+   * highlight are kept); use `isResultsOpen` when the question is whether the dropdown is visible.
    */
   getCurrentSearch(): string {
-    if (this.isResultsOpen) {
+    if (this.isResultsOpen || this.isQueryRetained_) {
       const searchDom = <HTMLInputElement>getEl('search', true);
 
       if (searchDom) {
@@ -413,6 +502,21 @@ export class SearchManager {
     }
 
     return '';
+  }
+
+  /**
+   * Folds the results list away without touching the query, the highlighted group or the colour scheme.
+   * Used on phones after a pick; reopening the search re-runs the kept query.
+   */
+  private collapseResults_(): void {
+    const resultsEl = getEl('search-results', true);
+
+    if (resultsEl) {
+      slideOutUp(resultsEl, 200);
+      resultsEl.innerHTML = '';
+    }
+    this.isResultsOpen = false;
+    this.isQueryRetained_ = true;
   }
 
   /**
@@ -436,6 +540,7 @@ export class SearchManager {
       }
       groupManagerInstance.clearSelect();
       this.isResultsOpen = false;
+      this.isQueryRetained_ = false;
 
       settingsManager.lastSearch = '';
       settingsManager.lastSearchResults = [];
@@ -461,6 +566,10 @@ export class SearchManager {
 
   doSearch(searchString: string, isPreventDropDown?: boolean): void {
     this.selectedIndex_ = -1;
+    // Any new search replaces the group the watchlist was holding; the watchlist re-asserts it after its own call.
+    this.isGroupHighlightHeld = false;
+    // A newer keystroke supersedes any miss still waiting to be reported.
+    this.cancelNoResultsToast_();
 
     const searchInput = getEl('search', true);
     const isUserTyping = typeof document !== 'undefined' && searchInput !== null && document.activeElement === searchInput;
@@ -474,6 +583,7 @@ export class SearchManager {
       if (emptiedDom && emptiedDom.value.trim().replace(/,/gu, '') === '') {
         emptiedDom.value = '';
       }
+      this.lastMissToasted_ = '';
       this.hideResults();
       EventBus.getInstance().emit(EventBusEvent.searchUpdated, searchString, 0, settingsManager.searchLimit);
 
@@ -571,16 +681,85 @@ export class SearchManager {
       this.fillResultBox(results, catalogManagerInstance, totalFound);
     }
 
+    if (idList.length > 0) {
+      this.cancelNoResultsToast_();
+      this.lastMissToasted_ = '';
+    }
+
     if (idList.length === 0) {
       // lastSearch is the term list, so test the typed string's length instead.
       if (searchString_.length >= settingsManager.minimumSearchCharacters) {
-        uiManagerInstance.toast(t7e('searchManager.noResults' as TranslationKey), ToastMsgType.serious, false);
+        // Sensors are not loaded when the build disables them (phone mode, embeds): say so instead of a bare miss.
+        // A sensor name that the Filter menu or Search Settings hides would otherwise read as a bare miss (#497).
+        let noResultsKey = 'searchManager.noResults';
+
+        // The Filter menu also sets isDisableSensors, so test for a hidden sensor match first (it needs loaded
+        // sensors); only then fall back to the phone wording, where sensors never load.
+        if (SearchManager.sensorMatchHidden_(searchString_, catalogManagerInstance)) {
+          noResultsKey = 'searchManager.noResultsSensorsHidden';
+        } else if (settingsManager.isDisableSensors) {
+          noResultsKey = 'searchManager.noResultsSensors';
+        }
+
+        this.scheduleNoResultsToast_(searchString_, noResultsKey, uiManagerInstance);
       }
       this.hideResults();
     }
   }
 
+  /** Idle time after the last keystroke before a miss is reported, so typing does not raise a toast per key. */
+  static readonly NO_RESULTS_TOAST_DELAY_MS = 800;
+  private noResultsTimer_: ReturnType<typeof setTimeout> | null = null;
+  /** The last query a miss was reported for; typing more characters after it does not report again. */
+  private lastMissToasted_ = '';
+
+  private cancelNoResultsToast_(): void {
+    if (this.noResultsTimer_ !== null) {
+      clearTimeout(this.noResultsTimer_);
+      this.noResultsTimer_ = null;
+    }
+  }
+
+  private scheduleNoResultsToast_(query: string, key: string, uiManager: { toast: (msg: string, type: ToastMsgType, isLong?: boolean) => void }): void {
+    this.cancelNoResultsToast_();
+    if (this.lastMissToasted_ !== '' && query.startsWith(this.lastMissToasted_)) {
+      return;
+    }
+    this.noResultsTimer_ = setTimeout(() => {
+      this.noResultsTimer_ = null;
+      this.lastMissToasted_ = query;
+      uiManager.toast(t7e(key as TranslationKey), ToastMsgType.serious, false);
+    }, SearchManager.NO_RESULTS_TOAST_DELAY_MS);
+  }
+
+  /** True when a sensor name contains the query but ground sensors are hidden from search by the Filter menu or Search Settings. */
+  private static sensorMatchHidden_(query: string, catalogManager: CatalogManager): boolean {
+    const hidden = (settingsManager.filter as Record<string, boolean | undefined> | undefined)?.groundSensors === false || settingsManager.searchableTypes?.sensor === false;
+
+    if (!hidden) {
+      return false;
+    }
+    const terms = query
+      .toUpperCase()
+      .split(',')
+      .map((term) => term.trim())
+      .filter((term) => term.length > 0);
+
+    return catalogManager.objectCache.some((obj) => obj?.isSensor() && terms.some((term) => obj.name.toUpperCase().includes(term)));
+  }
+
   /** Result types whose match landed on the object's name, so the name should be highlighted. */
+  /** A docked vehicle keeps its own row; the note says which station it is folded into (#463). */
+  private static dockedNoteHtml_(id: number, searchType: SearchResultType): string {
+    const hostLabel = getDockedHostLabel(id);
+
+    if (!hostLabel || searchType === SearchResultType.MODULE) {
+      return '';
+    }
+
+    return ` <span class="search-partial-badge search-module-note">${t7e('searchManager.dockedTo').replace('{host}', hostLabel)}</span>`;
+  }
+
   private static isNameHighlightType_(searchType: SearchResultType): boolean {
     return (
       searchType === SearchResultType.OBJECT_NAME ||
@@ -631,7 +810,8 @@ export class SearchManager {
 
       html += `<div class="search-result${decayedClass}" data-obj-id="${obj.id}">`;
       html += `<span class="search-type-badge">${searchTypeBadgeLabel(result.searchType)}</span>`;
-      html += '<div class="truncate-search">';
+      // A module row carries a note that has to be readable in full, so it wraps instead of truncating.
+      html += result.searchType === SearchResultType.MODULE || isDocked(obj.id) ? '<div class="truncate-search search-module-row">' : '<div class="truncate-search">';
 
       // Left half of search results
       if (obj.isMissile()) {
@@ -652,10 +832,28 @@ export class SearchManager {
         html += sat.altName.substring(result.strIndex, result.strIndex + result.patlen);
         html += '</span>';
         html += sat.altName.substring(result.strIndex + result.patlen);
+      } else if (result.searchType === SearchResultType.ALIAS) {
+        const alias = getSearchAlias(obj.id) ?? '';
+
+        // An alias matched: show the name, then the alias with the match highlighted
+        html += `${obj.name} (${alias.substring(0, result.strIndex)}`;
+        html += '<span class="search-hilight">';
+        html += alias.substring(result.strIndex, result.strIndex + result.patlen);
+        html += '</span>';
+        html += `${alias.substring(result.strIndex + result.patlen)})`;
+      } else if (result.searchType === SearchResultType.MODULE) {
+        // A merged station module matched: show the host row with a hint that the module is part of it
+        const hostLabel = getHostLabel(String((obj as Satellite).sccNum));
+        const hint = t7e('searchManager.moduleOf' as TranslationKey)
+          .replace('{module}', `${result.moduleName ?? ''} ${result.moduleScc ?? ''}`.trim())
+          .replace('{host}', hostLabel);
+
+        html += `${obj.name} <span class="search-partial-badge search-module-note">${hint}</span>`;
       } else {
         // If not, just write the name
         html += obj.name;
       }
+      html += SearchManager.dockedNoteHtml_(obj.id, result.searchType);
       html += '</div>';
       html += '<div class="search-result-scc">';
 
@@ -674,6 +872,9 @@ export class SearchManager {
             html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += sat.sccNum.substring(result.strIndex + result.patlen);
+            if (result.partial) {
+              html += `<span class="search-partial-badge">${t7e('searchManager.partialMatch' as TranslationKey)}</span>`;
+            }
           }
           break;
         case SearchResultType.NORAD_ID_A5:
@@ -690,6 +891,9 @@ export class SearchManager {
             html += a5.substring(result.strIndex, result.strIndex + result.patlen);
             html += '</span>';
             html += a5.substring(result.strIndex + result.patlen);
+            if (result.partial) {
+              html += `<span class="search-partial-badge">${t7e('searchManager.partialMatch' as TranslationKey)}</span>`;
+            }
           }
           break;
         case SearchResultType.INTLDES:
@@ -798,6 +1002,12 @@ export class SearchManager {
       }
     }
 
+    // On phones the expanded drawer sits over the results list and swallows taps (#216); the search box is
+    // outside the drawer, so folding it away keeps the typed query and exposes the rows.
+    if (settingsManager.isMobileModeEnabled) {
+      ServiceLocator.getUiManager()?.pluginDrawer?.close();
+    }
+
     colorSchemeManagerInstance.isUseGroupColorScheme = true;
     colorSchemeManagerInstance.calculateColorBuffers(true);
   }
@@ -821,6 +1031,8 @@ export class SearchManager {
     }
 
     this.isSearchOpen = false;
+    // A miss still waiting to be reported is moot once the search is closed.
+    this.cancelNoResultsToast_();
     getEl('search-holder')?.classList.remove('search-slide-down');
     getEl('search-holder')?.classList.add('search-slide-up');
     ServiceLocator.getUiManager().hideSideMenus();

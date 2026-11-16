@@ -21,13 +21,17 @@ import {
   Sensor,
   Sgp4,
   SpaceObjectType,
+  StateVectorSgp4,
   Sun,
   TAU,
   TemeVec3,
 } from '@ootk/src/main';
+import type { Sun as SunBody } from '../../engine/rendering/draw-manager/sun';
 import { dateFormat } from '../../engine/utils/dateFormat';
 import { SatMath, SunStatus } from '../analysis/sat-math';
 import { DetailedSensor } from './DetailedSensor';
+import { refinePassEdgeMs } from './pass-edge';
+import { refinePeakMs } from './pass-peak';
 
 export enum TearrType {
   RISE,
@@ -54,6 +58,10 @@ export type TearrData = {
   lat?: Degrees;
   lon?: Degrees;
   visible?: boolean;
+  /** Satellite outside Earth's umbra at this row's time; null when unknown. */
+  sunlit?: boolean | null;
+  /** In view, sunlit and site dark. Only set for optical or observer sensors. */
+  opticalVisible?: boolean;
 };
 
 export class SensorMath {
@@ -64,6 +72,17 @@ export class SensorMath {
     }
 
     return sensor.isMaskBlocked(rae.az, rae.el);
+  }
+
+  /**
+   * The pass edge between an out-of-view epoch and an in-view epoch, on the whole UTC second shared by
+   * every pass view (see pass-edge.ts), with the look angles at that second.
+   */
+  private static refineEdge_(satrec: SatelliteRecord, sensor: DetailedSensor, outMs: number, inMs: number): { date: Date; aer: ReturnType<typeof SatMath.getRae> } {
+    const edgeMs = refinePassEdgeMs((epochMs) => SatMath.checkIsInView(sensor, SatMath.getRae(new Date(epochMs), satrec, sensor)), outMs, inMs);
+    const date = new Date(edgeMs);
+
+    return { date, aer: SatMath.getRae(date, satrec, sensor) };
   }
 
   /**
@@ -97,24 +116,33 @@ export class SensorMath {
         const aerNext = SatMath.getRae(now1, satrec, sensor);
         const isInFOVNext = SatMath.checkIsInView(sensor, aerNext);
 
+        // Rise and set edges are refined to the whole second shared with Best Passes and Next Pass.
+        const rise = isRise ? SensorMath.refineEdge_(satrec, sensor, Number(now) - 1000, Number(now)) : null;
+
         // if elevation is going down then it is a peak
         if (!isMaxElFound && aerNext.el && aerNext.el < aer.el) {
+          // The sample at `now` sits on the simulation clock's phase; the peak is the whole second of highest elevation
+          // within one step either side (shared with the pass card and the reports, pass-peak.ts), so it does not move with sim time.
+          const peak = rise ? null : refinePeakMs((ms) => SatMath.getRae(new Date(ms), satrec, sensor, true).el, Number(now), 1000);
+          const peakAer = peak ? SatMath.getRae(new Date(peak.ms), satrec, sensor, true) : aer;
+          const edge = rise ?? { date: peak ? new Date(peak.ms) : now, aer: peakAer };
+
           return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
+            time: dateFormat(edge.date, 'isoDateTime', true),
+            rng: edge.aer.rng,
+            az: edge.aer.az,
+            el: edge.aer.el,
             type: isRise ? TearrType.RISE_AND_MAX_EL : TearrType.MAX_EL,
             inView: isInFOV,
             objName: sensor.objName,
             maskLimited: isRiseMasked,
           };
-        } else if (isRise) {
+        } else if (isRise && rise) {
           return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
+            time: dateFormat(rise.date, 'isoDateTime', true),
+            rng: rise.aer.rng,
+            az: rise.aer.az,
+            el: rise.aer.el,
             type: TearrType.RISE,
             inView: isInFOV,
             objName: sensor.objName,
@@ -124,11 +152,13 @@ export class SensorMath {
 
         // Is in FOV and Wont Be Next Time so Last Line of Coverage
         if (!isInFOVNext) {
+          const set = SensorMath.refineEdge_(satrec, sensor, Number(now) + 1000, Number(now));
+
           return {
-            time: dateFormat(now, 'isoDateTime', true),
-            rng: aer.rng,
-            az: aer.az,
-            el: aer.el,
+            time: dateFormat(set.date, 'isoDateTime', true),
+            rng: set.aer.rng,
+            az: set.aer.az,
+            el: set.aer.el,
             type: !isMaxElFound ? TearrType.MAX_EL_AND_SET : TearrType.SET,
             inView: isInFOV,
             objName: sensor.objName,
@@ -188,7 +218,7 @@ export class SensorMath {
     const positionEci = <TemeVec3>Sgp4.propagate(sat.satrec, m!).position;
 
     if (!positionEci) {
-      errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${now}`);
+      errorManagerInstance.debug(`No ECI position for ${sat.satrec.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
       tearr.alt = <Kilometers>0;
       tearr.lon = <Degrees>0;
       tearr.lat = <Degrees>0;
@@ -341,7 +371,7 @@ export class SensorMath {
       const eci = <TemeVec3>Sgp4.propagate(sat.satrec, m!).position;
 
       if (!eci) {
-        errorManagerInstance.debug(`No ECI position for ${sat.satrec?.satnum} at ${now}`);
+        errorManagerInstance.debug(`No ECI position for ${sat.satrec?.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
         continue;
       }
 
@@ -372,6 +402,28 @@ export class SensorMath {
         }
       }
     }
+  }
+
+  /**
+   * A coarse search finds the first sample inside the field of view; the pass actually began somewhere in the
+   * step before it. Returns that start on the whole second shared with Look Angles and Best Passes. A first
+   * sample already in view is returned as is (the pass is under way).
+   */
+  private static refineRise_(sat: Satellite, sensor: DetailedSensor, firstInView: Date, stepSec: number): Date {
+    const inMs = firstInView.getTime();
+    // Never reach back before the search start: a pass already under way at the start reports the start
+    const outMs = Math.max(inMs - stepSec * 1000, ServiceLocator.getTimeManager().getOffsetTimeObj(0).getTime());
+
+    if (outMs >= inMs) {
+      return firstInView;
+    }
+    const isInView = (epochMs: number) => SatMath.checkIsInView(sensor, SatMath.getRae(new Date(epochMs), sat.satrec, sensor, true));
+
+    if (isInView(outMs)) {
+      return firstInView;
+    }
+
+    return new Date(refinePassEdgeMs(isInView, outMs, inMs));
   }
 
   static nextNpasses(sat: Satellite, sensors: DetailedSensor[], searchLength: number, interval: number, numPasses: number): Date[] {
@@ -408,7 +460,7 @@ export class SensorMath {
       const isInFOV = SatMath.checkIsInView(sensor, aer);
 
       if (isInFOV) {
-        passTimesArray.push(now);
+        passTimesArray.push(SensorMath.refineRise_(sat, sensor, now, interval));
         // Jump 3/4th to the next orbit
         i += orbitalPeriod * 60 * 0.75; // NOSONAR
       }
@@ -441,7 +493,7 @@ export class SensorMath {
         const isInFOV = SatMath.checkIsInView(sensor, aer);
 
         if (isInFOV) {
-          inViewTime.push(now);
+          inViewTime.push(SensorMath.refineRise_(sat, sensor, now, interval));
           break;
         }
       }
@@ -472,6 +524,73 @@ export class SensorMath {
     }
 
     return nextPassArray;
+  }
+
+  /**
+   * Sun elevation below which a site counts as dark for optical observing (nautical twilight).
+   * Matches the Pro Optical Observability Planner (DARK_SUN_EL_DEG); OSS cannot import it.
+   */
+  static readonly SITE_DARK_SUN_EL_DEG = -12;
+
+  /** Optical sensors and observers (the custom-sensor default) are subject to lighting; radar is not. */
+  static isOpticalSensor(sensor: DetailedSensor | undefined): boolean {
+    return sensor?.type === SpaceObjectType.OPTICAL || sensor?.type === SpaceObjectType.OBSERVER;
+  }
+
+  /**
+   * Lighting at one instant: is the satellite sunlit (outside Earth's shadow) and is the site dark
+   * (Sun at or below {@link SITE_DARK_SUN_EL_DEG}). Each field is null when it cannot be computed.
+   * @param satPos The satellite's ECI position at `now` (km), not a stale cached one.
+   */
+  static getLightingState(satPos: TemeVec3 | null | undefined, sensor: DetailedSensor, now: Date): { sunlit: boolean | null; siteDark: boolean | null; sunElDeg: number | null } {
+    const { gmst } = calcGmst(now);
+    const sunPos = Sun.eci(now);
+    const sitePos = lla2eci(sensor.llaRad(), gmst);
+    // Geodetic normal of the site (lat/lon rotated into ECI by GMST), as the Pro planner's site.up
+    const lla = sensor.llaRad();
+    const up = {
+      x: Math.cos(lla.lat) * Math.cos(lla.lon + gmst),
+      y: Math.cos(lla.lat) * Math.sin(lla.lon + gmst),
+      z: Math.sin(lla.lat),
+    } as TemeVec3;
+    const sunElDeg = SatMath.calculateGroundSiteSunElevation(sitePos, sunPos, up);
+
+    let sunlit: boolean | null = null;
+
+    if (satPos && !(satPos.x === 0 && satPos.y === 0 && satPos.z === 0)) {
+      const status = SatMath.calculateIsInSun({ position: satPos } as unknown as StateVectorSgp4, sunPos);
+
+      // Only the umbra is eclipsed; penumbra still reflects (partial) sunlight, as in the Pro planner
+      sunlit = status === SunStatus.UNKNOWN ? null : status !== SunStatus.UMBRAL;
+    }
+
+    return { sunlit, siteDark: sunElDeg === null ? null : sunElDeg <= SensorMath.SITE_DARK_SUN_EL_DEG, sunElDeg };
+  }
+
+  /**
+   * What the Vis Mag rows should show. A satellite in Earth's shadow reflects no sunlight, so it has no
+   * apparent magnitude ("notSunlit"); otherwise the number, flagged `assumed` whenever the intrinsic magnitude
+   * is not a catalog value: the flat default, a preset or a physics estimate (passed as the override) all count.
+   */
+  static getVisMagReading(
+    sat: Satellite,
+    sensor: DetailedSensor,
+    now: Date,
+    sun: SunBody,
+    intrinsicMagOverride?: number
+  ): { kind: 'notSunlit' } | { kind: 'mag'; value: number; assumed: boolean } {
+    if (SensorMath.getLightingState(sat.position, sensor, now).sunlit === false) {
+      return { kind: 'notSunlit' };
+    }
+
+    const assumed = !sat.vmag || Boolean((sat as Satellite & { isVmagEstimated?: boolean }).isVmagEstimated);
+
+    return { kind: 'mag', value: SatMath.calculateVisMag(sat, sensor, now, sun, intrinsicMagOverride), assumed };
+  }
+
+  /** Optically visible = above the horizon (in view) AND satellite sunlit AND site dark. */
+  static getOpticalVerdict(inView: boolean, state: { sunlit: boolean | null; siteDark: boolean | null }): boolean {
+    return inView && state.sunlit === true && state.siteDark === true;
   }
 
   static checkIfVisibleForOptical(sat: BaseObject, sensor: DetailedSensor, now: Date): boolean {

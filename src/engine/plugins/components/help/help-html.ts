@@ -41,7 +41,7 @@ const resolveImageSrc_ = (src: string): string => {
 const buildImageHtml_ = (image: IHelpImage): string => {
   const caption = image.caption ? `<figcaption>${image.caption}</figcaption>` : '';
 
-  return `<figure class="help-figure"><img src="${resolveImageSrc_(image.src)}" alt="${image.alt}" loading="lazy" />${caption}</figure>`;
+  return `<figure class="help-figure"><button type="button" class="help-figure-zoom" aria-haspopup="dialog" aria-label="${image.alt}"><img src="${resolveImageSrc_(image.src)}" alt="${image.alt}" loading="lazy" /></button>${caption}</figure>`;
 };
 
 const buildSectionHtml_ = (section: IHelpSection): string => {

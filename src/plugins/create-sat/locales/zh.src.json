@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "卫星 NORAD ID (90000-99999)",
+        "noradIdHint": "90000-99999 的 ID 保留给分析对象，不会与真实目录编号冲突。",
         "satelliteName": "卫星名称",
         "inclinationDeg": "倾角（度）",
         "apogeeAltKm": "远地点高度（km）",
@@ -17,6 +18,7 @@
         "country": "国家",
         "epochYear": "历元年",
         "epochDay": "历元日",
+        "epochTimestamp": "历元时间戳 (UTC, ISO)",
         "inclination": "倾角",
         "rightAscension": "升交点赤经",
         "eccentricity": "离心率",
@@ -34,13 +36,22 @@
         "sectionOrbit": "轨道",
         "sectionEpoch": "历元",
         "sectionElements": "轨道要素",
-        "sectionPresets": "预设"
+        "sectionPresets": "预设",
+        "sectionWalker": "星座 (Walker delta)",
+        "walkerHint": "在同一高度和倾角下,于P个等间隔轨道面创建T颗卫星 (T/P/F 模式)。成员使用最小的空闲分析员编号。",
+        "walkerAltKm": "高度 (km)",
+        "walkerTotal": "卫星数 (T)",
+        "walkerPlanes": "轨道面数 (P)",
+        "walkerPhasing": "相位 (F)",
+        "walkerPrefix": "名称前缀",
+        "walkerTpfHelp": "T 必须是 P 的倍数。F(相位)取值范围为 0 到 P-1。"
       },
       "buttons": {
         "createSatellite": "创建卫星",
         "saveTle": "保存 TLE",
         "makeSunSync": "太阳同步倾角",
-        "cloneSelected": "克隆所选卫星"
+        "cloneSelected": "克隆所选卫星",
+        "createWalker": "创建星座"
       },
       "options": {
         "payload": "有效载荷",
@@ -63,11 +74,14 @@
         "invalidNoradId": "NORAD ID 无效。必须是 90000 到 99999 之间的 5 位数字。",
         "invalidType": "类型无效。必须是 1（有效载荷）、2（火箭体）、3（碎片）或 4（特殊）。",
         "invalidCountry": "国家无效。必须从列表中选择。",
-        "invalidEpochYear": "历元年无效。必须是 2 位数字。",
+        "invalidEpochYear": "历元年必须是 2 位数字（26）或 1957 至 2056 年（2026）。",
+        "invalidEpochTimestamp": "历元时间戳无效。请使用 ISO 日期时间，例如 2026-11-04T00:00:00Z。",
         "invalidEpochDay": "历元日无效。格式必须为 NNN.NNNNNNNN（例如 001.00000000）。",
         "invalidInclination": "倾角无效。格式必须为 NNN.NNNN（例如 000.0000）。",
         "invalidRasc": "升交点赤经无效。格式必须为 NNN.NNNN（例如 000.0000）。",
-        "invalidEccentricity": "离心率无效。必须是 7 位数字（例如 0000000）。",
+        "invalidEccentricity": "离心率必须不小于 0 且小于 1：输入小数（0.0012）或 7 位 TLE 格式（0012000）。",
+        "calcInvalidEccentricity": "已隐藏计算值：离心率必须不小于 0 且小于 1。",
+        "calcSubSurface": "已隐藏计算值：该轨道穿过地表以下。请降低平均运动或离心率。",
         "invalidArgPe": "近地点幅角无效。格式必须为 NNN.NNNN（例如 000.0000）。",
         "invalidMeanAnomaly": "平近点角无效。格式必须为 NNN.NNNN（例如 000.0000）。",
         "invalidMeanMotion": "平均运动无效。格式必须为 NN.NNNNN（例如 16.00000）。",
@@ -88,7 +102,8 @@
         "meanMotionRange": "{field}必须大于 0 且不超过每天 {max} 圈。",
         "periodPositive": "{field}必须是正的分钟数。",
         "numberRequired": "{field}必须是数字。",
-        "noradIdReserved": "NORAD ID {id} 已被一条发射轨迹占用。请选择其他 ID，或先移除该轨迹。"
+        "noradIdReserved": "NORAD ID {id} 已被一条发射轨迹占用。请选择其他 ID，或先移除该轨迹。",
+        "noradIdNoSlot": "NORAD ID {id} 不是可用的分析员槽位。请使用表单建议的 ID，或先释放该槽位。"
       },
       "successMsgs": {
         "satCreated": "卫星 {name}（{scc}）创建成功",
@@ -121,6 +136,20 @@
         "replace": "替换",
         "cancel": "取消",
         "changed": "卫星或表单已更改。请检查后重新提交。"
+      },
+      "walker": {
+        "created": "已创建 {count} 颗卫星,名称为 {prefix}-P#-S# ({failed} 个失败)",
+        "errors": {
+          "altitude": "高度必须在 160 到 400000 km 之间。",
+          "inclination": "倾角必须在 0 到 180 度之间。",
+          "total": "卫星数 (T) 必须是不小于 1 的整数。",
+          "planes": "轨道面数 (P) 必须是 1 到 T 之间的整数。",
+          "phasing": "相位 (F) 必须是 0 到 {max} 之间的整数。",
+          "divisible": "T 必须能被 P 整除。",
+          "tooMany": "每个星座最多 {max} 颗卫星。",
+          "noSlots": "空闲分析员位置不足 (空闲 {free},需要 {needed})。",
+          "failed": "无法生成星座。"
+        }
       }
     }
   }

@@ -125,6 +125,11 @@ export abstract class SplashScreen {
       hideEl('loading-screen');
       showEl('keeptrack-header');
       SplashScreen.hideLoadingScreenElements();
+      if (!settingsManager.isAutoStart) {
+        // The start button lives inside the loading screen that was just hidden, so nothing else announces it (#383:
+        // the welcome tour waits on this event and never started on phones). Auto start emits it from handleStartAppButton.
+        EventBus.getInstance().emit(EventBusEvent.splashScreenHidden);
+      }
     }
 
     getEl('loader-text')!.innerText = '';

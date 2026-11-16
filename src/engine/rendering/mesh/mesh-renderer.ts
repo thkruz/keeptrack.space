@@ -361,7 +361,11 @@ export class MeshRenderer {
         ambientTint = mix(ambientTint, vec3(1.0), a);
       }
 
-      vec3 ambientColor = baseColor * 0.1;
+      // Sunlit keeps the 0.1 ambient. In eclipse the floor rises (earthshine/albedo stand-in) with a faint
+      // light-facing fill so the model stays readable while still clearly darker than a sunlit one.
+      float sunAmt = min(vInSun, 1.0);
+      float ambientAmt = mix(0.32 + 0.10 * lightAmt, 0.1, sunAmt);
+      vec3 ambientColor = baseColor * ambientAmt;
       vec3 dirColor = baseColor * ambientTint * lightAmt * (min(vInSun,1.0) * 0.65);
       vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.65);
 

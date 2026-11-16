@@ -23,6 +23,7 @@
  */
 
 import { DensityBin } from '@app/app/data/catalog-manager';
+import { getDockedIds, isDocked } from '@app/app/data/docked-vehicles';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { Planet } from '@app/app/objects/planet';
 import { ColorCruncherThreadManager } from '@app/app/threads/color-cruncher-thread-manager';
@@ -428,6 +429,7 @@ export class ColorSchemeManager {
       if (data && data.colorData.length === this.colorData.length) {
         this.colorData.set(data.colorData);
         this.pickableData.set(data.pickableData);
+        this.hideDockedDots_();
         this.isColorBufferDirty_ = true;
         // Save clean copy before overlay so setFovFadeAlpha can reapply without compounding
         if (this.fovFadeAlpha_) {
@@ -772,8 +774,26 @@ export class ColorSchemeManager {
     }
   }
 
+  /** The color worker knows nothing about docking, so blank the docked vehicles in its result. */
+  private hideDockedDots_(): void {
+    for (const id of getDockedIds()) {
+      if (id * 4 + 3 < this.colorData.length) {
+        this.colorData.fill(0, id * 4, id * 4 + 4);
+        this.pickableData[id] = Pickable.No;
+      }
+    }
+  }
+
   private getColorIfDisabledSat_(objectData: BaseObject[], i: number): ColorInformation | null {
     const sat = objectData[i] as Satellite;
+
+    // A visiting vehicle docked to a station is folded into the host's dot (#463)
+    if (isDocked(sat.id)) {
+      return {
+        color: [0, 0, 0, 0],
+        pickable: Pickable.No,
+      };
+    }
 
     // Optimize for the most common cases first
 
@@ -1088,6 +1108,7 @@ export class ColorSchemeManager {
 
       if (
         ServiceLocator.getUiManager().searchManager.getCurrentSearch() === '' &&
+        !ServiceLocator.getUiManager().searchManager.isGroupHighlightHeld &&
         watchlistTransform !== 'translateX(0px)' &&
         !PluginRegistry.getPlugin(TimeMachine)?.isMenuButtonActive &&
         !(<TimeMachine>PluginRegistry.getPlugin(TimeMachine))?.isTimeMachineRunning

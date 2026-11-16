@@ -50,6 +50,59 @@ export const requestIdleWrite = (cb: () => void): void => {
   setTimeout(cb, 0);
 };
 
+const lastWrittenHtml_ = new WeakMap<Element, { html: string; serialized: string }>();
+
+/**
+ * Assign `html` to `el.innerHTML` unless the element already shows it. Compares against the last value written
+ * through this helper (and the element's current serialization, so outside edits still get overwritten).
+ * Returns true when the DOM was written. Rewriting identical content costs layout work and detaches hovered nodes.
+ */
+export const writeHtmlIfChanged = (el: Element, html: string): boolean => {
+  const last = lastWrittenHtml_.get(el);
+
+  if (last?.html === html && el.innerHTML === last.serialized) {
+    return false;
+  }
+
+  el.innerHTML = html;
+  lastWrittenHtml_.set(el, { html, serialized: el.innerHTML });
+
+  return true;
+};
+
+/** Assign `text` to `el.textContent` unless it already shows it. Returns true when the DOM was written. */
+export const writeTextIfChanged = (el: Element, text: string): boolean => {
+  if (el.textContent === text) {
+    return false;
+  }
+
+  el.textContent = text;
+
+  return true;
+};
+
+/** Set an attribute unless it already has that value. Any `setAttribute` call queues a mutation record, even for identical values. Returns true when written. */
+export const writeAttrIfChanged = (el: Element, name: string, value: string): boolean => {
+  if (el.getAttribute(name) === value) {
+    return false;
+  }
+
+  el.setAttribute(name, value);
+
+  return true;
+};
+
+/** Assign `title` unless the element already has it. A same-value assignment still queues a mutation record. */
+export const writeTitleIfChanged = (el: HTMLElement, title: string): boolean => {
+  if (el.title === title && (title !== '' || el.hasAttribute('title'))) {
+    return false;
+  }
+
+  el.title = title;
+
+  return true;
+};
+
 export const setInnerHtml = (id: string, html: string) => {
   requestIdleWrite(() => {
     const el = getEl(id, true);
@@ -59,7 +112,7 @@ export const setInnerHtml = (id: string, html: string) => {
 
       return;
     }
-    el.innerHTML = html;
+    writeHtmlIfChanged(el, html);
   });
 };
 
@@ -69,15 +122,10 @@ export const setInnerHtml = (id: string, html: string) => {
  * @param value - The value to set for the display style (default: 'block').
  */
 export const showEl = (id: string | HTMLElement, value = 'block') => {
-  if (typeof id === 'object') {
-    id.style.display = value;
+  const el = typeof id === 'object' ? id : getEl(id, true);
 
-    return;
-  }
-
-  const el = getEl(id, true);
-
-  if (el) {
+  // An identical inline display write still invalidates style (and layout for the subtree); skip it.
+  if (el && el.style.display !== value) {
     el.style.display = value;
   }
 };
@@ -87,16 +135,10 @@ export const showEl = (id: string | HTMLElement, value = 'block') => {
  * @param id - The ID of the element to hide.
  */
 export const hideEl = (id: string | HTMLElement) => {
-  if (typeof id === 'object') {
-    id.style.display = 'none';
+  if (typeof id === 'object' || typeof id === 'string') {
+    const el = typeof id === 'object' ? id : getEl(id, true);
 
-    return;
-  }
-
-  if (typeof id === 'string') {
-    const el = getEl(id, true);
-
-    if (el) {
+    if (el && el.style.display !== 'none') {
       el.style.display = 'none';
     }
 

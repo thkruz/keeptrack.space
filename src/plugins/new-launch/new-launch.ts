@@ -8,6 +8,7 @@ import { ServiceLocator } from '@app/engine/core/service-locator';
 import { TimeManager } from '@app/engine/core/time-manager';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import { GroupedPicker } from '@app/engine/ui/grouped-picker';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { dateFormat } from '@app/engine/utils/dateFormat';
 import { html } from '@app/engine/utils/development/formatter';
@@ -61,6 +62,7 @@ export class NewLaunch extends KeepTrackPlugin {
   readonly id = 'NewLaunch';
   dependencies_ = [SelectSatManager.name];
   protected readonly selectSatManager_: SelectSatManager;
+  protected facilityPicker_: GroupedPicker | null = null;
   lastLaunchParams: LaunchParams | null = null;
 
   constructor() {
@@ -91,7 +93,7 @@ export class NewLaunch extends KeepTrackPlugin {
     this.preValidate_(sat);
 
     (<HTMLInputElement>getEl('nl-scc')).value = sat.sccNum;
-    (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4).padStart(8, '0');
+    (<HTMLInputElement>getEl('nl-inc')).value = sat.inclination.toFixed(4);
   };
 
   menuMode: MenuMode[] = [MenuMode.CREATE, MenuMode.ALL];
@@ -168,13 +170,13 @@ export class NewLaunch extends KeepTrackPlugin {
 
     for (const country of countryKeys) {
       grouped[country].sort((a, b) => {
-        const siteCompare = a.site.localeCompare(b.site);
+        const siteCompare = a.site.localeCompare(b.site, undefined, { numeric: true });
 
         if (siteCompare !== 0) {
           return siteCompare;
         }
 
-        return a.name.localeCompare(b.name);
+        return a.name.localeCompare(b.name, undefined, { numeric: true });
       });
     }
 
@@ -270,7 +272,7 @@ export class NewLaunch extends KeepTrackPlugin {
                 </div>
                 <div class="kt-field-row">
                   <div class="input-field col s12" id="nl-launch-menu">
-                    <select id="nl-facility">
+                    <select id="nl-facility" class="no-autoinit">
                       ${optionsHtml}
                     </select>
                     <label>${l('launchFacility')}</label>
@@ -387,6 +389,23 @@ export class NewLaunch extends KeepTrackPlugin {
 
     ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
     this.applyMatchedWindow_(window, { target: `${targetSat.name} (${targetSat.sccNum})`, site: this.launchSiteLabel_(site) });
+  }
+
+  /**
+   * Replaces the long flat facility dropdown with the shared grouped drawer picker (collapsed country
+   * groups plus search). The native select stays hidden as the source of truth. Skips a select a subclass
+   * already left to Materialize.
+   */
+  protected attachFacilityPicker_(): void {
+    const select = getEl('nl-facility', true) as HTMLSelectElement | null;
+
+    if (!select || !select.classList.contains('no-autoinit') || this.facilityPicker_) {
+      return;
+    }
+    this.facilityPicker_ = new GroupedPicker(select, {
+      title: t7e('plugins.NewLaunch.labels.launchFacility' as T7eKey),
+      searchPlaceholder: t7e('plugins.NewLaunch.labels.searchFacilities' as T7eKey),
+    });
   }
 
   /**
@@ -710,6 +729,17 @@ export class NewLaunch extends KeepTrackPlugin {
     return [tle1, tle2];
   }
 
+  /** Disabled with a selection that is neither a satellite nor a launch site: say what to select. */
+  getDisabledReason(): string | null {
+    const obj = ServiceLocator.getCatalogManager().getObject(this.selectSatManager_.selectedSat, GetSatType.EXTRA_ONLY);
+
+    if (obj && !obj.isSatellite() && obj.type !== SpaceObjectType.LAUNCH_SITE) {
+      return t7e('pluginDrawer.reasonSelectSatelliteOrLaunchSite');
+    }
+
+    return null;
+  }
+
   addJs(): void {
     super.addJs();
     this.registerSelectSatListener_();
@@ -721,6 +751,8 @@ export class NewLaunch extends KeepTrackPlugin {
       if (menuRoot) {
         initMaterialSelects(menuRoot);
       }
+
+      this.attachFacilityPicker_();
 
       // Launch-window matching. The matched time is only valid for the
       // facility/direction/target it was computed with, so changing either

@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "Fuente",
-      "tooltip": "Fuente de los Datos de Información del Satélite"
+      "tooltip": "Fuente de los Datos de Información del Satélite",
+      "notRecorded": "No registrado"
     },
     "Confidence": {
       "label": "Confianza",
@@ -38,6 +39,12 @@
     },
     "errorMsgs": {
       "htmlNotReady": "El panel de información del satélite no terminó de cargarse, por lo que no se pudieron actualizar sus datos."
+    },
+    "export": {
+      "copyValues": "Copiar valores como texto",
+      "copied": "Valores copiados",
+      "region": "Detalles del objeto",
+      "secondary": "Objeto secundario"
     }
   }
 }

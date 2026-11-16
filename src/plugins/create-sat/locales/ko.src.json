@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "위성 NORAD ID (90000-99999)",
+        "noradIdHint": "90000-99999 ID는 분석가 객체용으로 예약되어 실제 카탈로그 번호와 충돌하지 않습니다.",
         "satelliteName": "위성 이름",
         "inclinationDeg": "경사각 (도)",
         "apogeeAltKm": "원지점 고도 (km)",
@@ -17,6 +18,7 @@
         "country": "국가",
         "epochYear": "원기 연도",
         "epochDay": "원기 일자",
+        "epochTimestamp": "원기 타임스탬프 (UTC, ISO)",
         "inclination": "경사각",
         "rightAscension": "적경",
         "eccentricity": "이심률",
@@ -34,13 +36,22 @@
         "sectionOrbit": "궤도",
         "sectionEpoch": "기준 시각",
         "sectionElements": "궤도 요소",
-        "sectionPresets": "프리셋"
+        "sectionPresets": "프리셋",
+        "sectionWalker": "콘스텔레이션 (워커 델타)",
+        "walkerHint": "같은 고도와 경사각으로 균등 간격의 P개 궤도면에 T개 위성을 만듭니다 (T/P/F 패턴). 각 위성은 비어 있는 가장 낮은 분석가 ID를 사용합니다.",
+        "walkerAltKm": "고도 (km)",
+        "walkerTotal": "위성 수 (T)",
+        "walkerPlanes": "궤도면 수 (P)",
+        "walkerPhasing": "위상 (F)",
+        "walkerPrefix": "이름 접두어",
+        "walkerTpfHelp": "T는 P의 배수여야 합니다. F(위상)는 0부터 P-1까지입니다."
       },
       "buttons": {
         "createSatellite": "위성 생성",
         "saveTle": "TLE 저장",
         "makeSunSync": "태양 동기 경사각",
-        "cloneSelected": "선택한 위성 복제"
+        "cloneSelected": "선택한 위성 복제",
+        "createWalker": "콘스텔레이션 만들기"
       },
       "options": {
         "payload": "탑재체",
@@ -63,11 +74,14 @@
         "invalidNoradId": "잘못된 NORAD ID입니다. 90000에서 99999 사이의 5자리 숫자여야 합니다.",
         "invalidType": "잘못된 유형입니다. 1 (탑재체), 2 (로켓 동체), 3 (파편), 또는 4 (특수)여야 합니다.",
         "invalidCountry": "잘못된 국가입니다. 목록에서 선택해야 합니다.",
-        "invalidEpochYear": "잘못된 원기 연도입니다. 2자리 숫자여야 합니다.",
+        "invalidEpochYear": "원기 연도는 2자리(26) 또는 1957~2056년(2026)이어야 합니다.",
+        "invalidEpochTimestamp": "원기 타임스탬프가 올바르지 않습니다. 2026-11-04T00:00:00Z 같은 ISO 날짜-시간을 사용하세요.",
         "invalidEpochDay": "잘못된 원기 일자입니다. NNN.NNNNNNNN 형식이어야 합니다 (예: 001.00000000).",
         "invalidInclination": "잘못된 경사각입니다. NNN.NNNN 형식이어야 합니다 (예: 000.0000).",
         "invalidRasc": "잘못된 적경입니다. NNN.NNNN 형식이어야 합니다 (예: 000.0000).",
-        "invalidEccentricity": "잘못된 이심률입니다. 7자리 숫자여야 합니다 (예: 0000000).",
+        "invalidEccentricity": "이심률은 0 이상 1 미만이어야 합니다. 소수(0.0012) 또는 7자리 TLE 형식(0012000)으로 입력하세요.",
+        "calcInvalidEccentricity": "계산값 숨김: 이심률은 0 이상 1 미만이어야 합니다.",
+        "calcSubSurface": "계산값 숨김: 이 궤도는 지표면 아래를 지납니다. 평균 운동 또는 이심률을 낮추세요.",
         "invalidArgPe": "잘못된 근지점 편각입니다. NNN.NNNN 형식이어야 합니다 (예: 000.0000).",
         "invalidMeanAnomaly": "잘못된 평균 근점 이각입니다. NNN.NNNN 형식이어야 합니다 (예: 000.0000).",
         "invalidMeanMotion": "잘못된 평균 운동입니다. NN.NNNNN 형식이어야 합니다 (예: 16.00000).",
@@ -88,7 +102,8 @@
         "meanMotionRange": "{field}은(는) 0보다 크고 하루 {max}회전 이하여야 합니다.",
         "periodPositive": "{field}은(는) 양수 분 값이어야 합니다.",
         "numberRequired": "{field}은(는) 숫자여야 합니다.",
-        "noradIdReserved": "NORAD ID {id}은(는) 발사 궤적이 사용 중입니다. 다른 ID를 선택하거나 먼저 궤적을 제거하세요."
+        "noradIdReserved": "NORAD ID {id}은(는) 발사 궤적이 사용 중입니다. 다른 ID를 선택하거나 먼저 궤적을 제거하세요.",
+        "noradIdNoSlot": "NORAD ID {id}은(는) 사용 가능한 분석가 슬롯이 아닙니다. 양식이 제안하는 ID를 사용하거나 먼저 이 슬롯을 비우세요."
       },
       "successMsgs": {
         "satCreated": "위성 {name} ({scc})이(가) 성공적으로 생성되었습니다",
@@ -121,6 +136,20 @@
         "replace": "교체",
         "cancel": "취소",
         "changed": "위성 또는 양식이 변경되었습니다. 확인 후 다시 제출하세요."
+      },
+      "walker": {
+        "created": "{prefix}-P#-S# 이름의 위성 {count}개를 만들었습니다 ({failed}개 실패)",
+        "errors": {
+          "altitude": "고도는 160~400000 km여야 합니다.",
+          "inclination": "경사각은 0~180도여야 합니다.",
+          "total": "위성 수 (T)는 1 이상의 정수여야 합니다.",
+          "planes": "궤도면 수 (P)는 1부터 T까지의 정수여야 합니다.",
+          "phasing": "위상 (F)은 0부터 {max}까지의 정수여야 합니다.",
+          "divisible": "T는 P로 나누어떨어져야 합니다.",
+          "tooMany": "콘스텔레이션당 최대 {max}개 위성입니다.",
+          "noSlots": "비어 있는 분석가 슬롯이 부족합니다 (여유 {free}, 필요 {needed}).",
+          "failed": "콘스텔레이션을 생성하지 못했습니다."
+        }
       }
     }
   }

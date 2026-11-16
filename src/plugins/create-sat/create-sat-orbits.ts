@@ -127,6 +127,33 @@ export function dateToEpochFields(date: Date): { year: string; day: string } {
   };
 }
 
+/**
+ * Parse an ISO date-time (UTC) into the TLE epoch fields. A string without a zone designator is read as UTC; a
+ * date-only string is rejected so a typo cannot silently become midnight. Returns null when it is not a valid ISO date-time.
+ */
+export function isoToEpochFields(text: string): { year: string; day: string } | null {
+  const s = text.trim();
+  const m = /^(?<date>\d{4}-\d{2}-\d{2})[T ](?<time>\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)(?<zone>Z|[+-]\d{2}:?\d{2})?$/iu.exec(s);
+
+  if (!m?.groups) {
+    return null;
+  }
+  const zone = m.groups.zone ? m.groups.zone.toUpperCase() : 'Z';
+  const time = m.groups.time.length === 5 ? `${m.groups.time}:00` : m.groups.time;
+  const zoneIso = zone === 'Z' || zone.includes(':') ? zone : `${zone.slice(0, 3)}:${zone.slice(3)}`;
+  const date = new Date(`${m.groups.date}T${time}${zoneIso}`);
+
+  const [y, mo, d] = m.groups.date.split('-').map(Number);
+  const wall = new Date(Date.UTC(y, mo - 1, d));
+
+  // Date rolls 30 Feb over to 2 Mar instead of failing, so check the calendar date as typed.
+  if (Number.isNaN(date.getTime()) || wall.getUTCMonth() !== mo - 1 || wall.getUTCDate() !== d) {
+    return null;
+  }
+
+  return dateToEpochFields(date);
+}
+
 /** Raw TLE international-designator columns (10-17 of line 1), e.g. "98067A". */
 export function rawIntlDesFromTle(tle1: TleLine1): string {
   return tle1.substring(9, 17).trim();
@@ -145,4 +172,49 @@ export function cosparToRawIntlDes(objectId: string | undefined): string {
   }
 
   return `${match.groups.year.slice(-2)}${match.groups.rest}`;
+}
+
+/** Earliest and latest calendar year a TLE epoch can name (two-digit years 57-99 are 19xx, 00-56 are 20xx). */
+export const MIN_EPOCH_YEAR = 1957;
+export const MAX_EPOCH_YEAR = 2056;
+
+/**
+ * Read the Epoch Year field: two digits ("26") or a four-digit calendar year inside 1957-2056 ("2026").
+ * @returns the full calendar year, or null when the text is not a plausible TLE epoch year.
+ */
+export function epochYearToFull(raw: string): number | null {
+  const text = raw.trim();
+
+  if (/^\d{2}$/u.test(text)) {
+    const yy = Number.parseInt(text, 10);
+
+    return yy >= 57 ? 1900 + yy : 2000 + yy;
+  }
+  if (/^\d{4}$/u.test(text)) {
+    const full = Number.parseInt(text, 10);
+
+    return full >= MIN_EPOCH_YEAR && full <= MAX_EPOCH_YEAR ? full : null;
+  }
+
+  return null;
+}
+
+/**
+ * The ISO UTC timestamp for an Epoch Year + Epoch Day pair, so both inputs can describe the same instant.
+ * @returns null when either field is not a valid epoch.
+ */
+export function epochFieldsToIso(yearText: string, dayText: string): string | null {
+  const year = epochYearToFull(yearText);
+  const day = dayText.trim() === '' ? Number.NaN : Number(dayText.trim());
+
+  if (year === null || !(day >= 1 && day < 367)) {
+    return null;
+  }
+  const date = new Date(Date.UTC(year, 0, 1) + (day - 1) * 86_400_000);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString().replace(/\.000Z$/u, 'Z');
 }

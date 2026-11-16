@@ -3,6 +3,8 @@
     "orbitPreview": "Orbit Preview",
     "unknown": "Unknown",
     "close": "Close",
+    "dock": "Dock",
+    "menuHelp": "Help for this menu",
     "download": "Download",
     "downloadNamed": "Download {name}",
     "loading": "Loading…"
@@ -265,6 +267,13 @@
     "groupDevTools": "Development Tools",
     "groupAbout": "About",
     "modeAll": "All Plugins",
+    "reasonSelectSensor": "Select a sensor first",
+    "reasonSelectSatellite": "Select a satellite first",
+    "reasonSelectTleSatellite": "Select a satellite with an orbit (TLE) to use this",
+    "reasonSelectSatelliteOrLaunchSite": "Select a satellite or a launch site to use this",
+    "reasonEnablePlanets": "Turn on planets in Settings to use this",
+    "reasonAddToWatchlist": "Add satellites to your watchlist first",
+    "reasonFreeAccount": "Free account unlocks this",
     "openPluginMenu": "Open plugin menu",
     "openAppLauncher": "Open app launcher",
     "appLauncherTooltip": "App Launcher (Shift+Z)",
@@ -276,6 +285,10 @@
     "expand": "Expand",
     "phoneLink": "Phone Link",
     "phoneLinkSignIn": "Sign in to link your phone",
+    "signInPromptTitle": "Sign in to {{feature}}",
+    "signInPromptBody": "{{feature}} is available with a free account. Sign in to use it.",
+    "signInPromptAction": "Sign in",
+    "signInPromptCancel": "Not now",
     "connected": "Connected",
     "offline": "Offline",
     "footerLinks": {
@@ -291,7 +304,9 @@
     "resetCamera": "Reset Camera",
     "clearLines": "Clear Lines",
     "clearScreen": "Clear Screen",
-    "startClock": "Start Clock"
+    "startClock": "Start Clock",
+    "groupObject": "Satellite",
+    "groupMore": "More"
   },
   "urlManager": {
     "satNotFound": "Satellite \"{val}\" was not found!",
@@ -318,7 +333,12 @@
     "resultCount": "{count} results",
     "resultCountLimited": "Showing {shown} of {total} results",
     "noResults": "No Results Found",
+    "noResultsSensors": "No Results Found. Sensors are not searchable in this view.",
+    "noResultsSensorsHidden": "No Results Found. Ground sensors are hidden by the Filter menu or Search Settings.",
     "decayed": "Decayed",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} is part of the {host}",
+    "dockedTo": "docked to the {host}",
     "typeStar": "Star",
     "typeSensor": "Sensor",
     "typeLaunchSite": "Launch Site",
@@ -357,6 +377,10 @@
   "layersManager": {
     "toggleLayers": "Toggle Layers",
     "layers": "Layers"
+  },
+  "mobileZoom": {
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
   },
   "modalConfirm": {
     "confirmAction": "Confirm Action",
@@ -397,5 +421,10 @@
       "breakup": "Breakup debris",
       "created": "Created satellites"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

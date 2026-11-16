@@ -30,7 +30,7 @@ describe('NewLaunch (base) bottomIconCallback', () => {
     plugin.bottomIconCallback();
 
     expect((getEl('nl-scc') as HTMLInputElement).value).toBe(defaultSat.sccNum);
-    expect((getEl('nl-inc') as HTMLInputElement).value).toBe(defaultSat.inclination.toFixed(4).padStart(8, '0'));
+    expect((getEl('nl-inc') as HTMLInputElement).value).toBe(defaultSat.inclination.toFixed(4));
   });
 
   it('is a no-op when the menu button is inactive', () => {

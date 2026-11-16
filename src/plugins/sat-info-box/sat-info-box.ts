@@ -12,15 +12,18 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeAttrIfChanged, writeHtmlIfChanged } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, CatalogSource, Satellite } from '@ootk/src/main';
 import bookmarkAddPng from '@public/img/icons/bookmark-add.png';
 import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
+import contentCopyPng from '@public/img/icons/content-copy.png';
 import Draggabilly from 'draggabilly';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { INFO_CIRCLE_CLASS, plainValueText } from './info-value';
+import { watchPhoneHelpIcons } from './phone-help-icons';
 import { isPlaceholderIntlDes } from './placeholder-intl-des';
 import { CONTAINER_ID, EL, SECTIONS } from './sat-info-box-html';
 import './sat-info-box.css';
@@ -39,6 +42,55 @@ const setInnerHtml = (id: string, value: string): void => {
  * This class controls all the functionality of the satellite info box.
  * There are select events and update events that are registered to the Event Bus.
  */
+/** Plain-text dump of the info box rows ("Key: value" per line) headed by the object name and UTC time. */
+export const buildInfoBoxText = (box: HTMLElement | null, time: Date): string => {
+  if (!box) {
+    return '';
+  }
+  const name = box.querySelector(`#${EL.NAME}`)?.textContent?.trim() ?? '';
+  const lines = [`${name} (${time.toISOString()} UTC)`];
+
+  box.querySelectorAll('.sat-info-row').forEach((row) => {
+    if (row instanceof HTMLElement && row.offsetParent === null && row.style.display === 'none') {
+      return;
+    }
+    const key = plainValueText(row.querySelector('.sat-info-key'));
+    const value = plainValueText(row.querySelector('.sat-info-value'));
+
+    if (key && value) {
+      lines.push(`${key}: ${value}`);
+    }
+  });
+
+  return lines.join('\n');
+};
+
+/**
+ * Plain-text summary of the secondary object for the combined copy output: name, identifiers and, for satellites,
+ * the main orbit values. Pure so it can be unit tested without the DOM.
+ */
+export const buildSecondaryText = (obj: BaseObject | null | undefined, heading: string): string => {
+  if (!obj) {
+    return '';
+  }
+  const sat = obj as Partial<Satellite>;
+  const lines = [`--- ${heading} ---`, obj.name];
+  const add = (key: string, value: string | number | undefined, unit = ''): void => {
+    if (value !== undefined && value !== '' && !(typeof value === 'number' && !Number.isFinite(value))) {
+      lines.push(`${key}: ${typeof value === 'number' ? value.toFixed(2) : value}${unit}`);
+    }
+  };
+
+  add('NORAD', sat.sccNum);
+  add('COSPAR', sat.intlDes);
+  add('Inclination', sat.inclination, ' deg');
+  add('Period', sat.period, ' min');
+  add('Apogee', sat.apogee, ' km');
+  add('Perigee', sat.perigee, ' km');
+
+  return lines.join('\n');
+};
+
 export class SatInfoBox extends KeepTrackPlugin {
   readonly id = 'SatInfoBox';
   dependencies_: string[] = [SelectSatManager.name];
@@ -78,10 +130,10 @@ export class SatInfoBox extends KeepTrackPlugin {
 
       if (toggleEl) {
         if (isOnList) {
-          toggleEl.src = bookmarkRemovePng;
+          writeAttrIfChanged(toggleEl, 'src', bookmarkRemovePng);
           toggleEl.classList.replace('off-watchlist', 'on-watchlist');
         } else {
-          toggleEl.src = bookmarkAddPng;
+          writeAttrIfChanged(toggleEl, 'src', bookmarkAddPng);
           toggleEl.classList.replace('on-watchlist', 'off-watchlist');
         }
       }
@@ -131,11 +183,14 @@ export class SatInfoBox extends KeepTrackPlugin {
     if (isShow) {
       satInfoboxDom.style.display = 'block';
     }
+    if (satInfoboxDom.id === SatInfoBox.containerId_) {
+      document.body?.classList.toggle('kt-satinfo-open', isShow);
+    }
 
     const searchBoxHeight = satInfoboxDom?.getBoundingClientRect().height ?? 0;
     const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
 
-    document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTop}px`);
+    SatInfoBox.setSearchBoxBottom(`${searchBoxHeight + bottomMenuTop}px`);
   }
 
   addListenerToCollapseElement(section: HTMLElement | null, isCollapsedRef?: { value: boolean }): void {
@@ -163,21 +218,137 @@ export class SatInfoBox extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * The docked box is anchored by `bottom` with `top: auto`, which Draggabilly reads as y = 0, so the first
+   * drag from the dock jumped the box to the top edge (#49). Pin the box at its current on-screen position
+   * with explicit top/left and tell Draggabilly the same numbers, so the box stays under the pointer.
+   */
+  static freezeFloatingGeometry_(
+    draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number } },
+    el: HTMLElement,
+    container: HTMLElement,
+    topInset = 0
+  ): void {
+    const rect = el.getBoundingClientRect();
+    const containerRect = container.getBoundingClientRect();
+    const x = Math.max(0, Math.round(rect.left - containerRect.left));
+    const y = Math.max(topInset, Math.round(rect.top - containerRect.top));
+
+    el.style.bottom = 'auto';
+    el.style.right = 'auto';
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    draggie.position.x = x;
+    draggie.position.y = y;
+    if (draggie.startPosition) {
+      draggie.startPosition.x = x;
+      draggie.startPosition.y = y;
+    }
+  }
+
+  /** Pulls a just-enlarged floating box back inside its container and refreshes Draggabilly's containment. */
+  static clampAfterResize_(
+    draggie: { position: { x: number; y: number }; startPosition?: { x: number; y: number }; relativeStartPosition?: { x: number; y: number }; measureContainment?: () => void },
+    el: HTMLElement,
+    container: HTMLElement,
+    topInset = 0
+  ): void {
+    const overflow = el.getBoundingClientRect().bottom - container.getBoundingClientRect().bottom;
+
+    if (overflow > 0) {
+      const newTop = Math.max(topInset, draggie.position.y - overflow);
+
+      draggie.position.y = newTop;
+      if (draggie.startPosition) {
+        draggie.startPosition.y = newTop;
+      }
+      el.style.top = `${newTop}px`;
+    }
+    draggie.measureContainment?.();
+    SatInfoBox.applyTopInset_(draggie, topInset);
+  }
+
+  /** Pixel height of the top bar (nav, classification bar and time slider) the floating box must stay below (#49). */
+  static getTopInsetPx_(container: HTMLElement): number {
+    const probe = document.createElement('div');
+
+    probe.style.cssText = 'position:absolute;visibility:hidden;pointer-events:none;width:1px;height:var(--top-menu-height, 50px)';
+    container.appendChild(probe);
+    const inset = probe.getBoundingClientRect().height;
+
+    probe.remove();
+
+    return Number.isFinite(inset) ? Math.round(inset) : 0;
+  }
+
+  /**
+   * Draggabilly contains the drag inside the container; shrink that containment from the top so the header can
+   * never be dragged under the top bar, where it could not be grabbed again (#49). Call after measureContainment.
+   */
+  static applyTopInset_(draggie: { relativeStartPosition?: { x: number; y: number } }, topInset: number): void {
+    if (topInset > 0 && draggie.relativeStartPosition) {
+      draggie.relativeStartPosition.y -= topInset;
+    }
+  }
+
+  /**
+   * Draggabilly only starts a drag while `isPointerDown` is false, and only clears it when a matching
+   * pointerup or pointercancel reaches the window. A release that never arrives (the box hidden or the
+   * window blurred mid-press, a handler swallowing the event) leaves it true, and the next press from the
+   * docked box is ignored or drags on hover (#49). Clear that state by hand.
+   */
+  static releaseStalePointer_(draggie: { isPointerDown?: boolean; isDragging?: boolean; pointerDone?: () => void; element?: HTMLElement }): boolean {
+    if (!draggie.isPointerDown && !draggie.isDragging) {
+      return false;
+    }
+    if (draggie.isPointerDown) {
+      draggie.pointerDone?.();
+    }
+    draggie.isDragging = false;
+    if (draggie.element) {
+      draggie.element.classList.remove('is-dragging', 'is-pointer-down');
+      draggie.element.style.transform = '';
+    }
+
+    return true;
+  }
+
+  private draggie_: Draggabilly | null = null;
+
   private initDraggabilly() {
     if (!settingsManager.isMobileModeEnabled) {
       const draggie = new Draggabilly(getEl(SatInfoBox.containerId_)!, {
         containment: KeepTrack.getInstance().containerRoot,
       });
 
+      this.draggie_ = draggie;
+
       draggie.on('dragStart', () => {
         const satInfoBoxElement = getEl(SatInfoBox.containerId_)!;
 
-        satInfoBoxElement.style.height = 'fit-content';
-        satInfoBoxElement.style.maxHeight = '80%';
-        document.documentElement.style.setProperty('--search-box-bottom', '0px');
+        // Only write what changes: a repeat drag finds the floating geometry already in place.
+        if (satInfoBoxElement.style.height !== 'fit-content') {
+          satInfoBoxElement.style.height = 'fit-content';
+        }
+        if (satInfoBoxElement.style.maxHeight !== '80%') {
+          satInfoBoxElement.style.maxHeight = '80%';
+        }
+        SatInfoBox.setSearchBoxBottom('0px');
         satInfoBoxElement.classList.remove('satinfo-fixed');
 
-        getEl('search-results')!.style.maxHeight = '85%';
+        const searchResults = getEl('search-results')!;
+
+        if (searchResults.style.maxHeight !== '85%') {
+          searchResults.style.maxHeight = '85%';
+        }
+
+        // Draggabilly measured position and containment before this handler grew the box (45% to 80% max
+        // height) and undocked it, so pin the final floating geometry now, then re-clamp and re-measure.
+        const containerRoot = KeepTrack.getInstance().containerRoot;
+        const topInset = SatInfoBox.getTopInsetPx_(containerRoot);
+
+        SatInfoBox.freezeFloatingGeometry_(draggie, satInfoBoxElement, containerRoot, topInset);
+        SatInfoBox.clampAfterResize_(draggie, satInfoBoxElement, containerRoot, topInset);
       });
 
       draggie.on('pointerDown', () => {
@@ -187,6 +358,18 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     // If right click kill and reinit
     const satInfobox = getEl(SatInfoBox.containerId_)!;
+
+    // Capture phase, so it runs before Draggabilly's own pointerdown handler: a fresh press means any
+    // recorded press is stale.
+    satInfobox.addEventListener(
+      'pointerdown',
+      () => {
+        if (this.draggie_) {
+          SatInfoBox.releaseStalePointer_(this.draggie_ as unknown as Parameters<typeof SatInfoBox.releaseStalePointer_>[0]);
+        }
+      },
+      true
+    );
 
     satInfobox.addEventListener('mousedown', (e: MouseEvent) => {
       if (e.button === 2) {
@@ -205,6 +388,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     this.addListenerToCollapseElement(getEl(`${SECTIONS.IDENTIFIERS}`));
     this.addCopyListeners_();
+    getEl(EL.COPY_VALUES, true)?.addEventListener('click', () => this.copyAllValues_());
 
     EventBus.getInstance().emit(EventBusEvent.satInfoBoxAddListeners);
   }
@@ -224,8 +408,25 @@ export class SatInfoBox extends KeepTrackPlugin {
    * Skips empty or "not available" values and degrades gracefully when the
    * Clipboard API is unavailable (e.g. insecure contexts or older browsers).
    */
+  /** Copies every visible key/value row of the info box, with the object name and UTC time, as plain text. A secondary object, when chosen, is appended as its own block. */
+  private copyAllValues_(): void {
+    let text = buildInfoBoxText(getEl(SatInfoBox.containerId_, true), ServiceLocator.getTimeManager().simulationTimeObj);
+    const secondary = PluginRegistry.getPlugin(SelectSatManager)?.secondarySatObj;
+
+    if (secondary) {
+      text += `\n\n${buildSecondaryText(secondary, t7e('satInfoBox.export.secondary' as Parameters<typeof t7e>[0]))}`;
+    }
+
+    navigator.clipboard
+      .writeText(text)
+      .then(() => ServiceLocator.getUiManager().toast(t7e('satInfoBox.export.copied' as Parameters<typeof t7e>[0]), ToastMsgType.normal))
+      .catch(() => {
+        // Clipboard write was rejected (e.g. permissions); nothing to clean up
+      });
+  }
+
   private copyIdentifier_(elementId: string): void {
-    const value = getEl(elementId, true)?.textContent?.trim() ?? '';
+    const value = plainValueText(getEl(elementId, true));
     const notAvailable = t7e('satInfoBox.notAvailable' as Parameters<typeof t7e>[0]);
     const notAvailableJsc = t7e('satInfoBox.notAvailableJscVimpel' as Parameters<typeof t7e>[0]);
 
@@ -263,7 +464,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     getEl('canvas-holder')?.insertAdjacentHTML(
       'beforeend',
       html`
-        <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden">
+        <div id="${CONTAINER_ID}" class="text-select satinfo-fixed start-hidden keyboard-priority" tabindex="0" role="region"
+          aria-label="${t7e('satInfoBox.export.region' as Parameters<typeof t7e>[0])}">
           ${elements
             .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
             .map((el) => el.html ?? '')
@@ -278,6 +480,12 @@ export class SatInfoBox extends KeepTrackPlugin {
     this.initDraggabilly();
 
     this.isHtmlReady_ = true;
+
+    const box = getEl(CONTAINER_ID, true);
+
+    if (box) {
+      watchPhoneHelpIcons(box);
+    }
   }
 
   private createHeader(): string {
@@ -286,6 +494,9 @@ export class SatInfoBox extends KeepTrackPlugin {
         <div id="${EL.TITLE}" class="center-text">
           <span id="${EL.NAME}">This is a title</span>
           <span id="${EL.FLAG}" class="fi"></span>
+          <button id="${EL.COPY_VALUES}" type="button" class="sat-info-copy-values"
+            aria-label="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}"
+            kt-tooltip="${t7e('satInfoBox.export.copyValues' as Parameters<typeof t7e>[0])}"><img class="sat-watchlist-icon off-watchlist" src="${contentCopyPng}" alt="" /></button>
         </div>
       </div>
     `;
@@ -346,7 +557,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (isVisible) {
       showEl(el.parentElement, 'flex');
-      el.innerHTML = value;
+      writeHtmlIfChanged(el, value);
     } else {
       hideEl(el.parentElement);
     }
@@ -361,12 +572,20 @@ export class SatInfoBox extends KeepTrackPlugin {
       const container = getEl(SatInfoBox.containerId_, true);
 
       container?.querySelectorAll('.sat-info-value').forEach((element) => {
+        // Rows holding a form control (Doppler Ref Preset select, Ref Frequency input + unit) are settings, not
+        // per-object values: blanking them emptied the select's option labels and the " MHz" unit (#350).
+        if (element.querySelector('select, input, textarea')) {
+          return;
+        }
         // Preserve nested identity fields (for example launch site/pad IDs).
         const textNodes = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
         let node = textNodes.nextNode();
 
         while (node) {
-          node.textContent = '';
+          // The "i" glyph of an info circle must survive a deselect, or every circle renders empty after the next selection (#277)
+          if (!node.parentElement?.closest(`.${INFO_CIRCLE_CLASS}`)) {
+            node.textContent = '';
+          }
           node = textNodes.nextNode();
         }
         element.removeAttribute('kt-tooltip');
@@ -413,10 +632,15 @@ export class SatInfoBox extends KeepTrackPlugin {
     setInnerHtml(EL.NAME, obj.name);
 
     if (obj instanceof Satellite || obj instanceof OemSatellite) {
+      /*
+       * Restore only the rows the mission plugin hid for a non-satellite. Rows that decide their own
+       * visibility per selection (apparent magnitude, sun) are skipped: forcing them to flex here and
+       * letting their owner hide them again later changed the box height twice on every selection.
+       */
       KeepTrack.getInstance()
-        .containerRoot.querySelectorAll('.sat-only-info')
-        ?.forEach((el) => {
-          (<HTMLElement>el).style.display = 'flex';
+        .containerRoot.querySelectorAll<HTMLElement>('.sat-only-info:not([data-kt-self-managed])')
+        .forEach((el) => {
+          showEl(el, 'flex');
         });
     }
 
@@ -426,10 +650,10 @@ export class SatInfoBox extends KeepTrackPlugin {
       const countryCode = obj instanceof OemSatellite ? obj.country : (obj as Satellite).country;
       const sccNum5 = obj instanceof OemSatellite ? obj.sccNum5 : (obj as Satellite).sccNum5;
 
-      if (obj.isSatellite() && sccNum5 === '25544') {
-        flagEl.classList.value = 'fi fi-iss';
-      } else {
-        flagEl.classList.value = `fi ${country2flagIcon(countryCode)}`;
+      const flagClasses = obj.isSatellite() && sccNum5 === '25544' ? 'fi fi-iss' : `fi ${country2flagIcon(countryCode)}`;
+
+      if (flagEl.classList.value !== flagClasses) {
+        flagEl.classList.value = flagClasses;
       }
     }
 
@@ -478,7 +702,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
-      setInnerHtml(EL.SOURCE, SatInfoBox.formatSourceName_(sat.source ?? CatalogSource.CELESTRAK));
+      setInnerHtml(EL.SOURCE, SatInfoBox.formatSourceName(sat.source ?? CatalogSource.CELESTRAK));
 
       this.updateConfidenceDom_(sat);
     }
@@ -497,7 +721,11 @@ export class SatInfoBox extends KeepTrackPlugin {
     [CatalogSource.EXTRA_JSON]: 'extra.json',
   };
 
-  private static formatSourceName_(source: string): string {
+  static formatSourceName(source: string): string {
+    if (!source || source.trim().toLowerCase() === 'unknown') {
+      return t7e('satInfoBox.Source.notRecorded' as Parameters<typeof t7e>[0]);
+    }
+
     return SatInfoBox.SOURCE_DISPLAY_NAMES_[source] ?? source;
   }
 
@@ -561,11 +789,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     // Get the height of the DOM
     const searchBoxHeight = (ServiceLocator.getUiManager().searchManager.isResultsOpen ? satInfoBoxDom?.getBoundingClientRect().height : 0) ?? 0;
     const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
-    const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
 
-    if (curVal !== `${searchBoxHeight + bottomMenuTop}px`) {
-      document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTop}px`);
-    }
+    SatInfoBox.setSearchBoxBottom(`${searchBoxHeight + bottomMenuTop}px`);
 
     if (obj.isSatellite()) {
       this.setSatInfoBoxSatellite_();
@@ -590,13 +815,13 @@ export class SatInfoBox extends KeepTrackPlugin {
     const satMissionData = getEl('sat-mission-data', true);
 
     if (satMissionData) {
-      satMissionData.style.display = 'none';
+      hideEl(satMissionData);
     }
 
     const satIdentifierData = getEl('sat-identifier-data', true);
 
     if (satIdentifierData) {
-      satIdentifierData.style.display = 'none';
+      hideEl(satIdentifierData);
     }
   }
 
@@ -609,19 +834,38 @@ export class SatInfoBox extends KeepTrackPlugin {
         if (!el?.parentElement) {
           return;
         }
-        el.parentElement.style.display = 'flex';
+        showEl(el.parentElement, 'flex');
       }
     );
 
     const satIdentifierData = getEl('sat-identifier-data', true);
 
     if (satIdentifierData) {
-      satIdentifierData.style.display = 'block';
+      showEl(satIdentifierData);
+    }
+  }
+
+  /**
+   * Set `--search-box-bottom`, which only `#search-results` reads (its max-height). The variable is written on that
+   * element, not on the root: a custom property changed on the root restyles every element that inherits it
+   * (measured at 686 elements for one write), while here it restyles the results list alone. The stylesheet's
+   * `:root` default of 0px still applies until the first write.
+   */
+  static setSearchBoxBottom(value: string): void {
+    const searchResults = getEl('search-results', true);
+
+    if (searchResults && searchResults.style.getPropertyValue('--search-box-bottom') !== value) {
+      searchResults.style.setProperty('--search-box-bottom', value);
     }
   }
 
   hide(): void {
+    if (this.draggie_) {
+      SatInfoBox.releaseStalePointer_(this.draggie_ as unknown as Parameters<typeof SatInfoBox.releaseStalePointer_>[0]);
+    }
     hideEl(SatInfoBox.containerId_);
+    // CSS keys off this class instead of body:has(#sat-infobox[style*=...]), which rescans the body on every DOM change.
+    document.body?.classList.remove('kt-satinfo-open');
     this.isVisible_ = false;
   }
 
@@ -630,6 +874,7 @@ export class SatInfoBox extends KeepTrackPlugin {
       return;
     }
     showEl(SatInfoBox.containerId_);
+    document.body?.classList.add('kt-satinfo-open');
     this.isVisible_ = true;
     EventBus.getInstance().emit(EventBusEvent.satInfoBoxShown);
   }

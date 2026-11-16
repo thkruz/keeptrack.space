@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "출처",
-      "tooltip": "위성 정보의 데이터 출처"
+      "tooltip": "위성 정보의 데이터 출처",
+      "notRecorded": "기록 없음"
     },
     "Confidence": {
       "label": "신뢰도",
@@ -38,6 +39,12 @@
     },
     "errorMsgs": {
       "htmlNotReady": "위성 정보 패널이 로드를 완료하지 못해 세부 정보를 업데이트할 수 없습니다."
+    },
+    "export": {
+      "copyValues": "값을 텍스트로 복사",
+      "copied": "값을 복사했습니다",
+      "region": "객체 세부 정보",
+      "secondary": "보조 객체"
     }
   }
 }

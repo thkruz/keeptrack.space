@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "센서 라벨 표시",
           "helpText": "지구본과 평면 지도의 센서 마커 옆에 센서 이름을 표시합니다."
+        },
+        "showObjectLabels": {
+          "label": "객체 이름 표시",
+          "helpText": "선택, 보조, 관심 목록 객체의 이름을 모양 접두사와 함께 표시합니다: [1] 기본, (2) 보조, * 관심 목록."
         }
       },
       "rmbMenu": {
@@ -63,6 +67,13 @@
       "infoBox": {
         "addLabel": "관심 목록에 추가",
         "removeLabel": "관심 목록에서 제거"
+      },
+      "stale": {
+        "label": "오래된 궤도 요소 기준",
+        "helpText": "이 기준보다 오래된 궤도 요소는 관찰 목록, 통과 표, 내보내기에서 오래됨으로 표시됩니다. 기본값 72.",
+        "ageHeader": "GP 경과 (h)",
+        "marker": "오래됨",
+        "tooltip": "궤도 요소가 {hours}시간보다 오래되었습니다. 예측이 부정확할 수 있습니다."
       }
     },
     "WatchlistOverlay": {

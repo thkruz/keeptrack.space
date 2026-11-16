@@ -48,6 +48,7 @@
       "downloadButton": "Bericht herunterladen",
       "copyButton": "In Zwischenablage kopieren",
       "sensorNote": "Diese Berichte erfordern einen ausgewählten Sensor.",
+      "sensorLimitNote": "Verwendet {name}: Mindestelevation {minEl}°. Überflüge darunter werden nicht gemeldet.",
       "sections": {
         "orbitPosition": "Orbit und Position",
         "sensor": "Sensor",
@@ -112,7 +113,11 @@
           "windowLine": "Berichtszeitraum: {start} bis {end} UTC, Schritt: {step} s",
           "generatedWallClock": "Erstellt (Echtzeit)",
           "appVersion": "KeepTrack-Version",
-          "ricConvention": "RIC-Konvention"
+          "ricConvention": "RIC-Konvention",
+          "passCaveat": "Ortszeiten der Station verwenden die Zone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet.",
+          "passCaveatDisplay": "Ortszeiten verwenden die Anzeigezone {zone}. Die Fenster zeigen nur geometrische Sichtbarkeit, keinen Nachweis, dass ein Signal empfangen werden kann. Die Maximalelevation ist auf die nächste Sekunde genau berechnet.",
+          "sensorCoverage": "Gilt nur für den Sensor {sensor}.",
+          "sensorCoverageOthers": "Gilt nur für den Sensor {sensor}. {count} weitere aktive Sensoren oder Standorte sind nicht enthalten."
         },
         "titles": {
           "aer": "Bericht Azimut, Elevation, Entfernung",
@@ -157,7 +162,11 @@
           "radialKm": "Radial (km)",
           "intrackKm": "Entlang der Bahn (km)",
           "crosstrackKm": "Quer zur Bahn (km)",
-          "relSpeed": "Rel. Geschw. (km/s)"
+          "relSpeed": "Rel. Geschw. (km/s)",
+          "timeLocal": "Ortszeit",
+          "riseLocal": "Aufgangszeit (Ortszeit)",
+          "setLocal": "Untergangszeit (Ortszeit)",
+          "maxElTimeLocal": "Zeit max. Elevation (Ortszeit)"
         },
         "empty": {
           "noPasses": "Keine Überflüge gefunden!",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "durchgehend",
-          "start": "zu Beginn sichtbar",
-          "end": "am Ende sichtbar"
+          "start": "zu Beginn sichtbar; Maximum im Fenster",
+          "end": "am Ende sichtbar; Maximum im Fenster"
         },
         "illumination": {
           "sun": "Ja",

@@ -51,7 +51,13 @@ const tooltipAttrs_ = (helpText?: string): string => {
     return '';
   }
 
-  return ` data-position="top" data-delay="50" data-tooltip="${escapeAttr_(helpText)}"`;
+  // #488: `data-tooltip` draws a CSS pseudo-element inside the row, which the side menu's overflow clips. `kt-tooltip` is
+  // drawn by the global tooltip layer (a body-level div placed beside the menu and clamped to the viewport). Touch has no
+  // hover, so there the row also opts into tap-to-toggle.
+  const isTouch = typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(hover: none)').matches;
+  const tap = isTouch ? ' kt-tooltip-tap' : '';
+
+  return ` kt-tooltip="${escapeAttr_(escapeText_(helpText))}"${tap}`;
 };
 
 const disabledAttr_ = (control: ISettingControl): string => (control.isDisabled?.() ? ' disabled' : '');
@@ -128,7 +134,24 @@ export const renderSettingControl = (control: ISettingControl, sectionId: string
  * Returns empty string if every control is hidden by {@link ISettingControl.isAvailable}.
  */
 export const renderSettingsSection = (contribution: ISettingsContribution): string => {
-  const controlsHtml = contribution.controls.map((c) => renderSettingControl(c, contribution.sectionId)).join('');
+  let controlsHtml = '';
+  let openGroup: string | undefined;
+
+  for (const control of contribution.controls) {
+    const controlHtml = renderSettingControl(control, contribution.sectionId);
+
+    // A hidden control must not leave an empty sub-group heading behind.
+    if (controlHtml.trim().length === 0) {
+      continue;
+    }
+    if (control.group !== openGroup) {
+      controlsHtml += openGroup ? '\n        </div>' : '';
+      controlsHtml += control.group ? `\n        <div class="kt-subgroup"><div class="kt-subgroup-label">${escapeText_(control.group)}</div>` : '';
+      openGroup = control.group;
+    }
+    controlsHtml += controlHtml;
+  }
+  controlsHtml += openGroup ? '\n        </div>' : '';
 
   if (controlsHtml.trim().length === 0) {
     return '';

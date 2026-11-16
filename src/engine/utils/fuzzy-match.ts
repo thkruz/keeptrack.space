@@ -121,3 +121,24 @@ export const fuzzyMatchIndices = (label: string, query: string): number[] => {
 
   return queryIdx === lowerQuery.length ? indices : [];
 };
+
+/**
+ * Scores below this come only from the loose subsequence tier of
+ * {@link fuzzyScore} (prefix, substring and acronym hits all score 80 or more;
+ * a weighted category substring hit is 60).
+ */
+export const FUZZY_STRONG_SCORE = 60;
+
+/**
+ * Drops loose subsequence-only hits once at least one real (prefix, substring or
+ * acronym) hit exists, so "Cape" does not trail Cape Cod with Canberra and
+ * Medicina. When nothing matches strongly the weak hits are kept: a typo-ish
+ * query still finds its closest rows instead of going empty.
+ */
+export const dropWeakFuzzyHits = <T>(hits: T[], getScore: (hit: T) => number): T[] => {
+  if (!hits.some((hit) => getScore(hit) >= FUZZY_STRONG_SCORE)) {
+    return hits;
+  }
+
+  return hits.filter((hit) => getScore(hit) >= FUZZY_STRONG_SCORE);
+};

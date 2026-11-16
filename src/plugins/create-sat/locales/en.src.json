@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "Satellite NORAD ID (90000-99999)",
+        "noradIdHint": "IDs 90000-99999 are reserved for analyst objects so they never clash with real catalog numbers.",
         "satelliteName": "Satellite Name",
         "inclinationDeg": "Inclination (degrees)",
         "apogeeAltKm": "Apogee Altitude (km)",
@@ -17,6 +18,7 @@
         "country": "Country",
         "epochYear": "Epoch Year",
         "epochDay": "Epoch Day",
+        "epochTimestamp": "Epoch timestamp (UTC, ISO)",
         "inclination": "Inclination",
         "rightAscension": "Right Ascension",
         "eccentricity": "Eccentricity",
@@ -34,13 +36,22 @@
         "sectionOrbit": "Orbit",
         "sectionEpoch": "Epoch",
         "sectionElements": "Orbital Elements",
-        "sectionPresets": "Presets"
+        "sectionPresets": "Presets",
+        "sectionWalker": "Constellation (Walker delta)",
+        "walkerHint": "Creates T satellites in P evenly spaced planes at one altitude and inclination (T/P/F pattern). Members use the lowest free analyst IDs.",
+        "walkerAltKm": "Altitude (km)",
+        "walkerTotal": "Satellites (T)",
+        "walkerPlanes": "Planes (P)",
+        "walkerPhasing": "Phasing (F)",
+        "walkerPrefix": "Name prefix",
+        "walkerTpfHelp": "T must be a multiple of P. F (phasing) runs from 0 to P-1."
       },
       "buttons": {
         "createSatellite": "Create Satellite",
         "saveTle": "Save TLE",
         "makeSunSync": "Sun-Sync Inclination",
-        "cloneSelected": "Clone Selected Satellite"
+        "cloneSelected": "Clone Selected Satellite",
+        "createWalker": "Create Constellation"
       },
       "options": {
         "payload": "Payload",
@@ -63,11 +74,14 @@
         "invalidNoradId": "Invalid NORAD ID. Must be a 5-digit number between 90000 and 99999.",
         "invalidType": "Invalid type. Must be 1 (Payload), 2 (Rocket Body), 3 (Debris), or 4 (Special).",
         "invalidCountry": "Invalid country. Must be selected from the list.",
-        "invalidEpochYear": "Invalid epoch year. Must be a 2-digit number.",
+        "invalidEpochYear": "Epoch year must be 2 digits (26) or a year from 1957 to 2056 (2026).",
+        "invalidEpochTimestamp": "Invalid epoch timestamp. Use an ISO date-time such as 2026-11-04T00:00:00Z.",
         "invalidEpochDay": "Invalid epoch day. Must be in the format NNN.NNNNNNNN (e.g., 001.00000000).",
         "invalidInclination": "Invalid inclination. Must be in the format NNN.NNNN (e.g., 000.0000).",
         "invalidRasc": "Invalid right ascension. Must be in the format NNN.NNNN (e.g., 000.0000).",
-        "invalidEccentricity": "Invalid eccentricity. Must be a 7-digit number (e.g., 0000000).",
+        "invalidEccentricity": "Eccentricity must be at least 0 and below 1: type a decimal (0.0012) or the 7-digit TLE form (0012000).",
+        "calcInvalidEccentricity": "Calculated values hidden: eccentricity must be at least 0 and below 1.",
+        "calcSubSurface": "Calculated values hidden: this orbit passes below Earth's surface. Lower the mean motion or the eccentricity.",
         "invalidArgPe": "Invalid argument of perigee. Must be in the format NNN.NNNN (e.g., 000.0000).",
         "invalidMeanAnomaly": "Invalid mean anomaly. Must be in the format NNN.NNNN (e.g., 000.0000).",
         "invalidMeanMotion": "Invalid mean motion. Must be in the format NN.NNNNN (e.g., 16.00000).",
@@ -88,7 +102,8 @@
         "meanMotionRange": "{field} must be greater than 0 and at most {max} revolutions per day.",
         "periodPositive": "{field} must be a positive number of minutes.",
         "numberRequired": "{field} must be a number.",
-        "noradIdReserved": "NORAD ID {id} is held by a launch trajectory. Choose another ID or remove the trajectory first."
+        "noradIdReserved": "NORAD ID {id} is held by a launch trajectory. Choose another ID or remove the trajectory first.",
+        "noradIdNoSlot": "NORAD ID {id} is not an available analyst slot. Use an ID the form suggests or free this one first."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) created successfully",
@@ -121,6 +136,20 @@
         "replace": "Replace",
         "cancel": "Cancel",
         "changed": "The satellite or form changed. Review it and submit again."
+      },
+      "walker": {
+        "created": "Created {count} satellites named {prefix}-P#-S# ({failed} failed)",
+        "errors": {
+          "altitude": "Altitude must be 160 to 400000 km.",
+          "inclination": "Inclination must be 0 to 180 degrees.",
+          "total": "Satellites (T) must be a whole number of at least 1.",
+          "planes": "Planes (P) must be a whole number from 1 to T.",
+          "phasing": "Phasing (F) must be a whole number from 0 to {max}.",
+          "divisible": "T must be divisible by P.",
+          "tooMany": "At most {max} satellites per constellation.",
+          "noSlots": "Not enough free analyst slots ({free} free, {needed} needed).",
+          "failed": "The constellation could not be generated."
+        }
       }
     }
   }

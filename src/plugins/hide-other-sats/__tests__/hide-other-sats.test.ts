@@ -1,3 +1,5 @@
+import { GroupType } from '@app/app/data/object-group';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -38,6 +40,133 @@ describe('HideOtherSatellitesPlugin', () => {
 
       expect(commands).toHaveLength(1);
       expect(commands[0].id).toBe('HideOtherSatellitesPlugin.toggle');
+    });
+  });
+
+  describe('plain selection (no group)', () => {
+    const setup = (selectedGroup: unknown, selectedSat: number, secondarySat = -1) => {
+      const plugin = new HideOtherSatellitesPlugin();
+
+      websiteInit(plugin);
+      vi.spyOn(plugin, 'setBottomIconToSelected').mockImplementation(() => {
+        /* Intentional no-op */
+      });
+      const groupsManager = ServiceLocator.getGroupsManager();
+
+      groupsManager.selectedGroup = selectedGroup as never;
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat, secondarySat } as never);
+      const createSpy = vi.spyOn(groupsManager, 'createGroup').mockImplementation(() => ({ ids: [], isOverlayHidden: false }) as never);
+      const selectSpy = vi.spyOn(groupsManager, 'selectGroup').mockImplementation(() => {
+        /* Intentional no-op */
+      });
+
+      return { plugin, createSpy, selectSpy };
+    };
+
+    it('groups the selected objects so every other dot is hidden', () => {
+      const { plugin, createSpy, selectSpy } = setup(null, 5, 9);
+
+      plugin.hideOtherSats();
+
+      expect(createSpy).toHaveBeenCalledWith(GroupType.ID_LIST, [5, 9]);
+      expect(selectSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('hides orbit lines only for the group it creates, never via the global flag', () => {
+      const { plugin, createSpy } = setup(null, 5);
+
+      settingsManager.isGroupOverlayDisabled = false;
+      plugin.hideOtherSats();
+
+      expect((createSpy.mock.results[0].value as { isOverlayHidden: boolean }).isOverlayHidden).toBe(true);
+      expect(settingsManager.isGroupOverlayDisabled).toBe(false);
+    });
+
+    it('a search that replaces the temporary group is not suppressed, and turning off leaves it selected', () => {
+      const { plugin } = setup(null, 5);
+      const groupsManager = ServiceLocator.getGroupsManager();
+      const search = { ids: [1, 2], isOverlayHidden: false };
+
+      vi.spyOn(plugin, 'setBottomIconToUnselected').mockImplementation(() => undefined);
+      vi.spyOn(SettingsManager, 'preserveSettings').mockImplementation(() => undefined);
+      settingsManager.isGroupOverlayDisabled = false;
+      plugin.hideOtherSats();
+      groupsManager.selectedGroup = search as never;
+      plugin.showOtherSats();
+
+      expect(search.isOverlayHidden).toBe(false);
+      expect(settingsManager.isGroupOverlayDisabled).toBe(false);
+      expect(groupsManager.selectedGroup).toBe(search);
+    });
+
+    it('leaves the orbit overlay setting alone for a user group', () => {
+      const { plugin } = setup({ ids: [1] }, 5);
+
+      settingsManager.isGroupOverlayDisabled = false;
+      plugin.hideOtherSats();
+
+      expect(settingsManager.isGroupOverlayDisabled).toBe(false);
+    });
+
+    it('turning off clears the group it created and restores the scheme and overlay', () => {
+      const { plugin } = setup(null, 5);
+      const groupsManager = ServiceLocator.getGroupsManager();
+      const csm = ServiceLocator.getColorSchemeManager();
+      const group = { ids: [5], isOverlayHidden: false };
+      const prev = csm.currentColorScheme;
+
+      vi.spyOn(plugin, 'setBottomIconToUnselected').mockImplementation(() => undefined);
+      vi.spyOn(SettingsManager, 'preserveSettings').mockImplementation(() => undefined);
+      vi.spyOn(csm, 'calculateColorBuffers').mockImplementation(() => undefined);
+      vi.spyOn(csm, 'reloadColors').mockImplementation(() => undefined);
+      vi.spyOn(groupsManager, 'createGroup').mockReturnValue(group as never);
+      vi.spyOn(groupsManager, 'selectGroup').mockImplementation((g) => {
+        groupsManager.selectedGroup = g;
+        csm.isUseGroupColorScheme = true;
+      });
+      const clearSpy = vi.spyOn(groupsManager, 'clearSelect');
+
+      csm.isUseGroupColorScheme = false;
+      settingsManager.isGroupOverlayDisabled = null;
+      plugin.hideOtherSats();
+      expect(groupsManager.selectedGroup).toBe(group);
+      plugin.showOtherSats();
+
+      expect(clearSpy).toHaveBeenCalledTimes(1);
+      expect(groupsManager.selectedGroup).toBeNull();
+      expect(csm.isUseGroupColorScheme).toBe(false);
+      expect(csm.currentColorScheme).toBe(prev);
+      expect(settingsManager.isGroupOverlayDisabled).toBe(false);
+    });
+
+    it('turning off leaves a user group alone', () => {
+      const { plugin } = setup({ ids: [1] }, 5);
+      const groupsManager = ServiceLocator.getGroupsManager();
+      const clearSpy = vi.spyOn(groupsManager, 'clearSelect');
+
+      vi.spyOn(plugin, 'setBottomIconToUnselected').mockImplementation(() => undefined);
+      vi.spyOn(SettingsManager, 'preserveSettings').mockImplementation(() => undefined);
+      plugin.hideOtherSats();
+      plugin.showOtherSats();
+
+      expect(clearSpy).not.toHaveBeenCalled();
+      expect(groupsManager.selectedGroup).not.toBeNull();
+    });
+
+    it('leaves an existing group alone', () => {
+      const { plugin, selectSpy } = setup({ ids: [1] }, 5);
+
+      plugin.hideOtherSats();
+
+      expect(selectSpy).not.toHaveBeenCalled();
+    });
+
+    it('changes nothing with no selection', () => {
+      const { plugin, selectSpy } = setup(null, -1);
+
+      plugin.hideOtherSats();
+
+      expect(selectSpy).not.toHaveBeenCalled();
     });
   });
 

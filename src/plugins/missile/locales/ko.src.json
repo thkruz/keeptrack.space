@@ -47,6 +47,7 @@
         "unitedKingdom": "영국",
         "france": "프랑스",
         "northKorea": "북한",
+        "iran": "이란",
         "natoCountries": "NATO 회원국",
         "nonNatoCountries": "비NATO 국가",
         "usMilitaryBases": "미군 기지",
@@ -106,7 +107,8 @@
         "sinpoSub": "신포급 잠수함 (북극성-1)",
         "sinpo": "신포",
         "pyongan": "평안",
-        "pyongyang": "평양"
+        "pyongyang": "평양",
+        "semnan": "세므난 (가상 ICBM)"
       },
       "targets": {
         "washingtonDc": "워싱턴 D.C.",

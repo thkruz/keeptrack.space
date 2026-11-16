@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+
+import { CameraType } from '@app/engine/camera/camera-type';
 import { SolarBody } from '@app/engine/core/interfaces';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -20,6 +22,10 @@ export abstract class Path extends Line {
   referenceFrame: 'J2000' | 'TEME' = 'TEME';
   /** This flag is set to true when the line is no longer needed. The garbage collector will handle removing it */
   isGarbage = false;
+  /** Vertices are Earth-fixed (ECEF) instead of inertial: drawn with the ECF shader branch so they follow the rotating Earth. */
+  isEcefData = false;
+  /** Restrict drawing to the flat map ('flat') or to every other view ('other'). Undefined draws in all views. */
+  viewFilter?: 'flat' | 'other';
 
   constructor(dataPoints = 2, centerBody = SolarBody.Earth) {
     super(dataPoints);
@@ -39,6 +45,14 @@ export abstract class Path extends Line {
       return;
     }
 
+    if (this.viewFilter) {
+      const isFlat = ServiceLocator.getMainCamera().cameraType === CameraType.FLAT_MAP;
+
+      if ((this.viewFilter === 'flat') !== isFlat) {
+        return;
+      }
+    }
+
     gl.uniform4fv(lineManager.uniforms_.u_color, this.getDrawColor_());
 
     // Celestial/orbit paths are stored as absolute inertial positions
@@ -46,7 +60,7 @@ export abstract class Path extends Line {
     // ALWAYS draw in ECI - never the GMST-rotated ECF branch. In ECF mode
     // setWorldUniforms leaves u_ecfMode=1 for the whole line pass, which would
     // spin these paths off their bodies; force it (and the anchor override) off.
-    gl.uniform1i(lineManager.uniforms_.u_ecfMode, 0);
+    gl.uniform1i(lineManager.uniforms_.u_ecfMode, this.isEcefData ? 1 : 0);
     gl.uniform1i(lineManager.uniforms_.u_anchorMode, 0);
 
     const sceneManager = Scene.getInstance();

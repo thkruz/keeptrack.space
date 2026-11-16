@@ -108,7 +108,7 @@ export abstract class SatMath {
 
       positionEci = <TemeVec3>stateVector.position;
       if (!stateVector || !positionEci) {
-        errorManagerInstance.log(`No ECI position for ${satrec.satnum} at ${now}`);
+        errorManagerInstance.log(`No ECI position for ${satrec.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
 
         return <Kilometers>0;
       }
@@ -236,6 +236,38 @@ export abstract class SatMath {
     }
 
     return SunStatus.PENUMBRAL;
+  }
+
+  /**
+   * Geometric elevation of the Sun's centre above a ground site's local horizon.
+   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sunECI The Sun's ECI position in km.
+   * @param upECI Unit vector of the site's local vertical in ECI (the geodetic normal). Defaults to the radial direction.
+   * @returns Degrees (negative below the horizon), or null when either vector is degenerate.
+   */
+  static calculateGroundSiteSunElevation(sitePos: TemeVec3, sunECI: TemeVec3, upECI?: TemeVec3): Degrees | null {
+    if (!sitePos || !sunECI) {
+      return null;
+    }
+
+    const r = Math.hypot(sitePos.x, sitePos.y, sitePos.z);
+    const toSun = { x: sunECI.x - sitePos.x, y: sunECI.y - sitePos.y, z: sunECI.z - sitePos.z };
+    const sunDist = Math.hypot(toSun.x, toSun.y, toSun.z);
+
+    if (!Number.isFinite(r) || !Number.isFinite(sunDist) || r === 0 || sunDist === 0) {
+      return null;
+    }
+
+    const up = upECI ?? { x: sitePos.x / r, y: sitePos.y / r, z: sitePos.z / r };
+    const upLen = Math.hypot(up.x, up.y, up.z);
+
+    if (!Number.isFinite(upLen) || upLen === 0) {
+      return null;
+    }
+
+    const sinSunEl = (up.x * toSun.x + up.y * toSun.y + up.z * toSun.z) / (upLen * sunDist);
+
+    return (Math.asin(Math.min(1, Math.max(-1, sinSunEl))) * RAD2DEG) as Degrees;
   }
 
   /**
@@ -730,7 +762,7 @@ export abstract class SatMath {
       const velPts = SatMath.getEci(sat, now).velocity;
 
       if (!eciPts) {
-        errorManagerInstance.debug(`No ECI position for ${sat.sccNum} at ${now}`);
+        errorManagerInstance.debug(`No ECI position for ${sat.sccNum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
         continue;
       }
 
@@ -741,7 +773,7 @@ export abstract class SatMath {
         eciPts2 = SatMath.getEci(sat2, now).position;
         velPts2 = SatMath.getEci(sat2, now).velocity;
         if (!eciPts2) {
-          errorManagerInstance.debug(`No ECI position for ${sat2.sccNum} at ${now}`);
+          errorManagerInstance.debug(`No ECI position for ${sat2.sccNum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
           continue;
         }
       }
@@ -795,7 +827,7 @@ export abstract class SatMath {
 
     if (!positionEci) {
       if (!isHideToasts) {
-        errorManagerInstance.info(`No ECI position for ${satrec.satnum} at ${now}`);
+        errorManagerInstance.info(`No ECI position for ${satrec.satnum} at ${Number.isNaN(now.getTime()) ? 'invalid time' : now.toISOString()}`);
       }
 
       return { az: null, el: null, rng: null };

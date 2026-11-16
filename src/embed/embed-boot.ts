@@ -63,8 +63,8 @@ export function resolveUiFlags(config: EmbedConfig): Partial<EmbedUiFlags> {
  *  - plugins.allow: plugins {id: {enabled: true}} + isStrictPluginList
  *  - ui.bottomMenu/search/keyboard/contextMenu/toasts: isDisableBottomMenu / isDisableSearchBox /
  *    isDisableKeyboard / isAllowRightClick / isDisableToasts. topMenu and timeControls have no setting; they
- *    are hidden with CSS (embed-ui.ts). infoBox false is hidden with CSS and also sets enableHoverOverlay /
- *    enableHoverOrbits false (no hover tooltip).
+ *    are hidden with CSS (embed-ui.ts). infoBox false is hidden with CSS. ui.hover (default: follows infoBox) sets
+ *    enableHoverOverlay / enableHoverOrbits; the `hover` event fires regardless.
  *  - ownership.selection 'host': isDisableSelectSat (the facade lifts it around host calls)
  */
 export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: SettingsOverrideLike = {}): SettingsOverrideLike {
@@ -133,10 +133,16 @@ export function mapEmbedConfigToSettings(config: EmbedConfig, baseOverride: Sett
   if (ui.toasts === false) {
     out.isDisableToasts = true;
   }
-  if (ui.infoBox === false) {
-    // The hover tooltip is the same info card; hosts that turn the info box off do not want it on hover either.
+  // The tooltip follows ui.hover; when omitted it follows infoBox (the same info card). The `hover` event does not
+  // depend on either: the engine polls the picker, not the tooltip state.
+  const tooltip = typeof ui.hover === 'boolean' ? ui.hover : ui.infoBox;
+
+  if (tooltip === false) {
     out.enableHoverOverlay = false;
     out.enableHoverOrbits = false;
+  } else if (ui.hover === true) {
+    out.enableHoverOverlay = true;
+    out.enableHoverOrbits = true;
   }
 
   if (config.ownership?.selection === 'host') {

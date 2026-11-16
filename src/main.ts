@@ -20,6 +20,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { installOfflineBanner } from './app/ui/offline-banner';
 import { prepareEmbed } from './embed/embed-install';
 import { KeepTrack } from './keeptrack';
 import { localesReady } from './locales/locales';
@@ -55,6 +56,11 @@ const boot = async (): Promise<void> => {
   // After init(): the opt-out reads settingsManager.isDisableServiceWorker, which only reflects
   // settingsOverride (e.g. an embed's) once init() has applied it
   registerServiceWorker();
+
+  // Offline notice for everyone (not tied to an account); an embed's host owns its own connectivity UI
+  if (!embed.isEmbedded) {
+    installOfflineBanner();
+  }
 
   // Expose to window for debugging
   window.keepTrack = keepTrackInstance;

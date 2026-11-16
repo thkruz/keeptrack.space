@@ -26,6 +26,7 @@ import { SatMath, SunStatus } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { findPassPeakMs, refinePeakMs } from '@app/app/sensors/pass-peak';
 import type { BurnSummary, MissionImpact, ScreeningDiff } from '@app/engine/conjunction/analysis-state';
 import { uncertaintyParentOf } from '@app/engine/conjunction/uncertainty-source';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
@@ -36,11 +37,11 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { IBottomIconConfig, ICommandPaletteCommand, IHelpConfig, ISideMenuConfig } from '@app/engine/plugins/core/plugin-capabilities';
-import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { initMaterialSelects, refreshMaterialSelect } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { createCsvBlob } from '@app/engine/utils/saveVariable';
+import { createBrandedCsvBlob } from '@app/engine/utils/saveVariable';
 import { t7e } from '@app/locales/keys';
 import { Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import analysisPng from '@public/img/icons/reports.png';
@@ -72,6 +73,7 @@ import {
   generateSunEclipseReport,
   generateVisibilityWindowsReport,
   REPORT_DEFAULTS,
+  REPORT_PASS_DETECT_STEP_SEC,
   ReportCoreDeps,
   ReportData,
   ReportOptions,
@@ -331,7 +333,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     }
     select.innerHTML = this.buildSourceOptions_();
     select.value = this.batchSource_;
-    initMaterialSelects(getEl('reports-menu', true) ?? document.body);
+    refreshMaterialSelect(select);
   }
 
   private setBatchProgress_(text: string | null): void {
@@ -437,7 +439,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const merged = mergeBatchTables(results);
     const stamp = generatedAt.toISOString().replace(/[-:]/gu, '').slice(0, 15);
 
-    saveAs(createCsvBlob(batchTableToCsv(merged.table)), `${report.id}-batch-${stamp}.csv`);
+    saveAs(createBrandedCsvBlob(batchTableToCsv(merged.table)), `${report.id}-batch-${stamp}.csv`);
     // Batch report over several objects has no single subject (matched by order and time)
     EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id);
     let message = l('batch.done')
@@ -526,7 +528,8 @@ export class ReportsPlugin extends KeepTrackPlugin {
         label: l('commands.open'),
         category,
         callback: () => this.bottomMenuClicked(),
-        isAvailable: () => ReportsPlugin.asReportTarget_(this.selectSatManager_?.primarySatObj) !== null,
+        // Always listed: with nothing selected, opening it explains what is needed instead of hiding the menu from search.
+        isAvailable: () => true,
       },
       ...reportCommands,
     ];
@@ -571,6 +574,7 @@ export class ReportsPlugin extends KeepTrackPlugin {
           <section class="kt-section">
             <div class="kt-section-label">${l('sections.sensor')}</div>
             <div class="kt-note" id="reports-sensor-note">${l('sensorNote')}</div>
+            <div class="kt-note" id="reports-limit-note" style="display: none;"></div>
             ${ReportsPlugin.buildActionRows_(sensorReports)}
           </section>
           <section class="kt-section">
@@ -677,6 +681,12 @@ export class ReportsPlugin extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.selectSatData, () => this.updateReportAvailability_());
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => this.updateReportAvailability_());
+    // Keep the Source counts live while the menu is open
+    // searchUpdated fires before the search manager stores the new result group, so read the count a tick later
+    EventBus.getInstance().on(EventBusEvent.searchUpdated, () => {
+      setTimeout(() => this.refreshSourceOptions_(), 0);
+    });
+    EventBus.getInstance().on(EventBusEvent.onWatchlistUpdated, () => this.refreshSourceOptions_());
     // A clock jump is a new set of inputs: the next report re-anchors its start
     EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
       this.startAnchor_ = null;
@@ -762,6 +772,19 @@ export class ReportsPlugin extends KeepTrackPlugin {
 
     if (note) {
       note.style.display = hasSensor ? 'none' : 'block';
+    }
+
+    const limitNote = getEl('reports-limit-note', true);
+
+    if (limitNote) {
+      const sensor = hasSensor ? ServiceLocator.getSensorManager().currentSensors[0] : null;
+
+      limitNote.textContent = sensor
+        ? l('sensorLimitNote')
+            .replace('{name}', sensor.name ?? sensor.objName ?? '')
+            .replace('{minEl}', String(sensor.minEl))
+        : '';
+      limitNote.style.display = sensor ? 'block' : 'none';
     }
 
     const conjNote = getEl('reports-conj-note', true);
@@ -998,7 +1021,15 @@ export class ReportsPlugin extends KeepTrackPlugin {
       // sensor reports are gated to those, this guard just keeps the closure total.
       findPasses: (sensor, opts) => (sat instanceof Satellite ? this.findReportPasses_(sat, sensor, opts) : []),
       sunStatusAt: (date) => ReportsPlugin.sunStatusAt_(sat, date),
+      otherSensorCount: ReportsPlugin.otherSensorCount_(),
     };
+  }
+
+  /** Selected sensors the report does not cover: the other primaries plus every secondary sensor. */
+  static otherSensorCount_(): number {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    return Math.max(0, (sensorManager.currentSensors?.length ?? 0) - 1) + (sensorManager.secondarySensors?.length ?? 0);
   }
 
   /**
@@ -1018,7 +1049,43 @@ export class ReportsPlugin extends KeepTrackPlugin {
       return { inView: SatMath.checkIsInView(sensor, rae as Parameters<typeof SatMath.checkIsInView>[1]), el: rae.el };
     };
 
-    return addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, 30), sampleAt);
+    const passes = addWindowEdgePasses(this.findPasses_(sat, sensor, opts), opts, Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC), sampleAt);
+
+    // Peaks on a grid fixed to the UTC clock, not to the report window start, so a pass reads the same in every window (#313).
+    // Window-clipped passes (edge) are re-peaked too: their scan samples sit on the window-start phase.
+    const elAt = (ms: number) => SatMath.getRae(new Date(ms), satrec, sensor, true).el;
+
+    // A pass cut by the window edge reports the peak inside the window, like Best Passes and the pass plan CSV (#466),
+    // so Max El is never earlier than Rise or later than Set (#465). The Note column says the pass is cut by the window.
+    const inView = (ms: number): boolean => sampleAt(new Date(ms))?.inView === true;
+
+    return passes.map((pass) => {
+      // The edge scan steps from the window start, so the far edge lands on that phase: walk it to the whole second
+      // so Set (or Rise) reads the same whatever the window start (#465).
+      const aosMs = pass.edge === 'end' ? ReportsPlugin.walkOutOfView_(inView, pass.aos.getTime(), -1, 1000) : pass.aos.getTime();
+      const losMs = pass.edge === 'start' ? ReportsPlugin.walkOutOfView_(inView, pass.los.getTime(), 1, 1000) : pass.los.getTime();
+      const peak = findPassPeakMs(elAt, aosMs, losMs);
+      const timed = { ...pass, aos: new Date(aosMs), los: new Date(losMs) };
+
+      return peak ? { ...timed, maxEl: peak.el, maxElTime: new Date(peak.ms) } : timed;
+    });
+  }
+
+  /** Walks from an in-view instant in one direction (-1 earlier, 1 later) to the last in-view instant, capped at four hours. */
+  static walkOutOfView_(inView: (ms: number) => boolean, fromMs: number, dir: -1 | 1, stepMs: number = REPORT_PASS_DETECT_STEP_SEC * 1000): number {
+    const maxSteps = Math.floor((4 * 3600 * 1000) / stepMs);
+    let lastIn = fromMs;
+
+    for (let i = 1; i <= maxSteps; i++) {
+      const ms = fromMs + dir * i * stepMs;
+
+      if (!inView(ms)) {
+        break;
+      }
+      lastIn = ms;
+    }
+
+    return lastIn;
   }
 
   /** Finds in-view passes via the shared best-pass finder, mapping rows to {@link ReportPass}. */
@@ -1045,18 +1112,38 @@ export class ReportsPlugin extends KeepTrackPlugin {
       sensor,
       {
         lengthDays: opts.windowSec / (24 * 60 * 60),
-        intervalSec: Math.min(opts.stepSec, 30),
+        intervalSec: Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC),
         maxResults: 1000,
       },
       deps
     );
 
-    return passes.map((row) => ({
-      aos: row.START_DATE as Date,
-      los: row.STOP_DATE as Date,
-      maxEl: parseFloat((row.MAXIMUM_ELEVATION as string) ?? '0'),
-      maxElTime: new Date(row.MAXIMUM_ELEVATION_DTG as number),
-    }));
+    const detectStepMs = Math.min(opts.stepSec, REPORT_PASS_DETECT_STEP_SEC) * 1000;
+
+    return passes.map((row) => {
+      const sampledMs = row.MAXIMUM_ELEVATION_DTG as number;
+      const sampledEl = parseFloat((row.MAXIMUM_ELEVATION as string) ?? '0');
+      const peak = ReportsPlugin.refinePeak_(
+        (ms) => SatMath.getRae(new Date(ms), satrec, sensor, true).el,
+        sampledMs,
+        sampledEl,
+        detectStepMs,
+        (row.START_DATE as Date).getTime(),
+        (row.STOP_DATE as Date).getTime()
+      );
+
+      return { aos: row.START_DATE as Date, los: row.STOP_DATE as Date, maxEl: peak.el, maxElTime: new Date(peak.ms) };
+    });
+  }
+
+  /**
+   * The detector only samples elevation every few tens of seconds, so its peak can sit below the true maximum.
+   * Ternary search of the elevation curve around the sampled peak (one sample step either side, inside the pass),
+   * snapped to a whole second so it matches Look Angles and Best Passes.
+   */
+  static refinePeak_(elAt: (ms: number) => number | null, sampledMs: number, sampledEl: number, stepMs: number, aosMs: number, losMs: number): { ms: number; el: number } {
+    // One shared rule with Look Angles and the pass card (app/sensors/pass-peak.ts): the whole second of highest elevation.
+    return refinePeakMs(elAt, sampledMs, stepMs, aosMs, losMs) ?? { ms: sampledMs, el: sampledEl };
   }
 
   /** Computes the satellite's sun-illumination state and sun angle at a given time. */
@@ -1440,8 +1527,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const payload = buildDownloadPayload(data, this.format_);
     // The window shows the chosen format: text keeps the metadata header and
     // aligned table, CSV/JSON show exactly what the download and copy produce.
-    const preview = this.format_ === 'text' ? buildPreviewText(data) : payload.content;
-    const blob = payload.ext === 'csv' ? createCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
+    // A narrow window (phone, small popup) gets the last column wrapped under its row so a long note stays readable (#502).
+    const maxChars = typeof win.innerWidth === 'number' && win.innerWidth > 0 ? Math.floor((win.innerWidth - 20) / 7.3) : undefined;
+    const preview = this.format_ === 'text' ? buildPreviewText(data, maxChars) : payload.content;
+    const blob = payload.ext === 'csv' ? createBrandedCsvBlob(payload.content) : new Blob([payload.content], { type: payload.mime });
     const url = URL.createObjectURL(blob);
 
     win.document.open();
@@ -1470,6 +1559,10 @@ export class ReportsPlugin extends KeepTrackPlugin {
     const pre = win.document.createElement('pre');
 
     pre.textContent = preview;
+    // Wide tables (Visibility Windows has nine or ten columns): smaller type so they fit a 1366 px window, and a scroll
+    // box with room under the last row so the sideways scrollbar never covers it (#442).
+    pre.style.cssText = 'font-size:12px;line-height:1.35;margin:8px 0 0;padding:0 0 18px;overflow-x:auto;max-width:100%;box-sizing:border-box';
+    win.document.body.style.margin = '8px';
     win.document.body.appendChild(pre);
 
     win.document.title = data.filename;

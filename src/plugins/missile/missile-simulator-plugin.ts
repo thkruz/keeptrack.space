@@ -22,6 +22,7 @@ import {
   attackerRangeKm,
   CUSTOM_TARGET_ID,
   getAttackerSite,
+  getSessionDefaultScenario,
   TARGET_OPTIONS,
   targetLat,
   targetLon,
@@ -173,7 +174,6 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
         <div class="row">
           <form id="${this.id}-menu-form" class="col s12">
             <section class="kt-section">
-              <div class="kt-section-label">${l('sections.attackType')}</div>
               <div class="kt-field-row">
                 <div class="input-field col s12">
                   <select id="ms-type">
@@ -194,10 +194,7 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
                   <label>${l('labels.typeOfAttack')}</label>
                 </div>
               </div>
-            </section>
-            <div id="ms-custom-opt">
-              <section class="kt-section">
-                <div class="kt-section-label">${l('sections.launch')}</div>
+              <div id="ms-custom-opt">
                 <div class="kt-field-row">
                   <div class="input-field col s12">
                     <select id="ms-attacker">
@@ -218,9 +215,6 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
                     <label for="ms-lon-lau" class="active">${l('labels.customLaunchLongitude')}</label>
                   </div>
                 </div>
-              </section>
-              <section class="kt-section">
-                <div class="kt-section-label">${l('sections.target')}</div>
                 <div class="kt-field-row">
                   <div class="input-field col s12">
                     <select id="ms-target">
@@ -247,8 +241,8 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
                     <label for="ms-warheads" class="active">${l('labels.warheads')}</label>
                   </div>
                 </div>
-              </section>
-            </div>
+              </div>
+            </section>
             <button id="${this.id}-submit" class="kt-action waves-effect waves-light" type="submit" name="action">
               <span class="kt-action-label">${l('buttons.launchMissileAttack')}</span>
             </button>
@@ -512,6 +506,11 @@ export class MissileSimulatorPlugin extends KeepTrackPlugin {
     getEl('searchRvBtn')!.addEventListener('click', this.searchForRvs_);
     getEl('clearMissilesBtn')!.addEventListener('click', this.clearMissiles_);
     getEl('clearAllSimulationsBtn')?.addEventListener('click', () => confirmAndClearAllSimulations());
+
+    const scenario = getSessionDefaultScenario();
+
+    (getEl('ms-attacker') as HTMLSelectElement).value = scenario.attackerId.toString();
+    (getEl('ms-target') as HTMLSelectElement).value = scenario.targetId.toString();
 
     if (menuRoot) {
       initMaterialSelects(menuRoot);

@@ -51,6 +51,11 @@
         "goToInvalid": "Ungültiges Datum. UTC-Format YYYY-MM-DD HH:MM:SS verwenden.",
         "containerNotFound": "Container mit der ID {id} nicht gefunden",
         "timeInvalid": "Ungültiges Zeitformat! Erwartet wird HH:MM:SS, HH:MM:SS.s oder HHMMSS"
+      },
+      "clock": {
+        "live": "LIVE",
+        "paused": "PAUSIERT",
+        "simulated": "SIMULIERT"
       }
     }
   }

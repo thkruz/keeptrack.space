@@ -14,6 +14,14 @@
         "primaryLogoFailed": "メインロゴ画像の読み込みに失敗しました。",
         "secondaryLogoFailed": "サブロゴ画像の読み込みに失敗しました。",
         "noCanvasContext": "一時キャンバスの2Dコンテキストを取得できませんでした。スクリーンショットを作成できません。"
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "観測地: {site}",
+        "source": "ソース: {source}",
+        "utc": "{time} UTC",
+        "computed": "計算された表示: この時点で軌道要素は {age} 前のもの",
+        "computedBeforeEpoch": "計算ビュー: この時刻は軌道要素のエポックの {age} 前です"
       }
     }
   }

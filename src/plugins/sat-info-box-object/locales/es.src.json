@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "Magnitud Aparente",
-      "tooltip": "Magnitud visual aparente observada desde el sensor seleccionado en el tiempo de simulación actual"
+      "tooltip": "Magnitud visual aparente estimada observada desde el sensor seleccionado en el tiempo de simulación actual (estimación del modelo; no se considera el clima)"
     },
     "estimatedSuffix": "(est.)",
     "unknown": "Desconocido",
@@ -79,6 +79,51 @@
       "crossTrack": "Transversal",
       "crossTrackTooltip": "Distancia transversal al satélite secundario"
     },
-    "noData": "SIN DATOS"
+    "noData": "SIN DATOS",
+    "notSunlit": "Sin iluminar",
+    "assumedSuffix": "(supuesto)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "Satélite militar activo",
+          "communications": "Satélite de comunicaciones activo",
+          "navigation": "Satélite de navegación activo",
+          "weather": "Satélite meteorológico activo",
+          "earthObservation": "Satélite de observación de la Tierra activo",
+          "astronomy": "Telescopio espacial activo",
+          "science": "Satélite científico activo",
+          "technology": "Satélite de demostración tecnológica activo",
+          "other": "Satélite activo"
+        },
+        "inactive": {
+          "military": "Satélite militar inactivo",
+          "communications": "Satélite de comunicaciones inactivo",
+          "navigation": "Satélite de navegación inactivo",
+          "weather": "Satélite meteorológico inactivo",
+          "earthObservation": "Satélite de observación de la Tierra inactivo",
+          "astronomy": "Telescopio espacial inactivo",
+          "science": "Satélite científico inactivo",
+          "technology": "Satélite de demostración tecnológica inactivo",
+          "other": "Satélite inactivo"
+        },
+        "plain": {
+          "military": "Satélite militar",
+          "communications": "Satélite de comunicaciones",
+          "navigation": "Satélite de navegación",
+          "weather": "Satélite meteorológico",
+          "earthObservation": "Satélite de observación de la Tierra",
+          "astronomy": "Telescopio espacial",
+          "science": "Satélite científico",
+          "technology": "Satélite de demostración tecnológica",
+          "other": "Satélite"
+        }
+      },
+      "crewedStation": "Estación espacial tripulada",
+      "simulated": "Objeto simulado (maniobra hipotética)",
+      "rocketBody": "Cuerpo de cohete abandonado en órbita",
+      "debris": "Desechos abandonados en órbita",
+      "special": "Objeto especial en seguimiento",
+      "missile": "Misil balístico en vuelo"
+    }
   }
 }

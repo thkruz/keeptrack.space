@@ -11,7 +11,7 @@
         "beamWidth": "Szerokość wiązki",
         "maxTmxTime": "Maks. czas Tmx",
         "sun": "Słońce",
-        "visMag": "Jasność wiz.",
+        "visMag": "Jasność wiz. (szac.)",
         "nextPass": "Następny przelot",
         "reason": "Poza zasięgiem"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Szerokość liniowa na zasięgu celu",
         "maxTmxTime": "Czas potrzebny sygnałowi RF/światłu na dotarcie do celu i powrót",
         "sun": "Czy Słońce wpływa na czujnik",
-        "visMag": "Jasność wizualna (niższe wartości oznaczają jaśniejsze obiekty)",
+        "visMag": "Szacowana jasność wizualna (niższe wartości oznaczają jaśniejsze obiekty). Obliczona ze standardowego modelu jasności; rzeczywista jasność zależy od orientacji i fazy. Zakłada bezchmurne niebo; pogoda i zachmurzenie nie są uwzględniane.",
         "nextPass": "Następny czas w zasięgu",
         "reason": "Dlaczego obiekt jest poza polem widzenia sensora"
       },
@@ -38,12 +38,12 @@
         "outOfFov": "Poza polem widzenia",
         "unavailable": "Niedostępne",
         "beyondMaxRange": "Poza maksymalnym zasięgiem",
-        "reasonMinRange": "Odległość {{value}} poniżej min. {{limit}}",
-        "reasonMaxRange": "Odległość {{value}} powyżej maks. {{limit}}",
-        "reasonMinEl": "Elewacja {{value}} poniżej min. {{limit}}",
-        "reasonMaxEl": "Elewacja {{value}} powyżej maks. {{limit}}",
-        "reasonMask": "Elewacja {{value}} poniżej maski horyzontu {{limit}}",
-        "reasonAzimuth": "Azymut {{value}} poza zakresem {{min}} do {{max}}",
+        "reasonMinRange": "Odległość poniżej min. {{limit}}",
+        "reasonMaxRange": "Odległość powyżej maks. {{limit}}",
+        "reasonMinEl": "Elewacja poniżej min. {{limit}}",
+        "reasonMaxEl": "Elewacja powyżej maks. {{limit}}",
+        "reasonMask": "Elewacja poniżej maski horyzontu {{limit}}",
+        "reasonAzimuth": "Azymut poza zakresem {{min}} do {{max}}",
         "reasonCone": "Poza stożkiem osi celowania sensora",
         "unknown": "Nieznane",
         "notApplicable": "Nie dotyczy",
@@ -51,7 +51,9 @@
         "notInOrbitToast": "Satelita {sccNum} nie jest na orbicie!<br>Czas symulacji to {simTime}.<br>Sprawdź, czy masz właściwy TLE.",
         "categoryKinematic": "Kinematyka",
         "categorySensor": "Sensor",
-        "kinematicOk": "W granicach sensora"
+        "kinematicOk": "W granicach sensora",
+        "notSunlit": "Nieoświetlony",
+        "assumedSuffix": "(założone)"
       }
     }
   }

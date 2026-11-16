@@ -48,6 +48,7 @@
       "downloadButton": "Pobierz raport",
       "copyButton": "Kopiuj do schowka",
       "sensorNote": "Te raporty wymagają wybrania sensora.",
+      "sensorLimitNote": "Użyto {name}: minimalna elewacja {minEl}°. Przeloty poniżej nie są raportowane.",
       "sections": {
         "orbitPosition": "Orbita i pozycja",
         "sensor": "Sensor",
@@ -112,7 +113,11 @@
           "windowLine": "Okres raportu: od {start} do {end} UTC, krok: {step} s",
           "generatedWallClock": "Wygenerowano (czas rzeczywisty)",
           "appVersion": "Wersja KeepTrack",
-          "ricConvention": "Konwencja RIC"
+          "ricConvention": "Konwencja RIC",
+          "passCaveat": "Czasy lokalne stanowiska używają strefy {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja jest doprecyzowana do najbliższej sekundy.",
+          "passCaveatDisplay": "Czasy lokalne używają strefy wyświetlania {zone}. Okna pokazują tylko dostęp geometryczny, a nie dowód, że sygnał można odebrać. Maksymalna elewacja jest doprecyzowana do najbliższej sekundy.",
+          "sensorCoverage": "Dotyczy wyłącznie czujnika {sensor}.",
+          "sensorCoverageOthers": "Dotyczy wyłącznie czujnika {sensor}. Pozostałe aktywne czujniki lub stanowiska ({count}) nie są uwzględnione."
         },
         "titles": {
           "aer": "Raport azymut, elewacja, odległość",
@@ -157,7 +162,11 @@
           "radialKm": "Radialna (km)",
           "intrackKm": "Wzdłuż toru (km)",
           "crosstrackKm": "W poprzek toru (km)",
-          "relSpeed": "Prędk. wzgl. (km/s)"
+          "relSpeed": "Prędk. wzgl. (km/s)",
+          "timeLocal": "Czas lokalny",
+          "riseLocal": "Czas wschodu (lokalny)",
+          "setLocal": "Czas zachodu (lokalny)",
+          "maxElTimeLocal": "Czas maks. elewacji (lokalny)"
         },
         "empty": {
           "noPasses": "Nie znaleziono przelotów!",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "ciągle",
-          "start": "widoczny na początku",
-          "end": "widoczny na końcu"
+          "start": "widoczny na początku; maksimum w oknie",
+          "end": "widoczny na końcu; maksimum w oknie"
         },
         "illumination": {
           "sun": "Tak",

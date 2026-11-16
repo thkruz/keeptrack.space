@@ -135,6 +135,16 @@
   z-index: 3;
 }
 
+/* Lists opened inside a data-select-container="body" ancestor attach to the click-through #kt-select-portal layer
+   (material-select.ts). The list itself must take clicks, whichever plugin's CSS is loaded (#350, #266). */
+#kt-select-portal > .dropdown-content.select-dropdown {
+  min-width: max-content;
+  pointer-events: auto;
+  /* The global .dropdown-content cap (40vh) clipped a 6-item list at 768 px tall (#350); the portal list has the
+     whole viewport, so let it show every item and scroll only when it truly cannot fit. */
+  max-height: calc(100vh - 24px) !important;
+}
+
 /* Full-bleed hairline between sub-groups within a card. */
 .kt-ui-v13 .kt-divider {
   height: 1px;
@@ -163,6 +173,15 @@
   float: none;
   margin: 6px 0 0;
   padding: 0;
+  /* A flex item defaults to min-width:auto, so a nowrap child (picker trigger, long value) stretched the column
+     wider than its card (#500). Let the column shrink to the card. */
+  min-width: 0;
+}
+
+/* Materialize v2 parks a floating label at left:16px, but KeepTrack zeroes the input/select text padding, so every
+   v13 label sat 16px right of its own field text and the card text edge (#499, #503). Align label to the text. */
+.kt-ui-v13 .input-field > label {
+  left: 0;
 }
 
 /* ===== Action rows ===== */

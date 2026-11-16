@@ -11,7 +11,7 @@
         "beamWidth": "Largeur du Faisceau",
         "maxTmxTime": "Temps Tmx Max.",
         "sun": "Soleil",
-        "visMag": "Mag. Vis.",
+        "visMag": "Mag. Vis. (est.)",
         "nextPass": "Prochain Passage",
         "reason": "Hors de vue"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Largeur linéaire à la portée de la cible",
         "maxTmxTime": "Temps pour que RF/Lumière atteigne la cible et revienne",
         "sun": "Le Soleil impacte-t-il le capteur",
-        "visMag": "Magnitude visuelle (Les nombres plus bas sont plus brillants)",
+        "visMag": "Magnitude visuelle estimée (les nombres plus bas sont plus brillants). Calculée à partir d'un modèle de magnitude standard ; la luminosité réelle varie selon l'attitude et la phase. Suppose un ciel dégagé ; la météo et la couverture nuageuse ne sont pas prises en compte.",
         "nextPass": "Prochaine fois en couverture",
         "reason": "Pourquoi l'objet est hors du champ de vision du capteur"
       },
@@ -38,12 +38,12 @@
         "outOfFov": "Hors du FOV",
         "unavailable": "Indisponible",
         "beyondMaxRange": "Au-delà de la portée maximale",
-        "reasonMinRange": "Distance {{value}} sous le min. {{limit}}",
-        "reasonMaxRange": "Distance {{value}} au-delà du max. {{limit}}",
-        "reasonMinEl": "Élévation {{value}} sous le min. {{limit}}",
-        "reasonMaxEl": "Élévation {{value}} au-delà du max. {{limit}}",
-        "reasonMask": "Élévation {{value}} sous le masque d'horizon {{limit}}",
-        "reasonAzimuth": "Azimut {{value}} hors de {{min}} à {{max}}",
+        "reasonMinRange": "Distance sous le min. {{limit}}",
+        "reasonMaxRange": "Distance au-delà du max. {{limit}}",
+        "reasonMinEl": "Élévation sous le min. {{limit}}",
+        "reasonMaxEl": "Élévation au-delà du max. {{limit}}",
+        "reasonMask": "Élévation sous le masque d'horizon {{limit}}",
+        "reasonAzimuth": "Azimut hors de {{min}} à {{max}}",
         "reasonCone": "Hors du cône de visée du capteur",
         "unknown": "Inconnu",
         "notApplicable": "N/D",
@@ -51,7 +51,9 @@
         "notInOrbitToast": "Le satellite {sccNum} n'est pas en orbite !<br>L'heure de simulation est {simTime}.<br>Vérifiez que vous disposez du bon TLE.",
         "categoryKinematic": "Cinématique",
         "categorySensor": "Capteur",
-        "kinematicOk": "Dans les limites du capteur"
+        "kinematicOk": "Dans les limites du capteur",
+        "notSunlit": "Non éclairé",
+        "assumedSuffix": "(supposé)"
       }
     }
   }

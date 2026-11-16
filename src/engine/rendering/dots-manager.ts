@@ -736,10 +736,17 @@ export class DotsManager {
    * @returns An object containing the x, y, and z coordinates of the dot's position.
    */
   getCurrentPosition(i: number) {
+    const posData = this.positionData;
+
+    // positionData is nulled during catalog swap while highPerformanceRender keeps firing (Public #1462)
+    if (!posData) {
+      return { x: <Kilometers>0, y: <Kilometers>0, z: <Kilometers>0 };
+    }
+
     return {
-      x: <Kilometers>this.positionData[i * 3],
-      y: <Kilometers>this.positionData[i * 3 + 1],
-      z: <Kilometers>this.positionData[i * 3 + 2],
+      x: <Kilometers>posData[i * 3],
+      y: <Kilometers>posData[i * 3 + 1],
+      z: <Kilometers>posData[i * 3 + 2],
     };
   }
 

@@ -64,6 +64,14 @@ export class GraphicsSettings {
   isDrawPoliticalLabels = false;
   isDrawCloudsMap = true;
 
+  // Pro "High quality graphics" (opt-in, applied by the Pro EarthAtmosphere plugin; all default off)
+  /** Sun glint on the oceans. */
+  hqOceanGlint = false;
+  /** Soft day/night terminator with warm night lights. */
+  hqSoftTerminator = false;
+  /** ACES filmic tonemap on the Earth surface. */
+  hqFilmicTonemap = false;
+
   // Earth Rendering
   /**
    * If false, skip drawing the Earth mesh entirely (debug only).
@@ -130,6 +138,11 @@ export class GraphicsSettings {
    * Determines whether or not to draw graticule (lat/lon grid) lines on the Earth.
    */
   isDrawGraticule = false;
+  /**
+   * Set only while the flat map view is temporarily showing the graticule by default: holds the
+   * user's real (saved) isDrawGraticule value so persistence never stores the temporary one.
+   */
+  graticuleSavedValue: boolean | null = null;
   /**
    * Determines whether or not to draw the day/night terminator line and subsolar
    * point marker on the flat (equirectangular) map view.

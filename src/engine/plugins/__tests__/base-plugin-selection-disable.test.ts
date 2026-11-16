@@ -57,4 +57,23 @@ describe('KeepTrackPlugin disable on lost selection', () => {
     expect(plugin.isIconDisabled).toBe(true);
     expect(hideSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('does not touch the icon class list when the DOM already has the requested state', () => {
+    const plugin = makePlugin('needs-selection-menu');
+    const icon = document.getElementById('needs-selection-icon') as HTMLElement;
+    const toggle = vi.spyOn(icon.classList, 'toggle');
+
+    // Flags say active/enabled but the DOM already matches the target state: nothing to write.
+    plugin.isMenuButtonActive = true;
+    plugin.setBottomIconToUnselected(false);
+    plugin.isIconDisabled = true;
+    plugin.setBottomIconToDisabled(false);
+    plugin.isIconDisabled = false;
+    plugin.setBottomIconToEnabled();
+    expect(toggle).not.toHaveBeenCalled();
+
+    plugin.isIconDisabled = false;
+    plugin.setBottomIconToDisabled(false);
+    expect(toggle).toHaveBeenCalledWith('bmenu-item-disabled', true);
+  });
 });

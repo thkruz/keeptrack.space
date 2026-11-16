@@ -1,15 +1,16 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Satellitenbilder",
-      "title": "Satellitenbilder",
+      "bottomIconLabel": "Wetterbilder",
+      "title": "Wetterbilder",
       "defaultImageTitle": "Neuestes Satellitenbild",
       "labels": {
         "dscovrUnavailable": "DSCOVR vorübergehend nicht verfügbar",
         "dscovrImage": "DSCOVR-Bild {index}",
         "dscovrLoading": "DSCOVR-Bilder werden geladen…",
         "refresh": "Neuestes Bild aktualisieren",
-        "imageAtUtc": "{name} um {time} UTC"
+        "imageAtUtc": "{name} um {time} UTC",
+        "hint": "Klicke auf einen Satelliten, um zu ihm zu fliegen und sein aktuelles Vollbild der Erdscheibe zu öffnen"
       },
       "sections": {
         "geostationary": "Geostationär",

@@ -4,6 +4,7 @@ import { getEl, showEl } from '@app/engine/utils/get-el';
 import Draggabilly from 'draggabilly';
 import { html } from '../utils/development/formatter';
 import './engine-ui.css';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { ServiceLocator } from '../core/service-locator';
 
 interface DraggableBoxOptions {
@@ -16,6 +17,7 @@ export abstract class DraggableBox {
   protected boxId: string;
   protected boxEl: HTMLElement | null = null;
   protected draggie: Draggabilly | null = null;
+  private lastZIndex_: number | null = null;
   protected width: string | null = null;
   protected title: string = '';
   private static zIndexCounter_ = 10000;
@@ -62,8 +64,8 @@ export abstract class DraggableBox {
                 ${this.getBoxTitleHtml()}
               </span>
             </div>
-            ${this.isDockable ? `<span id="${this.boxId}-dock" class="draggable-box__btn draggable-box__dock-btn"></span>` : ''}
-            <span id="${this.boxId}-close" class="draggable-box__btn draggable-box__close-btn"></span>
+            ${this.isDockable ? `<span id="${this.boxId}-dock" class="draggable-box__btn draggable-box__dock-btn" role="button" tabindex="0" aria-label="${t7e('Common.dock' as TranslationKey)}" title="${t7e('Common.dock' as TranslationKey)}"></span>` : ''}
+            <span id="${this.boxId}-close" class="draggable-box__btn draggable-box__close-btn" role="button" tabindex="0" aria-label="${t7e('Common.close' as TranslationKey)}" title="${t7e('Common.close' as TranslationKey)}"></span>
           </div>
           <div class="draggable-box__content">
             ${this.getBoxContentHtml()}
@@ -108,11 +110,15 @@ export abstract class DraggableBox {
       this.draggie = new Draggabilly(boxContent, {
         containment: getEl('canvas-holder')!,
       });
-      this.draggie.on('dragStart', () => {
-        boxContent.style.height = 'fit-content';
-        boxContent.style.maxHeight = '80%';
-      });
+      // Draggabilly measures containment right before it emits dragStart, so the
+      // final floating size must be set on pointerDown (which fires earlier).
       this.draggie.on('pointerDown', () => {
+        if (boxContent.style.height !== 'fit-content') {
+          boxContent.style.height = 'fit-content';
+        }
+        if (boxContent.style.maxHeight !== '80%') {
+          boxContent.style.maxHeight = '80%';
+        }
         this.sendToFront();
       });
       boxContent.addEventListener('mousedown', (e: MouseEvent) => {
@@ -126,7 +132,15 @@ export abstract class DraggableBox {
   }
 
   private sendToFront() {
-    getEl(`${this.boxId}`)!.style.zIndex = DraggableBox.increaseMaxZIndex().toString();
+    const el = getEl(`${this.boxId}`)!;
+
+    // #360: every pointerDown used to write a new z-index, invalidating style right before Draggabilly's containment
+    // measure and forcing a full synchronous recalc at drag start. Skip the write when this box is already on top.
+    if (this.lastZIndex_ !== null && this.lastZIndex_ === DraggableBox.zIndexCounter_ && el.style.zIndex === String(this.lastZIndex_)) {
+      return;
+    }
+    this.lastZIndex_ = DraggableBox.increaseMaxZIndex();
+    el.style.zIndex = this.lastZIndex_.toString();
   }
 
   close(cb?: () => void) {

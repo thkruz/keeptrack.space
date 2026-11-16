@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} 不可用！",
         "noLaunches": "未返回即将进行的发射。",
         "rateLimited": "The Space Devs 目前正在限制请求。请几分钟后再试。",
-        "nothingToExport": "没有可导出的发射。请先加载发射列表。"
+        "nothingToExport": "没有可导出的发射。请先加载发射列表。",
+        "timeTbd": "时间待定"
       },
       "help": {
         "overview": "发射日历列出全球接下来的 20 次轨道发射，数据实时来自 The Space Devs 发射库：每次发射的发射窗口、任务、火箭、发射场、机构和国家。任务、火箭、发射场和机构名称在有资料时会链接到延伸阅读。",

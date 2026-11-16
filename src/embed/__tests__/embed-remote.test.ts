@@ -139,6 +139,26 @@ describe('EmbedRemote', () => {
     expect(events[1].payload).toEqual({ object: { id: 2 } });
   });
 
+  it('delivers the final null hover after a fast enter then leave', () => {
+    const { remote, listeners } = makeRemote();
+
+    remote.start();
+    last().open();
+    last().receive(welcome());
+    vi.setSystemTime(2_000_000);
+    const hover = listeners.get('hover');
+
+    hover?.({ object: { id: 1 } });
+    hover?.({ object: { id: 2 } });
+    hover?.({ object: null });
+    vi.advanceTimersByTime(150);
+    expect(
+      last()
+        .sent.filter((m) => m.type === 'event')
+        .at(-1)?.payload
+    ).toEqual({ object: null });
+  });
+
   it('reconnects with capped exponential backoff and resets after welcome', () => {
     const { remote, statuses } = makeRemote();
 

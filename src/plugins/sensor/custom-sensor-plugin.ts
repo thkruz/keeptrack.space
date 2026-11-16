@@ -3,6 +3,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { UiGeolocation } from '@app/app/ui/ui-manager-geolocation';
 import { SoundNames } from '@app/engine/audio/sounds';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
+import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -22,17 +23,20 @@ import bookmarkRemovePng from '@public/img/icons/bookmark-remove.png';
 import sensorAddPng from '@public/img/icons/sensor-add.png';
 import viewListPng from '@public/img/icons/view-list.png';
 import { ClickDragOptions, KeepTrackPlugin, SideMenuSettingsOptions } from '../../engine/plugins/base-plugin';
+import type { SensorFov } from '../sensor-fov/sensor-fov';
 import {
   buildCustomSensorParams,
   CustomSensorFormValues,
   customSensorFormFromSensor,
   customSensorSubmitKey,
   DUPLICATE_SUBMIT_WINDOW_MS,
+  isStepBinMask,
   parseMask,
   validateCustomSensor,
 } from './custom-sensor-core';
 import { renderCustomSensorList } from './custom-sensor-list-renderer';
 import { buildCustomSensorStore, customSensorParamsFromRecord, parseCustomSensorStore } from './custom-sensor-persistence';
+import { notifySavedSitesReloaded, saveSites } from './custom-site-registry';
 import './custom-sensor.css';
 
 export class CustomSensorPlugin extends KeepTrackPlugin {
@@ -49,9 +53,13 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       if (sensorManagerInstance.isSensorSelected()) {
         (<HTMLInputElement>getEl('cs-replace')).style.display = '';
+        getEl('cs-add-replace-note')!.style.display = '';
         CustomSensorPlugin.prefillFromSensor_(sensorManagerInstance.currentSensors[0]);
       } else {
         (<HTMLInputElement>getEl('cs-replace')).style.display = 'none';
+        // The note explains Replace, so it is only shown while the Replace button is.
+        getEl('cs-add-replace-note')!.style.display = 'none';
+        CustomSensorPlugin.setPrefillNote_(null);
       }
     }
   };
@@ -80,6 +88,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'create-rmb',
+      group: 'more',
       level1Html: CustomSensorPlugin.buildRmbL1Html_(),
       level2ElementName: 'create-rmb-menu',
       level2Html: CustomSensorPlugin.buildRmbL2Html_(),
@@ -98,7 +107,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <section class="kt-section">
         <div class="kt-section-label">${s('identity')}</div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipSensorName')}">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipSensorName')}">
             <input id="cs-uiName" type="text" value="${getCustomSensorDefaultDisplayName()}" />
             <label for="cs-uiName" class="active">${l('sensorName')}</label>
           </div>
@@ -119,17 +128,17 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <section class="kt-section">
         <div class="kt-section-label">${s('location')}</div>
         <div class="kt-field-row">
-          <div class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipLatitude')}">
-            <input id="cs-lat" type="text" value="0" />
+          <div class="input-field col s6" kt-tooltip="${l('tooltipLatitude')}">
+            <input id="cs-lat" type="text" value="0" placeholder="${l('latPlaceholder')}" />
             <label for="cs-lat" class="active">${l('latitude')}</label>
           </div>
-          <div class="input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipLongitude')}">
-            <input id="cs-lon" type="text" value="0" />
+          <div class="input-field col s6" kt-tooltip="${l('tooltipLongitude')}">
+            <input id="cs-lon" type="text" value="0" placeholder="${l('lonPlaceholder')}" />
             <label for="cs-lon" class="active">${l('longitude')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipElevation')}">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipElevation')}">
             <input id="cs-hei" type="text" value="0" />
             <label for="cs-hei" class="active">${l('elevation')}</label>
           </div>
@@ -138,47 +147,62 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
       <section class="kt-section">
         <div class="kt-section-label">${s('fieldOfView')}</div>
-        <div class="switch row" data-position="top" data-delay="50" data-tooltip="${l('tooltipTelescope')}">
+        <div id="cs-prefill-note" class="cs-prefill-note" style="display: none"></div>
+        <div class="switch row" kt-tooltip="${l('tooltipTelescope')}">
           <label>
-            <input id="cs-telescope" type="checkbox" checked />
+            <input id="cs-telescope" type="checkbox" />
             <span class="lever"></span>
             ${l('telescope')}
           </label>
         </div>
+        <div id="cs-telescope-hint" class="kt-note" style="margin-top: 8px;">${l('telescopeHint')}</div>
         <div class="kt-field-row">
-          <div id="cs-minaz-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinAz')}">
+          <div id="cs-minaz-div" class="input-field col s6" kt-tooltip="${l('tooltipMinAz')}">
             <input id="cs-minaz" type="text" value="0" />
             <label for="cs-minaz" class="active">${l('minAzimuth')}</label>
           </div>
-          <div id="cs-maxaz-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxAz')}">
+          <div id="cs-maxaz-div" class="input-field col s6" kt-tooltip="${l('tooltipMaxAz')}">
             <input id="cs-maxaz" type="text" value="360" />
             <label for="cs-maxaz" class="active">${l('maxAzimuth')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minel-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinEl')}">
+          <div id="cs-minel-div" class="input-field col s6" kt-tooltip="${l('tooltipMinEl')}">
             <input id="cs-minel" type="text" value="10" />
             <label for="cs-minel" class="active">${l('minElevation')}</label>
           </div>
-          <div id="cs-maxel-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxEl')}">
+          <div id="cs-maxel-div" class="input-field col s6" kt-tooltip="${l('tooltipMaxEl')}">
             <input id="cs-maxel" type="text" value="90" />
             <label for="cs-maxel" class="active">${l('maxElevation')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div id="cs-minrange-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMinRange')}">
+          <div id="cs-minrange-div" class="input-field col s6" kt-tooltip="${l('tooltipMinRange')}">
             <input id="cs-minrange" type="text" value="100" />
             <label for="cs-minrange" class="active">${l('minRange')}</label>
           </div>
-          <div id="cs-maxrange-div" class="start-hidden input-field col s6" data-position="top" data-delay="50" data-tooltip="${l('tooltipMaxRange')}">
+          <div id="cs-maxrange-div" class="input-field col s6" kt-tooltip="${l('tooltipMaxRange')}">
             <input id="cs-maxrange" type="text" value="50000" />
             <label for="cs-maxrange" class="active">${l('maxRange')}</label>
           </div>
         </div>
         <div class="kt-field-row">
-          <div class="input-field col s12" data-position="top" data-delay="50" data-tooltip="${l('tooltipHorizonMask')}">
-            <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="0,5&#10;90,25&#10;180,5&#10;270,25"></textarea>
+          <div class="input-field col s12" kt-tooltip="${l('tooltipHorizonMask')}">
+            <textarea id="cs-mask" class="materialize-textarea cs-mask" rows="3" spellcheck="false" placeholder="${l('maskPlaceholder')}"></textarea>
             <label for="cs-mask" class="active">${l('horizonMask')}</label>
+          </div>
+        </div>
+        <div class="switch row" kt-tooltip="${l('tooltipMaskStep')}">
+          <label>
+            <input id="cs-mask-step" type="checkbox" />
+            <span class="lever"></span>
+            ${l('maskStep')}
+          </label>
+        </div>
+        <div class="kt-field-row">
+          <div class="input-field col s12" kt-tooltip="${l('tooltipTimeZone')}">
+            <input id="cs-timezone" type="text" spellcheck="false" autocomplete="off" placeholder="${l('timeZonePlaceholder')}" />
+            <label for="cs-timezone" class="active">${l('timeZone')}</label>
           </div>
         </div>
       </section>
@@ -189,11 +213,12 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       <button id="cs-replace" type="button" name="action" class="kt-action waves-effect">
         <span class="kt-action-label">${l('replaceSensor')}</span>
       </button>
-      <button id="cs-clear" type="button" name="action" class="kt-action waves-effect">
-        <span class="kt-action-label">${l('clearCustomSensors')}</span>
-      </button>
+      <div id="cs-add-replace-note" class="cs-prefill-note">${l('addReplaceNote')}</div>
       <button id="cs-geolocation" type="button" name="search" class="kt-action waves-effect">
         <span class="kt-action-label">${l('useGeolocation')}</span>
+      </button>
+      <button id="cs-clear" type="button" name="action" class="kt-action kt-action-danger cs-clear waves-effect">
+        <span class="kt-action-label">${l('clearCustomSensors')}</span>
       </button>
     </form>
     `;
@@ -222,6 +247,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     switch (targetId) {
       case 'create-observer-rmb':
+        ServiceLocator.getUiManager().hideSideMenus();
         slideInRight(getEl('custom-sensor-menu'), 300);
         this.setBottomIconToSelected();
         sensorManagerInstance.isCustomSensorMenuOpen = true;
@@ -247,6 +273,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         break;
       case 'create-sensor-rmb':
         {
+          ServiceLocator.getUiManager().hideSideMenus();
           slideInRight(getEl('custom-sensor-menu'), 300);
           this.setBottomIconToSelected();
           sensorManagerInstance.isCustomSensorMenuOpen = true;
@@ -376,8 +403,36 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
        */
       setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
     });
-    eventBus.on(EventBusEvent.setSensor, () => CustomSensorPlugin.saveCustomSensors());
-    eventBus.on(EventBusEvent.resetSensor, () => CustomSensorPlugin.saveCustomSensors());
+    // Account sync brought custom sensors from another device: rebuild them after the catalog-sensor restore
+    eventBus.on(EventBusEvent.remoteSettingsApplied, (changedKeys) => {
+      if (changedKeys.includes(StorageKey.CUSTOM_SITE_REGISTRY)) {
+        notifySavedSitesReloaded();
+      }
+      if (changedKeys.includes(StorageKey.CUSTOM_SENSORS) || changedKeys.includes(StorageKey.CURRENT_SENSOR)) {
+        setTimeout(() => CustomSensorPlugin.restoreCustomSensors(), 0);
+      }
+    });
+    // A site made current from the Sensor List or palette changes the active list too
+    eventBus.on(EventBusEvent.setSensor, () => {
+      CustomSensorPlugin.saveCustomSensors();
+      CustomSensorPlugin.updateCustomSensorListDom();
+    });
+    eventBus.on(EventBusEvent.resetSensor, () => {
+      CustomSensorPlugin.saveCustomSensors();
+      CustomSensorPlugin.updateCustomSensorListDom();
+    });
+  }
+
+  /**
+   * Call before emitting remoteSettingsApplied. The sensor-list listener re-applies CURRENT_SENSOR
+   * synchronously; a custom primary is unknown to it, so it resets the sensor, and the resulting save
+   * would delete the freshly synced custom store (and push that deletion back to the account).
+   * Saves stay off until the deferred {@link restoreCustomSensors} has rebuilt the sensors.
+   */
+  static holdSavesForRemoteRestore(changedKeys: readonly StorageKey[]): void {
+    if (changedKeys.includes(StorageKey.CUSTOM_SENSORS) || changedKeys.includes(StorageKey.CURRENT_SENSOR)) {
+      CustomSensorPlugin.isStoreRestored_ = false;
+    }
   }
 
   /** True once {@link restoreCustomSensors} has run; saves are skipped before that. */
@@ -394,6 +449,9 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const persistence = PersistenceManager.getInstance();
     const store = buildCustomSensorStore(sensorManagerInstance.currentSensors[0], sensorManagerInstance.secondarySensors);
+
+    // Every active custom site is also kept in the saved registry; Clear / Reset leave the registry alone
+    saveSites(store.sensors);
 
     if (store.sensors.length === 0) {
       persistence.removeItem(StorageKey.CUSTOM_SENSORS);
@@ -423,15 +481,23 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     const primary = restored.find((sensor) => sensor.objName === store.primaryObjName) ?? null;
     const secondaries = restored.filter((sensor) => sensor !== primary);
 
-    CustomSensorPlugin.withCameraPreserved_(() => {
-      if (primary) {
-        // Replaces whatever the boot restored: the saved primary was this custom sensor
-        sensorManagerInstance.addSecondarySensor(primary, true);
-      }
-      for (const sensor of secondaries) {
-        sensorManagerInstance.addSecondarySensor(sensor);
-      }
-    }, true);
+    try {
+      CustomSensorPlugin.withCameraPreserved_(() => {
+        if (primary) {
+          // Replaces whatever the boot restored: the saved primary was this custom sensor
+          sensorManagerInstance.addSecondarySensor(primary, true);
+        }
+        for (const sensor of secondaries) {
+          sensorManagerInstance.addSecondarySensor(sensor);
+        }
+      }, true);
+    } catch (error) {
+      /*
+       * A throw while framing the camera or priming the cruncher must not skip the list refresh
+       * below: the sensors are already in the manager and the panel would show none of them.
+       */
+      errorManagerInstance.warn(`Custom sensor restore did not finish: ${String(error)}`);
+    }
 
     CustomSensorPlugin.updateCustomSensorListDom();
     CustomSensorPlugin.saveCustomSensors();
@@ -509,8 +575,14 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
   private static addClearCustomSensorListener_() {
     getEl('cs-clear')!.addEventListener('click', () => {
+      // Destructive and unrecoverable: ask first
+      if (!confirm(CustomSensorPlugin.t_('labels.confirmClear'))) {
+        return;
+      }
       const sensorManagerInstance = ServiceLocator.getSensorManager();
 
+      // A re-add right after Clear is a real add, not a double-click; never swallow it silently
+      CustomSensorPlugin.lastSubmit_ = null;
       sensorManagerInstance.clearSecondarySensors();
       // clearSecondarySensors keeps a catalog primary; Clear resets every sensor
       if (sensorManagerInstance.isSensorSelected()) {
@@ -519,6 +591,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       CustomSensorPlugin.updateCustomSensorListDom();
       CustomSensorPlugin.saveCustomSensors();
+      ServiceLocator.getUiManager().toast(CustomSensorPlugin.t_('toasts.cleared'), ToastMsgType.normal);
     });
   }
 
@@ -547,6 +620,8 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       minRng: parseFloat(value('cs-minrange')),
       maxRng: parseFloat(value('cs-maxrange')),
       mask: (getEl('cs-mask', true) as HTMLTextAreaElement | null)?.value ?? '',
+      maskStep: (getEl('cs-mask-step', true) as HTMLInputElement | null)?.checked ?? false,
+      timeZone: (getEl('cs-timezone', true) as HTMLInputElement | null)?.value ?? '',
     };
   }
 
@@ -579,6 +654,23 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       telescope.click();
     }
     CustomSensorPlugin.setFields_(customSensorFormFromSensor(sensor));
+    CustomSensorPlugin.setPrefillNote_(sensor.uiName ?? sensor.name);
+    const maskStep = getEl('cs-mask-step', true) as HTMLInputElement | null;
+
+    if (maskStep) {
+      maskStep.checked = isStepBinMask(sensor.elevationMasks, sensor.interpolateMask);
+    }
+  }
+
+  /** Shows (name given) or hides the line saying the field values were copied from the current sensor. */
+  private static setPrefillNote_(sensorName: string | null): void {
+    const note = getEl('cs-prefill-note', true);
+
+    if (!note) {
+      return;
+    }
+    note.textContent = sensorName === null ? '' : t7e('plugins.CustomSensorPlugin.labels.prefillNote' as Parameters<typeof t7e>[0], { name: sensorName });
+    note.style.display = sensorName === null ? 'none' : '';
   }
 
   /** Submit key and time of the last sensor created, to swallow a double-click's second submit. */
@@ -591,6 +683,16 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
    */
   /** Identity (objName) of the sensor the last successful submit created; the action subject. */
   private static lastCreatedSensorId_: string | undefined;
+
+  /** An active sensor (primary or secondary) with the same display name, latitude and longitude. */
+  private static findActiveTwin_(values: { uiName: string; lat: number; lon: number }): DetailedSensor | undefined {
+    const sm = ServiceLocator.getSensorManager();
+    const name = resolveCustomSensorName(values.uiName);
+
+    return [...(sm.currentSensors ?? []), ...(sm.secondarySensors ?? [])].find(
+      (s) => s?.isSensor?.() && (s.uiName ?? s.name) === name && s.lat === values.lat && s.lon === values.lon
+    );
+  }
 
   private static processCustomSensorSubmit_(isReplaceSensor = false): 'added' | 'rejected' | 'duplicate' {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
@@ -607,11 +709,22 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     if (errorKey) {
       // Mask errors name the offending pair; other messages have no placeholders
-      const pair = parseMask(values.mask).badPair ?? '';
+      const pair = parseMask(values.mask, values.maskStep === true).badPair ?? '';
 
       errorManagerInstance.warn(t7e(`plugins.CustomSensorPlugin.errorMsgs.${errorKey}` as Parameters<typeof t7e>[0], { pair }));
 
       return 'rejected';
+    }
+
+    // Same name and position as a sensor already active: adding it again would list it twice
+    if (!isReplaceSensor && CustomSensorPlugin.findActiveTwin_(values)) {
+      // Never a silent no-op: say why nothing was added
+      ServiceLocator.getUiManager().toast(
+        t7e('plugins.CustomSensorPlugin.toasts.duplicate' as Parameters<typeof t7e>[0], { name: resolveCustomSensorName(values.uiName) }),
+        ToastMsgType.caution
+      );
+
+      return 'duplicate';
     }
 
     CustomSensorPlugin.lastSubmit_ = { key: submitKey, at: now };
@@ -634,6 +747,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
 
     CustomSensorPlugin.updateCustomSensorListDom();
     CustomSensorPlugin.saveCustomSensors();
+    CustomSensorPlugin.showFovLayerForLimitedSensor_(values);
 
     let toastKey = 'addedSecondary';
 
@@ -648,6 +762,25 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     );
 
     return 'added';
+  }
+
+  /**
+   * A sensor with a narrow az/el window (a camera frame) is only checkable by eye when the
+   * Sensor FOV layer is on, and nothing told the user to switch it on. Turn it on for those
+   * sensors; a full-sky sensor keeps the layer as the user left it.
+   */
+  private static showFovLayerForLimitedSensor_(values: { minAz: number; maxAz: number; minEl: number; maxEl: number }): void {
+    const isFullSky = values.maxAz - values.minAz >= 360 && values.minEl <= 0 && values.maxEl >= 90;
+
+    if (isFullSky) {
+      return;
+    }
+
+    const fovPlugin = PluginRegistry.getPluginByName<SensorFov>('SensorFov');
+
+    if (fovPlugin && !fovPlugin.isIconDisabled && !fovPlugin.isMenuButtonActive) {
+      fovPlugin.enableFovView();
+    }
   }
 
   /**
@@ -675,7 +808,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
     }
   }
 
-  private static updateCustomSensorListDom() {
+  static updateCustomSensorListDom() {
     const l = (key: string) => CustomSensorPlugin.t_(`sensorList.${key}`);
     const sensorManagerInstance = ServiceLocator.getSensorManager();
     const primarySensor = isCustomSensor(sensorManagerInstance.currentSensors[0]) ? [sensorManagerInstance.currentSensors[0]] : ([] as DetailedSensor[]);
@@ -698,6 +831,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
       }
       e.preventDefault();
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+      CustomSensorPlugin.lastSubmit_ = null;
       const sensorManagerInstance = ServiceLocator.getSensorManager();
       const sensor = sensorManagerInstance.getSensorByObjName(removeBtn.dataset.id);
 
@@ -736,6 +870,7 @@ export class CustomSensorPlugin extends KeepTrackPlugin {
         const sensorManagerInstance = ServiceLocator.getSensorManager();
 
         if (sensorManagerInstance.isSensorSelected()) {
+          CustomSensorPlugin.setPrefillNote_(sensorManagerInstance.currentSensors[0].uiName ?? sensorManagerInstance.currentSensors[0].name);
           CustomSensorPlugin.setFields_({
             'cs-minaz': sensorManagerInstance.currentSensors[0].minAz.toString(),
             'cs-maxaz': sensorManagerInstance.currentSensors[0].maxAz.toString(),

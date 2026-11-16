@@ -7,6 +7,7 @@ import { InputManager } from '@app/engine/input/input-manager';
 import { MouseInput } from '@app/engine/input/input-manager/mouse-input';
 import { UrlManager } from '@app/engine/input/url-manager';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
+import { KeepTrack } from '@app/keeptrack';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -131,6 +132,100 @@ describe('MouseInput handlers', () => {
     });
   });
 
+  describe('Escape deselects from the bare scene only', () => {
+    const press = (target: EventTarget | null = document.body) => m().deselectOnEscape_({ key: 'Escape', defaultPrevented: false, target } as never);
+
+    beforeEach(() => {
+      vi.spyOn(PluginRegistry, 'getPlugin').mockImplementation(() => ({ selectSat, setSecondarySat, selectedSat: 5 }) as never);
+      inputManager.isRmbMenuOpen = false;
+      // The standard environment replaces the global Element; the handler needs the DOM one.
+      vi.stubGlobal('Element', window.Element);
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('closes an open search first and keeps the selection', () => {
+      const closeSearch = vi.fn();
+
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: true, closeSearch } } as never);
+      press();
+      expect(closeSearch).toHaveBeenCalledWith(true);
+      expect(selectSat).not.toHaveBeenCalled();
+    });
+
+    it('deselects on the next press once search is closed', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+    });
+
+    // #482 decision: Escape closes the topmost UI first, then drops only the selected object. The observing sensor stays.
+    it('deselecting on Escape never resets the selected sensor', () => {
+      const resetSensorSelected = vi.fn();
+
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      vi.spyOn(ServiceLocator, 'getSensorManager').mockReturnValue({ resetSensorSelected } as never);
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      expect(resetSensorSelected).not.toHaveBeenCalled();
+    });
+
+    it('ignores a role=dialog that is display:none but yields to a visible one', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      document.body.innerHTML = '<div id="launchpad" role="dialog" style="display:none"></div>';
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      const pad = document.getElementById('launchpad')!;
+
+      pad.style.display = 'block';
+      // A display:block dialog with no size (closed login / email modals) does not block Escape.
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      pad.getBoundingClientRect = () => ({ width: 300, height: 200 }) as DOMRect;
+      press();
+      expect(selectSat).not.toHaveBeenCalled();
+      pad.style.opacity = '0';
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      pad.style.opacity = '1';
+      pad.setAttribute('inert', '');
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      document.body.innerHTML = '';
+    });
+
+    it('ignores a dialog box whose overlay is hidden (closed account modals) once an account dialog was opened and dismissed', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      document.body.innerHTML = '<div id="modal-login-container" style="display:none"><div id="modal-login" role="dialog" style="display:block"></div></div>';
+      const box = document.getElementById('modal-login')!;
+
+      // A browser reports a size for the box only while the overlay is shown; mock a stale size to prove the ancestor check.
+      box.getBoundingClientRect = () => ({ width: 400, height: 300 }) as DOMRect;
+      (box as unknown as { checkVisibility: () => boolean }).checkVisibility = () => false;
+      press();
+      expect(selectSat).toHaveBeenCalledWith(-1);
+      selectSat.mockClear();
+      (box as unknown as { checkVisibility: () => boolean }).checkVisibility = () => true;
+      press();
+      expect(selectSat).not.toHaveBeenCalled();
+      document.body.innerHTML = '';
+    });
+
+    it('leaves the selection while the right-click menu is open or a field has focus', () => {
+      vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ searchManager: { isSearchOpen: false, closeSearch: vi.fn() } } as never);
+      inputManager.isRmbMenuOpen = true;
+      press();
+      inputManager.isRmbMenuOpen = false;
+      press(document.createElement('input'));
+      expect(selectSat).not.toHaveBeenCalled();
+    });
+  });
+
   describe('right-click menu dismissal', () => {
     it('closes the menu on Escape only while it is open', () => {
       inputManager.isRmbMenuOpen = false;
@@ -239,6 +334,54 @@ describe('MouseInput handlers', () => {
     });
   });
 
+  describe('getCanvasCoords layout caching', () => {
+    it('reads container layout once, not per mouse event, and again after invalidation', () => {
+      const container = KeepTrack.getInstance().containerRoot;
+      const offsetLeft = vi.fn(() => 5);
+
+      Object.defineProperty(container, 'offsetLeft', { configurable: true, get: offsetLeft });
+      MouseInput.invalidateContainerOffset();
+      const evt = { clientX: 100, clientY: 50 } as MouseEvent;
+
+      expect(MouseInput.getCanvasCoords(evt).x).toBe(95);
+      MouseInput.getCanvasCoords(evt);
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(1);
+
+      window.dispatchEvent(new Event('resize'));
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(2);
+      delete (container as unknown as Record<string, unknown>).offsetLeft;
+      MouseInput.invalidateContainerOffset();
+    });
+  });
+
+  describe('getCanvasCoords scroll invalidation', () => {
+    it('ignores scrolls inside unrelated elements but re-measures after a window or ancestor scroll', () => {
+      const container = KeepTrack.getInstance().containerRoot;
+      const offsetLeft = vi.fn(() => 5);
+      const sideMenu = document.createElement('div');
+
+      document.body.appendChild(sideMenu);
+      Object.defineProperty(container, 'offsetLeft', { configurable: true, get: offsetLeft });
+      MouseInput.invalidateContainerOffset();
+      const evt = { clientX: 100, clientY: 50 } as MouseEvent;
+
+      MouseInput.getCanvasCoords(evt);
+      sideMenu.dispatchEvent(new Event('scroll'));
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(1);
+
+      document.dispatchEvent(new Event('scroll'));
+      MouseInput.getCanvasCoords(evt);
+      expect(offsetLeft).toHaveBeenCalledTimes(2);
+
+      sideMenu.remove();
+      delete (container as unknown as Record<string, unknown>).offsetLeft;
+      MouseInput.invalidateContainerOffset();
+    });
+  });
+
   describe('canvasMouseMoveFire_', () => {
     it('updates the camera mouse position and flags drag movement', () => {
       camera.state.isDragging = true;
@@ -262,6 +405,18 @@ describe('MouseInput handlers', () => {
       fire('clear-lines-rmb');
 
       expect(ServiceLocator.getSoundManager()!.play).not.toHaveBeenCalled();
+    });
+
+    it('always closes the menu (so hover works again) even when the action throws', () => {
+      const input = ServiceLocator.getInputManager();
+
+      input.isRmbMenuOpen = true;
+      vi.spyOn(lineManagerInstance, 'clear').mockImplementation(() => {
+        throw new Error('action failed');
+      });
+
+      expect(() => fire('clear-lines-rmb')).toThrow('action failed');
+      expect(input.isRmbMenuOpen).toBe(false);
     });
 
     it('clears lines via the line manager', () => {

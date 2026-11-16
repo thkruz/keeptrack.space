@@ -2,9 +2,9 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "历元时差：一般，{days}",
-        "low": "历元时差：较低，{days}",
-        "poor": "历元时差：很低，{days}"
+        "caution": "历元时差：渐旧，{days}",
+        "low": "历元时差：较旧，{days}",
+        "poor": "历元时差：很旧，{days}"
       },
       "tooltip": "仿真时间与根数历元之间的时间差。超过 3 天为一般，超过 7 天为较低，超过 14 天为很低：根数越旧，位置偏差越大。",
       "toast": {

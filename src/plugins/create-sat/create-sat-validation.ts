@@ -14,6 +14,7 @@
 import { AnalystSlotReservations } from '@app/app/data/analyst-slot-reservations';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
+import { epochYearToFull } from './create-sat-orbits';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
@@ -33,6 +34,39 @@ const FIELD_RANGES: Record<string, { min: number; max: number }> = {
 export const VALIDATED_FIELDS = ['scc', 'inc', 'rasc', 'ecen', 'argPe', 'meana', 'meanmo', 'per'] as const;
 
 /**
+ * Read the eccentricity field. A value with a decimal point is a decimal
+ * eccentricity in [0, 1) ("0.001"); a plain integer is the TLE form (e * 1e7).
+ * @returns the seven-digit TLE string, or null when the value is not valid.
+ */
+export function parseEccentricityField(rawValue: string): string | null {
+  const value = rawValue.trim();
+
+  if (/^\d{1,7}$/u.test(value)) {
+    return value.padStart(7, '0');
+  }
+
+  if (/^(\d+\.\d*|\.\d+)$/u.test(value)) {
+    const digits = Math.round(parseFloat(value) * 1e7);
+
+    return digits >= 0 && digits < 1e7 ? String(digits).padStart(7, '0') : null;
+  }
+
+  return null;
+}
+
+/** Label shown beside the field so the interpretation is never silent ("e = 0.0010000"). */
+export function eccentricityHint(rawValue: string): string {
+  const tle = parseEccentricityField(rawValue);
+
+  if (tle !== null) {
+    return `e = 0.${tle}`;
+  }
+
+  // A non-empty value that is not a valid eccentricity states the rule right at the field.
+  return rawValue.trim() === '' ? '' : errMsg('invalidEccentricity');
+}
+
+/**
  * Evaluate a single field's raw value.
  * @returns true (valid), false (invalid), or null (empty → neutral).
  */
@@ -46,9 +80,7 @@ export function evaluateField(key: string, rawValue: string): boolean | null {
   // Eccentricity is entered as the 7-digit TLE integer (e * 1e7); the implied
   // eccentricity must be in [0, 1).
   if (key === 'ecen') {
-    const intVal = parseInt(value, 10);
-
-    return !isNaN(intVal) && intVal >= 0 && intVal < 1e7;
+    return parseEccentricityField(value) !== null;
   }
 
   const num = parseFloat(value);
@@ -95,7 +127,14 @@ export function wireInlineValidation(prefix: string, fields: readonly string[] =
       continue;
     }
 
-    const validate = (): void => applyFieldState(el, evaluateField(key, el.value));
+    const hint = key === 'ecen' ? getEl(`${prefix}-ecen-hint`, true) : null;
+    const validate = (): void => {
+      applyFieldState(el, evaluateField(key, el.value));
+      if (hint) {
+        hint.textContent = eccentricityHint(el.value);
+        hint.classList.toggle('create-sat-hint-error', el.classList.contains('invalid'));
+      }
+    };
 
     el.addEventListener('input', validate);
     validate();
@@ -246,7 +285,7 @@ export function validateAdvancedFields(v: TleInputParams): FormFieldError[] {
   if (!v.source || v.source.trim() === '') {
     add('src', errMsg('invalidSource'));
   }
-  if (!/^\d{1,2}$/u.test(v.epochyr.trim())) {
+  if (epochYearToFull(v.epochyr) === null && !/^\d{1,2}$/u.test(v.epochyr.trim())) {
     add('year');
   }
   if (!isInRange('day', v.epochday)) {
@@ -258,7 +297,7 @@ export function validateAdvancedFields(v: TleInputParams): FormFieldError[] {
   if (!isInRange('rasc', v.rasc)) {
     add('rasc');
   }
-  if (!/^\d{1,7}$/u.test(v.ecen.trim())) {
+  if (parseEccentricityField(v.ecen) === null) {
     add('ecen');
   }
   if (!isInRange('argPe', v.argPe)) {

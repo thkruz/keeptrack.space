@@ -1,15 +1,16 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Satelitní snímky",
-      "title": "Satelitní snímky",
+      "bottomIconLabel": "Snímky počasí",
+      "title": "Snímky počasí",
       "defaultImageTitle": "Nejnovější satelitní snímek",
       "labels": {
         "dscovrUnavailable": "DSCOVR dočasně nedostupný",
         "dscovrImage": "Snímek DSCOVR {index}",
         "dscovrLoading": "Načítání snímků DSCOVR…",
         "refresh": "Obnovit nejnovější snímek",
-        "imageAtUtc": "{name} v {time} UTC"
+        "imageAtUtc": "{name} v {time} UTC",
+        "hint": "Kliknutím na družici k ní přeletíte a otevřete její nejnovější snímek celého disku"
       },
       "sections": {
         "geostationary": "Geostacionární",

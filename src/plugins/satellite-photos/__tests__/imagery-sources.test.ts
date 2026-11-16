@@ -114,3 +114,17 @@ describe('imagery-sources', () => {
     });
   });
 });
+
+describe('EUMETSAT WMS sources', () => {
+  it('Meteosat rows use view.eumetsat.int, not the dead eumetview host', async () => {
+    const { IMAGERY_SOURCES, eumetsatWmsUrl } = await import('../imagery-sources');
+    const urls = IMAGERY_SOURCES.filter((s) => s.id.startsWith('meteosat')).map((s) => s.buildImage(new Date(), Date.now()).url);
+
+    expect(urls).toHaveLength(2);
+    urls.forEach((u) => {
+      expect(u).toContain('https://view.eumetsat.int/geoserver/wms?');
+      expect(u).not.toContain('eumetview');
+    });
+    expect(eumetsatWmsUrl('msg_fes:rgb_natural', '-90,-90,90,90')).toContain('layers=msg_fes:rgb_natural');
+  });
+});

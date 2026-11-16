@@ -201,6 +201,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
     return html`
       <div id="${KTOC_MENU_IDS.MENU}" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="${KTOC_MENU_IDS.CONTENT}" class="side-menu">
+          <div class="kt-note ktoc-attribution">${l('labels.issuer')}</div>
           <section class="kt-section">
             <div class="kt-section-label">${l('sections.filters')}</div>
             <div class="ktoc-segmented" role="group" aria-label="${l('labels.statusFilter')}">
@@ -230,7 +231,6 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
             <button id="${KTOC_MENU_IDS.REFRESH}" class="kt-action waves-effect" type="button">
               <span class="kt-action-label">${l('labels.refresh')}</span>
             </button>
-            <sub class="ktoc-attribution">${l('labels.issuer')}</sub>
           </section>
         </div>
       </div>
@@ -509,12 +509,18 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
     const head = table.createTHead().insertRow();
 
     head.className = 'ktoc-notices-header';
-    const headers = [l('table.event'), l('table.date'), l('table.satellite'), l('table.type'), l('table.status'), l('table.notice')];
+    const noticeHeader = l('table.notice');
+    const headers = [l('table.event'), l('table.date'), l('table.satellite'), l('table.type'), l('table.status'), noticeHeader];
 
     for (const text of headers) {
       const th = document.createElement('th');
 
-      th.textContent = text;
+      // The notice column holds only an open-in-new icon: no visible header, so nothing clips at narrow widths.
+      if (text === noticeHeader) {
+        th.setAttribute('aria-label', text);
+      } else {
+        th.textContent = text;
+      }
       head.appendChild(th);
     }
 
@@ -539,7 +545,7 @@ export class KtocNoticesPlugin extends KeepTrackPlugin {
 
     const canceled = isKtocCanceled(notice);
 
-    KtocNoticesPlugin.addCell_(tr, ktocEventLabel(notice.event_num));
+    KtocNoticesPlugin.addCell_(tr, typeof notice.event_num === 'number' ? `#${notice.event_num}` : ktocEventLabel(notice.event_num));
     KtocNoticesPlugin.addCell_(tr, formatKtocUtc(notice.event_date_ms, false));
     KtocNoticesPlugin.addCell_(tr, KtocNoticesPlugin.satelliteLabel_(notice.norad_id));
     KtocNoticesPlugin.addCell_(tr, ktocEventTypeLabel(notice.event_type));

@@ -14,7 +14,8 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { formatLocaleNumber } from '@app/engine/utils/format-locale-number';
+import { getEl, hideEl, requestIdleWrite, showEl, writeHtmlIfChanged, writeTitleIfChanged } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
@@ -22,6 +23,7 @@ import { BaseObject, cKmPerMs, DEG2RAD, Degrees, eci2lla, Kilometers, RadecTopoc
 import type { SensorManager } from '../../app/sensors/sensorManager';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { missileManager } from '../missile/missile-manager';
+import { infoCircleHtml } from '../sat-info-box/info-value';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { StereoMap } from '../stereo-map/stereo-map';
@@ -44,10 +46,17 @@ const EL = {
   REASON: 'sat-fov-reason',
 };
 
+/** Rows whose jargon label gets a visible info circle (the key's hover tooltip alone is not discoverable). */
+const INFO_CIRCLE_ROWS = new Set<string>(['sat-beamwidth', 'sat-maxTmx', 'sat-sun', 'sat-ra', 'sat-dec']);
+
 const l = (key: string): string => t7e(`plugins.SatInfoBoxSensor.${key}` as Parameters<typeof t7e>[0]);
 
 /** Real-time floor between two Next Pass searches for the same object and sensor (the search is heavy). */
 const NEXT_PASS_MIN_REAL_INTERVAL_MS = 1000;
+/** Floor when the last search returned a pass that was already started at search time (not in view): searching again would give the same answer. */
+const NEXT_PASS_STALE_RESULT_REAL_INTERVAL_MS = 30000;
+/** The stale-result floor only applies while the sim clock stays this close to the search time; a bigger jump searches again at once. */
+const NEXT_PASS_STALE_RESULT_MAX_SIM_ADVANCE_MS = 600e3;
 /** A backwards sim-clock move larger than this invalidates the cached Next Pass. */
 const NEXT_PASS_BACKWARD_TOLERANCE_MS = 1000;
 /** With no pass found, search again once the sim clock has used up this much of the 2-day horizon. */
@@ -91,6 +100,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
   // Starting values of the collapsable sections
   private readonly isSensorSectionCollapsed_ = true;
   private nextPassCache_: NextPassCache | null = null;
+  private nextPassText_ = '';
+  private nextPassPending_: { satId: number; sensorName: string } | null = null;
   private static readonly reasonProviders_: FovReasonProvider[] = [];
 
   /** Lets an add-on contribute reasons to the Not in View row. Registering the same provider twice is a no-op. */
@@ -162,13 +173,18 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
           (row) => html`
         <div
           class="sat-info-row${row.id === EL.SUN || row.id === EL.VMAG || row.id === EL.NEXT_PASS ? ' sat-only-info' : ''}"
+          ${row.id === EL.SUN ? 'data-kt-self-managed="true"' : ''}
         >
         <div class="sat-info-key" data-position="top" data-delay="50"
           kt-tooltip="${row.tooltip}"
         >
           ${row.key}
         </div>
-        <div class="sat-info-value" id="${row.id}">${row.value}</div>
+        ${
+          INFO_CIRCLE_ROWS.has(row.id)
+            ? `<div class="sat-info-value-wrap"><div class="sat-info-value" id="${row.id}">${row.value}</div>${infoCircleHtml(row.tooltip)}</div>`
+            : `<div class="sat-info-value" id="${row.id}">${row.value}</div>`
+        }
         </div>
       `
         )
@@ -208,8 +224,10 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     if (!sensorManagerInstance.isSensorSelected()) {
       const satSunDom = getEl(EL.SUN);
 
-      if (satSunDom?.parentElement) {
-        satSunDom.parentElement.style.display = 'none';
+      const sunRow = (satSunDom?.closest<HTMLElement>('.sat-info-row') ?? satSunDom?.parentElement) as HTMLElement | null | undefined;
+
+      if (sunRow) {
+        sunRow.style.display = 'none';
       }
     } else {
       this.calculateSunStatus_(obj);
@@ -240,18 +258,20 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     // If No Sensor, then Ignore Sun Exclusion
     const satSunDom = getEl(EL.SUN);
 
-    if (satSunDom?.parentElement) {
+    const sunRow = (satSunDom?.closest<HTMLElement>('.sat-info-row') ?? satSunDom?.parentElement) as HTMLElement | null | undefined;
+
+    if (satSunDom && sunRow) {
       // If No Sensor, then Ignore Sun Exclusion
       if (!sensorManagerInstance.isSensorSelected()) {
-        satSunDom.parentElement.style.display = 'none';
+        sunRow.style.display = 'none';
 
         return;
       }
-      satSunDom.parentElement.style.display = 'flex';
+      sunRow.style.display = 'flex';
 
       // If Radar Selected, then Say the Sun Doesn't Matter
       if (sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OPTICAL && sensorManagerInstance.currentSensors[0].type !== SpaceObjectType.OBSERVER) {
-        satSunDom.innerHTML = l('values.noEffect');
+        writeHtmlIfChanged(satSunDom, l('values.noEffect'));
         satSunDom.style.color = 'green';
 
         return;
@@ -260,7 +280,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       // If we are in the sun exclusion zone, then say so
       if (sunTime?.sunriseStart.getTime() - now.getTime() < 0 && sunTime?.sunsetEnd.getTime() - now.getTime() > 0) {
         // Unless you are in sun exclusion
-        satSunDom.innerHTML = l('values.sunExclusion');
+        writeHtmlIfChanged(satSunDom, l('values.sunExclusion'));
         satSunDom.style.color = 'red';
 
         return;
@@ -269,20 +289,20 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       // If it is night then tell the user if the satellite is illuminated
       switch (satInSun) {
         case SunStatus.UMBRAL:
-          satSunDom.innerHTML = l('values.noSunlight');
+          writeHtmlIfChanged(satSunDom, l('values.noSunlight'));
           satSunDom.style.color = 'red';
           break;
         case SunStatus.PENUMBRAL:
-          satSunDom.innerHTML = l('values.limitedSunlight');
+          writeHtmlIfChanged(satSunDom, l('values.limitedSunlight'));
           satSunDom.style.color = 'orange';
           break;
         case SunStatus.SUN:
-          satSunDom.innerHTML = l('values.directSunlight');
+          writeHtmlIfChanged(satSunDom, l('values.directSunlight'));
           satSunDom.style.color = 'green';
           break;
         case SunStatus.UNKNOWN:
         default:
-          satSunDom.innerHTML = l('values.unableToCalculate');
+          writeHtmlIfChanged(satSunDom, l('values.unableToCalculate'));
           satSunDom.style.color = 'red';
           break;
       }
@@ -437,8 +457,9 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
     if (!sensorManagerInstance.isSensorSelected()) {
       this.nextPassCache_ = null;
+      this.nextPassPending_ = null;
       if (nextPassElement) {
-        nextPassElement.innerHTML = l('values.unavailable');
+        writeHtmlIfChanged(nextPassElement, l('values.unavailable'));
       }
 
       return;
@@ -454,18 +475,75 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     const realNowMs = Date.now();
     const isInView = !!sensorManagerInstance.currentTEARR?.inView;
 
-    if (!SatInfoBoxSensor.shouldRecalcNextPass_(this.nextPassCache_, { satId, sensorName, simNowMs, realNowMs, isInView })) {
+    if (SatInfoBoxSensor.shouldRecalcNextPass_(this.nextPassCache_, { satId, sensorName, simNowMs, realNowMs, isInView })) {
+      this.scheduleNextPassSearch_(obj, satId, sensorName);
+    }
+
+    if (!nextPassElement) {
       return;
     }
 
-    const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
-    const resultMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
+    // While the first search for this object and sensor is still pending there is nothing correct to show yet.
+    const isCacheForSelection = this.nextPassCache_?.satId === satId && this.nextPassCache_.sensorName === sensorName;
 
-    this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: realNowMs, resultMs };
+    if (!isCacheForSelection) {
+      writeHtmlIfChanged(nextPassElement, t7e('Common.loading'));
 
-    if (nextPassElement) {
-      nextPassElement.innerHTML = resultMs === null ? nextPassText : `${nextPassText} UTC`;
+      return;
     }
+
+    this.writeNextPassRow_(nextPassElement, isInView, simNowMs);
+  }
+
+  /** Writes the cached Next Pass, or "in progress" when the cached rise time is already behind the clock and the object is in view. */
+  private writeNextPassRow_(nextPassElement: HTMLElement, isInView: boolean, simNowMs: number): void {
+    const cachedMs = this.nextPassCache_?.resultMs ?? null;
+
+    writeHtmlIfChanged(nextPassElement, isInView && cachedMs !== null && cachedMs <= simNowMs ? t7e('plugins.LookAnglesPlugin.msgs.inProgress') : this.nextPassText_);
+  }
+
+  /**
+   * The pass search takes tens of milliseconds, so it never runs inside the draw loop: it is queued for an idle period
+   * and the row keeps its previous value (or "Loading…" for a new object) until it finishes.
+   */
+  private scheduleNextPassSearch_(obj: BaseObject, satId: number, sensorName: string): void {
+    if (this.nextPassPending_?.satId === satId && this.nextPassPending_.sensorName === sensorName) {
+      return;
+    }
+
+    const job = { satId, sensorName };
+
+    this.nextPassPending_ = job;
+    requestIdleWrite(() => {
+      if (this.nextPassPending_ !== job) {
+        return;
+      }
+      this.nextPassPending_ = null;
+
+      const sensorManagerInstance = ServiceLocator.getSensorManager();
+      const isStillCurrent =
+        sensorManagerInstance.isSensorSelected() &&
+        (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat ?? obj.id) === satId &&
+        (sensorManagerInstance.currentSensors[0]?.objName ?? '') === sensorName;
+
+      if (!isStillCurrent) {
+        return;
+      }
+
+      const timeManagerInstance = ServiceLocator.getTimeManager();
+      const nextPassText = this.calculateNextPassText_(obj, sensorManagerInstance);
+      const parsedMs = SatInfoBoxSensor.parseNextPassTime_(nextPassText);
+      const simNowMs = timeManagerInstance.simulationTimeObj.getTime();
+
+      this.nextPassCache_ = { satId, sensorName, calcSimMs: simNowMs, calcRealMs: Date.now(), resultMs: parsedMs };
+      this.nextPassText_ = parsedMs === null ? nextPassText : `${nextPassText} UTC`;
+
+      const nextPassElement = getEl(EL.NEXT_PASS, true);
+
+      if (nextPassElement) {
+        this.writeNextPassRow_(nextPassElement, !!sensorManagerInstance.currentTEARR?.inView, simNowMs);
+      }
+    });
   }
 
   /** Decides whether the cached Next Pass is stale for the current object, sensor and sim time. */
@@ -475,6 +553,19 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
 
     if (now.realNowMs - cache.calcRealMs < NEXT_PASS_MIN_REAL_INTERVAL_MS) {
+      return false;
+    }
+
+    // The search itself answered with a start time at or before the clock it ran for; asking again every second
+    // (the pass is "over" by the rule below) re-runs the same heavy search in the draw loop for the same answer.
+    const isResultAlreadyStale = cache.resultMs !== null && cache.resultMs <= cache.calcSimMs;
+
+    if (
+      isResultAlreadyStale &&
+      now.simNowMs >= cache.calcSimMs - NEXT_PASS_BACKWARD_TOLERANCE_MS &&
+      now.simNowMs - cache.calcSimMs < NEXT_PASS_STALE_RESULT_MAX_SIM_ADVANCE_MS &&
+      now.realNowMs - cache.calcRealMs < NEXT_PASS_STALE_RESULT_REAL_INTERVAL_MS
+    ) {
       return false;
     }
 
@@ -529,7 +620,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
 
     reasonEl.parentElement.style.display = text ? 'flex' : 'none';
-    reasonEl.innerHTML = text ?? '-';
+    writeHtmlIfChanged(reasonEl, text ?? '-');
   }
 
   /** Human-readable version of the first FOV bound the look angle breaks. */
@@ -540,8 +631,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       return l('values.outOfFov');
     }
 
-    const deg = (v: number) => `${v.toFixed(1)}°`;
-    const km = (v: number) => `${v.toFixed(0)} km`;
+    const deg = (v: number) => `${formatLocaleNumber(v, 1)}°`;
+    const km = (v: number) => `${formatLocaleNumber(v, 0)} km`;
 
     switch (reason.kind) {
       case 'minRange':
@@ -644,7 +735,7 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     const tearr = ServiceLocator.getSensorManager().currentTEARR;
 
     if (elements.vmag) {
-      elements.vmag.innerHTML = l('values.outOfFov');
+      writeHtmlIfChanged(elements.vmag, '-');
     }
 
     /*
@@ -653,26 +744,26 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
      * hiding them behind a tooltip.
      */
     if (elements.az) {
-      elements.az.innerHTML = tearr.az ? `${tearr.az.toFixed(0)}°` : l('values.unknown');
-      elements.az.title = '';
+      writeHtmlIfChanged(elements.az, tearr.az ? `${formatLocaleNumber(tearr.az, 0)}°` : l('values.unknown'));
+      writeTitleIfChanged(elements.az, '');
     }
     if (elements.el) {
-      elements.el.innerHTML = tearr.el ? `${tearr.el.toFixed(1)}°` : l('values.unknown');
-      elements.el.title = '';
+      writeHtmlIfChanged(elements.el, tearr.el ? `${formatLocaleNumber(tearr.el, 1)}°` : l('values.unknown'));
+      writeTitleIfChanged(elements.el, '');
     }
     if (elements.rng) {
-      elements.rng.innerHTML = tearr.rng ? `${tearr.rng.toFixed(2)} km` : l('values.unknown');
-      elements.rng.title = '';
+      writeHtmlIfChanged(elements.rng, tearr.rng ? `${formatLocaleNumber(tearr.rng, 2)} km` : l('values.unknown'));
+      writeTitleIfChanged(elements.rng, '');
     }
 
     SatInfoBoxSensor.setReasonRow_(tearr.fovReason ?? l('values.outOfFov'));
     SatInfoBoxSensor.appendReasonExtras_(false);
 
     if (elements.ra) {
-      elements.ra.innerHTML = l('values.outOfFov');
+      writeHtmlIfChanged(elements.ra, '-');
     }
     if (elements.dec) {
-      elements.dec.innerHTML = l('values.outOfFov');
+      writeHtmlIfChanged(elements.dec, '-');
     }
 
     let beamwidthString = l('values.unknown');
@@ -681,13 +772,13 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       beamwidthString = sensorManagerInstance.currentSensors[0]?.beamwidth ? `${sensorManagerInstance.currentSensors[0].beamwidth}°` : l('values.unknown');
     }
     if (elements.beamwidth) {
-      elements.beamwidth.innerHTML = l('values.outOfFov');
+      writeHtmlIfChanged(elements.beamwidth, '-');
     }
     if (elements.beamwidth) {
-      elements.beamwidth.title = beamwidthString;
+      writeTitleIfChanged(elements.beamwidth, beamwidthString);
     }
     if (elements.maxTmx) {
-      elements.maxTmx.innerHTML = l('values.outOfFov');
+      writeHtmlIfChanged(elements.maxTmx, '-');
     }
   }
 
@@ -725,8 +816,8 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       try {
         const { ra, dec } = SatInfoBoxSensor.computeTopocentricRaDec_(obj, sensor, simTime);
 
-        raText = `${ra.toFixed(4)}°`;
-        decText = `${dec.toFixed(4)}°`;
+        raText = `${formatLocaleNumber(ra, 4)}°`;
+        decText = `${formatLocaleNumber(dec, 4)}°`;
       } catch {
         raText = l('values.unableToCalculate');
         decText = raText;
@@ -734,10 +825,10 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
     }
 
     if (elements.ra) {
-      elements.ra.innerHTML = raText;
+      writeHtmlIfChanged(elements.ra, raText);
     }
     if (elements.dec) {
-      elements.dec.innerHTML = decText;
+      writeHtmlIfChanged(elements.dec, decText);
     }
   }
 
@@ -764,27 +855,27 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
       const az = ServiceLocator.getSensorManager().currentTEARR.az;
 
       if (az) {
-        elements.az.innerHTML = `${az.toFixed(0)}°`;
+        writeHtmlIfChanged(elements.az, `${formatLocaleNumber(az, 0)}°`);
       } else {
-        elements.az.innerHTML = l('values.unknown');
+        writeHtmlIfChanged(elements.az, l('values.unknown'));
       }
     } // Convert to Degrees
     if (elements.el) {
       const el = ServiceLocator.getSensorManager().currentTEARR.el;
 
       if (el) {
-        elements.el.innerHTML = `${el.toFixed(1)}°`;
+        writeHtmlIfChanged(elements.el, `${formatLocaleNumber(el, 1)}°`);
       } else {
-        elements.el.innerHTML = l('values.unknown');
+        writeHtmlIfChanged(elements.el, l('values.unknown'));
       }
     }
     if (elements.rng) {
       const rng = ServiceLocator.getSensorManager().currentTEARR.rng;
 
       if (rng) {
-        elements.rng.innerHTML = `${rng.toFixed(2)} km`;
+        writeHtmlIfChanged(elements.rng, `${formatLocaleNumber(rng, 2)} km`);
       } else {
-        elements.rng.innerHTML = l('values.unknown');
+        writeHtmlIfChanged(elements.rng, l('values.unknown'));
       }
     }
 
@@ -794,19 +885,24 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
     if (elements.vmag) {
       if (obj.isMissile()) {
-        elements.vmag.innerHTML = l('values.notApplicable');
+        writeHtmlIfChanged(elements.vmag, l('values.notApplicable'));
       } else if (obj instanceof OemSatellite) {
-        elements.vmag.innerHTML = l('values.notApplicable');
+        writeHtmlIfChanged(elements.vmag, l('values.notApplicable'));
       } else {
         const sat = obj as Satellite;
 
-        elements.vmag.innerHTML = SatMath.calculateVisMag(
+        const reading = SensorMath.getVisMagReading(
           sat,
           sensorManagerInstance.currentSensors[0],
           timeManagerInstance.simulationTimeObj,
           sun,
           SatInfoBoxSensor.intrinsicMagOverride_(sat)
-        ).toFixed(2);
+        );
+
+        writeHtmlIfChanged(
+          elements.vmag,
+          reading.kind === 'notSunlit' ? l('values.notSunlit') : `${formatLocaleNumber(reading.value, 2)}${reading.assumed ? ` ${l('values.assumedSuffix')}` : ''}`
+        );
       }
     }
     let beamwidthString = l('values.unknown');
@@ -816,17 +912,17 @@ export class SatInfoBoxSensor extends KeepTrackPlugin {
 
       beamwidthString =
         sensorManagerInstance.currentSensors[0].beamwidth && currentRange
-          ? `${(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth)).toFixed(2)} km`
+          ? `${formatLocaleNumber(currentRange * Math.sin(DEG2RAD * sensorManagerInstance.currentSensors[0].beamwidth), 2)} km`
           : l('values.unknown');
     }
     if (elements.beamwidth) {
-      elements.beamwidth.innerHTML = beamwidthString;
+      writeHtmlIfChanged(elements.beamwidth, beamwidthString);
     }
     if (elements.maxTmx) {
       const currentRange = ServiceLocator.getSensorManager().currentTEARR.rng;
       // Time for RF to hit target and bounce back
 
-      elements.maxTmx.innerHTML = currentRange ? `${((currentRange / cKmPerMs) * 2).toFixed(2)} ms` : l('values.unknown');
+      writeHtmlIfChanged(elements.maxTmx, currentRange ? `${formatLocaleNumber((currentRange / cKmPerMs) * 2, 2)} ms` : l('values.unknown'));
     }
   }
 }

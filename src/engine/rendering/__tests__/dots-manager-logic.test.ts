@@ -30,6 +30,11 @@ describe('DotsManager logic', () => {
       dots.positionData = new Float32Array([10, 20, 30, 40, 50, 60]);
     });
 
+    it('getCurrentPosition returns the origin while positionData is null (catalog swap)', () => {
+      (dots as unknown as { positionData: unknown }).positionData = null;
+      expect(dots.getCurrentPosition(58230)).toStrictEqual({ x: 0, y: 0, z: 0 });
+    });
+
     it('getCurrentPosition reads the xyz triple for an index', () => {
       expect(dots.getCurrentPosition(1)).toStrictEqual({ x: 40, y: 50, z: 60 });
     });

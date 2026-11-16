@@ -7,6 +7,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { IHelpConfig, IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities';
 import { initMaterialSelects } from '@app/engine/ui/material-select';
+import { drawBrandLogo, preloadBrandLogo } from '@app/engine/utils/branding';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -57,6 +58,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
 
   constructor() {
     super();
+    preloadBrandLogo(settingsManager.installDirectory);
     this.selectSatManager_ = PluginRegistry.getPlugin(SelectSatManager) as unknown as SelectSatManager; // this will be validated in KeepTrackPlugin constructor
   }
 
@@ -445,6 +447,10 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
       mask: PolarPlotPlugin.maskOption_(),
     });
 
+    if (!settingsManager.copyrightOveride) {
+      drawBrandLogo(ctx, width, height);
+    }
+
     return canvas;
   }
 
@@ -458,7 +464,7 @@ export class PolarPlotPlugin extends KeepTrackPlugin {
     const polarSat = this.selectSatManager_.getSelectedSat() as Satellite;
     const link = document.createElement('a');
 
-    link.href = canvas.toDataURL('image/png');
+    link.href = canvas.toDataURL('image/png'); // logo drawn in renderPassToCanvas_
     link.download = `sat-${polarSat.sccNum6 ?? polarSat.sccNum}-polar-plot.png`;
     link.click();
   }

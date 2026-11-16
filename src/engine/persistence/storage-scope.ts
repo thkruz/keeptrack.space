@@ -34,6 +34,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.OBSERVATION_STATIONS]: StorageScope.Account,
   [StorageKey.SCENARIO_LIBRARY]: StorageScope.Account,
   [StorageKey.ACHIEVEMENT_COUNTERS]: StorageScope.Account,
+  [StorageKey.DISPLAY_TIME_ZONE]: StorageScope.Account,
 
   // --- Account: visual/UX preferences (settings menu) -------------------------
   [StorageKey.SETTINGS_DRAW_CAMERA_WIDGET]: StorageScope.Account,
@@ -89,16 +90,22 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.STARS_SETTINGS]: StorageScope.Account,
   [StorageKey.STEREO_MAP_SETTINGS]: StorageScope.Account,
 
-  // --- Device: custom sensor definitions (per-browser, like the other tool inputs)
-  [StorageKey.CUSTOM_SENSORS]: StorageScope.Device,
+  // --- Account: custom sensor definitions follow the user to a new device (restore-on-reopen)
+  [StorageKey.CUSTOM_SENSORS]: StorageScope.Account,
+  [StorageKey.CUSTOM_SITE_REGISTRY]: StorageScope.Account,
+
+  // --- Device: saved starting point for Reset to Start (selection and camera are per-session)
+  [StorageKey.START_POINT]: StorageScope.Device,
 
   // --- Device: hardware/perf-dependent graphics --------------------------------
   [StorageKey.SETTINGS_DRAW_ORBIT_ECLIPSE]: StorageScope.Device,
   [StorageKey.SETTINGS_DRAW_SWATH_FIELD_OF_REGARD]: StorageScope.Device,
+  [StorageKey.SETTINGS_HQ_GRAPHICS]: StorageScope.Device,
   [StorageKey.SETTINGS_DRAW_FLAG_DECALS]: StorageScope.Device,
   [StorageKey.SETTINGS_FLAG_DECAL_SCALE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_EPOCH_AGE]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_SENSOR_LABELS]: StorageScope.Device,
+  [StorageKey.SETTINGS_SHOW_OBJECT_LABELS]: StorageScope.Device,
   // Phones default hover info off; Next Pass on hover is a fast-CPU option.
   [StorageKey.SETTINGS_SHOW_INFO_ON_HOVER]: StorageScope.Device,
   [StorageKey.SETTINGS_SHOW_NEXT_PASS]: StorageScope.Device,
@@ -112,6 +119,7 @@ export const STORAGE_KEY_SCOPES: Record<StorageKey, StorageScope> = {
   [StorageKey.GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION]: StorageScope.Device,
   [StorageKey.GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION]: StorageScope.Device,
+  [StorageKey.STALE_GP_THRESHOLD_HOURS]: StorageScope.Device,
 
   // --- Device: filter state (explicitly excluded from account sync) ------------
   [StorageKey.FILTER_SETTINGS_OPERATIONAL_PAYLOADS]: StorageScope.Device,

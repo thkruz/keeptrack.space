@@ -300,14 +300,41 @@ body.drawer-mode {
     transform: rotate(-90deg);
   }
 
+  .drawer-group-count {
+    margin-left: auto;
+    margin-right: 8px;
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .plugin-drawer.rail-mode .drawer-group-count {
+    display: none;
+  }
+
+  .plugin-drawer.rail-mode.rail-hover .drawer-group-count {
+    display: inline;
+  }
+
+  .drawer-group-header:focus-visible {
+    outline: 2px solid var(--color-primary, #4da3ff);
+    outline-offset: -2px;
+  }
+
+  /* Groups fold and unfold instantly. A max-height animation from the 2000px cap spent most of its time on
+     invisible height, so collapses looked late and the drawer felt unresponsive. */
   .drawer-group-items {
     overflow: hidden;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: none;
     max-height: 2000px;
   }
 
   .drawer-group.collapsed .drawer-group-items {
     max-height: 0;
+    /* #326: max-height 0 + overflow hidden left collapsed rows hit-testable under the next header on phones;
+       hidden rows also leave the tab order. */
+    visibility: hidden;
+    pointer-events: none;
+    transition: none;
   }
 
   /* ---- Drawer Items ---- */
@@ -380,9 +407,63 @@ body.drawer-mode {
    * signals it is not a normal action. (pointer-events: none would swallow the
    * click and the hint with it.)
    */
+  .drawer-item {
+    flex-wrap: wrap;
+  }
+
   .drawer-item.disabled {
-    opacity: 0.35;
     cursor: not-allowed;
+  }
+
+  .drawer-item.disabled > :not(.drawer-item-reason) {
+    opacity: 0.35;
+  }
+
+  /* One-line "why unavailable" under the label of a disabled or locked row */
+  .drawer-item-reason,
+  .drawer-item-account-hint {
+    flex-basis: 100%;
+    margin-top: 2px;
+    padding-left: 40px;
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
+  }
+
+  .drawer-item-reason:empty,
+  .drawer-item-account-hint {
+    display: none;
+  }
+
+  .drawer-item-account-hint[hidden] {
+    display: none !important;
+  }
+
+  /* The reason line wraps under the row; keep it after the star, shortcut and badges (#295) */
+  .drawer-item-reason,
+  .drawer-item-account-hint {
+    order: 10;
+  }
+
+  /* Rail mode keeps the row one line tall; the reason lives in the tooltip */
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-reason,
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item .drawer-item-account-hint {
+    display: none !important;
+  }
+
+  /* #291: the lock keeps the blue icon tint in the rail (a gold row tint must not bleed into it) */
+  .plugin-drawer .drawer-item .drawer-item-lock-icon {
+    filter: var(--filter-icon-blue) !important;
+  }
+
+  /* #438: the `hidden` attribute (set from each plugin's own gate) decides, not the body class alone */
+  .drawer-item.bmenu-item-pro .drawer-item-account-hint:not([hidden]) {
+    display: block;
+  }
+
+  /* Signed out, the sign-in prompt is the first thing a tap shows, so the account hint wins over the disabled reason */
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-reason {
+    display: none;
   }
 
   .drawer-item.disabled .drawer-item-icon {
@@ -432,6 +513,32 @@ body.drawer-mode {
     filter: hue-rotate(227deg) brightness(1.8);
   }
 
+  /* Lock badge: rendered for every gated row, shown only while signed out, so it
+     follows the body-level .user-logged-in class when auth state changes. */
+  .drawer-item-lock {
+    display: none;
+    margin-left: 6px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .drawer-item-lock-icon {
+    display: block;
+    width: 16px;
+    height: 16px;
+    filter: var(--filter-icon-blue);
+  }
+
+  &:not(.user-logged-in):not(.login-gate-bypassed) .drawer-item.bmenu-item-pro .drawer-item-lock {
+    display: inline-block;
+  }
+
+  /* R20-F8 (#544): the collapsed rail hides the lock so locked rows match the others in height;
+     the gold icon tint already marks them. Expanded drawer and .rail-hover keep the lock. */
+  .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item .drawer-item-lock {
+    display: none !important;
+  }
+
   /* ---- User Account (pinned above utility footer) ---- */
   .drawer-user-account:empty {
     display: none;
@@ -458,6 +565,12 @@ body.drawer-mode {
 
   .drawer-user-account__row:hover {
     background: rgba(255, 255, 255, 0.08);
+  }
+
+  /* The logged-out Login / Sign Up row is a link: keep the accent link colour (R20-F7). */
+  a.drawer-user-account__row,
+  a.drawer-user-account__row:hover {
+    color: var(--color-dark-text-accent);
   }
 
   .drawer-user-account__avatar {
@@ -633,8 +746,8 @@ body.drawer-mode {
 
   .drawer-utility-footer {
     position: fixed;
-    bottom: 12px;
-    left: 50%;
+    bottom: var(--drawer-footer-bottom, 12px);
+    left: var(--drawer-footer-left, 50%);
     transform: translateX(-50%);
     z-index: 10000;
     background: rgba(30, 30, 30, 0.75);
@@ -751,6 +864,17 @@ body.drawer-mode {
     height: 20px;
     filter: var(--filter-icon-blue);
     opacity: 0.7;
+    /* Also replaces the generic 0.2s filter transition these images would otherwise pick up. */
+    transition: none;
+  }
+
+  /*
+   * Fade the icons only while the pill is open. Collapsed, the sections are clipped to zero width at opacity 0,
+   * and a selection flips selected/disabled on a dozen of these icons at once: with the transition always on,
+   * each flip ran an opacity animation nobody could see ("Compositing failed: animation has no visible change").
+   */
+  .drawer-utility-footer:hover .drawer-utility-icon img,
+  .drawer-utility-footer.expanded .drawer-utility-icon img {
     transition: opacity var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
@@ -807,6 +931,12 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.desktop-mode {
     width: 420px;
+    top: var(--top-menu-height);
+    height: calc(100% - var(--top-menu-height));
+  }
+
+  /* #451: the scrim starts below the top bar like the drawer, so a focused zone chip and its ring stay at full brightness */
+  .drawer-overlay {
     top: var(--top-menu-height);
     height: calc(100% - var(--top-menu-height));
   }
@@ -869,6 +999,25 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   }
 
+  /* #353: the SIMULATED clock label widens the center group (min-width max-content), and the search box shrank to
+     about 150 px, clipping its placeholder to "Search... (Shift+". Keep a floor that fits the whole hint; the box
+     still shrinks from 420 down to it. Below 1200 px the original shrink-to-fit rule applies. */
+  @media (min-width: 1200px) {
+    #search-holder,
+    #search-holder.search-slide-up {
+      min-width: 300px;
+    }
+  }
+
+  /* #403: at 1280 px (Access Timeline open) 260 px still cut the hint to "Search... (Shift+"; a 300 px floor plus a
+     slightly smaller placeholder keeps the full "Search... (Shift+F)" visible at 1280 and 1366, live and simulated. */
+  @media (min-width: 1200px) and (max-width: 1400px) {
+    #search-holder input[type='search']::placeholder {
+      font-size: 13px;
+      text-overflow: clip;
+    }
+  }
+
   #search-holder.search-slide-up input[type='search'] {
     width: 100% !important;
     padding-left: 10px !important;
@@ -923,8 +1072,8 @@ body.drawer-mode:not(.is-mobile-mode) {
     transform: translateX(0);
     width: 60px;
     overflow: hidden;
-    transition: width var(--kt-duration-slow, 300ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1)),
-      box-shadow var(--kt-duration-slow, 300ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
+    transition: width var(--kt-duration-fast, 100ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1)),
+      box-shadow var(--kt-duration-fast, 100ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
   }
 
   /* The whole top-actions row collapses in rail mode so plugin-injected
@@ -933,7 +1082,7 @@ body.drawer-mode:not(.is-mobile-mode) {
   .plugin-drawer.rail-mode .drawer-top-actions {
     max-height: 0;
     overflow: hidden;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: max-height var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode.rail-hover .drawer-top-actions {
@@ -947,9 +1096,9 @@ body.drawer-mode:not(.is-mobile-mode) {
     margin: 0;
     border: none;
     opacity: 0;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+    transition: max-height var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      margin var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
@@ -960,8 +1109,8 @@ body.drawer-mode:not(.is-mobile-mode) {
     border: none;
     opacity: 0;
     overflow: hidden;
-    transition: max-width var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+    transition: max-width var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+      margin var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
@@ -1000,7 +1149,7 @@ body.drawer-mode:not(.is-mobile-mode) {
     position: relative;
     padding: 8px 12px;
     justify-content: center;
-    transition: padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-item-label {
@@ -1009,7 +1158,7 @@ body.drawer-mode:not(.is-mobile-mode) {
 
   .plugin-drawer.rail-mode .drawer-item-icon {
     margin-right: 0;
-    transition: margin var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: margin var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-item-shortcut {
@@ -1045,7 +1194,7 @@ body.drawer-mode:not(.is-mobile-mode) {
      vertically under the cursor. */
   .plugin-drawer.rail-mode .drawer-user-account {
     padding: 16px 10px;
-    transition: padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+    transition: padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-user-account__row {
@@ -1062,9 +1211,9 @@ body.drawer-mode:not(.is-mobile-mode) {
     padding: 0;
     border: none;
     overflow: hidden;
-    transition: max-height var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
+    transition: max-height var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
       opacity var(--kt-duration-normal, 200ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1)),
-      padding var(--kt-duration-slow, 300ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
+      padding var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 
   .plugin-drawer.rail-mode .drawer-rail-toggle {
@@ -1088,11 +1237,15 @@ body.drawer-mode:not(.is-mobile-mode) {
   /* Collapsed groups should still show icons in rail mode */
   .plugin-drawer.rail-mode .drawer-group.collapsed .drawer-group-items {
     max-height: 2000px;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   /* Restore normal collapse behavior when rail is hovered (expanded) */
   .plugin-drawer.rail-mode.rail-hover .drawer-group.collapsed .drawer-group-items {
     max-height: 0;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   /* Rail mode hover expansion — triggered by JS class on .drawer-inner hover */
@@ -1285,7 +1438,8 @@ body.is-mobile-mode {
     padding-right: 10px !important;
   }
 
-  .drawer-search {
+  /* The drawer search row is the touch entry point to the command palette (issue #157). */
+  .drawer-search-shortcut {
     display: none !important;
   }
 
@@ -1426,5 +1580,475 @@ body.is-mobile-mode {
   .drawer-utility-footer.expanded .drawer-utility-section {
     max-width: 600px;
     opacity: 1;
+  }
+}
+
+/* ===================================================================
+   Phone widths (viewport-based, any device or UA, not only is-mobile-mode)
+   Issue #143: side menus were 400-550 px wide at 390 px (UA-only mobile rules did not
+   apply), the page scrolled sideways, and the floating utility pill expanded over
+   the bottom action buttons (Plan Observations, Export CSV).
+   Generic fix: menus fill the viewport (the drawer rail stays behind them, the menu
+   title bar has the close button), the menu body scrolls, and the scroll area ends
+   above the floating pill and the home-indicator safe area, so the last action row
+   is always reachable. Landscape phones (short height) get the same treatment.
+   =================================================================== */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  .side-menu-parent,
+  [id$="-secondary"].side-menu-parent {
+    position: fixed !important;
+    top: var(--top-menu-height) !important;
+    /* The drawer rail stays visible and tappable, the menu takes the rest of the width. */
+    left: var(--drawer-offset, 0px) !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: calc(100vw - var(--drawer-offset, 0px)) !important;
+    max-width: calc(100vw - var(--drawer-offset, 0px)) !important;
+    min-width: 0 !important;
+    height: auto !important;
+    max-height: calc(100dvh - var(--top-menu-height)) !important;
+  }
+
+  /*
+   * A settings pane (Best Passes, Custom Sensor...) opens over its parent menu at the same full-viewport rect.
+   * Desktop gives panes z-index 4 under the parent's 5, so on phones the parent's submit row painted over the
+   * pane's controls (#143, Best Passes optical gate under #bp-submit). The pane sits above the parent here.
+   */
+  body [id$="-secondary"].side-menu-parent {
+    z-index: 102 !important;
+  }
+
+  /*
+   * The camera widget canvas sits at z-index 100 and took taps meant for the menu's help and close buttons (#217).
+   * Open side menus fill the phone viewport, so they stack above the widget; the drawer (1000) stays above both.
+   */
+  body .side-menu-parent {
+    z-index: 101 !important;
+  }
+
+  .side-menu {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    max-width: 100% !important;
+    padding-left: max(1rem, env(safe-area-inset-left)) !important;
+    padding-right: max(1rem, env(safe-area-inset-right)) !important;
+    /* Clear the floating utility pill (48 px + 12 px offset) and the home indicator. */
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .side-menu-title-bar {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .side-menu-title-text {
+    width: auto !important;
+    flex: 1 1 0 !important;
+    min-width: 50% !important;
+    max-width: none !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(0.75rem, 3.5vw, 1rem);
+  }
+
+  .side-menu-title-right {
+    flex-shrink: 0 !important;
+  }
+
+  /*
+   * Secondary panes (Best Passes settings...) have no title text, so the close group sat at the bar's start, and
+   * the bar's -1rem side margins (made for the primary menu's 1rem padding) pushed it past the pane's 10 px
+   * padding to x=-4 (#171). Right-align the group and drop the bleed margins inside the pane.
+   */
+  .secondary-title-bar {
+    justify-content: flex-end;
+    margin-left: 0;
+    margin-right: 0;
+    margin-top: 0;
+  }
+
+  /* Wide tables (Look Angles, results) scroll inside their own box instead of being clipped. */
+  .side-menu .row,
+  .side-menu table {
+    max-width: calc(100vw - var(--drawer-offset, 0px) - 2rem);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .side-menu table {
+    display: block;
+  }
+
+  .side-menu thead,
+  .side-menu tbody {
+    display: block;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  /* Form inputs must not sit at negative x or exceed the card. */
+  .side-menu .input-field,
+  .side-menu .input-field.col,
+  .kt-ui-v13 .kt-field-row .input-field.col {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .side-menu input,
+  .side-menu select,
+  .side-menu textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Touch targets for action buttons. */
+  .kt-ui-v13 .kt-action {
+    min-height: 44px;
+  }
+
+  /* The utility pill must not grow over menu content on touch hover; it opens by tap (.expanded). */
+  .drawer-utility-footer:not(.expanded):hover {
+    max-width: 48px;
+    padding: 6px;
+    gap: 0;
+  }
+
+  .drawer-utility-footer:not(.expanded):hover::before {
+    width: 28px;
+    opacity: 1;
+  }
+
+  .drawer-utility-footer:not(.expanded):hover .drawer-utility-section {
+    max-width: 0;
+    opacity: 0;
+  }
+
+  .drawer-utility-footer {
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  }
+
+  body {
+    overflow-x: hidden;
+  }
+}
+
+/* ===================================================================
+   Phone drawer and touch targets (issues #153 to #157)
+   =================================================================== */
+@media (max-width: 639px), (max-height: 500px) and (max-width: 1000px) {
+  /* #155: the expanded desktop-UA drawer was 420 px wide at 390 px. */
+  body.drawer-mode .plugin-drawer,
+  body.drawer-mode .plugin-drawer.desktop-mode {
+    max-width: 100vw !important;
+  }
+
+  body.drawer-mode .plugin-drawer.desktop-mode:not(.rail-mode) {
+    width: 100vw !important;
+    /* Short landscape screens: footer, account row and toggle scroll with the list instead of eating it. */
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body.drawer-mode .plugin-drawer.desktop-mode:not(.rail-mode) .drawer-inner {
+    flex: none;
+    overflow: visible;
+  }
+
+  /* Tap targets: rail rows were 41 px, the search input 25 px. */
+  body.drawer-mode .drawer-item {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode .drawer-search {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode .drawer-rail-toggle {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  /* #157: group headers were 35 px tall */
+  body.drawer-mode .drawer-group-header {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode #search-holder {
+    min-height: 44px;
+    min-width: 96px;
+    width: auto !important;
+    flex: 1 1 96px;
+  }
+
+  body.drawer-mode #search-holder input[type='search'] {
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+
+  body.drawer-mode .nav-logo img {
+    height: 20px;
+  }
+
+  /* The top-right icon items already live in the drawer; without this they left the search 15 px wide. */
+  body.drawer-mode #nav-top-right > li {
+    display: none !important;
+  }
+
+  body.drawer-mode #nav-top-center {
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+
+  /* #157: the desktop block above nests these under body.drawer-mode:not(.is-mobile-mode), which outranks the
+     rules just above and left the clock group at max-content (290 px), pushing Search to x=451 at 390 px.
+     Same row, same order: the sensor name shrinks and ellipsizes, Search keeps a 44 px icon target. */
+  body.drawer-mode:not(.is-mobile-mode) #nav-top-center,
+  body.drawer-mode.is-mobile-mode #nav-top-center {
+    min-width: 0;
+    flex: 1 1 0;
+    overflow: hidden;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) #datetime,
+  body.drawer-mode.is-mobile-mode #datetime {
+    flex: 0 0 auto;
+  }
+
+  /* #307: the phone UA (is-mobile-mode) was left out of this rule, so its chip (overflow hidden, max-content width)
+     had an automatic min-width of 0 and collapsed to 1 px beside the clock. Same row for both UAs now. */
+  body.drawer-mode:not(.is-mobile-mode) #sensor-selected-container,
+  body.drawer-mode.is-mobile-mode #sensor-selected-container {
+    flex: 1 1 0;
+    /* #371: a 0 floor let the chip squeeze to one letter ("C.") at 390 px desktop UA; keep room for a short name. */
+    min-width: 72px;
+    max-width: 160px;
+    width: auto;
+  }
+
+  /* #371: the phone UA (is-mobile-mode) gets the same collapsed 44 px search icon as desktop UA; it expands on focus. */
+  body.drawer-mode #search-holder,
+  body.drawer-mode #search-holder.search-slide-up {
+    flex: 0 0 44px;
+    width: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: 0;
+    border-left: 0;
+    padding: 0;
+  }
+
+  body.drawer-mode #search-holder input[type='search'],
+  body.drawer-mode #search-holder.search-slide-up input[type='search'] {
+    width: 44px !important;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 !important;
+    color: transparent;
+    cursor: pointer;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") center / 20px no-repeat;
+  }
+
+  body.drawer-mode #search-holder input[type='search']::placeholder {
+    color: transparent;
+  }
+
+  /* Expand to a readable field while focused; the clock group shrinks to make room. */
+  body.drawer-mode #search-holder:focus-within,
+  body.drawer-mode #search-holder.search-slide-up:focus-within {
+    /* #400: keep a right gutter so the border is not clipped, but take it out of the box width (212 + 8 margin = the
+       old 220 footprint) so the clock group does not shrink further and clip LIVE. */
+    flex: 0 0 min(212px, calc(55vw - 8px));
+    width: min(212px, calc(55vw - 8px)) !important;
+    box-sizing: border-box;
+    max-width: calc(100vw - 16px);
+    margin-right: 8px;
+  }
+
+  /* #381: the stray "(" beside the expanded search was the rounded outline of the #datetime-zone select peeking out
+     next to the holder. Hide the select only while the search is expanded; collapsed, it stays visible. */
+  body.drawer-mode:has(#search-holder:focus-within) #datetime-zone {
+    display: none;
+  }
+
+  body.drawer-mode #search-holder:focus-within input[type='search'] {
+    width: 100% !important;
+    padding: 0 10px !important;
+    color: inherit;
+    background-image: none;
+    cursor: text;
+  }
+
+  body.drawer-mode #search-holder:focus-within input[type='search']::placeholder {
+    color: inherit;
+  }
+}
+
+/* The close button only exists for the phone drawer, which covers the nav bar and its hamburger. */
+.drawer-close-btn {
+  display: none;
+}
+
+body.is-mobile-mode {
+
+  /* #156: one scroll area for the whole drawer. The footer, version links and account row used to be
+     pinned under a separate scrolling list and covered the last rows (Time Machine, Take Photo). */
+  .plugin-drawer.mobile-mode {
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-sizing: border-box;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-inner {
+    flex: none;
+    overflow: visible;
+  }
+
+  /* #297: the drawer itself scrolls, so the close control sticks to its top edge */
+  .drawer-close-btn {
+    display: flex;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    /* #407: no opaque tile. It hid the right end of whichever row scrolled under it (chevrons, badges); the glyph
+       carries a dark halo instead so it stays readable over row text, and the 48 px touch target is unchanged. */
+    background: transparent;
+    text-shadow: 0 0 2px #000, 0 0 5px #000, 0 0 9px #000;
+    order: -3;
+    align-self: flex-end;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    font-size: 28px;
+    line-height: 1;
+    color: white;
+    cursor: pointer;
+  }
+
+  /* #153: sign-in / account row first, right under the close button. */
+  /* #471: the sticky close X (48 px wide, top right) covered the chevron of a group header scrolled under it. */
+  .plugin-drawer.mobile-mode .drawer-group-header {
+    padding-right: 56px;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-user-account {
+    order: -2;
+    border-top: none;
+    border-bottom: 2px solid var(--color-dark-border);
+    padding: 4px 16px;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-user-account__row {
+    min-height: 44px;
+  }
+
+  .plugin-drawer.mobile-mode .drawer-rail-toggle {
+    display: none;
+  }
+}
+
+.drawer-sign-in-prompt {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 60%);
+}
+
+.drawer-sign-in-prompt__card {
+  max-width: 360px;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid var(--color-dark-border);
+  background: var(--color-dark-background, #1a1a1a);
+  color: white;
+}
+
+.drawer-sign-in-prompt__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+}
+
+.drawer-sign-in-prompt__body {
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+
+.drawer-sign-in-prompt__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.drawer-sign-in-prompt__actions button {
+  min-height: 44px;
+  padding: 0 16px;
+  cursor: pointer;
+}
+
+/* ===================================================================
+   #380: desktop user agent in a phone-width window (<= 640px).
+   Layout only, the plugin set is unchanged. The 60px rail takes 15 percent of a
+   390px viewport, so it narrows to a 44px strip; hover/focus still expands it as
+   an overlay (rail-hover is position fixed and does not push content), and menus
+   keep their existing --drawer-offset gap.
+   =================================================================== */
+@media (max-width: 640px) {
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) {
+    width: 44px;
+  }
+
+  /* #456: --drawer-offset stays 60px while the rail is 44px here, which left a 16px strip of the satellite info box
+     visible between the rail and the open menu. Start menus at the rail's real edge. */
+  /* Round 16: the phone block (max-width 639px, ~1579) sets left, width and max-width with !important, which beat the
+     plain `left: 44px`. Match it with !important and recompute the width so the menu fills to the right edge. */
+  body.drawer-mode:not(.is-mobile-mode):has(.plugin-drawer.rail-mode) .side-menu-parent:not([id$='-secondary']) {
+    --drawer-offset: 44px;
+    left: 44px !important;
+    width: calc(100vw - 44px) !important;
+    max-width: calc(100vw - 44px) !important;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-item-icon {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* #385: the rail scrollbar (up to 15px) overlapped the 44px buttons and clipped their right border.
+     Hide it; the rail still scrolls by wheel/touch, and the strip keeps full-width 44px targets. */
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-inner {
+    scrollbar-width: none;
+    overflow-x: hidden;
+  }
+
+  body.drawer-mode:not(.is-mobile-mode) .plugin-drawer.rail-mode:not(.rail-hover) .drawer-inner::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Toasts sit right of the narrow rail and below the top bar, never full width. */
+  body:not(.is-mobile-mode) #toast-container {
+    min-width: 0;
+    left: 52px;
+    right: 8px;
+    top: calc(var(--top-menu-height, 50px) + 8px);
+    max-width: calc(100vw - 60px);
+  }
+
+  body.search-results-open:not(.is-mobile-mode) #toast-container {
+    top: auto;
+    bottom: 7%;
   }
 }

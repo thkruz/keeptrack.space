@@ -63,21 +63,21 @@
       },
       "labels": {
         "sensorName": "Název senzoru",
-        "latitude": "Zeměpisná šířka",
-        "longitude": "Zeměpisná délka",
-        "elevation": "Nadmořská výška (km)",
+        "latitude": "Zeměpisná šířka (°)",
+        "longitude": "Zeměpisná délka (°)",
+        "elevation": "Nadmořská výška (km)",
         "sensorType": "Typ senzoru",
         "typeObserver": "Pozorovatel",
         "typeOptical": "Optický",
         "typePhasedArray": "Fázový anténní radar",
         "typeMechanical": "Mechanický",
         "telescope": "Teleskop",
-        "minAzimuth": "Minimální azimut",
-        "maxAzimuth": "Maximální azimut",
-        "minElevation": "Minimální elevace",
-        "maxElevation": "Maximální elevace",
-        "minRange": "Minimální dosah",
-        "maxRange": "Maximální dosah",
+        "minAzimuth": "Minimální azimut (°)",
+        "maxAzimuth": "Maximální azimut (°)",
+        "minElevation": "Minimální elevace (°)",
+        "maxElevation": "Maximální elevace (°)",
+        "minRange": "Minimální dosah (km)",
+        "maxRange": "Maximální dosah (km)",
         "replaceSensor": "Nahradit senzor",
         "addCustomSensor": "Přidat vlastní senzor",
         "clearCustomSensors": "Vymazat vlastní senzory",
@@ -94,7 +94,19 @@
         "tooltipMinRange": "Dosah v kilometrech (např.: 500)",
         "tooltipMaxRange": "Dosah v kilometrech (např.: 20000)",
         "horizonMask": "Maska horizontu (az,el na řádek)",
-        "tooltipHorizonMask": "Volitelné. Body azimut,elevace ve stupních, jeden na řádek nebo oddělené středníky. Minimální elevace se mezi body interpoluje a přechází přes 360. 2 až 72 bodů, 0 <= az < 360, 0 <= el <= 89."
+        "maskPlaceholder": "Volitelné. Jedna dvojice azimut,elevace na řádek, např. 90,25",
+        "prefillNote": "Pole jsou převzata z aktuálního senzoru ({{name}}). Upravte je před přidáním.",
+        "addReplaceNote": "Přidat ponechá aktuální senzor a přidá tento jako vedlejší. Nahradit z něj udělá hlavní senzor.",
+        "confirmClear": "Odebrat všechny vlastní senzory a obnovit výběr senzoru?",
+        "timeZonePlaceholder": "např. Europe/Paris",
+        "tooltipHorizonMask": "Volitelné. Body azimut,elevace ve stupních, jeden na řádek nebo oddělené středníky. Minimální elevace se mezi body interpoluje a přechází přes 360. 2 až 72 bodů, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Stupňovité pásy (elevace platí do dalšího azimutu)",
+        "tooltipMaskStep": "Vypnuto: elevace se mezi body interpoluje. Zapnuto: každý azimut začíná pás s danou elevací až do dalšího azimutu, přes 360 se pokračuje (0,10 a 90,35 znamená 10 stupňů od 0 do 90, poté 35 stupňů).",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "např. 41.75",
+        "lonPlaceholder": "např. -70.54",
+        "telescopeHint": "Zapnuto: celý azimut 360°, elevační maska 10° a neomezený dosah. Vypnuto: meze azimutu, elevace a dosahu nastavíte sami."
       },
       "rmbMenu": {
         "title": "Vytvořit",
@@ -130,7 +142,8 @@
         "maskBadPair": "Maska horizontu: nelze použít \"{{pair}}\". Zadejte az,el s 0 <= az < 360 a 0 <= el <= 89.",
         "maskDuplicateAz": "Maska horizontu: azimut v \"{{pair}}\" se vyskytuje vícekrát.",
         "maskTooFew": "Maska horizontu potřebuje alespoň 2 body.",
-        "maskTooMany": "Maska horizontu umožňuje nejvýše 72 bodů."
+        "maskTooMany": "Maska horizontu umožňuje nejvýše 72 bodů.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Identita",
@@ -140,6 +153,8 @@
       "toasts": {
         "addedPrimary": "Vlastní senzor „{{name}}“ byl přidán jako primární senzor.",
         "addedSecondary": "Vlastní senzor „{{name}}“ byl přidán jako sekundární senzor.",
+        "duplicate": "Vlastní senzor „{{name}}“ je na tomto místě již aktivní. Změňte název nebo polohu a přidejte další.",
+        "cleared": "Vlastní senzory byly vymazány.",
         "replaced": "Primární senzor byl nahrazen senzorem „{{name}}“."
       }
     },
@@ -157,13 +172,30 @@
         "calculationLengthTooltip": "Kolik dní úhlů pohledu se má vypočítat",
         "intervalTooltip": "Počet sekund mezi jednotlivými řádky úhlů pohledu"
       },
+      "framing": {
+        "section": "Plán záběru (okno expozice)",
+        "start": "Začátek expozice (UTC)",
+        "startTooltip": "Datum a čas, nebo HH:MM:SS v datu simulace",
+        "startPlaceholder": "např. 22:11:03 nebo 2026-11-13T22:11:03",
+        "startInvalid": "Použijte HH:MM:SS nebo YYYY-MM-DDTHH:MM:SS (UTC)",
+        "length": "Délka expozice (s)",
+        "inFrame": "ve výhledu",
+        "enters": "vstoupí",
+        "leaves": "opustí",
+        "none": "V tomto okně není v zorném poli senzoru"
+      },
       "table": {
         "time": "Čas",
+        "title": "{object} ze stanice {sensor}",
+        "timeUtc": "Čas (UTC)",
         "type": "Typ",
         "el": "El.",
         "az": "Az.",
         "rng": "Vzd.",
-        "visible": "Viditelný"
+        "visible": "Nad obzorem",
+        "duration": "Trvání",
+        "sunlit": "Osvětlený",
+        "optical": "Opticky viditelný"
       },
       "msgs": {
         "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
@@ -174,7 +206,10 @@
         "maxEl": "Max. El.",
         "unknown": "Neznámé",
         "inView": "V dohledu",
-        "noLookAnglesToDownload": "Nejsou k dispozici žádné úhly pohledu ke stažení!"
+        "inProgress": "Právě v dohledu",
+        "noLookAnglesToDownload": "Nejsou k dispozici žádné úhly pohledu ke stažení!",
+        "eclipsed": "Zastíněn",
+        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti. Počasí a oblačnost se neberou v úvahu."
       },
       "maskLimited": "maska",
       "maskLimitedTitle": "Tuto hranu určuje maska horizontu senzoru, ne jeho minimální elevace",
@@ -183,7 +218,7 @@
         "imgAlt": "Tabulka úhlů pohledu s časy, azimuty, elevacemi a vzdálenostmi",
         "imgCaption": "Každý řádek je naváděcí řešení; kliknutím na něj přesunete hodiny na daný okamžik.",
         "readingHeading": "Čtení tabulky",
-        "reading": "Každý řádek uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>) a vzdálenost (<strong>Vzd.</strong>) satelitu při pohledu ze senzoru, plus zda je opticky <strong>Viditelný</strong>. Se zapnutou volbou <strong>Zobrazit pouze časy východu a západu</strong> se tabulka zúží na události východu, maximální elevace a západu každého přeletu, označené ve sloupci <strong>Typ</strong>.",
+        "reading": "Každý řádek uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>) a vzdálenost (<strong>Vzd.</strong>) satelitu při pohledu ze senzoru, plus zda je <strong>Nad obzorem</strong>, <strong>Osvětlený</strong> a (jen u optických senzorů) <strong>Opticky viditelný</strong>. Se zapnutou volbou <strong>Zobrazit pouze časy východu a západu</strong> se tabulka zúží na události východu, maximální elevace a západu každého přeletu, označené ve sloupci <strong>Typ</strong>.",
         "howToUse": "<ol><li>Vyberte senzor i satelit; ikona pluginu v panelu zůstává neaktivní, dokud nejsou nastaveny oba.</li><li>Otevřete <strong>Úhly pohledu</strong> z panelu. Tabulka se vypočítá automaticky.</li><li>Otevřete panel nastavení a přepněte režim východ/západ nebo změňte hodnoty <strong>Délka výpočtu (dny)</strong> a <strong>Interval (sekundy)</strong>.</li><li>Kliknutím na řádek přesunete simulační hodiny na daný okamžik, nebo tabulku exportujete tlačítkem stahování.</li></ol>",
         "tip1": "Režim východ/západ je nejrychlejší způsob, jak zjistit, kdy satelit uvidíte příště; na úplnou tabulku přepněte, když potřebujete naváděcí úhly sekundu po sekundě.",
         "tip2": "Kliknutí na řádek zachová stav přehrávání, takže pozastavené hodiny zůstanou pozastavené i v novém čase."
@@ -202,7 +237,9 @@
         "az": "Az.",
         "rng": "Vzd.",
         "sensor": "Senzor",
-        "visible": "Viditelný"
+        "visible": "Nad obzorem",
+        "sunlit": "Osvětlený",
+        "optical": "Opticky viditelný"
       },
       "msgs": {
         "notVisible": "Satelit nebude viditelný v příštích {hours} hodinách.",
@@ -210,17 +247,19 @@
         "no": "Ne",
         "na": "N/A",
         "sensorListMissing": "Seznam senzorů nebyl nalezen v rozhraní",
-        "satrecNotFound": "Záznam družice nebyl nalezen"
+        "satrecNotFound": "Záznam družice nebyl nalezen",
+        "eclipsed": "Zastíněn",
+        "opticalNote": "Opticky viditelný = nad obzorem, družice osvětlena Sluncem a Slunce na nebo níže než {limit}° na stanovišti. Počasí a oblačnost se neberou v úvahu."
       },
       "help": {
         "overview": "Úhly pohledu z více míst odpovídají na síťovou otázku: který ze všech mých senzorů vidí vybraný satelit a kdy? Počítají úhly pohledu pro mnoho stanovišť najednou a prokládají je do jediné chronologické tabulky.",
         "imgAlt": "Tabulka úhlů pohledu z více míst se senzory a naváděcími daty",
         "imgCaption": "Každý řádek spojuje okamžik přeletu se senzorem, který jej vidí.",
         "readingHeading": "Čtení tabulky",
-        "reading": "Řádky jsou seřazeny chronologicky napříč všemi zapnutými stanovišti a každý uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>), vzdálenost (<strong>Vzd.</strong>), dotčený <strong>Senzor</strong> a optickou viditelnost. Panel přepínačů senzorů určuje, která stanoviště se počítají: zelené senzory jsou zahrnuty a červené vyloučeny.",
+        "reading": "Řádky jsou seřazeny chronologicky napříč všemi zapnutými stanovišti a každý uvádí <strong>Čas</strong>, elevaci (<strong>El.</strong>), azimut (<strong>Az.</strong>), vzdálenost (<strong>Vzd.</strong>), dotčený <strong>Senzor</strong> a zda je <strong>Nad obzorem</strong>, <strong>Osvětlený</strong> a (jen u optických senzorů) <strong>Opticky viditelný</strong>. Panel přepínačů senzorů určuje, která stanoviště se počítají: zelené senzory jsou zahrnuty a červené vyloučeny.",
         "howToUse": "<ol><li>Vyberte satelit; ikona pluginu v panelu zůstává neaktivní, dokud není vybrán. Výběr senzoru není potřeba.</li><li>Otevřete <strong>Pohledy z více míst</strong> z panelu. Výchozí síť včasné výstrahy proti raketám se vypočítá automaticky.</li><li>Zapínáním a vypínáním senzorů v panelu seznamu senzorů změníte síť.</li><li>Kliknutím na řádek vyberete daný senzor a přesunete hodiny na daný okamžik, nebo tabulku exportujete tlačítkem stahování.</li></ol>",
         "tip1": "Použijte je k plánování předávek: kde končí pokrytí jednoho senzoru, další řádek ukáže, které stanoviště satelit převezme.",
-        "tip2": "Optická stanoviště ukazují viditelnost jen tehdy, když světelné podmínky skutečné pozorování umožňují; radary vždy zobrazují N/A."
+        "tip2": "Optická stanoviště ukazují v Opticky viditelný Ano jen tehdy, když je družice nad obzorem a osvětlená a stanoviště je ve tmě (Slunce na úrovni -12 stupňů nebo níže), jinak Ne; řádky radarů ukazují Nad obzorem a Osvětlený, ve sloupci Opticky viditelný je „-“."
       }
     }
   }

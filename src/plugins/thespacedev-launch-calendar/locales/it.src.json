@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} non è disponibile!",
         "noLaunches": "Nessun lancio imminente ricevuto.",
         "rateLimited": "The Space Devs sta limitando le richieste in questo momento. Riprova tra qualche minuto.",
-        "nothingToExport": "Nessun lancio da esportare. Carica prima l'elenco dei lanci."
+        "nothingToExport": "Nessun lancio da esportare. Carica prima l'elenco dei lanci.",
+        "timeTbd": "orario da definire"
       },
       "help": {
         "overview": "Calendario lanci elenca i prossimi 20 lanci orbitali in tutto il mondo, recuperati in tempo reale dall'archivio lanci di The Space Devs: finestra di lancio, missione, razzo, sito di lancio, agenzia e paese di ciascuno. I nomi di missione, razzo, sito e agenzia rimandano ad approfondimenti quando disponibili.",

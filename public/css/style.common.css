@@ -399,7 +399,7 @@ textarea {
 .ui-datepicker-calendar tbody tr td a {
   display: flex;
   font-weight: bold;
-  color: var(--color-primary);
+  color: var(--color-dark-text-accent); /* the global a !important used to force this; #ba160c is 2.5:1 here (#534) */
   background: var(--color-dark-background);
   border: 1px solid rgba(0, 0, 0, 0);
   height: 45px;
@@ -2734,6 +2734,36 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   background-color: var(--kt-bg-hover, rgba(255, 255, 255, 0.08)) !important;
 }
 
+/*
+ * Group submenus ("Satellite", "More") hold other plugins' entries. A member that
+ * has its own submenu is flattened into a headed section; the heading is a label,
+ * not an action.
+ */
+.right-btn-menu .rmb-group-sub {
+  display: block;
+}
+
+.right-btn-menu ul li.rmb-group-header {
+  min-height: 0;
+  padding: 6px 12px 2px;
+  cursor: default;
+  font-size: 0.72em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.right-btn-menu ul li.rmb-group-header a {
+  cursor: default;
+}
+
+.rmb-group-entry.rmb-group-divider {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--kt-border-default, rgba(255, 255, 255, 0.12));
+}
+
 .side-menu {
   position: absolute;
   inset: 0;
@@ -2837,6 +2867,33 @@ body:not(.user-logged-in):not(.login-gate-bypassed) .bmenu-item-pro:hover img {
   opacity: 0.3;
   cursor: default;
   pointer-events: none;
+}
+
+.icon-btn[hidden] {
+  display: none;
+}
+
+/* Phone: touch targets of at least 40 px (watchlist toolbar, menu title-bar buttons) */
+@media (max-width: 639px) {
+  .icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .icon-btn[hidden] {
+    display: none;
+  }
+}
+
+/* Title-bar help button: themed glyph via CSS mask (never a raw img). */
+.side-menu-help-glyph {
+  width: 20px;
+  height: 20px;
+  display: block;
+  pointer-events: none;
+  background-color: #fff;
+  -webkit-mask: var(--side-menu-help-icon) center / contain no-repeat;
+  mask: var(--side-menu-help-icon) center / contain no-repeat;
 }
 
 .icon-btn-img {
@@ -3140,6 +3197,27 @@ nav a.sidenav-trigger i {
   white-space: nowrap;
 }
 
+.search-partial-badge {
+  font-size: 0.75em;
+  opacity: 0.7;
+  margin-left: 8px;
+  white-space: nowrap;
+}
+
+/* Module rows (Unity, Zvezda...) wrap so the "is part of the ISS" note is never cut off. */
+.truncate-search.search-module-row {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  overflow-wrap: anywhere;
+}
+
+.search-module-row .search-module-note {
+  display: block;
+  margin-left: 0;
+  white-space: normal;
+}
+
 .search-slide-down {
   width: 160px;
   transition: width var(--kt-duration-normal, 200ms) var(--kt-easing-enter, cubic-bezier(0, 0, 0.2, 1));
@@ -3195,6 +3273,11 @@ nav a.sidenav-trigger i {
   padding-top: 10px;
   border-style: solid;
   border-color: var(--color-dark-border);
+}
+
+/* #288: the sat-info box (z-index 4) sits in the same column; an open result list goes above it so every row stays reachable */
+body.search-results-open #search-results {
+  z-index: 5;
 }
 
 
@@ -4127,10 +4210,43 @@ input:focus {
 }
 
 #help-text .help-figure img {
+  display: block;
   max-width: 100%;
-  max-height: 45vh;
+  max-height: 60vh;
   border: 1px solid var(--color-dark-border);
   border-radius: 4px;
+}
+
+#help-text .help-figure-zoom {
+  display: inline-block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+#help-text .help-figure-zoom:focus-visible {
+  outline: 2px solid var(--color-primary, #4aa3ff);
+  outline-offset: 2px;
+}
+
+.help-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 30000; /* above #help-outer (20000) and its #help-screen (99) */
+  display: block;
+  margin: 0;
+  padding: 16px;
+  border: 0;
+  overflow: auto;
+  text-align: center;
+  cursor: zoom-out;
+  background: rgb(0 0 0 / 88%);
+}
+
+.help-lightbox img {
+  max-width: 100%;
+  height: auto;
 }
 
 #help-text .help-figure figcaption {
@@ -4366,6 +4482,18 @@ input:focus {
   top: 75px;
 }
 
+/* #320: the full-width stack ran over the left side menu's header buttons (Close Approaches' rightmost control at
+   1366x768). From 1024 px dock the stack to the right edge, clear of the 400 px side menu column. */
+@media (min-width: 1024px) {
+  #toast-container {
+    min-width: 0;
+    width: auto;
+    left: auto;
+    right: 16px;
+    max-width: calc(100vw - 440px);
+  }
+}
+
 /*
  * Keep toasts off the open search results (SearchManager toggles the class).
  * Below 1024px the results list spans the full width under the header, so the
@@ -4484,7 +4612,11 @@ body.search-results-open #toast-container {
 
 a {
   text-decoration: none;
-  color: var(--color-dark-text-accent) !important;
+  color: var(--color-dark-text-accent);
+}
+
+a:hover {
+  color: var(--color-dark-text-accent);
 }
 
 

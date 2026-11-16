@@ -61,6 +61,24 @@ export function buildSideMenuTabsHtml(tabsId: string, tabs: SideMenuTabDef[]): s
  *
  * @param tabsId - The DOM id of the `<ul class="tabs">` element
  */
+/** Last width the indicator was laid out for, per tab bar. 0 means hidden. */
+const lastIndicatorWidth = new WeakMap<Element, number>();
+const pendingIndicatorUpdates = new Set<string>();
+
+/** Updates the indicator unless the bar is hidden or its width is unchanged since the last update. */
+function updateIndicatorIfNeeded(tabsEl: Element, width: number): void {
+  if (width === 0) {
+    lastIndicatorWidth.set(tabsEl, 0);
+
+    return;
+  }
+  if (lastIndicatorWidth.get(tabsEl) === width) {
+    return;
+  }
+  lastIndicatorWidth.set(tabsEl, width);
+  Tabs.getInstance(tabsEl as HTMLElement)?.updateTabIndicator();
+}
+
 export function initSideMenuTabs(tabsId: string): void {
   const tabsEl = document.querySelector(`#${tabsId}`);
 
@@ -73,8 +91,9 @@ export function initSideMenuTabs(tabsId: string): void {
      * indicator whenever the tab bar's size changes.
      */
     if (typeof ResizeObserver !== 'undefined') {
-      const resizeObserver = new ResizeObserver(() => {
-        Tabs.getInstance(tabsEl as HTMLElement)?.updateTabIndicator();
+      // Observer callbacks run after layout, so the measurements Materialize takes here are not forced.
+      const resizeObserver = new ResizeObserver((entries) => {
+        updateIndicatorIfNeeded(tabsEl, entries[entries.length - 1]?.contentRect.width ?? tabsEl.getBoundingClientRect().width);
       });
 
       resizeObserver.observe(tabsEl);
@@ -101,22 +120,28 @@ export function initSideMenuTabs(tabsId: string): void {
 /**
  * Update the Materialize tabs indicator position.
  * Must be called after the side menu becomes visible (e.g. in `onBottomIconClick()`),
- * wrapped in a `setTimeout` to ensure layout has completed.
+ * deferred two frames so layout has completed and no forced layout occurs.
  *
  * @param tabsId - The DOM id of the `<ul class="tabs">` element
  */
 export function updateSideMenuTabIndicator(tabsId: string): void {
-  setTimeout(() => {
-    const tabsEl = document.querySelector(`#${tabsId}`);
+  if (pendingIndicatorUpdates.has(tabsId)) {
+    return;
+  }
+  pendingIndicatorUpdates.add(tabsId);
+  // Two frames: Materialize reads tab widths, which forces a layout if it runs in the same task as the menu
+  // being shown. By the second frame the menu has been laid out, so the reads are free. The resize observer
+  // may already have updated the indicator for this width, in which case this is a no-op.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      pendingIndicatorUpdates.delete(tabsId);
+      const tabsEl = document.querySelector(`#${tabsId}`);
 
-    if (tabsEl) {
-      const tabsInstance = Tabs.getInstance(tabsEl as HTMLElement);
-
-      if (tabsInstance) {
-        tabsInstance.updateTabIndicator();
+      if (tabsEl) {
+        updateIndicatorIfNeeded(tabsEl, tabsEl.getBoundingClientRect().width);
       }
-    }
-  }, 0);
+    });
+  });
 }
 
 /**

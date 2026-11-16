@@ -80,6 +80,7 @@ export class SatellitePhotos extends KeepTrackPlugin {
       <div id="sat-photo-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="sat-photo-menu-content" class="side-menu">
           <section class="kt-section">
+            <div class="kt-note" id="sat-photo-hint">${t7e('plugins.SatellitePhotos.labels.hint' as Parameters<typeof t7e>[0])}</div>
             <div class="kt-section-label">${t7e('plugins.SatellitePhotos.sections.geostationary')}</div>
             <div id="sat-photo-geo-list">${geoRows}</div>
           </section>

@@ -581,6 +581,18 @@ export const pluginManifest: PluginDescriptor[] = [
     defaultConfig: { enabled: true, order: 311 },
   },
   {
+    configKey: 'ResetToStart',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/reset-to-start/reset-to-start') : undefined,
+    proClassName: 'ResetToStart',
+    defaultConfig: { enabled: true, order: 318 },
+  },
+  {
+    configKey: 'OfflineBundle',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/offline-bundle/offline-bundle') : undefined,
+    proClassName: 'OfflineBundlePlugin',
+    defaultConfig: { enabled: true, order: 319 },
+  },
+  {
     configKey: 'TerminatorToggle',
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/terminator-toggle/terminator-toggle') : undefined,
     proClassName: 'TerminatorToggle',
@@ -742,6 +754,13 @@ export const pluginManifest: PluginDescriptor[] = [
     isLoginRequired: true,
   },
   {
+    configKey: 'TrajectoryComparePlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/trajectory-compare/trajectory-compare') : undefined,
+    proClassName: 'TrajectoryComparePlugin',
+    defaultConfig: { enabled: true, order: 421.5 },
+    isLoginRequired: true,
+  },
+  {
     configKey: 'BestPassPlugin',
     ossImport: () => import('./best-pass/best-pass'),
     ossClassName: 'BestPassPlugin',
@@ -783,6 +802,13 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/observability-planner/observability-planner') : undefined,
     proClassName: 'ObservabilityPlanner',
     defaultConfig: { enabled: true, order: 427 },
+    isLoginRequired: true,
+  },
+  {
+    configKey: 'LightCurvePlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/light-curve/light-curve') : undefined,
+    proClassName: 'LightCurvePlugin',
+    defaultConfig: { enabled: true, order: 428 },
     isLoginRequired: true,
   },
   {
@@ -990,6 +1016,18 @@ export const pluginManifest: PluginDescriptor[] = [
     proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/launchpad/launchpad') : undefined,
     proClassName: 'LaunchpadPlugin',
     defaultConfig: { enabled: true },
+  },
+  {
+    configKey: 'ObjectComparisonPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/object-comparison/object-comparison') : undefined,
+    proClassName: 'ObjectComparisonPlugin',
+    defaultConfig: { enabled: true, order: 96 },
+  },
+  {
+    configKey: 'SiteAccessSearchPlugin',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/site-access-search/site-access-search') : undefined,
+    proClassName: 'SiteAccessSearchPlugin',
+    defaultConfig: { enabled: true, order: 97 },
   },
   {
     configKey: 'FavoritesMenuPlugin',

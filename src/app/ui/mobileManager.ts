@@ -14,6 +14,7 @@ import { t7e } from '@app/locales/keys';
 import { Kilometers, Radians } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
 import { getEl, hideEl } from '../../engine/utils/get-el';
+import { MobileZoomButtons } from './mobile-zoom-buttons';
 
 export class MobileManager {
   static readonly MOBILE_ORBIT_LIMIT = 1500;
@@ -26,7 +27,6 @@ export class MobileManager {
     'SatInfoBoxObject',
     'SatInfoBoxOrbital',
     'SatInfoBoxMission',
-    'SatInfoBoxSponsor',
     'SatInfoBoxLinks',
     'TopMenu',
     'DateTimeManager',
@@ -52,6 +52,31 @@ export class MobileManager {
     'Screenshot',
     'FindSatPlugin',
     'SatellitePhotos',
+    // Added for phones 2026-11-12 (issues #153, #157): sign-in row, sensors group, command palette button.
+    'UserAccountPlugin',
+    'CommandPalettePlugin',
+    'SensorListPlugin',
+    'SensorInfoPlugin',
+    'CustomSensorPlugin',
+    'LookAnglesPlugin',
+    'BestPassPlugin',
+    // Added 2026-11-13 (#191): info circles and icon-only buttons need TooltipsPlugin, which supports tap on touch.
+    'TooltipsPlugin',
+    // Added 2026-11-13 (Z21, #206): Settings menu reachable from the phone drawer.
+    'SettingsMenuPlugin',
+    // Added 2026-11-14 (#303): curated Pro set. In: ObservabilityPlanner (single-column form plus a results table that
+    // scrolls inside its own box) and SatInfoBoxDoppler (an info-box section, no side menu of its own). Out: the wide
+    // multi-pane analysis menus (Coverage, Link Budget, Multi-view, Polar/Flat map), which need a desktop pointer or width.
+    'ObservabilityPlanner',
+    'SatInfoBoxDoppler',
+    // Added 2026-11-13 (#157): the access timeline strip has no other entry point; phone CSS gives it 44 px targets.
+    'AccessTimelinePlugin',
+    // Added 2026-11-14 (#367): the clock label opens the rewind/play/forward popover; the plugin must exist on phones.
+    'VcrPlugin',
+    // Added 2026-11-14 (#383): without it the welcome tour never starts on phones (plugin config was forced to false).
+    'OnboardingPlugin',
+    // Added 2026-11-15 (#539): Reset to Start sits in the clock popover; long-press opens Reset / Set / Clear.
+    'ResetToStart',
   ];
 
   static checkMobileMode() {
@@ -151,6 +176,8 @@ export class MobileManager {
             ServiceLocator.getUiManager().searchManager.closeSearch();
             hideEl('actions-section');
           });
+
+          EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => MobileZoomButtons.init());
 
           settingsManager.maxAnalystSats = 1;
           settingsManager.maxFieldOfViewMarkers = 1;

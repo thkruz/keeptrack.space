@@ -128,6 +128,43 @@ export const targetStandoffDistanceKm = (radiusKm: Kilometers): Kilometers => Ma
  */
 export const initialFramingDistanceKm = (radiusKm: Kilometers): Kilometers => Math.max(6 * radiusKm, 0.03) as Kilometers;
 
+/**
+ * Camera floors for an object whose 3D model is loaded (#389). The catalog size estimate can be far
+ * smaller than the drawn mesh (the ISS has no span in most catalogs), so the model's own bounding radius
+ * (km) wins whenever it is larger. Objects without a model keep the catalog-derived floors, and the
+ * result is never below them, so a CubeSat mesh can still be approached closely.
+ */
+export const modelAwareStandoffKm = (
+  catalogRadiusKm: Kilometers | null,
+  modelRadiusKm: number | null | undefined,
+  view?: { fovRad: number; aspect: number }
+): { minStandoff: Kilometers; framing: Kilometers } | null => {
+  const hasModel = typeof modelRadiusKm === 'number' && Number.isFinite(modelRadiusKm) && modelRadiusKm > 0;
+
+  if (!hasModel && catalogRadiusKm === null) {
+    return null;
+  }
+  const radiusKm = Math.max(catalogRadiusKm ?? 0, hasModel ? modelRadiusKm : 0) as Kilometers;
+  let minStandoff = targetStandoffDistanceKm(radiusKm);
+  let framing = initialFramingDistanceKm(radiusKm);
+
+  // Keep the whole bounding sphere inside the narrower of the vertical and horizontal FOV (aspect-aware).
+  if (hasModel && view && view.fovRad > 0 && view.aspect > 0 && Number.isFinite(view.fovRad) && Number.isFinite(view.aspect)) {
+    const halfV = view.fovRad / 2;
+    const halfH = Math.atan(Math.tan(halfV) * view.aspect);
+    const halfMin = Math.min(halfV, halfH);
+    const fitKm = (FIT_MARGIN * radiusKm) / Math.sin(Math.min(halfMin, Math.PI / 2 - 0.01));
+
+    minStandoff = Math.max(minStandoff, fitKm) as Kilometers;
+    framing = Math.max(framing, 1.5 * minStandoff) as Kilometers;
+  }
+
+  return { minStandoff, framing };
+};
+
+/** Margin on the bounding-sphere fit so the model does not touch the frame edge at the closest zoom. */
+const FIT_MARGIN = 1.1;
+
 const isLeapYear_ = (dateIn: Date) => {
   const year = dateIn.getUTCFullYear();
 

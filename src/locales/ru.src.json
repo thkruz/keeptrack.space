@@ -3,6 +3,8 @@
     "orbitPreview": "Предпросмотр орбиты",
     "unknown": "Неизвестно",
     "close": "Закрыть",
+    "dock": "Закрепить",
+    "menuHelp": "Help for this menu",
     "download": "Скачать",
     "downloadNamed": "Скачать {name}",
     "loading": "Загрузка…"
@@ -270,6 +272,13 @@
     "groupDevTools": "Инструменты разработки",
     "groupAbout": "О программе",
     "modeAll": "Все плагины",
+    "reasonSelectSensor": "Сначала выберите датчик",
+    "reasonSelectSatellite": "Сначала выберите спутник",
+    "reasonSelectTleSatellite": "Выберите спутник с орбитой (TLE), чтобы использовать это",
+    "reasonSelectSatelliteOrLaunchSite": "Выберите спутник или стартовую площадку, чтобы использовать это",
+    "reasonEnablePlanets": "Включите планеты в Настройках, чтобы использовать это",
+    "reasonAddToWatchlist": "Сначала добавьте спутники в список наблюдения",
+    "reasonFreeAccount": "Открывается бесплатной учётной записью",
     "openPluginMenu": "Открыть меню плагинов",
     "openAppLauncher": "Открыть панель запуска приложений",
     "appLauncherTooltip": "Панель запуска приложений (Shift+Z)",
@@ -281,6 +290,10 @@
     "expand": "Развернуть",
     "phoneLink": "Связь с телефоном",
     "phoneLinkSignIn": "Войдите, чтобы подключить телефон",
+    "signInPromptTitle": "Войдите, чтобы использовать: {{feature}}",
+    "signInPromptBody": "Функция «{{feature}}» доступна с бесплатной учётной записью. Войдите, чтобы ею пользоваться.",
+    "signInPromptAction": "Войти",
+    "signInPromptCancel": "Не сейчас",
     "connected": "Подключено",
     "offline": "Не в сети",
     "footerLinks": {
@@ -296,7 +309,9 @@
     "resetCamera": "Сбросить камеру",
     "clearLines": "Очистить линии",
     "clearScreen": "Очистить экран",
-    "startClock": "Запустить часы"
+    "startClock": "Запустить часы",
+    "groupObject": "Спутник",
+    "groupMore": "Ещё"
   },
   "urlManager": {
     "satNotFound": "Спутник \"{val}\" не найден!",
@@ -323,7 +338,12 @@
     "resultCount": "Результатов: {count}",
     "resultCountLimited": "Показано {shown} из {total} результатов",
     "noResults": "Ничего не найдено",
+    "noResultsSensors": "Ничего не найдено. В этом режиме поиск датчиков недоступен.",
+    "noResultsSensorsHidden": "Ничего не найдено. Наземные датчики скрыты в меню «Фильтр» или в настройках поиска.",
     "decayed": "Сошёл с орбиты",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} входит в состав {host}",
+    "dockedTo": "пристыкован к {host}",
     "typeStar": "Звезда",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовая площадка",
@@ -362,6 +382,10 @@
   "layersManager": {
     "toggleLayers": "Переключить слои",
     "layers": "Слои"
+  },
+  "mobileZoom": {
+    "zoomIn": "Приблизить",
+    "zoomOut": "Отдалить"
   },
   "modalConfirm": {
     "confirmAction": "Подтвердите действие",
@@ -402,5 +426,10 @@
       "breakup": "Обломки разрушения",
       "created": "Созданные спутники"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

@@ -48,6 +48,7 @@
       "downloadButton": "下载报告",
       "copyButton": "复制到剪贴板",
       "sensorNote": "这些报告需要先选择一个传感器。",
+      "sensorLimitNote": "使用 {name}：最小仰角 {minEl}°。低于此值的过境不会报告。",
       "sections": {
         "orbitPosition": "轨道与位置",
         "sensor": "传感器",
@@ -112,7 +113,11 @@
           "windowLine": "报告时段：{start} 至 {end} UTC，步长：{step} 秒",
           "generatedWallClock": "生成时间（实际时间）",
           "appVersion": "KeepTrack 版本",
-          "ricConvention": "RIC 约定"
+          "ricConvention": "RIC 约定",
+          "passCaveat": "站点本地时间使用 {zone} 时区。时间窗仅表示几何可见性，不证明可以接收到信号。最大仰角精确到最接近的秒。",
+          "passCaveatDisplay": "本地时间使用显示时区 {zone}。时间窗仅表示几何可见性，不证明可以接收到信号。最大仰角精确到最接近的秒。",
+          "sensorCoverage": "仅涵盖传感器 {sensor}。",
+          "sensorCoverageOthers": "仅涵盖传感器 {sensor}。其他 {count} 个活动传感器或站点未包含在内。"
         },
         "titles": {
           "aer": "方位角、仰角、距离报告",
@@ -157,7 +162,11 @@
           "radialKm": "径向 (km)",
           "intrackKm": "沿迹 (km)",
           "crosstrackKm": "横迹 (km)",
-          "relSpeed": "相对速度 (km/s)"
+          "relSpeed": "相对速度 (km/s)",
+          "timeLocal": "本地时间",
+          "riseLocal": "升起时间（本地）",
+          "setLocal": "落下时间（本地）",
+          "maxElTimeLocal": "最大仰角时间（本地）"
         },
         "empty": {
           "noPasses": "未找到过境！",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "持续可见",
-          "start": "开始时可见",
-          "end": "结束时可见"
+          "start": "开始时可见; 峰值取窗口内",
+          "end": "结束时可见; 峰值取窗口内"
         },
         "illumination": {
           "sun": "是",

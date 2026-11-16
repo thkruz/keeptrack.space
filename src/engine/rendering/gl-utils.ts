@@ -217,9 +217,8 @@ export abstract class GlUtils {
 
         gl.generateMipmap(gl.TEXTURE_2D);
       } else {
-        // not power of 2: clamp and linear filtering
-        // eslint-disable-next-line no-console
-        console.warn(`Texture ${url} is not power of 2!`);
+        // not power of 2: clamp and linear filtering. WebGL2 supports NPOT textures
+        // (e.g. the 4000x2000 moon bump map), so this is intended and does not warn.
 
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -370,10 +369,7 @@ export abstract class GlUtils {
       // Generate mipmaps
       gl.generateMipmap(gl.TEXTURE_2D);
     } else {
-      // eslint-disable-next-line no-console
-      console.warn(`Texture ${img.src} is not power of 2!`);
-
-      // No, it's not a power of 2. Turn off mips and set wrapping to clamp to edge
+      // Not a power of 2 (valid in WebGL2, so no warning). Turn off mips and set wrapping to clamp to edge
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);

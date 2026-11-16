@@ -178,6 +178,8 @@ describe('TheSpaceDevLaunchCalendarPlugin hardening', () => {
       expect(TheSpaceDevLaunchCalendarPlugin.formatWindow(null)).toBe(k('msgs.tbd'));
       expect(TheSpaceDevLaunchCalendarPlugin.formatWindow(new Date('2000-01-01T00:00:00Z'))).toBe(k('msgs.tbd'));
       expect(TheSpaceDevLaunchCalendarPlugin.formatWindow(new Date('2099-06-01T12:00:00Z'))).toBe('2099-06-01 12:00:00 UTC');
+      // LL2 2.0.0 has no net_precision: a midnight UTC window is a date-only launch, so the time is reported as TBD.
+      expect(TheSpaceDevLaunchCalendarPlugin.formatWindow(new Date('2099-06-01T00:00:00Z'))).toBe(`2099-06-01 (${k('msgs.timeTbd')})`);
     });
 
     it('one record with an unparseable window renders TBD and the rest of the table still renders', () => {
@@ -186,8 +188,9 @@ describe('TheSpaceDevLaunchCalendarPlugin hardening', () => {
 
       expect(() => TheSpaceDevLaunchCalendarPlugin.initTable(table, plugin.launchList)).not.toThrow();
       expect(table.rows).toHaveLength(4);
-      expect(table.rows[2].cells[0].textContent).toBe(k('msgs.tbd'));
-      expect(table.rows[3].cells[0].textContent).toBe('2099-06-01 12:00:00 UTC');
+      // The TBD row sorts after the dated rows.
+      expect(table.rows[2].cells[0].textContent).toBe('2099-06-01 12:00:00 UTC');
+      expect(table.rows[3].cells[0].textContent).toBe(k('msgs.tbd'));
     });
 
     it('a rocket without a configuration or a pad without a location does not throw', () => {

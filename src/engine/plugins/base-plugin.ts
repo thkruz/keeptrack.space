@@ -8,6 +8,7 @@ import { TranslationKey, t7e } from '@app/locales/keys';
 import { OfflineIconBehavior } from '@app/settings/core-settings';
 import { BaseObject } from '@ootk/src/main';
 import downloadPng from '@public/img/icons/download.png';
+import helpPng from '@public/img/icons/help.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
 import settingsPng from '@public/img/icons/settings.png';
 import Module from 'module';
@@ -144,6 +145,9 @@ export abstract class KeepTrackPlugin {
    */
   sideMenuSecondaryHtml: string;
 
+  /** Optional title shown in the secondary pane's title bar. */
+  sideMenuSecondaryTitle?: string;
+
   sideMenuSecondaryOptions: SideMenuSettingsOptions = {
     width: 400,
     leftOffset: null,
@@ -193,6 +197,20 @@ export abstract class KeepTrackPlugin {
 
   /** True once this plugin registered help content (config or title/body). */
   protected hasHelp_ = false;
+
+  /** Title and body passed to registerHelp, so the menu's own help button can show them directly. */
+  private helpPayload_: { title: string; text: string } | null = null;
+
+  /** Shows this plugin's own help (the menu that owns the title-bar button), not whichever menu is open first. */
+  private showOwnHelp_(): void {
+    if (!this.helpPayload_) {
+      adviceManagerInstance.showContextHelp();
+
+      return;
+    }
+    adviceManagerInstance.showAdvice(this.helpPayload_.title, this.helpPayload_.text);
+    EventBus.getInstance().emit(EventBusEvent.helpMenuShown, this.id);
+  }
 
   /**
    * Whether the bottom icon is disabled by default.
@@ -545,6 +563,7 @@ export abstract class KeepTrackPlugin {
       const config = this.getSecondaryMenuConfig();
 
       this.sideMenuSecondaryHtml = config.html;
+      this.sideMenuSecondaryTitle = config.title;
       this.sideMenuSecondaryOptions = {
         width: config.width ?? 300,
         leftOffset: config.leftOffset ?? null,
@@ -722,6 +741,7 @@ export abstract class KeepTrackPlugin {
           <div id="${this.sideMenuElementName}-secondary-content" class="side-menu-settings" style="padding: 0px 10px;">
             <div class="side-menu-title-bar secondary-title-bar">
               <div class="side-menu-title-left"></div>
+              ${this.sideMenuSecondaryTitle ? html`<h5 class="side-menu-title-text secondary-title-text">${this.sideMenuSecondaryTitle}</h5>` : ''}
               <div class="side-menu-title-right">
                 <button id="${this.sideMenuElementName}-secondary-close-btn"
                   class="center-align btn btn-ui waves-effect waves-light icon-btn"
@@ -876,7 +896,23 @@ export abstract class KeepTrackPlugin {
       getEl(`${this.sideMenuElementName}-close-btn`)?.addEventListener('click', () => {
         this.hideSideMenus();
       });
+      this.showMenuHelpButton_();
     });
+  }
+
+  /**
+   * Reveals the title-bar help button when this plugin has help and wires it to the same path as
+   * Shift+F1, so free users can find the per-menu help without knowing the shortcut.
+   */
+  private showMenuHelpButton_(): void {
+    const btn = getEl(`${this.sideMenuElementName}-help-btn`);
+
+    if (!btn || !this.hasHelp_ || this.helpRole === 'none') {
+      return;
+    }
+
+    btn.hidden = false;
+    btn.addEventListener('click', () => this.showOwnHelp_());
   }
 
   private generateTitleBarHtml_(): string {
@@ -884,8 +920,8 @@ export abstract class KeepTrackPlugin {
       ? html`
       <button id="${this.sideMenuElementName}-download-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
-        type="button">
-        <img src="${this.downloadIconSrc}" alt="${t7e('Common.download' as TranslationKey)}" class="icon-btn-img" />
+        type="button" aria-label="${t7e('Common.download' as TranslationKey)}" title="${t7e('Common.download' as TranslationKey)}">
+        <img src="${this.downloadIconSrc}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>
     `
       : '';
@@ -895,15 +931,24 @@ export abstract class KeepTrackPlugin {
       ? html`
       <button id="${this.sideMenuElementName}-secondary-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
-        type="button">
-        <img src="${secondaryIconSrc}" alt="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" class="icon-btn-img" />
+        type="button" aria-label="${t7e('pluginDrawer.modeSettings' as TranslationKey)}" title="${t7e('pluginDrawer.modeSettings' as TranslationKey)}">
+        <img src="${secondaryIconSrc}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>`
       : '';
+    // Hidden until uiManagerFinal confirms the plugin has help (see showMenuHelpButton_).
+    const helpIconHtml = html`
+      <button id="${this.sideMenuElementName}-help-btn"
+        class="center-align btn btn-ui waves-effect waves-light icon-btn side-menu-help-btn"
+        type="button" hidden
+        aria-label="${t7e('Common.menuHelp' as TranslationKey)}"
+        kt-tooltip="${t7e('Common.menuHelp' as TranslationKey)}">
+        <img src="${helpPng}" alt="" aria-hidden="true" class="icon-btn-img" />
+      </button>`;
     const closeIconHtml = html`
       <button id="${this.sideMenuElementName}-close-btn"
         class="center-align btn btn-ui waves-effect waves-light icon-btn"
-        type="button">
-        <img src="${leftPanelClosePng}" alt="${t7e('Common.close' as TranslationKey)}" class="icon-btn-img" />
+        type="button" aria-label="${t7e('Common.close' as TranslationKey)}" title="${t7e('Common.close' as TranslationKey)}">
+        <img src="${leftPanelClosePng}" alt="" aria-hidden="true" class="icon-btn-img" />
       </button>`;
 
     return html`
@@ -913,6 +958,7 @@ export abstract class KeepTrackPlugin {
         <div class="side-menu-title-right">
           ${downloadIconHtml}
           ${settingsIconHtml}
+          ${helpIconHtml}
           ${closeIconHtml}
         </div>
       </div>`;
@@ -1217,14 +1263,21 @@ export abstract class KeepTrackPlugin {
     }
   }
 
+  /** Toggles a class only when the element does not already have that state, so redundant calls never invalidate style. */
+  private static setIconClass_(el: HTMLElement | null, className: string, isOn: boolean): void {
+    if (el && el.classList.contains(className) !== isOn) {
+      el.classList.toggle(className, isOn);
+    }
+  }
+
   setBottomIconToSelected(): void {
     if (this.isMenuButtonActive) {
       return;
     }
     this.isMenuButtonActive = true;
     this.bottomIconComponent_?.select();
-    getEl(this.bottomIconElementName, true)?.classList.add('bmenu-item-selected');
-    getEl(`${this.id}-utility-icon`, true)?.classList.add('bmenu-item-selected');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-selected', true);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-selected', true);
   }
 
   setBottomIconToUnselected(isHideSideMenus = true): void {
@@ -1239,8 +1292,8 @@ export abstract class KeepTrackPlugin {
     if (isHideSideMenus) {
       EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
     }
-    getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-selected');
-    getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-selected');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-selected', false);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-selected', false);
   }
 
   /**
@@ -1254,6 +1307,15 @@ export abstract class KeepTrackPlugin {
 
     this.setBottomIconToDisabled(isHideSideMenus);
     this.setBottomIconToUnselected(isHideSideMenus);
+  }
+
+  /**
+   * Whether the current satellite selection can be used by this plugin. Only consulted when
+   * isRequireSatelliteSelected is set; override to reject selections the plugin cannot handle
+   * (e.g. an OEM object that has no TLE).
+   */
+  protected isSelectionSupported_(_obj: BaseObject): boolean {
+    return true;
   }
 
   /**
@@ -1307,8 +1369,9 @@ export abstract class KeepTrackPlugin {
     this.setBottomIconToUnselected(isHideSideMenus);
     this.isIconDisabled = true;
     this.bottomIconComponent_?.disable(false);
-    getEl(this.bottomIconElementName, true)?.classList.add('bmenu-item-disabled');
-    getEl(`${this.id}-utility-icon`, true)?.classList.add('bmenu-item-disabled');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-disabled', true);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-disabled', true);
+    this.syncUtilityIconReason_(true);
   }
 
   setBottomIconToEnabled(): void {
@@ -1317,8 +1380,45 @@ export abstract class KeepTrackPlugin {
     }
     this.isIconDisabled = false;
     this.bottomIconComponent_?.enable();
-    getEl(this.bottomIconElementName, true)?.classList.remove('bmenu-item-disabled');
-    getEl(`${this.id}-utility-icon`, true)?.classList.remove('bmenu-item-disabled');
+    KeepTrackPlugin.setIconClass_(getEl(this.bottomIconElementName, true), 'bmenu-item-disabled', false);
+    KeepTrackPlugin.setIconClass_(getEl(`${this.id}-utility-icon`, true), 'bmenu-item-disabled', false);
+    this.syncUtilityIconReason_(false);
+  }
+
+  /**
+   * Keep the drawer footer copy's aria-disabled, tooltip and aria-label in step with the icon state. Utility-only
+   * plugins have no bottom icon element for the drawer's observer to follow, so the plugin updates its footer icon
+   * directly. The plain label lives in data-drawer-label (set by the drawer).
+   */
+  private syncUtilityIconReason_(isDisabled: boolean): void {
+    const el = getEl(`${this.id}-utility-icon`, true);
+
+    if (!el) {
+      return;
+    }
+    el.setAttribute('aria-disabled', String(isDisabled));
+    const baseLabel = el.dataset.drawerLabel;
+
+    if (!baseLabel) {
+      return;
+    }
+    const reason = isDisabled ? this.silentDisabledReason_() : '';
+    const text = reason ? `${baseLabel}: ${reason}` : baseLabel;
+
+    el.setAttribute('kt-tooltip', text);
+    el.setAttribute('aria-label', text);
+  }
+
+  /** The reason explainDisabledIcon() would give, without showing a toast. */
+  private silentDisabledReason_(): string {
+    if (this.isRequireSensorSelected && !ServiceLocator.getSensorManager()?.isSensorSelected()) {
+      return t7e('pluginDrawer.reasonSelectSensor' as TranslationKey);
+    }
+    if (this.isRequireSatelliteSelected && !this.verifySatelliteSelected(false)) {
+      return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
+    }
+
+    return this.getDisabledReason() ?? '';
   }
 
   /**
@@ -1401,6 +1501,13 @@ export abstract class KeepTrackPlugin {
       if (!selectSatManager || (selectSatManager as unknown as { selectedSat: number }).selectedSat === -1) {
         return;
       }
+
+      // An unsupported selection (e.g. an OEM object for a TLE-only plugin) keeps the icon disabled
+      const selectedObj = (selectSatManager as unknown as { getSelectedSat?: () => BaseObject | null }).getSelectedSat?.();
+
+      if (selectedObj && !this.isSelectionSupported_(selectedObj)) {
+        return;
+      }
     }
 
     if (settingsManager.offlineIconBehavior === OfflineIconBehavior.HIDE) {
@@ -1436,14 +1543,16 @@ export abstract class KeepTrackPlugin {
    */
   isRequireSatelliteSelected = false;
 
-  verifySatelliteSelected(): boolean {
+  verifySatelliteSelected(isMakeToast = true): boolean {
     /*
      * const searchDom = getEl('search', true);
      * if (!selectSatManagerInstance || (selectSatManagerInstance?.selectedSat === -1 && (!searchDom || (<HTMLInputElement>searchDom).value === ''))) {
      */
     if (((PluginRegistry.getPluginByName('SelectSatManager') as unknown as { selectedSat: number } | null)?.selectedSat ?? -1) === -1) {
-      errorManagerInstance.warnToast(t7e('errorMsgs.SelectSatelliteFirst'));
-      this.shakeBottomIcon();
+      if (isMakeToast) {
+        errorManagerInstance.warnToast(t7e('errorMsgs.SelectSatelliteFirst'));
+        this.shakeBottomIcon();
+      }
 
       return false;
     }
@@ -1478,7 +1587,7 @@ export abstract class KeepTrackPlugin {
     }
     if (this.isRequireSatelliteSelected && !this.isRequireSensorSelected) {
       EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject): void => {
-        if (!obj) {
+        if (!obj || !this.isSelectionSupported_(obj)) {
           this.disableForMissingSelection_();
         } else if (!this.isOfflineDisabled_) {
           this.setBottomIconToEnabled();
@@ -1764,6 +1873,7 @@ export abstract class KeepTrackPlugin {
    */
   registerHelp(helpTitle: string, helpText: string) {
     this.hasHelp_ = true;
+    this.helpPayload_ = { title: helpTitle, text: helpText };
     EventBus.getInstance().on(EventBusEvent.onHelpMenuClick, (): boolean => {
       if (this.isHelpTarget_()) {
         adviceManagerInstance.showAdvice(helpTitle, helpText);

@@ -120,6 +120,7 @@ export class EditSat extends KeepTrackPlugin {
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'edit-rmb',
+      group: 'object',
       level1Html: html`
         <li class="rmb-menu-item" id="edit-rmb"><a href="#">${t7e('plugins.EditSat.contextMenu.editSat' as T7eKey)} &#x27A4;</a></li>`,
       level2ElementName: 'edit-rmb-menu',
@@ -158,6 +159,21 @@ export class EditSat extends KeepTrackPlugin {
   // =========================================================================
   // Lifecycle
   // =========================================================================
+
+  protected override isSelectionSupported_(obj: BaseObject): boolean {
+    return obj instanceof Satellite;
+  }
+
+  /** Disabled with a selection that has no TLE (OEM object, sensor, launch site...): say what to select. */
+  getDisabledReason(): string | null {
+    const obj = this.selectSatManager_.getSelectedSat(GetSatType.EXTRA_ONLY);
+
+    if (obj && !(obj instanceof Satellite)) {
+      return t7e('pluginDrawer.reasonSelectTleSatellite');
+    }
+
+    return null;
+  }
 
   addHtml(): void {
     super.addHtml();
@@ -200,6 +216,13 @@ export class EditSat extends KeepTrackPlugin {
       }
       this.doReaderActions_(evt);
       evt.preventDefault();
+      // Let the same file be chosen again (a revised file often keeps its name).
+      // readAsText has already captured the File, so clearing the input is safe.
+      const input = evt.target as HTMLInputElement;
+
+      setTimeout(() => {
+        input.value = '';
+      }, 0);
     });
 
     getEl(`${p}-error`)!.addEventListener('click', () => this.hideError_());
@@ -236,10 +259,11 @@ export class EditSat extends KeepTrackPlugin {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj: BaseObject) => {
-      if (!obj) {
+      if (!obj || !(obj instanceof Satellite)) {
         if (this.isMenuButtonActive) {
           this.closeSideMenu();
         }
+        this.setBottomIconToUnselected();
         this.setBottomIconToDisabled();
       } else if (this.isMenuButtonActive && obj.isSatellite() && (obj as Satellite).sccNum !== (<HTMLInputElement>getEl(`${EditSat.elementPrefix}-scc`)).value) {
         this.populateSideMenu_();
@@ -601,6 +625,27 @@ export class EditSat extends KeepTrackPlugin {
 
     if (!sat) {
       errorManagerInstance.warn(t7e('plugins.EditSat.errorMsgs.satelliteNotFound' as T7eKey).replace('{sccNum}', parsed.sccNum));
+
+      return;
+    }
+
+    const formScc = (getEl(`${EditSat.elementPrefix}-scc`) as HTMLInputElement | null)?.value.trim();
+
+    // Catalog aliases (attached station modules resolve to their host) are fine for navigation, but imported
+    // elements may only be applied to the satellite whose own catalog number the file carries.
+    const canonicalScc = (scc: string): string =>
+      scc
+        .trim()
+        .replace(/^0+(?=\d)/u, '')
+        .toUpperCase();
+    const isAliasMismatch = canonicalScc(parsed.sccNum) !== canonicalScc(sat.sccNum);
+
+    if (isAliasMismatch || (formScc && catalogManagerInstance.sccNum2Id(formScc) !== sat.id)) {
+      errorManagerInstance.warn(
+        t7e('plugins.EditSat.errorMsgs.sccMismatch' as T7eKey)
+          .replace(/\{fileScc\}/gu, parsed.sccNum)
+          .replace(/\{selectedScc\}/gu, formScc || sat.sccNum)
+      );
 
       return;
     }

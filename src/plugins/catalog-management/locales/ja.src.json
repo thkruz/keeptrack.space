@@ -20,7 +20,12 @@
         "tleSource": "ソース",
         "tleFormat": "形式",
         "timeSpanHrs": "期間（時間）",
-        "stepSizeSec": "ステップサイズ（秒）"
+        "stepSizeSec": "ステップサイズ（秒）",
+        "keepSatInfoHint": "カタログにある衛星の軌道を更新します。名称・国・ミッション情報は保持されます。",
+        "importNewOnlyHint": "カタログにない衛星のみ追加します。既存の衛星は変更されません。",
+        "importHint": "対応形式は .tce、.tle、.txt。両方のスイッチがオフの場合はカタログ全体を置き換えます。スイッチをオンにすると統合されます。",
+        "sourceHint": "Official: 実在のカタログ登録オブジェクトのみ。KeepTrack: 作成したアナリスト衛星も含みます。",
+        "selectedSatReason": "これらのエクスポートを使うには衛星を選択してください。"
       },
       "options": {
         "sourceOfficial": "公式",

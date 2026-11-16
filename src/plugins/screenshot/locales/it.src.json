@@ -14,6 +14,14 @@
         "primaryLogoFailed": "Impossibile caricare l'immagine del logo principale.",
         "secondaryLogoFailed": "Impossibile caricare l'immagine del logo secondario.",
         "noCanvasContext": "Impossibile ottenere il contesto 2D per il canvas temporaneo. Impossibile creare lo screenshot."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Sito: {site}",
+        "source": "Fonte: {source}",
+        "utc": "{time} UTC",
+        "computed": "Vista calcolata: elementi orbitali vecchi di {age} in questo momento",
+        "computedBeforeEpoch": "Vista calcolata: questo momento precede di {age} l'epoca degli elementi orbitali"
       }
     }
   }

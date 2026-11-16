@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Pokaż etykiety czujników",
           "helpText": "Rysuje nazwę czujnika obok jego znacznika na globie i mapie płaskiej."
+        },
+        "showObjectLabels": {
+          "label": "Pokaż nazwy obiektów",
+          "helpText": "Rysuje nazwy obok wybranego, drugiego i obserwowanych obiektów z prefiksem kształtu: [1] główny, (2) drugi, * obserwowany."
         }
       },
       "rmbMenu": {
@@ -63,6 +67,13 @@
       "infoBox": {
         "addLabel": "Dodaj do listy obserwowanych",
         "removeLabel": "Usuń z listy obserwowanych"
+      },
+      "stale": {
+        "label": "Próg przestarzałych elementów orbity",
+        "helpText": "Elementy orbity starsze niż ten próg są oznaczane jako PRZESTARZAŁE na liście obserwacji, w tabelach przelotów i eksportach. Domyślnie 72.",
+        "ageHeader": "Wiek GP (h)",
+        "marker": "PRZESTARZAŁE",
+        "tooltip": "Elementy orbity są starsze niż {hours} h. Prognozy mogą być niedokładne."
       }
     },
     "WatchlistOverlay": {

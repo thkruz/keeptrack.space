@@ -1,15 +1,16 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "衛星画像",
-      "title": "衛星画像",
+      "bottomIconLabel": "気象衛星画像",
+      "title": "気象衛星画像",
       "defaultImageTitle": "最新の衛星画像",
       "labels": {
         "dscovrUnavailable": "DSCOVRは一時的に利用できません",
         "dscovrImage": "DSCOVR画像 {index}",
         "dscovrLoading": "DSCOVR画像を読み込んでいます…",
         "refresh": "最新画像を更新",
-        "imageAtUtc": "{name}（{time} UTC）"
+        "imageAtUtc": "{name}（{time} UTC）",
+        "hint": "衛星をクリックすると、その衛星へ移動し、最新の全球画像を開きます"
       },
       "sections": {
         "geostationary": "静止軌道",

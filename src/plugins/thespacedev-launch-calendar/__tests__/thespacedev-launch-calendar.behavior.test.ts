@@ -131,6 +131,19 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
       expect(plugin.launchList).toHaveLength(2);
       expect(plugin.launchList[1].name).toBe('Second');
     });
+
+    it('sorts stale (TBD) windows after dated launches and keeps feed order within each group', () => {
+      plugin.processData({
+        results: [
+          launchResult({ name: 'Stale', window_start: '2000-01-01T00:00:00Z' }),
+          launchResult({ name: 'Soon', window_start: '2098-01-01T12:00:00Z' }),
+          launchResult({ name: 'Bad', window_start: 'not-a-date' }),
+          launchResult({ name: 'Later', window_start: '2099-01-01T12:00:00Z' }),
+        ] as any,
+      });
+
+      expect(plugin.launchList.map((x) => x.name)).toEqual(['Soon', 'Later', 'Stale', 'Bad']);
+    });
   });
 
   describe('static table builders', () => {
@@ -156,6 +169,18 @@ describe('TheSpaceDevLaunchCalendarPlugin behavior', () => {
       expect(countryCell?.textContent).toBe('USA, FRA');
       // Mission and rocket render as iframe links when URLs are present.
       expect(tbl.querySelectorAll('a.iframe').length).toBeGreaterThan(0);
+    });
+
+    it('gives mission, location and agency cells a tooltip with the full untruncated text', () => {
+      const tbl = document.createElement('table');
+
+      TheSpaceDevLaunchCalendarPlugin.initTable(tbl, [futureLaunch()]);
+
+      const cells = tbl.rows[1].cells;
+
+      expect(cells[1].title).toBe('A Very Long Mission Name That Truncates / Falcon 9');
+      expect(cells[2].title).toBe('Cape Canaveral');
+      expect(cells[3].title).toBe('SpaceX');
     });
 
     it('renders the TBD placeholder for a launch window more than a day in the past', () => {

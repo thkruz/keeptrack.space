@@ -9,17 +9,26 @@
         "groundStationsHeader": "지상국",
         "groundStationsAll": "모든 지상국",
         "missingData": "데이터 없음",
-        "tooltipSensorsInFov": "센서 커버리지 시각화"
+        "tooltipSensorsInFov": "센서 커버리지 시각화",
+        "savedSites": "저장된 사용자 지정 사이트",
+        "savedSite_current": "현재",
+        "savedSite_active": "활성",
+        "savedSite_saved": "저장됨"
       },
       "buttons": {
         "markAll": "{name} 표시",
         "resetSensor": "센서 초기화",
-        "showSensorsWithFov": "모든 센서를 FOV와 함께 표시..."
+        "showSensorsWithFov": "모든 센서를 FOV와 함께 표시...",
+        "removeSavedSite": "저장된 사이트 {name} 제거",
+        "activateSavedSite": "저장된 사이트 {name}도 사용",
+        "deactivateSavedSite": "저장된 사이트 {name} 사용 중지"
       },
       "commands": {
         "category": "센서",
         "setSensor": "현재 센서를 {name}(으)로 설정",
-        "setSensorGroup": "센서 그룹 설정: {name}"
+        "setSensorGroup": "센서 그룹 설정: {name}",
+        "setSavedSite": "현재 센서를 저장된 사이트 {name}(으)로 설정",
+        "activateSavedSite": "저장된 사이트 {name}도 사용"
       },
       "help": {
         "overview": "센서 메뉴는 앱의 나머지 기능이 계산 기준으로 삼는 지상국을 선택하는 곳입니다. 센서는 주로 지원하는 네트워크별로 그룹화되며, 각 항목의 왼쪽에는 센서 이름이, 오른쪽에는 소유 국가 또는 조직이 표시됩니다. 선택한 센서는 관측각, 시야각 원뿔, 관심 목록 통과 알림 및 센서를 사용하는 다른 모든 메뉴에 적용됩니다.",

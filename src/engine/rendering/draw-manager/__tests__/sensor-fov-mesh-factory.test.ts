@@ -88,4 +88,50 @@ describe('SensorFovMeshFactory.drawAll with nothing drawable', () => {
     expect(toastSpy).not.toHaveBeenCalled();
     expect(fence.isMenuButtonActive).toBe(true);
   });
+
+  const meshFor = (name: string, maxRng: number) => {
+    const sensor = defaultSensor.clone();
+
+    sensor.objName = name;
+    sensor.maxRng = maxRng as never;
+    const mesh = Object.create(SensorFovMesh.prototype) as SensorFovMesh;
+
+    mesh.sensor = sensor;
+    const drawSpy = vi.spyOn(mesh, 'draw').mockImplementation(() => undefined);
+
+    return { sensor, mesh, drawSpy };
+  };
+
+  it('draws two 50000 km radar-class sensors without the deep-space warning', () => {
+    const a = meshFor('RADAR-A', 50000);
+    const b = meshFor('RADAR-B', 50000);
+
+    ServiceLocator.getSensorManager().currentSensors = [a.sensor];
+    ServiceLocator.getSensorManager().secondarySensors = [b.sensor];
+    factory.meshes = [a.mesh, b.mesh];
+    fov.setBottomIconToEnabled();
+    fov.setBottomIconToSelected();
+
+    draw();
+
+    expect(a.drawSpy).toHaveBeenCalledTimes(1);
+    expect(b.drawSpy).toHaveBeenCalledTimes(1);
+    expect(toastSpy).not.toHaveBeenCalled();
+  });
+
+  it('warns exactly once when two deep-space sensors cannot be drawn, even over several frames', () => {
+    const a = meshFor('GEO-A', 400000);
+    const b = meshFor('GEO-B', 400000);
+
+    ServiceLocator.getSensorManager().currentSensors = [a.sensor];
+    ServiceLocator.getSensorManager().secondarySensors = [b.sensor];
+    factory.meshes = [a.mesh, b.mesh];
+    fov.setBottomIconToEnabled();
+    fov.setBottomIconToSelected();
+
+    draw();
+    draw();
+
+    expect(toastSpy).toHaveBeenCalledTimes(1);
+  });
 });

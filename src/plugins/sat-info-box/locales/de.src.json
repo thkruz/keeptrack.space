@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "Quelle",
-      "tooltip": "Datenquelle für die Satelliteninformationen"
+      "tooltip": "Datenquelle für die Satelliteninformationen",
+      "notRecorded": "Nicht erfasst"
     },
     "Confidence": {
       "label": "Vertrauen",
@@ -38,6 +39,12 @@
     },
     "errorMsgs": {
       "htmlNotReady": "Das Satelliten-Infofeld wurde nicht fertig geladen, daher konnten seine Angaben nicht aktualisiert werden."
+    },
+    "export": {
+      "copyValues": "Werte kopieren",
+      "copied": "Werte kopiert",
+      "region": "Objektdetails",
+      "secondary": "Sekundäres Objekt"
     }
   }
 }

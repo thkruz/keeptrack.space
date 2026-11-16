@@ -3,27 +3,33 @@
     "title": "Dane orbitalne",
     "Apogee": {
       "label": "Apogeum",
-      "tooltip": "Najwyższa wysokość orbity nad promieniem równikowym (6378,137 km)"
+      "tooltip": "Najwyższa wysokość orbity nad promieniem równikowym (6378,137 km)",
+      "help": "Najwyższy punkt orbity, podany jako wysokość nad Ziemią."
     },
     "Perigee": {
       "label": "Perygeum",
-      "tooltip": "Najniższa wysokość orbity nad promieniem równikowym (6378,137 km)"
+      "tooltip": "Najniższa wysokość orbity nad promieniem równikowym (6378,137 km)",
+      "help": "Najniższy punkt orbity, podany jako wysokość nad Ziemią."
     },
     "Inclination": {
       "label": "Inklinacja",
-      "tooltip": "Kąt mierzony od równika w węźle wstępującym"
+      "tooltip": "Kąt mierzony od równika w węźle wstępującym",
+      "help": "O ile orbita jest nachylona względem równika. 0° okrąża równik; 90° przechodzi nad biegunami."
     },
     "Eccentricity": {
       "label": "Mimośród",
-      "tooltip": "Jak bardzo orbita jest kolista (0 to okrąg)"
+      "tooltip": "Jak bardzo orbita jest kolista (0 to okrąg)",
+      "help": "Jak bardzo orbita jest wydłużona. 0 to idealny okrąg; wartości bliskie 1 to długie owale."
     },
     "RightAsc": {
       "label": "Rektascensja",
-      "tooltip": "Gdzie obiekt wznosi się ponad równik"
+      "tooltip": "Gdzie obiekt wznosi się ponad równik",
+      "help": "Rektascensja węzła wstępującego: kierunek na niebie, w którym orbita przecina równik w stronę północy."
     },
     "ArgOfPerigee": {
       "label": "Arg. perycentrum",
-      "tooltip": "Gdzie znajduje się najniższy punkt orbity"
+      "tooltip": "Gdzie znajduje się najniższy punkt orbity",
+      "help": "Argument perygeum: kąt wzdłuż orbity od tego przecięcia równika do najniższego punktu."
     },
     "Latitude": {
       "label": "Szer. geogr.",
@@ -37,6 +43,29 @@
       "east": "E",
       "west": "W"
     },
+    "Region": {
+      "label": "Nad",
+      "tooltip": "Państwo pod punktem podsatelitarnym (granice Natural Earth)",
+      "ocean": "Nad oceanem",
+      "Water": {
+        "arctic": "Ocean Arktyczny",
+        "atlantic": "Ocean Atlantycki",
+        "pacific": "Ocean Spokojny",
+        "indian": "Ocean Indyjski",
+        "southern": "Ocean Południowy",
+        "mediterranean": "Morze Śródziemne",
+        "caribbean": "Morze Karaibskie",
+        "gulfOfMexico": "Zatoka Meksykańska",
+        "redSea": "Morze Czerwone",
+        "blackSea": "Morze Czarne",
+        "northSea": "Morze Północne",
+        "baltic": "Morze Bałtyckie",
+        "arabianSea": "Morze Arabskie",
+        "bayOfBengal": "Zatoka Bengalska",
+        "southChinaSea": "Morze Południowochińskie",
+        "persianGulf": "Zatoka Perska"
+      }
+    },
     "Altitude": {
       "label": "Wysokość",
       "tooltip": "Bieżąca wysokość nad poziomem morza"
@@ -46,7 +75,8 @@
       "tooltip": "Czas jednego pełnego obiegu wokół Ziemi",
       "meanMotion": "Ruch średni",
       "revPerDay": "obr./dobę",
-      "min": "min"
+      "min": "min",
+      "help": "Ile czasu obiekt potrzebuje na jedno okrążenie Ziemi."
     },
     "Velocity": {
       "label": "Prędkość",
@@ -67,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma radialna",
-      "tooltip": "Radialna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
+      "tooltip": "Niepewność położenia 1-sigma radialna (układ RIC). Wartość oznaczona (domyślne) to założona wartość domyślna aplikacji, a nie pomiar; w przeciwnym razie wynika z TLE w epoce GP. Pc i Raport zbliżeń używają tych samych wartości. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "InTrackSigma": {
       "label": "Sigma wzdłuż toru",
-      "tooltip": "Niepewność położenia wzdłuż toru 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
+      "tooltip": "Niepewność położenia 1-sigma wzdłuż toru (układ RIC). Wartość oznaczona (domyślne) to założona wartość domyślna aplikacji, a nie pomiar; w przeciwnym razie wynika z TLE w epoce GP. Pc i Raport zbliżeń używają tych samych wartości. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "CrossTrackSigma": {
       "label": "Sigma poprzeczna",
-      "tooltip": "Poprzeczna niepewność położenia 1 sigma z kowariancji wyznaczonej z TLE w epoce GP (układ RIC). Te same wartości wykorzystują Pc i raport koniunkcji."
+      "tooltip": "Niepewność położenia 1-sigma poprzeczna (układ RIC). Wartość oznaczona (domyślne) to założona wartość domyślna aplikacji, a nie pomiar; w przeciwnym razie wynika z TLE w epoce GP. Pc i Raport zbliżeń używają tych samych wartości. Aby ocenić zbliżenie, otwórz Raport zbliżeń; prawdopodobieństwo kolizji wymaga też kowariancji drugiego obiektu i rozmiarów obu obiektów."
     },
     "meter": "m",
     "kilometer": "km",
@@ -87,8 +117,31 @@
       "tooltip": "Ciało, względem którego mierzone są pozycje efemerydy (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Układ odniesienia",
-      "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)"
+      "label": "Układ",
+      "tooltip": "Układ współrzędnych efemerydy (OEM REF_FRAME)",
+      "teme": "TEME",
+      "temeInfo": "z zestawu elementów GP"
+    },
+    "Regime": {
+      "label": "Reżim",
+      "tooltip": "Pasmo wysokości orbity",
+      "help": "Pasmo wysokości orbity. LEO: niska orbita okołoziemska, poniżej 2000 km. MEO: średnia orbita, do wysokości geostacjonarnej. GEO: około 35 786 km nad równikiem, obiekt stoi nad jednym punktem. HEO: bardzo eliptyczna lub wyższa niż GEO.",
+      "leo": "LEO",
+      "leoInfo": "Niska orbita okołoziemska, poniżej 2000 km wysokości.",
+      "meo": "MEO",
+      "meoInfo": "Średnia orbita okołoziemska, między LEO a wysokością geostacjonarną.",
+      "geo": "GEO",
+      "geoInfo": "Orbita geostacjonarna, około 35 786 km nad równikiem.",
+      "heo": "HEO",
+      "heoInfo": "Silnie eliptyczna lub wyższa niż geostacjonarna."
+    },
+    "LatitudeBand": {
+      "label": "Zasięg szerokości",
+      "tooltip": "Najwyższa szerokość geograficzna, do jakiej dochodzi ślad naziemny, na północ i na południe. Równa się inklinacji, a dla orbity wstecznej 180 stopni minus inklinacja. Poza tym pasem satelita nigdy nie jest w zenicie."
+    },
+    "Sigma": {
+      "defaultTag": "domyślne",
+      "defaultNote": "Domyślne oszacowanie aplikacji dla tego rodzaju orbity. Nie zostało zmierzone i nie pochodziło z danych źródłowych."
     }
   }
 }

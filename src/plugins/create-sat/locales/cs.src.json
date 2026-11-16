@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "NORAD ID satelitu (90000-99999)",
+        "noradIdHint": "ID 90000-99999 jsou vyhrazena pro analytické objekty, aby nekolidovala se skutečnými čísly katalogu.",
         "satelliteName": "Název satelitu",
         "inclinationDeg": "Inklinace (stupně)",
         "apogeeAltKm": "Výška apogea (km)",
@@ -17,6 +18,7 @@
         "country": "Země",
         "epochYear": "Rok epochy",
         "epochDay": "Den epochy",
+        "epochTimestamp": "Časové razítko epochy (UTC, ISO)",
         "inclination": "Inklinace",
         "rightAscension": "Rektascenze",
         "eccentricity": "Excentricita",
@@ -34,13 +36,22 @@
         "sectionOrbit": "Oběžná dráha",
         "sectionEpoch": "Epocha",
         "sectionElements": "Elementy dráhy",
-        "sectionPresets": "Předvolby"
+        "sectionPresets": "Předvolby",
+        "sectionWalker": "Konstelace (Walker delta)",
+        "walkerHint": "Vytvoří T družic v P rovnoměrně rozmístěných rovinách s jednou výškou a sklonem (vzor T/P/F). Členové použijí nejnižší volná analytická ID.",
+        "walkerAltKm": "Výška (km)",
+        "walkerTotal": "Družice (T)",
+        "walkerPlanes": "Roviny (P)",
+        "walkerPhasing": "Fázování (F)",
+        "walkerPrefix": "Předpona názvu",
+        "walkerTpfHelp": "T musí být násobek P. F (fázování) je od 0 do P-1."
       },
       "buttons": {
         "createSatellite": "Vytvořit satelit",
         "saveTle": "Uložit TLE",
         "makeSunSync": "Slunečně synchronní sklon",
-        "cloneSelected": "Klonovat vybraný satelit"
+        "cloneSelected": "Klonovat vybraný satelit",
+        "createWalker": "Vytvořit konstelaci"
       },
       "options": {
         "payload": "Užitečné zatížení",
@@ -63,11 +74,14 @@
         "invalidNoradId": "Neplatné NORAD ID. Musí to být 5místné číslo mezi 90000 a 99999.",
         "invalidType": "Neplatný typ. Musí být 1 (Užitečné zatížení), 2 (Těleso rakety), 3 (Trosky) nebo 4 (Speciální).",
         "invalidCountry": "Neplatná země. Musí být vybrána ze seznamu.",
-        "invalidEpochYear": "Neplatný rok epochy. Musí to být 2místné číslo.",
+        "invalidEpochYear": "Rok epochy musí mít 2 číslice (26) nebo být rokem 1957 až 2056 (2026).",
+        "invalidEpochTimestamp": "Neplatné časové razítko epochy. Použijte ISO datum a čas, např. 2026-11-04T00:00:00Z.",
         "invalidEpochDay": "Neplatný den epochy. Musí být ve formátu NNN.NNNNNNNN (např. 001.00000000).",
         "invalidInclination": "Neplatná inklinace. Musí být ve formátu NNN.NNNN (např. 000.0000).",
         "invalidRasc": "Neplatná rektascenze. Musí být ve formátu NNN.NNNN (např. 000.0000).",
-        "invalidEccentricity": "Neplatná excentricita. Musí to být 7místné číslo (např. 0000000).",
+        "invalidEccentricity": "Excentricita musí být alespoň 0 a menší než 1: zadejte desetinné číslo (0.0012) nebo 7místný tvar TLE (0012000).",
+        "calcInvalidEccentricity": "Vypočtené hodnoty skryty: excentricita musí být alespoň 0 a menší než 1.",
+        "calcSubSurface": "Vypočtené hodnoty skryty: tato dráha prochází pod povrchem Země. Snižte střední pohyb nebo excentricitu.",
         "invalidArgPe": "Neplatný argument perigea. Musí být ve formátu NNN.NNNN (např. 000.0000).",
         "invalidMeanAnomaly": "Neplatná střední anomálie. Musí být ve formátu NNN.NNNN (např. 000.0000).",
         "invalidMeanMotion": "Neplatný střední pohyb. Musí být ve formátu NN.NNNNN (např. 16.00000).",
@@ -88,7 +102,8 @@
         "meanMotionRange": "{field} musí být větší než 0 a nejvýše {max} oběhů za den.",
         "periodPositive": "{field} musí být kladný počet minut.",
         "numberRequired": "{field} musí být číslo.",
-        "noradIdReserved": "NORAD ID {id} používá trajektorie startu. Zvolte jiné ID nebo nejprve trajektorii odeberte."
+        "noradIdReserved": "NORAD ID {id} používá trajektorie startu. Zvolte jiné ID nebo nejprve trajektorii odeberte.",
+        "noradIdNoSlot": "NORAD ID {id} není dostupný analytický slot. Použijte navržené ID nebo toto nejprve uvolněte."
       },
       "successMsgs": {
         "satCreated": "Satelit {name} ({scc}) byl úspěšně vytvořen",
@@ -121,6 +136,20 @@
         "replace": "Nahradit",
         "cancel": "Zrušit",
         "changed": "Družice nebo formulář se změnily. Zkontrolujte je a odešlete znovu."
+      },
+      "walker": {
+        "created": "Vytvořeno {count} družic s názvem {prefix}-P#-S# ({failed} selhalo)",
+        "errors": {
+          "altitude": "Výška musí být 160 až 400000 km.",
+          "inclination": "Sklon musí být 0 až 180 stupňů.",
+          "total": "Družice (T) musí být celé číslo alespoň 1.",
+          "planes": "Roviny (P) musí být celé číslo od 1 do T.",
+          "phasing": "Fázování (F) musí být celé číslo od 0 do {max}.",
+          "divisible": "T musí být dělitelné P.",
+          "tooMany": "Nejvýše {max} družic na konstelaci.",
+          "noSlots": "Nedostatek volných analytických pozic ({free} volných, {needed} potřeba).",
+          "failed": "Konstelaci se nepodařilo vygenerovat."
+        }
       }
     }
   }

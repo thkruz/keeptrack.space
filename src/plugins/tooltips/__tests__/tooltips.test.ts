@@ -2,7 +2,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import * as isThisNodeMod from '@app/engine/utils/isThisNode';
-import { TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
+import { computeSideTooltipPlacement, TooltipsPlugin } from '@app/plugins/tooltips/tooltips';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
 import { vi } from 'vitest';
@@ -64,6 +64,25 @@ describe('TooltipsPlugin behavior', () => {
     expect(document.getElementById('tooltip')!.classList.contains('kt-tooltip-visible')).toBe(false);
   });
 
+  it('ignores the emulated mouseenter on a touch-only device (#217)', () => {
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="Howdy" id="tt-touch"></div>');
+    const el = document.getElementById('tt-touch') as HTMLElement;
+    const original = window.matchMedia;
+
+    window.matchMedia = ((query: string) => ({ matches: query === '(hover: none)', media: query })) as unknown as typeof window.matchMedia;
+    try {
+      plugin.createTooltip(el);
+      el.dispatchEvent(new Event('mouseenter'));
+      vi.advanceTimersByTime(500);
+      expect(document.getElementById('tooltip')!.classList.contains('kt-tooltip-visible')).toBe(false);
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
   it('resolves a string id and warns when the element is missing', () => {
     // Browser branch so getEl returns null instead of throwing; warn would hit console.trace there.
     vi.spyOn(isThisNodeMod, 'isThisNode').mockReturnValue(false);
@@ -82,5 +101,261 @@ describe('TooltipsPlugin behavior', () => {
 
     expect(() => plugin.hideTooltip()).not.toThrow();
     expect(() => plugin.showTooltip(el, 'text')).not.toThrow();
+  });
+
+  it('showTooltip lazily creates the popup div when uiManagerInit never made it (phone boot)', () => {
+    document.getElementById('tooltip')?.remove();
+    const el = document.createElement('div');
+
+    document.body.appendChild(el);
+    plugin.showTooltip(el, 'lazy text');
+
+    const popup = document.getElementById('tooltip');
+
+    expect(popup).not.toBeNull();
+    expect(popup!.innerHTML).toBe('lazy text');
+  });
+
+  it('tap toggles the tooltip on touch for kt-tooltip-tap targets only', () => {
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    document.body.appendChild(div);
+    const tap = document.createElement('span');
+    const plain = document.createElement('span');
+
+    tap.setAttribute('kt-tooltip', 'Explain');
+    tap.setAttribute('kt-tooltip-tap', '');
+    plain.setAttribute('kt-tooltip', 'Other');
+    document.body.append(tap, plain);
+    plugin.createTooltip(tap);
+    plugin.createTooltip(plain);
+    const touch = (el: HTMLElement) => {
+      const down = new Event('pointerdown');
+
+      Object.defineProperty(down, 'pointerType', { value: 'touch' });
+      el.dispatchEvent(down);
+      el.click();
+    };
+
+    touch(tap);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    touch(tap);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+    touch(plain);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
+
+  it('wires a circle added after init on first pointer contact; mouse click toggles and tap elsewhere hides', () => {
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    EventBus.getInstance().emit(EventBusEvent.onKeepTrackReady);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    document.body.insertAdjacentHTML('beforeend', '<span id="late-circle" kt-tooltip="Late text" kt-tooltip-tap></span>');
+    const circle = document.getElementById('late-circle') as HTMLElement;
+
+    circle.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    circle.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
+    circle.dispatchEvent(new MouseEvent('pointerup', { bubbles: true }));
+    circle.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    expect(div.innerHTML).toBe('Late text');
+
+    circle.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+
+    circle.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    document.body.dispatchEvent(new MouseEvent('pointerdown', { bubbles: true }));
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
+
+  it('shows a late-added target on hover without prior wiring', () => {
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    document.body.insertAdjacentHTML('beforeend', '<span id="late-hover" kt-tooltip="Hover text"></span>');
+    const el = document.getElementById('late-hover') as HTMLElement;
+
+    el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+    el.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(200);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+  });
+
+  it('pointerup tap shows the tooltip once and the following click does not toggle it off', () => {
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    document.body.appendChild(div);
+    const tap = document.createElement('span');
+
+    tap.setAttribute('kt-tooltip', 'Explain');
+    tap.setAttribute('kt-tooltip-tap', '');
+    document.body.appendChild(tap);
+    plugin.createTooltip(tap);
+    const fire = (type: string) => {
+      const ev = new Event(type);
+
+      Object.defineProperty(ev, 'pointerType', { value: 'touch' });
+      tap.dispatchEvent(ev);
+    };
+
+    fire('pointerdown');
+    fire('pointerup');
+    tap.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    fire('pointerdown');
+    fire('pointerup');
+    tap.click();
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
+
+  it('a tap elsewhere hides a tap-shown tooltip', () => {
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    document.body.appendChild(div);
+    const tap = document.createElement('span');
+
+    tap.setAttribute('kt-tooltip', 'Explain');
+    tap.setAttribute('kt-tooltip-tap', '');
+    document.body.appendChild(tap);
+    plugin.createTooltip(tap);
+    plugin.addHtml();
+    const up = new Event('pointerup');
+
+    Object.defineProperty(up, 'pointerType', { value: 'touch' });
+    tap.dispatchEvent(up);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(false);
+  });
+  it('keeps a hovered tooltip past the watchdog interval and refreshes its text in place (#277, #274)', () => {
+    // Watchdog intervals leaked from earlier tests would hide the shared popup div
+    vi.clearAllTimers();
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="Geostationary" id="tt-stale"></div>');
+    const el = document.getElementById('tt-stale') as HTMLElement;
+
+    plugin.createTooltip(el);
+    vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ width: 10, height: 10, top: 0, left: 0, right: 10, bottom: 10, x: 0, y: 0, toJSON: () => '' });
+    vi.spyOn(el, 'matches').mockImplementation((sel: string) => sel === ':hover');
+
+    el.dispatchEvent(new Event('mouseenter'));
+    vi.advanceTimersByTime(200);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    vi.advanceTimersByTime(1200);
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+
+    el.setAttribute('kt-tooltip', 'Medium Earth orbit');
+    plugin.refreshTooltip(el);
+    expect(div.innerHTML).toBe('Medium Earth orbit');
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+  });
+  it('refreshes a visible tooltip when its target text changes with no pointer movement (#354)', async () => {
+    vi.clearAllTimers();
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="420.1234 km" id="tt-apogee"></div>');
+    const el = document.getElementById('tt-apogee') as HTMLElement;
+
+    plugin.createTooltip(el);
+    vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({ width: 10, height: 10, top: 0, left: 0, right: 10, bottom: 10, x: 0, y: 0, toJSON: () => '' });
+    vi.spyOn(el, 'matches').mockImplementation((sel: string) => sel === ':hover');
+
+    el.dispatchEvent(new Event('mouseenter'));
+    vi.advanceTimersByTime(200);
+    const div = document.getElementById('tooltip') as HTMLElement;
+
+    expect(div.innerHTML).toBe('420.1234 km');
+
+    // Selection change: the info box rewrites the attribute in place, nobody calls refreshTooltip
+    el.setAttribute('kt-tooltip', '35786.0000 km');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(div.innerHTML).toBe('35786.0000 km');
+    expect(div.classList.contains('kt-tooltip-visible')).toBe(true);
+    // A second change is still observed after the re-render re-armed the watchdog
+    el.setAttribute('kt-tooltip', '1200.0000 km');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(div.innerHTML).toBe('1200.0000 km');
+  });
+  it('shows the text current when the show delay ends, not the text at mouseenter (#354)', () => {
+    vi.clearAllTimers();
+    plugin.addHtml();
+    EventBus.getInstance().emit(EventBusEvent.uiManagerInit);
+    document.body.insertAdjacentHTML('beforeend', '<div kt-tooltip="old" id="tt-delay"></div>');
+    const el = document.getElementById('tt-delay') as HTMLElement;
+
+    plugin.createTooltip(el);
+    el.dispatchEvent(new Event('mouseenter'));
+    el.setAttribute('kt-tooltip', 'new');
+    vi.advanceTimersByTime(200);
+    expect((document.getElementById('tooltip') as HTMLElement).innerHTML).toBe('new');
+  });
+  it('opens Settings tooltips beside the side menu, clear of its right edge (#488)', () => {
+    const menu = document.createElement('div');
+
+    menu.id = 'settings-menu';
+    menu.className = 'side-menu-parent';
+    const row = document.createElement('div');
+
+    row.setAttribute('data-tooltip', 'Disable this to hide the camera widget');
+    menu.appendChild(row);
+    document.body.appendChild(menu);
+    menu.getBoundingClientRect = () => ({ left: 0, right: 320, top: 0, bottom: 700, width: 320, height: 700, x: 0, y: 0, toJSON: () => '' });
+    row.getBoundingClientRect = () => ({ left: 10, right: 300, top: 300, bottom: 340, width: 290, height: 40, x: 10, y: 300, toJSON: () => '' });
+    Object.defineProperty(window, 'innerWidth', { value: 1366, configurable: true });
+    Object.defineProperty(window, 'innerHeight', { value: 768, configurable: true });
+    const div = document.createElement('div');
+
+    div.id = 'tooltip';
+    div.getBoundingClientRect = () => ({ left: 0, right: 200, top: 0, bottom: 60, width: 200, height: 60, x: 0, y: 0, toJSON: () => '' });
+    document.body.appendChild(div);
+
+    plugin.showTooltip(row, 'Disable this to hide the camera widget');
+
+    expect(parseFloat(div.style.left)).toBe(328);
+    menu.remove();
+  });
+});
+
+describe('computeSideTooltipPlacement (#488)', () => {
+  const tip = { width: 200, height: 40 };
+  const target = { top: 300, bottom: 330, height: 30 };
+
+  it('sits beside the menu, centred on the row, on a wide viewport', () => {
+    const r = computeSideTooltipPlacement({ menu: { right: 400 }, target, tip, viewport: { width: 1366, height: 768 }, scrollY: 0 });
+
+    expect(r).toEqual({ left: 408, top: 295 });
+  });
+
+  it('clamps vertically inside the viewport beside the menu', () => {
+    const low = computeSideTooltipPlacement({ menu: { right: 400 }, target: { top: 750, bottom: 780, height: 30 }, tip, viewport: { width: 1366, height: 768 }, scrollY: 0 });
+    const high = computeSideTooltipPlacement({ menu: { right: 400 }, target: { top: 0, bottom: 30, height: 30 }, tip, viewport: { width: 1366, height: 768 }, scrollY: 0 });
+
+    expect(low.top).toBe(768 - 40 - 8);
+    expect(high.top).toBe(8);
+  });
+
+  it('drops below the row on a phone and stays inside the viewport', () => {
+    const r = computeSideTooltipPlacement({ menu: { right: 390 }, target, tip, viewport: { width: 390, height: 844 }, scrollY: 0 });
+
+    expect(r.top).toBe(338);
+    expect(r.left).toBeGreaterThanOrEqual(8);
+    expect(r.left + tip.width).toBeLessThanOrEqual(390 - 8);
+  });
+
+  it('flips above the row when below would cross the bottom edge on a phone', () => {
+    const r = computeSideTooltipPlacement({ menu: { right: 390 }, target: { top: 800, bottom: 830, height: 30 }, tip, viewport: { width: 390, height: 844 }, scrollY: 0 });
+
+    expect(r.top).toBe(800 - 40 - 8);
   });
 });

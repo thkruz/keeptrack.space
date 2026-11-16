@@ -37,12 +37,18 @@ const frame_ = () => {
   EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
 };
 
+/** The pass search runs in an idle callback (requestIdleWrite, at most 100 ms away); wait it out. */
+const flushIdle_ = () => {
+  vi.advanceTimersByTime(150);
+};
+
 describe('SatInfoBoxSensor sim-time correctness', () => {
   beforeEach(() => {
     setupStandardEnvironment([SelectSatManager, SatInfoBox]);
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
     vi.restoreAllMocks();
   });
 
@@ -95,7 +101,7 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       }
       expect(getEl('sat-ra')!.innerHTML).toMatch(/^\d+\.\d{4}°$/u);
 
-      const raKey = getEl('sat-ra')!.parentElement!.querySelector('.sat-info-key')!;
+      const raKey = getEl('sat-ra')!.closest('.sat-info-row')!.querySelector('.sat-info-key')!;
 
       expect(raKey.textContent).toContain('J2000');
       expect(raKey.textContent).toContain('topo');
@@ -136,6 +142,16 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       expect(SatInfoBoxSensor.shouldRecalcNextPass_(base, now({ simNowMs: base.resultMs! + 2 * 3600e3, isInView: true }))).toBe(true);
     });
 
+    it('does not re-search every second when the last answer was already a started pass and the object is not in view', () => {
+      const started = { ...base, calcRealMs: 0, resultMs: base.calcSimMs - 120e3 };
+
+      // 1 s real floor passed, pass "over" by the usual rule, but the answer cannot change: wait 30 s real.
+      expect(SatInfoBoxSensor.shouldRecalcNextPass_(started, now({ realNowMs: 2000, simNowMs: base.calcSimMs + 2000 }))).toBe(false);
+      expect(SatInfoBoxSensor.shouldRecalcNextPass_(started, now({ realNowMs: 31_000, simNowMs: base.calcSimMs + 31_000 }))).toBe(true);
+      // A big sim jump still searches at once.
+      expect(SatInfoBoxSensor.shouldRecalcNextPass_(started, now({ realNowMs: 2000, simNowMs: base.calcSimMs + 86400e3 }))).toBe(true);
+    });
+
     it('throttles repeated searches in real time', () => {
       expect(SatInfoBoxSensor.shouldRecalcNextPass_(base, now({ simNowMs: base.calcSimMs - 86400e3, realNowMs: 500 }))).toBe(false);
     });
@@ -164,6 +180,12 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       // Selected while the sim clock is at the wall clock...
       setSimTime_(new Date(Date.UTC(2026, 9, 17, 4, 0)));
       frame_();
+      // The search is off the frame: nothing computed yet, the row says Loading...
+      expect(nextpassSpy).not.toHaveBeenCalled();
+      expect(getEl('sat-nextpass')!.innerHTML).toBe('Loading…');
+      frame_();
+      expect(nextpassSpy).not.toHaveBeenCalled();
+      flushIdle_();
       expect(nextpassSpy).toHaveBeenCalledTimes(1);
       expect(getEl('sat-nextpass')!.innerHTML).toBe('2026-10-17 05:27:45 UTC');
 
@@ -176,9 +198,28 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
       nowSpy.mockReturnValue(Date.UTC(2026, 9, 17, 4, 0, 5));
       setSimTime_(new Date(Date.UTC(2026, 9, 15, 6, 39)));
       frame_();
+      // Old value stays until the new search finishes
+      expect(getEl('sat-nextpass')!.innerHTML).toBe('2026-10-17 05:27:45 UTC');
+      flushIdle_();
 
       expect(nextpassSpy).toHaveBeenCalledTimes(2);
       expect(getEl('sat-nextpass')!.innerHTML).toBe('2026-10-15 07:10:00 UTC');
+    });
+
+    it('drops a queued Next Pass search when the sensor is deselected before it runs', () => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(false);
+      const nextpassSpy = vi.spyOn(SensorMath, 'nextpass').mockReturnValue('2026-10-17 05:27:45');
+
+      setupSensorAndSat_();
+      setSimTime_(new Date(Date.UTC(2026, 9, 17, 4, 0)));
+      frame_();
+      ServiceLocator.getSensorManager().currentSensors = [];
+      flushIdle_();
+
+      expect(nextpassSpy).not.toHaveBeenCalled();
     });
   });
 
@@ -218,7 +259,51 @@ describe('SatInfoBoxSensor sim-time correctness', () => {
 
       expect(visMagSpy).toHaveBeenCalled();
       expect(visMagSpy.mock.calls[0][4]).toBe(2.5);
+      expect(getEl('sat-vmag')!.innerHTML).toMatch(/^9.87 /u);
+    });
+  });
+
+  describe('Vis Mag lighting and assumed intrinsic magnitude', () => {
+    const run_ = (vmag: number | null, lighting: { sunlit: boolean | null }) => {
+      const plugin = new SatInfoBoxSensor();
+
+      websiteInit(plugin);
+      vi.spyOn(DetailedSensor.prototype, 'isRaeInFov').mockReturnValue(true);
+      vi.spyOn(SensorMath, 'nextpass').mockReturnValue('No Passes in 2 Days');
+      vi.spyOn(stdMagEstimator, 'estimateStdMag').mockReturnValue(null);
+      vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ ...lighting, siteDark: true, sunElDeg: -30 });
+      const visMagSpy = vi.spyOn(SatMath, 'calculateVisMag').mockReturnValue(9.87);
+      const prevVmag = defaultSat.vmag;
+
+      defaultSat.vmag = vmag as never;
+      try {
+        setupSensorAndSat_();
+        setSimTime_(SIM_TIME);
+        frame_();
+      } finally {
+        defaultSat.vmag = prevVmag;
+      }
+
+      return visMagSpy;
+    };
+
+    it('eclipsed satellite: shows "Not sunlit" and no number', () => {
+      const visMagSpy = run_(4.2, { sunlit: false });
+
+      expect(getEl('sat-vmag')!.innerHTML).toBe('Not sunlit');
+      expect(visMagSpy).not.toHaveBeenCalled();
+    });
+
+    it('sunlit satellite with a catalog vmag: plain number, no assumed tag', () => {
+      run_(4.2, { sunlit: true });
+
       expect(getEl('sat-vmag')!.innerHTML).toBe('9.87');
+    });
+
+    it('sunlit satellite on the default intrinsic magnitude: number marked assumed', () => {
+      run_(null, { sunlit: true });
+
+      expect(getEl('sat-vmag')!.innerHTML).toBe('9.87 (assumed)');
     });
   });
 });

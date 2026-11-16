@@ -3,6 +3,8 @@
     "orbitPreview": "Попередній перегляд орбіти",
     "unknown": "Невідомо",
     "close": "Закрити",
+    "dock": "Закріпити",
+    "menuHelp": "Help for this menu",
     "download": "Завантажити",
     "downloadNamed": "Завантажити {name}",
     "loading": "Завантаження…"
@@ -275,6 +277,13 @@
     "groupDevTools": "Інструменти розробки",
     "groupAbout": "Про програму",
     "modeAll": "Усі плагіни",
+    "reasonSelectSensor": "Спочатку виберіть датчик",
+    "reasonSelectSatellite": "Спочатку виберіть супутник",
+    "reasonSelectTleSatellite": "Виберіть супутник з орбітою (TLE), щоб користуватися цим",
+    "reasonSelectSatelliteOrLaunchSite": "Виберіть супутник або стартовий майданчик, щоб користуватися цим",
+    "reasonEnablePlanets": "Увімкніть планети в Налаштуваннях, щоб користуватися цим",
+    "reasonAddToWatchlist": "Спершу додайте супутники до списку спостереження",
+    "reasonFreeAccount": "Відкривається безкоштовним обліковим записом",
     "openPluginMenu": "Відкрити меню плагінів",
     "openAppLauncher": "Відкрити панель запуску застосунків",
     "appLauncherTooltip": "Панель запуску застосунків (Shift+Z)",
@@ -286,6 +295,10 @@
     "expand": "Розгорнути",
     "phoneLink": "Зв'язок із телефоном",
     "phoneLinkSignIn": "Увійдіть, щоб під'єднати телефон",
+    "signInPromptTitle": "Увійдіть, щоб скористатися: {{feature}}",
+    "signInPromptBody": "Функція «{{feature}}» доступна з безкоштовним обліковим записом. Увійдіть, щоб нею користуватися.",
+    "signInPromptAction": "Увійти",
+    "signInPromptCancel": "Не зараз",
     "connected": "Під'єднано",
     "offline": "Офлайн",
     "footerLinks": {
@@ -301,7 +314,9 @@
     "resetCamera": "Скинути камеру",
     "clearLines": "Очистити лінії",
     "clearScreen": "Очистити екран",
-    "startClock": "Запустити годинник"
+    "startClock": "Запустити годинник",
+    "groupObject": "Супутник",
+    "groupMore": "Більше"
   },
   "urlManager": {
     "satNotFound": "Супутник \"{val}\" не знайдено!",
@@ -328,7 +343,12 @@
     "resultCount": "Результатів: {count}",
     "resultCountLimited": "Показано {shown} з {total} результатів",
     "noResults": "Нічого не знайдено",
+    "noResultsSensors": "Нічого не знайдено. У цьому режимі пошук датчиків недоступний.",
+    "noResultsSensorsHidden": "Нічого не знайдено. Наземні датчики приховані в меню «Фільтр» або в налаштуваннях пошуку.",
     "decayed": "Зійшов з орбіти",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} входить до складу {host}",
+    "dockedTo": "приєднаний до {host}",
     "typeStar": "Зоря",
     "typeSensor": "Датчик",
     "typeLaunchSite": "Стартовий майданчик",
@@ -367,6 +387,10 @@
   "layersManager": {
     "toggleLayers": "Перемкнути шари",
     "layers": "Шари"
+  },
+  "mobileZoom": {
+    "zoomIn": "Наблизити",
+    "zoomOut": "Віддалити"
   },
   "modalConfirm": {
     "confirmAction": "Підтвердьте дію",
@@ -407,5 +431,10 @@
       "breakup": "Уламки руйнування",
       "created": "Створені супутники"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

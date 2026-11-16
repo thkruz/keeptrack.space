@@ -61,6 +61,27 @@ import { PoliticalMap } from './political-map';
 import { OcclusionProgram } from './post-processing';
 import { RELIEF_NORMAL_GLSL } from './relief-shading';
 
+/**
+ * The single rule for cloud fade: only the camera zoom (0 = close, 1 = far) matters, never
+ * whether a satellite is selected or which camera mode is active. Non-Earth center bodies show clouds fully.
+ */
+export const getCloudFadeZoom = (isEarthCenterBody: boolean, zoomLevel: number): number => (isEarthCenterBody ? zoomLevel : 1.0);
+
+/**
+ * Texture file base (no quality suffix) of the night map to pair with a day style, or null when
+ * none ships. Only `earthmap-night*` exists in public/textures, so the alternate map reuses it
+ * (same geography) and the flat map has no night side at all.
+ */
+export const getEarthNightTextureBase = (style: string): string | null => {
+  switch (style) {
+    case EarthTextureStyle.BLUE_MARBLE:
+    case EarthTextureStyle.NADIR:
+      return `${EarthTextureStyle.BLUE_MARBLE}-night`;
+    default:
+      return null;
+  }
+};
+
 export class Earth {
   private gl_: WebGL2RenderingContext;
   private glowDirection_ = 1;
@@ -821,10 +842,8 @@ export class Earth {
     const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (ServiceLocator.getMainCamera().zoomLevel() / 2) ** (1 / 2) : 1.0);
-    const camType = ServiceLocator.getMainCamera().cameraType;
-    const isSatMode = camType === CameraType.FIXED_TO_SAT_LVLH || camType === CameraType.FIXED_TO_SAT_ECI;
 
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uRawZoomLevel, !isEarthCenterBody || isSatMode ? 1.0 : ServiceLocator.getMainCamera().zoomLevel());
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uRawZoomLevel, getCloudFadeZoom(isEarthCenterBody, ServiceLocator.getMainCamera().zoomLevel()));
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
@@ -927,8 +946,11 @@ export class Earth {
 
     const nightKey = sm.earthTextureStyle + sm.earthNightTextureQuality;
 
-    if (!this.textureNight[nightKey]) {
-      this.loadChannel_('night', this.textureNight, nightKey, `${this.getSrc_(`${sm.earthTextureStyle}-night`, sm.earthNightTextureQuality)}`);
+    const nightBase = getEarthNightTextureBase(sm.earthTextureStyle);
+
+    // Styles without a night map (flat) never request one: the 404 raised a toast on every switch.
+    if (nightBase && !this.textureNight[nightKey]) {
+      this.loadChannel_('night', this.textureNight, nightKey, `${this.getSrc_(nightBase, sm.earthNightTextureQuality)}`);
     }
     if (!this.textureBump[sm.earthBumpTextureQuality] && sm.earthBumpTextureQuality && sm.earthBumpTextureQuality !== EarthBumpTextureQuality.OFF) {
       this.loadChannel_('bump', this.textureBump, sm.earthBumpTextureQuality, `${this.getSrc_(this.BUMP_SRC_BASE, sm.earthBumpTextureQuality)}`);
@@ -1222,7 +1244,7 @@ export class Earth {
 
       //................................................
       // Specular lighting
-      vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.05;
+      vec3 specLightColor = texture(uSpecMap, vUv).rgb * diffuse * 0.03;
 
       //................................................
       // Final color
@@ -1278,11 +1300,17 @@ export class Earth {
       // holds a normalized 0..1 dwell value; map it to a ramp and blend on top.
       // Inert (zero cost visually) when uCoverageEnabled is off or dwell is 0.
       if (uCoverageEnabled > 0.5) {
-        float dwell = texture(uCoverageMap, vUv).r;
+        vec2 covSample = texture(uCoverageMap, vUv).rg;
+        float dwell = covSample.r;
         if (dwell > 0.0039) { // ~1/255: ignore empty cells
           vec3 covColor = coverageRamp(dwell);
           float covAlpha = uCoverageOpacity * (0.45 + 0.55 * clamp(dwell, 0.0, 1.0));
           fragColor.rgb = mix(fragColor.rgb, covColor, covAlpha);
+        } else if (covSample.g > 0.0039) {
+          // Optional second category (green channel): cells the feeding plugin excluded
+          // by a condition (e.g. Sun elevation). Magenta is distinct from the blue-cyan-
+          // yellow-red ramp and readable on day and night sides. R8 textures read g = 0.
+          fragColor.rgb = mix(fragColor.rgb, vec3(0.85, 0.35, 0.85), uCoverageOpacity * 0.75);
         }
       }
 

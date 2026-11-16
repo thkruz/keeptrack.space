@@ -104,6 +104,23 @@ describe('OrbitManager', () => {
       expect((om.orbitThreadMgr.sendInit as ReturnType<typeof vi.fn>).mock.calls.length).toBe(before);
     });
 
+    it('registers the Shift+L orbit shortcut and re-enables orbits when started with orbits disabled (#384)', () => {
+      vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined as never);
+      settingsManager.isDrawOrbits = false;
+      settingsManager.isDrawTrailingOrbits = false;
+
+      om.init(lineMgr as never, gl);
+      om.init(lineMgr as never, gl); // repeat boot call must not double-register
+
+      expect(o().isInitialized_).toBe(false);
+      expect(o().isShortcutsRegistered_).toBe(true);
+
+      o().toggleOrbitLines_(); // what the shortcut callback runs
+
+      expect(settingsManager.isDrawOrbits).toBe(true);
+      expect(o().isInitialized_).toBe(true);
+    });
+
     it('skips initialization when orbits are disabled', () => {
       settingsManager.isDrawOrbits = false;
 

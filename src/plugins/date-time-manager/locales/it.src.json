@@ -51,6 +51,11 @@
         "goToInvalid": "Data non valida. Usa il formato UTC YYYY-MM-DD HH:MM:SS.",
         "containerNotFound": "Contenitore con ID {id} non trovato",
         "timeInvalid": "Formato orario non valido! Previsto HH:MM:SS, HH:MM:SS.s o HHMMSS"
+      },
+      "clock": {
+        "live": "LIVE",
+        "paused": "IN PAUSA",
+        "simulated": "SIMULATO"
       }
     }
   }

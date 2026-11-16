@@ -3,6 +3,8 @@
     "orbitPreview": "Podgląd orbity",
     "unknown": "Nieznany",
     "close": "Zamknij",
+    "dock": "Zadokuj",
+    "menuHelp": "Help for this menu",
     "download": "Pobierz",
     "downloadNamed": "Pobierz {name}",
     "loading": "Wczytywanie…"
@@ -270,6 +272,13 @@
     "groupDevTools": "Narzędzia programistyczne",
     "groupAbout": "O programie",
     "modeAll": "Wszystkie wtyczki",
+    "reasonSelectSensor": "Najpierw wybierz sensor",
+    "reasonSelectSatellite": "Najpierw wybierz satelitę",
+    "reasonSelectTleSatellite": "Aby tego użyć, wybierz satelitę z orbitą (TLE)",
+    "reasonSelectSatelliteOrLaunchSite": "Aby tego użyć, wybierz satelitę lub miejsce startu",
+    "reasonEnablePlanets": "Aby tego użyć, włącz planety w Ustawieniach",
+    "reasonAddToWatchlist": "Najpierw dodaj satelity do listy obserwowanych",
+    "reasonFreeAccount": "Odblokowuje bezpłatne konto",
     "openPluginMenu": "Otwórz menu wtyczek",
     "openAppLauncher": "Otwórz program uruchamiający aplikacje",
     "appLauncherTooltip": "Program uruchamiający aplikacje (Shift+Z)",
@@ -281,6 +290,10 @@
     "expand": "Rozwiń",
     "phoneLink": "Połączenie z telefonem",
     "phoneLinkSignIn": "Zaloguj się, aby połączyć telefon",
+    "signInPromptTitle": "Zaloguj się, aby użyć: {{feature}}",
+    "signInPromptBody": "Funkcja {{feature}} jest dostępna z darmowym kontem. Zaloguj się, aby z niej skorzystać.",
+    "signInPromptAction": "Zaloguj się",
+    "signInPromptCancel": "Nie teraz",
     "connected": "Połączono",
     "offline": "Offline",
     "footerLinks": {
@@ -296,7 +309,9 @@
     "resetCamera": "Zresetuj kamerę",
     "clearLines": "Wyczyść linie",
     "clearScreen": "Wyczyść ekran",
-    "startClock": "Uruchom zegar"
+    "startClock": "Uruchom zegar",
+    "groupObject": "Satelita",
+    "groupMore": "Więcej"
   },
   "urlManager": {
     "satNotFound": "Satelita \"{val}\" nie został znaleziony!",
@@ -323,7 +338,12 @@
     "resultCount": "Wyniki: {count}",
     "resultCountLimited": "Wyświetlono {shown} z {total} wyników",
     "noResults": "Nie znaleziono wyników",
+    "noResultsSensors": "Brak wyników. W tym widoku nie można wyszukiwać sensorów.",
+    "noResultsSensorsHidden": "Brak wyników. Czujniki naziemne są ukryte w menu Filtr lub w Ustawieniach wyszukiwania.",
     "decayed": "Spłonął",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} jest częścią {host}",
+    "dockedTo": "zadokowany do {host}",
     "typeStar": "Gwiazda",
     "typeSensor": "Czujnik",
     "typeLaunchSite": "Miejsce startu",
@@ -362,6 +382,10 @@
   "layersManager": {
     "toggleLayers": "Przełącz warstwy",
     "layers": "Warstwy"
+  },
+  "mobileZoom": {
+    "zoomIn": "Powiększ",
+    "zoomOut": "Pomniejsz"
   },
   "modalConfirm": {
     "confirmAction": "Potwierdź działanie",
@@ -402,5 +426,10 @@
       "breakup": "Szczątki z rozpadu",
       "created": "Utworzone satelity"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

@@ -101,6 +101,35 @@ describe('TransponderChannelData_class', () => {
     });
   });
 
+  describe('getDisabledReason', () => {
+    const withSelection = async (sat: unknown, selectedSat: number) => {
+      const { PluginRegistry } = await import('@app/engine/core/plugin-registry');
+
+      vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({ selectedSat, primarySatObj: sat } as never);
+    };
+
+    it('explains a missing selection', async () => {
+      await withSelection(null, -1);
+      expect(new TransponderChannelData().getDisabledReason()).toBeTruthy();
+    });
+
+    it('explains a satellite without channel data (e.g. ISS)', async () => {
+      await withSelection({ id: 5, isSatellite: () => true, sccNum: '25544' }, 5);
+      const reason = new TransponderChannelData().getDisabledReason();
+
+      expect(reason).toBeTruthy();
+      expect(reason).not.toBe('pluginDrawer.reasonSelectSatellite');
+    });
+
+    it('has no reason when the satellite has channel data', async () => {
+      const plugin = new TransponderChannelData();
+      const scc = (plugin as unknown as { satsWithChannels_: string[] }).satsWithChannels_[0];
+
+      await withSelection({ id: 5, isSatellite: () => true, sccNum: scc }, 5);
+      expect(plugin.getDisabledReason()).toBeNull();
+    });
+  });
+
   describe('onBottomIconClick', () => {
     it('should not fetch when menu is inactive', () => {
       const plugin = new TransponderChannelData();

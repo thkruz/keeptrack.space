@@ -1,5 +1,7 @@
 import { isCustomSensor } from '@app/app/sensors/custom-sensor-identity';
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { EventBus } from '@app/engine/events/event-bus';
+import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { PersistenceManager } from '@app/engine/persistence/persistence-manager';
 import { StorageKey } from '@app/engine/persistence/storage-key';
 import { getEl } from '@app/engine/utils/get-el';
@@ -76,6 +78,7 @@ describe('CustomSensorPlugin persistence and camera', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
   });
 
   it('keeps the camera zoom when a custom sensor is added', () => {
@@ -137,14 +140,68 @@ describe('CustomSensorPlugin persistence and camera', () => {
     expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
   });
 
+  it('keeps the synced store when the CURRENT_SENSOR listener resets the sensor mid-restore (issue 158)', () => {
+    setForm();
+    C.processCustomSensorSubmit_();
+    const savedJson = store.get(StorageKey.CUSTOM_SENSORS);
+
+    // Login sync: the page is past boot (flag true), then the sync hold is raised before the listeners run
+    CustomSensorPlugin.holdSavesForRemoteRestore([StorageKey.CURRENT_SENSOR, StorageKey.CUSTOM_SENSORS]);
+    ServiceLocator.getSensorManager().currentSensors = [];
+    CustomSensorPlugin.saveCustomSensors();
+
+    expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
+
+    CustomSensorPlugin.restoreCustomSensors();
+    expect(ServiceLocator.getSensorManager().currentSensors[0]?.name).toBeTruthy();
+  });
+
+  it('rebuilds custom sensors when an account sync delivers them (new device)', () => {
+    setForm();
+    C.processCustomSensorSubmit_();
+    const sensorManager = ServiceLocator.getSensorManager();
+    const addedObjName = sensorManager.currentSensors[0].objName;
+
+    // A fresh device: nothing in memory, but sync wrote the store into persistence
+    sensorManager.currentSensors = [];
+    sensorManager.secondarySensors = [];
+    vi.useFakeTimers();
+    EventBus.getInstance().emit(EventBusEvent.remoteSettingsApplied, [StorageKey.CUSTOM_SENSORS]);
+    vi.runAllTimers();
+    vi.useRealTimers();
+
+    expect(sensorManager.currentSensors[0]?.objName).toBe(addedObjName);
+  });
+
   it('removes the saved sensors when the list is cleared', () => {
     setForm();
     C.processCustomSensorSubmit_();
     expect(store.has(StorageKey.CUSTOM_SENSORS)).toBe(true);
 
+    vi.stubGlobal('confirm', () => true);
     (getEl('cs-clear') as HTMLButtonElement).click();
 
     expect(store.has(StorageKey.CUSTOM_SENSORS)).toBe(false);
+  });
+
+  it('still refreshes the list and saves when adding a restored sensor throws', () => {
+    setForm();
+    C.processCustomSensorSubmit_();
+    const sensorManager = ServiceLocator.getSensorManager();
+    const savedJson = store.get(StorageKey.CUSTOM_SENSORS);
+
+    sensorManager.currentSensors = [];
+    sensorManager.secondarySensors = [];
+    vi.spyOn(sensorManager, 'addSecondarySensor').mockImplementation((sensor) => {
+      // The sensor is registered before the camera/cruncher step throws
+      sensorManager.currentSensors = [sensor];
+      throw new Error('camera not ready');
+    });
+    const listSpy = vi.spyOn(CustomSensorPlugin, 'updateCustomSensorListDom');
+
+    expect(() => CustomSensorPlugin.restoreCustomSensors()).not.toThrow();
+    expect(listSpy).toHaveBeenCalled();
+    expect(store.get(StorageKey.CUSTOM_SENSORS)).toBe(savedJson);
   });
 
   it('skips restoring when the last-sensor restore is disabled', () => {

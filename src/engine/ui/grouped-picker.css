@@ -1,0 +1,185 @@
+/* Styling for the GroupedPicker primitive (engine/ui/grouped-picker.ts). */
+
+.kt-picker-trigger {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 28px 8px 10px;
+  text-align: left;
+  font-size: 14px;
+  color: var(--kt-text-primary, #f5f5f5);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  border-radius: 4px;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  position: relative;
+}
+
+.kt-picker-trigger--count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kt-picker-trigger-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kt-picker-trigger-count {
+  flex: 0 0 auto;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.kt-picker-trigger::after {
+  content: '\25BE';
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.7;
+}
+
+.kt-picker-trigger:hover {
+  border-color: var(--color-primary, #1e88e5);
+}
+
+.kt-picker-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, 100vw);
+  background: var(--color-dark-background, #121212);
+  color: var(--kt-text-primary, #f5f5f5);
+  border-left: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.5);
+}
+
+.kt-picker-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.kt-picker-close {
+  min-width: 32px;
+  min-height: 32px;
+  font-size: 22px;
+  line-height: 1;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.kt-picker-search {
+  margin: 0 14px 8px;
+  padding: 8px 10px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-dark-border, rgba(255, 255, 255, 0.25));
+  border-radius: 4px;
+}
+
+.kt-picker-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 14px 14px;
+}
+
+.kt-picker-group > summary {
+  padding: 8px 0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-dark-text-muted, rgba(255, 255, 255, 0.7));
+}
+
+.kt-picker-item {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 8px 10px;
+  text-align: left;
+  font-size: 13px;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.kt-picker-item:not(.kt-picker-item-selected):hover,
+.kt-picker-item:not(.kt-picker-item-selected):focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* #329: a selected row must keep its selected colour under hover, focus and press. Higher specificity than any
+ * generic button:hover / :active / .waves rule, and the :not() above keeps the grey hover off selected rows. */
+.kt-picker-item.kt-picker-item-selected,
+.kt-picker-item.kt-picker-item-selected:hover,
+.kt-picker-item.kt-picker-item-selected:active,
+.kt-picker-item.kt-picker-item-selected:focus,
+.kt-picker-item.kt-picker-item-selected:focus-visible,
+.kt-picker-item[aria-pressed='true'],
+.kt-picker-item[aria-pressed='true']:hover,
+.kt-picker-item[aria-pressed='true']:active,
+.kt-picker-item[aria-pressed='true']:focus,
+.kt-picker-item[aria-current='true']:hover,
+.kt-picker-item[aria-current='true']:active {
+  background: var(--color-primary, #1e88e5);
+  background-color: var(--color-primary, #1e88e5);
+}
+
+.kt-picker-item:focus-visible,
+.kt-picker-group > summary:focus-visible,
+.kt-picker-search:focus-visible,
+.kt-picker-trigger:focus-visible,
+.kt-picker-close:focus-visible {
+  outline: 2px solid var(--color-primary, #1e88e5);
+  outline-offset: 1px;
+}
+
+@media (max-width: 600px) {
+  .kt-picker-drawer {
+    width: 100vw;
+  }
+
+  .kt-picker-item,
+  .kt-picker-group > summary {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+
+  .kt-picker-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .kt-picker-search {
+    font-size: 16px;
+  }
+}
+
+.kt-picker-empty {
+  padding: 16px 0;
+  font-style: italic;
+  color: var(--color-dark-text-muted, rgba(255, 255, 255, 0.5));
+}

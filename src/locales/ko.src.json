@@ -3,6 +3,8 @@
     "orbitPreview": "궤도 미리보기",
     "unknown": "알 수 없음",
     "close": "닫기",
+    "dock": "고정",
+    "menuHelp": "Help for this menu",
     "download": "다운로드",
     "downloadNamed": "{name} 다운로드",
     "loading": "불러오는 중…"
@@ -270,6 +272,13 @@
     "groupDevTools": "개발 도구",
     "groupAbout": "정보",
     "modeAll": "모든 플러그인",
+    "reasonSelectSensor": "먼저 센서를 선택하세요",
+    "reasonSelectSatellite": "먼저 위성을 선택하세요",
+    "reasonSelectTleSatellite": "궤도(TLE)가 있는 위성을 선택하세요",
+    "reasonSelectSatelliteOrLaunchSite": "위성 또는 발사장을 선택하세요",
+    "reasonEnablePlanets": "설정에서 행성을 켜세요",
+    "reasonAddToWatchlist": "먼저 관심 목록에 위성을 추가하세요",
+    "reasonFreeAccount": "무료 계정으로 잠금 해제",
     "openPluginMenu": "플러그인 메뉴 열기",
     "openAppLauncher": "앱 런처 열기",
     "appLauncherTooltip": "앱 런처 (Shift+Z)",
@@ -281,6 +290,10 @@
     "expand": "펼치기",
     "phoneLink": "휴대폰 연결",
     "phoneLinkSignIn": "휴대폰을 연결하려면 로그인하세요",
+    "signInPromptTitle": "{{feature}}을(를) 사용하려면 로그인하세요",
+    "signInPromptBody": "{{feature}}은(는) 무료 계정으로 사용할 수 있습니다. 로그인하여 사용하세요.",
+    "signInPromptAction": "로그인",
+    "signInPromptCancel": "나중에",
     "connected": "연결됨",
     "offline": "오프라인",
     "footerLinks": {
@@ -296,7 +309,9 @@
     "resetCamera": "카메라 초기화",
     "clearLines": "선 지우기",
     "clearScreen": "화면 지우기",
-    "startClock": "시계 시작"
+    "startClock": "시계 시작",
+    "groupObject": "위성",
+    "groupMore": "더 보기"
   },
   "urlManager": {
     "satNotFound": "위성 \"{val}\"을(를) 찾을 수 없습니다!",
@@ -323,7 +338,12 @@
     "resultCount": "결과 {count}개",
     "resultCountLimited": "{total}개 중 {shown}개 표시",
     "noResults": "검색 결과가 없습니다",
+    "noResultsSensors": "결과가 없습니다. 이 화면에서는 센서를 검색할 수 없습니다.",
+    "noResultsSensorsHidden": "결과를 찾을 수 없습니다. 지상 센서가 필터 메뉴 또는 검색 설정에서 숨겨져 있습니다.",
     "decayed": "소멸됨",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module}은(는) {host}의 일부입니다",
+    "dockedTo": "{host}에 도킹됨",
     "typeStar": "항성",
     "typeSensor": "센서",
     "typeLaunchSite": "발사장",
@@ -362,6 +382,10 @@
   "layersManager": {
     "toggleLayers": "레이어 전환",
     "layers": "레이어"
+  },
+  "mobileZoom": {
+    "zoomIn": "확대",
+    "zoomOut": "축소"
   },
   "modalConfirm": {
     "confirmAction": "작업 확인",
@@ -402,5 +426,10 @@
       "breakup": "분열 파편",
       "created": "생성한 위성"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

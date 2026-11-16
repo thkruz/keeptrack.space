@@ -5,6 +5,7 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { ICommandPaletteCommand, IContextMenuConfig, RmbMenuContext } from '@app/engine/plugins/core/plugin-capabilities';
 import { AtmosphereSettings, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { html } from '@app/engine/utils/development/formatter';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
@@ -38,7 +39,13 @@ interface EarthPresetDef {
 const LOOK_FLAGS_ = ['isDrawCloudsMap', 'isDrawBumpMap', 'isDrawSpecMap', 'isEarthGrayScale', 'isDrawPoliticalMap', 'isDrawAtmosphere', 'isEarthAmbientLighting'] as const;
 
 function applyLook_(look: EarthPresetLook): void {
-  ServiceLocator.getScene().earth.changeEarthTextureStyle(look.texture);
+  // A texture that fails to start loading must not abort the rest of the switch (flags, night, saved id).
+  try {
+    ServiceLocator.getScene().earth.changeEarthTextureStyle(look.texture);
+  } catch (e) {
+    errorManagerInstance.log('EarthPresets: texture change failed, applying the rest of the look', e);
+    settingsManager.earthTextureStyle = look.texture;
+  }
   for (const flag of LOOK_FLAGS_) {
     (settingsManager as unknown as Record<string, unknown>)[flag] = look[flag];
   }
@@ -213,6 +220,7 @@ export class EarthPresetsPlugin extends KeepTrackPlugin {
 
     return {
       level1ElementName: 'earth-rmb',
+      group: 'more',
       level1Html: html`<li class="rmb-menu-item" id="earth-rmb"><a href="#">${EarthPresetsPlugin.t_('rmbMenu.title')} &#x27A4;</a></li>`,
       level2ElementName: 'earth-rmb-menu',
       level2Html: html`<ul class='dropdown-contents'>${items}</ul>`,

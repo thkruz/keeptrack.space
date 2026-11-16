@@ -51,6 +51,11 @@
         "goToInvalid": "잘못된 날짜입니다. UTC 형식 YYYY-MM-DD HH:MM:SS을 사용하세요.",
         "containerNotFound": "ID가 {id}인 컨테이너를 찾을 수 없습니다",
         "timeInvalid": "잘못된 시간 형식입니다. HH:MM:SS, HH:MM:SS.s 또는 HHMMSS 형식이어야 합니다"
+      },
+      "clock": {
+        "live": "실시간",
+        "paused": "일시정지",
+        "simulated": "시뮬레이션"
       }
     }
   }

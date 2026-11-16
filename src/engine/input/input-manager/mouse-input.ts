@@ -13,11 +13,13 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { TimeMachine } from '@app/plugins/time-machine/time-machine';
 import { eci2lla, Kilometers } from '@ootk/src/main';
 import { userActionGate } from '../../core/user-action-gate';
+import { isContextMenuGroupMember } from '../../plugins/components/context-menu/context-menu-groups';
 import { closeColorbox } from '../../utils/colorbox';
 import { errorManagerInstance } from '../../utils/errorManager';
 import { getEl } from '../../utils/get-el';
 import { InputManager, LatLon } from '../input-manager';
 import { KeyboardInput } from './keyboard-input';
+import { isNativeKeyboardTarget } from './keyboard-native-target';
 
 export class MouseInput {
   private dragHasMoved = false;
@@ -59,7 +61,15 @@ export class MouseInput {
     }
 
     this.mouseMoveTimeout = -1;
+    canvasDOM.addEventListener('mouseleave', () => {
+      ServiceLocator.getInputManager().isPointerOverCanvas = false;
+      ServiceLocator.getHoverManager()?.clearHover();
+    });
+    canvasDOM.addEventListener('mouseenter', () => {
+      ServiceLocator.getInputManager().isPointerOverCanvas = true;
+    });
     canvasDOM.addEventListener('mousemove', (e) => {
+      ServiceLocator.getInputManager().isPointerOverCanvas = true;
       this.canvasMouseMove_(e);
       settingsManager.lastInteractionTime = Date.now();
       ServiceLocator.getInputManager().markPickActivity();
@@ -87,22 +97,37 @@ export class MouseInput {
       // Escape dismisses the right-click menu
       window.addEventListener('keydown', (e: KeyboardEvent) => this.dismissRmbMenuOnEscape_(e));
 
+      // One Escape rule: the first press closes whatever is open (search, right-click menu,
+      // drawer, dialog); the next press, from the bare scene, deselects the object.
+      // Capture phase so the state is read before the other Escape handlers close things.
+      window.addEventListener('keydown', (e: KeyboardEvent) => this.deselectOnEscape_(e), true);
+
       // Create Event Listeners for Right Menu Buttons.
       // Single-action items (no submenu) are clicked directly on their L1 element.
-      ServiceLocator.getInputManager()
-        .rmbMenuItems.map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
-        .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM])
-        .forEach((el) => {
-          el?.addEventListener('click', (e: MouseEvent) => {
-            // If the element is hiddeen ignore the click
-            if (el.style.display === 'none') {
-              return;
-            }
-            this.rmbMenuActions_(e);
-          });
-        });
+      // A group's own submenu gets no listener: its members already have one, and a click
+      // bubbling to the group as well would fire the action twice.
+      const rmbClickTargets = ServiceLocator.getInputManager()
+        .rmbMenuItems.filter((item) => !item.isGroup)
+        .map(({ elementIdL1, elementIdL2 }) => (elementIdL2 ? getEl(elementIdL2, true) : getEl(elementIdL1, true)))
+        .concat([toggleTimeDOM, resetCameraDOM, clearScreenDOM, clearLinesDOM]);
 
-      ServiceLocator.getInputManager().rmbMenuItems.forEach(({ elementIdL1, elementIdL2 }) => {
+      // A built-in moved into a group is also a registered item; listen once per element.
+      Array.from(new Set(rmbClickTargets)).forEach((el) => {
+        el?.addEventListener('click', (e: MouseEvent) => {
+          // If the element is hiddeen ignore the click
+          if (el.style.display === 'none') {
+            return;
+          }
+          this.rmbMenuActions_(e);
+        });
+      });
+
+      ServiceLocator.getInputManager().rmbMenuItems.forEach((item) => {
+        // Group members sit inside their group's submenu, which opens from the group's entry.
+        if (isContextMenuGroupMember(item)) {
+          return;
+        }
+        const { elementIdL1, elementIdL2 } = item;
         const el1 = getEl(elementIdL1, true);
         const el2 = elementIdL2 ? getEl(elementIdL2, true) : null;
 
@@ -218,12 +243,72 @@ export class MouseInput {
 
   /** Canvas-relative cursor coordinates (y from top) for a mouse event. */
   static getCanvasCoords(evt: MouseEvent): { x: number; y: number } {
-    const container = KeepTrack.getInstance().containerRoot;
-    const offsetX = container.scrollLeft - window.scrollX + container.offsetLeft;
-    const offsetY = container.scrollTop - window.scrollY + container.offsetTop;
+    const offset = MouseInput.getContainerOffset_();
 
-    return { x: evt.clientX - offsetX, y: evt.clientY - offsetY };
+    return { x: evt.clientX - offset.x, y: evt.clientY - offset.y };
   }
+
+  private static containerOffset_: { x: number; y: number } | null = null;
+  private static containerOffsetRoot_: HTMLElement | null = null;
+  private static containerOffsetResizeObserver_: ResizeObserver | null = null;
+  private static isContainerOffsetListening_ = false;
+
+  /** Drops the cached container offset; the next mouse event measures it again. */
+  static invalidateContainerOffset(): void {
+    MouseInput.containerOffset_ = null;
+  }
+
+  /**
+   * Container offset used for canvas coords. Reading scroll/offset properties forces a layout when the
+   * DOM was written earlier in the frame (hover card), so it is measured once and invalidated on
+   * window resize, scroll, and container resize instead of on every mousemove.
+   */
+  private static getContainerOffset_(): { x: number; y: number } {
+    const container = KeepTrack.getInstance().containerRoot;
+
+    if (MouseInput.containerOffset_ && MouseInput.containerOffsetRoot_ === container) {
+      return MouseInput.containerOffset_;
+    }
+
+    if (!MouseInput.isContainerOffsetListening_ && typeof window !== 'undefined') {
+      MouseInput.isContainerOffsetListening_ = true;
+      window.addEventListener('resize', MouseInput.invalidateContainerOffset);
+      // Capture so scrolls of the container itself (which do not bubble) are seen too.
+      window.addEventListener('scroll', MouseInput.onScrollInvalidate_, true);
+    }
+    if (MouseInput.containerOffsetRoot_ !== container) {
+      MouseInput.containerOffsetResizeObserver_?.disconnect();
+      MouseInput.containerOffsetRoot_ = container;
+      if (container && typeof ResizeObserver !== 'undefined') {
+        // Observer callbacks run after layout, so measuring here is free and keeps mousemove read-free.
+        MouseInput.containerOffsetResizeObserver_ = new ResizeObserver(() => MouseInput.measureContainerOffset_());
+        MouseInput.containerOffsetResizeObserver_.observe(container);
+      }
+    }
+
+    return MouseInput.measureContainerOffset_();
+  }
+
+  private static measureContainerOffset_(): { x: number; y: number } {
+    const container = MouseInput.containerOffsetRoot_ ?? KeepTrack.getInstance().containerRoot;
+
+    MouseInput.containerOffset_ = {
+      x: container.scrollLeft - window.scrollX + container.offsetLeft,
+      y: container.scrollTop - window.scrollY + container.offsetTop,
+    };
+
+    return MouseInput.containerOffset_;
+  }
+
+  /** Scrolls inside side menus, lists, etc. cannot move the container; only window/ancestor scrolls matter. */
+  private static readonly onScrollInvalidate_ = (evt: Event): void => {
+    const target = evt.target;
+    const container = MouseInput.containerOffsetRoot_;
+
+    if (target === document || target === window || target === container || (target instanceof Node && container && target.contains(container))) {
+      MouseInput.invalidateContainerOffset();
+    }
+  };
 
   /** Canvas coords for an event, or null when the event carries no usable client position. */
   private static getEventCanvasCoords_(evt: MouseEvent): { x: number; y: number } | null {
@@ -284,6 +369,68 @@ export class MouseInput {
     if (evt.key === 'Escape' && inputManager.isRmbMenuOpen) {
       inputManager.hidePopUps();
     }
+  }
+
+  /**
+   * Escape on the bare scene deselects the selected object (closing the info box).
+   * Anything else that Escape closes takes the press instead, so one Escape never
+   * closes search and drops the selection in the same keystroke. Decision (#482): Escape drops only the selected
+   * object; the observing sensor stays until Reset Sensor.
+   */
+  private deselectOnEscape_(evt: KeyboardEvent): void {
+    if (evt.key !== 'Escape' || evt.defaultPrevented) {
+      return;
+    }
+
+    const uiManager = ServiceLocator.getUiManager();
+    const searchManager = uiManager?.searchManager;
+
+    if (searchManager?.isSearchOpen) {
+      // Search owns this press even when its input is not focused.
+      searchManager.closeSearch(true);
+
+      return;
+    }
+
+    if (ServiceLocator.getInputManager().isRmbMenuOpen) {
+      return;
+    }
+
+    const target = evt.target instanceof Element ? evt.target : null;
+
+    // Typing fields, dialogs and the open drawer keep their own Escape.
+    if (isNativeKeyboardTarget(target) || MouseInput.hasVisibleOverlay_()) {
+      return;
+    }
+
+    const selectSatManager = PluginRegistry.getPlugin(SelectSatManager);
+
+    if (selectSatManager && selectSatManager.selectedSat !== -1 && userActionGate.allowSelection(-1)) {
+      selectSatManager.selectSat(-1);
+    }
+  }
+
+  /** True when the open drawer, an open dialog or a really visible role=dialog is on screen. */
+  private static hasVisibleOverlay_(): boolean {
+    if (document.querySelector('.plugin-drawer.open, dialog[open]')) {
+      return true;
+    }
+
+    return Array.from(document.querySelectorAll('[role="dialog"]:not([hidden])')).some((el) => {
+      // A closed modal keeps its role=dialog box inside a display:none overlay; the box's own style still says block.
+      if (typeof el.checkVisibility === 'function' && !el.checkVisibility({ opacityProperty: true, visibilityProperty: true })) {
+        return false;
+      }
+      const style = window.getComputedStyle(el);
+
+      if (style.display === 'none' || style.visibility === 'hidden' || Number.parseFloat(style.opacity) === 0 || el.hasAttribute('inert')) {
+        return false;
+      }
+      // Zero-size leftovers (closed login / email modals keep display:block) are not on screen.
+      const rect = el.getBoundingClientRect();
+
+      return rect.width > 0 && rect.height > 0;
+    });
   }
 
   private canvasClick_(evt: MouseEvent) {
@@ -456,50 +603,54 @@ export class MouseInput {
       targetId = (<HTMLElement>target.firstChild).id;
     }
 
-    switch (targetId) {
-      case 'reset-camera-rmb':
-        if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
-          ServiceLocator.getMainCamera().resetRotation();
-        } else {
-          ServiceLocator.getMainCamera().state.reset();
-        }
-        break;
-      case 'clear-lines-rmb':
-        lineManagerInstance.clear();
-        break;
-      case 'toggle-time-rmb':
-        timeManagerInstance.toggleTime();
-        break;
-      case 'clear-screen-rmb':
-        if (PluginRegistry.getPlugin(TimeMachine)) {
-          PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
-        }
-        uiManagerInstance.doSearch('');
-        uiManagerInstance.searchManager.closeSearch();
-        uiManagerInstance.hideSideMenus();
+    // The menu must always close: a throwing action otherwise left isRmbMenuOpen true, and hover is a no-op while it is set.
+    try {
+      switch (targetId) {
+        case 'reset-camera-rmb':
+          if (PluginRegistry.getPlugin(SelectSatManager)?.selectedSat !== -1) {
+            ServiceLocator.getMainCamera().resetRotation();
+          } else {
+            ServiceLocator.getMainCamera().state.reset();
+          }
+          break;
+        case 'clear-lines-rmb':
+          lineManagerInstance.clear();
+          break;
+        case 'toggle-time-rmb':
+          timeManagerInstance.toggleTime();
+          break;
+        case 'clear-screen-rmb':
+          if (PluginRegistry.getPlugin(TimeMachine)) {
+            PluginRegistry.getPlugin(TimeMachine)!.isTimeMachineRunning = false;
+          }
+          uiManagerInstance.doSearch('');
+          uiManagerInstance.searchManager.closeSearch();
+          uiManagerInstance.hideSideMenus();
 
-        // Revert any group color scheme back to a non group scheme
-        colorSchemeManagerInstance.isUseGroupColorScheme = false;
+          // Revert any group color scheme back to a non group scheme
+          colorSchemeManagerInstance.isUseGroupColorScheme = false;
 
-        // Clear Screen is a full reset, so drop the secondary (reference) object too -
-        // deselecting only the primary left the secondary object and its orbit on screen.
-        PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
-        if (userActionGate.allowSelection(-1)) {
-          PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
-        }
-        break;
-      default:
-        EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
-        break;
+          // Clear Screen is a full reset, so drop the secondary (reference) object too -
+          // deselecting only the primary left the secondary object and its orbit on screen.
+          PluginRegistry.getPlugin(SelectSatManager)?.setSecondarySat(-1);
+          if (userActionGate.allowSelection(-1)) {
+            PluginRegistry.getPlugin(SelectSatManager)?.selectSat(-1);
+          }
+          break;
+        default:
+          EventBus.getInstance().emit(EventBusEvent.rmbMenuActions, targetId, this.clickedSat);
+          break;
+      }
+    } finally {
+      ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+
+      const rightButtonMenuElement = getEl('right-btn-menu');
+
+      if (rightButtonMenuElement) {
+        rightButtonMenuElement.style.display = 'none';
+      }
+      ServiceLocator.getInputManager().clearRMBSubMenu();
+      ServiceLocator.getInputManager().isRmbMenuOpen = false;
     }
-    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
-
-    const rightButtonMenuElement = getEl('right-btn-menu');
-
-    if (rightButtonMenuElement) {
-      rightButtonMenuElement.style.display = 'none';
-    }
-    ServiceLocator.getInputManager().clearRMBSubMenu();
-    ServiceLocator.getInputManager().isRmbMenuOpen = false;
   }
 }

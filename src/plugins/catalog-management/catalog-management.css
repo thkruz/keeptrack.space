@@ -32,3 +32,24 @@
 .cm-toggle-row {
   margin: 8px 10px 4px;
 }
+
+/* One-line helper text under toggles, buttons and dropdowns. */
+.cm-hint {
+  margin: 2px 0 6px;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--kt-gray-300, #bdbdbd);
+  text-align: left;
+}
+
+.cm-hint[hidden] {
+  display: none;
+}
+
+.cm-toggle-row .cm-hint {
+  margin-left: 52px;
+}
+
+.cm-import-hint {
+  margin: 8px 10px 0;
+}

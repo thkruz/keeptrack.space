@@ -38,7 +38,8 @@
         "meanAnomaly": "Střední anomálie",
         "meanMotion": "Střední pohyb",
         "period": "Perioda",
-        "error": "Chyba"
+        "error": "Chyba",
+        "sessionOnly": "Úpravy platí jen pro tuto relaci. Po obnovení stránky se neuloží."
       },
       "buttons": {
         "resetOriginal": "Obnovit původní",
@@ -58,7 +59,8 @@
         "failedToPropagate": "Nepodařilo se propagovat satelit. Zkuste jiné parametry, nebo pokud jste si jisti, že jsou správné, nahlaste tento problém.",
         "cannotCalculateDirection": "Nelze vypočítat směr satelitu. Zkuste to znovu později.",
         "notRealSatellite": "Není skutečný satelit",
-        "satrecFailed": "Chyba při vytváření záznamu družice!"
+        "satrecFailed": "Chyba při vytváření záznamu družice!",
+        "sccMismatch": "Soubor je pro satelit {fileScc}, ale je vybrán {selectedScc}. Nejprve vyberte {fileScc}."
       }
     }
   }

@@ -2,7 +2,7 @@
   "plugins": {
     "Collisions": {
       "bottomIconLabel": "충돌",
-      "title": "충돌 메뉴",
+      "title": "충돌",
       "toolbar": {
         "fetchData": "데이터 가져오기",
         "refresh": "새로 고침"

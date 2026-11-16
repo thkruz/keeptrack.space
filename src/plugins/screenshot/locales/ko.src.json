@@ -14,6 +14,14 @@
         "primaryLogoFailed": "기본 로고 이미지를 불러오지 못했습니다.",
         "secondaryLogoFailed": "보조 로고 이미지를 불러오지 못했습니다.",
         "noCanvasContext": "임시 캔버스의 2D 컨텍스트를 가져오지 못했습니다. 스크린샷을 만들 수 없습니다."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "관측지: {site}",
+        "source": "출처: {source}",
+        "utc": "{time} UTC",
+        "computed": "계산된 화면: 이 시점에서 궤도 요소는 {age} 전 자료",
+        "computedBeforeEpoch": "계산된 보기: 이 시각은 궤도 요소 기준 시각보다 {age} 앞섭니다"
       }
     }
   }

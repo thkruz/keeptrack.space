@@ -1,0 +1,12 @@
+# Cloudflare Pages response headers (copied to dist/ by build-manager).
+# These asset groups never change in place; ship a new file name instead.
+# Mirrored by the "App immutable assets" cache rule on the keeptrack.space zone.
+
+/wasm/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/audio/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/textures/*
+  Cache-Control: public, max-age=31536000, immutable

@@ -27,6 +27,38 @@ import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+export interface SideTooltipRects {
+  /** Side menu rect (viewport coordinates). */
+  menu: { right: number };
+  target: { top: number; bottom: number; height: number };
+  tip: { width: number; height: number };
+  viewport: { width: number; height: number };
+  scrollY: number;
+}
+
+/**
+ * Places a body-level tooltip beside a side menu (never inside it, so the menu's overflow cannot clip it), vertically
+ * centred on the target; when there is no room beside the menu (phones) it drops below the target, flipping above when
+ * the bottom edge would be crossed. The result is always clamped inside the viewport (#488).
+ */
+export const computeSideTooltipPlacement = ({ menu, target, tip, viewport, scrollY }: SideTooltipRects): { left: number; top: number } => {
+  const margin = 8;
+  const clampTop = (t: number) => Math.max(margin + scrollY, Math.min(t, viewport.height + scrollY - tip.height - margin));
+  const clampLeft = (l: number) => Math.max(margin, Math.min(l, viewport.width - tip.width - margin));
+
+  if (menu.right + margin + tip.width + margin <= viewport.width) {
+    return { left: menu.right + margin, top: clampTop(target.top + scrollY + target.height / 2 - tip.height / 2) };
+  }
+
+  let top = target.bottom + scrollY + margin;
+
+  if (top + tip.height + margin > viewport.height + scrollY) {
+    top = target.top + scrollY - tip.height - margin;
+  }
+
+  return { left: clampLeft(margin), top: clampTop(top) };
+};
+
 export class TooltipsPlugin extends KeepTrackPlugin {
   readonly id = 'TooltipsPlugin';
   dependencies_ = [];
@@ -36,22 +68,97 @@ export class TooltipsPlugin extends KeepTrackPlugin {
   private isVisible_ = false;
   private showTimer_: ReturnType<typeof setTimeout> | null = null;
   tooltipTag = 'kt-tooltip';
+  /** Attribute that opts a target into tap-to-toggle on touch devices. */
+  tapAttr = 'kt-tooltip-tap';
+  private shownFor_: HTMLElement | null = null;
+  /** True while keyboard was the last input; a focused control only keeps its tooltip then (#422). */
+  private lastInputWasKeyboard_ = false;
+  private readonly wired_ = new WeakSet<HTMLElement>();
 
   private static readonly SHOW_DELAY_ = 150;
+  private static readonly WATCH_INTERVAL_ = 400;
+  /** The element the visible tooltip belongs to, so a watchdog can clear it when that element stops being hovered or shown (#287). */
+  private activeTarget_: HTMLElement | null = null;
+  private watchTimer_: ReturnType<typeof setInterval> | null = null;
+  /**
+   * Watches the visible tooltip's target for kt-tooltip changes. Values like the info box's stored-digit tooltips are
+   * rewritten in place when the selection changes while the pointer stays still; no mouseenter fires, so without this
+   * the bubble kept the previous object's value (#354).
+   */
+  private attrObserver_: MutationObserver | null = null;
 
   addHtml(): void {
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerInit, () => {
-      const tooltipDiv = document.createElement('div');
-
-      tooltipDiv.id = 'tooltip';
-      tooltipDiv.className = 'kt-tooltip-popup';
-      document.body.appendChild(tooltipDiv);
+      this.ensureTooltipDiv_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
       this.initTooltips();
+    });
+
+    /*
+     * Targets rendered after onKeepTrackReady (sat info box circles, menus built on demand) were never wired.
+     * Wire them on first pointer contact; capture phase so the listeners exist before the target's own phase.
+     */
+    const wireLate = (e: Event) => {
+      const target = e.target as Element | null;
+      const el = typeof target?.closest === 'function' ? (target.closest(`[${this.tooltipTag}]`) as HTMLElement | null) : null;
+
+      if (el && !this.wired_.has(el) && el.getAttribute(this.tooltipTag)) {
+        this.createTooltip(el);
+      }
+    };
+
+    document.addEventListener(
+      'pointerdown',
+      (e: Event) => {
+        this.lastInputWasKeyboard_ = false;
+        // Touch fires pointerup before any mouseover, so wire the target now or the first tap shows nothing (#488)
+        wireLate(e);
+      },
+      true
+    );
+    document.addEventListener(
+      'keydown',
+      () => {
+        this.lastInputWasKeyboard_ = true;
+      },
+      true
+    );
+    document.addEventListener('pointerdown', wireLate, true);
+    // #480: the pointer left the hovered target but its own mouseleave never ran (target re-laid out under the bubble,
+    // listener wired mid-hover). A document-level mouseout is the backstop for hover-shown bubbles.
+    document.addEventListener(
+      'mouseout',
+      (e: MouseEvent) => {
+        const target = this.activeTarget_;
+
+        if (!target || target === this.shownFor_ || !this.isVisible_) {
+          return;
+        }
+        const to = e.relatedTarget as Node | null;
+
+        if (to && (target.contains(to) || document.getElementById('tooltip')?.contains(to))) {
+          return;
+        }
+        if (e.target instanceof Node && target.contains(e.target)) {
+          this.hideTooltip();
+          this.isVisible_ = false;
+        }
+      },
+      true
+    );
+    document.addEventListener('mouseover', wireLate, true);
+
+    // A tap-shown tooltip stays until the next tap elsewhere
+    document.addEventListener('pointerdown', (e: PointerEvent) => {
+      if (this.shownFor_ && !this.shownFor_.contains(e.target as Node | null)) {
+        this.hideTooltip();
+        this.isVisible_ = false;
+        this.shownFor_ = null;
+      }
     });
   }
 
@@ -83,6 +190,11 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       return;
     }
 
+    if (this.wired_.has(el)) {
+      return;
+    }
+    this.wired_.add(el);
+
     let isHovered = false;
 
     const dismiss = () => {
@@ -92,9 +204,15 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       }
       this.hideTooltip();
       this.isVisible_ = false;
+      this.shownFor_ = null;
     };
 
     el.addEventListener('mouseenter', () => {
+      // Touch screens emulate mouseenter after a tap; hover tooltips would then stick over neighbouring labels (#217).
+      if (typeof window.matchMedia === 'function' && window.matchMedia('(hover: none)').matches && !el.hasAttribute(this.tapAttr)) {
+        return;
+      }
+
       isHovered = true;
 
       // A pending show for another element would otherwise leak through the shared timer
@@ -122,8 +240,14 @@ export class TooltipsPlugin extends KeepTrackPlugin {
         if (!isHovered || !(el as HTMLElement).isConnected) {
           return;
         }
+        // Read the text again: the selection may have changed during the delay (#354)
+        const currentText = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
 
-        this.showTooltip(el as HTMLElement, text);
+        if (!currentText) {
+          return;
+        }
+
+        this.showTooltip(el as HTMLElement, currentText);
         this.isVisible_ = true;
       }, TooltipsPlugin.SHOW_DELAY_);
     });
@@ -133,17 +257,151 @@ export class TooltipsPlugin extends KeepTrackPlugin {
       dismiss();
     });
 
+    // Keyboard users reach tooltipped controls with Tab: show on keyboard focus, hide on blur.
+    el.addEventListener('focus', () => {
+      const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
+
+      if (!text || !(el as HTMLElement).matches(':focus-visible')) {
+        return;
+      }
+
+      this.showTooltip(el as HTMLElement, text);
+      this.isVisible_ = true;
+    });
+    el.addEventListener('blur', dismiss);
+
     /*
      * Clicking a tooltipped control usually toggles UI that hides or replaces the
      * target (e.g. a drawer item closing the drawer); no mouseleave fires for an
      * element hidden under the cursor, which left the tooltip stuck on screen.
      */
-    el.addEventListener('click', dismiss);
+    /*
+     * Touch has no hover: a tap on a tap-to-toggle target (info circles) shows its tooltip and a second tap hides it.
+     * The toggle runs on pointerup so it does not depend on the emulated mouse events a touch screen sends afterwards
+     * (mouseenter would otherwise race the click); the click that follows is swallowed.
+     */
+    let handledByTouch = false;
+    const toggleForTouch = () => {
+      const wasShownHere = this.isVisible_ && this.shownFor_ === el;
+
+      dismiss();
+
+      if (wasShownHere) {
+        return;
+      }
+
+      const text = (el as HTMLElement).getAttribute(this.tooltipTag) ?? '';
+
+      if (text) {
+        this.showTooltip(el as HTMLElement, text);
+        this.isVisible_ = true;
+        this.shownFor_ = el as HTMLElement;
+      }
+    };
+
+    el.addEventListener('pointerup', (e: PointerEvent) => {
+      if (e.pointerType === 'touch' && (el as HTMLElement).hasAttribute(this.tapAttr)) {
+        handledByTouch = true;
+        toggleForTouch();
+      }
+    });
+    // Tap-to-toggle targets toggle on click for any pointer type (phone harnesses and hybrid devices send mouse events)
+    el.addEventListener('click', (e: MouseEvent) => {
+      // A label forwards its tap to its input as a second click; that echo must not toggle the tooltip again (#488)
+      if (e.target !== el && (e.target as HTMLElement | null)?.tagName === 'INPUT' && el.tagName === 'LABEL') {
+        return;
+      }
+
+      if (handledByTouch) {
+        handledByTouch = false;
+
+        return;
+      }
+
+      if ((el as HTMLElement).hasAttribute(this.tapAttr)) {
+        toggleForTouch();
+
+        return;
+      }
+
+      dismiss();
+    });
 
     el.style.cursor = 'pointer';
   }
 
+  /** Re-renders the visible tooltip when it belongs to `el` and the element's text changed while it was showing (#274). */
+  refreshTooltip(el: HTMLElement): void {
+    if (this.activeTarget_ !== el || !el.isConnected) {
+      return;
+    }
+    const text = el.getAttribute(this.tooltipTag) ?? '';
+
+    if (text) {
+      this.showTooltip(el, text);
+    } else {
+      this.hideTooltip();
+    }
+  }
+
+  /** True while the tooltip's element is still attached, rendered and under the pointer or keyboard focus. */
+  private isTargetStillActive_(): boolean {
+    const target = this.activeTarget_;
+
+    if (!target || !target.isConnected) {
+      return false;
+    }
+    const rect = target.getBoundingClientRect();
+
+    if (rect.width === 0 && rect.height === 0) {
+      return false;
+    }
+    if (target === this.shownFor_) {
+      return true;
+    }
+
+    // #422: a mouse click focuses the control and some browsers keep matching :focus-visible, which kept the bubble
+    // alive after the pointer left. Focus only counts while the last input was the keyboard.
+    return target.matches(':hover') || (this.lastInputWasKeyboard_ && target.matches(':focus-visible'));
+  }
+
+  private startWatchdog_(): void {
+    this.stopWatchdog_();
+    this.watchTimer_ = setInterval(() => {
+      if (!this.isTargetStillActive_()) {
+        this.hideTooltip();
+        this.isVisible_ = false;
+        this.shownFor_ = null;
+      }
+    }, TooltipsPlugin.WATCH_INTERVAL_);
+  }
+
+  private stopWatchdog_(): void {
+    if (this.watchTimer_) {
+      clearInterval(this.watchTimer_);
+      this.watchTimer_ = null;
+    }
+    this.attrObserver_?.disconnect();
+    this.activeTarget_ = null;
+  }
+
+  /** Re-renders the visible tooltip whenever its target's kt-tooltip attribute changes (#354). */
+  private observeTarget_(targetEl: HTMLElement): void {
+    if (typeof MutationObserver === 'undefined') {
+      return;
+    }
+    this.attrObserver_ ??= new MutationObserver(() => {
+      const target = this.activeTarget_;
+
+      if (target) {
+        this.refreshTooltip(target);
+      }
+    });
+    this.attrObserver_.observe(targetEl, { attributes: true, attributeFilter: [this.tooltipTag] });
+  }
+
   hideTooltip() {
+    this.stopWatchdog_();
     const tooltipDiv = document.getElementById('tooltip');
 
     if (tooltipDiv) {
@@ -151,8 +409,25 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     }
   }
 
+  /** Returns the popup div, creating it when missing (phone boots can skip or miss uiManagerInit). */
+  private ensureTooltipDiv_(): HTMLElement {
+    const existing = document.getElementById('tooltip');
+
+    if (existing) {
+      return existing;
+    }
+
+    const tooltipDiv = document.createElement('div');
+
+    tooltipDiv.id = 'tooltip';
+    tooltipDiv.className = 'kt-tooltip-popup';
+    document.body.appendChild(tooltipDiv);
+
+    return tooltipDiv;
+  }
+
   showTooltip(targetEl: HTMLElement, text: string): void {
-    const tooltipDiv = document.getElementById('tooltip');
+    const tooltipDiv = this.ensureTooltipDiv_();
 
     if (!tooltipDiv) {
       return;
@@ -189,8 +464,94 @@ export class TooltipsPlugin extends KeepTrackPlugin {
     // Clamp vertically to viewport
     top = Math.max(8, Math.min(top, viewportHeight + window.scrollY - tooltipRect.height - 8));
 
+    // Left drawer rows: open beside the drawer so the popup never covers a neighbouring row's label or shortcut (#298).
+    const drawerEl = targetEl.closest<HTMLElement>('.plugin-drawer');
+
+    if (drawerEl) {
+      const drawerRect = drawerEl.getBoundingClientRect();
+      const sideLeft = drawerRect.right + 8;
+
+      if (sideLeft + tooltipRect.width + 8 > viewportWidth) {
+        // No room beside the drawer (phone): the row label is already on screen, so show nothing.
+        return;
+      }
+      left = sideLeft;
+      // Never rise above the drawer's top edge: the strip over it (Access Timeline chip, nav bar) is not part of the drawer (#434)
+      const minTop = Math.max(8, drawerRect.top + window.scrollY + 4);
+
+      top = Math.max(minTop, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8));
+    }
+
+    // Info box rows: open beside the box (left, else right) so the popup never hides the neighbouring values (#273)
+    const infoBoxEl = targetEl.closest<HTMLElement>('#sat-infobox');
+
+    if (infoBoxEl) {
+      const boxRect = infoBoxEl.getBoundingClientRect();
+      const sideTop = Math.max(
+        8,
+        Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, viewportHeight + window.scrollY - tooltipRect.height - 8)
+      );
+
+      if (boxRect.left - 8 - tooltipRect.width >= 8) {
+        left = boxRect.left - 8 - tooltipRect.width;
+        top = sideTop;
+      } else if (boxRect.right + 8 + tooltipRect.width + 8 <= viewportWidth) {
+        left = boxRect.right + 8;
+        top = sideTop;
+      }
+    }
+
+    // Collisions probability badge: open beside the side menu so the long probability text never covers the Export
+    // buttons or the neighbouring cards (#356)
+    const probMenuEl = targetEl.matches('.cp-prob') ? targetEl.closest<HTMLElement>('.side-menu-parent') : null;
+
+    if (probMenuEl) {
+      const menuRight = probMenuEl.getBoundingClientRect().right;
+
+      // The floating bottom-center pill occupies the lowest ~68px of the viewport: keep the bubble above that band (#420)
+      const pillBand = 68;
+      const maxTop = viewportHeight + window.scrollY - pillBand - tooltipRect.height - 8;
+
+      if (menuRight + 8 + tooltipRect.width + 8 <= viewportWidth) {
+        left = menuRight + 8;
+        top = Math.max(8, Math.min(targetRect.top + window.scrollY + targetRect.height / 2 - tooltipRect.height / 2, maxTop));
+      } else {
+        top = Math.max(8, Math.min(top, maxTop));
+      }
+    }
+
+    // Custom Sensor form fields: open beside the side menu so the bubble never covers the field's own label or the row
+    // above it (#495, #496) and Settings rows (#488)
+    const customSensorEl = targetEl.closest<HTMLElement>('#custom-sensor-menu-form, #settings-menu');
+    const customMenuEl = customSensorEl?.closest<HTMLElement>('.side-menu-parent') ?? null;
+
+    if (customMenuEl) {
+      const placed = computeSideTooltipPlacement({
+        menu: customMenuEl.getBoundingClientRect(),
+        target: targetRect,
+        tip: tooltipRect,
+        viewport: { width: viewportWidth, height: viewportHeight },
+        scrollY: window.scrollY,
+      });
+
+      left = placed.left;
+      top = placed.top;
+    }
+
+    // Access Timeline pass bars: keep the bubble over the lane so a long bar's centred tooltip never covers the row's sensor name (#431)
+    const passLaneEl = targetEl.matches('.access-timeline__pass') ? targetEl.closest<HTMLElement>('.access-timeline__lane') : null;
+
+    if (passLaneEl) {
+      left = Math.max(left, passLaneEl.getBoundingClientRect().left + 4);
+    }
+
     tooltipDiv.style.left = `${left}px`;
     tooltipDiv.style.top = `${top}px`;
     tooltipDiv.classList.add('kt-tooltip-visible');
+    // startWatchdog_ clears activeTarget_ (via stopWatchdog_), so assign it afterwards or the watchdog hides the
+    // bubble at its first tick (#277) and refreshTooltip never matches (#274).
+    this.startWatchdog_();
+    this.activeTarget_ = targetEl;
+    this.observeTarget_(targetEl);
   }
 }

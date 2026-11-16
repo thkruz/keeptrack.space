@@ -11,6 +11,22 @@ describe('report-formatter', () => {
   };
 
   describe('formatFixedWidth', () => {
+    it('moves the last column under its row when the table is wider than maxChars (#502)', () => {
+      const wide = {
+        headers: ['Rise', 'Peak', 'Note'],
+        rows: [
+          ['10:00', '45', 'in view at start; peak within window'],
+          ['11:00', '30', ''],
+        ],
+      };
+      const out = formatFixedWidth(wide, undefined, 20).split('\n');
+
+      expect(out).toContain('    in view at start; peak within window');
+      expect(out.every((line) => line.length <= 40)).toBe(true);
+      expect(out.filter((line) => line.startsWith('11:00'))).toHaveLength(1);
+      expect(formatFixedWidth(wide, undefined, 500)).toContain('45     in view at start; peak within window');
+    });
+
     it('sizes each column to the widest cell across the header AND every row', () => {
       const out = formatFixedWidth(table);
       // lines: [0] header, [1] underline, [2] row t1, [3] row t2.

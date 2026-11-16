@@ -46,6 +46,18 @@ export abstract class UrlManager {
   };
   static lastUpdateTime_: number;
 
+  private static readonly shareParamProviders_: Array<() => string | null> = [];
+
+  /**
+   * Lets a plugin add one `key=value` slice (already URL-safe) to the share URL, for example the Best Passes search.
+   * The provider returns null when it has nothing to share. Registering the same function twice is a no-op.
+   */
+  static registerShareParamProvider(provider: () => string | null): void {
+    if (!UrlManager.shareParamProviders_.includes(provider)) {
+      UrlManager.shareParamProviders_.push(provider);
+    }
+  }
+
   static {
     EventBus.getInstance().on(EventBusEvent.selectSatData, (sat) => {
       if (sat instanceof Satellite) {
@@ -260,6 +272,9 @@ export abstract class UrlManager {
           case 'misl':
             this.handleMislParam_(kv[key]);
             break;
+          case 'bp':
+            // Best Passes search: read by the Best Passes plugin
+            break;
           case 'pitch':
           case 'yaw':
             this.handlePitchYawParam_(kv);
@@ -427,13 +442,21 @@ export abstract class UrlManager {
       }
     }
 
+    for (const provider of UrlManager.shareParamProviders_) {
+      const slice = provider();
+
+      if (slice) {
+        paramSlices.push(slice);
+      }
+    }
+
     if (paramSlices.length > 0) {
       url += `?${paramSlices.join('&')}`;
     }
 
     // Drop heavy params progressively to stay under the URL length limit and avoid 431 errors
     if (url.length > UrlManager.MAX_URL_LENGTH_) {
-      const heavyKeys = ['tle', 'external-only', 'search', 'limitSats'];
+      const heavyKeys = ['tle', 'external-only', 'search', 'limitSats', 'bp'];
 
       for (const dropKey of heavyKeys) {
         const idx = paramSlices.findIndex((s) => s.startsWith(`${dropKey}=`) || s.startsWith(`${dropKey}%`));

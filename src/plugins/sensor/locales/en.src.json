@@ -56,28 +56,28 @@
         "imgAlt": "The Custom Sensor menu with location and field of view fields",
         "imgCaption": "Set the location and field of view, then add the sensor.",
         "fieldsHeading": "Defining the Sensor",
-        "fields": "Set the <strong>Latitude</strong>, <strong>Longitude</strong>, and <strong>Elevation Above Sea Level (Km)</strong>, then pick the <strong>Type of Sensor</strong>: Observer, Optical, Phased Array Radar, or Mechanical. Checking <strong>Telescope</strong> gives a full 360 degree azimuth view with a 10 degree elevation mask and unlimited range; uncheck it to set the azimuth, elevation, and range limits yourself. <strong>Horizon mask</strong>: optional <code>azimuth,minimum elevation</code> pairs, one per line (2 to 72 points, azimuth 0 to 359, elevation 0 to 89). Elevation is interpolated between points and wraps at 360. A pass interrupted by the mask is reported as two contacts.",
+        "fields": "Set the <strong>Latitude</strong>, <strong>Longitude</strong>, and <strong>Altitude Above Sea Level (km)</strong>, then pick the <strong>Type of Sensor</strong>: Observer, Optical, Phased Array Radar, or Mechanical. Checking <strong>Telescope</strong> gives a full 360 degree azimuth view with a 10 degree elevation mask and unlimited range; uncheck it to set the azimuth, elevation, and range limits yourself. <strong>Horizon mask</strong>: optional <code>azimuth,minimum elevation</code> pairs, one per line (2 to 72 points, azimuth 0 to 359, elevation 0 to 89). Elevation is interpolated between points and wraps at 360. A pass interrupted by the mask is reported as two contacts.",
         "howToUse": "<ol><li>Open the <strong>Custom Sensor</strong> menu (Create mode), or right-click anywhere on Earth and choose <strong>Create Sensor Here</strong> or <strong>Create Observer Here</strong> to pre-fill the location.</li><li>Adjust the fields, or click <strong>Use Geolocation</strong> to use your own position (HTTPS only).</li><li>Click <strong>Add Custom Sensor</strong>. The new sensor appears on the globe and in the active sensor list panel.</li><li>Enable <strong>Replace Sensor</strong> to swap the primary sensor instead of adding another; <strong>Clear Custom Sensors</strong> removes them all.</li></ol>",
         "tip1": "To edit a real sensor's parameters, select it in the Sensors menu first; the form pre-fills with its values so you can tweak and re-add it.",
         "tip2": "Multiple custom sensors stack: each addition becomes another active sensor, which is an easy way to mock up a small network."
       },
       "labels": {
         "sensorName": "Sensor Name",
-        "latitude": "Latitude",
-        "longitude": "Longitude",
-        "elevation": "Elevation Above Sea Level (Km)",
+        "latitude": "Latitude (°)",
+        "longitude": "Longitude (°)",
+        "elevation": "Altitude Above Sea Level (km)",
         "sensorType": "Type of Sensor",
         "typeObserver": "Observer",
         "typeOptical": "Optical",
         "typePhasedArray": "Phased Array Radar",
         "typeMechanical": "Mechanical",
         "telescope": "Telescope",
-        "minAzimuth": "Minimum Azimuth",
-        "maxAzimuth": "Maximum Azimuth",
-        "minElevation": "Minimum Elevation",
-        "maxElevation": "Maximum Elevation",
-        "minRange": "Minimum Range",
-        "maxRange": "Maximum Range",
+        "minAzimuth": "Minimum Azimuth (°)",
+        "maxAzimuth": "Maximum Azimuth (°)",
+        "minElevation": "Minimum Elevation (°)",
+        "maxElevation": "Maximum Elevation (°)",
+        "minRange": "Minimum Range (km)",
+        "maxRange": "Maximum Range (km)",
         "replaceSensor": "Replace Sensor",
         "addCustomSensor": "Add Custom Sensor",
         "clearCustomSensors": "Clear Custom Sensors",
@@ -85,7 +85,7 @@
         "tooltipSensorName": "Name of the Sensor",
         "tooltipLatitude": "Latitude in Decimal Form (ex: 43.283)",
         "tooltipLongitude": "Longitude in Decimal Form (ex: -73.283)",
-        "tooltipElevation": "Elevation in kilometers (ex: 0.645)",
+        "tooltipElevation": "Altitude above sea level in kilometers (ex: 0.645)",
         "tooltipTelescope": "Is this Sensor a Telescope?",
         "tooltipMinAz": "Azimuth in degrees (ex: 50)",
         "tooltipMaxAz": "Azimuth in degrees (ex: 120)",
@@ -94,7 +94,19 @@
         "tooltipMinRange": "Range in kilometers (ex: 500)",
         "tooltipMaxRange": "Range in kilometers (ex: 20000)",
         "horizonMask": "Horizon mask (az,el per line)",
-        "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89."
+        "maskPlaceholder": "Optional. One azimuth,elevation pair per line, e.g. 90,25",
+        "prefillNote": "Fields copied from the current sensor ({{name}}). Edit them before adding.",
+        "addReplaceNote": "Add keeps the current sensor and adds this one as a secondary sensor. Replace makes this the primary sensor.",
+        "confirmClear": "Remove all custom sensors and reset the sensor selection?",
+        "timeZonePlaceholder": "e.g. Europe/Paris",
+        "tooltipHorizonMask": "Optional. Azimuth,elevation points in degrees, one per line or separated by semicolons. The minimum elevation is interpolated between points and wraps at 360. 2 to 72 points, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Step bins (hold elevation until next azimuth)",
+        "tooltipMaskStep": "Off: the minimum elevation is interpolated between points. On: each azimuth starts a bin that holds its elevation until the next azimuth, wrapping at 360 (0,10 and 90,35 means 10 degrees from 0 to 90, then 35 degrees from 90 on).",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "e.g. 41.75",
+        "lonPlaceholder": "e.g. -70.54",
+        "telescopeHint": "On: full 360° azimuth, 10° elevation mask and unlimited range. Off: set the azimuth, elevation and range limits yourself."
       },
       "rmbMenu": {
         "title": "Create",
@@ -105,7 +117,7 @@
         "sensorName": "Sensor Name",
         "latitude": "Latitude",
         "longitude": "Longitude",
-        "elevation": "Elevation",
+        "elevation": "Altitude",
         "azimuth": "Azimuth",
         "elevationRange": "Elevation",
         "range": "Range",
@@ -130,7 +142,8 @@
         "maskBadPair": "Horizon mask: cannot use \"{{pair}}\". Write az,el with 0 <= az < 360 and 0 <= el <= 89.",
         "maskDuplicateAz": "Horizon mask: the azimuth in \"{{pair}}\" appears more than once.",
         "maskTooFew": "Horizon mask needs at least 2 points.",
-        "maskTooMany": "Horizon mask allows at most 72 points."
+        "maskTooMany": "Horizon mask allows at most 72 points.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Identity",
@@ -140,6 +153,8 @@
       "toasts": {
         "addedPrimary": "Custom sensor \"{{name}}\" added as the primary sensor.",
         "addedSecondary": "Custom sensor \"{{name}}\" added as a secondary sensor.",
+        "duplicate": "A custom sensor named \"{{name}}\" is already active at this location. Change the name or position to add another.",
+        "cleared": "Custom sensors cleared.",
         "replaced": "Primary sensor replaced with \"{{name}}\"."
       }
     },
@@ -157,13 +172,30 @@
         "calculationLengthTooltip": "How Many Days of Look Angles Should be Calculated",
         "intervalTooltip": "Seconds Between Each Line of Look Angles"
       },
+      "framing": {
+        "section": "Framing plan (exposure window)",
+        "start": "Exposure start (UTC)",
+        "startTooltip": "Date and time, or HH:MM:SS on the simulation date",
+        "startPlaceholder": "e.g. 22:11:03 or 2026-11-13T22:11:03",
+        "startInvalid": "Use HH:MM:SS or YYYY-MM-DDTHH:MM:SS (UTC)",
+        "length": "Exposure length (s)",
+        "inFrame": "in frame",
+        "enters": "enters",
+        "leaves": "leaves",
+        "none": "Not in the sensor field of view during this window"
+      },
       "table": {
         "time": "Time",
+        "title": "{object} from {sensor}",
+        "timeUtc": "Time (UTC)",
         "type": "Type",
         "el": "El",
         "az": "Az",
         "rng": "Rng",
-        "visible": "Visible"
+        "visible": "Above horizon",
+        "duration": "Duration",
+        "sunlit": "Sunlit",
+        "optical": "Optically visible"
       },
       "msgs": {
         "notVisible": "Satellite is not visible for the next {hours} hours.",
@@ -174,7 +206,10 @@
         "maxEl": "Max El",
         "unknown": "Unknown",
         "inView": "In View",
-        "noLookAnglesToDownload": "No look angles available for download!"
+        "inProgress": "In view now",
+        "noLookAnglesToDownload": "No look angles available for download!",
+        "eclipsed": "Eclipsed",
+        "opticalNote": "Optically visible = above the horizon, satellite sunlit, and Sun at or below {limit}° at the site. Weather and cloud cover are not considered."
       },
       "maskLimited": "mask",
       "maskLimitedTitle": "This edge is set by the sensor's horizon mask, not its minimum elevation",
@@ -183,7 +218,7 @@
         "imgAlt": "The Look Angles table of times, azimuths, elevations, and ranges",
         "imgCaption": "Each row is a pointing solution; click one to jump the clock to that moment.",
         "readingHeading": "Reading the Table",
-        "reading": "Each row lists the <strong>Time</strong>, elevation (<strong>El</strong>), azimuth (<strong>Az</strong>), and range (<strong>Rng</strong>) of the satellite as seen from the sensor, plus whether it is optically <strong>Visible</strong>. With <strong>Show Only Rise and Set Times</strong> enabled, the table collapses to each pass's rise, maximum elevation, and set events, labeled in the <strong>Type</strong> column.",
+        "reading": "Each row lists the <strong>Time</strong>, elevation (<strong>El</strong>), azimuth (<strong>Az</strong>), and range (<strong>Rng</strong>) of the satellite as seen from the sensor, plus whether it is <strong>Above horizon</strong>, <strong>Sunlit</strong>, and (optical sensors only) <strong>Optically visible</strong>. With <strong>Show Only Rise and Set Times</strong> enabled, the table collapses to each pass's rise, maximum elevation, and set events, labeled in the <strong>Type</strong> column.",
         "howToUse": "<ol><li>Select both a sensor and a satellite; its drawer icon stays disabled until both are set.</li><li>Open <strong>Look Angles</strong> from the drawer. The table computes automatically.</li><li>Open the settings panel to toggle rise/set mode or change the <strong>Calculation Length (Days)</strong> and <strong>Interval (Seconds)</strong>.</li><li>Click a row to jump the simulation clock to that moment, or use the download button to export the table.</li></ol>",
         "tip1": "Rise/set mode is the fastest way to answer when you can see the satellite next; switch to the full table when you need second by second pointing angles.",
         "tip2": "Clicking a row preserves your playback state, so a paused clock stays paused at the new time."
@@ -202,7 +237,9 @@
         "az": "Az",
         "rng": "Rng",
         "sensor": "Sensor",
-        "visible": "Visible"
+        "visible": "Above horizon",
+        "sunlit": "Sunlit",
+        "optical": "Optically visible"
       },
       "msgs": {
         "notVisible": "Satellite is not visible for the next {hours} hours.",
@@ -210,17 +247,19 @@
         "no": "No",
         "na": "N/A",
         "sensorListMissing": "Could not find the sensor list",
-        "satrecNotFound": "Satellite record not found"
+        "satrecNotFound": "Satellite record not found",
+        "eclipsed": "Eclipsed",
+        "opticalNote": "Optically visible = above the horizon, satellite sunlit, and Sun at or below {limit}° at the site. Weather and cloud cover are not considered."
       },
       "help": {
         "overview": "Multi-Site Look Angles answers a network question: of all my sensors, which one sees the selected satellite, and when? It computes look angles across many sites at once and interleaves them into a single chronological table.",
         "imgAlt": "The Multi-Site Look Angles table with sensors and pointing data",
         "imgCaption": "Each row pairs a pass moment with the sensor that sees it.",
         "readingHeading": "Reading the Table",
-        "reading": "Rows are sorted chronologically across every enabled site, each listing the <strong>Time</strong>, elevation (<strong>El</strong>), azimuth (<strong>Az</strong>), range (<strong>Rng</strong>), the <strong>Sensor</strong> involved, and optical visibility. The sensor toggle panel chooses which sites are computed: green sensors are included and red sensors are excluded.",
+        "reading": "Rows are sorted chronologically across every enabled site, each listing the <strong>Time</strong>, elevation (<strong>El</strong>), azimuth (<strong>Az</strong>), range (<strong>Rng</strong>), the <strong>Sensor</strong> involved, and whether it is <strong>Above horizon</strong>, <strong>Sunlit</strong>, and (optical sensors only) <strong>Optically visible</strong>. The sensor toggle panel chooses which sites are computed: green sensors are included and red sensors are excluded.",
         "howToUse": "<ol><li>Select a satellite; its drawer icon stays disabled until one is selected. No sensor selection is needed.</li><li>Open <strong>Multi-Site Looks</strong> from the drawer. The default missile warning network is computed automatically.</li><li>Toggle sensors on or off in the sensor list panel to change the network.</li><li>Click a row to select that sensor and jump the clock to that moment, or export the table with the download button.</li></ol>",
         "tip1": "Use it to plan handoffs: where one sensor's coverage ends, the next row shows which site picks the satellite up.",
-        "tip2": "Optical sites show visibility only when lighting conditions allow an actual observation; radars always show N/A."
+        "tip2": "Optical sites show Yes in Optically visible only when the satellite is above the horizon and sunlit and the site is dark (Sun at or below -12 degrees), otherwise No; radar rows show Above horizon and Sunlit, with \"-\" in Optically visible."
       }
     }
   }

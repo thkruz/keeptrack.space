@@ -11,7 +11,7 @@
         "beamWidth": "波束宽度",
         "maxTmxTime": "最大 Tmx 时间",
         "sun": "太阳",
-        "visMag": "视星等",
+        "visMag": "视星等（估算）",
         "nextPass": "下次过境",
         "reason": "不可见原因"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "目标距离处的线性宽度",
         "maxTmxTime": "RF/光到达目标并返回的时间",
         "sun": "太阳是否影响传感器",
-        "visMag": "视星等（数值越低越亮）",
+        "visMag": "估算视星等（数值越低越亮）。基于标准星等模型计算；实际亮度随姿态和相位而变化。 假定天空晴朗，不考虑天气和云量。",
         "nextPass": "下次进入覆盖范围的时间",
         "reason": "目标位于传感器视场之外的原因"
       },
@@ -38,12 +38,12 @@
         "outOfFov": "超出 FOV",
         "unavailable": "不可用",
         "beyondMaxRange": "超出最大距离",
-        "reasonMinRange": "距离 {{value}} 低于最小值 {{limit}}",
-        "reasonMaxRange": "距离 {{value}} 超过最大值 {{limit}}",
-        "reasonMinEl": "仰角 {{value}} 低于最小值 {{limit}}",
-        "reasonMaxEl": "仰角 {{value}} 超过最大值 {{limit}}",
-        "reasonMask": "仰角 {{value}} 低于地平线遮罩 {{limit}}",
-        "reasonAzimuth": "方位角 {{value}} 超出 {{min}} 至 {{max}} 范围",
+        "reasonMinRange": "距离低于最小值 {{limit}}",
+        "reasonMaxRange": "距离超过最大值 {{limit}}",
+        "reasonMinEl": "仰角低于最小值 {{limit}}",
+        "reasonMaxEl": "仰角超过最大值 {{limit}}",
+        "reasonMask": "仰角低于地平线遮罩 {{limit}}",
+        "reasonAzimuth": "方位角超出 {{min}} 至 {{max}} 范围",
         "reasonCone": "位于传感器视轴锥体之外",
         "unknown": "未知",
         "notApplicable": "不适用",
@@ -51,7 +51,9 @@
         "notInOrbitToast": "卫星 {sccNum} 不在轨道上!<br>模拟时间为 {simTime}。<br>请确认您使用的是正确的 TLE。",
         "categoryKinematic": "运动学",
         "categorySensor": "传感器",
-        "kinematicOk": "在传感器限制范围内"
+        "kinematicOk": "在传感器限制范围内",
+        "notSunlit": "未受日照",
+        "assumedSuffix": "(假设)"
       }
     }
   }

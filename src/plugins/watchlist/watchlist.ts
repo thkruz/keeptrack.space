@@ -32,7 +32,17 @@ import { SensorToSatLine } from '@app/engine/rendering/line-manager/sensor-to-sa
 import { clickAndDragWidth } from '@app/engine/utils/click-and-drag';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeAttrIfChanged } from '@app/engine/utils/get-el';
+import {
+  formatGpAge,
+  getStaleGpThresholdHours,
+  gpAgeHours,
+  gpEpochMs,
+  isGpStale,
+  MAX_STALE_GP_HOURS,
+  MIN_STALE_GP_HOURS,
+  setStaleGpThresholdHours,
+} from '@app/engine/utils/gp-age';
 import { isThisNode } from '@app/engine/utils/isThisNode';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { t7e } from '@app/locales/keys';
@@ -70,6 +80,7 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   getContextMenuConfig(): IContextMenuConfig {
     return {
       level1ElementName: 'watchlist-rmb',
+      group: 'object',
       level1Html: html`<li class="rmb-menu-item" id="watchlist-rmb"><a href="#">${WatchlistPlugin.tRmb_('addToWatchlist')}</a></li>`,
       order: 4,
       isVisible: (ctx: RmbMenuContext) => ctx.target instanceof Satellite,
@@ -159,6 +170,31 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
           set: (next: boolean) => {
             settingsManager.isShowSensorLabels = next;
             PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_SENSOR_LABELS, next.toString());
+          },
+        },
+        {
+          type: 'toggle',
+          id: 'showObjectLabels',
+          label: t7e('plugins.WatchlistPlugin.settings.showObjectLabels.label'),
+          helpText: t7e('plugins.WatchlistPlugin.settings.showObjectLabels.helpText'),
+          get: () => settingsManager.isShowObjectLabels,
+          set: (next: boolean) => {
+            settingsManager.isShowObjectLabels = next;
+            PersistenceManager.getInstance().saveItem(StorageKey.SETTINGS_SHOW_OBJECT_LABELS, next.toString());
+          },
+        },
+        {
+          type: 'number',
+          id: 'staleGpThreshold',
+          label: t7e('plugins.WatchlistPlugin.stale.label'),
+          helpText: t7e('plugins.WatchlistPlugin.stale.helpText'),
+          min: MIN_STALE_GP_HOURS,
+          max: MAX_STALE_GP_HOURS,
+          step: 1,
+          unit: 'h',
+          get: () => getStaleGpThresholdHours(),
+          set: (next: number) => {
+            setStaleGpThresholdHours(next);
           },
         },
       ],
@@ -413,11 +449,18 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
   protected applyToggleState_(toggleEl: HTMLImageElement, isOnWatchlist: boolean): void {
     const label = WatchlistPlugin.tInfoBox_(isOnWatchlist ? 'removeLabel' : 'addLabel');
 
-    toggleEl.src = isOnWatchlist ? bookmarkRemovePng : bookmarkAddPng;
-    toggleEl.classList.replace(isOnWatchlist ? 'off-watchlist' : 'on-watchlist', isOnWatchlist ? 'on-watchlist' : 'off-watchlist');
-    toggleEl.alt = label;
-    toggleEl.setAttribute('aria-label', label);
-    toggleEl.setAttribute('kt-tooltip', label);
+    // Runs on every selection. Re-assigning an identical src restarts the image update steps and every attribute write
+    // dirties style, so each write is skipped when the value is already there.
+    writeAttrIfChanged(toggleEl, 'src', isOnWatchlist ? bookmarkRemovePng : bookmarkAddPng);
+    const cls = toggleEl.classList;
+    const onClass = isOnWatchlist ? 'on-watchlist' : 'off-watchlist';
+
+    if (!cls.contains(onClass)) {
+      cls.replace(isOnWatchlist ? 'off-watchlist' : 'on-watchlist', onClass);
+    }
+    writeAttrIfChanged(toggleEl, 'alt', label);
+    writeAttrIfChanged(toggleEl, 'aria-label', label);
+    writeAttrIfChanged(toggleEl, 'kt-tooltip', label);
   }
 
   protected selectSatData_(obj?: BaseObject) {
@@ -663,16 +706,26 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
 
     let watchlistListHTML = '';
 
+    const referenceMs = ServiceLocator.getTimeManager()?.simulationTimeObj?.getTime() ?? Date.now();
+    const staleHours = getStaleGpThresholdHours();
+
     for (const { id } of this.watchlistList) {
       const sat = catalogManagerInstance.getSat(id, GetSatType.EXTRA_ONLY)!;
+      const age = gpAgeHours(gpEpochMs(sat.epochYear, sat.epochDay), referenceMs);
+      const staleClass = isGpStale(age, staleHours) ? ' watchlist-age-stale' : '';
+      const ageText = age === null ? '' : `${formatGpAge(age, staleHours).replace('STALE', t7e('plugins.WatchlistPlugin.stale.marker'))}`;
+      const ageTip = staleClass ? ` kt-tooltip="${t7e('plugins.WatchlistPlugin.stale.tooltip').replace('{hours}', String(staleHours))}"` : '';
 
       watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
             <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
           </div>
-          <div class="col s7 m7 l7">
+          <div class="col s5 m5 l5">
              <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name || t7e('Common.unknown')}</span>
+          </div>
+          <div class="col s2 m2 l2">
+            <span class="watchlist-age${staleClass}" data-sat-age="${sat.id}"${ageTip}>${ageText}</span>
           </div>
           <div class="col s2 m2 l2 center-align remove-icon">
             <img class="watchlist-remove" data-sat-id="${sat.id}" src="${bookmarkRemovePng}" style="cursor: pointer;"></img>

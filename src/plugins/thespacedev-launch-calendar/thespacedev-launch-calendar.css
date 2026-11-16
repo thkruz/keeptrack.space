@@ -48,3 +48,14 @@
   text-transform: none;
   color: var(--color-dark-text-muted);
 }
+
+/* Body cells and in-app links use light grey, not the accent red (R18, #213). */
+.launch-calendar-results-table tr:not(:first-child) td,
+.launch-calendar-results-table tr:not(:first-child) td a {
+  color: var(--kt-text-secondary, rgba(255, 255, 255, 0.7));
+}
+
+.launch-calendar-results-table tr:not(:first-child) td a:hover {
+  color: var(--color-text-light, #f5f5f5);
+  text-decoration: underline;
+}

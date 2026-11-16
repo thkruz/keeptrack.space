@@ -136,6 +136,21 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
     },
   },
   {
+    key: StorageKey.SETTINGS_HQ_GRAPHICS,
+    serialize: (sm) => JSON.stringify({ oceanGlint: sm.hqOceanGlint, softTerminator: sm.hqSoftTerminator, filmicTonemap: sm.hqFilmicTonemap }),
+    deserialize: (sm, raw) => {
+      try {
+        const v = JSON.parse(raw) as Record<string, unknown>;
+
+        sm.hqOceanGlint = v.oceanGlint === true;
+        sm.hqSoftTerminator = v.softTerminator === true;
+        sm.hqFilmicTonemap = v.filmicTonemap === true;
+      } catch {
+        // Corrupt value: keep the defaults (all off).
+      }
+    },
+  },
+  {
     key: StorageKey.SETTINGS_DRAW_FLAG_DECALS,
     serialize: (sm) => String(sm.isDrawFlagDecals),
     deserialize: (sm, raw) => {
@@ -151,6 +166,13 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
       if (Number.isFinite(value) && value >= 0.2 && value <= 0.6) {
         sm.flagDecalScale = value;
       }
+    },
+  },
+  {
+    key: StorageKey.SETTINGS_SHOW_OBJECT_LABELS,
+    serialize: (sm) => String(sm.isShowObjectLabels),
+    deserialize: (sm, raw) => {
+      sm.isShowObjectLabels = bool(raw);
     },
   },
   {
@@ -190,7 +212,7 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
   },
   {
     key: StorageKey.SETTINGS_DRAW_GRATICULE,
-    serialize: (sm) => String(sm.isDrawGraticule),
+    serialize: (sm) => String(sm.graticuleSavedValue ?? sm.isDrawGraticule),
     deserialize: (sm, raw) => {
       sm.isDrawGraticule = bool(raw);
     },

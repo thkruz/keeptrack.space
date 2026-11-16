@@ -138,6 +138,7 @@ export function buildEditSatMenuHtml(): string {
         ${editSatActionButton('editSat-save', b('saveTle'))}
         ${editSatActionButton('editSat-open', b('loadTle'))}
         <input id="editSat-file" class="start-hidden" type="file" name="files[]" />
+        <p id="es-session-note" class="kt-note">${l('sessionOnly')}</p>
       </section>
     </form>
   `;

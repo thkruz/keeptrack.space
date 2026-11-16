@@ -56,28 +56,28 @@
         "imgAlt": "El menú de Sensor Personalizado con campos de ubicación y campo de visión",
         "imgCaption": "Establece la ubicación y el campo de visión, luego añade el sensor.",
         "fieldsHeading": "Definir el Sensor",
-        "fields": "Establece la <strong>Latitud</strong>, la <strong>Longitud</strong> y la <strong>Elevación sobre el Nivel del Mar (Km)</strong>, luego elige el <strong>Tipo de Sensor</strong>: observador, óptico, radar de matriz en fase o mecánico. Marcar <strong>Telescopio</strong> proporciona una vista completa de azimut de 360 grados con una máscara de elevación de 10 grados y rango ilimitado; desmárcalo para establecer tú mismo los límites de azimut, elevación y rango. <strong>Máscara de horizonte</strong>: pares opcionales <code>azimut,elevación mínima</code>, uno por línea (de 2 a 72 puntos, azimut de 0 a 359, elevación de 0 a 89). La elevación se interpola entre los puntos y se cierra en 360. Un pase interrumpido por la máscara se informa como dos contactos.",
+        "fields": "Establece la <strong>Latitud</strong>, la <strong>Longitud</strong> y la <strong>Altitud sobre el Nivel del Mar (km)</strong>, luego elige el <strong>Tipo de Sensor</strong>: observador, óptico, radar de matriz en fase o mecánico. Marcar <strong>Telescopio</strong> proporciona una vista completa de azimut de 360 grados con una máscara de elevación de 10 grados y rango ilimitado; desmárcalo para establecer tú mismo los límites de azimut, elevación y rango. <strong>Máscara de horizonte</strong>: pares opcionales <code>azimut,elevación mínima</code>, uno por línea (de 2 a 72 puntos, azimut de 0 a 359, elevación de 0 a 89). La elevación se interpola entre los puntos y se cierra en 360. Un pase interrumpido por la máscara se informa como dos contactos.",
         "howToUse": "<ol><li>Abre el menú <strong>Sensor Personalizado</strong> (modo Crear), o haz clic derecho en cualquier lugar de la Tierra y elige <strong>Crear Sensor Aquí</strong> o <strong>Crear Observador Aquí</strong> para rellenar previamente la ubicación.</li><li>Ajusta los campos, o haz clic en <strong>Usar Geolocalización</strong> para usar tu propia posición (solo HTTPS).</li><li>Haz clic en <strong>Añadir Sensor Personalizado</strong>. El nuevo sensor aparece en el globo y en el panel de la lista de sensores activos.</li><li>Activa <strong>Reemplazar Sensor</strong> para sustituir el sensor primario en lugar de añadir otro; <strong>Limpiar Sensores Personalizados</strong> los elimina todos.</li></ol>",
         "tip1": "Para editar los parámetros de un sensor real, selecciónalo primero en el menú de Sensores; el formulario se rellena previamente con sus valores para que puedas ajustarlos y volver a añadirlo.",
         "tip2": "Varios sensores personalizados se acumulan: cada adición se convierte en otro sensor activo, lo cual es una forma fácil de simular una pequeña red."
       },
       "labels": {
         "sensorName": "Nombre del Sensor",
-        "latitude": "Latitud",
-        "longitude": "Longitud",
-        "elevation": "Elevación sobre el Nivel del Mar (Km)",
+        "latitude": "Latitud (°)",
+        "longitude": "Longitud (°)",
+        "elevation": "Altitud sobre el Nivel del Mar (km)",
         "sensorType": "Tipo de Sensor",
         "typeObserver": "Observador",
         "typeOptical": "Óptico",
         "typePhasedArray": "Radar de Matriz en Fase",
         "typeMechanical": "Mecánico",
         "telescope": "Telescopio",
-        "minAzimuth": "Azimut Mínimo",
-        "maxAzimuth": "Azimut Máximo",
-        "minElevation": "Elevación Mínima",
-        "maxElevation": "Elevación Máxima",
-        "minRange": "Rango Mínimo",
-        "maxRange": "Rango Máximo",
+        "minAzimuth": "Azimut Mínimo (°)",
+        "maxAzimuth": "Azimut Máximo (°)",
+        "minElevation": "Elevación Mínima (°)",
+        "maxElevation": "Elevación Máxima (°)",
+        "minRange": "Rango Mínimo (km)",
+        "maxRange": "Rango Máximo (km)",
         "replaceSensor": "Reemplazar Sensor",
         "addCustomSensor": "Añadir Sensor Personalizado",
         "clearCustomSensors": "Limpiar Sensores Personalizados",
@@ -85,7 +85,7 @@
         "tooltipSensorName": "Nombre del Sensor",
         "tooltipLatitude": "Latitud en forma decimal (ej: 43.283)",
         "tooltipLongitude": "Longitud en forma decimal (ej: -73.283)",
-        "tooltipElevation": "Elevación en kilómetros (ej: 0.645)",
+        "tooltipElevation": "Altitud sobre el nivel del mar en kilómetros (ej: 0.645)",
         "tooltipTelescope": "¿Es este sensor un telescopio?",
         "tooltipMinAz": "Azimut en grados (ej: 50)",
         "tooltipMaxAz": "Azimut en grados (ej: 120)",
@@ -94,7 +94,19 @@
         "tooltipMinRange": "Rango en kilómetros (ej: 500)",
         "tooltipMaxRange": "Rango en kilómetros (ej: 20000)",
         "horizonMask": "Máscara de horizonte (az,el por línea)",
-        "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89."
+        "maskPlaceholder": "Opcional. Un par azimut,elevación por línea, p. ej. 90,25",
+        "prefillNote": "Campos copiados del sensor actual ({{name}}). Edítelos antes de añadir.",
+        "addReplaceNote": "Añadir conserva el sensor actual y añade este como sensor secundario. Reemplazar lo convierte en el sensor principal.",
+        "confirmClear": "¿Eliminar todos los sensores personalizados y restablecer la selección de sensor?",
+        "timeZonePlaceholder": "p. ej. Europe/Paris",
+        "tooltipHorizonMask": "Opcional. Puntos acimut,elevación en grados, uno por línea o separados por punto y coma. La elevación mínima se interpola entre puntos y continúa al pasar por 360. De 2 a 72 puntos, 0 <= az < 360, 0 <= el <= 89.",
+        "maskStep": "Tramos escalonados (la elevación se mantiene hasta el siguiente acimut)",
+        "tooltipMaskStep": "Desactivado: la elevación mínima se interpola entre puntos. Activado: cada acimut inicia un tramo que mantiene su elevación hasta el siguiente acimut, con vuelta en 360 (0,10 y 90,35 significa 10 grados de 0 a 90 y luego 35 grados).",
+        "timeZone": "Time zone (IANA, optional)",
+        "tooltipTimeZone": "Optional. IANA time zone name of the site, for example America/New_York. Leave empty to use the browser time zone. Used only when a report asks for site local time; all tables stay in UTC by default.",
+        "latPlaceholder": "p. ej. 41.75",
+        "lonPlaceholder": "p. ej. -70.54",
+        "telescopeHint": "Activado: azimut completo de 360°, máscara de elevación de 10° y alcance ilimitado. Desactivado: define tú mismo los límites de azimut, elevación y alcance."
       },
       "rmbMenu": {
         "title": "Crear",
@@ -105,7 +117,7 @@
         "sensorName": "Nombre del Sensor",
         "latitude": "Latitud",
         "longitude": "Longitud",
-        "elevation": "Elevación",
+        "elevation": "Altitud",
         "azimuth": "Azimut",
         "elevationRange": "Elevación",
         "range": "Rango",
@@ -130,7 +142,8 @@
         "maskBadPair": "Máscara de horizonte: no se puede usar \"{{pair}}\". Escriba az,el con 0 <= az < 360 y 0 <= el <= 89.",
         "maskDuplicateAz": "Máscara de horizonte: el acimut de \"{{pair}}\" aparece más de una vez.",
         "maskTooFew": "La máscara de horizonte necesita al menos 2 puntos.",
-        "maskTooMany": "La máscara de horizonte admite como máximo 72 puntos."
+        "maskTooMany": "La máscara de horizonte admite como máximo 72 puntos.",
+        "timeZoneInvalid": "Custom Sensor time zone must be a valid IANA name such as America/New_York, or empty."
       },
       "sections": {
         "identity": "Identidad",
@@ -140,6 +153,8 @@
       "toasts": {
         "addedPrimary": "Sensor personalizado «{{name}}» añadido como sensor principal.",
         "addedSecondary": "Sensor personalizado «{{name}}» añadido como sensor secundario.",
+        "duplicate": "Ya hay un sensor personalizado \"{{name}}\" activo en esta ubicación. Cambie el nombre o la posición para añadir otro.",
+        "cleared": "Sensores personalizados borrados.",
         "replaced": "Sensor principal sustituido por «{{name}}»."
       }
     },
@@ -157,13 +172,30 @@
         "calculationLengthTooltip": "Cuántos días de ángulos de observación se deben calcular",
         "intervalTooltip": "Segundos entre cada línea de ángulos de observación"
       },
+      "framing": {
+        "section": "Plan de encuadre (ventana de exposición)",
+        "start": "Inicio de exposición (UTC)",
+        "startTooltip": "Fecha y hora, o HH:MM:SS en la fecha de la simulación",
+        "startPlaceholder": "p. ej. 22:11:03 o 2026-11-13T22:11:03",
+        "startInvalid": "Use HH:MM:SS o YYYY-MM-DDTHH:MM:SS (UTC)",
+        "length": "Duración de exposición (s)",
+        "inFrame": "en el campo",
+        "enters": "entra",
+        "leaves": "sale",
+        "none": "No está en el campo de visión del sensor en esta ventana"
+      },
       "table": {
         "time": "Hora",
+        "title": "{object} desde {sensor}",
+        "timeUtc": "Hora (UTC)",
         "type": "Tipo",
         "el": "El.",
         "az": "Az.",
         "rng": "Dist.",
-        "visible": "Visible"
+        "visible": "Sobre el horizonte",
+        "duration": "Duración",
+        "sunlit": "Iluminado",
+        "optical": "Visible ópticamente"
       },
       "msgs": {
         "notVisible": "El satélite no será visible durante las próximas {hours} horas.",
@@ -174,7 +206,10 @@
         "maxEl": "El. máx.",
         "unknown": "Desconocido",
         "inView": "En vista",
-        "noLookAnglesToDownload": "¡No hay ángulos de observación disponibles para descargar!"
+        "inProgress": "En vista ahora",
+        "noLookAnglesToDownload": "¡No hay ángulos de observación disponibles para descargar!",
+        "eclipsed": "Eclipsado",
+        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio. No se consideran el clima ni la nubosidad."
       },
       "maskLimited": "máscara",
       "maskLimitedTitle": "Este borde lo define la máscara de horizonte del sensor, no su elevación mínima",
@@ -183,7 +218,7 @@
         "imgAlt": "La tabla de Ángulos de Visión con horas, azimuts, elevaciones y distancias",
         "imgCaption": "Cada fila es una solución de apuntamiento; haz clic en una para saltar el reloj a ese momento.",
         "readingHeading": "Leer la Tabla",
-        "reading": "Cada fila muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>) y la distancia (<strong>Dist.</strong>) del satélite visto desde el sensor, además de si es ópticamente <strong>Visible</strong>. Con <strong>Mostrar Solo Tiempos de Salida y Puesta</strong> activado, la tabla se reduce a los eventos de salida, elevación máxima y puesta de cada pase, etiquetados en la columna <strong>Tipo</strong>.",
+        "reading": "Cada fila muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>) y la distancia (<strong>Dist.</strong>) del satélite visto desde el sensor, además de si está <strong>Sobre el horizonte</strong>, <strong>Iluminado</strong> y (solo en sensores ópticos) <strong>Visible ópticamente</strong>. Con <strong>Mostrar Solo Tiempos de Salida y Puesta</strong> activado, la tabla se reduce a los eventos de salida, elevación máxima y puesta de cada pase, etiquetados en la columna <strong>Tipo</strong>.",
         "howToUse": "<ol><li>Selecciona tanto un sensor como un satélite; su icono en el panel de complementos permanece deshabilitado hasta que ambos estén establecidos.</li><li>Abre <strong>Ángulos de Visión</strong> desde el panel de complementos. La tabla se calcula automáticamente.</li><li>Abre el panel de configuración para alternar el modo salida/puesta o cambiar la <strong>Duración del Cálculo (Días)</strong> y el <strong>Intervalo (Segundos)</strong>.</li><li>Haz clic en una fila para saltar el reloj de la simulación a ese momento, o usa el botón de descarga para exportar la tabla.</li></ol>",
         "tip1": "El modo salida/puesta es la forma más rápida de saber cuándo podrás ver el satélite la próxima vez; cambia a la tabla completa cuando necesites ángulos de apuntamiento segundo a segundo.",
         "tip2": "Hacer clic en una fila conserva tu estado de reproducción, de modo que un reloj en pausa permanece en pausa en la nueva hora."
@@ -202,7 +237,9 @@
         "az": "Az.",
         "rng": "Dist.",
         "sensor": "Sensor",
-        "visible": "Visible"
+        "visible": "Sobre el horizonte",
+        "sunlit": "Iluminado",
+        "optical": "Visible ópticamente"
       },
       "msgs": {
         "notVisible": "El satélite no será visible durante las próximas {hours} horas.",
@@ -210,17 +247,19 @@
         "no": "No",
         "na": "N/D",
         "sensorListMissing": "No se encontró la lista de sensores en la interfaz",
-        "satrecNotFound": "No se encontró el registro del satélite"
+        "satrecNotFound": "No se encontró el registro del satélite",
+        "eclipsed": "Eclipsado",
+        "opticalNote": "Visible ópticamente = sobre el horizonte, satélite iluminado y Sol en {limit}° o por debajo en el sitio. No se consideran el clima ni la nubosidad."
       },
       "help": {
         "overview": "Los Ángulos de Visión Multi-Sitio responden a una pregunta de red: de todos mis sensores, ¿cuál ve el satélite seleccionado y cuándo? Calcula los ángulos de visión en muchos sitios a la vez y los intercala en una única tabla cronológica.",
         "imgAlt": "La tabla de Ángulos de Visión Multi-Sitio con sensores y datos de apuntamiento",
         "imgCaption": "Cada fila empareja un momento del pase con el sensor que lo ve.",
         "readingHeading": "Leer la Tabla",
-        "reading": "Las filas están ordenadas cronológicamente entre todos los sitios habilitados, y cada una muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>), la distancia (<strong>Dist.</strong>), el <strong>Sensor</strong> involucrado y la visibilidad óptica. El panel de selección de sensores determina qué sitios se calculan: los sensores verdes se incluyen y los rojos se excluyen.",
+        "reading": "Las filas están ordenadas cronológicamente entre todos los sitios habilitados, y cada una muestra la <strong>Hora</strong>, la elevación (<strong>El.</strong>), el azimut (<strong>Az.</strong>), la distancia (<strong>Dist.</strong>), el <strong>Sensor</strong> involucrado y si está <strong>Sobre el horizonte</strong>, <strong>Iluminado</strong> y (solo en sensores ópticos) <strong>Visible ópticamente</strong>. El panel de selección de sensores determina qué sitios se calculan: los sensores verdes se incluyen y los rojos se excluyen.",
         "howToUse": "<ol><li>Selecciona un satélite; su icono en el panel de complementos permanece deshabilitado hasta que haya uno seleccionado. No se necesita seleccionar ningún sensor.</li><li>Abre <strong>Vistas Multi-Sitio</strong> desde el panel de complementos. La red de alerta de misiles predeterminada se calcula automáticamente.</li><li>Activa o desactiva sensores en el panel de la lista de sensores para cambiar la red.</li><li>Haz clic en una fila para seleccionar ese sensor y saltar el reloj a ese momento, o exporta la tabla con el botón de descarga.</li></ol>",
         "tip1": "Úsalo para planificar traspasos: donde termina la cobertura de un sensor, la siguiente fila muestra qué sitio recoge el satélite.",
-        "tip2": "Los sitios ópticos muestran la visibilidad solo cuando las condiciones de iluminación permiten una observación real; los radares siempre muestran N/D."
+        "tip2": "Los sitios ópticos muestran Sí en Visible ópticamente solo cuando el satélite está sobre el horizonte e iluminado y el sitio está oscuro (Sol a -12 grados o menos); en caso contrario muestran No. Las filas de radar muestran Sobre el horizonte e Iluminado, con «-» en Visible ópticamente."
       }
     }
   }

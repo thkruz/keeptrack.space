@@ -82,6 +82,7 @@ describe('buildHelpHtml', () => {
     // src is prefixed with the install directory at render time
     expect(result).toMatch(/src="[^"]*img\/help\/test\/menu\.png"/u);
     expect(result).toContain('alt="The menu"');
+    expect(result).toContain('class="help-figure-zoom"');
     expect(result).toContain('<figcaption>The menu open.</figcaption>');
     expect(result).toContain('Heading-less section.');
     // Second section has no heading element

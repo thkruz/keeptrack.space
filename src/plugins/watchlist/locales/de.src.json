@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Sensorbeschriftungen anzeigen",
           "helpText": "Zeigt den Sensornamen neben seiner Markierung auf dem Globus und der flachen Karte."
+        },
+        "showObjectLabels": {
+          "label": "Objektnamen anzeigen",
+          "helpText": "Zeigt Namen neben dem gewählten, dem sekundären und den Beobachtungslisten-Objekten mit Formpräfix: [1] primär, (2) sekundär, * Beobachtungsliste."
         }
       },
       "rmbMenu": {
@@ -63,6 +67,13 @@
       "infoBox": {
         "addLabel": "Zur Beobachtungsliste hinzufügen",
         "removeLabel": "Von der Beobachtungsliste entfernen"
+      },
+      "stale": {
+        "label": "Schwelle für veraltete Bahndaten",
+        "helpText": "Bahndaten, die älter sind, werden in Beobachtungsliste, Überflugtabellen und Exporten als VERALTET markiert. Standard 72.",
+        "ageHeader": "GP-Alter (h)",
+        "marker": "VERALTET",
+        "tooltip": "Die Bahndaten sind älter als {hours} h. Vorhersagen können ungenau sein."
       }
     },
     "WatchlistOverlay": {

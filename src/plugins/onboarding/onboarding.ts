@@ -1,3 +1,4 @@
+import { getPresetOpenGroups } from '@app/app/ui/drawer-presets';
 import { MenuMode, ToastMsgType } from '@app/engine/core/interfaces';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -12,6 +13,7 @@ import {
   ISettingsContributor,
   ISideMenuConfig,
 } from '@app/engine/plugins/core/plugin-capabilities';
+import { adviceManagerInstance } from '@app/engine/utils/adviceManager';
 import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { keepTrackApi } from '@app/keepTrackApi';
@@ -110,6 +112,14 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
         keywords: ['checklist', 'get started', 'missions'],
         callback: () => this.bottomMenuClicked(),
       },
+      {
+        id: 'OnboardingPlugin.helpForMenu',
+        label: l('commands.helpForMenu'),
+        category,
+        shortcutHint: 'Shift+F1',
+        keywords: ['help', 'menu help', 'what does this do', 'documentation', 'guide'],
+        callback: () => adviceManagerInstance.showContextHelp(),
+      },
     ];
   }
 
@@ -169,6 +179,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     wireMissionAutoChecks((missionId: string) => this.markMissionDone_(missionId));
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, () => {
+      this.applyDrawerPreset_();
       this.renderChecklistMenu_();
       this.card_?.render();
       this.wireChecklistMenu_();
@@ -306,6 +317,14 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   // Stage: welcome
   // =========================================================================
 
+  /**
+   * Role answer picks which drawer groups start open (#124). Nothing is hidden and groups the user
+   * toggled themselves keep their state; clearing the role restores the app default.
+   */
+  private applyDrawerPreset_(): void {
+    ServiceLocator.getUiManager()?.pluginDrawer?.setDefaultOpenGroups(getPresetOpenGroups(this.state_.persona));
+  }
+
   private startWelcome_(): void {
     if (this.engine_?.isActive) {
       return;
@@ -341,6 +360,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
 
             this.state_.persona = this.state_.persona === persona ? null : persona;
             this.saveState_();
+            this.applyDrawerPreset_();
             popoverEl.querySelectorAll('.kt-tour-chip').forEach((c) => {
               c.classList.toggle('kt-tour-chip-selected', (c as HTMLElement).dataset.persona === this.state_.persona);
             });
@@ -589,6 +609,17 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
   private showAccount_(isNextVisit = false): void {
     const isOfferable = this.isAccountStepAvailable_() && this.state_.accountPrompt === (isNextVisit ? 'later' : 'none');
 
+    // #457: on a phone the card covers the globe and zoom buttons and stacks with the "Tour complete" toast seconds
+    // after the tour. Defer the one offer to the next visit instead (the 'later' state already does that).
+    if (isOfferable && !isNextVisit && settingsManager.isMobileModeEnabled) {
+      this.state_.accountPrompt = 'later';
+      this.saveState_();
+      this.track_('onboarding_account_deferred', { source: 'phone-tour-end' });
+      this.finishTour_(true);
+
+      return;
+    }
+
     if (!isOfferable) {
       if (!isNextVisit) {
         this.finishTour_(true);
@@ -629,7 +660,7 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
       kind: 'card',
       title: l('account.title'),
       body: isPowerDone ? l('account.bodyPower') : l('account.body'),
-      extraHtml: `<ul class="kt-tour-recap"><li>${l('account.benefit1')}</li><li>${l('account.benefit2')}</li><li>${l('account.benefit3')}</li></ul>`,
+      extraHtml: `<ul class="kt-tour-recap kt-tour-account-recap"><li>${l('account.benefit1')}</li><li>${l('account.benefit2')}</li><li>${l('account.benefit3')}</li></ul>`,
       buttons: [
         { id: 'create', label: l('buttons.createAccount'), isPrimary: true },
         { id: 'later', label: l('buttons.maybeLater') },
@@ -687,8 +718,12 @@ export class OnboardingPlugin extends KeepTrackPlugin implements ICommandPalette
     if (isCelebrate) {
       keepTrackApi.toast(l('toasts.finished'), ToastMsgType.normal);
       this.pulseHamburger_();
-      // No dimming overlay: the globe and search stay usable with the drawer open
-      openDrawerWithoutOverlay();
+      // Phones: the overlay-free drawer is full width and covers the search magnifier, so leave it closed and
+      // let the pulsing hamburger point at it (#383).
+      if (!settingsManager.isMobileModeEnabled) {
+        // No dimming overlay: the globe and search stay usable with the drawer open
+        openDrawerWithoutOverlay();
+      }
     }
   }
 

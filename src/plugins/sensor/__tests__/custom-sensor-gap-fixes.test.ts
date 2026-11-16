@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -83,6 +85,7 @@ describe('CustomSensorPlugin gap fixes', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.unstubAllGlobals();
     vi.advanceTimersByTime(1000);
   });
 
@@ -113,6 +116,33 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect(addSpy).toHaveBeenCalledTimes(2);
   });
 
+  it('does not add a sensor whose name and position match an active one', () => {
+    setForm();
+    submitForm();
+    const added = addSpy.mock.calls[0][0] as DetailedSensor;
+
+    ServiceLocator.getSensorManager().secondarySensors = [added];
+    vi.advanceTimersByTime(1500);
+    submitForm();
+
+    expect(addSpy).toHaveBeenCalledTimes(1);
+    // Never silent: the second Add explains why nothing was added
+    expect(toastSpy).toHaveBeenCalledTimes(2);
+  });
+
+  it('adds a sensor with a new name at the same position as an active one (#197)', () => {
+    setForm();
+    submitForm();
+    const added = addSpy.mock.calls[0][0] as DetailedSensor;
+
+    ServiceLocator.getSensorManager().secondarySensors = [added];
+    vi.advanceTimersByTime(1500);
+    setForm({ 'cs-uiName': 'Wide', 'cs-minaz': '0', 'cs-maxaz': '360' });
+    submitForm();
+
+    expect(addSpy).toHaveBeenCalledTimes(2);
+  });
+
   it('accepts a different sensor submitted right after the first', () => {
     setForm();
     submitForm();
@@ -136,6 +166,13 @@ describe('CustomSensorPlugin gap fixes', () => {
     submitForm();
     submitForm();
     expect(emitted).toEqual(['CustomSensorPlugin']);
+  });
+
+  it('starts with Telescope off and the field-of-view limits visible', () => {
+    expect((getEl('cs-telescope') as HTMLInputElement).checked).toBe(false);
+    for (const id of ['cs-minaz-div', 'cs-maxaz-div', 'cs-minel-div', 'cs-maxel-div', 'cs-minrange-div', 'cs-maxrange-div']) {
+      expect(getEl(id)!.classList.contains('start-hidden')).toBe(false);
+    }
   });
 
   it('Replace Sensor pre-fills every field of the current sensor', () => {
@@ -163,9 +200,43 @@ describe('CustomSensorPlugin gap fixes', () => {
     expect(value('cs-mask')).toBe('0,5\n180,12');
     // Telescope off so the copied limits are visible
     expect((getEl('cs-telescope') as HTMLInputElement).checked).toBe(false);
+    // The form says the values were inherited, naming the source sensor
+    const note = getEl('cs-prefill-note')!;
+
+    expect(note.style.display).toBe('');
+    expect(note.textContent).not.toContain('prefillNote'); // rendered text, not the raw key
+  });
+
+  it('keeps the add/replace note aligned with the button labels and above the sticky bar (#327)', () => {
+    const css = readFileSync(resolve(__dirname, '../custom-sensor.css'), 'utf8');
+    const rule = css.slice(css.lastIndexOf('#custom-sensor-menu-form > #cs-add-replace-note'));
+
+    expect(rule).toMatch(/padding-left:\s*21px/u);
+    expect(rule).toMatch(/z-index:\s*3/u);
+  });
+
+  it('labels the range fields in km and the mask placeholder is not a sample mask', () => {
+    const en = JSON.parse(readFileSync(resolve(__dirname, '../locales/en.src.json'), 'utf8')).plugins.CustomSensorPlugin.labels;
+
+    expect(en.minRange).toContain('(km)');
+    expect(en.maxRange).toContain('(km)');
+    expect(en.elevation).toContain('(km)');
+    expect(en.maskPlaceholder.includes(String.fromCharCode(10))).toBe(false);
+    expect((getEl('cs-mask') as HTMLTextAreaElement).placeholder.includes(String.fromCharCode(10))).toBe(false);
+  });
+
+  it('Clear Custom Sensors does nothing when the confirmation is declined', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const clearSpy = vi.spyOn(sensorManager, 'clearSecondarySensors');
+
+    vi.stubGlobal('confirm', () => false);
+    getEl('cs-clear')!.click();
+
+    expect(clearSpy).not.toHaveBeenCalled();
   });
 
   it('Clear Custom Sensors also resets a catalog primary sensor', () => {
+    vi.stubGlobal('confirm', () => true);
     const sensorManager = ServiceLocator.getSensorManager();
 
     sensorManager.currentSensors = [catalogSensor()];

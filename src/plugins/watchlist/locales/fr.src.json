@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Afficher les étiquettes des capteurs",
           "helpText": "Affiche le nom du capteur à côté de son marqueur sur le globe et la carte plane."
+        },
+        "showObjectLabels": {
+          "label": "Afficher les noms d'objets",
+          "helpText": "Affiche les noms à côté de l'objet sélectionné, du secondaire et de la liste de suivi, avec un préfixe de forme : [1] principal, (2) secondaire, * liste de suivi."
         }
       },
       "rmbMenu": {
@@ -63,6 +67,13 @@
       "infoBox": {
         "addLabel": "Ajouter à la liste de suivi",
         "removeLabel": "Retirer de la liste de suivi"
+      },
+      "stale": {
+        "label": "Seuil de données orbitales périmées",
+        "helpText": "Les éléments plus anciens sont marqués PÉRIMÉ dans la liste de suivi, les tableaux de passages et les exports. Par défaut 72.",
+        "ageHeader": "Âge GP (h)",
+        "marker": "PÉRIMÉ",
+        "tooltip": "Les éléments orbitaux ont plus de {hours} h. Les prévisions peuvent être imprécises."
       }
     },
     "WatchlistOverlay": {

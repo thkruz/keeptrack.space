@@ -19,20 +19,22 @@ import { saveAs } from 'file-saver';
 import { ClickDragOptions, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { OrbitPreview } from '../shared/orbit-preview';
-import { applyOrbitPreset, applySunSyncInclination, buildPreviewTleFromForm, cloneSelectedSatellite, getFreeAnalystScc } from './create-sat-actions';
+import { applyOrbitPreset, applySunSyncInclination, buildActivePreviewTle, cloneSelectedSatellite, getFreeAnalystScc, getFreeAnalystSccs } from './create-sat-actions';
 import { warnOnTleChecksumMismatch } from './create-sat-checksum';
 import { buildCreateSatHelp } from './create-sat-help';
 import { buildAdvancedTabHtml, buildBasicTabHtml, createSatActionButton } from './create-sat-menu-html';
-import { dateToEpochFields, OrbitPresetId } from './create-sat-orbits';
+import { dateToEpochFields, epochFieldsToIso, epochYearToFull, isoToEpochFields, OrbitPresetId } from './create-sat-orbits';
 import {
   FormErrorReporter,
   FormFieldError,
   fieldErrorFromException,
+  parseEccentricityField,
   TleInputParams,
   validateAdvancedFields,
   validateBasicFields,
   wireInlineValidation,
 } from './create-sat-validation';
+import { parseWalkerInputs, planWalker, walkerErrorMessage } from './create-sat-walker';
 import './create-sat.css';
 
 type T7eKey = Parameters<typeof t7e>[0];
@@ -54,6 +56,10 @@ interface CreateRequest {
   resubmit: (confirmed: Satellite) => void;
   /** Shows a field error the composer or parser found after validation passed. */
   onFieldError: (error: FormFieldError) => void;
+  /** Batch creation: no per-satellite toast, search or usage event, and a needed replacement confirmation counts as a failure. */
+  quiet?: boolean;
+  /** Called once per satellite installed in quiet mode. */
+  onSuccess?: () => void;
 }
 /**
  * CreateSat plugin for creating and editing satellites
@@ -61,6 +67,11 @@ interface CreateRequest {
 export class CreateSat extends KeepTrackPlugin {
   readonly id = 'CreateSat';
   static readonly elementPrefix = 'createSat';
+  /**
+   * Extra sentence the Pro TLE/OMM import sets while it submits, appended to the one "created" toast
+   * (a renumbered NORAD ID) instead of raising a second toast on top of it (#429). Cleared by the importer.
+   */
+  protected static createdToastNote_ = '';
   dependencies_ = [SelectSatManager.name];
   /** The menu button works with no satellite selected */
   isRequireSatelliteSelected = false;
@@ -237,8 +248,17 @@ export class CreateSat extends KeepTrackPlugin {
     // An untouched Advanced epoch follows the simulation clock, not the menu-build time.
     CreateSat.syncAutoEpoch_();
     // Defer so isMenuButtonActive has settled before drawing the preview orbit.
-    setTimeout(() => this.updatePreview_(), 0);
+    setTimeout(() => {
+      this.updatePreview_();
+      CreateSat.syncToastClearance_(this.isMenuButtonActive);
+    }, 0);
   }
+
+  /** While the menu is open the toast stack moves to the bottom so it never covers the menu title. */
+  protected static syncToastClearance_(isOpen: boolean): void {
+    document.body.classList.toggle('create-sat-menu-open', isOpen);
+  }
+
   /**
    * Add HTML and register events
    */
@@ -247,7 +267,10 @@ export class CreateSat extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
     // Drop the preview orbit whenever the side menu closes.
-    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => this.orbitPreview_.clear());
+    EventBus.getInstance().on(EventBusEvent.hideSideMenus, () => {
+      this.orbitPreview_.clear();
+      CreateSat.syncToastClearance_(false);
+    });
   }
 
   /**
@@ -267,6 +290,8 @@ export class CreateSat extends KeepTrackPlugin {
     getEl('createSat-save')!.addEventListener('click', CreateSat.exportTLE_);
     // Submit button for Basic tab
     getEl('createSat-basic-submit')!.addEventListener('click', () => this.createSatBasicSubmit_());
+    // Walker delta constellation generator (Basic tab)
+    getEl('createSat-walker-submit')?.addEventListener('click', () => CreateSat.createWalkerSubmit_());
 
     // Values stay the catalog codes; only the option text follows the UI language.
     countryNameList
@@ -345,7 +370,64 @@ export class CreateSat extends KeepTrackPlugin {
       getEl(`${p}-${id}`)?.addEventListener('input', () => this.updatePreview_());
     }
 
+    // The Basic tab drives the preview while it is active, so its fields redraw it too.
+    for (const id of ['basic-inc', 'basic-apogee', 'basic-perigee']) {
+      getEl(`${p}-${id}`)?.addEventListener('input', () => this.updatePreview_());
+    }
+    // Switching tabs switches which form the preview reads (after Materialize flips the active tab).
+    getEl('createSat-tabs')?.addEventListener('click', () => setTimeout(() => this.updatePreview_(), 0));
+
+    CreateSat.wireEpochTimestamp_(p, () => this.updatePreview_());
     wireInlineValidation(p);
+  }
+
+  /** Typing an ISO UTC timestamp fills the year and day fields; typing in either of those clears the timestamp box. */
+  protected static wireEpochTimestamp_(p: string, onApplied: () => void): void {
+    const isoEl = getEl(`${p}-epochiso`, true) as HTMLInputElement | null;
+    const yearEl = getEl(`${p}-year`, true) as HTMLInputElement | null;
+    const dayEl = getEl(`${p}-day`, true) as HTMLInputElement | null;
+
+    if (!isoEl || !yearEl || !dayEl) {
+      return;
+    }
+    isoEl.addEventListener('change', () => {
+      if (isoEl.value.trim() === '') {
+        return;
+      }
+      const fields = isoToEpochFields(isoEl.value);
+
+      if (!fields) {
+        isoEl.classList.add('invalid');
+        ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.invalidEpochTimestamp' as T7eKey), ToastMsgType.caution, true);
+
+        return;
+      }
+      isoEl.classList.remove('invalid');
+      yearEl.value = fields.year;
+      dayEl.value = fields.day;
+      onApplied();
+    });
+    // Editing Epoch Year or Epoch Day rewrites the timestamp so both always name the same instant.
+    for (const el of [yearEl, dayEl]) {
+      el.addEventListener('input', () => CreateSat.refreshEpochTimestamp(p));
+    }
+    CreateSat.refreshEpochTimestamp(p);
+  }
+
+  /** Rewrite the Epoch timestamp box from Epoch Year + Epoch Day (blank when they are not a valid epoch). Call after writing those fields in code. */
+  static refreshEpochTimestamp(p: string = CreateSat.elementPrefix): void {
+    const isoEl = getEl(`${p}-epochiso`, true) as HTMLInputElement | null;
+    const yearEl = getEl(`${p}-year`, true) as HTMLInputElement | null;
+    const dayEl = getEl(`${p}-day`, true) as HTMLInputElement | null;
+
+    if (!isoEl || !yearEl || !dayEl) {
+      return;
+    }
+    const iso = epochFieldsToIso(yearEl.value, dayEl.value);
+
+    isoEl.value = iso ?? '';
+    // A typed but invalid epoch is flagged rather than left looking like a forgotten blank.
+    isoEl.classList.toggle('invalid', iso === null && (yearEl.value.trim() !== '' || dayEl.value.trim() !== ''));
   }
 
   /** Redraw (or clear) the live ghost-orbit preview from the current form. */
@@ -356,7 +438,7 @@ export class CreateSat extends KeepTrackPlugin {
       return;
     }
 
-    const tle = buildPreviewTleFromForm(CreateSat.elementPrefix);
+    const tle = buildActivePreviewTle(CreateSat.elementPrefix);
 
     if (tle) {
       this.orbitPreview_.update(tle.tle1, tle.tle2);
@@ -378,19 +460,51 @@ export class CreateSat extends KeepTrackPlugin {
       }
 
       const meanmo = Number.parseFloat(meanmoEl.value);
-      const ecen = Number.parseFloat(ecenEl.value) / 1e7;
+      const ecen = Number.parseInt(parseEccentricityField(ecenEl.value) ?? '', 10) / 1e7;
       const meana = Number.parseFloat((getEl(`${CreateSat.elementPrefix}-meana`, true) as HTMLInputElement | null)?.value ?? '');
-
-      if (Number.isNaN(meanmo) || Number.isNaN(ecen) || meanmo <= 0 || ecen < 0 || ecen >= 1) {
-        return;
-      }
-
-      const derived = CreateSat.calculateDerivedParams(meanmo, ecen, Number.isNaN(meana) ? 0 : meana);
 
       const apogeeEl = getEl(`${CreateSat.elementPrefix}-calc-apogee`) as HTMLInputElement;
       const perigeeEl = getEl(`${CreateSat.elementPrefix}-calc-perigee`) as HTMLInputElement;
       const smaEl = getEl(`${CreateSat.elementPrefix}-calc-sma`) as HTMLInputElement;
       const velocityEl = getEl(`${CreateSat.elementPrefix}-calc-velocity`) as HTMLInputElement;
+      const noteEl = getEl(`${CreateSat.elementPrefix}-calc-note`, true);
+      const showNote = (key: string | null): void => {
+        if (noteEl) {
+          noteEl.textContent = key ? t7e(`plugins.CreateSat.errorMsgs.${key}` as T7eKey) : '';
+          noteEl.hidden = key === null;
+        }
+      };
+      const clearCalculated = (key: string): void => {
+        for (const el of [apogeeEl, perigeeEl, smaEl, velocityEl]) {
+          if (el) {
+            el.value = '';
+            el.placeholder = '--';
+          }
+        }
+        showNote(key);
+      };
+
+      // Invalid input blanks the readout and says why, instead of leaving the last good (or a meaningless) number.
+      if ((ecenEl.value.trim() !== '' && Number.isNaN(ecen)) || ecen < 0 || ecen >= 1) {
+        clearCalculated('calcInvalidEccentricity');
+
+        return;
+      }
+      if (Number.isNaN(meanmo) || meanmo <= 0) {
+        return;
+      }
+      if (Number.isNaN(ecen)) {
+        return;
+      }
+
+      const derived = CreateSat.calculateDerivedParams(meanmo, ecen, Number.isNaN(meana) ? 0 : meana);
+
+      if (derived.perigee < 0) {
+        clearCalculated('calcSubSurface');
+
+        return;
+      }
+      showNote(null);
 
       if (apogeeEl) {
         apogeeEl.value = derived.apogee.toFixed(1);
@@ -433,6 +547,18 @@ export class CreateSat extends KeepTrackPlugin {
   protected static advancedErrors_: FormErrorReporter | null = null;
 
   /** Raw Basic-tab values. */
+  /**
+   * Formats a typed mean motion as NN.NNNNN..., keeping the precision typed (up to the 8 decimals a TLE line
+   * holds); 5 is the minimum shown. Used on change and on submit so tabbing out never rounds the value.
+   */
+  static formatMeanMotion_(raw: string): string {
+    const value = parseFloat(raw);
+    const typedDecimals = /\.(\d+)/u.exec(raw.trim())?.[1].length ?? 0;
+    const decimals = Math.min(8, Math.max(5, typedDecimals));
+
+    return value.toFixed(decimals).padStart(decimals + 3, '0');
+  }
+
   private static readBasicInputs_(): { scc: string; name: string; inc: string; apogee: string; perigee: string } {
     const v = (suffix: string): string => (getEl(`${CreateSat.elementPrefix}-basic-${suffix}`, true) as HTMLInputElement | null)?.value ?? '';
 
@@ -502,6 +628,77 @@ export class CreateSat extends KeepTrackPlugin {
     );
   }
 
+  /** Show or clear the Walker form message. */
+  private static setWalkerMessage_(text: string): void {
+    const el = getEl(`${CreateSat.elementPrefix}-walker-error`, true);
+
+    if (el) {
+      el.textContent = text;
+      el.hidden = text === '';
+    }
+  }
+
+  /**
+   * Create a Walker delta constellation (T/P/F) from the Basic tab's Walker section, one analyst satellite per
+   * member in the lowest free slots, named "<prefix>-P<plane>-S<slot>" so the set can be found with one search.
+   */
+  protected static createWalkerSubmit_(): void {
+    const v = (id: string): string => (getEl(`${CreateSat.elementPrefix}-walker-${id}`, true) as HTMLInputElement | null)?.value ?? '';
+    const raw = { altitude: v('alt'), inclination: v('inc'), total: v('total'), planes: v('planes'), phasing: v('phasing'), prefix: v('prefix') };
+    const parsed = parseWalkerInputs(raw);
+
+    if ('code' in parsed) {
+      CreateSat.setWalkerMessage_(walkerErrorMessage(parsed));
+
+      return;
+    }
+
+    const plan = planWalker(raw, new Date(ServiceLocator.getTimeManager().simulationTimeObj), getFreeAnalystSccs(parsed.total));
+
+    if ('code' in plan) {
+      CreateSat.setWalkerMessage_(walkerErrorMessage(plan));
+
+      return;
+    }
+
+    CreateSat.setWalkerMessage_('');
+    let created = 0;
+    let failed = 0;
+
+    for (const member of plan) {
+      CreateSat.submitTle_({
+        params: member.params,
+        intl: member.intl,
+        snapshot: () => member.params.scc,
+        resubmit: () => {
+          failed++;
+        },
+        onFieldError: () => {
+          failed++;
+        },
+        quiet: true,
+        onSuccess: () => {
+          created++;
+        },
+      });
+    }
+
+    const prefix = plan[0].params.name.replace(/-P1-S1$/u, '');
+
+    if (created > 0) {
+      ServiceLocator.getUiManager().doSearch(prefix);
+      EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'CreateSat');
+    }
+    ServiceLocator.getUiManager().toast(
+      t7e('plugins.CreateSat.walker.created' as T7eKey)
+        .replace('{count}', String(created))
+        .replace('{prefix}', prefix)
+        .replace('{failed}', String(failed)),
+      failed > 0 ? ToastMsgType.caution : ToastMsgType.normal,
+      true
+    );
+  }
+
   /**
    * Setup period and mean motion converter event listeners
    */
@@ -531,7 +728,7 @@ export class CreateSat extends KeepTrackPlugin {
       }
     });
 
-    // Mean Motion to Period conversion
+    // Mean Motion to Period conversion (keeps the typed precision; see formatMeanMotion_)
     getEl(`${CreateSat.elementPrefix}-meanmo`)!.addEventListener('change', () => {
       const meanmoInput = getEl(`${CreateSat.elementPrefix}-meanmo`) as HTMLInputElement;
       const meanmo = meanmoInput.value;
@@ -544,11 +741,7 @@ export class CreateSat extends KeepTrackPlugin {
         const per = (1440 / parseFloat(meanmo)).toFixed(4);
         (getEl(`${CreateSat.elementPrefix}-per`) as HTMLInputElement).value = per.padStart(8, '0');
 
-        /*
-         * Also reformat the input just in case the user entered a value with
-         * more than 4 decimal places
-         */
-        meanmoInput.value = parseFloat(meanmo).toFixed(5).padStart(8, '0');
+        meanmoInput.value = CreateSat.formatMeanMotion_(meanmo);
       } catch (error) {
         errorManagerInstance.warn(t7e('plugins.CreateSat.errorMsgs.meanMotionToPeriodFailed' as T7eKey).replace('{error}', String(error)));
       }
@@ -636,6 +829,7 @@ export class CreateSat extends KeepTrackPlugin {
     yearEl.value = year;
     dayEl.value = day;
     dayEl.setAttribute(CreateSat.AUTO_EPOCH_ATTR_, `${year}|${day}`);
+    CreateSat.refreshEpochTimestamp();
   }
 
   /** Every invalid Advanced field (empty when the form can be submitted). */
@@ -653,9 +847,16 @@ export class CreateSat extends KeepTrackPlugin {
     sccInput.value = scc;
 
     const yearInput = getEl(`${CreateSat.elementPrefix}-year`) as HTMLInputElement;
-    let year = yearInput.value.trim().replace(/\D/gu, '').slice(-2); // Only digits, last 2
+    let year = yearInput.value.trim().replace(/\D/gu, ''); // Only digits
 
-    year = year.padStart(2, '0'); // Must be 2 digits
+    const fullYear = epochYearToFull(year);
+
+    // A plausible four-digit year (1957-2056) becomes its TLE two digits; an implausible one ("2699") stays as typed so validation rejects it.
+    if (year.length === 4 && fullYear !== null) {
+      year = year.slice(-2);
+    } else if (year.length <= 2) {
+      year = year.padStart(2, '0'); // Must be 2 digits
+    }
 
     yearInput.value = year;
 
@@ -674,6 +875,8 @@ export class CreateSat extends KeepTrackPlugin {
     }
 
     dayInput.value = day;
+    // The reformatted year and day are the new truth; rewrite the timestamp so it never keeps an earlier epoch.
+    CreateSat.refreshEpochTimestamp();
 
     const incInput = getEl(`${CreateSat.elementPrefix}-inc`) as HTMLInputElement;
     let inc = incInput.value.trim();
@@ -708,7 +911,8 @@ export class CreateSat extends KeepTrackPlugin {
      * Ensure eccentricity is a 7-digit number (e.g., 0000000)
      * Remove any decimal point and pad with zeros
      */
-    ecen = ecen.replace('.', '').replace(/\D/gu, '').padStart(7, '0').slice(0, 7);
+    // An unreadable value (e.g. 1.5) is left as typed so validation rejects it; never reshape it into a different, valid eccentricity.
+    ecen = parseEccentricityField(ecen) ?? ecen;
 
     ecenInput.value = ecen;
 
@@ -744,7 +948,7 @@ export class CreateSat extends KeepTrackPlugin {
     const meanmoNum = parseFloat(meanmo);
 
     if (!isNaN(meanmoNum)) {
-      meanmo = meanmoNum.toFixed(5).padStart(8, '0');
+      meanmo = CreateSat.formatMeanMotion_(meanmo);
     } else {
       meanmo = meanmo.padStart(8, '0');
     }
@@ -857,7 +1061,12 @@ export class CreateSat extends KeepTrackPlugin {
       const obj = catalogManagerInstance.getObject(satId, GetSatType.EXTRA_ONLY);
 
       if (!obj?.isSatellite()) {
-        ServiceLocator.getUiManager().toast(t7e('plugins.CreateSat.errorMsgs.invalidSatObject' as T7eKey), ToastMsgType.error, true);
+        // Name the field and the reason instead of a bare "Invalid satellite object".
+        request.onFieldError({
+          id: 'scc',
+          fields: ['scc'],
+          message: t7e('plugins.CreateSat.errorMsgs.noradIdNoSlot' as T7eKey).replace('{id}', inputParams.scc.trim()),
+        });
 
         return;
       }
@@ -865,6 +1074,15 @@ export class CreateSat extends KeepTrackPlugin {
       const sat = obj as Satellite;
 
       if ((sat.active || sat.country !== 'ANALSAT') && confirmedObject !== sat) {
+        if (request.quiet) {
+          request.onFieldError({
+            id: 'scc',
+            fields: ['scc'],
+            message: t7e('plugins.CreateSat.errorMsgs.noradIdNoSlot' as T7eKey).replace('{id}', inputParams.scc.trim()),
+          });
+
+          return;
+        }
         const oldTle1 = sat.tle1;
         const oldTle2 = sat.tle2;
         const oldIdentity = JSON.stringify([sat.name, sat.country, sat.active]);
@@ -1013,17 +1231,25 @@ export class CreateSat extends KeepTrackPlugin {
         selectSatManager.selectSat(satId);
       }
 
+      if (request.quiet) {
+        request.onSuccess?.();
+
+        return;
+      }
+
       // Search for the new satellite
       ServiceLocator.getUiManager().doSearch(inputParams.scc);
 
       // Show success message
-      ServiceLocator.getUiManager().toast(
-        t7e('plugins.CreateSat.successMsgs.satCreated' as T7eKey)
-          .replace('{name}', inputParams.name)
-          .replace('{scc}', inputParams.scc),
-        ToastMsgType.normal,
-        true
-      );
+      const createdText = t7e('plugins.CreateSat.successMsgs.satCreated' as T7eKey)
+        .replace('{name}', inputParams.name)
+        .replace('{scc}', inputParams.scc);
+
+      const note = CreateSat.createdToastNote_;
+      // Two sentences need a full stop between them (satCreated has none); CJK text takes a full-width stop.
+      const stop = /[.!。]$/u.test(createdText) ? '' : /[　-鿿＀-￯]$/u.test(createdText) ? '。' : '.';
+
+      ServiceLocator.getUiManager().toast(note ? `${createdText}${stop} ${note}` : createdText, ToastMsgType.normal, true);
       EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, 'CreateSat', { satId });
     } catch (error) {
       // ootk rejects an out-of-range element with a ParseError; name the field and its range instead.

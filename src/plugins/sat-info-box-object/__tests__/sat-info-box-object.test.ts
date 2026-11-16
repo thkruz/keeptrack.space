@@ -1,4 +1,5 @@
 import { SatMath } from '@app/app/analysis/sat-math';
+import { SensorMath } from '@app/app/sensors/sensor-math';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
@@ -48,6 +49,83 @@ describe('SatInfoBoxObject data population', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
+  });
+
+  describe('deferred object data', () => {
+    const emitSelect = (obj: Satellite) => EventBus.getInstance().emit(EventBusEvent.selectSatData, obj);
+
+    it('does not fill the object card inside the click task and fills it two frames later', () => {
+      const frames: FrameRequestCallback[] = [];
+
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+      const fill = vi.spyOn(p(), 'updateObjectData_').mockImplementation(() => undefined);
+
+      emitSelect(defaultSat);
+      expect(fill).not.toHaveBeenCalled();
+      frames.shift()!(0);
+      expect(fill).not.toHaveBeenCalled();
+      frames.shift()!(0);
+      expect(fill).toHaveBeenCalledTimes(1);
+      expect(fill).toHaveBeenCalledWith(defaultSat);
+    });
+
+    it('runs only the last of several rapid selections', () => {
+      const frames: FrameRequestCallback[] = [];
+
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+      const fill = vi.spyOn(p(), 'updateObjectData_').mockImplementation(() => undefined);
+
+      emitSelect(defaultSat);
+      emitSelect(defaultSat);
+      while (frames.length > 0) {
+        frames.shift()!(0);
+      }
+      expect(fill).toHaveBeenCalledTimes(1);
+    });
+
+    it('drops a pending run when the selection changed', () => {
+      const frames: FrameRequestCallback[] = [];
+
+      vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => frames.push(cb));
+      const fill = vi.spyOn(p(), 'updateObjectData_').mockImplementation(() => undefined);
+
+      emitSelect(defaultSat);
+      PluginRegistry.getPlugin(SelectSatManager)!.selectedSat = -1;
+      while (frames.length > 0) {
+        frames.shift()!(0);
+      }
+      expect(fill).not.toHaveBeenCalled();
+    });
+
+    it('builds the catalog RCS statistics once across selections', () => {
+      const catalog = ServiceLocator.getCatalogManager();
+      const getSats = vi.spyOn(catalog, 'getSats');
+
+      p().updateRcsData_(defaultSat);
+      p().updateRcsData_(defaultSat);
+      expect(getSats).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('registers the summary line right after the title header (order 0.5)', () => {
+    const infoBox = PluginRegistry.getPlugin(SatInfoBox)!;
+
+    EventBus.getInstance().emit(EventBusEvent.satInfoBoxInit);
+    const summary = infoBox.getElements().find((el) => el.html?.includes('id="sat-summary"'));
+
+    expect(summary).toBeDefined();
+    expect(summary!.order).toBeGreaterThan(0);
+    expect(summary!.order).toBeLessThan(1);
+  });
+
+  it('redraws the summary line when the object data refreshes', () => {
+    document.body.insertAdjacentHTML('beforeend', p().createSummaryLine_());
+    p().updateObjectData_(defaultSat);
+    const first = getEl('sat-summary')!.textContent;
+
+    getEl('sat-summary')!.textContent = '';
+    p().updateObjectData_(defaultSat);
+    expect(getEl('sat-summary')!.textContent).toBe(first);
   });
 
   it('updateObjectData_ does nothing for a non-satellite/non-missile object', () => {
@@ -106,6 +184,51 @@ describe('SatInfoBoxObject data population', () => {
     EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
     expect(getEl('sat-appmag')!.innerHTML).toBe('12.34');
     expect((visMagSpy.mock.calls[1][2] as Date).getTime()).toBe(Date.UTC(2026, 9, 16, 12, 0));
+  });
+
+  it('repeating the same Apparent Mag reading makes no DOM write, a new reading does (#49)', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    const readingSpy = vi.spyOn(SensorMath, 'getVisMagReading').mockReturnValue({ kind: 'mag', value: 10.65, assumed: false });
+
+    p().updateApparentMag_(defaultSat);
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(getEl('sat-appmag')!, { childList: true, subtree: true, characterData: true });
+    p().updateApparentMag_(defaultSat);
+    expect(observer.takeRecords()).toHaveLength(0);
+
+    readingSpy.mockReturnValue({ kind: 'mag', value: 10.7, assumed: false });
+    p().updateApparentMag_(defaultSat);
+    expect(observer.takeRecords().length).toBeGreaterThan(0);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('10.70');
+    observer.disconnect();
+  });
+
+  it('eclipsed satellite: Apparent Mag shows "Not sunlit" instead of a number', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    vi.spyOn(SensorMath, 'getLightingState').mockReturnValue({ sunlit: false, siteDark: true, sunElDeg: -30 });
+    const visMagSpy = vi.spyOn(SatMath, 'calculateVisMag').mockReturnValue(10.65);
+
+    EventBus.getInstance().emit(EventBusEvent.updateSelectBox, defaultSat);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('Not sunlit');
+    expect(visMagSpy).not.toHaveBeenCalled();
+  });
+
+  it('sunlit satellite on the default intrinsic magnitude: Apparent Mag is marked assumed', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const sat = new Satellite({ ...defaultSat, vmag: null } as never);
+
+    sensorManager.currentSensors = [defaultSensor];
+    vi.spyOn(sensorManager, 'isSensorSelected').mockReturnValue(true);
+    vi.spyOn(SensorMath, 'getVisMagReading').mockReturnValue({ kind: 'mag', value: 10.65, assumed: true });
+    p().updateApparentMag_(sat);
+    expect(getEl('sat-appmag')!.innerHTML).toBe('10.65 (assumed)');
   });
 
   it('ignores select-box updates for missiles', () => {

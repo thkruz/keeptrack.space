@@ -108,6 +108,7 @@
       "commands": {
         "startTour": "Tutorial starten",
         "startPowerTour": "Power-Tour öffnen",
+        "helpForMenu": "Help for this menu (Shift+F1)",
         "openChecklist": "Erste-Schritte-Checkliste öffnen"
       },
       "settings": {

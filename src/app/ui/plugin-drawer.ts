@@ -14,26 +14,36 @@ import { settingsManager } from '@app/settings/settings';
 import appsPng from '@public/img/icons/apps.png';
 import leftPanelClosePng from '@public/img/icons/left-panel-close.png';
 import leftPanelOpenPng from '@public/img/icons/left-panel-open.png';
+import lockPng from '@public/img/icons/lock.png';
 import searchPng from '@public/img/icons/search.png';
 import ktsOrangeLogoPng from '@public/img/kts-orange-logo.png';
 import {
   ALL_DRAWER_PLUGIN_ITEMS_SELECTOR,
   buildRecentGroupFromCache,
   collectDrawerItems,
+  computeFooterPlacement,
   type DrawerBadge,
   type DrawerGroup,
   type DrawerItemData,
+  defaultOpenGroupKeys,
   drawerItemPluginId,
   drawerItemsForPluginSelector,
+  drawerRowFeatureName,
   explainDisabledPluginReason,
   explainDisabledUtilityIcon,
+  hideDrawerTooltips,
+  isGroupExpanded,
+  isSignedOutGatedRow,
   loadRecents,
   type RecentEntry,
   recordRecent,
   renderBadge,
   renderStatusFooter,
   renderUtilityFooter,
+  sanitizeDrawerIdToken,
+  showSignInPrompt,
   syncBadgesFromEvents,
+  syncDrawerItemReason,
   syncDrawerItemState,
   syncInitialUtilityState,
   syncUtilityFooterState,
@@ -49,6 +59,8 @@ export class PluginDrawer {
   private overlayEl_: HTMLElement | null = null;
   private hamburgerEl_: HTMLElement | null = null;
   private groupStates_: Record<string, boolean> = {};
+  /** Groups that start open when the user has no stored choice; onboarding (#124) can override via setDefaultOpenGroups. */
+  private extraOpenGroups_: string[] = [];
   private readonly allDrawerItems_: Map<string, DrawerItemData> = new Map();
   private isRailMode_ = false;
   private readonly badges_: Map<string, DrawerBadge> = new Map();
@@ -67,7 +79,7 @@ export class PluginDrawer {
    * click only "expanded the drawer". With the delay, an aimed click activates the icon it was
    * aimed at, and resting on the rail still expands it to show labels.
    */
-  private static readonly RAIL_HOVER_INTENT_MS = 250;
+  private static readonly RAIL_HOVER_INTENT_MS = 150;
   /** A press older than this is not used to resolve a click. */
   private static readonly PRESS_MEMORY_MS = 1000;
 
@@ -94,6 +106,7 @@ export class PluginDrawer {
       this.wireEventListeners_();
       this.observeBottomIconState_();
       this.observeTopMenuState_();
+      this.observeSideMenuClearance_();
     });
 
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => {
@@ -107,10 +120,21 @@ export class PluginDrawer {
       }
     });
 
+    // Opening any side menu (drawer row, palette, shortcut, icon) must not leave the expanded drawer over it
+    EventBus.getInstance().on(EventBusEvent.bottomMenuClick, () => {
+      if (this.isOpen_) {
+        this.close();
+      }
+    });
+
     EventBus.getInstance().on(EventBusEvent.selectSatData, () => {
       this.close();
       this.syncDisabledState_();
     });
+
+    // #438: the lock hint follows each plugin's own gate, so re-sync it whenever the account state changes.
+    EventBus.getInstance().on(EventBusEvent.userLogin, () => this.syncDisabledState_());
+    EventBus.getInstance().on(EventBusEvent.userLogout, () => this.syncDisabledState_());
 
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, () => {
       // Selecting a secondary satellite can enable plugins (e.g. RIC plots) without
@@ -265,7 +289,11 @@ export class PluginDrawer {
 
     drawer.id = 'plugin-drawer';
     drawer.className = `plugin-drawer ${modeClass}`;
+    // Phone drawer covers the nav bar and its hamburger, so it carries its own close control.
+    const closeHtml = this.isMobileMode_ ? `<div id="drawer-close-btn" class="drawer-close-btn" role="button" tabindex="0" aria-label="${t7e('Common.close')}">&times;</div>` : '';
+
     drawer.innerHTML = [
+      closeHtml,
       '<div class="drawer-inner">',
       '  <div class="drawer-top-actions">',
       searchHtml,
@@ -314,6 +342,7 @@ export class PluginDrawer {
     const recentGroup = this.buildRecentGroup_(menuGroups);
 
     this.renderMenuGroups_(menuGroups, recentGroup);
+    this.syncRenderedReasons_();
     this.renderUtilityFooter_(utilityGroups);
     this.renderStatusFooter_();
     this.syncInitialUtilityState_();
@@ -334,6 +363,22 @@ export class PluginDrawer {
     }
   }
 
+  /**
+   * A fresh render only knows load-time state, and no icon-class change fires for rows that start
+   * disabled, so give every row its aria-disabled and "why" line up front (#193).
+   */
+  private syncRenderedReasons_(): void {
+    getEl('drawer-content', true)
+      ?.querySelectorAll<HTMLElement>(ALL_DRAWER_PLUGIN_ITEMS_SELECTOR)
+      .forEach((el) => {
+        const pluginId = drawerItemPluginId(el);
+        const bottomIcon = pluginId ? getEl(pluginId, true) : null;
+        const isDisabled = bottomIcon ? bottomIcon.classList.contains('bmenu-item-disabled') : el.classList.contains('disabled');
+
+        syncDrawerItemReason(el, isDisabled);
+      });
+  }
+
   private renderMenuGroups_(groups: Record<string, DrawerGroup>, recentGroup?: DrawerGroup): void {
     const contentEl = getEl('drawer-content', true);
 
@@ -348,6 +393,11 @@ export class PluginDrawer {
       html += PluginDrawer.renderGroupHtml_('recent', recentGroup, true);
     }
 
+    const nonEmptyKeys = Object.entries(groups)
+      .filter(([, g]) => g.items.length > 0)
+      .map(([k]) => k);
+    const defaultOpen = defaultOpenGroupKeys(nonEmptyKeys, this.extraOpenGroups_);
+
     for (const [key, group] of Object.entries(groups)) {
       if (group.items.length === 0) {
         continue;
@@ -355,7 +405,7 @@ export class PluginDrawer {
 
       group.items.sort((a, b) => a.order - b.order);
 
-      const isExpanded = this.groupStates_[key] !== false;
+      const isExpanded = isGroupExpanded(key, this.groupStates_, defaultOpen);
 
       html += PluginDrawer.renderGroupHtml_(key, group, isExpanded);
     }
@@ -363,18 +413,8 @@ export class PluginDrawer {
     contentEl.innerHTML = html;
 
     // Wire group header click handlers for collapsible behavior
-    contentEl.querySelectorAll('.drawer-group-header').forEach((header) => {
-      header.addEventListener('click', () => {
-        const groupEl = header.parentElement;
-
-        groupEl?.classList.toggle('collapsed');
-        const key = groupEl?.dataset.groupKey;
-
-        if (key) {
-          this.groupStates_[key] = !groupEl?.classList.contains('collapsed');
-          this.saveGroupStates_();
-        }
-      });
+    contentEl.querySelectorAll('.drawer-group').forEach((groupEl) => {
+      this.wireGroupHeader_(groupEl as HTMLElement);
     });
   }
 
@@ -405,6 +445,13 @@ export class PluginDrawer {
 
         const pluginId = drawerItemPluginId(itemEl);
         const topMenuId = itemEl.dataset.topMenuId;
+
+        // Signed out: a gated row stays clickable and names the feature in a sign-in prompt.
+        if (isSignedOutGatedRow(itemEl)) {
+          this.showSignInPromptFor_(itemEl);
+
+          return;
+        }
 
         // A disabled item should explain itself rather than silently ignore the
         // click. Shake it for feedback. A plugin with a reason for its disabled
@@ -473,6 +520,12 @@ export class PluginDrawer {
         const iconEl = (evt.target as HTMLElement).closest('.drawer-utility-icon') as HTMLElement | null;
 
         if (!iconEl || iconEl.classList.contains('disabled')) {
+          return;
+        }
+
+        if (isSignedOutGatedRow(iconEl)) {
+          this.showSignInPromptFor_(iconEl);
+
           return;
         }
 
@@ -606,6 +659,7 @@ export class PluginDrawer {
       drawer.addEventListener('mouseleave', () => {
         this.cancelRailHoverTimer_();
         drawer.classList.remove('rail-hover');
+        hideDrawerTooltips();
       });
 
       // Prevent the toggle button from triggering hover expansion
@@ -624,6 +678,11 @@ export class PluginDrawer {
     this.hamburgerEl_?.addEventListener('click', () => {
       ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
       this.toggle();
+    });
+
+    // Phone drawer close button
+    getEl('drawer-close-btn', true)?.addEventListener('click', () => {
+      this.close();
     });
 
     // Overlay click closes drawer
@@ -664,8 +723,20 @@ export class PluginDrawer {
 
         evt.preventDefault();
         this.toggle();
+
+        // #453: Tab from the scene still opens the drawer (#202), but focus now moves into it so the next Tab keeps going.
+        if (this.isOpen_) {
+          this.focusFirstItem_();
+        }
       }
     });
+  }
+
+  /** Move keyboard focus to the first enabled drawer row (after a keyboard open from the scene). */
+  private focusFirstItem_(): void {
+    const first = getEl('drawer-content', true)?.querySelector<HTMLElement>('.drawer-item[tabindex="0"]:not(.disabled)');
+
+    first?.focus({ preventScroll: true });
   }
 
   private syncActiveState_(): void {
@@ -723,6 +794,164 @@ export class PluginDrawer {
   }
 
   /**
+   * Keep the floating utility button clear of open side menus (#513). The pill sits at the
+   * horizontal centre of the viewport, which at 1366 px lands on the right edge (and scrollbar)
+   * of any wide menu such as the Optical Observability Planner. While a menu covers the centre,
+   * centre the pill in the free space to the right of the menu instead.
+   */
+  private observeSideMenuClearance_(): void {
+    const footer = getEl('drawer-utility-footer', true);
+
+    if (!footer) {
+      return;
+    }
+
+    let rafId = 0;
+    let lastLeft = '';
+    let lastBottom = '';
+    let pendingObserver: IntersectionObserver | null = null;
+    const apply = (menuRight: number, infoBox: { left: number; top: number; right: number } | null) => {
+      const placement = computeFooterPlacement({ viewportWidth: window.innerWidth, viewportHeight: window.innerHeight, menuRight, infoBox });
+      const left = `${placement.left}px`;
+      const bottom = `${placement.bottom}px`;
+
+      if (left !== lastLeft) {
+        lastLeft = left;
+        footer.style.setProperty('--drawer-footer-left', left);
+      }
+      if (bottom !== lastBottom) {
+        lastBottom = bottom;
+        footer.style.setProperty('--drawer-footer-bottom', bottom);
+      }
+    };
+
+    /*
+     * A new IntersectionObserver reports every target once, with the rect the browser computed in its own
+     * layout pass. Nothing is read synchronously, so this never forces a style recalc or layout, whatever the
+     * rest of the app wrote since the last frame (#554: getComputedStyle here cost 269 ms in a short trace).
+     * A hidden menu or info box (display: none) reports an empty rect.
+     */
+    const measureWithObserver = () => {
+      pendingObserver?.disconnect();
+      const infoEl = document.getElementById('sat-infobox');
+      const observer = new IntersectionObserver((entries) => {
+        observer.disconnect();
+        if (pendingObserver === observer) {
+          pendingObserver = null;
+        }
+        let menuRight = 0;
+        let infoBox: { left: number; top: number; right: number } | null = null;
+
+        for (const entry of entries) {
+          const rect = entry.boundingClientRect;
+
+          if (rect.width <= 0 || rect.height <= 0) {
+            continue;
+          }
+          if (entry.target === infoEl) {
+            if (window.innerWidth >= 640) {
+              infoBox = { left: rect.left, top: rect.top, right: rect.right };
+            }
+          } else {
+            menuRight = Math.max(menuRight, rect.right);
+          }
+        }
+        apply(menuRight, infoBox);
+      });
+
+      let observed = 0;
+
+      document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((menu) => {
+        // Inline styles are plain attribute reads; a closed menu is skipped without asking for its rect.
+        if (menu.style.display !== 'none' && menu.style.visibility !== 'hidden') {
+          observer.observe(menu);
+          observed++;
+        }
+      });
+      if (infoEl && infoEl.style.display !== 'none') {
+        observer.observe(infoEl);
+        observed++;
+      }
+      if (observed === 0) {
+        // Nothing to measure, and an observer with no targets never calls back.
+        observer.disconnect();
+        apply(0, null);
+
+        return;
+      }
+      pendingObserver = observer;
+    };
+    const update = () => {
+      rafId = 0;
+      if (typeof IntersectionObserver !== 'undefined') {
+        measureWithObserver();
+
+        return;
+      }
+      // No IntersectionObserver (old browsers, jsdom): read the rects directly.
+      let menuRight = 0;
+
+      document.querySelectorAll<HTMLElement>('.side-menu-parent').forEach((menu) => {
+        const style = getComputedStyle(menu);
+
+        if (style.display === 'none' || style.visibility === 'hidden') {
+          return;
+        }
+        const rect = menu.getBoundingClientRect();
+
+        if (rect.width > 0 && rect.height > 0) {
+          menuRight = Math.max(menuRight, rect.right);
+        }
+      });
+
+      const infoEl = document.getElementById('sat-infobox');
+      let infoBox: { left: number; top: number; right: number } | null = null;
+
+      if (infoEl && window.innerWidth >= 640 && getComputedStyle(infoEl).display !== 'none') {
+        const r = infoEl.getBoundingClientRect();
+
+        if (r.width > 0 && r.height > 0) {
+          infoBox = { left: r.left, top: r.top, right: r.right };
+        }
+      }
+      apply(menuRight, infoBox);
+    };
+    const schedule = () => {
+      if (!rafId) {
+        // Two frames: the rects below are read after the frame that applied the menu/info box change has laid out,
+        // so the reads never force a synchronous layout (a single rAF runs before that frame's layout).
+        // Then a macrotask: a rAF callback runs before the frame's style/layout, so reading rects there forces a
+        // synchronous layout of everything the selection just dirtied (measured at 160 ms). After the frame has been
+        // rendered the layout is clean and the reads are free.
+        rafId = requestAnimationFrame(() => {
+          setTimeout(update, 0);
+        });
+      }
+    };
+    // Skip attribute writes that did not change the value (selection hide/show can re-apply the same class/style).
+    const observer = new MutationObserver((mutations) => {
+      if (mutations.some((m) => m.attributeName && (m.target as HTMLElement).getAttribute(m.attributeName) !== m.oldValue)) {
+        schedule();
+      }
+    });
+
+    document.querySelectorAll('.side-menu-parent').forEach((menu) => {
+      observer.observe(menu, { attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style'] });
+      menu.addEventListener('transitionend', schedule);
+    });
+    const infoEl = document.getElementById('sat-infobox');
+
+    if (infoEl) {
+      observer.observe(infoEl, { attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style'] });
+      if (typeof ResizeObserver !== 'undefined') {
+        new ResizeObserver(schedule).observe(infoEl);
+      }
+    }
+    window.addEventListener('resize', schedule);
+    schedule();
+  }
+
+  /**
    * Top-menu nav buttons (sound, night, ...) are the source of truth for their
    * utility footer copies, and their state changes from shortcuts and
    * programmatic calls as well as clicks. Observe the class and image src of
@@ -764,6 +993,7 @@ export class PluginDrawer {
       const isDisabled = bottomIcon?.classList.contains('bmenu-item-disabled') ?? false;
 
       el.classList.toggle('disabled', isDisabled);
+      syncDrawerItemReason(el as HTMLElement, isDisabled);
     });
 
     this.syncUtilityFooterState_();
@@ -776,6 +1006,76 @@ export class PluginDrawer {
 
     document.documentElement.style.setProperty('--bottom-menu-top', `${height}px`);
     document.documentElement.style.setProperty('--bottom-menu-height', `${height}px`);
+  }
+
+  /** Click and keyboard (Enter/Space) toggle for a group header; persists the user's choice. */
+  private wireGroupHeader_(groupEl: HTMLElement): void {
+    const header = groupEl.querySelector('.drawer-group-header');
+
+    const toggle = () => {
+      groupEl.classList.toggle('collapsed');
+      const collapsed = groupEl.classList.contains('collapsed');
+
+      header?.setAttribute('aria-expanded', String(!collapsed));
+      const key = groupEl.dataset.groupKey;
+
+      if (key) {
+        this.groupStates_[key] = !collapsed;
+        this.saveGroupStates_();
+      }
+    };
+
+    header?.addEventListener('click', toggle);
+    header?.addEventListener('keydown', (evt) => {
+      const e = evt as KeyboardEvent;
+
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
+    });
+  }
+
+  /**
+   * Choose which groups start open for a user with no stored choice (used by onboarding, #124).
+   * Re-renders only if the drawer is already built. Stored user choices still win.
+   */
+  setDefaultOpenGroups(keys: string[]): void {
+    this.extraOpenGroups_ = [...keys];
+    this.applyDefaultsToDom_();
+  }
+
+  /**
+   * Update already-rendered groups to the current defaults without persisting anything.
+   * Groups the user has toggled (stored true/false) are left alone.
+   */
+  private applyDefaultsToDom_(): void {
+    const groupEls = Array.from(getEl('drawer-content', true)?.querySelectorAll('.drawer-group[data-group-key]') ?? []) as HTMLElement[];
+
+    if (groupEls.length === 0) {
+      return;
+    }
+
+    const menuKeys = groupEls.map((el) => el.dataset.groupKey as string).filter((k) => k !== 'recent');
+    const defaultOpen = defaultOpenGroupKeys(menuKeys, this.extraOpenGroups_);
+
+    for (const groupEl of groupEls) {
+      const key = groupEl.dataset.groupKey as string;
+      const expanded = isGroupExpanded(key, this.groupStates_, defaultOpen);
+
+      groupEl.classList.toggle('collapsed', !expanded);
+      groupEl.querySelector('.drawer-group-header')?.setAttribute('aria-expanded', String(expanded));
+    }
+  }
+
+  /** Open or close one group programmatically and persist it as the user's choice. */
+  setGroupExpanded(key: string, expanded: boolean): void {
+    this.groupStates_[key] = expanded;
+    this.saveGroupStates_();
+    const groupEl = getEl('drawer-content', true)?.querySelector(`.drawer-group[data-group-key="${key}"]`);
+
+    groupEl?.classList.toggle('collapsed', !expanded);
+    groupEl?.querySelector('.drawer-group-header')?.setAttribute('aria-expanded', String(expanded));
   }
 
   private loadGroupStates_(): void {
@@ -805,8 +1105,9 @@ export class PluginDrawer {
     const collapsedClass = isExpanded ? '' : ' collapsed';
     let html = `<div class="drawer-group${collapsedClass}" data-group-key="${key}">`;
 
-    html += '<div class="drawer-group-header">';
+    html += `<div class="drawer-group-header" role="button" tabindex="0" aria-expanded="${isExpanded}">`;
     html += `<span class="drawer-group-label">${group.label}</span>`;
+    html += key === 'recent' ? '' : `<span class="drawer-group-count">${group.items.length}</span>`;
     html += '<span class="drawer-group-chevron">&#x25BE;</span>';
     html += '</div>';
     html += '<div class="drawer-group-items">';
@@ -821,13 +1122,21 @@ export class PluginDrawer {
       const disabledClass = item.isDisabled ? ' disabled' : '';
       const proAttr = item.isLoginRequired ? ' data-pro-gated' : '';
       const proClass = item.isLoginRequired && !settingsManager.isDisableLoginGate ? ' bmenu-item-pro' : '';
+      const loginRequiredText = t7e('errorMsgs.LoginRequired' as TranslationKey);
       const tabIdx = item.isDisabled ? '' : ' tabindex="0"';
       const shortcutBadge = item.shortcutHint ? `<span class="drawer-item-shortcut">${item.shortcutHint}</span>` : '';
 
-      html += `<div class="drawer-item${disabledClass}${proClass}" ${dataAttr}${proAttr}${tabIdx} role="button" kt-tooltip="${item.label}">`;
+      const hintId = `drawer-hint-${sanitizeDrawerIdToken(`${key}-${item.id}`)}`;
+      const hintAttr = proClass ? ` aria-describedby="${hintId}"` : '';
+
+      html += `<div class="drawer-item${disabledClass}${proClass}" ${dataAttr}${proAttr}${tabIdx}${hintAttr} role="button" kt-tooltip="${item.label}">`;
       html += `<img class="drawer-item-icon" src="${item.imgSrc}" alt="${item.label}" />`;
       html += `<span class="drawer-item-label">${item.label}</span>`;
       html += '<span class="drawer-item-badge"></span>';
+      html += proClass
+        ? `<span class="drawer-item-lock" aria-label="${loginRequiredText}" title="${loginRequiredText}"><img class="drawer-item-lock-icon" src="${lockPng}" alt="" /></span>`
+        : '';
+      html += proClass ? `<span class="drawer-item-account-hint" id="${hintId}">${t7e('pluginDrawer.reasonFreeAccount' as TranslationKey)}</span>` : '';
       html += shortcutBadge;
       html += '</div>';
     }
@@ -836,6 +1145,13 @@ export class PluginDrawer {
     html += '</div>';
 
     return html;
+  }
+
+  private showSignInPromptFor_(el: HTMLElement): void {
+    ServiceLocator.getSoundManager()?.play(SoundNames.CLICK);
+    this.drawerEl_?.classList.remove('rail-hover');
+    this.close();
+    showSignInPrompt(drawerRowFeatureName(el));
   }
 
   // ---- Command Palette ----
@@ -931,17 +1247,7 @@ export class PluginDrawer {
       });
 
       // Wire collapsible header for the new group
-      const header = newGroupEl.querySelector('.drawer-group-header');
-
-      header?.addEventListener('click', () => {
-        newGroupEl.classList.toggle('collapsed');
-        const key = (newGroupEl as HTMLElement).dataset.groupKey;
-
-        if (key) {
-          this.groupStates_[key] = !newGroupEl.classList.contains('collapsed');
-          this.saveGroupStates_();
-        }
-      });
+      this.wireGroupHeader_(newGroupEl as HTMLElement);
     }
   }
 
@@ -997,6 +1303,7 @@ export class PluginDrawer {
 
   private enterRailMode_(): void {
     this.cancelRailHoverTimer_();
+    hideDrawerTooltips();
     this.drawerEl_?.classList.remove('rail-hover');
     this.drawerEl_?.classList.add('rail-mode');
     document.documentElement.style.setProperty('--drawer-offset', '60px');

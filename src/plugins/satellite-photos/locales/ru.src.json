@@ -1,15 +1,16 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Спутниковые снимки",
-      "title": "Спутниковые снимки",
+      "bottomIconLabel": "Метеоснимки",
+      "title": "Метеоснимки",
       "defaultImageTitle": "Последний спутниковый снимок",
       "labels": {
         "dscovrUnavailable": "DSCOVR временно недоступен",
         "dscovrImage": "Снимок DSCOVR {index}",
         "dscovrLoading": "Загрузка снимков DSCOVR…",
         "refresh": "Обновить последний снимок",
-        "imageAtUtc": "{name} в {time} UTC"
+        "imageAtUtc": "{name} в {time} UTC",
+        "hint": "Нажмите на спутник, чтобы перелететь к нему и открыть его последний снимок полного диска"
       },
       "sections": {
         "geostationary": "Геостационарные",

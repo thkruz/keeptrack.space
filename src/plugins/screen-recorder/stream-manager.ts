@@ -1,5 +1,6 @@
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { KeepTrack } from '@app/keeptrack';
+import { createWatermarkedStream, WatermarkedStream } from './recording-watermark';
 import { injectWebmDuration } from './webm-duration';
 
 export interface MediaRecorderOptions {
@@ -38,6 +39,8 @@ export class StreamManager {
   private supportedType_: string | undefined;
   private startDelayTimer_: ReturnType<typeof setTimeout> | null = null;
   private stream_: MediaStream | null = null;
+  /** Compositing pipeline that burns the KeepTrack mark into the recorded video; null when unavailable. */
+  private watermark_: WatermarkedStream | null = null;
   private state_: RecordingState = 'idle';
   private requestId_ = 0;
   private canSave_ = false;
@@ -203,7 +206,8 @@ export class StreamManager {
       const types = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'];
 
       this.supportedType_ = types.find((type) => window.MediaRecorder.isTypeSupported(type));
-      const recorder = new window.MediaRecorder(this.stream_, {
+      this.watermark_ = createWatermarkedStream(this.stream_, settingsManager.installDirectory);
+      const recorder = new window.MediaRecorder(this.watermark_?.stream ?? this.stream_, {
         ...(this.supportedType_ ? { mimeType: this.supportedType_ } : {}),
         videoBitsPerSecond: this.videoBitsPerSec_ || StreamManager.BIT_RATE_30_MBPS,
       });
@@ -305,6 +309,8 @@ export class StreamManager {
       clearTimeout(this.startDelayTimer_);
       this.startDelayTimer_ = null;
     }
+    this.watermark_?.dispose();
+    this.watermark_ = null;
     this.stream_?.getTracks().forEach((track) => {
       if (this.trackEnded_) {
         track.removeEventListener('ended', this.trackEnded_);

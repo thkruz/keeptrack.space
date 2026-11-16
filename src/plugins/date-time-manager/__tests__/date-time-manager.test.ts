@@ -1,4 +1,5 @@
-import { DateTimeManager } from '@app/plugins/date-time-manager/date-time-manager';
+import { ServiceLocator } from '@app/engine/core/service-locator';
+import { DateTimeManager, formatPlaybackRate } from '@app/plugins/date-time-manager/date-time-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { standardPluginSuite } from '@test/generic-tests';
@@ -72,5 +73,75 @@ describe('DateTimeManager_updateDateTime_guards', () => {
     dtm.updateDateTime(new Date());
 
     expect(getElementByIdSpy).toHaveBeenCalled();
+  });
+});
+
+describe('DateTimeManager_playback_rate_readout', () => {
+  it('formats the rate with a multiplication sign and at most two decimals', () => {
+    expect(formatPlaybackRate(1)).toBe('1×');
+    expect(formatPlaybackRate(-4)).toBe('-4×');
+    expect(formatPlaybackRate(0.5)).toBe('0.5×');
+    expect(formatPlaybackRate(1 / 3)).toBe('0.33×');
+  });
+
+  it('shows the rate beside the clock only for a simulated clock', () => {
+    setupStandardEnvironment([TopMenu]);
+    document.body.insertAdjacentHTML('beforeend', '<div id="datetime-status"></div>');
+    const dtm = new DateTimeManager();
+    const time = ServiceLocator.getTimeManager();
+    const status = () => document.getElementById('datetime-status')?.textContent ?? '';
+    const update = () => {
+      (dtm as unknown as { lastStatusStr_: string | null }).lastStatusStr_ = null;
+      (dtm as unknown as { updateStatus_: () => void }).updateStatus_();
+    };
+
+    time.simulationTimeObj = new Date(Date.UTC(2020, 0, 1));
+    time.propRate = 4;
+    update();
+    expect(status()).toContain('· 4×');
+
+    time.propRate = 0;
+    update();
+    expect(status()).not.toContain('×');
+  });
+});
+
+describe('DateTimeManager_zone_chip_labels', () => {
+  it('shows abbreviations while closed on a phone and full names while open, keeping the selected chip text short', () => {
+    (DateTimeManager.prototype as unknown as { uiManagerFinal_: () => void }).uiManagerFinal_ = vi.fn();
+    setupStandardEnvironment([TopMenu]);
+    const dtm = new DateTimeManager() as unknown as { setZoneChipOpen_: (c: HTMLSelectElement, open: boolean) => void };
+    const chip = document.createElement('select');
+
+    chip.innerHTML = '<option value="a" data-full="CST (UTC-06:00)" data-short="CST">x</option><option value="b" data-full="CST (UTC+08:00)" data-short="GMT+8">x</option>';
+    window.matchMedia = (() => ({ matches: true })) as unknown as typeof window.matchMedia;
+    dtm.setZoneChipOpen_(chip, false);
+    expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST', 'GMT+8']);
+    chip.value = 'b';
+    dtm.setZoneChipOpen_(chip, true);
+    // The chip renders the selected option, so it stays short; the other rows show full names (#455 review)
+    expect(Array.from(chip.options).map((o) => o.textContent)).toEqual(['CST (UTC-06:00)', 'GMT+8']);
+    window.matchMedia = (() => ({ matches: false })) as unknown as typeof window.matchMedia;
+    dtm.setZoneChipOpen_(chip, false);
+    expect(chip.options[0].textContent).toBe('CST (UTC-06:00)');
+  });
+});
+
+describe('DateTimeManager_zone_chip_markup', () => {
+  it('renders a hostile zone string as option text, never as elements', () => {
+    (DateTimeManager.prototype as unknown as { uiManagerFinal_: () => void }).uiManagerFinal_ = vi.fn();
+    setupStandardEnvironment([TopMenu]);
+    const hostile = '"><img src=x>';
+    const dtm = new DateTimeManager() as unknown as { syncZoneChip_: () => void; displayZone_: string };
+    const chip = document.createElement('select');
+
+    chip.id = 'datetime-zone';
+    document.body.appendChild(chip);
+    dtm.displayZone_ = hostile;
+    dtm.syncZoneChip_();
+    expect(chip.querySelector('img')).toBeNull();
+    expect(chip.children.length).toBeGreaterThan(0);
+    expect(Array.from(chip.children).every((c) => c.tagName === 'OPTION')).toBe(true);
+    chip.remove();
   });
 });

@@ -1,5 +1,6 @@
 /* eslint-disable max-statements */
 /* eslint-disable max-lines */
+import { findGeoRegion, getGeoRegionName } from '@app/app/analysis/geo-region-lookup';
 import { SatMath } from '@app/app/analysis/sat-math';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
@@ -12,14 +13,20 @@ import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { CelestialBody } from '@app/engine/rendering/draw-manager/celestial-bodies/celestial-body';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl } from '@app/engine/utils/get-el';
+import { getEl, writeAttrIfChanged, writeHtmlIfChanged, writeTextIfChanged } from '@app/engine/utils/get-el';
+import { getStaleGpThresholdHours, isGpStale } from '@app/engine/utils/gp-age';
 import { t7e } from '@app/locales/keys';
 import { BaseObject, eci2lla, Kilometers, MINUTES_PER_DAY, Satellite, Tle, TleLine1 } from '@ootk/src/main';
+import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
+import { setValueWithInfo } from '../sat-info-box/info-value';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { classifyOrbitRegime } from './orbit-regime';
+import { getMarineIndex, getRegionIndex, loadMarineIndex, loadRegionIndex } from './region-data';
 import { EL, SECTIONS } from './sat-info-box-orbital-html';
 import { screeningSigmasKm } from './screening-sigmas';
+import { findWaterBody } from './water-bodies';
 
 /** Localized placeholder for values that cannot be shown. */
 const notAvailableText = (): string => t7e('SatInfoBoxOrbital.notAvailable' as Parameters<typeof t7e>[0]);
@@ -28,10 +35,30 @@ const notAvailableText = (): string => t7e('SatInfoBoxOrbital.notAvailable' as P
 const setInnerHtml = (id: string, value: string): void => {
   const element = getEl(id, true);
 
+  // Skip unchanged rows: the info box refreshes about twice a second and a rewrite detaches focused children.
+  // writeHtmlIfChanged compares against what the parser serialized last time, so values with &, nbsp or
+  // other entities (which never equal their innerHTML) do not rewrite the cell, and invalidate layout, on every refresh.
   if (element) {
-    element.innerHTML = value;
+    writeHtmlIfChanged(element, value);
   }
 };
+
+/** Same skip-if-unchanged write for an element already in hand (#49: fewer DOM writes while the panel is dragged). */
+const setElHtml = (element: HTMLElement, value: string): void => {
+  writeHtmlIfChanged(element, value);
+};
+
+/** Tooltip write that skips identical values (setAttribute queues a mutation record even when nothing changed). */
+const writeTooltip_ = (id: string, value: string): void => {
+  const element = getEl(id, true);
+
+  if (element) {
+    writeAttrIfChanged(element, 'kt-tooltip', value);
+  }
+};
+
+/** Three decimals hide the difference between LEO orbits (ISS 0.0007349 read 0.001), so small values keep four significant digits. */
+const formatEccentricity_ = (eccentricity: number): string => (eccentricity > 0 && eccentricity < 0.01 ? eccentricity.toPrecision(4) : eccentricity.toFixed(3));
 
 export class SatInfoBoxOrbital extends KeepTrackPlugin {
   readonly id = 'SatInfoBoxOrbital';
@@ -66,12 +93,43 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     EventBus.getInstance().on(EventBusEvent.updateSelectBox, updateCurrentSelection);
     EventBus.getInstance().on(EventBusEvent.selectSatData, updateCurrentSelection);
+    // A clock jump (paused or running) refreshes the panel at once; the state is propagated for the new time here,
+    // not read from the worker buffer, so a late or reordered worker update cannot show an earlier time's values.
+    EventBus.getInstance().on(EventBusEvent.staticOffsetChange, () => {
+      updateCurrentSelection(PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj ?? undefined);
+    });
   }
 
   private satInfoBoxAddListeners_() {
     const satInfoBoxPlugin = PluginRegistry.getPlugin(SatInfoBox)!;
 
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.ORBITAL}`), { value: this.isOrbitalSectionCollapsed_ });
+    this.addHelpListeners_(getEl(SECTIONS.ORBITAL, true));
+  }
+
+  private addHelpListeners_(section: HTMLElement | null): void {
+    if (!section || section.dataset.helpBound === 'true') {
+      return;
+    }
+    section.dataset.helpBound = 'true';
+
+    const keyOf = (target: EventTarget | null): HTMLElement | null => ((target as HTMLElement | null)?.closest?.('[data-help-toggle]') as HTMLElement | null) ?? null;
+
+    section.addEventListener('click', (e) => {
+      const key = keyOf(e.target);
+
+      if (key) {
+        SatInfoBoxOrbital.toggleHelp_(key);
+      }
+    });
+    section.addEventListener('keydown', (e) => {
+      const key = keyOf(e.target);
+
+      if (key && (e.key === 'Enter' || e.key === ' ')) {
+        e.preventDefault();
+        SatInfoBoxOrbital.toggleHelp_(key);
+      }
+    });
   }
 
   private createOrbitalSection(): string {
@@ -89,17 +147,55 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
   private createOrbitalDataRows(): string {
     // Create all orbital data rows
-    const rows = [
-      { key: t7e('SatInfoBoxOrbital.Apogee.label'), id: EL.APOGEE, tooltip: t7e('SatInfoBoxOrbital.Apogee.tooltip'), value: 'xxx km' },
-      { key: t7e('SatInfoBoxOrbital.Perigee.label'), id: EL.PERIGEE, tooltip: t7e('SatInfoBoxOrbital.Perigee.tooltip'), value: 'xxx km' },
-      { key: t7e('SatInfoBoxOrbital.Inclination.label'), id: EL.INCLINATION, tooltip: t7e('SatInfoBoxOrbital.Inclination.tooltip'), value: 'xxx.xx' },
-      { key: t7e('SatInfoBoxOrbital.Eccentricity.label'), id: EL.ECCENTRICITY, tooltip: t7e('SatInfoBoxOrbital.Eccentricity.tooltip'), value: 'x.xx' },
-      { key: t7e('SatInfoBoxOrbital.RightAsc.label'), id: EL.RAAN, tooltip: t7e('SatInfoBoxOrbital.RightAsc.tooltip'), value: 'x.xx' },
-      { key: t7e('SatInfoBoxOrbital.ArgOfPerigee.label'), id: EL.ARG_PE, tooltip: t7e('SatInfoBoxOrbital.ArgOfPerigee.tooltip'), value: 'x.xx' },
+    const rows: { key: string; id: string; tooltip: string; help?: string; value: string }[] = [
+      { key: t7e('SatInfoBoxOrbital.Regime.label'), id: EL.REGIME, tooltip: t7e('SatInfoBoxOrbital.Regime.tooltip'), help: t7e('SatInfoBoxOrbital.Regime.help'), value: 'xxx' },
+      { key: t7e('SatInfoBoxOrbital.Apogee.label'), id: EL.APOGEE, tooltip: t7e('SatInfoBoxOrbital.Apogee.tooltip'), help: t7e('SatInfoBoxOrbital.Apogee.help'), value: 'xxx km' },
+      {
+        key: t7e('SatInfoBoxOrbital.Perigee.label'),
+        id: EL.PERIGEE,
+        tooltip: t7e('SatInfoBoxOrbital.Perigee.tooltip'),
+        help: t7e('SatInfoBoxOrbital.Perigee.help'),
+        value: 'xxx km',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.Inclination.label'),
+        id: EL.INCLINATION,
+        tooltip: t7e('SatInfoBoxOrbital.Inclination.tooltip'),
+        help: t7e('SatInfoBoxOrbital.Inclination.help'),
+        value: 'xxx.xx',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.Eccentricity.label'),
+        id: EL.ECCENTRICITY,
+        tooltip: t7e('SatInfoBoxOrbital.Eccentricity.tooltip'),
+        help: t7e('SatInfoBoxOrbital.Eccentricity.help'),
+        value: 'x.xx',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.RightAsc.label'),
+        id: EL.RAAN,
+        tooltip: t7e('SatInfoBoxOrbital.RightAsc.tooltip'),
+        help: t7e('SatInfoBoxOrbital.RightAsc.help'),
+        value: 'x.xx',
+      },
+      {
+        key: t7e('SatInfoBoxOrbital.ArgOfPerigee.label'),
+        id: EL.ARG_PE,
+        tooltip: t7e('SatInfoBoxOrbital.ArgOfPerigee.tooltip'),
+        help: t7e('SatInfoBoxOrbital.ArgOfPerigee.help'),
+        value: 'x.xx',
+      },
       { key: t7e('SatInfoBoxOrbital.Latitude.label'), id: EL.LATITUDE, tooltip: t7e('SatInfoBoxOrbital.Latitude.tooltip'), value: 'x.xx' },
       { key: t7e('SatInfoBoxOrbital.Longitude.label'), id: EL.LONGITUDE, tooltip: t7e('SatInfoBoxOrbital.Longitude.tooltip'), value: 'x.xx' },
+      {
+        key: t7e('SatInfoBoxOrbital.LatitudeBand.label' as Parameters<typeof t7e>[0]),
+        id: EL.LAT_BAND,
+        tooltip: t7e('SatInfoBoxOrbital.LatitudeBand.tooltip' as Parameters<typeof t7e>[0]),
+        value: 'x.xx',
+      },
+      { key: t7e('SatInfoBoxOrbital.Region.label'), id: EL.REGION, tooltip: t7e('SatInfoBoxOrbital.Region.tooltip'), value: 'xxx' },
       { key: t7e('SatInfoBoxOrbital.Altitude.label'), id: EL.ALTITUDE, tooltip: t7e('SatInfoBoxOrbital.Altitude.tooltip'), value: 'xxx km' },
-      { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), value: 'xxx min' },
+      { key: t7e('SatInfoBoxOrbital.Period.label'), id: EL.PERIOD, tooltip: t7e('SatInfoBoxOrbital.Period.tooltip'), help: t7e('SatInfoBoxOrbital.Period.help'), value: 'xxx min' },
       { key: t7e('SatInfoBoxOrbital.Velocity.label'), id: EL.VELOCITY, tooltip: t7e('SatInfoBoxOrbital.Velocity.tooltip'), value: 'xxx km/s' },
       { key: t7e('SatInfoBoxOrbital.GPEpoch.label'), id: EL.GP_EPOCH, tooltip: t7e('SatInfoBoxOrbital.GPEpoch.tooltip'), value: 'xxxx-xx-xx xx:xx:xx UTC' },
       { key: t7e('SatInfoBoxOrbital.AgeOfGP.label'), id: EL.ELSET_AGE, tooltip: t7e('SatInfoBoxOrbital.AgeOfGP.tooltip'), value: 'xxx.xxxx' },
@@ -112,19 +208,44 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Drop the covariance rows (Radial, In Track, Cross Track Sigma) when the setting is disabled
     const visibleRows = settingsManager.plugins.SatInfoBoxOrbital!.isShowCovariance ? rows : rows.filter((row) => !covarianceIds.includes(row.id));
 
-    return (
-      this.createOemFrameRows_() +
-      visibleRows
-        .map(
-          (row) => html`
+    return this.createOemFrameRows_() + visibleRows.map((row) => SatInfoBoxOrbital.createDataRow_(row)).join('');
+  }
+
+  /**
+   * One data row. A row with a plain-language definition gets a focusable key: hover shows the short tooltip,
+   * while click, tap, Enter or Space opens the definition inline, which works on touch and with a keyboard.
+   */
+  private static createDataRow_(row: { key: string; id: string; tooltip: string; help?: string; value: string }): string {
+    if (!row.help) {
+      return html`
         <div class="sat-info-row sat-only-info">
           <div class="sat-info-key" kt-tooltip="${row.tooltip}">${row.key}</div>
           <div class="sat-info-value" id="${row.id}">${row.value}</div>
         </div>
-      `
-        )
-        .join('')
-    );
+      `;
+    }
+
+    return html`
+        <div class="sat-info-row sat-only-info sat-info-row--help">
+          <div class="sat-info-key sat-info-key--help" kt-tooltip="${row.tooltip}" tabindex="0" role="button" aria-expanded="false" aria-controls="${row.id}-help" data-help-toggle="${row.id}-help">${row.key}</div>
+          <div class="sat-info-value" id="${row.id}">${row.value}</div>
+          <div class="sat-info-help" id="${row.id}-help" hidden>${row.help}</div>
+        </div>
+      `;
+  }
+
+  /** Opens or closes the inline definition under a key; used by click, Enter and Space. */
+  private static toggleHelp_(key: HTMLElement): void {
+    const help = getEl(key.dataset.helpToggle ?? '', true);
+
+    if (!help) {
+      return;
+    }
+
+    const isOpen = key.getAttribute('aria-expanded') === 'true';
+
+    key.setAttribute('aria-expanded', String(!isOpen));
+    help.hidden = isOpen;
   }
 
   /**
@@ -160,13 +281,18 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
   /** Show the OEM header's center body and frame for an OEM object; hide both rows for anything else. */
   private updateOemFrameRows_(obj: BaseObject): void {
     const isOem = obj instanceof OemSatellite;
+    const isGp = obj instanceof Satellite;
 
     for (const id of [EL.CENTER_BODY, EL.REF_FRAME]) {
       const row = getEl(`${id}-row`, true);
 
       if (row) {
-        row.style.display = isOem ? 'flex' : 'none';
+        row.style.display = isOem || (isGp && id === EL.REF_FRAME) ? 'flex' : 'none';
       }
+    }
+
+    if (isGp) {
+      setValueWithInfo(EL.REF_FRAME, t7e('SatInfoBoxOrbital.RefFrame.teme' as Parameters<typeof t7e>[0]), t7e('SatInfoBoxOrbital.RefFrame.temeInfo' as Parameters<typeof t7e>[0]));
     }
 
     if (!isOem) {
@@ -216,19 +342,69 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     this.updateAltitudeAndVelocity_(obj);
   }
 
+  /**
+   * Position and speed of a satellite at the simulation clock, propagated on the main thread. obj.position and
+   * obj.totalVelocity come from the worker and trail a time jump, so the panel does not read them for a Satellite.
+   */
+  private static currentState_(obj: Satellite): { position: Parameters<typeof eci2lla>[0]; speed: number } {
+    const simTime = ServiceLocator.getTimeManager().simulationTimeObj;
+    const pv = simTime ? obj.eci(simTime) : null;
+
+    if (pv && pv.position && pv.velocity) {
+      const { x, y, z } = pv.velocity;
+
+      return { position: pv.position, speed: Math.hypot(x, y, z) };
+    }
+
+    return { position: obj.position, speed: obj.totalVelocity };
+  }
+
   private updateSatelliteOrbitalElements_(obj: Satellite): void {
     setInnerHtml(EL.APOGEE, `${obj.apogee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     setInnerHtml(EL.PERIGEE, `${obj.perigee.toFixed(0)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     setInnerHtml(EL.INCLINATION, `${obj.inclination.toFixed(2)}°`);
-    setInnerHtml(EL.ECCENTRICITY, obj.eccentricity.toFixed(3));
+    setInnerHtml(EL.ECCENTRICITY, formatEccentricity_(obj.eccentricity));
     setInnerHtml(EL.RAAN, `${obj.rightAscension.toFixed(2)}°`);
     setInnerHtml(EL.ARG_PE, `${obj.argOfPerigee.toFixed(2)}°`);
 
+    // Hover or long-press shows the stored digits; the row keeps the short form.
+    const km = ` ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    const digits: [string, number, number, string][] = [
+      [EL.APOGEE, obj.apogee, 4, km],
+      [EL.PERIGEE, obj.perigee, 4, km],
+      [EL.INCLINATION, obj.inclination, 4, '°'],
+      [EL.ECCENTRICITY, obj.eccentricity, 7, ''],
+      [EL.RAAN, obj.rightAscension, 4, '°'],
+      [EL.ARG_PE, obj.argOfPerigee, 4, '°'],
+    ];
+
+    // The unit is part of the stored-digit tooltip so a bare number never floats over the row (#273)
+    for (const [id, value, places, unit] of digits) {
+      writeTooltip_(id, `${value.toFixed(places)}${unit}`);
+    }
+
     this.updatePeriodElement_(obj.period);
+    this.updateRegimeElement_(obj.perigee, obj.apogee, obj.eccentricity);
     this.updateElsetAgeElement_(obj);
-    this.updateLatLonElements_(obj.position);
+    this.updateLatLonElements_(SatInfoBoxOrbital.currentState_(obj).position);
+    this.updateLatitudeBand_(obj.inclination);
 
     this.updateSectionHeader_();
+  }
+
+  /** Names the altitude regime of the orbit (LEO, MEO, GEO, HEO) in plain language. */
+  private updateRegimeElement_(perigeeKm: number, apogeeKm: number, eccentricity: number): void {
+    const regime = classifyOrbitRegime(perigeeKm, apogeeKm, eccentricity);
+
+    if (regime) {
+      setValueWithInfo(
+        EL.REGIME,
+        t7e(`SatInfoBoxOrbital.Regime.${regime}` as Parameters<typeof t7e>[0]),
+        t7e(`SatInfoBoxOrbital.Regime.${regime}Info` as Parameters<typeof t7e>[0])
+      );
+    } else {
+      setInnerHtml(EL.REGIME, notAvailableText());
+    }
   }
 
   private updatePeriodElement_(period: number): void {
@@ -236,15 +412,19 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (periodDom) {
       if (!Number.isFinite(period) || period <= 0) {
-        periodDom.textContent = notAvailableText();
+        writeTextIfChanged(periodDom, notAvailableText());
         periodDom.removeAttribute('kt-tooltip');
 
         return;
       }
-      periodDom.innerHTML = `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`;
-      periodDom.dataset.position = 'top';
-      periodDom.dataset.delay = '50';
-      periodDom.setAttribute('kt-tooltip', `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`);
+      setElHtml(periodDom, `${period.toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.min')}`);
+      writeAttrIfChanged(periodDom, 'data-position', 'top');
+      writeAttrIfChanged(periodDom, 'data-delay', '50');
+      writeAttrIfChanged(
+        periodDom,
+        'kt-tooltip',
+        `${t7e('SatInfoBoxOrbital.Period.meanMotion')}: ${(MINUTES_PER_DAY / period).toFixed(2)} ${t7e('SatInfoBoxOrbital.Period.revPerDay')}`
+      );
     }
   }
 
@@ -257,13 +437,21 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const elsetAgeDom = getEl(EL.ELSET_AGE);
 
     if (elsetAgeDom) {
-      elsetAgeDom.innerHTML = ageText;
-      elsetAgeDom.dataset.position = 'top';
-      elsetAgeDom.dataset.delay = '50';
-      elsetAgeDom.setAttribute(
+      // Same threshold and comparison as the watchlist STALE flag (hours past the stale setting).
+      const ageDays = obj.ageOfElset(simTime);
+      const staleHours = getStaleGpThresholdHours();
+      const isStale = Number.isFinite(ageDays) && isGpStale(ageDays * 24, staleHours);
+      const staleNote = isStale ? `<br/>${t7e('plugins.WatchlistPlugin.stale.tooltip').replace('{hours}', String(staleHours))}` : '';
+
+      setElHtml(elsetAgeDom, isStale ? `${ageText} ${t7e('plugins.WatchlistPlugin.stale.marker')}` : ageText);
+      elsetAgeDom.classList.toggle('sat-info-stale', isStale);
+      writeAttrIfChanged(elsetAgeDom, 'data-position', 'top');
+      writeAttrIfChanged(elsetAgeDom, 'data-delay', '50');
+      writeAttrIfChanged(
+        elsetAgeDom,
         'kt-tooltip',
         `${t7e('SatInfoBoxOrbital.AgeOfGP.epochYear')}: ${obj.tle1.substring(18, 20)}<br/>
-           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}`
+           ${t7e('SatInfoBoxOrbital.AgeOfGP.epochDay')}: ${obj.tle1.substring(20, 28)}${staleNote}`
       );
     }
   }
@@ -325,16 +513,79 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
     if (satLonElement && satLatElement) {
       if (lla.lon >= 0) {
-        satLonElement.innerHTML = `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`;
+        setElHtml(satLonElement, `${lla.lon.toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.east')}`);
       } else {
-        satLonElement.innerHTML = `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`;
+        setElHtml(satLonElement, `${(lla.lon * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Longitude.west')}`);
       }
       if (lla.lat >= 0) {
-        satLatElement.innerHTML = `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`;
+        setElHtml(satLatElement, `${lla.lat.toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.north')}`);
       } else {
-        satLatElement.innerHTML = `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`;
+        setElHtml(satLatElement, `${(lla.lat * -1).toFixed(3)}°${t7e('SatInfoBoxOrbital.Latitude.south')}`);
       }
     }
+
+    this.updateRegionElement_(lla.lat, lla.lon);
+  }
+
+  /**
+   * Latitude reach row: the highest latitude the ground track gets to, the same north and south (shown as ±). For an inclination i that is
+   * i (i up to 90) or 180 - i (retrograde). Same for every point of the orbit, so it is the band the object stays in.
+   */
+  static formatLatitudeBand(inclinationDeg: number): string {
+    if (!Number.isFinite(inclinationDeg)) {
+      return notAvailableText();
+    }
+
+    const reach = inclinationDeg > 90 ? 180 - inclinationDeg : inclinationDeg;
+
+    return `±${reach.toFixed(2)}°`;
+  }
+
+  private updateLatitudeBand_(inclinationDeg: number): void {
+    setInnerHtml(EL.LAT_BAND, SatInfoBoxOrbital.formatLatitudeBand(inclinationDeg));
+  }
+
+  /**
+   * "Over" row: country under the sub-satellite point, or "Over ocean". The country polygons load
+   * once on first use; the row shows N/A until then. Runs at the info box's normal refresh rate.
+   */
+  private updateRegionElement_(lat: number, lon: number): void {
+    const regionElement = getEl(EL.REGION, true);
+
+    if (!regionElement) {
+      return;
+    }
+
+    const index = getRegionIndex();
+
+    if (!index) {
+      loadRegionIndex().catch(() => undefined);
+      writeTextIfChanged(regionElement, notAvailableText());
+
+      return;
+    }
+
+    const hit = findGeoRegion(index, lat, lon);
+    const language = i18next.language || 'en';
+
+    if (hit) {
+      writeTextIfChanged(regionElement, getGeoRegionName(hit, language));
+
+      return;
+    }
+
+    // Over water: named sea or ocean polygons (lazy-loaded), else the coarse boxes while loading or if the fetch failed.
+    const marine = getMarineIndex();
+    const marineHit = marine ? findGeoRegion(marine, lat, lon) : null;
+
+    if (!marine) {
+      loadMarineIndex().catch(() => undefined);
+    }
+
+    writeTextIfChanged(
+      regionElement,
+      marineHit ? getGeoRegionName(marineHit, language) : t7e(`SatInfoBoxOrbital.Region.Water.${findWaterBody(lat, lon)}` as Parameters<typeof t7e>[0])
+    );
   }
 
   /**
@@ -358,6 +609,7 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
 
   private updateSatelliteAltitudeAndVelocity_(obj: Satellite | OemSatellite, satAltitudeElement: HTMLElement, satVelocityElement: HTMLElement): boolean {
     const gmst = ServiceLocator.getTimeManager().gmst;
+    let speedKmS = obj.totalVelocity;
 
     if (((obj as OemSatellite).centerBody ?? SolarBody.Earth) !== SolarBody.Earth) {
       const centerBody = ServiceLocator.getScene().getBodyById((obj as OemSatellite).centerBody) as CelestialBody | null;
@@ -365,8 +617,8 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       if (!centerBody) {
         errorManagerInstance.debug(`Error calculating altitude for non-Earth centered object ${obj.name}: center body not found.`);
 
-        satAltitudeElement.textContent = notAvailableText();
-        satVelocityElement.textContent = notAvailableText();
+        writeTextIfChanged(satAltitudeElement, notAvailableText());
+        writeTextIfChanged(satVelocityElement, notAvailableText());
 
         return false;
       }
@@ -376,22 +628,25 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
         z: (obj.position.z - centerBody.position[2]) as Kilometers,
       };
 
-      satAltitudeElement.innerHTML = `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+      setElHtml(satAltitudeElement, `${SatMath.getAlt(position, gmst, centerBody.RADIUS as Kilometers).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     } else {
-      satAltitudeElement.innerHTML = `${SatMath.getAlt(obj.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+      const state = obj instanceof Satellite ? SatInfoBoxOrbital.currentState_(obj) : { position: obj.position, speed: obj.totalVelocity };
+
+      setElHtml(satAltitudeElement, `${SatMath.getAlt(state.position, gmst).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
+      speedKmS = state.speed;
     }
 
-    satVelocityElement.innerHTML = `${obj.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
+    setElHtml(satVelocityElement, `${speedKmS.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`);
 
     return true;
   }
 
   private updateMissileAltitudeAndVelocity_(misl: MissileObject, satAltitudeElement: HTMLElement, satVelocityElement: HTMLElement): void {
-    satAltitudeElement.innerHTML = `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`;
+    setElHtml(satAltitudeElement, `${(ServiceLocator.getSensorManager().currentTEARR?.alt ?? 0).toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}`);
     if (misl.totalVelocity) {
-      satVelocityElement.innerHTML = `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`;
+      setElHtml(satVelocityElement, `${misl.totalVelocity.toFixed(2)} ${t7e('SatInfoBoxOrbital.kilometer')}/${t7e('SatInfoBoxOrbital.second')}`);
     } else {
-      satVelocityElement.innerHTML = t7e('SatInfoBoxOrbital.unknown');
+      setElHtml(satVelocityElement, t7e('SatInfoBoxOrbital.unknown'));
     }
   }
 
@@ -412,9 +667,20 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       return;
     }
 
-    setInnerHtml(EL.UNCERTAINTY_RADIAL, SatInfoBoxOrbital.formatSigmaKm(sigmas.radial));
-    setInnerHtml(EL.UNCERTAINTY_INTRACK, SatInfoBoxOrbital.formatSigmaKm(sigmas.inTrack));
-    setInnerHtml(EL.UNCERTAINTY_CROSSTRACK, SatInfoBoxOrbital.formatSigmaKm(sigmas.crossTrack));
+    // These sigmas always come from the app's screening model, never from the source record, so each carries the tag.
+    const rows: [string, number][] = [
+      [EL.UNCERTAINTY_RADIAL, sigmas.radial],
+      [EL.UNCERTAINTY_INTRACK, sigmas.inTrack],
+      [EL.UNCERTAINTY_CROSSTRACK, sigmas.crossTrack],
+    ];
+
+    for (const [id, sigmaKm] of rows) {
+      // The info circle explains what "default" means; the same note stays as the value's own tooltip.
+      const note = `${t7e('SatInfoBoxOrbital.Sigma.defaultNote' as Parameters<typeof t7e>[0])} ${(sigmaKm * 1000).toFixed(3)} ${t7e('SatInfoBoxOrbital.meter')}`;
+
+      setValueWithInfo(id, `${SatInfoBoxOrbital.formatSigmaKm(sigmaKm)} (${t7e('SatInfoBoxOrbital.Sigma.defaultTag' as Parameters<typeof t7e>[0])})`, note);
+      writeTooltip_(id, note);
+    }
   }
 
   /** A 1-sigma value (km) with its unit: meters below 1 km, km (3 decimals, as in the reports) above. */
@@ -451,10 +717,10 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     const satCrossTrackElement = getEl('sat-sec-crosstrack');
 
     if (satDistanceElement && satRadiusElement && satInTrackElement && satCrossTrackElement) {
-      satDistanceElement.innerHTML = `${dist} km`;
-      satRadiusElement.innerHTML = `${ric.position.x.toFixed(2)}km`;
-      satInTrackElement.innerHTML = `${ric.position.y.toFixed(2)}km`;
-      satCrossTrackElement.innerHTML = `${ric.position.z.toFixed(2)}km`;
+      setElHtml(satDistanceElement, `${dist} km`);
+      setElHtml(satRadiusElement, `${ric.position.x.toFixed(2)}km`);
+      setElHtml(satInTrackElement, `${ric.position.y.toFixed(2)}km`);
+      setElHtml(satCrossTrackElement, `${ric.position.z.toFixed(2)}km`);
     } else {
       errorManagerInstance.debug('Error updating secondary satellite info!');
     }
@@ -465,9 +731,11 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
     // Interplanetary ephemerides do not have Earth-centered osculating elements;
     // report unavailable until a body/frame-aware element model is provided.
     if (obj.centerBody !== SolarBody.Earth) {
-      [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE].forEach((id) => {
-        setInnerHtml(id, notAvailableText());
-      });
+      [EL.APOGEE, EL.PERIGEE, EL.INCLINATION, EL.ECCENTRICITY, EL.RAAN, EL.ARG_PE, EL.PERIOD, EL.REGIME, EL.ELSET_AGE, EL.LATITUDE, EL.LONGITUDE, EL.REGION, EL.LAT_BAND].forEach(
+        (id) => {
+          setInnerHtml(id, notAvailableText());
+        }
+      );
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
       this.updateSectionHeader_(obj);
 
@@ -488,16 +756,19 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       // Earth-centered elements of an escape or heliocentric trajectory are not an orbit, so do not show them as one.
       setInnerHtml(EL.PERIGEE, isApsisAvailable ? finite(elements.perigee, 0, ` ${t7e('SatInfoBoxOrbital.kilometer')}`) : notAvailableText());
       setInnerHtml(EL.INCLINATION, finite(elements.inclinationDegrees, 2, '°'));
-      setInnerHtml(EL.ECCENTRICITY, isElliptic ? finite(elements.eccentricity, 3) : notAvailableText());
+      setInnerHtml(EL.ECCENTRICITY, isElliptic && Number.isFinite(elements.eccentricity) ? formatEccentricity_(elements.eccentricity) : notAvailableText());
       setInnerHtml(EL.RAAN, finite(elements.rightAscensionDegrees, 2, '°'));
       setInnerHtml(EL.ARG_PE, finite(elements.argPerigeeDegrees, 2, '°'));
 
       this.updatePeriodElement_(isElliptic ? elements.period : Number.NaN);
+      this.updateRegimeElement_(isApsisAvailable ? elements.perigee : Number.NaN, elements.apogee, elements.eccentricity);
 
       setInnerHtml(EL.ELSET_AGE, notAvailableText());
 
       this.updateLatLonElements_(obj.position);
+      this.updateLatitudeBand_(elements.inclinationDegrees);
     } catch {
+      setInnerHtml(EL.LAT_BAND, notAvailableText());
       setInnerHtml(EL.APOGEE, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.PERIGEE, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.INCLINATION, t7e('SatInfoBoxOrbital.unknown'));
@@ -505,10 +776,12 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       setInnerHtml(EL.RAAN, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.ARG_PE, t7e('SatInfoBoxOrbital.unknown'));
       setInnerHtml(EL.PERIOD, t7e('SatInfoBoxOrbital.unknown'));
+      setInnerHtml(EL.REGIME, t7e('SatInfoBoxOrbital.unknown'));
       getEl(EL.PERIOD, true)?.removeAttribute('kt-tooltip');
       setInnerHtml(EL.ELSET_AGE, notAvailableText());
       setInnerHtml(EL.LATITUDE, notAvailableText());
       setInnerHtml(EL.LONGITUDE, notAvailableText());
+      setInnerHtml(EL.REGION, notAvailableText());
     }
 
     this.updateSectionHeader_(obj);
@@ -531,9 +804,9 @@ export class SatInfoBoxOrbital extends KeepTrackPlugin {
       const phase = obj.getActivePhase();
       const phaseName = phase ? phase.name : '';
 
-      headerSpan.textContent = phaseName ? `${t7e('SatInfoBoxOrbital.title')} (${phaseName})` : t7e('SatInfoBoxOrbital.title');
+      writeTextIfChanged(headerSpan, phaseName ? `${t7e('SatInfoBoxOrbital.title')} (${phaseName})` : t7e('SatInfoBoxOrbital.title'));
     } else {
-      headerSpan.textContent = t7e('SatInfoBoxOrbital.title');
+      writeTextIfChanged(headerSpan, t7e('SatInfoBoxOrbital.title'));
     }
   }
 }

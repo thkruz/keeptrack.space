@@ -26,6 +26,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
+import { appendCsvBrandFooter, appendTextBrandFooter } from '@app/engine/utils/branding';
 import { ReportData, ReportTable } from './reports-core';
 
 export type ReportFormat = 'text' | 'csv' | 'json';
@@ -40,6 +41,8 @@ export interface DownloadPayload {
 
 /** Gap rendered between columns in the fixed-width layout. */
 const COLUMN_GAP = '   ';
+/** Indent of the wrapped last column in a narrow preview. */
+const WRAP_INDENT = '    ';
 
 /**
  * Resolves the table to render. Built-in reports supply a structured
@@ -68,7 +71,7 @@ export const resolveReportTable = (data: ReportData): ReportTable => {
  * length across the header AND every data row, so wide values (negative
  * coordinates, large ECI vectors) never break the alignment.
  */
-export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): string => {
+export const formatFixedWidth = (table: ReportTable, emptyMessage?: string, maxChars?: number): string => {
   // The text preview prefers the UI-language overrides; CSV and JSON never read them.
   const headers = table.display?.headers ?? table.headers;
   const dataRows = table.display?.rows ?? table.rows;
@@ -87,19 +90,29 @@ export const formatFixedWidth = (table: ReportTable, emptyMessage?: string): str
       .join(COLUMN_GAP)
       .trimEnd();
 
+  // Narrow preview window: when a row is wider than the window, the last column (a free-text note) moves to an
+  // indented line under its row instead of running off the right edge (#502). Downloads never pass maxChars.
+  const wrapLast = typeof maxChars === 'number' && colCount > 1 && Math.max(...[headers, ...dataRows].map((r) => renderRow(r).length)) > maxChars;
+  const renderWrapped = (row: string[]): string[] => {
+    const head = renderRow(row.slice(0, colCount - 1));
+    const last = (row[colCount - 1] ?? '').trim();
+
+    return last ? [head, `${WRAP_INDENT}${last}`] : [head];
+  };
+
   const lines: string[] = [];
 
   if (headers.length > 0) {
-    const headerLine = renderRow(headers);
+    const headerLines = wrapLast ? renderWrapped(headers) : [renderRow(headers)];
 
-    lines.push(headerLine, '-'.repeat(headerLine.length));
+    lines.push(...headerLines, '-'.repeat(Math.max(...headerLines.map((l) => l.length))));
   }
 
   if (dataRows.length === 0 && emptyMessage) {
     lines.push(emptyMessage);
   } else {
     for (const row of dataRows) {
-      lines.push(renderRow(row));
+      lines.push(...(wrapLast ? renderWrapped(row) : [renderRow(row)]));
     }
   }
 
@@ -148,17 +161,17 @@ ${'='.repeat(title.length)}
  * The human-readable preview shown in the report window: metadata block, any
  * titled sections, then the aligned main table.
  */
-export const buildPreviewText = (data: ReportData): string => {
+export const buildPreviewText = (data: ReportData, maxChars?: number): string => {
   const sections = (data.sections ?? [])
     .map(
-      (section) => `${sectionTitle(section.title)}${formatFixedWidth(section.table)}
+      (section) => `${sectionTitle(section.title)}${formatFixedWidth(section.table, undefined, maxChars)}
 
 `
     )
     .join('');
   const mainTitle = data.tableTitle ? sectionTitle(data.tableTitle) : '';
 
-  return `${data.header}${sections}${mainTitle}${formatFixedWidth(resolveReportTable(data), data.emptyMessage)}`;
+  return `${data.header}${sections}${mainTitle}${formatFixedWidth(resolveReportTable(data), data.emptyMessage, maxChars)}`;
 };
 
 /**
@@ -175,7 +188,7 @@ export const buildDownloadPayload = (data: ReportData, format: ReportFormat): Do
       const preamble = data.csvIncludeHeader ? headerToCsvComments(data.csvHeader ?? data.header) : '';
       const content = preamble ? `${preamble}\n${tableToCsv(table)}` : tableToCsv(table);
 
-      return { content, ext: 'csv', mime: 'text/csv;charset=utf-8' };
+      return { content: appendCsvBrandFooter(content), ext: 'csv', mime: 'text/csv;charset=utf-8' };
     }
     case 'json':
       return {
@@ -184,6 +197,6 @@ export const buildDownloadPayload = (data: ReportData, format: ReportFormat): Do
         mime: 'application/json;charset=utf-8',
       };
     default:
-      return { content: buildPreviewText(data), ext: 'txt', mime: 'text/plain;charset=utf-8' };
+      return { content: appendTextBrandFooter(buildPreviewText(data)), ext: 'txt', mime: 'text/plain;charset=utf-8' };
   }
 };

@@ -2,7 +2,7 @@
   "plugins": {
     "Collisions": {
       "bottomIconLabel": "碰撞",
-      "title": "碰撞菜单",
+      "title": "碰撞",
       "toolbar": {
         "fetchData": "获取数据",
         "refresh": "刷新"

@@ -10,6 +10,7 @@ import {
 } from '@rspack/core';
 import { execSync } from 'node:child_process';
 import DotEnv from 'dotenv-webpack';
+import { resolveDevApiKey } from './lib/dev-api-key';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,7 +46,7 @@ export class WebpackManager {
     const packAssets = `${dirName}/../src/plugins-pro/solar-system-pack/assets`;
 
     if (!existsSync(packAssets)) {
-      reporter.warn('Solar System Pack assets not found - the pro build will render its bodies untextured.');
+      reporter.log('Solar System Pack assets not found - the pro build will render its bodies untextured.', 'warn');
 
       return [];
     }
@@ -83,7 +84,7 @@ export class WebpackManager {
     const proMeshes = `${dirName}/../src/plugins-pro/public/meshes`;
 
     if (!existsSync(proMeshes)) {
-      reporter.warn('Pro mesh pack not found - named hero spacecraft will fall back to generic models.');
+      reporter.log('Pro mesh pack not found - named hero spacecraft will fall back to generic models.', 'warn');
 
       return [];
     }
@@ -111,6 +112,8 @@ export class WebpackManager {
       __IS_PRO__: JSON.stringify(this.config.isPro),
       __EDITION__: JSON.stringify(this.config.edition),
       __PROPAGATOR_BACKEND__: JSON.stringify(this.config.propagatorBackend),
+      __DEV_API_KEY__: JSON.stringify(resolveDevApiKey(config.mode ?? 'development', isWatch || config.isWatch, `./${config.envFilePath}`)),
+      __TURNSTILE_SITE_KEY__: JSON.stringify(config.PUBLIC_TURNSTILE_SITE_KEY ?? ''),
     });
     const webpackConfig = [] as Configuration[];
     let baseConfig = this.createBaseConfig_(dirName);
@@ -266,6 +269,13 @@ export class WebpackManager {
             test: /\.txt$/u,
             include: [/src/u],
             type: 'asset/source',
+          },
+          {
+            // Materialize's unused fieldset.form-field :has() rules restyle ~1000 elements after every DOM change
+            test: /materialize\.css$/iu,
+            include: [/@materializecss/u],
+            enforce: 'pre',
+            loader: `${dirName}/loaders/strip-unused-materialize-css.cjs`,
           },
           {
             test: /\.css$/iu,
@@ -461,7 +471,9 @@ export class WebpackManager {
       entry.neighborhoodHistoryWorker = ['./src/plugins-pro/neighborhood-history/neighborhoodHistoryWorker.ts'];
       entry.interceptorWorker = ['./src/plugins-pro/satellite-interceptor/interceptorWorker.ts'];
       entry.transitFinderWorker = ['./src/plugins-pro/transit-finder/transitFinderWorker.ts'];
+      entry.siteAccessWorker = ['./src/plugins-pro/site-access-search/siteAccessWorker.ts'];
       entry.observabilityWorker = ['./src/plugins-pro/observability-planner/observabilityWorker.ts'];
+      entry.lightCurveWorker = ['./src/plugins-pro/light-curve/lightCurveWorker.ts'];
     }
 
     return ({

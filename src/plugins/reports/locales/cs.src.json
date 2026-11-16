@@ -48,6 +48,7 @@
       "downloadButton": "Stáhnout zprávu",
       "copyButton": "Kopírovat do schránky",
       "sensorNote": "Tyto zprávy vyžadují vybraný senzor.",
+      "sensorLimitNote": "Použit senzor {name}: minimální elevace {minEl}°. Přelety pod ní se nehlásí.",
       "sections": {
         "orbitPosition": "Dráha a poloha",
         "sensor": "Senzor",
@@ -112,7 +113,11 @@
           "windowLine": "Období zprávy: {start} až {end} UTC, krok: {step} s",
           "generatedWallClock": "Vytvořeno (skutečný čas)",
           "appVersion": "Verze KeepTrack",
-          "ricConvention": "Konvence RIC"
+          "ricConvention": "Konvence RIC",
+          "passCaveat": "Místní časy stanoviště používají pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu.",
+          "passCaveatDisplay": "Místní časy používají zobrazované pásmo {zone}. Okna ukazují jen geometrický dosah, ne důkaz, že lze signál přijmout. Maximální elevace je zpřesněna na nejbližší sekundu.",
+          "sensorCoverage": "Pokrývá pouze senzor {sensor}.",
+          "sensorCoverageOthers": "Pokrývá pouze senzor {sensor}. Dalších aktivních senzorů nebo stanovišť ({count}) zahrnuto není."
         },
         "titles": {
           "aer": "Zpráva azimut, elevace, vzdálenost",
@@ -157,7 +162,11 @@
           "radialKm": "Radiální (km)",
           "intrackKm": "Podél dráhy (km)",
           "crosstrackKm": "Napříč dráhou (km)",
-          "relSpeed": "Rel. rychlost (km/s)"
+          "relSpeed": "Rel. rychlost (km/s)",
+          "timeLocal": "Místní čas",
+          "riseLocal": "Čas východu (místní)",
+          "setLocal": "Čas západu (místní)",
+          "maxElTimeLocal": "Čas max. elevace (místní)"
         },
         "empty": {
           "noPasses": "Nenalezeny žádné přelety!",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "nepřetržitě",
-          "start": "viditelný na začátku",
-          "end": "viditelný na konci"
+          "start": "viditelný na začátku; maximum v okně",
+          "end": "viditelný na konci; maximum v okně"
         },
         "illumination": {
           "sun": "Ano",

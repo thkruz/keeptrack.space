@@ -10,6 +10,7 @@ export const EL = {
   TITLE: 'sat-info-title',
   NAME: 'sat-info-title-name',
   FLAG: 'sat-infobox-fi',
+  COPY_VALUES: 'sat-info-copy-values',
 
   // Identifier elements
   INTL_DES: 'sat-intl-des',

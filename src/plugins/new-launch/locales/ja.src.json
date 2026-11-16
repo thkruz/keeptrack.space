@@ -10,6 +10,7 @@
         "inclination": "傾斜角",
         "launchingNorthOrSouth": "北向きまたは南向きの打ち上げ",
         "launchFacility": "打ち上げ施設",
+        "searchFacilities": "施設または国を検索...",
         "north": "北",
         "south": "南"
       },

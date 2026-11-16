@@ -42,12 +42,12 @@ export function applyEmbedUiCss(flags: Partial<EmbedUiFlags>, hidden: Set<keyof 
   }
 }
 
-const FLAG_KEYS: (keyof EmbedUiFlags)[] = ['bottomMenu', 'topMenu', 'search', 'timeControls', 'keyboard', 'contextMenu', 'toasts', 'infoBox'];
+const FLAG_KEYS: (keyof EmbedUiFlags)[] = ['bottomMenu', 'topMenu', 'search', 'timeControls', 'keyboard', 'contextMenu', 'toasts', 'infoBox', 'hover'];
 
 /**
  * Runtime UI toggling. Best effort: never throws, ignores unknown keys and non-boolean values.
  *
- * Runtime: keyboard, contextMenu, toasts (the engine reads the setting on every use); topMenu,
+ * Runtime: keyboard, contextMenu, toasts, hover (the engine reads the setting on every use); topMenu,
  * timeControls, infoBox, bottomMenu, search (CSS show/hide).
  * Boot-only limitation: a bottomMenu or search disabled in the boot config was never built by the
  * engine, so enabling it later has nothing to show.
@@ -82,7 +82,7 @@ export class EmbedUi {
         clean.timeControls = false;
       }
       applyEmbedUiCss(clean, this.hidden_);
-      this.engine_.applyRuntimeUi({ keyboard: clean.keyboard, contextMenu: clean.contextMenu, toasts: clean.toasts });
+      this.engine_.applyRuntimeUi({ keyboard: clean.keyboard, contextMenu: clean.contextMenu, toasts: clean.toasts, hover: clean.hover });
     } catch (e) {
       // eslint-disable-next-line no-console
       console.warn('[keepTrackEmbed] setUi failed', e);

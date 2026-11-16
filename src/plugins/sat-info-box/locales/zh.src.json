@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "来源",
-      "tooltip": "卫星信息的数据来源"
+      "tooltip": "卫星信息的数据来源",
+      "notRecorded": "未记录"
     },
     "Confidence": {
       "label": "置信度",
@@ -38,6 +39,12 @@
     },
     "errorMsgs": {
       "htmlNotReady": "卫星信息面板未完成加载，因此无法更新其详细信息。"
+    },
+    "export": {
+      "copyValues": "将数值复制为文本",
+      "copied": "数值已复制",
+      "region": "对象详情",
+      "secondary": "次要对象"
     }
   }
 }

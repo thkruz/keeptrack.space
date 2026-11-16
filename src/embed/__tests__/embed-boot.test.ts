@@ -79,6 +79,12 @@ describe('mapEmbedConfigToSettings', () => {
   it('infoBox false also turns off the hover tooltip', () => {
     expect(mapEmbedConfigToSettings({ ui: { infoBox: false } })).toMatchObject({ enableHoverOverlay: false, enableHoverOrbits: false });
     expect(mapEmbedConfigToSettings({ ui: { infoBox: true } }).enableHoverOverlay).toBeUndefined();
+  });
+
+  it('ui.hover is independent of infoBox', () => {
+    expect(mapEmbedConfigToSettings({ ui: { hover: true, infoBox: false } })).toMatchObject({ enableHoverOverlay: true, enableHoverOrbits: true });
+    expect(mapEmbedConfigToSettings({ ui: { hover: false, infoBox: true } })).toMatchObject({ enableHoverOverlay: false, enableHoverOrbits: false });
+    expect(mapEmbedConfigToSettings({ ui: { hover: true } }).enableHoverOverlay).toBe(true);
     expect(mapEmbedConfigToSettings({}).enableHoverOverlay).toBeUndefined();
   });
 

@@ -27,7 +27,8 @@
         "apiUnavailable": "{url} jest niedostępny!",
         "noLaunches": "Nie otrzymano żadnych nadchodzących startów.",
         "rateLimited": "The Space Devs ogranicza teraz liczbę żądań. Spróbuj ponownie za kilka minut.",
-        "nothingToExport": "Brak startów do wyeksportowania. Najpierw wczytaj listę startów."
+        "nothingToExport": "Brak startów do wyeksportowania. Najpierw wczytaj listę startów.",
+        "timeTbd": "godzina do ustalenia"
       },
       "help": {
         "overview": "Kalendarz startów pokazuje 20 najbliższych startów orbitalnych na świecie, pobieranych na żywo z bazy startów The Space Devs: okno startowe, misję, rakietę, miejsce startu, agencję i kraj dla każdego z nich. Nazwy misji, rakiet, miejsc i agencji prowadzą do dodatkowych informacji, jeśli są dostępne.",

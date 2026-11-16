@@ -43,6 +43,48 @@ export class AdviceManager {
   /** Element that had focus when the help opened, so closing hands focus back to it. */
   private returnFocusEl_: HTMLElement | null = null;
   private isEscapeBound_ = false;
+  private lightboxEl_: HTMLButtonElement | null = null;
+  private lightboxReturnEl_: HTMLElement | null = null;
+  private readonly onFigureClick_ = (event: MouseEvent): void => {
+    const zoom = (event.target as Element | null)?.closest?.<HTMLButtonElement>('.help-figure-zoom');
+    const img = zoom?.querySelector('img');
+
+    if (!zoom || !img) {
+      return;
+    }
+    this.openLightbox_(img.currentSrc || img.src, zoom.getAttribute('aria-label') ?? '', zoom);
+  };
+
+  /** Shows a help figure at its natural size above the help panel; click or Escape closes it. */
+  private openLightbox_(src: string, label: string, opener: HTMLElement): void {
+    this.closeLightbox_(false);
+    const box = document.createElement('button');
+
+    box.type = 'button';
+    box.className = 'help-lightbox';
+    box.setAttribute('aria-label', label);
+    const image = document.createElement('img');
+
+    image.src = src;
+    image.alt = '';
+    box.appendChild(image);
+    box.addEventListener('click', () => this.closeLightbox_(true));
+    // Mount on body so no help-panel stacking context can cap the lightbox.
+    document.body.appendChild(box);
+    this.lightboxEl_ = box;
+    this.lightboxReturnEl_ = opener;
+    box.focus();
+  }
+
+  private closeLightbox_(restoreFocus: boolean): void {
+    this.lightboxEl_?.remove();
+    this.lightboxEl_ = null;
+    if (restoreFocus && this.lightboxReturnEl_?.isConnected) {
+      this.lightboxReturnEl_.focus();
+    }
+    this.lightboxReturnEl_ = null;
+  }
+
   private readonly onOuterClick_ = (event: MouseEvent): void => {
     if (event.target === this.helpOuterDOM) {
       this.closeAdvice();
@@ -65,6 +107,16 @@ export class AdviceManager {
     // Capture both keyboard phases before the app's camera/time/drawer listeners.
     // Native link activation and scrolling retain their browser defaults.
     event.stopImmediatePropagation();
+    if (this.lightboxEl_) {
+      if (event.key === 'Escape' || (event.key === 'F1' && event.shiftKey)) {
+        event.preventDefault();
+        this.closeLightbox_(true);
+      } else if (event.key === 'Tab') {
+        event.preventDefault();
+      }
+
+      return;
+    }
     if (event.key === 'Escape' || (event.key === 'F1' && event.shiftKey)) {
       event.preventDefault();
       this.closeAdvice();
@@ -146,6 +198,14 @@ export class AdviceManager {
       return;
     }
 
+    this.showContextHelp();
+  }
+
+  /**
+   * Opens the help of the open menu or active view, or the general help when none answers.
+   * Same path as Shift+F1, exposed so the command palette can offer it.
+   */
+  public showContextHelp(): void {
     EventBus.getInstance().emit(EventBusEvent.onHelpMenuClick);
 
     if (!this.isAdviceOpen) {
@@ -199,6 +259,7 @@ export class AdviceManager {
       this.returnFocusEl_ = active instanceof HTMLElement && !this.helpOuterDOM.contains(active) ? active : null;
     }
 
+    this.closeLightbox_(false);
     this.helpOuterDOM.style.display = 'block';
     this.helpHeaderDOM.innerHTML = header;
     this.helpTextDOM.innerHTML = text;
@@ -219,6 +280,7 @@ export class AdviceManager {
     ServiceLocator.getInputManager()?.keyboard?.keyStates.clear();
     // Same function reference every time, so repeated opens never stack listeners.
     this.helpOuterDOM.addEventListener('click', this.onOuterClick_);
+    this.helpTextDOM.addEventListener('click', this.onFigureClick_);
 
     if (!this.isEscapeBound_) {
       // Capture phase: Escape must reach the help before menus or the camera keys below it.
@@ -233,6 +295,7 @@ export class AdviceManager {
   /** Hides the help overlay (click, Escape or Shift+F1) and returns focus to the page. */
   public closeAdvice(): void {
     this.isAdviceOpen = false;
+    this.closeLightbox_(false);
 
     if (this.helpOuterDOM) {
       this.helpOuterDOM.style.display = 'none';

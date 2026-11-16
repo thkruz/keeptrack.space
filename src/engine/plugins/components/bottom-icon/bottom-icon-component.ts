@@ -283,7 +283,9 @@ export class BottomIconComponent {
     }
 
     this.isSelected = true;
-    this.element?.classList.add(CSS_CLASSES.SELECTED);
+    if (this.element && !this.element.classList.contains(CSS_CLASSES.SELECTED)) {
+      this.element.classList.toggle(CSS_CLASSES.SELECTED, true);
+    }
   }
 
   /**
@@ -302,7 +304,9 @@ export class BottomIconComponent {
       EventBus.getInstance().emit(EventBusEvent.hideSideMenus);
     }
 
-    this.element?.classList.remove(CSS_CLASSES.SELECTED);
+    if (this.element?.classList.contains(CSS_CLASSES.SELECTED)) {
+      this.element.classList.toggle(CSS_CLASSES.SELECTED, false);
+    }
   }
 
   /**
@@ -314,7 +318,9 @@ export class BottomIconComponent {
     }
 
     this.isDisabled = false;
-    this.element?.classList.remove(CSS_CLASSES.DISABLED);
+    if (this.element?.classList.contains(CSS_CLASSES.DISABLED)) {
+      this.element.classList.toggle(CSS_CLASSES.DISABLED, false);
+    }
   }
 
   /**
@@ -331,7 +337,9 @@ export class BottomIconComponent {
     }
 
     this.isDisabled = true;
-    this.element?.classList.add(CSS_CLASSES.DISABLED);
+    if (this.element && !this.element.classList.contains(CSS_CLASSES.DISABLED)) {
+      this.element.classList.toggle(CSS_CLASSES.DISABLED, true);
+    }
   }
 
   /**

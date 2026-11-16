@@ -3,6 +3,8 @@
     "orbitPreview": "轨道预览",
     "unknown": "未知",
     "close": "关闭",
+    "dock": "停靠",
+    "menuHelp": "Help for this menu",
     "download": "下载",
     "downloadNamed": "下载 {name}",
     "loading": "加载中…"
@@ -270,6 +272,13 @@
     "groupDevTools": "开发工具",
     "groupAbout": "关于",
     "modeAll": "全部插件",
+    "reasonSelectSensor": "请先选择传感器",
+    "reasonSelectSatellite": "请先选择卫星",
+    "reasonSelectTleSatellite": "请选择带有轨道数据（TLE）的卫星",
+    "reasonSelectSatelliteOrLaunchSite": "请选择卫星或发射场",
+    "reasonEnablePlanets": "请在设置中开启行星",
+    "reasonAddToWatchlist": "请先将卫星添加到监视列表",
+    "reasonFreeAccount": "免费账户即可解锁",
     "openPluginMenu": "打开插件菜单",
     "openAppLauncher": "打开应用启动器",
     "appLauncherTooltip": "应用启动器 (Shift+Z)",
@@ -281,6 +290,10 @@
     "expand": "展开",
     "phoneLink": "手机连接",
     "phoneLinkSignIn": "登录以连接您的手机",
+    "signInPromptTitle": "登录以使用{{feature}}",
+    "signInPromptBody": "{{feature}}需要免费账户。请登录后使用。",
+    "signInPromptAction": "登录",
+    "signInPromptCancel": "暂不",
     "connected": "已连接",
     "offline": "离线",
     "footerLinks": {
@@ -296,7 +309,9 @@
     "resetCamera": "重置相机",
     "clearLines": "清除线条",
     "clearScreen": "清除屏幕",
-    "startClock": "启动时钟"
+    "startClock": "启动时钟",
+    "groupObject": "卫星",
+    "groupMore": "更多"
   },
   "urlManager": {
     "satNotFound": "未找到卫星\"{val}\"!",
@@ -323,7 +338,12 @@
     "resultCount": "{count} 个结果",
     "resultCountLimited": "显示 {total} 个结果中的 {shown} 个",
     "noResults": "未找到结果",
+    "noResultsSensors": "未找到结果。此视图中无法搜索传感器。",
+    "noResultsSensorsHidden": "未找到结果。地面传感器已在筛选菜单或搜索设置中隐藏。",
     "decayed": "已陨落",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} 是 {host} 的一部分",
+    "dockedTo": "已对接 {host}",
     "typeStar": "恒星",
     "typeSensor": "传感器",
     "typeLaunchSite": "发射场",
@@ -362,6 +382,10 @@
   "layersManager": {
     "toggleLayers": "切换图层",
     "layers": "图层"
+  },
+  "mobileZoom": {
+    "zoomIn": "放大",
+    "zoomOut": "缩小"
   },
   "modalConfirm": {
     "confirmAction": "确认操作",
@@ -402,5 +426,10 @@
       "breakup": "解体碎片",
       "created": "已创建的卫星"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

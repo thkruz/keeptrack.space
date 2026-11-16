@@ -52,7 +52,7 @@
     },
     "AppMag": {
       "label": "视星等",
-      "tooltip": "在当前仿真时间从所选传感器观测到的视星等"
+      "tooltip": "在当前仿真时间从所选传感器观测到的视星等估算值（模型估算；不考虑天气）"
     },
     "estimatedSuffix": "（估算）",
     "unknown": "未知",
@@ -79,6 +79,51 @@
       "crossTrack": "横迹",
       "crossTrackTooltip": "与次要卫星的横迹距离"
     },
-    "noData": "无数据"
+    "noData": "无数据",
+    "notSunlit": "未受日照",
+    "assumedSuffix": "(假设)",
+    "Summary": {
+      "Payload": {
+        "active": {
+          "military": "在役军事卫星",
+          "communications": "在役通信卫星",
+          "navigation": "在役导航卫星",
+          "weather": "在役气象卫星",
+          "earthObservation": "在役地球观测卫星",
+          "astronomy": "在役太空望远镜",
+          "science": "在役科学卫星",
+          "technology": "在役技术验证卫星",
+          "other": "在役卫星"
+        },
+        "inactive": {
+          "military": "已停用军事卫星",
+          "communications": "已停用通信卫星",
+          "navigation": "已停用导航卫星",
+          "weather": "已停用气象卫星",
+          "earthObservation": "已停用地球观测卫星",
+          "astronomy": "已停用太空望远镜",
+          "science": "已停用科学卫星",
+          "technology": "已停用技术验证卫星",
+          "other": "已停用卫星"
+        },
+        "plain": {
+          "military": "军事卫星",
+          "communications": "通信卫星",
+          "navigation": "导航卫星",
+          "weather": "气象卫星",
+          "earthObservation": "地球观测卫星",
+          "astronomy": "太空望远镜",
+          "science": "科学卫星",
+          "technology": "技术验证卫星",
+          "other": "卫星"
+        }
+      },
+      "crewedStation": "载人空间站",
+      "simulated": "模拟天体（假设变轨）",
+      "rocketBody": "遗留在轨道上的火箭箭体",
+      "debris": "遗留在轨道上的碎片",
+      "special": "特殊跟踪目标",
+      "missile": "飞行中的弹道导弹"
+    }
   }
 }

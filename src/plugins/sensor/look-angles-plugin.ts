@@ -1,5 +1,8 @@
+import { SatMath } from '@app/app/analysis/sat-math';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { refinePassEdgeMs } from '@app/app/sensors/pass-edge';
+import { refinePeakMs } from '@app/app/sensors/pass-peak';
 import { SensorMath, TearrData, TearrType } from '@app/app/sensors/sensor-math';
 import { GetSatType, MenuMode } from '@app/engine/core/interfaces';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -15,13 +18,19 @@ import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
+import { BaseObject, Degrees, Kilometers, Satellite, TemeVec3 } from '@ootk/src/main';
 import tableChartPng from '@public/img/icons/table-chart.png';
 import { ClickDragOptions, fileExcelPng, KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { computeFraming, describeFraming, parseExposureStart } from './look-angles-framing';
 import './look-angles.css';
 
-type LookAngleData = TearrData & { canStationObserve: boolean };
+/**
+ * One Look Angles row. Three states are kept apart: above the horizon (geometric, in the sensor's view), satellite
+ * sunlit, and optically visible (above horizon, sunlit and site Sun below SensorMath.SITE_DARK_SUN_EL_DEG).
+ * `opticalVisible` is undefined for non-optical sensors, which get no optical verdict.
+ */
+type LookAngleData = TearrData & { sunlit?: boolean | null; opticalVisible?: boolean; inProgress?: boolean; passRiseMs?: number };
 
 /** Shorthand for this plugin's locale keys. */
 const l = (key: string): string => t7e(`plugins.LookAnglesPlugin.${key}` as Parameters<typeof t7e>[0]);
@@ -80,7 +89,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   /**
    * The last look angles array
    */
-  private lastlooksArray_: TearrData[];
+  private lastlooksArray_: LookAngleData[];
 
   isRequireSatelliteSelected = true;
   isRequireSensorSelected = true;
@@ -102,8 +111,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
   sideMenuElementName: string = 'look-angles-menu';
   sideMenuElementHtml: string = html`
     <section class="kt-section">
-      <div class="kt-section-label">${l('sections.results')}</div>
+      <div id="looks-title" class="kt-section-label">${l('sections.results')}</div>
       <table id="looks" class="la-table center-align"></table>
+      <p id="looks-optical-note" class="la-optical-note" style="display: none;"></p>
     </section>`;
   sideMenuSecondaryHtml = html`
     <section class="kt-section">
@@ -127,6 +137,22 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
             <label for="look-angles-interval" class="active">${l('settings.interval')}</label>
         </div>
       </div>
+    </section>
+    <section class="kt-section">
+      <div class="kt-section-label">${l('framing.section')}</div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="look-angles-exposure-start" value="" type="text" placeholder="${l('framing.startPlaceholder')}" data-position="bottom" data-delay="50" data-tooltip="${l('framing.startTooltip')}" />
+            <label for="look-angles-exposure-start" class="active">${l('framing.start')}</label>
+        </div>
+      </div>
+      <div class="kt-field-row">
+        <div class="input-field col s12">
+            <input id="look-angles-exposure-length" value="30" type="text" data-position="bottom" data-delay="50" />
+            <label for="look-angles-exposure-length" class="active">${l('framing.length')}</label>
+        </div>
+      </div>
+      <p id="look-angles-framing-result" class="la-optical-note"></p>
     </section>`;
   downloadIconSrc = fileExcelPng;
   downloadIconCb = () => {
@@ -158,21 +184,127 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const lookAnglesSat = this.selectSatManager_.getSelectedSat() as Satellite;
 
     saveXlsx(
-      LookAnglesPlugin.buildExportRows_(this.lastlooksArray_, sensorDisplayName),
+      LookAnglesPlugin.buildExportRows_(this.lastlooksArray_, sensorDisplayName, this.readFramingInput_()),
       LookAnglesPlugin.buildExportFileName_(sensorDisplayName, `${lookAnglesSat.sccNum6 ?? lookAnglesSat.sccNum}`, this.lastlooksArray_[0]?.time)
     );
   };
 
+  /** The exposure window typed in the Framing plan section, or null when it is blank or unreadable. */
+  private readFramingInput_(): { startMs: number; lengthSec: number } | null {
+    const startText = (getEl('look-angles-exposure-start', true) as HTMLInputElement | null)?.value ?? '';
+    const lengthText = (getEl('look-angles-exposure-length', true) as HTMLInputElement | null)?.value ?? '';
+    const startMs = parseExposureStart(startText, ServiceLocator.getTimeManager().simulationTimeObj.getTime());
+    const lengthSec = Number.parseFloat(lengthText);
+
+    if (!Number.isFinite(startMs) || !Number.isFinite(lengthSec) || lengthSec <= 0) {
+      return null;
+    }
+
+    return { startMs, lengthSec };
+  }
+
+  /** True when something is typed in Exposure start but it cannot be parsed. */
+  private hasUnreadableExposureStart_(): boolean {
+    const startText = ((getEl('look-angles-exposure-start', true) as HTMLInputElement | null)?.value ?? '').trim();
+
+    return startText !== '' && !Number.isFinite(parseExposureStart(startText, ServiceLocator.getTimeManager().simulationTimeObj.getTime()));
+  }
+
+  /** Recompute the in-frame seconds for the exposure window against the rows now in the table. */
+  private updateFraming_(): void {
+    const out = getEl('look-angles-framing-result', true);
+
+    if (!out) {
+      return;
+    }
+    const input = this.readFramingInput_();
+
+    if (!input || !this.lastlooksArray_) {
+      out.textContent = this.hasUnreadableExposureStart_() ? l('framing.startInvalid') : '';
+
+      return;
+    }
+    const result = computeFraming(this.lastlooksArray_, input.startMs, input.lengthSec, this.isRiseSetOnly_ ? undefined : this.angleCalculationInterval_);
+
+    out.textContent = describeFraming(result, {
+      inFrame: l('framing.inFrame'),
+      enters: l('framing.enters'),
+      leaves: l('framing.leaves'),
+      none: l('framing.none'),
+    });
+  }
+
   /** Export rows. Numeric columns stay numbers (not toFixed strings) so the XLSX has number cells. */
-  private static buildExportRows_(looks: TearrData[], sensorDisplayName: string): Record<string, string | number | null>[] {
-    return looks.map((look) => ({
+  private static buildExportRows_(
+    looks: LookAngleData[],
+    sensorDisplayName: string,
+    framing: { startMs: number; lengthSec: number } | null = null
+  ): Record<string, string | number | boolean | null>[] {
+    const durations = LookAnglesPlugin.passDurations_(looks);
+
+    const rows: Record<string, string | number | boolean | null>[] = looks.map((look, idx) => ({
       Time: dateFormat(look.time, 'isoDateTime', false),
-      Type: LookAnglesPlugin.tearrTypeToString_(look.type),
+      Type: LookAnglesPlugin.tearrTypeToString_(look.type, look.inProgress),
+      'Time in view (s)': durations[idx],
       Azimuth: roundOrNull(look.az, 1),
       Elevation: roundOrNull(look.el, 1),
       Range: roundOrNull(look.rng, 1),
       Sensor: sensorDisplayName,
+      sunlit: look.sunlit ?? '',
+      opticalVisible: look.opticalVisible ?? '',
+      'Exposure length (s)': '',
     }));
+
+    if (framing) {
+      const result = computeFraming(looks, framing.startMs, framing.lengthSec);
+
+      rows.push({
+        Time: dateFormat(new Date(framing.startMs).toISOString(), 'isoDateTime', false),
+        Type: l('framing.section'),
+        'Time in view (s)': result.inFrameSec,
+        Azimuth: null,
+        Elevation: null,
+        Range: null,
+        Sensor: sensorDisplayName,
+        sunlit: '',
+        opticalVisible: '',
+        'Exposure length (s)': framing.lengthSec,
+      });
+    }
+
+    return rows;
+  }
+
+  /**
+   * Seconds inside the sensor's field of view for each row. A Set row carries the time since the
+   * Rise row of the same pass; every other row (and a Set with no Rise, e.g. an in-progress pass) is null.
+   */
+  private static passDurations_(looks: LookAngleData[]): (number | null)[] {
+    const toMs = (time: string): number => Date.parse(/z$/iu.test(time) ? time.replace(' ', 'T') : `${time.replace(' ', 'T')}Z`);
+    let riseMs: number | null = null;
+
+    return looks.map((look) => {
+      if (look.inProgress) {
+        // A pass under way at the start time: its true rise (searched back) when known, else the row's own time
+        riseMs = look.passRiseMs ?? toMs(look.time);
+
+        return null;
+      }
+      if (look.type === TearrType.RISE) {
+        riseMs = toMs(look.time);
+
+        return null;
+      }
+      if (look.type === TearrType.SET && riseMs !== null) {
+        const seconds = Math.round((toMs(look.time) - riseMs) / 1000);
+
+        riseMs = null;
+
+        return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+      }
+
+      return null;
+    });
   }
 
   /**
@@ -236,6 +368,9 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
         this.angleCalculationInterval_ = parseInt((<HTMLInputElement>getEl('look-angles-interval')).value);
         this.refreshSideMenuData_();
       });
+
+      getEl('look-angles-exposure-start')?.addEventListener('change', () => this.updateFraming_());
+      getEl('look-angles-exposure-length')?.addEventListener('change', () => this.updateFraming_());
 
       getEl('settings-riseset')!.addEventListener('change', this.settingsRisesetChange_.bind(this));
 
@@ -327,8 +462,18 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       const tearrData = isOemSat
         ? (sat as unknown as OemSatellite).getTearData(now, sensors, this.isRiseSetOnly_, isMaxElFound)
         : SensorMath.getTearData(now, sat.satrec, sensors, this.isRiseSetOnly_, isMaxElFound);
-      const canStationObserve = sensors[0].type === SpaceObjectType.OPTICAL ? SensorMath.checkIfVisibleForOptical(sat, sensors[0], now) : true;
-      const looksPass = { ...tearrData, canStationObserve };
+      const looksPass: LookAngleData = { ...tearrData };
+
+      if (looksPass.time !== '') {
+        const satPos = isOemSat ? (sat as unknown as OemSatellite).eci(now)?.position : SatMath.getEci(sat, now).position;
+        const lighting = SensorMath.getLightingState(satPos as TemeVec3 | undefined, sensors[0], now);
+
+        looksPass.sunlit = lighting.sunlit;
+        if (SensorMath.isOpticalSensor(sensors[0])) {
+          // Every row the sensor reports is in its field of view (minEl may be below 0), as in Multi-Sensor
+          looksPass.opticalVisible = SensorMath.getOpticalVerdict(true, lighting);
+        }
+      }
 
       if (looksPass.time !== '') {
         // Update the table with looks for this 5 second chunk and then increase table counter by 1
@@ -365,13 +510,114 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     }
 
     looksArray.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+    if (this.isRiseSetOnly_) {
+      this.addInProgressRow_(looksArray, sat, sensors, isOemSat);
+    }
     this.lastlooksArray_ = looksArray;
+    this.updateFraming_();
 
     // Populate the Side Menu
     this.populateSideMenuTable_(looksArray, timeManagerInstance);
+    LookAnglesPlugin.setTitle_(sat, sensors[0]);
     this.emitActionUsed_(sat, sensors);
 
     return looksArray;
+  }
+
+  /**
+   * Rise/set mode only reports edges, so a pass already under way at the start time has no Rise row
+   * and the table would not say the satellite is in view now. Prepend an "In view now" row at the start time.
+   */
+  private addInProgressRow_(looksArray: LookAngleData[], sat: Satellite, sensors: DetailedSensor[], isOemSat: boolean): void {
+    const first = looksArray[0];
+
+    if (first && (first.type === TearrType.RISE || first.type === TearrType.RISE_AND_MAX_EL)) {
+      return; // The pass starts inside the window; its Rise row already says so
+    }
+
+    const start = ServiceLocator.getTimeManager().getOffsetTimeObj(0);
+    const probe = isOemSat ? (sat as unknown as OemSatellite).getTearData(start, sensors, false, false) : SensorMath.getTearData(start, sat.satrec, sensors, false, false);
+
+    if (!probe || probe.time === '' || !probe.inView) {
+      return;
+    }
+    const satPos = isOemSat ? (sat as unknown as OemSatellite).eci(start)?.position : SatMath.getEci(sat, start).position;
+    const lighting = SensorMath.getLightingState(satPos as TemeVec3 | undefined, sensors[0], start);
+    const row: LookAngleData = { ...probe, type: undefined, inProgress: true, sunlit: lighting.sunlit };
+
+    if (SensorMath.isOpticalSensor(sensors[0])) {
+      row.opticalVisible = SensorMath.getOpticalVerdict(true, lighting);
+    }
+    if (!isOemSat) {
+      this.applyTruePassStart_(looksArray, row, sat, sensors[0], start);
+    }
+    looksArray.unshift(row);
+  }
+
+  /**
+   * For a pass already under way: search back (5 s steps, up to 30 min) for the true rise and the pass maximum.
+   * A descending object makes the first forward sample read as "Max El" at the current position, so that row is
+   * replaced by the true peak (placed right after the In view now row). The rise time is kept on the in-progress
+   * row so the Set row can show a duration.
+   */
+  private applyTruePassStart_(looksArray: LookAngleData[], row: LookAngleData, sat: Satellite, sensor: DetailedSensor, start: Date): void {
+    const startMs = start.getTime();
+    const stepMs = 5000;
+    const getAer = (ms: number) => SatMath.getRae(new Date(ms), sat.satrec, sensor, true);
+    const isIn = (ms: number): boolean => SatMath.checkIsInView(sensor, getAer(ms));
+    let peak = { ms: startMs, el: row.el ?? -90, rng: row.rng, az: row.az };
+    let earliestInMs = startMs;
+    let outMs: number | null = null;
+
+    for (let back = stepMs; back <= 30 * 60 * 1000; back += stepMs) {
+      const ms = startMs - back;
+      const aer = getAer(ms);
+
+      if (!SatMath.checkIsInView(sensor, aer)) {
+        outMs = ms;
+        break;
+      }
+      earliestInMs = ms;
+      if (aer.el !== null && aer.el > peak.el) {
+        peak = { ms, el: aer.el, rng: aer.rng, az: aer.az };
+      }
+    }
+    if (outMs !== null) {
+      row.passRiseMs = refinePassEdgeMs(isIn, outMs, earliestInMs);
+    }
+    // The 5 s search-back grid sits on the simulation clock's phase; take the whole-second peak shared with the pass card and reports (#313)
+    if (peak.ms !== startMs) {
+      const refined = refinePeakMs((ms) => getAer(ms).el, peak.ms, stepMs, earliestInMs, startMs);
+
+      if (refined) {
+        const aer = getAer(refined.ms);
+
+        peak = { ms: refined.ms, el: refined.el, rng: aer.rng, az: aer.az };
+      }
+    }
+    // Only an object already past its peak has a stale "Max El" first row; a rising one keeps the forward-found peak
+    const first = looksArray[0];
+    const isStalePeak =
+      first && (first.type === TearrType.MAX_EL || first.type === TearrType.MAX_EL_AND_SET) && Math.abs(Date.parse(`${first.time.replace(' ', 'T')}Z`) - startMs) < 2000;
+
+    if (isStalePeak && peak.ms !== startMs) {
+      const truePeak: LookAngleData = {
+        ...first,
+        time: dateFormat(new Date(peak.ms), 'isoDateTime', true),
+        el: peak.el as Degrees,
+        rng: peak.rng as Kilometers,
+        az: peak.az as Degrees,
+        type: TearrType.MAX_EL,
+        maskLimited: false,
+      };
+
+      if (first.type === TearrType.MAX_EL_AND_SET) {
+        looksArray[0] = { ...first, type: TearrType.SET };
+      } else {
+        looksArray.shift();
+      }
+      looksArray.unshift(truePeak);
+    }
   }
 
   /** Achievement signal: look angles computed for a sat from a sensor. Once per sat+sensor pair until either changes. */
@@ -390,6 +636,18 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: sat.id, sensorId });
   }
 
+  /** Name the object and the sensor above the table, e.g. "ISS (ZARYA) from Maui". */
+  private static setTitle_(sat: Satellite, sensor: DetailedSensor | undefined): void {
+    const titleEl = getEl('looks-title', true);
+
+    if (!titleEl) {
+      return;
+    }
+    const sensorName = sensor?.system ? `${sensor.system} (${sensor.name})` : sensor?.name;
+
+    titleEl.textContent = sensorName ? l('table.title').replace('{object}', sat.name).replace('{sensor}', sensorName) : l('sections.results');
+  }
+
   private populateSideMenuTable_(lookAngleData: LookAngleData[], timeManagerInstance: TimeManager) {
     const tbl = <HTMLTableElement>getEl('looks'); // Identify the table to update
 
@@ -399,12 +657,14 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tr.classList.add('la-table-header');
     const tdT = tr.insertCell();
 
-    tdT.appendChild(document.createTextNode(l('table.time')));
+    // The times in this table are UTC; say so in the header.
+    tdT.appendChild(document.createTextNode(l('table.timeUtc')));
 
     // Type column: Rise/Set/Max El in rise-set mode, "In View" for every sample otherwise
     const tdType: HTMLTableCellElement = tr.insertCell();
 
     tdType.appendChild(document.createTextNode(l('table.type')));
+    tr.insertCell().appendChild(document.createTextNode(l('table.duration')));
 
     const tdE = tr.insertCell();
 
@@ -418,9 +678,25 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     const tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode(l('table.visible')));
+    // Sunlit and (optical sensors only) optically-visible columns follow the geometric one
+    const showOptical = SensorMath.isOpticalSensor(ServiceLocator.getSensorManager().currentSensors?.[0]);
 
-    for (const entry of lookAngleData) {
-      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV });
+    tr.insertCell().appendChild(document.createTextNode(l('table.sunlit')));
+    if (showOptical) {
+      tr.insertCell().appendChild(document.createTextNode(l('table.optical')));
+    }
+
+    const durations = LookAnglesPlugin.passDurations_(lookAngleData);
+
+    lookAngleData.forEach((entry, idx) => {
+      LookAnglesPlugin.populateSideMenuRow_({ tbl, tdT, entry, timeManagerInstance, tdE, tdA, tdR, tdType, tdV, showOptical, durationSec: durations[idx] });
+    });
+
+    const note = getEl('looks-optical-note', true);
+
+    if (note) {
+      note.textContent = showOptical ? l('msgs.opticalNote').replace('{limit}', String(SensorMath.SITE_DARK_SUN_EL_DEG)) : '';
+      note.style.display = showOptical ? '' : 'none';
     }
 
     if (lookAngleData.length === 0) {
@@ -428,7 +704,7 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       const td = tr.insertCell();
       const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
 
-      td.colSpan = 6;
+      td.colSpan = showOptical ? 9 : 8;
       td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
     }
   }
@@ -443,6 +719,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdR,
     tdType,
     tdV,
+    showOptical,
+    durationSec = null,
   }: {
     tbl: HTMLTableElement;
     tdT: HTMLTableCellElement;
@@ -453,6 +731,8 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
     tdR: HTMLTableCellElement;
     tdType: HTMLTableCellElement;
     tdV: HTMLTableCellElement;
+    showOptical: boolean;
+    durationSec?: number | null;
   }) {
     if (tbl.rows.length > 0) {
       const tr = tbl.insertRow();
@@ -460,7 +740,13 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tr.setAttribute('class', 'link');
 
       tdT = tr.insertCell();
-      tdT.appendChild(document.createTextNode(dateFormat(entry.time, 'isoDateTime', false)));
+      /*
+       * Every row, the "In view now" row included, shows the instant its el/az/range were sampled (#343). The
+       * searched-back rise (passRiseMs) is only used for the Set row's time-in-view, never shown beside current values.
+       */
+      const shownTime = dateFormat(entry.time, 'isoDateTime', false);
+
+      tdT.appendChild(document.createTextNode(shownTime));
 
       // Create click listener
       tr.addEventListener('click', () => {
@@ -469,11 +755,13 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
 
       if (tdType) {
         tdType = tr.insertCell();
-        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type)));
+        tdType.appendChild(document.createTextNode(this.tearrTypeToString_(entry.type, entry.inProgress)));
         if (entry.maskLimited) {
           tdType.appendChild(LookAnglesPlugin.createMaskMarker_());
         }
       }
+
+      tr.insertCell().appendChild(document.createTextNode(durationSec === null ? '' : `${durationSec} s`));
 
       tdE = tr.insertCell();
       tdE.appendChild(document.createTextNode(entry.el?.toFixed(1) ?? 'Unknown'));
@@ -482,13 +770,23 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
       tdR = tr.insertCell();
       tdR.appendChild(document.createTextNode(entry.rng?.toFixed(0) ?? 'Unknown'));
       tdV = tr.insertCell();
-      tdV.appendChild(document.createTextNode(entry.canStationObserve ? l('msgs.yes') : l('msgs.no')));
-      if (entry.canStationObserve) {
-        tdV.setAttribute('style', 'color: #2d7b31');
+      // Geometric only: every listed row is in the sensor's view (minEl may be below 0). Lighting is in the next columns.
+      LookAnglesPlugin.appendVerdictCell_(tdV, true, l('msgs.yes'), l('msgs.no'));
+
+      if (entry.sunlit === null || typeof entry.sunlit === 'undefined') {
+        tr.insertCell().appendChild(document.createTextNode('-'));
       } else {
-        tdV.setAttribute('style', 'color: #c62828');
+        LookAnglesPlugin.appendVerdictCell_(tr.insertCell(), entry.sunlit, l('msgs.yes'), l('msgs.eclipsed'));
+      }
+      if (showOptical) {
+        LookAnglesPlugin.appendVerdictCell_(tr.insertCell(), entry.opticalVisible === true, l('msgs.yes'), l('msgs.no'));
       }
     }
+  }
+
+  private static appendVerdictCell_(cell: HTMLTableCellElement, ok: boolean, yes: string, no: string): void {
+    cell.appendChild(document.createTextNode(ok ? yes : no));
+    cell.setAttribute('style', ok ? 'color: #2d7b31' : 'color: #c62828');
   }
 
   /** Small "mask" tag on a rise/set row whose edge was set by the horizon mask. */
@@ -506,7 +804,10 @@ export class LookAnglesPlugin extends KeepTrackPlugin {
    * Label for a row's pass type. Rows without a type come from the full (not rise/set only)
    * table, where every emitted sample is inside the sensor's field of view: label them "In View".
    */
-  private static tearrTypeToString_(type?: TearrType): string {
+  private static tearrTypeToString_(type?: TearrType, inProgress?: boolean): string {
+    if (inProgress) {
+      return l('msgs.inProgress');
+    }
     if (typeof type === 'undefined') {
       return l('msgs.inView');
     }

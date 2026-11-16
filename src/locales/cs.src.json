@@ -3,6 +3,8 @@
     "orbitPreview": "Náhled dráhy",
     "unknown": "Neznámý",
     "close": "Zavřít",
+    "dock": "Ukotvit",
+    "menuHelp": "Help for this menu",
     "download": "Stáhnout",
     "downloadNamed": "Stáhnout {name}",
     "loading": "Načítání…"
@@ -270,6 +272,13 @@
     "groupDevTools": "Vývojářské nástroje",
     "groupAbout": "O aplikaci",
     "modeAll": "Všechny pluginy",
+    "reasonSelectSensor": "Nejprve vyberte senzor",
+    "reasonSelectSatellite": "Nejprve vyberte družici",
+    "reasonSelectTleSatellite": "Pro použití vyberte družici s oběžnou dráhou (TLE)",
+    "reasonSelectSatelliteOrLaunchSite": "Pro použití vyberte družici nebo startovací místo",
+    "reasonEnablePlanets": "Pro použití zapněte planety v Nastavení",
+    "reasonAddToWatchlist": "Nejprve přidejte družice do seznamu sledovaných",
+    "reasonFreeAccount": "Odemkne bezplatný účet",
     "openPluginMenu": "Otevřít nabídku pluginů",
     "openAppLauncher": "Otevřít spouštěč aplikací",
     "appLauncherTooltip": "Spouštěč aplikací (Shift+Z)",
@@ -281,6 +290,10 @@
     "expand": "Rozbalit",
     "phoneLink": "Propojení s telefonem",
     "phoneLinkSignIn": "Přihlaste se a propojte svůj telefon",
+    "signInPromptTitle": "Přihlaste se pro funkci {{feature}}",
+    "signInPromptBody": "Funkce {{feature}} je dostupná s bezplatným účtem. Přihlaste se a použijte ji.",
+    "signInPromptAction": "Přihlásit se",
+    "signInPromptCancel": "Teď ne",
     "connected": "Připojeno",
     "offline": "Offline",
     "footerLinks": {
@@ -296,7 +309,9 @@
     "resetCamera": "Obnovit kameru",
     "clearLines": "Vymazat čáry",
     "clearScreen": "Vymazat obrazovku",
-    "startClock": "Spustit hodiny"
+    "startClock": "Spustit hodiny",
+    "groupObject": "Satelit",
+    "groupMore": "Další"
   },
   "urlManager": {
     "satNotFound": "Družice \"{val}\" nebyla nalezena!",
@@ -323,7 +338,12 @@
     "resultCount": "Výsledků: {count}",
     "resultCountLimited": "Zobrazeno {shown} z {total} výsledků",
     "noResults": "Nebyly nalezeny žádné výsledky",
+    "noResultsSensors": "Nic nenalezeno. Senzory se v tomto zobrazení nevyhledávají.",
+    "noResultsSensorsHidden": "Nic nenalezeno. Pozemní senzory jsou skryty v nabídce Filtr nebo v Nastavení vyhledávání.",
     "decayed": "Zaniklý",
+    "partialMatch": "Partial match",
+    "moduleOf": "{module} je součástí objektu {host}",
+    "dockedTo": "připojeno k objektu {host}",
     "typeStar": "Hvězda",
     "typeSensor": "Senzor",
     "typeLaunchSite": "Místo startu",
@@ -362,6 +382,10 @@
   "layersManager": {
     "toggleLayers": "Přepnout vrstvy",
     "layers": "Vrstvy"
+  },
+  "mobileZoom": {
+    "zoomIn": "Přiblížit",
+    "zoomOut": "Oddálit"
   },
   "modalConfirm": {
     "confirmAction": "Potvrdit akci",
@@ -402,5 +426,10 @@
       "breakup": "Trosky z rozpadu",
       "created": "Vytvořené družice"
     }
+  },
+  "offlineBanner": {
+    "message": "You are offline. Still works: the loaded catalog and orbit propagation. Not available until you reconnect: catalog refresh, account sync and sign-in.",
+    "catalogAge": "Catalog data saved {{age}}.",
+    "catalogStale": "Catalog data saved {{age}}; it may be out of date."
   }
 }

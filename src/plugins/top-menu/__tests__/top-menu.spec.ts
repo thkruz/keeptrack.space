@@ -11,6 +11,8 @@ test.describe('TopMenu', () => {
     await expect(page.locator('#nav-wrapper')).toBeVisible({ timeout: 5_000 });
     await expect(page.locator('#search')).toBeAttached();
     await expect(page.locator('#search-results')).toBeAttached();
+    // #409: satellite names are not dictionary words, so no spell-check underline
+    await expect(page.locator('#search')).toHaveAttribute('spellcheck', 'false');
     await expect(page.locator('#fullscreen-icon')).toBeAttached();
   });
 

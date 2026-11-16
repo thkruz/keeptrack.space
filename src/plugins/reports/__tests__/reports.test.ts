@@ -72,6 +72,13 @@ describe('ReportsPlugin_class', () => {
       expect(reportIds).toContain('ReportsPlugin.sun-eclipse-report');
     });
 
+    it('lists Open Reports in the palette even with nothing selected', () => {
+      const plugin = new ReportsPlugin();
+      const open = plugin.getCommandPaletteCommands().find((c) => c.id === 'ReportsPlugin.open');
+
+      expect(open?.isAvailable?.()).toBe(true);
+    });
+
     it('should have isAvailable on report commands', () => {
       const plugin = new ReportsPlugin();
       const commands = plugin.getCommandPaletteCommands();
@@ -570,5 +577,37 @@ describe('ReportsPlugin batch reports', () => {
 
     expect(confirmSpy).toHaveBeenCalledOnce();
     expect(saveBatch).not.toHaveBeenCalled();
+  });
+});
+
+describe('ReportsPlugin.walkOutOfView_ (#465)', () => {
+  it('walks to the last in-view whole second, not the last scan-grid sample', () => {
+    const setMs = 100_500;
+    const inView = (ms: number) => ms <= setMs;
+
+    expect(ReportsPlugin.walkOutOfView_(inView, 90_000, 1, 1000)).toBe(100_000);
+    expect(ReportsPlugin.walkOutOfView_(inView, 90_000, 1)).toBe(100_000);
+  });
+
+  it('walks backwards for a pass already in view at the window end', () => {
+    expect(ReportsPlugin.walkOutOfView_((ms) => ms >= 10_200, 20_000, -1, 1000)).toBe(11_000);
+  });
+});
+
+describe('ReportsPlugin.otherSensorCount_ (pro issue #540)', () => {
+  beforeEach(() => {
+    setupStandardEnvironment([SelectSatManager]);
+  });
+
+  it('counts the other primary sensors and every secondary sensor', () => {
+    const sensorManager = ServiceLocator.getSensorManager();
+
+    sensorManager.currentSensors = [{ name: 'A' }, { name: 'B' }] as never;
+    sensorManager.secondarySensors = [{ name: 'C' }] as never;
+    expect(ReportsPlugin.otherSensorCount_()).toBe(2);
+
+    sensorManager.currentSensors = [{ name: 'A' }] as never;
+    sensorManager.secondarySensors = [];
+    expect(ReportsPlugin.otherSensorCount_()).toBe(0);
   });
 });

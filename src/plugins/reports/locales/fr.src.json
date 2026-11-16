@@ -48,6 +48,7 @@
       "downloadButton": "Télécharger le rapport",
       "copyButton": "Copier dans le presse-papiers",
       "sensorNote": "Ces rapports nécessitent la sélection d'un capteur.",
+      "sensorLimitNote": "Capteur {name} : élévation minimale {minEl}°. Les passages en dessous ne sont pas signalés.",
       "sections": {
         "orbitPosition": "Orbite et position",
         "sensor": "Capteur",
@@ -112,7 +113,11 @@
           "windowLine": "Période du rapport : {start} à {end} UTC, pas : {step} s",
           "generatedWallClock": "Généré (heure réelle)",
           "appVersion": "Version de KeepTrack",
-          "ricConvention": "Convention RIC"
+          "ricConvention": "Convention RIC",
+          "passCaveat": "Les heures locales du site utilisent le fuseau {zone}. Les fenêtres montrent seulement l'accès géométrique, pas la preuve qu'un signal peut être reçu. L'élévation maximale est affinée à la seconde près.",
+          "passCaveatDisplay": "Les heures locales utilisent le fuseau d’affichage {zone}. Les fenêtres montrent seulement l'accès géométrique, pas la preuve qu'un signal peut être reçu. L'élévation maximale est affinée à la seconde près.",
+          "sensorCoverage": "Couvre uniquement le capteur {sensor}.",
+          "sensorCoverageOthers": "Couvre uniquement le capteur {sensor}. {count} autres capteurs ou sites actifs ne sont pas inclus."
         },
         "titles": {
           "aer": "Rapport azimut, élévation, distance",
@@ -157,7 +162,11 @@
           "radialKm": "Radial (km)",
           "intrackKm": "Le long de la trace (km)",
           "crosstrackKm": "Hors trace (km)",
-          "relSpeed": "Vitesse rel. (km/s)"
+          "relSpeed": "Vitesse rel. (km/s)",
+          "timeLocal": "Heure locale",
+          "riseLocal": "Heure de lever (locale)",
+          "setLocal": "Heure de coucher (locale)",
+          "maxElTimeLocal": "Heure d'élévation max. (locale)"
         },
         "empty": {
           "noPasses": "Aucun passage trouvé !",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "continu",
-          "start": "visible au début",
-          "end": "visible à la fin"
+          "start": "visible au début; maximum dans la fenêtre",
+          "end": "visible à la fin; maximum dans la fenêtre"
         },
         "illumination": {
           "sun": "Oui",

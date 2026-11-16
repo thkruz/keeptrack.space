@@ -1,4 +1,5 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
+import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
 import { EditSat } from '@app/plugins/edit-sat/edit-sat';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
@@ -132,5 +133,86 @@ describe('EditSat behavior', () => {
 
     // Bails before any catalog lookup when nothing was captured for this scc.
     expect(sccSpy).not.toHaveBeenCalled();
+  });
+
+  describe('Load TLE from a real file', () => {
+    const TLE1 = '1 25544U 98067A   24001.50000000  .00016717  00000-0  10270-3 0  9005';
+    const TLE2 = '2 25544  51.6400 208.9163 0006317  69.9862  25.2906 15.49401438 25004';
+
+    // jsdom's FileReader needs real timers; the global setup installs fake ones.
+    beforeEach(() => {
+      vi.useRealTimers();
+    });
+
+    afterEach(() => {
+      vi.useFakeTimers();
+    });
+
+    const loadFile = async (text: string) => {
+      const file = new File([text], 'iss.tle', { type: 'text/plain' });
+      const reader = new FileReader();
+      const done = new Promise<void>((resolve) => {
+        reader.addEventListener('load', () => resolve());
+      });
+
+      reader.onload = p().readerOnLoad_.bind(plugin);
+      reader.readAsText(file);
+      await done;
+    };
+
+    it('applies a plain two-line file (name line, CRLF) to the matching satellite', async () => {
+      const catalog = ServiceLocator.getCatalogManager();
+
+      (getEl('es-scc') as HTMLInputElement).value = '25544';
+      vi.spyOn(catalog, 'sccNum2Sat').mockReturnValue({ ...defaultSat, sccNum: '25544', id: 7 } as never);
+      vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(7);
+      const fillSpy = vi.spyOn(p(), 'populateFormFields_').mockImplementation(() => undefined);
+
+      await loadFile(`ISS (ZARYA)
+${TLE1}
+${TLE2}
+`);
+
+      expect(fillSpy).toHaveBeenCalled();
+    });
+
+    it('rejects a module TLE (25575) that aliases to the ISS host (25544), but applies 25544', async () => {
+      const catalog = ServiceLocator.getCatalogManager();
+      const warnSpy = vi.spyOn(errorManagerInstance, 'warn').mockImplementation(() => undefined);
+
+      (getEl('es-scc') as HTMLInputElement).value = '25544';
+      // Alias resolution: 25575 resolves to the ISS host, so the ids match; only canonical identity differs.
+      vi.spyOn(catalog, 'sccNum2Sat').mockReturnValue({ ...defaultSat, sccNum: '25544', id: 7 } as never);
+      vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(7);
+      const fillSpy = vi.spyOn(p(), 'populateFormFields_').mockImplementation(() => undefined);
+
+      await loadFile(`${TLE1.replace('25544', '25575')}
+${TLE2.replace('25544', '25575')}
+`);
+
+      expect(fillSpy).not.toHaveBeenCalled();
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+
+      await loadFile(`${TLE1}
+${TLE2}
+`);
+
+      expect(fillSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('rejects a file whose catalog number differs from the selected satellite', async () => {
+      const catalog = ServiceLocator.getCatalogManager();
+
+      (getEl('es-scc') as HTMLInputElement).value = '99999';
+      vi.spyOn(catalog, 'sccNum2Sat').mockReturnValue({ ...defaultSat, id: 7 } as never);
+      vi.spyOn(catalog, 'sccNum2Id').mockReturnValue(8);
+      const fillSpy = vi.spyOn(p(), 'populateFormFields_').mockImplementation(() => undefined);
+
+      await loadFile(`${TLE1}
+${TLE2}
+`);
+
+      expect(fillSpy).not.toHaveBeenCalled();
+    });
   });
 });

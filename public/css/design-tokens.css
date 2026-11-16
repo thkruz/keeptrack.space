@@ -39,7 +39,7 @@
   --kt-text-secondary: rgba(255, 255, 255, 0.7);
   --kt-text-tertiary: rgba(255, 255, 255, 0.45);
   --kt-text-accent: #dd382f;
-  --kt-text-muted: #6b6b6b;
+  --kt-text-muted: #9a9a9a; /* 5.86:1 on #1f1f1f, 4.69:1 on #303030 */
 
   /* ---- Semantic: Interactive ---- */
   --kt-accent: var(--kt-red-500);

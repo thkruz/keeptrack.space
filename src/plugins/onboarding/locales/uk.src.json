@@ -108,6 +108,7 @@
       "commands": {
         "startTour": "Запустити навчання",
         "startPowerTour": "Відкрити розширений тур",
+        "helpForMenu": "Help for this menu (Shift+F1)",
         "openChecklist": "Відкрити список «Початок роботи»"
       },
       "settings": {

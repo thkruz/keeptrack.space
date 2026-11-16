@@ -93,6 +93,57 @@ describe('SatInfoBoxOrbital data population', () => {
     expect(getEl(EL.APOGEE)!.textContent).toBeTruthy();
   });
 
+  it('does not mutate the section on a repeat refresh with unchanged values', () => {
+    p().updateOrbitData_(defaultSat);
+
+    const section = getEl(EL.APOGEE)!.closest('.sat-info-section') ?? document.body;
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(section, { childList: true, characterData: true, attributes: true, subtree: true });
+    p().updateOrbitData_(defaultSat);
+    const records = observer.takeRecords();
+
+    observer.disconnect();
+    expect(records.map((r) => `${r.type}:${(r.target as HTMLElement).id ?? ''}`)).toEqual([]);
+  });
+
+  it('shows the regime of a satellite in plain words', () => {
+    vi.stubGlobal('requestIdleCallback', (cb: IdleRequestCallback) => cb({ didTimeout: false, timeRemaining: () => 50 }));
+    p().updateOrbitData_(defaultSat);
+
+    const value = getEl(EL.REGIME)!;
+
+    expect(value.firstChild?.textContent).toMatch(/^(LEO|MEO|GEO|HEO)/u);
+    // #191 the explanation sits in a focusable info circle, not in the value text
+    expect(value.querySelector('.sat-info-circle')?.getAttribute('aria-label')).toBeTruthy();
+  });
+
+  it('gives Period, Apogee, Right Asc. and Arg of Perigee a keyboard-reachable definition', () => {
+    for (const id of [EL.PERIOD, EL.APOGEE, EL.RAAN, EL.ARG_PE, EL.REGIME]) {
+      const key = getEl(id)!.parentElement!.querySelector<HTMLElement>('[data-help-toggle]');
+
+      expect(key, id).not.toBeNull();
+      expect(key!.getAttribute('tabindex')).toBe('0');
+      expect(key!.getAttribute('aria-expanded')).toBe('false');
+      expect(getEl(`${id}-help`)!.hidden).toBe(true);
+    }
+  });
+
+  it('opens and closes a definition with a click, Enter or Space', () => {
+    const key = getEl(EL.PERIOD)!.parentElement!.querySelector<HTMLElement>('[data-help-toggle]')!;
+    const help = getEl(`${EL.PERIOD}-help`)!;
+
+    key.click();
+    expect(help.hidden).toBe(false);
+    expect(key.getAttribute('aria-expanded')).toBe('true');
+
+    key.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }));
+    expect(help.hidden).toBe(true);
+
+    key.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
+    expect(help.hidden).toBe(false);
+  });
+
   it('updateOrbitData_ ignores a null object', () => {
     expect(() => p().updateOrbitData_(null)).not.toThrow();
   });
@@ -101,6 +152,18 @@ describe('SatInfoBoxOrbital data population', () => {
     const missile = { isSatellite: () => false, isMissile: () => true, totalVelocity: 7.5 };
 
     expect(() => p().updateOrbitData_(missile)).not.toThrow();
+  });
+
+  it('a repeated updateOrbitData_ and updateSectionHeader_ write no attributes, text or nodes (#49)', () => {
+    p().updateOrbitData_(defaultSat);
+    const section = getEl('orbital-section')!;
+    const observer = new MutationObserver(() => undefined);
+
+    observer.observe(section, { childList: true, subtree: true, characterData: true, attributes: true });
+    p().updateOrbitData_(defaultSat);
+    p().updateSectionHeader_();
+    expect(observer.takeRecords()).toHaveLength(0);
+    observer.disconnect();
   });
 
   it('updateSectionHeader_ updates the section title without throwing', () => {
@@ -310,7 +373,20 @@ describe('SatInfoBoxOrbital Age of GP row', () => {
     timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 20));
     p().updateOrbitData_(landsat8);
 
-    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`10.22 ${days()}`);
+    expect(getEl(EL.ELSET_AGE)!.textContent).toBe(`10.22 ${days()} ${t7e('plugins.WatchlistPlugin.stale.marker')}`);
+  });
+
+  it('#210 colours Age of GP only past the watchlist stale threshold', () => {
+    const timeManager = ServiceLocator.getTimeManager();
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 10));
+    p().updateOrbitData_(landsat8);
+    expect(getEl(EL.ELSET_AGE)!.classList.contains('sat-info-stale')).toBe(false);
+
+    timeManager.simulationTimeObj = new Date(Date.UTC(2022, 7, 20));
+    p().updateOrbitData_(landsat8);
+    expect(getEl(EL.ELSET_AGE)!.classList.contains('sat-info-stale')).toBe(true);
+    expect(getEl(EL.ELSET_AGE)!.getAttribute('kt-tooltip')).toContain('72');
   });
 
   it('shows a negative age with a note when the sim time is before the GP epoch', () => {

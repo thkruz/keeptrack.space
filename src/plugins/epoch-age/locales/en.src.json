@@ -2,11 +2,11 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "Epoch age: fair, {days}",
-        "low": "Epoch age: low, {days}",
-        "poor": "Epoch age: very low, {days}"
+        "caution": "Epoch age: aging, {days}",
+        "low": "Epoch age: old, {days}",
+        "poor": "Epoch age: very old, {days}"
       },
-      "tooltip": "Time between the simulation and the element set epoch. Fair past 3 days, low past 7, very low past 14: positions drift further from reality the older the elements are.",
+      "tooltip": "Time between the simulation and the element set epoch. Aging past 3 days, old past 7, very old past 14: positions drift further from reality the older the elements are.",
       "toast": {
         "poor": "Elements are more than 14 days old at this time. Positions may be off by tens of kilometres or more."
       },

@@ -32,12 +32,35 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 6px;
+  margin: 6px 0 0;
+}
+
+/* #520 (second fix): the first attempt used `.watchlist-add-row .input-field input` (0,2,1), which loses to
+   materialize-local.css `.input-field input[type='text']:not(.browser-default):not(.select-dropdown)` (0,4,1,
+   margin 0 0 8px) and to `.side-menu .input-field` (0,2,0, margin-bottom 1.5rem) on order. The #watchlist-menu id
+   (shared by the OSS and Pro menus) adds (1,0,0), so these win without !important. */
+#watchlist-menu .watchlist-add-row .input-field input {
+  margin-bottom: 0;
+}
+
+#watchlist-menu .watchlist-add-row .input-field {
+  margin-bottom: 0;
+}
+
+.watchlist-add-row .input-field + .icon-btn,
+.watchlist-add-row .watchlist-add {
+  margin-bottom: 0;
 }
 
 .watchlist-add-row .input-field {
   flex: 1 1 auto;
   margin: 12px 0 0;
+  /* #499: Materialize v2 side padding pushed the input text 15 px right of its label (the label is pinned to left:0
+     by menu-v13.css). Zero it like the flush fields above so label and text share the card edge; min-width lets the
+     input shrink on a 390 px phone instead of pushing the add icon out. */
+  padding-left: 0;
+  padding-right: 0;
+  min-width: 0;
 }
 
 .watchlist-add-row .icon-btn {
@@ -48,4 +71,15 @@
   flex: 0 0 auto;
   width: 24px;
   height: 24px;
+}
+
+/* Element set age. The STALE word carries the meaning; colour and weight only reinforce it. */
+.watchlist-age {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.watchlist-age-stale {
+  color: var(--color-warning, #ffb300);
+  font-weight: 600;
 }

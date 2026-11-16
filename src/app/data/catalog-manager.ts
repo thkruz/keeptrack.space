@@ -60,6 +60,7 @@ import { StringExtractor } from '../ui/string-extractor';
 import { LaunchSite } from './catalog-manager/LaunchFacility';
 import { MissileObject } from './catalog-manager/MissileObject';
 import { SatLinkManager } from './catalog-manager/satLinkManager';
+import { resolveStationHost } from './station-modules';
 
 declare module '@app/engine/core/interfaces' {
   interface SatCruncherMessageData {
@@ -239,6 +240,9 @@ export class CatalogManager {
     if (/^0+\d/u.test(key)) {
       key = key.replace(/^0+/u, '');
     }
+
+    // Attached station modules are merged into their host (#459): ?sat=25575 resolves to the ISS.
+    key = resolveStationHost(key);
 
     // Fast path: direct sccIndex hit.
     if (typeof this.sccIndex[key] !== 'undefined') {

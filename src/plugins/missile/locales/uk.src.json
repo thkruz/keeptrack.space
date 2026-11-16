@@ -47,6 +47,7 @@
         "unitedKingdom": "Велика Британія",
         "france": "Франція",
         "northKorea": "Північна Корея",
+        "iran": "Іран",
         "natoCountries": "Країни НАТО",
         "nonNatoCountries": "Країни поза НАТО",
         "usMilitaryBases": "Військові бази США",
@@ -106,7 +107,8 @@
         "sinpoSub": "ПЧ «Сінпхо» (Пуккиксон-1)",
         "sinpo": "Сінпхо",
         "pyongan": "Пхьонан",
-        "pyongyang": "Пхеньян"
+        "pyongyang": "Пхеньян",
+        "semnan": "Семнан (гіпотетична МБР)"
       },
       "targets": {
         "washingtonDc": "Вашингтон",

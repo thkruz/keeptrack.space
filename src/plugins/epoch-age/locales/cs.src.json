@@ -2,9 +2,9 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "Stáří epochy: přijatelné, {days}",
-        "low": "Stáří epochy: nízké, {days}",
-        "poor": "Stáří epochy: velmi nízké, {days}"
+        "caution": "Stáří epochy: stárnoucí, {days}",
+        "low": "Stáří epochy: staré, {days}",
+        "poor": "Stáří epochy: velmi staré, {days}"
       },
       "tooltip": "Čas mezi simulací a epochou sady elementů. Přijatelné po 3 dnech, nízké po 7, velmi nízké po 14: čím starší elementy, tím více se polohy odchylují od skutečnosti.",
       "toast": {

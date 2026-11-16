@@ -14,6 +14,14 @@
         "primaryLogoFailed": "Das primäre Logobild konnte nicht geladen werden.",
         "secondaryLogoFailed": "Das sekundäre Logobild konnte nicht geladen werden.",
         "noCanvasContext": "2D-Kontext für die temporäre Zeichenfläche nicht verfügbar. Screenshot kann nicht erstellt werden."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Standort: {site}",
+        "source": "Quelle: {source}",
+        "utc": "{time} UTC",
+        "computed": "Berechnete Ansicht: Bahnelemente zu diesem Zeitpunkt {age} alt",
+        "computedBeforeEpoch": "Berechnete Ansicht: dieser Zeitpunkt liegt {age} vor der Epoche der Bahnelemente"
       }
     }
   }

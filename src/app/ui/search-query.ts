@@ -3,6 +3,7 @@ import { SearchableFields } from '@app/settings/core-settings';
 import { settingsManager } from '@app/settings/settings';
 import { BaseObject, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
+import { getModulesOfHost, StationModule } from '../data/station-modules';
 import { OemSatellite } from '../objects/oem-satellite';
 import { SearchResult, SearchResultType } from './search-manager';
 
@@ -15,6 +16,14 @@ import { SearchResult, SearchResultType } from './search-manager';
  */
 function paddedSccKey(sat: Satellite): string {
   return (sat.sccNum6 ?? sat.sccNum ?? '').padStart(6, '0');
+}
+
+/**
+ * True when a purely numeric query matches the NORAD id only as a substring
+ * ("70000" against 270000), so the row can be tagged apart from the exact hit.
+ */
+function isPartialNoradMatch(sat: Satellite, term: string): boolean {
+  return /^\d+$/u.test(term) && paddedSccKey(sat) !== term.padStart(6, '0');
 }
 
 /**
@@ -31,31 +40,109 @@ function noradHighlight(sat: Satellite, term: string): { strIndex: number; patle
   return idx < 0 ? { strIndex: 0, patlen: 0 } : { strIndex: idx, patlen: stripped.length };
 }
 
+/** The merged station module of this object whose name contains the (upper-case) query, if any. */
+export function findModuleByName(sat: Satellite, term: string): StationModule | undefined {
+  const modules = getModulesOfHost(sat.sccNum);
+
+  if (modules.length === 0 || term.length === 0) {
+    return undefined;
+  }
+
+  return modules.find((m) => m.name.toUpperCase().includes(term.toUpperCase()));
+}
+
+/** Supplies user-assigned aliases (object id to alias text); registered by a plugin such as the watchlist. */
+export type SearchAliasSource = () => ReadonlyMap<number, string>;
+
+let aliasSource_: SearchAliasSource | null = null;
+
+/** Register (or clear with null) the alias source consulted by the regular text search. */
+export function registerSearchAliasSource(source: SearchAliasSource | null): void {
+  aliasSource_ = source;
+}
+
+/** The alias for an object id, or undefined when none is registered. */
+export function getSearchAlias(id: number): string | undefined {
+  return aliasSource_?.().get(id);
+}
+
+/** Rank of a result that does not earn a boost. */
+const SEARCH_RANK_OTHER = 3;
+
+/**
+ * Common names that people type instead of the catalog name, mapped to the NORAD id they mean.
+ * Kept short on purpose: only objects whose catalog name hides the common one.
+ */
+const COMMON_NAME_NORAD: Readonly<Record<string, string>> = {
+  ISS: '25544',
+  'INTERNATIONAL SPACE STATION': '25544',
+  HUBBLE: '20580',
+  TIANGONG: '48274',
+};
+
+/**
+ * Ranking rule for the text search (lower sorts first):
+ * 0 = the query is a common name for this object (ISS -> 25544),
+ * 1 = the query equals the object's name or alt name exactly,
+ * 2 = the name starts with the query as a whole word ("ISS (ZARYA)" for "ISS"),
+ * 3 = any other substring match, kept in catalog order.
+ */
+export function getSearchRank(obj: BaseObject, query: string): number {
+  const q = query.trim().toUpperCase();
+  const commonId = COMMON_NAME_NORAD[q];
+
+  if (commonId && (obj as Satellite).sccNum === commonId) {
+    return 0;
+  }
+
+  const name = obj.name?.toUpperCase() ?? '';
+  const altName = (obj as Satellite).altName?.toUpperCase() ?? '';
+
+  if (name === q || altName === q) {
+    return 1;
+  }
+  if (name.startsWith(`${q} `) || name.startsWith(`${q}(`)) {
+    return 2;
+  }
+
+  return SEARCH_RANK_OTHER;
+}
+
 /**
  * Run a regular (text) search over the catalog, returning at most
  * {@link settingsManager.searchLimit} results plus the total number found.
  */
 export function runRegularSearch(searchString: string): { results: SearchResult[]; totalFound: number } {
-  const results: SearchResult[] = [];
+  const normal: SearchResult[] = [];
+  const boosted: { rank: number; result: SearchResult }[] = [];
   let totalFound = 0;
   const limit = settingsManager.searchLimit;
   const { searchableFields } = settingsManager;
+  let currentRank = SEARCH_RANK_OTHER;
 
   const addResult_ = (result: SearchResult) => {
     totalFound++;
-    if (results.length < limit) {
-      results.push(result);
+    if (currentRank < SEARCH_RANK_OTHER) {
+      boosted.push({ rank: currentRank, result });
+    } else if (normal.length < limit) {
+      normal.push(result);
     }
   };
 
   // Split string into array using comma
   const searchList = searchString.split(/,/u);
+  // The built-in star list and the HR star catalog both carry the bright stars, so one name can
+  // reach the catalog twice. Keep one STAR row per name and term.
+  const seenStarNames = new Set<string>();
+  // Comma terms such as "Eglin AFB, Florida" each match the same sensor or launch site; list it once.
+  const seenOtherIds = new Set<number>();
 
   // Update last search with the most recent search results
   settingsManager.lastSearch = searchList;
 
   // Initialize search results
   const satData = getSearchableObjects();
+  const aliases = aliasSource_?.() ?? null;
 
   searchList.forEach((searchStringIn) => {
     const len = searchStringIn.length;
@@ -71,12 +158,51 @@ export function runRegularSearch(searchString: string): { results: SearchResult[
       }
 
       if (obj.isSatellite() || obj.isMissile()) {
+        const alias = aliases?.get(obj.id);
+        const before = totalFound;
+
+        currentRank = getSearchRank(obj, searchStringIn);
+
         matchSatelliteOrMissile(obj as Satellite & MissileObject, searchStringIn, len, searchableFields, addResult_);
+        // A common name ("INTERNATIONAL SPACE STATION") never appears in the catalog name, so add the row it maps to.
+        if (totalFound === before && currentRank === 0) {
+          addResult_({ strIndex: 0, searchType: SearchResultType.OBJECT_NAME, patlen: 0, id: obj.id });
+        }
+        // An attached module (Unity, Zvezda...) is merged into its host: typing its name finds the host row.
+        if (totalFound === before) {
+          const module = findModuleByName(obj as Satellite, searchStringIn);
+
+          if (module) {
+            addResult_({ strIndex: 0, searchType: SearchResultType.MODULE, patlen: len, id: obj.id, moduleName: module.name, moduleScc: module.sccNum });
+          }
+        }
+        // Name, alt name and the other fields win; an alias hit only fills in when none matched.
+        if (alias && totalFound === before && alias.toUpperCase().includes(searchStringIn)) {
+          addResult_({ strIndex: alias.toUpperCase().indexOf(searchStringIn), searchType: SearchResultType.ALIAS, patlen: len, id: obj.id });
+        }
       } else {
+        currentRank = SEARCH_RANK_OTHER;
+        const starKey = obj.isStar() ? `${searchStringIn}|${obj.name.trim().toUpperCase()}` : null;
+
+        if ((starKey !== null && seenStarNames.has(starKey)) || (!obj.isStar() && seenOtherIds.has(obj.id))) {
+          continue;
+        }
+        const beforeOther = totalFound;
+
         matchOtherObject(obj, searchStringIn, len, addResult_);
+        if (!obj.isStar() && totalFound !== beforeOther) {
+          seenOtherIds.add(obj.id);
+        }
+        if (starKey !== null && totalFound !== beforeOther) {
+          seenStarNames.add(starKey);
+        }
       }
     }
   });
+
+  // Stable sort: best rank first, catalog order inside a rank.
+  boosted.sort((a, b) => a.rank - b.rank);
+  const results = [...boosted.map((b) => b.result), ...normal].slice(0, limit);
 
   return { results, totalFound };
 }
@@ -130,7 +256,7 @@ function matchSatelliteOrMissile(
 
       const { strIndex, patlen } = noradHighlight(sat, searchStringIn);
 
-      addResult_({ strIndex, searchType: SearchResultType.NORAD_ID, patlen, id: sat.id });
+      addResult_({ strIndex, searchType: SearchResultType.NORAD_ID, patlen, id: sat.id, partial: isPartialNoradMatch(sat, searchStringIn) });
 
       return;
     }
@@ -143,7 +269,13 @@ function matchSatelliteOrMissile(
    * leaving sccNum5 null.
    */
   if (searchableFields.noradId && sat.sccNum5?.includes(searchStringIn)) {
-    addResult_({ strIndex: sat.sccNum5.indexOf(searchStringIn), searchType: SearchResultType.NORAD_ID_A5, patlen: len, id: sat.id });
+    addResult_({
+      strIndex: sat.sccNum5.indexOf(searchStringIn),
+      searchType: SearchResultType.NORAD_ID_A5,
+      patlen: len,
+      id: sat.id,
+      partial: sat.sccNum5 !== searchStringIn && paddedSccKey(sat) !== searchStringIn.padStart(6, '0'),
+    });
 
     return;
   }
@@ -294,6 +426,7 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
         patlen,
         id: sat.id,
         searchType: SearchResultType.NORAD_ID,
+        partial: isPartialNoradMatch(sat, term),
       });
     }
   };
@@ -315,6 +448,19 @@ export function runNumOnlySearch(searchString: string): { results: SearchResult[
 
     for (const sat of satsByKey.get(exactKey) ?? []) {
       addResult(sat, term);
+    }
+
+    // A merged module number ("26400") finds the host row (the ISS) with a hint that it is a module.
+    for (const sat of satData) {
+      const module = getModulesOfHost(sat.sccNum).find((m) => m.sccNum.padStart(6, '0') === exactKey);
+
+      if (module && !seenIds.has(sat.id)) {
+        seenIds.add(sat.id);
+        totalFound++;
+        if (results.length < limit) {
+          results.push({ strIndex: 0, patlen: 0, id: sat.id, searchType: SearchResultType.MODULE, moduleName: module.name, moduleScc: module.sccNum });
+        }
+      }
     }
 
     if (!isSingleTerm) {

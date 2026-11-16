@@ -31,6 +31,7 @@ export enum StorageKey {
   SETTINGS_SAT_LABEL_MODE = 'v2-keepTrack-settings-satLabelMode',
   SETTINGS_SAT_LABEL_MODE_V2 = 'v2-keepTrack-settings-satLabelModeV2',
   SETTINGS_SHOW_SENSOR_LABELS = 'v2-keepTrack-settings-showSensorLabels',
+  SETTINGS_SHOW_OBJECT_LABELS = 'v2-keepTrack-settings-showObjectLabels',
   SETTINGS_FREEZE_PROP_RATE_ON_DRAG = 'v2-keepTrack-settings-freezePropRateOnDrag',
   SETTINGS_DISABLE_TIME_MACHINE_TOASTS = 'v2-keepTrack-settings-disableTimeMachineToasts',
   SETTINGS_DISABLE_TOASTS = 'v2-keepTrack-settings-disableToasts',
@@ -49,6 +50,7 @@ export enum StorageKey {
   SETTINGS_DRAW_SUN = 'v2-keepTrack-settings-drawSun',
   SETTINGS_DRAW_ORBIT_ECLIPSE = 'v2-keepTrack-settings-drawOrbitEclipse',
   SETTINGS_DRAW_SWATH_FIELD_OF_REGARD = 'v2-keepTrack-settings-drawSwathFieldOfRegard',
+  SETTINGS_HQ_GRAPHICS = 'v2-keepTrack-settings-hqGraphics',
   SETTINGS_DRAW_FLAG_DECALS = 'v2-keepTrack-settings-drawFlagDecals',
   SETTINGS_FLAG_DECAL_SCALE = 'v2-keepTrack-settings-flagDecalScale',
   SETTINGS_SHOW_EPOCH_AGE = 'v2-keepTrack-settings-showEpochAge',
@@ -64,6 +66,7 @@ export enum StorageKey {
   GRAPHICS_SETTINGS_GODRAYS_ILLUMINATION_DECAY = 'v2-keepTrack-graphicsSettings-godraysIlluminationDecay',
   GRAPHICS_SETTINGS_EARTH_DAY_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthDayResolution',
   GRAPHICS_SETTINGS_EARTH_NIGHT_RESOLUTION = 'v2-keepTrack-graphicsSettings-earthNightResolution',
+  STALE_GP_THRESHOLD_HOURS = 'v2-keepTrack-staleGpThresholdHours',
   GRAPHICS_SETTINGS_TERRAIN_RELIEF_EXAGGERATION = 'v2-keepTrack-graphicsSettings-terrainReliefExaggeration',
   FILTER_SETTINGS_OPERATIONAL_PAYLOADS = 'v2-filter-settings-operational-payloads',
   FILTER_SETTINGS_NON_OPERATIONAL_PAYLOADS = 'v2-filter-settings-non-operational-payloads',
@@ -148,6 +151,9 @@ export enum StorageKey {
   // Achievement unlock toast style: 'compact' | 'card'
   ACHIEVEMENT_TOAST_STYLE = 'v2-keepTrack-achievementToastStyle',
 
+  // Display time zone for clocks and tables: 'UTC' (default) or an IANA zone name (synced to the account)
+  DISPLAY_TIME_ZONE = 'v2-keepTrack-displayTimeZone',
+
   // Best Pass Pro (column visibility + propagation settings)
   BEST_PASS_SETTINGS = 'v2-keepTrack-bestPassSettings',
 
@@ -208,6 +214,12 @@ export enum StorageKey {
   // Custom Sensor (user-built sensor definitions and which one was the primary,
   // restored on boot so a custom station survives a reload)
   CUSTOM_SENSORS = 'v2-keepTrack-customSensors',
+
+  // Saved custom-site registry (every custom site the user kept, active or not, keyed by stable id)
+  CUSTOM_SITE_REGISTRY = 'v2-keepTrack-customSiteRegistry',
+
+  // Reset to Start (saved starting time, play state, selection and camera view)
+  START_POINT = 'v2-keepTrack-startPoint',
 
   // FPS View (the one-time "how to fly" hint was shown on this device)
   FPS_VIEW_HINT_SEEN = 'v2-keepTrack-fpsViewHintSeen',

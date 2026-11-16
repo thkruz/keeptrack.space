@@ -11,7 +11,7 @@
         "beamWidth": "Šířka svazku",
         "maxTmxTime": "Max. čas Tmx",
         "sun": "Slunce",
-        "visMag": "Viz. mag.",
+        "visMag": "Viz. mag. (odhad)",
         "nextPass": "Další přelet",
         "reason": "Mimo dohled"
       },
@@ -24,7 +24,7 @@
         "beamWidth": "Lineární šířka v dosahu cíle",
         "maxTmxTime": "Čas potřebný pro RF/světlo k dosažení cíle a zpět",
         "sun": "Ovlivňuje Slunce senzor",
-        "visMag": "Vizuální magnituda (nižší čísla znamenají vyšší jas)",
+        "visMag": "Odhadnutá vizuální magnituda (nižší čísla znamenají vyšší jas). Vypočteno ze standardního magnitudového modelu; skutečný jas závisí na orientaci a fázi. Předpokládá jasnou oblohu; počasí a oblačnost se nezohledňují.",
         "nextPass": "Příští průchod v pokrytí",
         "reason": "Proč je objekt mimo zorné pole senzoru"
       },
@@ -38,12 +38,12 @@
         "outOfFov": "Mimo zorné pole",
         "unavailable": "Nedostupné",
         "beyondMaxRange": "Za maximálním dosahem",
-        "reasonMinRange": "Vzdálenost {{value}} pod min. {{limit}}",
-        "reasonMaxRange": "Vzdálenost {{value}} nad max. {{limit}}",
-        "reasonMinEl": "Elevace {{value}} pod min. {{limit}}",
-        "reasonMaxEl": "Elevace {{value}} nad max. {{limit}}",
-        "reasonMask": "Elevace {{value}} pod maskou horizontu {{limit}}",
-        "reasonAzimuth": "Azimut {{value}} mimo {{min}} až {{max}}",
+        "reasonMinRange": "Vzdálenost pod min. {{limit}}",
+        "reasonMaxRange": "Vzdálenost nad max. {{limit}}",
+        "reasonMinEl": "Elevace pod min. {{limit}}",
+        "reasonMaxEl": "Elevace nad max. {{limit}}",
+        "reasonMask": "Elevace pod maskou horizontu {{limit}}",
+        "reasonAzimuth": "Azimut mimo {{min}} až {{max}}",
         "reasonCone": "Mimo kužel osy senzoru",
         "unknown": "Neznámé",
         "notApplicable": "Není k dispozici",
@@ -51,7 +51,9 @@
         "notInOrbitToast": "Družice {sccNum} není na oběžné dráze!<br>Čas simulace je {simTime}.<br>Ověřte, že máte správné TLE.",
         "categoryKinematic": "Kinematika",
         "categorySensor": "Senzor",
-        "kinematicOk": "V mezích senzoru"
+        "kinematicOk": "V mezích senzoru",
+        "notSunlit": "Bez osvětlení",
+        "assumedSuffix": "(předpoklad)"
       }
     }
   }

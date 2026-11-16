@@ -10,7 +10,7 @@ import { initMaterialSelects } from '@app/engine/ui/material-select';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl } from '@app/engine/utils/get-el';
-import { t7e } from '@app/locales/keys';
+import { TranslationKey, t7e } from '@app/locales/keys';
 import { BaseObject, Satellite } from '@ootk/src/main';
 import scatterPlot3Png from '@public/img/icons/scatter-plot3.png';
 import * as echarts from 'echarts';
@@ -53,6 +53,17 @@ export class RicPlot extends KeepTrackPlugin {
 
     this.createPlot(this.getPlotData(), getEl(this.plotCanvasId)!);
   };
+
+  getDisabledReason(): string | null {
+    if (this.selectSatManager_.selectedSat === -1) {
+      return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
+    }
+    if (!this.selectSatManager_.secondarySatObj) {
+      return t7e('errorMsgs.SelectSecondarySatellite');
+    }
+
+    return null;
+  }
 
   plotCanvasId = 'plot-analysis-chart-ric';
   chart: echarts.ECharts;

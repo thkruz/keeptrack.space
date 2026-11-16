@@ -5,11 +5,18 @@ import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
 import { mat4, vec3, vec4 } from 'gl-matrix';
+import { CameraType } from '../camera/camera-type';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
 import { Engine } from '../engine';
 import { EventBus } from '../events/event-bus';
-import { RmbMenuContext } from '../plugins/core/plugin-capabilities';
+import {
+  addContextMenuGroupLevel1,
+  applyContextMenuGroupVisibility,
+  isContextMenuGroupMember,
+  registerContextMenuGroup,
+} from '../plugins/components/context-menu/context-menu-groups';
+import { ContextMenuGroupId, RmbMenuContext } from '../plugins/core/plugin-capabilities';
 import type { PickBox } from '../rendering/dots-manager';
 import { lineManagerInstance } from '../rendering/line-manager';
 import { html } from '../utils/development/formatter';
@@ -20,6 +27,7 @@ import { isThisNode } from '../utils/isThisNode';
 import { KeyboardInput } from './input-manager/keyboard-input';
 import { MouseInput } from './input-manager/mouse-input';
 import { TouchInput } from './input-manager/touch-input';
+import { type PickCandidate, resolvePickCandidate } from './pick-resolve';
 
 export type LatLon = {
   lat: Degrees;
@@ -61,7 +69,20 @@ type rmbMenuItem = {
    * Fine-grained visibility predicate. Overrides the boolean flags when provided.
    */
   isVisible?: (ctx: RmbMenuContext) => boolean;
+  /**
+   * Shared group submenu this item lives in (members) or represents (when isGroup is true).
+   */
+  group?: ContextMenuGroupId;
+  /**
+   * True for a group's own top-level entry; its visibility follows its members.
+   */
+  isGroup?: boolean;
 };
+
+/** Built-in entry that moves into the "More" group when that group exists. */
+const RMB_TOGGLE_TIME_ID = 'toggle-time-rmb';
+const RMB_TOGGLE_TIME_GROUP: ContextMenuGroupId = 'more';
+const RMB_TOGGLE_TIME_ORDER = 1000;
 
 export class InputManager {
   private updateHoverDelay = 0;
@@ -76,6 +97,8 @@ export class InputManager {
   public isPickingSupported = true;
   private hasWarnedPickingDisabled_ = false;
   lastUpdateTime: number = 0;
+  /** False once the pointer left the canvas; hover picking must not reuse the stale coordinates. */
+  isPointerOverCanvas = true;
 
   // ─── On-demand GPU picking gate (WP4) ───────────────────────────────
   /** How long after the last pointer/read activity to keep rendering the picking buffer. */
@@ -291,24 +314,40 @@ export class InputManager {
 
   clearRMBSubMenu = () => {
     this.rmbMenuItems.forEach((item) => {
-      if (item.elementIdL2) {
+      // A group member's submenu is a section inside its group's submenu, not a popup.
+      if (item.elementIdL2 && !isContextMenuGroupMember(item)) {
         hideEl(item.elementIdL2);
       }
     });
   };
 
   static showDropdownSubMenu(rightBtnMenuDOM: HTMLElement, rightBtnDOM: HTMLElement, canvasDOM: HTMLCanvasElement, element1?: HTMLElement) {
-    const offsetX = rightBtnMenuDOM.offsetLeft < canvasDOM.clientWidth / 2 ? 160 : -160;
+    const isOpeningRight = rightBtnMenuDOM.offsetLeft < canvasDOM.clientWidth / 2;
 
     rightBtnDOM.style.display = 'block';
     rightBtnDOM.style.textAlign = 'center';
     rightBtnDOM.style.position = 'absolute';
-    rightBtnDOM.style.left = `${rightBtnMenuDOM.offsetLeft + offsetX}px`;
+    // Sit flush against the parent menu so a wide submenu never covers it. Without layout
+    // (jsdom) the widths read 0 and the old fixed 160 px step applies.
+    const parentW = rightBtnMenuDOM.offsetWidth || 160;
+    const subW = rightBtnDOM.offsetWidth || 160;
+
+    rightBtnDOM.style.left = `${isOpeningRight ? rightBtnMenuDOM.offsetLeft + parentW : rightBtnMenuDOM.offsetLeft - subW}px`;
     rightBtnDOM.style.top = element1 ? `${rightBtnMenuDOM.offsetTop + element1.offsetTop}px` : `${rightBtnMenuDOM.offsetTop}px`;
     if (rightBtnDOM.offsetTop !== 0) {
       rightBtnDOM.style.display = 'block';
     } else {
       rightBtnDOM.style.display = 'none';
+
+      return;
+    }
+
+    // Keep a tall submenu on screen: slide it up instead of running past the canvas bottom.
+    const boundsH = canvasDOM.clientHeight;
+    const subH = rightBtnDOM.offsetHeight;
+
+    if (boundsH > 0 && subH > 0 && rightBtnDOM.offsetTop + subH > boundsH) {
+      rightBtnDOM.style.top = `${Math.max(0, boundsH - subH)}px`;
     }
   }
 
@@ -457,8 +496,7 @@ export class InputManager {
     const catalogManagerInstance = ServiceLocator.getCatalogManager();
     const buf = dotsManagerInstance.pickReadPixelBuffer;
     const { x0, y0, size, cx, cy } = pickBox;
-    let bestId = -1;
-    let bestDistance = Number.POSITIVE_INFINITY;
+    const found = new Map<number, number>();
 
     for (let row = 0; row < size; row++) {
       for (let col = 0; col < size; col++) {
@@ -477,15 +515,49 @@ export class InputManager {
         const dx = x0 + col - cx;
         const dy = y0 + row - cy;
         const distance = dx * dx + dy * dy;
+        const prev = found.get(id);
 
-        if (distance < bestDistance) {
-          bestDistance = distance;
-          bestId = id;
+        if (prev === undefined || distance < prev) {
+          found.set(id, distance);
         }
       }
     }
 
-    return bestId;
+    const candidates: PickCandidate[] = Array.from(found, ([id, pixelDistance2]) => ({ id, pixelDistance2 }));
+
+    /*
+     * Pick squares are much larger than the visible dot, so in a dense belt the id under the
+     * cursor pixel is whichever square won the depth test. Resolve overlaps by dot centre.
+     */
+    return resolvePickCandidate(candidates, { x: cx, y: cy }, (id) => this.getPickCentre_(id));
+  }
+
+  /** Dot centre of a catalog id in drawing-buffer pixels (y from the bottom), or null when it cannot be projected. */
+  private getPickCentre_(id: number): { x: number; y: number } | null {
+    // Polar and flat-map shaders reproject in the GPU; the CPU projection only matches the 3D view
+    const camType = ServiceLocator.getMainCamera().cameraType;
+
+    if (camType === CameraType.POLAR_VIEW) {
+      return null;
+    }
+
+    const obj = ServiceLocator.getCatalogManager().getObject(id);
+
+    if (!obj) {
+      return null;
+    }
+
+    const { gl } = ServiceLocator.getRenderer();
+    const screen = ServiceLocator.getRenderer().getScreenCoords(obj);
+
+    if (screen.error || !window.innerWidth || !window.innerHeight) {
+      return null;
+    }
+
+    return {
+      x: (screen.x * gl.drawingBufferWidth) / window.innerWidth,
+      y: gl.drawingBufferHeight - (screen.y * gl.drawingBufferHeight) / window.innerHeight,
+    };
   }
 
   /**
@@ -595,6 +667,8 @@ export class InputManager {
           `
         );
 
+        this.groupToggleTimeItem_();
+
         // sort getEl('rmb-wrapper').children by order in rmbMenuItems
         const rmbWrapper = getEl('right-btn-menu-ul', true);
 
@@ -657,6 +731,35 @@ export class InputManager {
   }
 
   /**
+   * Moves the built-in Pause Clock entry into the "More" group when a plugin created that group,
+   * keeping the top level for the frequent actions. Without the group it stays at the top level.
+   */
+  private groupToggleTimeItem_(): void {
+    if (!this.rmbMenuItems.some((item) => item.isGroup && item.group === RMB_TOGGLE_TIME_GROUP)) {
+      return;
+    }
+
+    const toggleTimeEl = getEl(RMB_TOGGLE_TIME_ID, true);
+
+    if (!toggleTimeEl) {
+      return;
+    }
+
+    addContextMenuGroupLevel1(RMB_TOGGLE_TIME_GROUP, RMB_TOGGLE_TIME_ID, RMB_TOGGLE_TIME_ORDER, toggleTimeEl, false);
+    this.rmbMenuItems.push({
+      elementIdL1: RMB_TOGGLE_TIME_ID,
+      elementIdL2: '',
+      order: RMB_TOGGLE_TIME_ORDER,
+      isRmbOnEarth: true,
+      isRmbOffEarth: true,
+      isRmbOnSat: true,
+      isVisible: () => true,
+      group: RMB_TOGGLE_TIME_GROUP,
+    });
+    registerContextMenuGroup(this.rmbMenuItems, RMB_TOGGLE_TIME_GROUP);
+  }
+
+  /**
    * Builds the context object describing what was right-clicked. Shared with
    * every menu item's visibility predicate and the rightBtnMenuOpen event.
    */
@@ -716,6 +819,8 @@ export class InputManager {
 
     hideEl('clear-lines-rmb');
 
+    const isItemVisible = (item: rmbMenuItem) => (item.isVisible ? item.isVisible(ctx) : InputManager.isItemVisibleLegacy_(item, ctx));
+
     if (lineManagerInstance.lines.length > 0) {
       const clearLinesEl = getEl('clear-lines-rmb', true);
 
@@ -725,7 +830,8 @@ export class InputManager {
     }
 
     this.rmbMenuItems
-      .filter((item) => (item.isVisible ? item.isVisible(ctx) : InputManager.isItemVisibleLegacy_(item, ctx)))
+      .filter((item) => !item.group)
+      .filter(isItemVisible)
       .forEach((item) => {
         const dom = getEl(item.elementIdL1);
 
@@ -733,6 +839,8 @@ export class InputManager {
           dom.style.display = 'block';
         }
       });
+
+    applyContextMenuGroupVisibility(this.rmbMenuItems, isItemVisible);
 
     rightBtnMenuDOM.style.display = 'block';
     satHoverBoxDOM.style.display = 'none';
@@ -887,7 +995,9 @@ export class InputManager {
       if (uiManagerInstance.searchHoverSatId >= 0) {
         this.mouse.mouseSat = uiManagerInstance.searchHoverSatId;
       } else if (!settingsManager.isMobileModeEnabled) {
-        if (Date.now() - this.lastUpdateTime > 100) {
+        if (!this.isPointerOverCanvas) {
+          this.mouse.mouseSat = -1;
+        } else if (Date.now() - this.lastUpdateTime > 100) {
           this.mouse.mouseSat = this.getSatIdFromCoord(inputCamera.state.mouseX, inputCamera.state.mouseY);
           this.lastUpdateTime = Date.now();
         }

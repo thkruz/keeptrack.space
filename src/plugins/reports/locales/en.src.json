@@ -48,6 +48,7 @@
       "downloadButton": "Download Report",
       "copyButton": "Copy to Clipboard",
       "sensorNote": "These reports require a sensor to be selected.",
+      "sensorLimitNote": "Using {name}: minimum elevation {minEl}°. Passes below it are not reported.",
       "sections": {
         "orbitPosition": "Orbit and Position",
         "sensor": "Sensor",
@@ -112,7 +113,11 @@
           "windowLine": "Report Window: {start} to {end} UTC, Step: {step} s",
           "generatedWallClock": "Generated (wall clock)",
           "appVersion": "KeepTrack version",
-          "ricConvention": "RIC convention"
+          "ricConvention": "RIC convention",
+          "passCaveat": "Site-local times use the {zone} zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second.",
+          "passCaveatDisplay": "Local times use the {zone} display zone. Windows show geometric access only, not proof that a signal can be received. Peak elevation is refined to the nearest second.",
+          "sensorCoverage": "Covers sensor {sensor} only.",
+          "sensorCoverageOthers": "Covers sensor {sensor} only. Other active sensors or sites not included: {count}."
         },
         "titles": {
           "aer": "Azimuth Elevation Range Report",
@@ -157,7 +162,11 @@
           "radialKm": "Radial (km)",
           "intrackKm": "In-Track (km)",
           "crosstrackKm": "Cross-Track (km)",
-          "relSpeed": "Rel Speed (km/s)"
+          "relSpeed": "Rel Speed (km/s)",
+          "timeLocal": "Local Time",
+          "riseLocal": "Rise Time (Local)",
+          "setLocal": "Set Time (Local)",
+          "maxElTimeLocal": "Max Elevation Time (Local)"
         },
         "empty": {
           "noPasses": "No passes found!",
@@ -167,8 +176,8 @@
         },
         "passEdge": {
           "continuous": "continuous",
-          "start": "in view at start",
-          "end": "in view at end"
+          "start": "in view at start; peak within window",
+          "end": "in view at end; peak within window"
         },
         "illumination": {
           "sun": "Yes",

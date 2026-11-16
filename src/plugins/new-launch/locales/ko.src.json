@@ -10,6 +10,7 @@
         "inclination": "경사각",
         "launchingNorthOrSouth": "북쪽 또는 남쪽 발사",
         "launchFacility": "발사 시설",
+        "searchFacilities": "시설 또는 국가 검색...",
         "north": "북쪽",
         "south": "남쪽"
       },

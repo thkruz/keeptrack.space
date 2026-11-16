@@ -47,6 +47,7 @@
         "unitedKingdom": "英国",
         "france": "法国",
         "northKorea": "朝鲜",
+        "iran": "伊朗",
         "natoCountries": "北约国家",
         "nonNatoCountries": "非北约国家",
         "usMilitaryBases": "美国军事基地",
@@ -106,7 +107,8 @@
         "sinpoSub": "新浦级潜艇（北极星-1）",
         "sinpo": "新浦",
         "pyongan": "平安",
-        "pyongyang": "平壤"
+        "pyongyang": "平壤",
+        "semnan": "塞姆南（假设洲际导弹）"
       },
       "targets": {
         "washingtonDc": "华盛顿特区",

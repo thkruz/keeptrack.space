@@ -3,27 +3,33 @@
     "title": "Données Orbitales",
     "Apogee": {
       "label": "Apogée",
-      "tooltip": "Altitude maximale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
+      "tooltip": "Altitude maximale de l'orbite au-dessus du rayon équatorial (6378,137 km)",
+      "help": "Le point le plus haut de l'orbite, donné en altitude au-dessus de la Terre."
     },
     "Perigee": {
       "label": "Périgée",
-      "tooltip": "Altitude minimale de l'orbite au-dessus du rayon équatorial (6378,137 km)"
+      "tooltip": "Altitude minimale de l'orbite au-dessus du rayon équatorial (6378,137 km)",
+      "help": "Le point le plus bas de l'orbite, donné en altitude au-dessus de la Terre."
     },
     "Inclination": {
       "label": "Inclinaison",
-      "tooltip": "Angle mesuré depuis l'équateur au nœud ascendant"
+      "tooltip": "Angle mesuré depuis l'équateur au nœud ascendant",
+      "help": "L'inclinaison de l'orbite par rapport à l'équateur. 0° suit l'équateur ; 90° passe au-dessus des pôles."
     },
     "Eccentricity": {
       "label": "Excentricité",
-      "tooltip": "À quel point l'orbite est circulaire (0 est un cercle)"
+      "tooltip": "À quel point l'orbite est circulaire (0 est un cercle)",
+      "help": "À quel point l'orbite est allongée. 0 est un cercle parfait ; près de 1, c'est un ovale étiré."
     },
     "RightAsc": {
       "label": "Asc. Droite",
-      "tooltip": "Où elle passe au-dessus de l'équateur"
+      "tooltip": "Où elle passe au-dessus de l'équateur",
+      "help": "Ascension droite du nœud ascendant : la direction dans le ciel où l'orbite croise l'équateur en allant vers le nord."
     },
     "ArgOfPerigee": {
       "label": "Arg du Périgée",
-      "tooltip": "Où se trouve la partie la plus basse de l'orbite"
+      "tooltip": "Où se trouve la partie la plus basse de l'orbite",
+      "help": "Argument du périgée : l'angle le long de l'orbite entre ce passage de l'équateur et le point le plus bas."
     },
     "Latitude": {
       "label": "Latitude",
@@ -37,6 +43,29 @@
       "east": "E",
       "west": "O"
     },
+    "Region": {
+      "label": "Au-dessus de",
+      "tooltip": "Pays situé sous le point subsatellite (frontières Natural Earth)",
+      "ocean": "Au-dessus de l'océan",
+      "Water": {
+        "arctic": "océan Arctique",
+        "atlantic": "océan Atlantique",
+        "pacific": "océan Pacifique",
+        "indian": "océan Indien",
+        "southern": "océan Austral",
+        "mediterranean": "mer Méditerranée",
+        "caribbean": "mer des Caraïbes",
+        "gulfOfMexico": "golfe du Mexique",
+        "redSea": "mer Rouge",
+        "blackSea": "mer Noire",
+        "northSea": "mer du Nord",
+        "baltic": "mer Baltique",
+        "arabianSea": "mer d’Arabie",
+        "bayOfBengal": "golfe du Bengale",
+        "southChinaSea": "mer de Chine méridionale",
+        "persianGulf": "golfe Persique"
+      }
+    },
     "Altitude": {
       "label": "Altitude",
       "tooltip": "Altitude actuelle au-dessus du niveau de la mer"
@@ -46,7 +75,8 @@
       "tooltip": "Temps pour une révolution complète autour de la Terre",
       "meanMotion": "Mouvement moyen",
       "revPerDay": "rév/jour",
-      "min": "min"
+      "min": "min",
+      "help": "Le temps que met l'objet pour faire un tour de la Terre."
     },
     "Velocity": {
       "label": "Vitesse",
@@ -67,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "Sigma Radial",
-      "tooltip": "Incertitude de position radiale à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
+      "tooltip": "Incertitude de position 1-sigma radiale (repère RIC). Une valeur marquée (par défaut) est une valeur par défaut supposée par l'application, pas une mesure ; sinon elle est dérivée du TLE à l'époque GP. Pc et le rapport de conjonction utilisent les mêmes valeurs. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "InTrackSigma": {
       "label": "Sigma Sur Piste",
-      "tooltip": "Incertitude de position le long de la trace à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
+      "tooltip": "Incertitude de position 1-sigma le long de la trajectoire (repère RIC). Une valeur marquée (par défaut) est une valeur par défaut supposée par l'application, pas une mesure ; sinon elle est dérivée du TLE à l'époque GP. Pc et le rapport de conjonction utilisent les mêmes valeurs. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "CrossTrackSigma": {
       "label": "Sigma Hors Piste",
-      "tooltip": "Incertitude de position transverse à 1 sigma issue de la covariance dérivée du TLE à l'époque GP (repère RIC). Mêmes valeurs que celles utilisées pour la Pc et le rapport de conjonction."
+      "tooltip": "Incertitude de position 1-sigma transversale (repère RIC). Une valeur marquée (par défaut) est une valeur par défaut supposée par l'application, pas une mesure ; sinon elle est dérivée du TLE à l'époque GP. Pc et le rapport de conjonction utilisent les mêmes valeurs. Pour juger un rapprochement, ouvrez le rapport de conjonction ; une probabilité de collision exige aussi la covariance de l'autre objet et la taille des deux objets."
     },
     "meter": "m",
     "kilometer": "km",
@@ -87,8 +117,31 @@
       "tooltip": "Corps à partir duquel les positions de l'éphéméride sont mesurées (OEM CENTER_NAME)"
     },
     "RefFrame": {
-      "label": "Repère de référence",
-      "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)"
+      "label": "Repère",
+      "tooltip": "Repère de coordonnées de l'éphéméride (OEM REF_FRAME)",
+      "teme": "TEME",
+      "temeInfo": "issu du jeu d’éléments GP"
+    },
+    "Regime": {
+      "label": "Régime",
+      "tooltip": "La tranche d'altitude de l'orbite",
+      "help": "La tranche d'altitude de l'orbite. LEO : orbite terrestre basse, sous 2 000 km. MEO : orbite moyenne, jusqu'à l'altitude géostationnaire. GEO : environ 35 786 km au-dessus de l'équateur, l'objet reste au-dessus d'un même point. HEO : très elliptique ou plus haute que la GEO.",
+      "leo": "LEO",
+      "leoInfo": "Orbite terrestre basse, sous 2 000 km d'altitude.",
+      "meo": "MEO",
+      "meoInfo": "Orbite terrestre moyenne, entre LEO et l'altitude géostationnaire.",
+      "geo": "GEO",
+      "geoInfo": "Orbite géostationnaire, à environ 35 786 km au-dessus de l'équateur.",
+      "heo": "HEO",
+      "heoInfo": "Très elliptique ou plus haute que la géostationnaire."
+    },
+    "LatitudeBand": {
+      "label": "Portée en latitude",
+      "tooltip": "Latitude la plus haute que la trace au sol atteint, au nord et au sud. Elle égale l’inclinaison, ou 180 degrés moins l’inclinaison pour une orbite rétrograde. Le satellite ne passe jamais à la verticale hors de cette bande."
+    },
+    "Sigma": {
+      "defaultTag": "par défaut",
+      "defaultNote": "Estimation par défaut de l’application pour ce type d’orbite. Elle n’a pas été mesurée et ne venait pas avec les données source."
     }
   }
 }

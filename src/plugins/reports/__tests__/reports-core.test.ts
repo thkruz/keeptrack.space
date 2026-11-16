@@ -2,6 +2,7 @@ import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { buildDownloadPayload } from '@app/plugins/reports/report-formatter';
 import {
   addWindowEdgePasses,
+  buildPassCaveatLine,
   buildReportHeader,
   buildReportWindowLine,
   formatReportTime,
@@ -14,6 +15,7 @@ import {
   ReportCoreDeps,
   ReportOptions,
   ReportPass,
+  wrapReportText,
 } from '@app/plugins/reports/reports-core';
 import { Satellite, TleLine1, TleLine2 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
@@ -51,6 +53,21 @@ const deps: ReportCoreDeps = {
 };
 
 describe('reports-core', () => {
+  describe('pass caveat wrapping (#201)', () => {
+    it('wraps the caveat so no line is wider than the preview', () => {
+      const lines = buildPassCaveatLine({ timeZone: 'America/New_York' }).trim().split('\n');
+
+      expect(lines.length).toBeGreaterThan(1);
+      expect(Math.max(...lines.map((line) => line.length))).toBeLessThanOrEqual(80);
+    });
+
+    it('wrapReportText keeps an over-long word whole and drops no words', () => {
+      const wrapped = wrapReportText(`aa bb ${'x'.repeat(12)} cc`, 6);
+
+      expect(wrapped.split('\n')).toEqual(['aa bb', 'xxxxxxxxxxxx', 'cc']);
+    });
+  });
+
   describe('formatReportTime', () => {
     it('renders YYYY-MM-DD HH:MM:SS in UTC', () => {
       expect(formatReportTime(new Date('2022-03-04T05:06:07.890Z'))).toBe('2022-03-04 05:06:07');
@@ -157,11 +174,25 @@ describe('reports-core', () => {
     it('AER samples the look angle inside each injected pass window', () => {
       const data = generateAerReport(defaultSat, fakeSensor, opts, deps, generatedAt);
 
-      expect(data.table!.headers).toEqual(['Time (UTC)', 'Pass', 'Azimuth(°)', 'Elevation(°)', 'Range(km)']);
+      expect(data.table!.headers).toEqual(['Time (UTC)', 'Pass', 'Azimuth(°)', 'Elevation(°)', 'Range(km)', 'Local Time']);
       // 180s window at 60s step inclusive -> 4 samples, all pass index 1.
       expect(data.table!.rows.length).toBe(4);
       expect(data.table!.rows.every((r) => r[1] === '1')).toBe(true);
       expect(data.table!.rows[0][2]).toBe('123.456');
+    });
+
+    it('#117 AER and Visibility Windows add site-local time columns and the reception caveat', () => {
+      const tokyo = { ...fakeSensor, timeZone: 'Asia/Tokyo' } as unknown as DetailedSensor;
+      const aer = generateAerReport(defaultSat, tokyo, opts, deps, generatedAt);
+      const vis = generateVisibilityWindowsReport(defaultSat, tokyo, opts, deps, generatedAt);
+
+      // 00:01:00Z is 09:01:00 in Tokyo (UTC+9)
+      expect(aer.table!.rows[0].at(-1)).toBe('2022-01-01 09:01:00');
+      expect(aer.header).toContain('Asia/Tokyo');
+      expect(aer.header).toContain('not proof that a signal can be received');
+      expect(vis.table!.headers).toEqual(expect.arrayContaining(['Rise Time (Local)', 'Set Time (Local)', 'Max Elevation Time (Local)']));
+      expect(vis.table!.rows[0].slice(6, 9)).toEqual(['2022-01-01 09:01:00', '2022-01-01 09:04:00', '2022-01-01 09:02:30']);
+      expect(vis.csvHeader).toContain('Asia/Tokyo');
     });
 
     it('AER reports an empty message when there are no passes', () => {
@@ -169,6 +200,16 @@ describe('reports-core', () => {
 
       expect(data.table!.rows).toHaveLength(0);
       expect(data.emptyMessage).toBeTruthy();
+    });
+
+    it('Visibility Windows header names the covered sensor and notes other active sensors', () => {
+      const single = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, deps, generatedAt);
+      const multi = generateVisibilityWindowsReport(defaultSat, fakeSensor, opts, { ...deps, otherSensorCount: 2 }, generatedAt);
+
+      expect(single.header).toContain(`Covers sensor ${fakeSensor.name} only.`);
+      expect(single.header).not.toContain('not included');
+      expect(multi.header).toContain('not included: 2');
+      expect(multi.csvHeader).toContain('not included: 2');
     });
 
     it('Visibility Windows emits one row per pass with rise/set/duration', () => {
@@ -314,7 +355,9 @@ describe('reports-core', () => {
       expect(csv).toContain('# Report Window: 2022-01-01 00:00:00 to 2022-01-01 06:00:00 UTC, Step: 60 s');
       const tableStart = lines.findIndex((line) => !line.startsWith('#'));
 
-      expect(lines[tableStart]).toBe('Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC)');
+      expect(lines[tableStart]).toBe(
+        'Pass #,Rise Time (UTC),Set Time (UTC),Duration (min),Max Elevation(°),Max Elevation Time (UTC),Rise Time (Local),Set Time (Local),Max Elevation Time (Local)'
+      );
     });
 
     it('pure time-series CSVs (LLA) stay data-only', () => {

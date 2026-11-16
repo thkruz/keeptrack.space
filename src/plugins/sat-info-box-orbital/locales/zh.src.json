@@ -3,27 +3,33 @@
     "title": "轨道数据",
     "Apogee": {
       "label": "远地点",
-      "tooltip": "轨道最高高度（相对赤道半径 6378.137 公里）"
+      "tooltip": "轨道最高高度（相对赤道半径 6378.137 公里）",
+      "help": "轨道的最高点，以距地球的高度表示。"
     },
     "Perigee": {
       "label": "近地点",
-      "tooltip": "轨道最低高度（相对赤道半径 6378.137 公里）"
+      "tooltip": "轨道最低高度（相对赤道半径 6378.137 公里）",
+      "help": "轨道的最低点，以距地球的高度表示。"
     },
     "Inclination": {
       "label": "倾角",
-      "tooltip": "从赤道升交点测量的角度"
+      "tooltip": "从赤道升交点测量的角度",
+      "help": "轨道相对赤道的倾斜程度。0°沿赤道运行；90°经过两极上空。"
     },
     "Eccentricity": {
       "label": "偏心率",
-      "tooltip": "轨道的圆度（0为圆形）"
+      "tooltip": "轨道的圆度（0为圆形）",
+      "help": "轨道的扁长程度。0 是正圆；越接近 1 越是细长的椭圆。"
     },
     "RightAsc": {
       "label": "赤经",
-      "tooltip": "在赤道上升起的位置"
+      "tooltip": "在赤道上升起的位置",
+      "help": "升交点赤经：轨道自南向北穿过赤道的那一点在天空中的方向。"
     },
     "ArgOfPerigee": {
       "label": "近地点幅角",
-      "tooltip": "轨道最低点的位置"
+      "tooltip": "轨道最低点的位置",
+      "help": "近地点幅角：从该赤道穿越点沿轨道到最低点的角度。"
     },
     "Latitude": {
       "label": "纬度",
@@ -37,6 +43,29 @@
       "east": "东",
       "west": "西"
     },
+    "Region": {
+      "label": "上空",
+      "tooltip": "星下点所在的国家（Natural Earth 边界数据）",
+      "ocean": "海洋上空",
+      "Water": {
+        "arctic": "北冰洋",
+        "atlantic": "大西洋",
+        "pacific": "太平洋",
+        "indian": "印度洋",
+        "southern": "南大洋",
+        "mediterranean": "地中海",
+        "caribbean": "加勒比海",
+        "gulfOfMexico": "墨西哥湾",
+        "redSea": "红海",
+        "blackSea": "黑海",
+        "northSea": "北海",
+        "baltic": "波罗的海",
+        "arabianSea": "阿拉伯海",
+        "bayOfBengal": "孟加拉湾",
+        "southChinaSea": "南海",
+        "persianGulf": "波斯湾"
+      }
+    },
     "Altitude": {
       "label": "高度",
       "tooltip": "当前海拔高度"
@@ -46,7 +75,8 @@
       "tooltip": "绕地球一圈所需时间",
       "meanMotion": "平均运动",
       "revPerDay": "圈/天",
-      "min": "分钟"
+      "min": "分钟",
+      "help": "物体绕地球一圈所需的时间。"
     },
     "Velocity": {
       "label": "速度",
@@ -67,15 +97,15 @@
     },
     "RadialSigma": {
       "label": "径向不确定度",
-      "tooltip": "径向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
+      "tooltip": "径向1-sigma位置不确定度（RIC坐标系）。标记为（默认）的值是应用假定的默认值，并非测量值；否则由GP历元的TLE导出。Pc和交会报告使用相同的值。要判断一次接近，请打开交会报告；碰撞概率还需要另一物体的协方差以及两个物体的尺寸。"
     },
     "InTrackSigma": {
       "label": "轨道内不确定度",
-      "tooltip": "沿迹 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
+      "tooltip": "沿轨1-sigma位置不确定度（RIC坐标系）。标记为（默认）的值是应用假定的默认值，并非测量值；否则由GP历元的TLE导出。Pc和交会报告使用相同的值。要判断一次接近，请打开交会报告；碰撞概率还需要另一物体的协方差以及两个物体的尺寸。"
     },
     "CrossTrackSigma": {
       "label": "轨道横向不确定度",
-      "tooltip": "横向 1-sigma 位置不确定度（GP 历元时刻由 TLE 推导的协方差，RIC 坐标系）。与 Pc 和交会报告使用的数值相同。"
+      "tooltip": "横向1-sigma位置不确定度（RIC坐标系）。标记为（默认）的值是应用假定的默认值，并非测量值；否则由GP历元的TLE导出。Pc和交会报告使用相同的值。要判断一次接近，请打开交会报告；碰撞概率还需要另一物体的协方差以及两个物体的尺寸。"
     },
     "meter": "米",
     "kilometer": "千米",
@@ -88,7 +118,30 @@
     },
     "RefFrame": {
       "label": "参考系",
-      "tooltip": "星历的坐标系（OEM REF_FRAME）"
+      "tooltip": "星历的坐标系（OEM REF_FRAME）",
+      "teme": "TEME",
+      "temeInfo": "来自GP根数集"
+    },
+    "Regime": {
+      "label": "轨道类型",
+      "tooltip": "轨道的高度范围",
+      "help": "轨道的高度范围。LEO：近地轨道，低于 2,000 公里。MEO：中地球轨道，至地球静止轨道高度。GEO：赤道上空约 35,786 公里，物体停留在同一点上空。HEO：高椭圆轨道，或高于 GEO。",
+      "leo": "LEO",
+      "leoInfo": "近地轨道，高度低于2000公里。",
+      "meo": "MEO",
+      "meoInfo": "中地球轨道，介于近地轨道与地球静止轨道高度之间。",
+      "geo": "GEO",
+      "geoInfo": "地球静止轨道，位于赤道上空约35786公里。",
+      "heo": "HEO",
+      "heoInfo": "大椭圆轨道，或高于地球静止轨道。"
+    },
+    "LatitudeBand": {
+      "label": "纬度范围",
+      "tooltip": "星下点轨迹向北和向南到达的最高纬度。它等于轨道倾角，逆行轨道则为180度减去倾角。在此纬度带之外，卫星永远不会经过头顶。"
+    },
+    "Sigma": {
+      "defaultTag": "默认",
+      "defaultNote": "应用对这类轨道的默认估计值。它不是实测值，也不是随源数据提供的。"
     }
   }
 }

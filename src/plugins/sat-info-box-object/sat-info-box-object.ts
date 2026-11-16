@@ -5,6 +5,7 @@ import { SatMath } from '@app/app/analysis/sat-math';
 import { estimateStdMagWithSource, StdMagWithSource } from '@app/app/analysis/std-mag-estimator';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { type FlagSource, resolveFlagKey } from '@app/app/data/catalogs/flag-resolver';
+import { SensorMath } from '@app/app/sensors/sensor-math';
 import { StringExtractor } from '@app/app/ui/string-extractor';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { ServiceLocator } from '@app/engine/core/service-locator';
@@ -14,20 +15,25 @@ import type { ISettingsContribution, ISettingsMultiContributor } from '@app/engi
 import { openColorbox } from '@app/engine/utils/colorbox';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
-import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
+import { getEl, hideEl, showEl, writeHtmlIfChanged } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { SettingsManager } from '@app/settings/settings';
 import { BaseObject, PayloadStatus, Satellite, SpaceObjectType } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SatInfoBox } from '../sat-info-box/sat-info-box';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
+import { getObjectSummaryKey, getProvidedObjectSummary } from './object-summary';
 import { EL, SECTIONS } from './sat-info-box-object-html';
 import './sat-info-box-object.css';
+
+/** Sorts right after the title header (order 0) and before the Actions section and every other section. */
+const SUMMARY_ORDER_ = 0.5;
 
 export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiContributor {
   readonly id = 'SatInfoBoxObject';
   dependencies_: string[] = [SatInfoBox.name];
 
+  private objectDataRevision_ = 0;
   private readonly isObjectDataSectionCollapsed_ = false;
   private readonly isSecondaryDataSectionCollapsed_ = false;
   /** Range of the flag size control, as a fraction of the model's bounding radius. */
@@ -83,6 +89,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     super.addHtml();
 
     EventBus.getInstance().on(EventBusEvent.satInfoBoxInit, () => {
+      PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSummaryLine_(), order: SUMMARY_ORDER_ });
       PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createObjectSection_(), order: 7 });
       PluginRegistry.getPlugin(SatInfoBox)!.addElement({ html: this.createSecondarySection(), order: 9 });
     });
@@ -94,7 +101,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     EventBus.getInstance().on(EventBusEvent.satInfoBoxAddListeners, this.satInfoBoxAddListeners_.bind(this));
     EventBus.getInstance().on(EventBusEvent.selectSatData, (obj?: BaseObject) => {
       if (SatInfoBox.isCurrentSelection(obj)) {
-        this.updateObjectData_(obj);
+        this.scheduleObjectData_(obj);
       }
     });
     EventBus.getInstance().on(EventBusEvent.setSecondarySat, this.updateSecondaryVisibility_.bind(this));
@@ -128,6 +135,26 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
 
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.OBJECT}`), { value: this.isObjectDataSectionCollapsed_ });
     satInfoBoxPlugin.addListenerToCollapseElement(getEl(`${SECTIONS.SECONDARY}`), { value: this.isSecondaryDataSectionCollapsed_ });
+  }
+
+  private createSummaryLine_(): string {
+    return html`<div id="${EL.SUMMARY}" class="sat-summary" style="display: none;"></div>`;
+  }
+
+  /** Plain-words line near the top of the info box; an AI summary provider (#219) can override it. */
+  private updateSummary_(obj: BaseObject): void {
+    const el = getEl(EL.SUMMARY, true);
+
+    if (!el) {
+      return;
+    }
+
+    const provided = getProvidedObjectSummary(obj);
+    const key = getObjectSummaryKey(obj);
+    const text = provided ?? (key ? t7e(key as Parameters<typeof t7e>[0]) : '');
+
+    el.textContent = text;
+    el.style.display = text ? '' : 'none';
   }
 
   private createObjectSection_(): string {
@@ -213,7 +240,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
         ${
           settingsManager.plugins.SatInfoBoxObject?.isShowAppMag !== false
             ? html`
-        <div class="sat-info-row sat-only-info" id="${EL.APPMAG_ROW}" style="display: none;">
+        <div class="sat-info-row sat-only-info" id="${EL.APPMAG_ROW}" data-kt-self-managed="true" style="display: none;">
           <div class="sat-info-key"
             kt-tooltip="${t7e('SatInfoBoxObject.AppMag.tooltip')}">${t7e('SatInfoBoxObject.AppMag.label')}
           </div>
@@ -278,6 +305,24 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     }
   }
 
+  /**
+   * The object card sits below the header, so its fill (catalog correlation tables, magnitudes, RCS) waits two
+   * frames instead of running inside the click task. A newer selection supersedes a pending run, and a run whose
+   * selection changed in the meantime is dropped.
+   */
+  private scheduleObjectData_(obj?: BaseObject): void {
+    const revision = ++this.objectDataRevision_;
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (revision !== this.objectDataRevision_ || !SatInfoBox.isCurrentSelection(obj)) {
+          return;
+        }
+        this.updateObjectData_(obj);
+      });
+    });
+  }
+
   private updateObjectData_(obj?: BaseObject) {
     if (!obj || (!obj.isSatellite() && !obj.isMissile())) {
       return;
@@ -296,6 +341,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     }
     this.updateSatType_(obj);
     this.updateSatStatus_(obj);
+    this.updateSummary_(obj);
 
     if (satMisl.isMissile()) {
       return;
@@ -389,9 +435,12 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     try {
       const timeManager = ServiceLocator.getTimeManager();
       const sun = ServiceLocator.getScene().sun;
-      const appMag = SatMath.calculateVisMag(sat, sensor, timeManager.simulationTimeObj, sun, intrinsicOverride);
+      const reading = SensorMath.getVisMagReading(sat, sensor, timeManager.simulationTimeObj, sun, intrinsicOverride);
 
-      appMagElement.innerHTML = appMag.toFixed(2);
+      writeHtmlIfChanged(
+        appMagElement,
+        reading.kind === 'notSunlit' ? t7e('SatInfoBoxObject.notSunlit') : `${reading.value.toFixed(2)}${reading.assumed ? ` ${t7e('SatInfoBoxObject.assumedSuffix')}` : ''}`
+      );
       appMagRow.style.display = '';
     } catch (e) {
       errorManagerInstance.debug(`Apparent magnitude calculation failed: ${e}`);
@@ -637,6 +686,23 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     }
   }
 
+  /** Catalog RCS means, rebuilt only when the catalog is reloaded; a full-catalog pass per selection cost ~5 ms. */
+  private rcsStatsCache_: { objectCache: unknown; count: number; stats: ReturnType<typeof buildCatalogRcsStats> } | null = null;
+
+  private getRcsStats_() {
+    const catalog = ServiceLocator.getCatalogManager();
+    const cache = this.rcsStatsCache_;
+
+    if (cache && cache.objectCache === catalog.objectCache && cache.count === catalog.numSatellites) {
+      return cache.stats;
+    }
+    const stats = buildCatalogRcsStats(catalog.getSats());
+
+    this.rcsStatsCache_ = { objectCache: catalog.objectCache, count: catalog.numSatellites, stats };
+
+    return stats;
+  }
+
   private updateRcsData_(sat: Satellite) {
     const satRcsEl = getEl(EL.RCS);
 
@@ -663,7 +729,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     // Catalog-mining is the most expensive layer; build the stats snapshot
     // once on demand here. Slower than the color scheme's path (which caches
     // it per recolor) but the info box runs at most a few times per second.
-    const stats = buildCatalogRcsStats(ServiceLocator.getCatalogManager().getSats());
+    const stats = this.getRcsStats_();
     const result = estimateRcsWithSource(sat, stats);
 
     if (result === null) {

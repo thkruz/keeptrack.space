@@ -52,6 +52,7 @@ export type KeepTrackPluginsConfiguration = {
   ShortTermFences?: PluginConfiguration;
   LookAnglesPlugin?: PluginConfiguration;
   LinkBudgetPlugin?: PluginConfiguration;
+  TrajectoryComparePlugin?: PluginConfiguration;
   MultiSensorLookAnglesPlugin?: PluginConfiguration;
   SensorTimeline?: PluginConfiguration;
   SatelliteTimeline?: PluginConfiguration;
@@ -102,6 +103,8 @@ export type KeepTrackPluginsConfiguration = {
   OpticalSimulation?: PluginConfiguration;
   GraticuleToggle?: PluginConfiguration;
   TerminatorToggle?: PluginConfiguration;
+  ResetToStart?: PluginConfiguration;
+  OfflineBundle?: PluginConfiguration;
   CloudsToggle?: PluginConfiguration;
   PoliticalMapToggle?: PluginConfiguration;
   HideOtherSatellitesPlugin?: PluginConfiguration;
@@ -162,5 +165,7 @@ export type KeepTrackPluginsConfiguration = {
   CommandPalettePlugin?: PluginConfiguration;
   LaunchpadPlugin?: PluginConfiguration;
   FavoritesMenuPlugin?: PluginConfiguration;
+  ObjectComparisonPlugin?: PluginConfiguration;
+  SiteAccessSearchPlugin?: PluginConfiguration;
   OnboardingPlugin?: PluginConfiguration;
 };

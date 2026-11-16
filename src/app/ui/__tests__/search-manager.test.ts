@@ -1,6 +1,7 @@
 import { CatalogManager } from '@app/app/data/catalog-manager';
 import { LaunchSite } from '@app/app/data/catalog-manager/LaunchFacility';
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
+import { setDockedVehicles } from '@app/app/data/docked-vehicles';
 import { GroupsManager } from '@app/app/data/groups-manager';
 import { SearchManager, SearchResultType, searchTypeBadgeLabel } from '@app/app/ui/search-manager';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
@@ -17,6 +18,7 @@ import { BaseObject, Degrees, Radians, Satellite, SpaceObjectType, Star } from '
 import { defaultMisl, defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
+import { runNumOnlySearch, runRegularSearch } from '../search-query';
 
 describe('SearchManager', () => {
   let searchManager: SearchManager;
@@ -170,6 +172,24 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults).toEqual([0]);
     });
 
+    it('Enter on a numeric NORAD query with one result selects that row, not another id (#176)', () => {
+      sats = [
+        new Satellite({ ...defaultSat, id: 0, sccNum: '05785', name: 'THOR ABLESTAR DEB' }),
+        new Satellite({ ...defaultSat, id: 1, sccNum: '33757', name: 'COSMOS 2251 DEB' }),
+      ];
+      wireUpServiceLocator(buildCatalog(sats));
+      const selectSat = vi.spyOn(SearchManager as any, 'lookAtSearchResult_').mockImplementation(() => undefined);
+
+      (searchManager as any).addListeners_();
+      searchManager.doSearch('33757');
+      expect(document.querySelectorAll('.search-result')).toHaveLength(1);
+
+      document.getElementById('search')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+      expect(selectSat).toHaveBeenCalledTimes(1);
+      expect(selectSat.mock.calls[0][1]).toBe(1);
+    });
+
     it('finds an alpha-5 sat via its 6-digit numeric form (sccNum6)', () => {
       // For an alpha-5 sat constructed via fromOmm-style with sccNum='T0001',
       // sccNum5='T0001' and sccNum6='270001'. The numeric-only search box
@@ -259,6 +279,18 @@ describe('SearchManager', () => {
 
       searchManager.doSearch('70000');
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
+    });
+
+    it('flags only the substring NORAD hit as a partial match', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, sccNum: '70000' }), new Satellite({ ...defaultSat, id: 1, sccNum: '270000' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      for (const run of [runNumOnlySearch, runRegularSearch]) {
+        const { results } = run('70000');
+        const partialById = Object.fromEntries(results.map((r) => [r.id, Boolean(r.partial)]));
+
+        expect(partialById).toEqual({ 0: false, 1: true });
+      }
     });
 
     it('disambiguates a leading-zero query for a shorter catalog number', () => {
@@ -361,6 +393,16 @@ describe('SearchManager', () => {
       expect(settingsManager.lastSearchResults.sort((a, b) => a - b)).toEqual([0, 1]);
     });
 
+    it('flags partial alpha-5 hits but not the exact one', () => {
+      sats = [new Satellite({ ...defaultSat, id: 0, name: 'UNKNOWN', sccNum: 'A1234' }), new Satellite({ ...defaultSat, id: 1, name: 'UNKNOWN', sccNum: 'A1299' })];
+      wireUpServiceLocator(buildCatalog(sats));
+
+      const partial = (q: string) => Object.fromEntries(runRegularSearch(q).results.map((r) => [r.id, Boolean(r.partial)]));
+
+      expect(partial('A12')).toEqual({ 0: true, 1: true });
+      expect(partial('A1234')).toEqual({ 0: false });
+    });
+
     it('respects the NORAD ID field toggle for alpha-5 searches', () => {
       sats = [new Satellite({ ...defaultSat, id: 0, name: 'Unknown', sccNum: 'A0000' })];
       wireUpServiceLocator(buildCatalog(sats));
@@ -445,6 +487,110 @@ describe('SearchManager', () => {
       settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: true };
       searchManager.doSearch('CAPE');
       expect(settingsManager.lastSearchResults).toEqual([3]);
+    });
+
+    it('lists a sensor once when comma terms both match it (#497)', () => {
+      settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: true };
+      searchManager.doSearch('CAPE COD, MASSACHUSETTS');
+      expect(settingsManager.lastSearchResults).toEqual([3]);
+    });
+
+    // The no-results toast waits for typing to pause; start each case from a clean miss state.
+    const flushMissToast = (): void => {
+      vi.advanceTimersByTime(SearchManager.NO_RESULTS_TOAST_DELAY_MS);
+    };
+
+    describe('no-results toast', () => {
+      beforeEach(() => {
+        vi.useFakeTimers();
+        searchManager.doSearch('');
+      });
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      it('typing a miss raises one toast after the pause, not one per keystroke', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        searchManager.doSearch('QQQ');
+        searchManager.doSearch('QQQX');
+        searchManager.doSearch('QQQXZ');
+        expect(toast).not.toHaveBeenCalled();
+        flushMissToast();
+        expect(toast).toHaveBeenCalledTimes(1);
+      });
+
+      it('typing more after a reported miss does not report it again', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        searchManager.doSearch('QQQ');
+        flushMissToast();
+        searchManager.doSearch('QQQX');
+        flushMissToast();
+        expect(toast).toHaveBeenCalledTimes(1);
+      });
+
+      it('closing the search before the pause cancels the pending toast', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        const ui = ServiceLocator.getUiManager() as unknown as { hideSideMenus?: () => void };
+
+        ui.hideSideMenus ??= () => undefined;
+        searchManager.doSearch('QQQ');
+        searchManager.closeSearch(true);
+        flushMissToast();
+        expect(toast).not.toHaveBeenCalled();
+      });
+
+      it('a hit before the pause cancels the pending toast', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        searchManager.doSearch('QQQ');
+        searchManager.doSearch('ZARYA');
+        flushMissToast();
+        expect(toast).not.toHaveBeenCalled();
+      });
+
+      it('a hidden sensor match shows the sensors-hidden hint instead of a bare miss (#497)', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+
+        settingsManager.searchableTypes = { ...settingsManager.searchableTypes, sensor: false };
+        searchManager.doSearch('CAPE');
+        flushMissToast();
+        expect(toast).toHaveBeenCalledWith(expect.stringContaining('Ground sensors are hidden'), expect.anything(), false);
+      });
+
+      it('Filter menu sensors-off (which also sets isDisableSensors) shows the Filter hint, not the phone wording (#497)', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+        const savedFilter = settingsManager.filter;
+        const savedDisable = settingsManager.isDisableSensors;
+
+        settingsManager.filter = { ...settingsManager.filter, groundSensors: false } as typeof settingsManager.filter;
+        settingsManager.isDisableSensors = true;
+        try {
+          searchManager.doSearch('CAPE');
+          flushMissToast();
+          expect(toast).toHaveBeenCalledWith(expect.stringContaining('Ground sensors are hidden'), expect.anything(), false);
+          expect(toast).not.toHaveBeenCalledWith(expect.stringContaining('not searchable in this view'), expect.anything(), false);
+        } finally {
+          settingsManager.filter = savedFilter;
+          settingsManager.isDisableSensors = savedDisable;
+        }
+      });
+
+      it('phone mode (no sensors loaded, isDisableSensors) keeps the phone wording (#497)', () => {
+        const toast = vi.spyOn(ServiceLocator.getUiManager(), 'toast').mockImplementation(() => undefined);
+        const savedDisable = settingsManager.isDisableSensors;
+
+        settingsManager.isDisableSensors = true;
+        try {
+          searchManager.doSearch('NOSUCHSENSORNAME');
+          flushMissToast();
+          expect(toast).toHaveBeenCalledWith(expect.stringContaining('not searchable in this view'), expect.anything(), false);
+        } finally {
+          settingsManager.isDisableSensors = savedDisable;
+        }
+      });
     });
 
     it('disabling the satellite type removes satellites from results', () => {
@@ -613,6 +759,23 @@ describe('SearchManager interactions', () => {
     vi.restoreAllMocks();
   });
 
+  it('cancels the chord letter inserted right after Shift+F focuses search (#163)', () => {
+    const searchEl = document.getElementById('search') as HTMLInputElement;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (SearchManager as any).swallowChordCharacter_();
+    const chord = new InputEvent('beforeinput', { data: 'F', cancelable: true });
+
+    searchEl.dispatchEvent(chord);
+    expect(chord.defaultPrevented).toBe(true);
+
+    // One-shot: the next letter is typed normally.
+    const next = new InputEvent('beforeinput', { data: 'i', cancelable: true });
+
+    searchEl.dispatchEvent(next);
+    expect(next.defaultPrevented).toBe(false);
+  });
+
   it('init wires the top-menu button and keyboard shortcut without throwing', () => {
     expect(() => mgr.init()).not.toThrow();
 
@@ -661,6 +824,19 @@ describe('SearchManager interactions', () => {
     expect(mgr.getCurrentSearch()).toBe('ISS');
   });
 
+  it('getCurrentSearch keeps the query after a phone collapse and drops it on hideResults', () => {
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+    mgr.isResultsOpen = true;
+    (mgr as unknown as { collapseResults_: () => void }).collapseResults_();
+
+    expect(mgr.isResultsOpen).toBe(false);
+    expect(mgr.getCurrentSearch()).toBe('ISS');
+
+    mgr.hideResults();
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+    expect(mgr.getCurrentSearch()).toBe('');
+  });
+
   it('mirrors the open results list onto the body so toasts can move off it', () => {
     // Toast cards covered the first result rows and swallowed their clicks (zoom QA 2026-10-24)
     mgr.isResultsOpen = true;
@@ -706,6 +882,52 @@ describe('SearchManager interactions', () => {
     expect(document.getElementById('search-results')!.querySelector('.search-result-count')!.textContent).toContain('50');
   });
 
+  it('fillResultBox renders a module row whose note wraps instead of truncating (#461)', () => {
+    const sat = new Satellite({ ...defaultSat, id: 0, name: 'ISS (ZARYA)', sccNum: '25544' });
+
+    ServiceLocator.getCatalogManager().objectCache = [sat] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    const results = [
+      { id: 0, searchType: SearchResultType.MODULE, strIndex: 0, patlen: 5, moduleName: 'Zvezda', moduleScc: '26400' },
+      { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 },
+    ];
+
+    mgr.fillResultBox(results, ServiceLocator.getCatalogManager(), 2);
+    const rows = document.getElementById('search-results')!.querySelectorAll('.search-result');
+    const moduleName = rows[0].querySelector('.truncate-search')!;
+
+    expect(moduleName.classList.contains('search-module-row')).toBe(true);
+    expect(moduleName.querySelector('.search-module-note')!.textContent).toContain('Zvezda 26400');
+    // Other rows keep the single-line truncating name column.
+    expect(rows[1].querySelector('.truncate-search')!.classList.contains('search-module-row')).toBe(false);
+  });
+
+  it('fillResultBox adds a "docked to" note to a docked vehicle row and leaves others alone (#463)', () => {
+    const dragon = new Satellite({ ...defaultSat, id: 3, name: 'CREW DRAGON 12', sccNum: '67796' });
+    const other = new Satellite({ ...defaultSat, id: 4, name: 'ISS OBJECT XZ', sccNum: '67683' });
+
+    ServiceLocator.getCatalogManager().objectCache = [undefined, undefined, undefined, dragon, other] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    setDockedVehicles(new Map([[3, '25544']]));
+    try {
+      mgr.fillResultBox(
+        [
+          { id: 3, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 5 },
+          { id: 4, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 },
+        ],
+        ServiceLocator.getCatalogManager(),
+        2
+      );
+      const rows = document.getElementById('search-results')!.querySelectorAll('.search-result');
+
+      expect(rows[0].querySelector('.search-module-note')!.textContent).toBe('docked to the ISS');
+      expect(rows[0].querySelector('.truncate-search')!.classList.contains('search-module-row')).toBe(true);
+      expect(rows[1].querySelector('.search-module-note')).toBeNull();
+    } finally {
+      setDockedVehicles(new Map());
+    }
+  });
+
   it('fillResultBox always shows how many objects matched, even below the limit', () => {
     const sat = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
 
@@ -722,6 +944,27 @@ describe('SearchManager interactions', () => {
     expect(document.querySelectorAll('.search-result').length).toBe(3);
   });
 
+  it('fillResultBox closes the plugin drawer on phones only (#216)', () => {
+    const sat = new Satellite({ ...defaultSat, id: 0, sccNum: '25544' });
+
+    ServiceLocator.getCatalogManager().objectCache = [sat] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    const close = vi.fn();
+
+    vi.spyOn(ServiceLocator, 'getUiManager').mockReturnValue({ pluginDrawer: { close }, hideSideMenus: vi.fn() } as never);
+    const row = { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 3 };
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = false;
+    mgr.fillResultBox([row], ServiceLocator.getCatalogManager(), 1);
+    expect(close).not.toHaveBeenCalled();
+
+    settingsManager.isMobileModeEnabled = true;
+    mgr.fillResultBox([row], ServiceLocator.getCatalogManager(), 1);
+    expect(close).toHaveBeenCalledTimes(1);
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
   it('addListeners_ routes the input event to doSearch and the icon click to toggleSearch', () => {
     p().addListeners_();
     const searchSpy = vi.spyOn(mgr, 'doSearch').mockImplementation(() => undefined);
@@ -735,12 +978,81 @@ describe('SearchManager interactions', () => {
     expect(toggleSpy).toHaveBeenCalled();
   });
 
+  it('phone: a pointerdown outside the search box collapses the results list but keeps the query', () => {
+    p().addListeners_();
+    const input = document.getElementById('search') as HTMLInputElement;
+    const results = document.getElementById('search-results')!;
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    input.value = 'ISS';
+    results.innerHTML = '<div class="search-result"></div>';
+    mgr.isResultsOpen = true;
+
+    // Inside the list: stays open.
+    results.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(mgr.isResultsOpen).toBe(true);
+
+    // On the map: closes the list, keeps the query.
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(mgr.isResultsOpen).toBe(false);
+    expect(results.innerHTML).toBe('');
+    expect(input.value).toBe('ISS');
+
+    // Desktop: untouched.
+    settingsManager.isMobileModeEnabled = false;
+    mgr.isResultsOpen = true;
+    document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(mgr.isResultsOpen).toBe(true);
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
   // #855: clicking any search result rotates the camera toward the object.
   const clickFirstResult = (objId: number) => {
     p().addListeners_();
     document.getElementById('search-results')!.innerHTML = `<div class="search-result" data-obj-id="${objId}"></div>`;
     (document.querySelector('.search-result') as HTMLElement).dispatchEvent(new Event('click', { bubbles: true }));
   };
+
+  // Desktop keeps the list open so users can browse several results (reverses #481 at Ted's request).
+  it('desktop: clicking a result keeps the list open and the query', () => {
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = false;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSensor);
+    vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+    vi.spyOn(PluginRegistry.getPlugin(SelectSatManager)!, 'selectSat').mockImplementation(() => undefined);
+    (document.getElementById('search') as HTMLInputElement).value = 'ISS';
+    p().isResultsOpen = true;
+
+    clickFirstResult(defaultSensor.id);
+
+    expect(p().isResultsOpen).toBe(true);
+    expect(document.querySelector('.search-result')).not.toBeNull();
+    expect((document.getElementById('search') as HTMLInputElement).value).toBe('ISS');
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
+
+  it('phone: clicking a result closes the list, keeps the query and drops the keyboard', () => {
+    const wasMobile = settingsManager.isMobileModeEnabled;
+
+    settingsManager.isMobileModeEnabled = true;
+    vi.spyOn(ServiceLocator.getCatalogManager(), 'getObject').mockReturnValue(defaultSensor);
+    vi.spyOn(ServiceLocator.getMainCamera(), 'lookAtLatLon').mockImplementation(() => undefined);
+    vi.spyOn(PluginRegistry.getPlugin(SelectSatManager)!, 'selectSat').mockImplementation(() => undefined);
+    const input = document.getElementById('search') as HTMLInputElement;
+    const blur = vi.spyOn(input, 'blur');
+
+    input.value = 'ISS';
+    p().isResultsOpen = true;
+
+    clickFirstResult(defaultSensor.id);
+
+    expect(p().isResultsOpen).toBe(false);
+    expect(input.value).toBe('ISS');
+    expect(blur).toHaveBeenCalled();
+    settingsManager.isMobileModeEnabled = wasMobile;
+  });
 
   it('clicking a star result rotates the camera via lookAtStar', () => {
     const star = new Star({ id: 5, name: 'VEGA', ra: 0 as Radians, dec: 0 as Radians });
@@ -785,6 +1097,30 @@ describe('SearchManager interactions', () => {
     document.getElementById('search')!.dispatchEvent(evt);
 
     expect(p().selectedIndex_).toBe(0);
+  });
+
+  it('Enter on a single result clicks it without ArrowDown', () => {
+    document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="0"></div>';
+    p().addListeners_();
+    const clicked = vi.fn();
+
+    document.querySelector('.search-result')!.addEventListener('click', clicked);
+    document.getElementById('search')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(clicked).toHaveBeenCalledTimes(1);
+  });
+
+  it('Enter with several results and none highlighted does not click', () => {
+    document.getElementById('search-results')!.innerHTML = '<div class="search-result" data-obj-id="0"></div><div class="search-result" data-obj-id="1"></div>';
+    p().addListeners_();
+    const clicked = vi.fn();
+
+    document.querySelectorAll('.search-result').forEach((el) => {
+      el.addEventListener('click', clicked);
+    });
+    document.getElementById('search')!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+
+    expect(clicked).not.toHaveBeenCalled();
   });
 
   it('updateSelectedResult_ marks the selected row and updates hover', () => {

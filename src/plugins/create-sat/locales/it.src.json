@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "ID NORAD satellite (90000-99999)",
+        "noradIdHint": "Gli ID 90000-99999 sono riservati agli oggetti dell'analista e non collidono mai con i numeri reali del catalogo.",
         "satelliteName": "Nome satellite",
         "inclinationDeg": "Inclinazione (gradi)",
         "apogeeAltKm": "Altitudine apogeo (km)",
@@ -17,6 +18,7 @@
         "country": "Paese",
         "epochYear": "Anno epoca",
         "epochDay": "Giorno epoca",
+        "epochTimestamp": "Timestamp epoca (UTC, ISO)",
         "inclination": "Inclinazione",
         "rightAscension": "Ascensione retta",
         "eccentricity": "Eccentricità",
@@ -34,13 +36,22 @@
         "sectionOrbit": "Orbita",
         "sectionEpoch": "Epoca",
         "sectionElements": "Elementi orbitali",
-        "sectionPresets": "Preimpostazioni"
+        "sectionPresets": "Preimpostazioni",
+        "sectionWalker": "Costellazione (Walker delta)",
+        "walkerHint": "Crea T satelliti in P piani equidistanti alla stessa altitudine e inclinazione (schema T/P/F). I membri usano gli ID analista liberi più bassi.",
+        "walkerAltKm": "Altitudine (km)",
+        "walkerTotal": "Satelliti (T)",
+        "walkerPlanes": "Piani (P)",
+        "walkerPhasing": "Fasamento (F)",
+        "walkerPrefix": "Prefisso del nome",
+        "walkerTpfHelp": "T deve essere un multiplo di P. F (fasatura) va da 0 a P-1."
       },
       "buttons": {
         "createSatellite": "Crea satellite",
         "saveTle": "Salva TLE",
         "makeSunSync": "Inclinazione eliosincrona",
-        "cloneSelected": "Clona satellite selezionato"
+        "cloneSelected": "Clona satellite selezionato",
+        "createWalker": "Crea costellazione"
       },
       "options": {
         "payload": "Carico utile",
@@ -63,11 +74,14 @@
         "invalidNoradId": "ID NORAD non valido. Deve essere un numero a 5 cifre compreso tra 90000 e 99999.",
         "invalidType": "Tipo non valido. Deve essere 1 (Carico utile), 2 (Corpo del razzo), 3 (Detriti) o 4 (Speciale).",
         "invalidCountry": "Paese non valido. Deve essere selezionato dall'elenco.",
-        "invalidEpochYear": "Anno epoca non valido. Deve essere un numero a 2 cifre.",
+        "invalidEpochYear": "L'anno dell'epoca deve avere 2 cifre (26) o essere un anno da 1957 a 2056 (2026).",
+        "invalidEpochTimestamp": "Timestamp epoca non valido. Usare data e ora ISO, ad es. 2026-11-04T00:00:00Z.",
         "invalidEpochDay": "Giorno epoca non valido. Deve essere nel formato NNN.NNNNNNNN (es. 001.00000000).",
         "invalidInclination": "Inclinazione non valida. Deve essere nel formato NNN.NNNN (es. 000.0000).",
         "invalidRasc": "Ascensione retta non valida. Deve essere nel formato NNN.NNNN (es. 000.0000).",
-        "invalidEccentricity": "Eccentricità non valida. Deve essere un numero a 7 cifre (es. 0000000).",
+        "invalidEccentricity": "L'eccentricità deve essere almeno 0 e minore di 1: digita un decimale (0.0012) o la forma TLE a 7 cifre (0012000).",
+        "calcInvalidEccentricity": "Valori calcolati nascosti: l'eccentricità deve essere almeno 0 e minore di 1.",
+        "calcSubSurface": "Valori calcolati nascosti: questa orbita passa sotto la superficie terrestre. Riduci il moto medio o l'eccentricità.",
         "invalidArgPe": "Argomento del perigeo non valido. Deve essere nel formato NNN.NNNN (es. 000.0000).",
         "invalidMeanAnomaly": "Anomalia media non valida. Deve essere nel formato NNN.NNNN (es. 000.0000).",
         "invalidMeanMotion": "Moto medio non valido. Deve essere nel formato NN.NNNNN (es. 16.00000).",
@@ -88,7 +102,8 @@
         "meanMotionRange": "{field} deve essere maggiore di 0 e al massimo {max} rivoluzioni al giorno.",
         "periodPositive": "{field} deve essere un numero positivo di minuti.",
         "numberRequired": "{field} deve essere un numero.",
-        "noradIdReserved": "L'ID NORAD {id} è occupato da una traiettoria di lancio. Scegli un altro ID o rimuovi prima la traiettoria."
+        "noradIdReserved": "L'ID NORAD {id} è occupato da una traiettoria di lancio. Scegli un altro ID o rimuovi prima la traiettoria.",
+        "noradIdNoSlot": "L'ID NORAD {id} non è uno slot analista disponibile. Usa un ID suggerito dal modulo o libera prima questo."
       },
       "successMsgs": {
         "satCreated": "Satellite {name} ({scc}) creato con successo",
@@ -121,6 +136,20 @@
         "replace": "Sostituisci",
         "cancel": "Annulla",
         "changed": "Il satellite o il modulo è cambiato. Verifica e invia di nuovo."
+      },
+      "walker": {
+        "created": "Creati {count} satelliti chiamati {prefix}-P#-S# ({failed} falliti)",
+        "errors": {
+          "altitude": "L'altitudine deve essere tra 160 e 400000 km.",
+          "inclination": "L'inclinazione deve essere tra 0 e 180 gradi.",
+          "total": "Satelliti (T) deve essere un intero di almeno 1.",
+          "planes": "Piani (P) deve essere un intero da 1 a T.",
+          "phasing": "Fasamento (F) deve essere un intero da 0 a {max}.",
+          "divisible": "T deve essere divisibile per P.",
+          "tooMany": "Al massimo {max} satelliti per costellazione.",
+          "noSlots": "Slot analista liberi insufficienti ({free} liberi, {needed} necessari).",
+          "failed": "Impossibile generare la costellazione."
+        }
       }
     }
   }

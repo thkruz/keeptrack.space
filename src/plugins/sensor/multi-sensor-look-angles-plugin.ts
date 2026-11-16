@@ -1,6 +1,7 @@
 import { SatMath } from '@app/app/analysis/sat-math';
 import { sensors } from '@app/app/data/catalogs/sensors';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
+import { isCustomSensor } from '@app/app/sensors/custom-sensor-identity';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath, TearrData } from '@app/app/sensors/sensor-math';
 import { SoundNames } from '@app/engine/audio/sounds';
@@ -17,7 +18,7 @@ import { getEl } from '@app/engine/utils/get-el';
 import { saveXlsx } from '@app/engine/utils/saveVariable';
 import { showLoading } from '@app/engine/utils/showLoading';
 import { t7e } from '@app/locales/keys';
-import { BaseObject, Degrees, Kilometers, MINUTES_PER_DAY, Satellite, SatelliteRecord, Seconds, SpaceObjectType, TAU } from '@ootk/src/main';
+import { BaseObject, Degrees, Kilometers, MINUTES_PER_DAY, Satellite, SatelliteRecord, Seconds, TAU, TemeVec3 } from '@ootk/src/main';
 import tableRowsPng from '@public/img/icons/table-rows.png';
 import { sensorGroups } from '../../app/data/catalogs/sensor-groups';
 import { SensorManager } from '../../app/sensors/sensorManager';
@@ -93,6 +94,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     <section class="kt-section">
       <div class="kt-section-label">${l('sections.results')}</div>
       <table id="multi-sensor-look-angles-table" class="msla-table center-align"></table>
+      <p id="multi-sensor-look-angles-optical-note" style="display: none;"></p>
     </section>`;
   sideMenuSecondaryHtml: string = html`
     <section class="kt-section">
@@ -131,7 +133,10 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
       az: roundOrNull(look.az, 2),
       el: roundOrNull(look.el, 2),
       rng: roundOrNull(look.rng, 2),
-      visible: look.visible,
+      // Constant by design: only in-view rows are pushed, so this is always true; kept as a label for the export.
+      aboveHorizon: look.visible,
+      sunlit: look.sunlit ?? '',
+      opticalVisible: look.opticalVisible ?? '',
     }));
     const stamp = compactUtcStamp(looks[0]?.time);
 
@@ -209,6 +214,25 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     });
   }
 
+  /**
+   * Catalog sensors plus any custom sites the user has active (primary or secondary).
+   * Custom sites are on by default (they were added deliberately) and de-duplicated by objName.
+   */
+  private getSelectableSensors_(): DetailedSensor[] {
+    const sensorManager = ServiceLocator.getSensorManager();
+    const active = [...(sensorManager.currentSensors ?? []), ...(sensorManager.secondarySensors ?? [])];
+    const custom = active.filter((s) => isCustomSensor(s) && s.objName);
+    const list = [...this.sensorList_];
+
+    for (const sensor of custom) {
+      if (!list.some((s) => s.objName === sensor.objName)) {
+        list.push(sensor);
+      }
+    }
+
+    return list;
+  }
+
   private refreshSideMenuData(sat: Satellite) {
     if (this.isMenuButtonActive) {
       if (sat) {
@@ -226,7 +250,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
 
           const allSensors: DetailedSensor[] = [];
 
-          for (const sensor of this.sensorList_) {
+          for (const sensor of this.getSelectableSensors_()) {
             if (!sensor.objName) {
               continue;
             }
@@ -276,7 +300,7 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     const sensorManagerInstance = ServiceLocator.getSensorManager();
 
     if (!sensors) {
-      sensors = this.sensorList_;
+      sensors = this.getSelectableSensors_();
     }
 
     const isResetToDefault = !sensorManagerInstance.isSensorSelected();
@@ -360,13 +384,17 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
         }
 
         if (multiSitePass.time !== '') {
-          // Only optical sensors need darkness and illumination checks
-          let canStationObserve = true;
+          // Geometric state: the pass is above the horizon / in the sensor's field of view
+          multiSitePass.visible = true;
 
-          if (sensor.type === SpaceObjectType.OPTICAL) {
-            canStationObserve = SensorMath.checkIfVisibleForOptical(sat, sensor, now);
+          // Lighting uses the satellite position propagated to this row's time, not the cached current one
+          const satPos = isOemSat ? (sat as unknown as OemSatellite).eci(now)?.position : SatMath.getEci(sat, now).position;
+          const lighting = SensorMath.getLightingState(satPos as TemeVec3 | undefined, sensor, now);
+
+          multiSitePass.sunlit = lighting.sunlit;
+          if (SensorMath.isOpticalSensor(sensor)) {
+            multiSitePass.opticalVisible = SensorMath.getOpticalVerdict(true, lighting);
           }
-          multiSitePass.visible = canStationObserve;
           multiSiteArray.push(multiSitePass);
 
           // Jump ahead to avoid redundant calculations within the same pass
@@ -461,6 +489,20 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
     let tdV = tr.insertCell();
 
     tdV.appendChild(document.createTextNode(l('table.visible')));
+    // Sunlit for every row; the optical verdict only when an optical or observer sensor is among the sites
+    const showOptical = sensors.some((s) => SensorMath.isOpticalSensor(s));
+
+    tr.insertCell().appendChild(document.createTextNode(l('table.sunlit')));
+    if (showOptical) {
+      tr.insertCell().appendChild(document.createTextNode(l('table.optical')));
+    }
+
+    const note = getEl('multi-sensor-look-angles-optical-note', true);
+
+    if (note) {
+      note.textContent = showOptical ? l('msgs.opticalNote').replace('{limit}', String(SensorMath.SITE_DARK_SUN_EL_DEG)) : '';
+      note.style.display = showOptical ? '' : 'none';
+    }
 
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
@@ -483,11 +525,18 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
       tdS = tr.insertCell();
       tdS.appendChild(document.createTextNode(sensor.uiName ?? sensor.shortName ?? sensor.objName ?? ''));
       tdV = tr.insertCell();
-      tdV.appendChild(document.createTextNode(entry.visible ? l('msgs.yes') : l('msgs.no')));
-      if (entry.visible) {
-        tdV.setAttribute('style', 'color: #2d7b31');
+      MultiSensorLookAnglesPlugin.appendVerdictCell_(tdV, entry.visible === true, l('msgs.yes'), l('msgs.no'));
+      if (typeof entry.sunlit !== 'boolean') {
+        tr.insertCell().appendChild(document.createTextNode('-'));
       } else {
-        tdV.setAttribute('style', 'color: #c62828');
+        MultiSensorLookAnglesPlugin.appendVerdictCell_(tr.insertCell(), entry.sunlit, l('msgs.yes'), l('msgs.eclipsed'));
+      }
+      if (showOptical) {
+        if (typeof entry.opticalVisible === 'boolean') {
+          MultiSensorLookAnglesPlugin.appendVerdictCell_(tr.insertCell(), entry.opticalVisible, l('msgs.yes'), l('msgs.no'));
+        } else {
+          tr.insertCell().appendChild(document.createTextNode('-'));
+        }
       }
       tr.addEventListener('click', () => {
         timeManagerInstance.changeSimulationTime(new Date(entry.time).getTime());
@@ -500,8 +549,13 @@ export class MultiSensorLookAnglesPlugin extends KeepTrackPlugin {
       const td = tr.insertCell();
       const searchLength = (this.lengthOfLookAngles_ * 24).toFixed(1);
 
-      td.colSpan = 4;
+      td.colSpan = showOptical ? 8 : 7;
       td.appendChild(document.createTextNode(l('msgs.notVisible').replace('{hours}', searchLength)));
     }
+  }
+
+  private static appendVerdictCell_(cell: HTMLTableCellElement, ok: boolean, yes: string, no: string): void {
+    cell.appendChild(document.createTextNode(ok ? yes : no));
+    cell.setAttribute('style', ok ? 'color: #2d7b31' : 'color: #c62828');
   }
 }

@@ -19,7 +19,8 @@
     },
     "Source": {
       "label": "情報源",
-      "tooltip": "衛星情報のデータソース"
+      "tooltip": "衛星情報のデータソース",
+      "notRecorded": "記録なし"
     },
     "Confidence": {
       "label": "信頼度",
@@ -38,6 +39,12 @@
     },
     "errorMsgs": {
       "htmlNotReady": "衛星情報パネルの読み込みが完了しなかったため、詳細を更新できませんでした。"
+    },
+    "export": {
+      "copyValues": "値をテキストとしてコピー",
+      "copied": "値をコピーしました",
+      "region": "オブジェクトの詳細",
+      "secondary": "セカンダリオブジェクト"
     }
   }
 }

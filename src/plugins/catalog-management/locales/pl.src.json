@@ -20,7 +20,12 @@
         "tleSource": "Źródło",
         "tleFormat": "Format",
         "timeSpanHrs": "Zakres czasu (godz.)",
-        "stepSizeSec": "Rozmiar kroku (s)"
+        "stepSizeSec": "Rozmiar kroku (s)",
+        "keepSatInfoHint": "Odświeża orbity satelitów, które już są w katalogu; nazwy, kraje i dane misji zostają.",
+        "importNewOnlyHint": "Dodaje tylko satelity, których jeszcze nie ma w katalogu; istniejące pozostają bez zmian.",
+        "importHint": "Przyjmuje .tce, .tle lub .txt. Przy obu wyłączonych przełącznikach plik zastępuje cały katalog; włącz przełącznik, aby scalić.",
+        "sourceHint": "Official: tylko rzeczywiste skatalogowane obiekty. KeepTrack: także utworzone przez Ciebie satelity analityka.",
+        "selectedSatReason": "Wybierz satelitę, aby włączyć te eksporty."
       },
       "options": {
         "sourceOfficial": "Oficjalne",

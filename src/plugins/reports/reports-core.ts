@@ -27,6 +27,7 @@
  */
 
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
+import { formatInTimeZone, normalizeTimeZone, resolveSiteTimeZone } from '@app/app/sensors/site-time-zone';
 import { Degrees, J2000, Kilometers, LlaVec3, MILLISECONDS_PER_SECOND, PosVel, Satellite, Tle, TleLine1 } from '@ootk/src/main';
 import { doc, docEn, fillDoc } from './report-i18n';
 
@@ -213,6 +214,8 @@ export interface ReportCoreDeps {
   findPasses: (sensor: DetailedSensor, opts: ReportOptions) => ReportPass[];
   /** Satellite sun-illumination + sun angle at a time (null when unavailable). */
   sunStatusAt: (date: Date) => { illumination: SunIllumination; sunAngleDeg: number } | null;
+  /** Active sensors or sites besides the one the report covers (omitted or 0 when none). */
+  otherSensorCount?: number;
 }
 
 /** Sensible defaults; the menu lets the user override window and step. */
@@ -220,6 +223,13 @@ export const REPORT_DEFAULTS = {
   windowSec: 72 * 60 * 60,
   stepSec: 30,
 } as const;
+
+/**
+ * Sampling step for pass detection in the AER and Visibility Windows reports, independent of the
+ * (coarser) table step. A pass shorter than the step can fall between two samples, so this is the
+ * shortest pass guaranteed to be found; Look Angles resolves shorter ones.
+ */
+export const REPORT_PASS_DETECT_STEP_SEC = 10;
 
 const HEADER_RULE = '-'.repeat(31);
 
@@ -273,6 +283,55 @@ export const formatReportTime = (time: Date): string => {
 
   return `${date} ${rest.split('.')[0]}`;
 };
+
+/** "YYYY-MM-DD HH:MM:SS" on the wall clock of the sensor's site (its own IANA zone, else the browser zone). */
+export const formatSiteLocalTime = (time: Date, sensor: Pick<DetailedSensor, 'timeZone'>): string => {
+  const { date, time: clock } = formatInTimeZone(time.getTime(), resolveSiteTimeZone(sensor.timeZone));
+
+  return `${date} ${clock}`;
+};
+
+/** Width the free-text header notes wrap at, so the monospace preview needs no sideways scroll for them. */
+const REPORT_HEADER_WRAP_COLUMNS = 80;
+
+/** Greedy word wrap for a header note; words longer than `columns` stay whole. Exported for tests. */
+export const wrapReportText = (text: string, columns: number): string => {
+  const lines: string[] = [];
+  let current = '';
+
+  for (const word of text.split(/\s+/u).filter(Boolean)) {
+    if (current && current.length + 1 + word.length > columns) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = current ? `${current} ${word}` : word;
+    }
+  }
+  if (current) {
+    lines.push(current);
+  }
+
+  return lines.join('\n');
+};
+
+/**
+ * One header line naming the site zone used by the local-time columns and stating that the
+ * windows are geometric access only (not proof a signal can be received) and that peak
+ * elevation is the best sampled value, so it can sit below the true peak.
+ */
+export const buildPassCaveatLine = (sensor: Pick<DetailedSensor, 'timeZone'>, tr: ReportText = doc): string =>
+  `${wrapReportText(fillDoc(tr(normalizeTimeZone(sensor.timeZone) ? 'header.passCaveat' : 'header.passCaveatDisplay'), { zone: resolveSiteTimeZone(sensor.timeZone) }), REPORT_HEADER_WRAP_COLUMNS)}
+
+`;
+
+/**
+ * One header line naming the single sensor a pass report covers and, when other sensors or
+ * sites are active, stating that they are not included.
+ */
+export const buildSensorCoverageLine = (sensor: Pick<DetailedSensor, 'name'>, otherSensorCount: number, tr: ReportText = doc): string =>
+  `${wrapReportText(fillDoc(tr(otherSensorCount > 0 ? 'header.sensorCoverageOthers' : 'header.sensorCoverage'), { sensor: sensor.name, count: otherSensorCount }), REPORT_HEADER_WRAP_COLUMNS)}
+
+`;
 
 /** Minimal shape the metadata header needs from a report target. */
 type HeaderSat = Pick<ReportableObject, 'name' | 'sccNum' | 'altId' | 'intlDes'>;
@@ -336,7 +395,7 @@ export const buildReportWindowLine = (opts: ReportOptions, tr: ReportText = doc)
  * regard and never blocks on a multi-day on-thread scan.
  */
 export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader(doc('titles.aer'), sat, sensor, generatedAt) + buildReportWindowLine(opts);
+  const header = buildReportHeader(doc('titles.aer'), sat, sensor, generatedAt) + buildReportWindowLine(opts) + buildPassCaveatLine(sensor);
   const rows: string[][] = [];
   const stepMs = Math.max(1, opts.stepSec) * MILLISECONDS_PER_SECOND;
   const passes = deps.findPasses(sensor, opts);
@@ -350,14 +409,14 @@ export const generateAerReport = (sat: Satellite, sensor: DetailedSensor, opts: 
         continue;
       }
 
-      rows.push([formatReportTime(time), `${idx + 1}`, rae.az.toFixed(3), rae.el.toFixed(3), rae.rng.toFixed(3)]);
+      rows.push([formatReportTime(time), `${idx + 1}`, rae.az.toFixed(3), rae.el.toFixed(3), rae.rng.toFixed(3), formatSiteLocalTime(time, sensor)]);
     }
   });
 
   return {
     filename: `aer-${sat.sccNum}`,
     header,
-    table: { ...bilingualHeaders(['timeUtc', 'pass', 'azimuthDeg', 'elevationDeg', 'rangeKm']), rows },
+    table: { ...bilingualHeaders(['timeUtc', 'pass', 'azimuthDeg', 'elevationDeg', 'rangeKm', 'timeLocal']), rows },
     emptyMessage: doc('empty.noPasses'),
   };
 };
@@ -462,8 +521,14 @@ export const generateCoesReport = (sat: OrbitalReportableObject, generatedAt: Da
 
 /** Rise/set visibility windows over a sensor for the report window. */
 export const generateVisibilityWindowsReport = (sat: Satellite, sensor: DetailedSensor, opts: ReportOptions, deps: ReportCoreDeps, generatedAt: Date): ReportData => {
-  const header = buildReportHeader(doc('titles.visibility'), sat, sensor, generatedAt) + buildReportWindowLine(opts);
-  const csvHeader = buildReportHeader(docEn('titles.visibility'), sat, sensor, generatedAt, docEn) + buildReportWindowLine(opts, docEn);
+  const otherCount = deps.otherSensorCount ?? 0;
+  const header =
+    buildReportHeader(doc('titles.visibility'), sat, sensor, generatedAt) + buildReportWindowLine(opts) + buildSensorCoverageLine(sensor, otherCount) + buildPassCaveatLine(sensor);
+  const csvHeader =
+    buildReportHeader(docEn('titles.visibility'), sat, sensor, generatedAt, docEn) +
+    buildReportWindowLine(opts, docEn) +
+    buildSensorCoverageLine(sensor, otherCount, docEn) +
+    buildPassCaveatLine(sensor, docEn);
   const passes = deps.findPasses(sensor, opts);
   // A Note column only when a window is clipped by the report interval (e.g. a GEO that never sets)
   const hasNotes = passes.some((pass) => typeof pass.edge !== 'undefined');
@@ -472,13 +537,15 @@ export const generateVisibilityWindowsReport = (sat: Satellite, sensor: Detailed
       const durationMin = (pass.los.getTime() - pass.aos.getTime()) / (MILLISECONDS_PER_SECOND * 60);
       const row = [`${idx + 1}`, formatReportTime(pass.aos), formatReportTime(pass.los), durationMin.toFixed(2), pass.maxEl.toFixed(1), formatReportTime(pass.maxElTime)];
 
+      row.push(formatSiteLocalTime(pass.aos, sensor), formatSiteLocalTime(pass.los, sensor), formatSiteLocalTime(pass.maxElTime, sensor));
+
       if (hasNotes) {
         row.push(pass.edge ? tr(`passEdge.${pass.edge}`) : '');
       }
 
       return row;
     });
-  const columns = ['passNum', 'riseTime', 'setTime', 'durationMin', 'maxElDeg', 'maxElTime'];
+  const columns = ['passNum', 'riseTime', 'setTime', 'durationMin', 'maxElDeg', 'maxElTime', 'riseLocal', 'setLocal', 'maxElTimeLocal'];
 
   if (hasNotes) {
     columns.push('note');

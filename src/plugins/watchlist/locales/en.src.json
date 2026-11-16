@@ -54,6 +54,10 @@
         "showSensorLabels": {
           "label": "Show Sensor Labels",
           "helpText": "Draw the sensor name next to its marker on the globe and the flat map."
+        },
+        "showObjectLabels": {
+          "label": "Show Object Labels",
+          "helpText": "Draw names next to the selected, secondary and watchlist objects in the scene, with a shape prefix: [1] primary, (2) secondary, * watchlist."
         }
       },
       "rmbMenu": {
@@ -63,6 +67,13 @@
       "infoBox": {
         "addLabel": "Add to Watchlist",
         "removeLabel": "Remove from Watchlist"
+      },
+      "stale": {
+        "label": "Stale Element Set Threshold",
+        "helpText": "Element sets older than this are marked STALE in the watchlist, pass tables and exports. Default 72.",
+        "ageHeader": "GP Age (h)",
+        "marker": "STALE",
+        "tooltip": "Element set is older than {hours} h. Predictions may be inaccurate."
       }
     },
     "WatchlistOverlay": {

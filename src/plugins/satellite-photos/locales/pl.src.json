@@ -1,15 +1,16 @@
 {
   "plugins": {
     "SatellitePhotos": {
-      "bottomIconLabel": "Zdjęcia satelitarne",
-      "title": "Zdjęcia satelitarne",
+      "bottomIconLabel": "Zdjęcia pogodowe",
+      "title": "Zdjęcia pogodowe",
       "defaultImageTitle": "Najnowsze zdjęcie satelitarne",
       "labels": {
         "dscovrUnavailable": "DSCOVR tymczasowo niedostępny",
         "dscovrImage": "Zdjęcie DSCOVR {index}",
         "dscovrLoading": "Ładowanie zdjęć DSCOVR…",
         "refresh": "Odśwież najnowsze zdjęcie",
-        "imageAtUtc": "{name} o {time} UTC"
+        "imageAtUtc": "{name} o {time} UTC",
+        "hint": "Kliknij satelitę, aby do niej przelecieć i otworzyć jej najnowszy obraz całej tarczy"
       },
       "sections": {
         "geostationary": "Geostacjonarne",

@@ -56,3 +56,154 @@
 #ui-datepicker-div .ui-datepicker-goto-input.invalid {
   border-color: #f44336;
 }
+
+/* Clock status line: UTC date plus a live/paused/simulated label (text, not color alone). */
+#datetime-status {
+  /* #321: 0.7rem rendered about 9 px at 1920; never below 12 px */
+  font-size: max(12px, 0.75rem);
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0.85;
+}
+
+#datetime-status[data-mode='simulated'],
+#datetime-status[data-mode='paused'] {
+  font-weight: bold;
+}
+
+/* Zone chip: neutral for UTC; the caution colour whenever times are not UTC, so it is never silent. */
+#datetime-zone {
+  display: block;
+  margin: 2px auto 0;
+  width: auto;
+  /* #318: size the chip to the active zone's label, not to the longest option in the list */
+  field-sizing: content;
+  height: auto;
+  padding: 0 4px;
+  font-size: max(12px, 0.75rem);
+  line-height: 1.2;
+  color: inherit;
+  background: transparent;
+  border: 1px solid currentcolor;
+  border-radius: 8px;
+  opacity: 0.85;
+  cursor: pointer;
+  appearance: auto;
+  /* #405: one outline only (the border); the browser focus ring is replaced by a ring that shows for keyboard focus */
+  outline: none;
+  color-scheme: dark;
+}
+
+#datetime-zone:focus-visible {
+  outline: 2px solid var(--kt-accent-light, #e01a0e);
+  outline-offset: 1px;
+}
+
+/* #405: the open list used the white native popup (white text on white until hovered); give every option the theme
+   surface and text colour, and use theme tints for hover and the selected row. */
+#datetime-zone option {
+  color: var(--kt-text-primary, #fff);
+  background-color: var(--kt-bg-elevated, #1e1e1e);
+}
+
+#datetime-zone option:hover,
+#datetime-zone option:focus {
+  background-color: var(--kt-bg-hover, #333);
+}
+
+/* #454: the app-wide accent-color tints the browser's focus ring on the hovered row red; it drew a line under the row
+   across the popup border. The hover fill already marks the row, so no ring on any option state. */
+#datetime-zone option,
+#datetime-zone option:hover,
+#datetime-zone option:focus,
+#datetime-zone option:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border: 0;
+}
+
+#datetime-zone option:checked {
+  background-color: var(--kt-bg-active, #444);
+  font-weight: bold;
+}
+
+/* #405: Chromium's native popup paints hovered and selected rows in its own blue. Where customizable selects exist
+   (Chromium 135+), switch the picker to author-styled rows with theme tokens; other browsers keep the native list above.
+   The closed chip keeps field-sizing: content (#318) and the 12 px font (#321). */
+@supports (appearance: base-select) {
+  #datetime-zone,
+  #datetime-zone::picker(select) {
+    appearance: base-select;
+  }
+
+  #datetime-zone::picker-icon {
+    display: none;
+  }
+
+  #datetime-zone::picker(select) {
+    color: var(--kt-text-primary, #fff);
+    background: var(--kt-bg-elevated, #1e1e1e);
+    border: 1px solid var(--kt-border, #555);
+    border-radius: 8px;
+    padding: 2px;
+    font-size: max(12px, 0.75rem);
+  }
+
+  #datetime-zone option {
+    padding: 6px 10px;
+    min-height: 32px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+  }
+
+  #datetime-zone option::checkmark {
+    display: none;
+  }
+
+  #datetime-zone option:hover,
+  #datetime-zone option:focus {
+    color: var(--kt-text-primary, #fff);
+    background-color: var(--kt-bg-hover, #333);
+  }
+
+  #datetime-zone option:checked {
+    color: var(--kt-text-primary, #fff);
+    background-color: var(--kt-bg-active, #444);
+    font-weight: bold;
+  }
+}
+
+#datetime-zone[data-zone='other'] {
+  color: var(--colorCaution, #ffb300);
+  border-color: var(--colorCaution, #ffb300);
+  font-weight: bold;
+  opacity: 1;
+}
+
+/* One-row clock (#234, supersedes the two-row block of #209): time, then "date · mode", then the zone chip, all on a
+   single line aligned with the other top-bar controls. The zone is named only by the chip. */
+#datetime {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+  column-gap: 8px;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+#datetime #datetime-text {
+  line-height: 1.1;
+}
+
+#datetime #datetime-zone {
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+#jday {
+  white-space: nowrap;
+  opacity: 0.85;
+}

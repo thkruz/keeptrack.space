@@ -20,7 +20,12 @@
         "tleSource": "来源",
         "tleFormat": "格式",
         "timeSpanHrs": "时间跨度（小时）",
-        "stepSizeSec": "步长（秒）"
+        "stepSizeSec": "步长（秒）",
+        "keepSatInfoHint": "更新目录中已有卫星的轨道；保留名称、国家和任务数据。",
+        "importNewOnlyHint": "仅添加目录中尚没有的卫星；已有卫星保持不变。",
+        "importHint": "支持 .tce、.tle 或 .txt。两个开关都关闭时，文件将替换整个目录；打开任一开关则合并。",
+        "sourceHint": "Official：仅限真实编目的目标。KeepTrack：还包含您创建的分析员卫星。",
+        "selectedSatReason": "请选择卫星以启用这些导出。"
       },
       "options": {
         "sourceOfficial": "官方",

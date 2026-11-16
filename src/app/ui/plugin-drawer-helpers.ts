@@ -1,6 +1,7 @@
 import { MenuMode } from '@app/engine/core/interfaces';
 import { KeyboardShortcutRegistry } from '@app/engine/core/keyboard-shortcut-registry';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
+import { ServiceLocator } from '@app/engine/core/service-locator';
 import { KeepTrackPlugin } from '@app/engine/plugins/base-plugin';
 import { migrateLegacyBottomIconId } from '@app/engine/plugins/bottom-icon-id';
 import { IconPlacement, UtilityGroup } from '@app/engine/plugins/core/plugin-capabilities';
@@ -40,6 +41,29 @@ export interface DrawerGroup {
 
 const MAX_RECENT_PLUGINS_ = 8;
 
+/** Group keys that start open when the user has not chosen otherwise ("recent" plus the first menu group). */
+export function defaultOpenGroupKeys(groupKeys: string[], extraOpen: string[] = []): Set<string> {
+  const open = new Set<string>(['recent', ...extraOpen]);
+  const first = groupKeys[0];
+
+  if (first && extraOpen.length === 0) {
+    open.add(first);
+  }
+
+  return open;
+}
+
+/**
+ * Whether a drawer group renders expanded. A choice the user made (stored true/false) always wins;
+ * otherwise groups start collapsed except the default-open ones. Nothing is hidden: collapsed groups
+ * keep their header and item count and open on click.
+ */
+export function isGroupExpanded(key: string, states: Record<string, boolean>, defaultOpen: Set<string>): boolean {
+  const stored = states[key];
+
+  return typeof stored === 'boolean' ? stored : defaultOpen.has(key);
+}
+
 /**
  * Every plugin row in the drawer content. Rows in a plugin's own group carry
  * data-plugin-id; the copies in the Recent group carry data-recent-plugin-id and the
@@ -67,6 +91,94 @@ export function syncDrawerItemState(el: HTMLElement): void {
 
   el.classList.toggle('active', isSelected);
   el.classList.toggle('disabled', isDisabled);
+  syncDrawerItemReason(el, isDisabled);
+}
+
+/** A single valid id token: whitespace and other unsafe characters collapse to hyphens. */
+export function sanitizeDrawerIdToken(raw: string): string {
+  return raw
+    .trim()
+    .replace(/[^A-Za-z0-9_-]+/gu, '-')
+    .replace(/^-+|-+$/gu, '');
+}
+
+/** Why a disabled drawer row is unavailable: missing sensor, missing satellite, or the plugin's own reason. */
+export function drawerDisabledReasonText(pluginId: string | undefined): string {
+  const plugin = pluginId ? PluginRegistry.plugins.find((p) => p.bottomIconElementName === pluginId) : undefined;
+
+  if (!plugin) {
+    return '';
+  }
+  if (plugin.isRequireSensorSelected && !ServiceLocator.getSensorManager()?.isSensorSelected()) {
+    return t7e('pluginDrawer.reasonSelectSensor' as TranslationKey);
+  }
+  if (plugin.isRequireSatelliteSelected && !plugin.verifySatelliteSelected(false)) {
+    return t7e('pluginDrawer.reasonSelectSatellite' as TranslationKey);
+  }
+
+  return plugin.getDisabledReason() ?? '';
+}
+
+/** Counter for fallback reason-line ids when a row has no plugin id. */
+let reasonIdSeq_ = 0;
+
+/**
+ * Keep a drawer row's visible "why disabled" line, aria-disabled and aria-describedby in step with its disabled state.
+ * The line is created on first use so rows copied elsewhere (Favorites) get it too.
+ */
+export function syncDrawerItemReason(el: HTMLElement, isDisabled: boolean): void {
+  let reasonEl = el.querySelector<HTMLElement>(':scope > .drawer-item-reason');
+  const text = isDisabled ? drawerDisabledReasonText(drawerItemPluginId(el)) : '';
+
+  if (!reasonEl && text) {
+    reasonEl = document.createElement('span');
+    reasonEl.className = 'drawer-item-reason';
+    const idSource = drawerItemPluginId(el) ?? el.dataset.topMenuId ?? `r${++reasonIdSeq_}`;
+
+    reasonEl.id = `drawer-reason-${sanitizeDrawerIdToken(idSource) || `r${++reasonIdSeq_}`}${el.hasAttribute('data-recent-plugin-id') ? '-recent' : ''}`;
+    el.appendChild(reasonEl);
+  }
+  if (reasonEl) {
+    reasonEl.textContent = text;
+  }
+
+  // The reason line hides in rail mode, so the tooltip carries it there.
+  const baseLabel = el.dataset.drawerLabel ?? el.getAttribute('kt-tooltip') ?? '';
+
+  if (baseLabel) {
+    el.dataset.drawerLabel = baseLabel;
+    el.setAttribute('kt-tooltip', text ? `${baseLabel}: ${text}` : baseLabel);
+  }
+
+  el.setAttribute('aria-disabled', String(isDisabled));
+
+  // #438: the "Free account unlocks this" line follows the plugin's own gate on every row, disabled or not,
+  // so a signed-in row that is only waiting for a sensor shows just its reason.
+  const hintEl = el.querySelector<HTMLElement>(':scope > .drawer-item-account-hint');
+
+  if (hintEl) {
+    hintEl.hidden = !isSignedOutGatedRow(el);
+  }
+
+  if (isDisabled && text && reasonEl) {
+    el.setAttribute('aria-describedby', reasonEl.id);
+  } else {
+    // Locked (Pro) rows keep pointing at their "Free account unlocks this" line.
+    const hintId = hintEl?.id;
+
+    if (hintId && hintEl && !hintEl.hidden) {
+      el.setAttribute('aria-describedby', hintId);
+    } else {
+      el.removeAttribute('aria-describedby');
+    }
+  }
+}
+
+/** Hide the shared tooltip popup, which would otherwise stay on screen after the row under it collapses. */
+export function hideDrawerTooltips(): void {
+  document.querySelectorAll('.kt-tooltip-popup.kt-tooltip-visible').forEach((el) => {
+    el.classList.remove('kt-tooltip-visible');
+  });
 }
 
 // ---- Shared Item Collection ----
@@ -293,7 +405,11 @@ export function renderUtilityFooter(groups: Record<string, DrawerGroup>): void {
       const dataAttr = item.isTopMenu ? `data-top-menu-id="${item.id}"` : `data-plugin-id="${item.id}"`;
       const idAttr = item.pluginId ? ` id="${item.pluginId}-utility-icon"` : '';
 
-      html += `<div class="drawer-utility-icon${disabledClass}${proClass}"${idAttr} ${dataAttr}${proAttr} kt-tooltip="${item.label}">`;
+      const reason = item.isDisabled && !item.isTopMenu ? drawerDisabledReasonText(item.id) : '';
+      const tip = reason ? `${item.label}: ${reason}` : item.label;
+      const ariaAttr = item.isDisabled ? ` aria-disabled="true" aria-label="${tip}"` : '';
+
+      html += `<div class="drawer-utility-icon${disabledClass}${proClass}"${idAttr} ${dataAttr}${proAttr}${ariaAttr} data-drawer-label="${item.label}" kt-tooltip="${tip}">`;
       html += `<img src="${item.imgSrc}" alt="${item.label}" />`;
       html += '</div>';
     }
@@ -491,6 +607,25 @@ export function explainDisabledPluginReason(bottomIconId: string): boolean {
 
 // ---- Utility Footer Sync ----
 
+/**
+ * Mirror a disabled state onto a utility footer icon: aria-disabled, plus the reason in the tooltip and
+ * aria-label ("Watchlist filter: Add satellites to the watchlist first"). The plain label is kept in data-drawer-label.
+ */
+export function syncUtilityIconReason(el: HTMLElement, isDisabled: boolean, reasonOverride?: string): void {
+  const baseLabel = el.dataset.drawerLabel ?? el.getAttribute('kt-tooltip') ?? '';
+  const reason = isDisabled ? (reasonOverride ?? drawerDisabledReasonText(el.dataset.pluginId)) : '';
+
+  el.setAttribute('aria-disabled', String(isDisabled));
+  if (!baseLabel) {
+    return;
+  }
+  el.dataset.drawerLabel = baseLabel;
+  const text = reason ? `${baseLabel}: ${reason}` : baseLabel;
+
+  el.setAttribute('kt-tooltip', text);
+  el.setAttribute('aria-label', text);
+}
+
 /** Sync utility footer icon selection state with bottom menu. */
 export function syncUtilityFooterState(): void {
   const footerEl = getEl('drawer-utility-footer', true);
@@ -503,8 +638,11 @@ export function syncUtilityFooterState(): void {
       return;
     }
     const isSelected = bottomIcon.classList.contains('bmenu-item-selected');
+    const isDisabled = bottomIcon.classList.contains('bmenu-item-disabled');
 
     el.classList.toggle('bmenu-item-selected', isSelected);
+    el.classList.toggle('bmenu-item-disabled', isDisabled);
+    syncUtilityIconReason(el as HTMLElement, isDisabled);
   });
 
   footerEl?.querySelectorAll('.drawer-utility-icon[data-top-menu-id]').forEach((el) => {
@@ -554,6 +692,7 @@ export function syncInitialUtilityState(): void {
     if (plugin.isIconDisabled) {
       utilityIcon.classList.add('bmenu-item-disabled');
     }
+    syncUtilityIconReason(utilityIcon, plugin.isIconDisabled);
   }
 
   const footerEl = getEl('drawer-utility-footer', true);
@@ -654,3 +793,149 @@ export function buildRecentGroupFromCache(recentIds: string[], allItems: Map<str
     items: recentItems,
   };
 }
+
+// ---- Signed-out sign-in prompt ----
+
+/** True when the row belongs to a login-gated plugin whose gate is currently closed (signed out). */
+export function isSignedOutGatedRow(el: HTMLElement): boolean {
+  if (el.dataset.proGated === undefined || settingsManager.isDisableLoginGate) {
+    return false;
+  }
+  const pluginId = drawerItemPluginId(el);
+  const plugin = pluginId ? findPluginByBottomIcon_(pluginId) : undefined;
+
+  return plugin ? plugin.isLoginRequired && !plugin.isLoginGateValid_() : !document.body.classList.contains('user-logged-in');
+}
+
+/**
+ * Show a "Sign in to <feature>" prompt for a gated row. The Sign in button reuses the
+ * existing login modal (KeepTrackPlugin.loginGateOpenModal); no auth flow lives here.
+ */
+export function showSignInPrompt(featureName: string): HTMLElement {
+  document.getElementById('drawer-sign-in-prompt')?.remove();
+
+  const overlay = document.createElement('div');
+
+  overlay.id = 'drawer-sign-in-prompt';
+  overlay.className = 'drawer-sign-in-prompt';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+
+  const card = document.createElement('div');
+
+  card.className = 'drawer-sign-in-prompt__card';
+
+  const title = document.createElement('h2');
+
+  title.className = 'drawer-sign-in-prompt__title';
+  title.textContent = t7e('pluginDrawer.signInPromptTitle' as DrawerKey_, { feature: featureName });
+
+  const body = document.createElement('p');
+
+  body.className = 'drawer-sign-in-prompt__body';
+  body.textContent = t7e('pluginDrawer.signInPromptBody' as DrawerKey_, { feature: featureName });
+
+  const actions = document.createElement('div');
+
+  actions.className = 'drawer-sign-in-prompt__actions';
+
+  const cancel = document.createElement('button');
+
+  cancel.type = 'button';
+  cancel.className = 'drawer-sign-in-prompt__cancel';
+  cancel.textContent = t7e('pluginDrawer.signInPromptCancel' as DrawerKey_);
+
+  const signIn = document.createElement('button');
+
+  signIn.type = 'button';
+  signIn.className = 'drawer-sign-in-prompt__action';
+  signIn.textContent = t7e('pluginDrawer.signInPromptAction' as DrawerKey_);
+
+  const close = (): void => overlay.remove();
+
+  cancel.addEventListener('click', close);
+  overlay.addEventListener('click', (evt) => {
+    if (evt.target === overlay) {
+      close();
+    }
+  });
+  overlay.addEventListener('keydown', (evt) => {
+    if (evt.key === 'Escape') {
+      close();
+    }
+  });
+  signIn.addEventListener('click', () => {
+    close();
+    KeepTrackPlugin.loginGateOpenModal?.();
+  });
+
+  actions.append(cancel, signIn);
+  card.append(title, body, actions);
+  overlay.append(card);
+  document.body.append(overlay);
+  signIn.focus();
+
+  return overlay;
+}
+
+/** Label of a drawer row or utility icon, for naming the feature in the prompt. */
+export function drawerRowFeatureName(el: HTMLElement): string {
+  return el.querySelector('.drawer-item-label')?.textContent?.trim() || el.getAttribute('kt-tooltip') || el.querySelector('img')?.getAttribute('alt') || '';
+}
+
+/** Collapsed pill width, in px. */
+export const FOOTER_PILL_SIZE = 48;
+/** Gap kept between the pill and the menu / info box, in px. */
+export const FOOTER_PILL_GAP = 8;
+/** Default distance of the pill from the bottom edge, in px. */
+export const FOOTER_PILL_BOTTOM = 12;
+
+export interface FooterPlacementInput {
+  viewportWidth: number;
+  viewportHeight: number;
+  /** Right edge of the right-most visible side menu (0 when none) */
+  menuRight: number;
+  /** Visible satellite info box rect, or null when hidden */
+  infoBox: { left: number; top: number; right: number } | null;
+}
+
+export interface FooterPlacement {
+  /** Horizontal centre of the pill, px */
+  left: number;
+  /** Distance of the pill's bottom edge from the viewport bottom, px */
+  bottom: number;
+}
+
+/**
+ * Pick where the floating utility pill sits (#513, #519). It stays at the viewport centre unless a
+ * side menu covers it; then it is centred in the gap between the menu and the info box. When that
+ * gap is too narrow for the pill, it keeps the menu-clear position but rides above the info box.
+ */
+export const computeFooterPlacement = ({ viewportWidth, viewportHeight, menuRight, infoBox }: FooterPlacementInput): FooterPlacement => {
+  const half = FOOTER_PILL_SIZE / 2;
+  const needed = FOOTER_PILL_SIZE + 2 * FOOTER_PILL_GAP;
+  const regionLeft = menuRight > 0 ? menuRight : 0;
+  // Info box is on the right; only treat it as a limit when it sits right of the menu.
+  const regionRight = infoBox && infoBox.left > regionLeft ? infoBox.left : viewportWidth;
+  const centre = viewportWidth / 2;
+  const defaultBottom = FOOTER_PILL_BOTTOM;
+
+  let left = centre;
+
+  if (menuRight + half + FOOTER_PILL_GAP > centre || (infoBox && centre + half + FOOTER_PILL_GAP > infoBox.left)) {
+    left = (regionLeft + regionRight) / 2;
+  }
+
+  // Keep the pill off the info box vertically when it cannot clear it horizontally.
+  const overlapsInfo = infoBox !== null && left + half + FOOTER_PILL_GAP > infoBox.left && left - half - FOOTER_PILL_GAP < infoBox.right;
+
+  if (regionRight - regionLeft >= needed || !overlapsInfo || !infoBox) {
+    return { left: Math.round(left), bottom: defaultBottom };
+  }
+
+  // Gap too narrow: sit just right of the menu edge, above the info box top.
+  return {
+    left: Math.round(Math.min(regionLeft + half + FOOTER_PILL_GAP, viewportWidth - half)),
+    bottom: Math.max(defaultBottom, Math.round(viewportHeight - infoBox.top + FOOTER_PILL_GAP)),
+  };
+};

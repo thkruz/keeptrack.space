@@ -225,12 +225,12 @@ jobs:
 
       # Non-OSS profiles: SSH + full submodules (pro included).
       - name: Set up SSH
-        if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
+        if: matrix.profile != 'oss' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch')
         uses: webfactory/ssh-agent@dc588b651fe13675774614f8e6a936a468676387 # v0.9.0
         with:
           ssh-private-key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
       - name: Update submodules
-        if: matrix.profile != 'oss' && github.event.pull_request.head.repo.full_name == github.repository
+        if: matrix.profile != 'oss' && (github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch')
         run: git submodule update --init --recursive
 
       - name: Install Dependencies

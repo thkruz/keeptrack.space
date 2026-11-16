@@ -9,17 +9,26 @@
         "groundStationsHeader": "地面站",
         "groundStationsAll": "所有地面站",
         "missingData": "缺失数据",
-        "tooltipSensorsInFov": "可视化传感器覆盖范围"
+        "tooltipSensorsInFov": "可视化传感器覆盖范围",
+        "savedSites": "已保存的自定义站点",
+        "savedSite_current": "当前",
+        "savedSite_active": "已启用",
+        "savedSite_saved": "已保存"
       },
       "buttons": {
         "markAll": "标记{name}",
         "resetSensor": "重置传感器",
-        "showSensorsWithFov": "显示所有传感器及其视场..."
+        "showSensorsWithFov": "显示所有传感器及其视场...",
+        "removeSavedSite": "移除已保存站点 {name}",
+        "activateSavedSite": "同时使用已保存站点 {name}",
+        "deactivateSavedSite": "停止使用已保存站点 {name}"
       },
       "commands": {
         "category": "传感器",
         "setSensor": "将当前传感器设为 {name}",
-        "setSensorGroup": "设置传感器组：{name}"
+        "setSensorGroup": "设置传感器组：{name}",
+        "setSavedSite": "将当前传感器设为已保存站点 {name}",
+        "activateSavedSite": "同时使用已保存站点 {name}"
       },
       "help": {
         "overview": "传感器菜单用于选择应用其余功能进行计算所依据的地面站。传感器按其主要支持的网络分组，每个条目左侧显示传感器名称，右侧显示所属国家或组织。所选传感器决定观测角、视场锥、关注列表过境提醒以及所有其他依赖传感器的菜单。",

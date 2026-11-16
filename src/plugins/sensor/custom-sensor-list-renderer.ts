@@ -11,6 +11,11 @@ import type { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 /** Translation lookup for the `sensorList.*` keys, injected by the plugin. */
 export type SensorListLabel = (key: string) => string;
 
+/** Format without losing the typed precision: up to 3 decimals, trailing zeros trimmed (1.5 stays 1.5, 2 stays 2). */
+function fmt(value: number): string {
+  return Number.isFinite(value) ? String(Number(value.toFixed(3))) : '-';
+}
+
 /**
  * Build the active-custom-sensor list markup as v13 cards (one card per sensor:
  * a header with the name + a remove control, then a two-column attribute grid).
@@ -37,12 +42,12 @@ export function renderCustomSensorList(sensors: DetailedSensor[], l: SensorListL
           </button>
         </div>
         <div class="cs-attr-grid">
-          ${attr('latitude', `${sensor.lat.toFixed(0)}°`)}
-          ${attr('longitude', `${sensor.lon.toFixed(0)}°`)}
-          ${attr('altitude', `${sensor.alt.toFixed(0)} km`)}
-          ${attr('azimuth', `${sensor.minAz.toFixed(0)}° - ${sensor.maxAz.toFixed(0)}°`)}
-          ${attr('elevationRange', `${sensor.minEl.toFixed(0)}° - ${sensor.maxEl.toFixed(0)}°`)}
-          ${attr('range', `${sensor.minRng.toFixed(0)} - ${sensor.maxRng.toFixed(0)} km`)}
+          ${attr('latitude', `${fmt(sensor.lat)}°`)}
+          ${attr('longitude', `${fmt(sensor.lon)}°`)}
+          ${attr('altitude', `${fmt(sensor.alt)} km`)}
+          ${attr('azimuth', `${fmt(sensor.minAz)}° - ${fmt(sensor.maxAz)}°`)}
+          ${attr('elevationRange', `${fmt(sensor.minEl)}° - ${fmt(sensor.maxEl)}°`)}
+          ${attr('range', `${fmt(sensor.minRng)} - ${fmt(sensor.maxRng)} km`)}
         </div>
       </div>`
     )

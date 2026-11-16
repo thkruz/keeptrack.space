@@ -1,3 +1,5 @@
+import { describeZoneAt, describeZoneShort, getDisplayTimeZone, getDisplayZoneChoices, isUtcZone, setDisplayTimeZone } from '@app/app/sensors/display-time-zone';
+import { formatInTimeZone } from '@app/app/sensors/site-time-zone';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
@@ -5,11 +7,29 @@ import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { isThisNode } from '@app/engine/utils/isThisNode';
+import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
 import { Milliseconds } from '@ootk/src/main';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { TopMenu } from '../top-menu/top-menu';
 import { Calendar } from './calendar';
+
+export type ClockMode = 'live' | 'paused' | 'simulated';
+
+/** Live: running at 1x and within 2 s of the wall clock. Paused: rate 0. Anything else is simulated. */
+export const getClockMode = (propRate: number, simulationTimeMs: number, nowMs: number): ClockMode => {
+  if (propRate === 0) {
+    return 'paused';
+  }
+  if (propRate === 1 && Math.abs(simulationTimeMs - nowMs) <= 2000) {
+    return 'live';
+  }
+
+  return 'simulated';
+};
+
+/** Playback rate as shown beside the clock: "1×", "-4×", "0.5×"; at most two decimals. */
+export const formatPlaybackRate = (propRate: number): string => `${Number(propRate.toFixed(2))}×`;
 
 export class DateTimeManager extends KeepTrackPlugin {
   readonly id = 'DateTimeManager';
@@ -30,6 +50,10 @@ export class DateTimeManager extends KeepTrackPlugin {
   private lastDateStr_: string | null = null;
   private lastJdayStr_: string | null = null;
   private lastTimeTextStr_: string | null = null;
+  private lastStatusStr_: string | null = null;
+  /** Display zone, re-read from storage at most once a second (account sync can change it behind our back). */
+  private displayZone_ = 'UTC';
+  private displayZoneReadAt_ = 0;
   calendar: Calendar;
 
   // =========================================================================
@@ -49,6 +73,8 @@ export class DateTimeManager extends KeepTrackPlugin {
     EventBus.getInstance().on(EventBusEvent.updateDateTime, this.updateDateTime.bind(this));
     EventBus.getInstance().on(EventBusEvent.onKeepTrackReady, () => this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj));
     EventBus.getInstance().on(EventBusEvent.selectedDateChange, (date: Date) => this.updateDateTime(date));
+    EventBus.getInstance().on(EventBusEvent.setSensor, () => this.syncZoneChip_());
+    EventBus.getInstance().on(EventBusEvent.resetSensor, () => this.syncZoneChip_());
   }
 
   updateDateTime(date: Date) {
@@ -77,15 +103,16 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
 
     const timeManagerInstance = ServiceLocator.getTimeManager();
-    const jdayStr = settingsManager.isUseJdayOnTopMenu
-      ? timeManagerInstance.getUTCDayOfYear(timeManagerInstance.simulationTimeObj).toString()
-      : timeManagerInstance.simulationTimeObj.toLocaleDateString();
+    // The date appears once (status line); JDAY is only ever the day of year, so it never repeats the date (#234).
+    const jdayStr = settingsManager.isUseJdayOnTopMenu ? `JDAY ${timeManagerInstance.getUTCDayOfYear(timeManagerInstance.simulationTimeObj).toString()}` : '';
 
     // Only touch the jday DOM on change; setInnerHtml rewrites innerHTML which triggers a style recalc.
     if (jdayStr !== this.lastJdayStr_) {
       setInnerHtml('jday', jdayStr);
       this.lastJdayStr_ = jdayStr;
     }
+
+    const zone = this.readDisplayZone_();
 
     if (!this.simulationTimeSerialized_ || Math.abs(this.lastTime - timeManagerInstance.simulationTimeObj.getTime()) > (1000 as Milliseconds)) {
       this.simulationTimeSerialized_ = timeManagerInstance.simulationTimeObj.toJSON();
@@ -94,6 +121,10 @@ export class DateTimeManager extends KeepTrackPlugin {
         if (this.iText > 11) {
           this.timeTextStr += this.simulationTimeSerialized_[this.iText - 1];
         }
+      }
+
+      if (!isUtcZone(zone)) {
+        this.timeTextStr = formatInTimeZone(timeManagerInstance.simulationTimeObj.getTime(), zone).time;
       }
 
       this.lastTime = timeManagerInstance.simulationTimeObj.getTime() as Milliseconds;
@@ -113,6 +144,8 @@ export class DateTimeManager extends KeepTrackPlugin {
       }
     }
 
+    this.updateStatus_();
+
     // The clock text (HH:MM:SS) only changes once per second, so skip the DOM write
     // otherwise. Writing every frame is what showed up as "Recalculate Style" in the
     // game loop. Update the existing text node in place rather than replacing it.
@@ -128,11 +161,142 @@ export class DateTimeManager extends KeepTrackPlugin {
     }
   }
 
+  /** The display zone, refreshed from storage once a second; a change forces the clock text to rebuild. */
+  private readDisplayZone_(): string {
+    const now = Date.now();
+
+    if (now - this.displayZoneReadAt_ > 1000) {
+      this.displayZoneReadAt_ = now;
+      const zone = getDisplayTimeZone();
+
+      if (zone !== this.displayZone_) {
+        this.displayZone_ = zone;
+        this.simulationTimeSerialized_ = null;
+        this.syncZoneChip_();
+      }
+    }
+
+    return this.displayZone_;
+  }
+
+  /** IANA zone of the selected sensor (first of a multi-sensor selection), if it has one. */
+  private selectedSiteZone_(): string | undefined {
+    try {
+      return ServiceLocator.getSensorManager().currentSensors?.[0]?.timeZone;
+    } catch {
+      return undefined;
+    }
+  }
+
+  /** Shows the zone beside the clock: neutral for UTC, caution colour for anything else. */
+  private syncZoneChip_(): void {
+    const chip = getEl('datetime-zone', true) as HTMLSelectElement | null;
+
+    if (!chip) {
+      return;
+    }
+    const zone = this.displayZone_;
+
+    const nowMs = ServiceLocator.getTimeManager().simulationTimeObj.getTime();
+    // #404/#455: every option carries its full name; on a phone the closed chip shows the abbreviations (data-short) and
+    // the open list shows the full names, so zones sharing an abbreviation (CST, IST) stay distinguishable.
+    chip.replaceChildren(
+      ...getDisplayZoneChoices(zone, this.selectedSiteZone_()).map((z) => {
+        const full = isUtcZone(z) ? 'UTC' : describeZoneAt(nowMs, z);
+        const option = document.createElement('option');
+
+        option.value = z;
+        option.title = full;
+        option.dataset.full = full;
+        option.dataset.short = describeZoneShort(nowMs, z);
+        option.textContent = full;
+
+        return option;
+      })
+    );
+    chip.value = zone;
+    chip.dataset.zone = isUtcZone(zone) ? 'utc' : 'other';
+    // #318: the active zone stays readable even where the select is narrow
+    chip.title = isUtcZone(zone) ? 'UTC' : describeZoneAt(ServiceLocator.getTimeManager().simulationTimeObj.getTime(), zone);
+    this.setZoneChipOpen_(chip, this.zoneChipOpen_);
+  }
+
+  /** True while the phone zone list is open (option texts are full names then). */
+  private zoneChipOpen_ = false;
+
+  /**
+   * #455: closed on a phone, option texts are abbreviations so the chip stays narrow; open (or wide screens), full names.
+   * The selected option keeps its abbreviation on a phone even while open, because the chip renders its text and a full
+   * name would be cut mid-string in the pinned width. The width is pinned while open so the chip does not grow.
+   */
+  private setZoneChipOpen_(chip: HTMLSelectElement, open: boolean): void {
+    const narrow = typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 639px)').matches;
+
+    if (open && narrow && !chip.style.width) {
+      chip.style.width = `${chip.offsetWidth}px`;
+    } else if (!open) {
+      chip.style.width = '';
+    }
+    this.zoneChipOpen_ = open;
+    Array.from(chip.options).forEach((o) => {
+      const short = narrow && (!open || o.selected);
+      const text = (short ? o.dataset.short : o.dataset.full) ?? o.textContent ?? '';
+
+      if (o.textContent !== text) {
+        o.textContent = text;
+      }
+    });
+  }
+
+  /** Writes "YYYY-MM-DD UTC · LIVE|PAUSED|SIMULATED" (plus the playback rate when simulated) under the clock; skips the DOM write unless the text changed. */
+  private updateStatus_(): void {
+    const statusEl = getEl('datetime-status', true);
+
+    if (!statusEl) {
+      return;
+    }
+    const timeManagerInstance = ServiceLocator.getTimeManager();
+    const simMs = timeManagerInstance.simulationTimeObj.getTime();
+    const mode = getClockMode(timeManagerInstance.propRate, simMs, Date.now());
+    const label = t7e(`plugins.DateTimeManager.clock.${mode}` as Parameters<typeof t7e>[0]);
+    // Paused and live states say it all; a simulated clock also shows its rate so a raised rate is never invisible.
+    const rate = mode === 'simulated' ? ` · ${formatPlaybackRate(timeManagerInstance.propRate)}` : '';
+    const zone = this.displayZone_;
+    const day = isUtcZone(zone) ? timeManagerInstance.simulationTimeObj.toISOString().slice(0, 10) : formatInTimeZone(simMs, zone).date;
+    // The zone is named once, by the chip next to this line (#234), so it is not repeated here.
+    const text = `${day} · ${label}${rate}`;
+
+    if (text !== this.lastStatusStr_) {
+      // The date sits in its own span so a phone can drop it and keep the mode label on the one row (#234).
+      const dayEl = document.createElement('span');
+
+      dayEl.className = 'datetime-status-day';
+      dayEl.textContent = `${day} · `;
+      statusEl.replaceChildren(dayEl, document.createTextNode(`${label}${rate}`));
+      statusEl.dataset.mode = mode;
+      this.lastStatusStr_ = text;
+    }
+  }
+
+  private closePickerForPopover_(): void {
+    if (this.calendar?.isPickerVisible) {
+      this.calendar.hideDatePicker();
+    }
+    const datetimeInput = getEl('datetime-input', true);
+
+    if (datetimeInput) {
+      datetimeInput.style.display = 'none';
+    }
+    this.isEditTimeOpen = false;
+  }
+
   datetimeTextClick(): void {
-    const simulationDateObj = new Date(ServiceLocator.getTimeManager().simulationTimeObj);
     const timeManagerInstance = ServiceLocator.getTimeManager();
 
+    // Refresh the sim time first: the copy below must be the clock the header shows, not the last drawn frame's.
+    timeManagerInstance.calculateSimulationTime();
     timeManagerInstance.synchronize();
+    const simulationDateObj = new Date(timeManagerInstance.simulationTimeObj);
 
     this.updateDateTime(simulationDateObj);
     this.calendar.setDate(simulationDateObj);
@@ -166,6 +330,8 @@ export class DateTimeManager extends KeepTrackPlugin {
           <div id="jday"></div>
           <div id="${this.dateTimeContainerId_}">
             <div id="datetime-text" class="waves-effect waves-light"></div>
+            <div id="datetime-status" role="status" aria-live="off"></div>
+            <select id="datetime-zone" class="browser-default" aria-label="Time zone for the clock and tables" data-zone="utc"><option value="UTC">UTC</option></select>
             <div id="datetime-input">
               <form id="datetime-input-form">
                 <input type="text" id="${this.dateTimeInputTbId_}" readonly="true" />
@@ -191,18 +357,24 @@ export class DateTimeManager extends KeepTrackPlugin {
     this.calendar = new Calendar('datetime-input-form');
 
     document.getElementById('datetime-text')?.addEventListener('click', this.datetimeTextClick.bind(this));
+    // The phone VCR popover and the date picker never show together (#388).
+    document.addEventListener('kt-vcr-popover-open', () => this.closePickerForPopover_());
 
-    if (settingsManager.isJdayToggleable) {
-      const jdayEl = getEl('jday', true);
+    this.displayZone_ = getDisplayTimeZone();
+    this.syncZoneChip_();
+    window.matchMedia?.('(max-width: 639px)')?.addEventListener?.('change', () => this.syncZoneChip_());
+    const zoneChip = document.getElementById('datetime-zone') as HTMLSelectElement | null;
 
-      if (jdayEl) {
-        jdayEl.style.cursor = 'pointer';
-        jdayEl.addEventListener('click', () => {
-          settingsManager.isUseJdayOnTopMenu = !settingsManager.isUseJdayOnTopMenu;
-          this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
-        });
-      }
-    }
+    (['focus', 'pointerdown', 'touchstart'] as const).forEach((evt) => zoneChip?.addEventListener(evt, () => this.setZoneChipOpen_(zoneChip, true), { passive: true }));
+    zoneChip?.addEventListener('blur', () => this.setZoneChipOpen_(zoneChip, false));
+    document.getElementById('datetime-zone')?.addEventListener('change', (e) => {
+      this.zoneChipOpen_ = false;
+      this.displayZone_ = setDisplayTimeZone((e.target as HTMLSelectElement).value);
+      this.displayZoneReadAt_ = Date.now();
+      this.simulationTimeSerialized_ = null;
+      this.syncZoneChip_();
+      this.updateDateTime(ServiceLocator.getTimeManager().simulationTimeObj);
+    });
 
     const datetimeInputTb = document.getElementById(this.dateTimeInputTbId_);
 

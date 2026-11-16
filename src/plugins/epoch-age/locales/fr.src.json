@@ -2,9 +2,9 @@
   "plugins": {
     "EpochAge": {
       "badge": {
-        "caution": "Âge de l'époque : moyen, {days}",
-        "low": "Âge de l'époque : faible, {days}",
-        "poor": "Âge de l'époque : très faible, {days}"
+        "caution": "Âge de l'époque : vieillissant, {days}",
+        "low": "Âge de l'époque : ancien, {days}",
+        "poor": "Âge de l'époque : très ancien, {days}"
       },
       "tooltip": "Écart entre la simulation et l'époque du jeu d'éléments. Moyen au-delà de 3 jours, faible au-delà de 7, très faible au-delà de 14 : plus les éléments sont anciens, plus les positions s'écartent de la réalité.",
       "toast": {

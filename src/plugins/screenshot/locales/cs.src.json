@@ -14,6 +14,14 @@
         "primaryLogoFailed": "Nepodařilo se načíst obrázek hlavního loga.",
         "secondaryLogoFailed": "Nepodařilo se načíst obrázek vedlejšího loga.",
         "noCanvasContext": "Nepodařilo se získat 2D kontext dočasného plátna. Snímek obrazovky nelze vytvořit."
+      },
+      "caption": {
+        "norad": "{name} (NORAD {id})",
+        "site": "Stanoviště: {site}",
+        "source": "Zdroj: {source}",
+        "utc": "{time} UTC",
+        "computed": "Vypočtený pohled: orbitální elementy jsou v tuto chvíli staré {age}",
+        "computedBeforeEpoch": "Vypočtený pohled: tento čas je {age} před epochou drah. elementů"
       }
     }
   }

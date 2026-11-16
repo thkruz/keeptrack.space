@@ -9,6 +9,7 @@
       },
       "labels": {
         "noradId": "衛星NORAD ID (90000-99999)",
+        "noradIdHint": "90000-99999のIDはアナリスト用オブジェクトに予約されており、実際のカタログ番号と重複しません。",
         "satelliteName": "衛星名",
         "inclinationDeg": "軌道傾斜角 (度)",
         "apogeeAltKm": "遠地点高度 (km)",
@@ -17,6 +18,7 @@
         "country": "国",
         "epochYear": "元期年",
         "epochDay": "元期日",
+        "epochTimestamp": "元期タイムスタンプ (UTC, ISO)",
         "inclination": "軌道傾斜角",
         "rightAscension": "昇交点赤経",
         "eccentricity": "離心率",
@@ -34,13 +36,22 @@
         "sectionOrbit": "軌道",
         "sectionEpoch": "元期",
         "sectionElements": "軌道要素",
-        "sectionPresets": "プリセット"
+        "sectionPresets": "プリセット",
+        "sectionWalker": "コンステレーション (ウォーカーデルタ)",
+        "walkerHint": "同一の高度と軌道傾斜角で、等間隔のP個の軌道面にT機の衛星を作成します (T/P/Fパターン)。各衛星は空いている最小のアナリストIDを使います。",
+        "walkerAltKm": "高度 (km)",
+        "walkerTotal": "衛星数 (T)",
+        "walkerPlanes": "軌道面数 (P)",
+        "walkerPhasing": "位相 (F)",
+        "walkerPrefix": "名前の接頭辞",
+        "walkerTpfHelp": "T は P の倍数にしてください。F(位相)は 0 から P-1 までです。"
       },
       "buttons": {
         "createSatellite": "衛星を作成",
         "saveTle": "TLEを保存",
         "makeSunSync": "太陽同期傾斜角",
-        "cloneSelected": "選択した衛星を複製"
+        "cloneSelected": "選択した衛星を複製",
+        "createWalker": "コンステレーションを作成"
       },
       "options": {
         "payload": "ペイロード",
@@ -63,11 +74,14 @@
         "invalidNoradId": "無効なNORAD IDです。90000〜99999の5桁の数字を入力してください。",
         "invalidType": "無効なタイプです。1（ペイロード）、2（ロケット本体）、3（デブリ）、または4（特殊）を指定してください。",
         "invalidCountry": "無効な国です。リストから選択してください。",
-        "invalidEpochYear": "無効な元期年です。2桁の数字を入力してください。",
+        "invalidEpochYear": "元期年は2桁（26）または1957〜2056年（2026）で入力してください。",
+        "invalidEpochTimestamp": "元期タイムスタンプが無効です。2026-11-04T00:00:00Z のような ISO 日時を使用してください。",
         "invalidEpochDay": "無効な元期日です。NNN.NNNNNNNN形式で入力してください（例：001.00000000）。",
         "invalidInclination": "無効な軌道傾斜角です。NNN.NNNN形式で入力してください（例：000.0000）。",
         "invalidRasc": "無効な昇交点赤経です。NNN.NNNN形式で入力してください（例：000.0000）。",
-        "invalidEccentricity": "無効な離心率です。7桁の数字を入力してください（例：0000000）。",
+        "invalidEccentricity": "離心率は0以上1未満で入力してください。小数（0.0012）またはTLEの7桁形式（0012000）が使えます。",
+        "calcInvalidEccentricity": "計算値を非表示にしました。離心率は0以上1未満にしてください。",
+        "calcSubSurface": "計算値を非表示にしました。この軌道は地表より下を通ります。平均運動または離心率を小さくしてください。",
         "invalidArgPe": "無効な近地点引数です。NNN.NNNN形式で入力してください（例：000.0000）。",
         "invalidMeanAnomaly": "無効な平均近点角です。NNN.NNNN形式で入力してください（例：000.0000）。",
         "invalidMeanMotion": "無効な平均運動です。NN.NNNNN形式で入力してください（例：16.00000）。",
@@ -88,7 +102,8 @@
         "meanMotionRange": "{field}は0より大きく、1日あたり{max}周回以下にしてください。",
         "periodPositive": "{field}は正の分数で入力してください。",
         "numberRequired": "{field}は数値で入力してください。",
-        "noradIdReserved": "NORAD ID {id} は打ち上げ軌道で使用中です。別の ID を選ぶか、先にその軌道を削除してください。"
+        "noradIdReserved": "NORAD ID {id} は打ち上げ軌道で使用中です。別の ID を選ぶか、先にその軌道を削除してください。",
+        "noradIdNoSlot": "NORAD ID {id} は利用可能なアナリスト枠ではありません。フォームが提示する ID を使うか、先にこの枠を解放してください。"
       },
       "successMsgs": {
         "satCreated": "衛星 {name} ({scc}) が正常に作成されました",
@@ -121,6 +136,20 @@
         "replace": "置き換える",
         "cancel": "キャンセル",
         "changed": "衛星またはフォームが変更されました。確認して再送信してください。"
+      },
+      "walker": {
+        "created": "{prefix}-P#-S# という名前の衛星を {count} 機作成しました ({failed} 件失敗)",
+        "errors": {
+          "altitude": "高度は160〜400000 kmにしてください。",
+          "inclination": "軌道傾斜角は0〜180度にしてください。",
+          "total": "衛星数 (T) は1以上の整数にしてください。",
+          "planes": "軌道面数 (P) は1からTまでの整数にしてください。",
+          "phasing": "位相 (F) は0から{max}までの整数にしてください。",
+          "divisible": "TはPで割り切れる必要があります。",
+          "tooMany": "1つのコンステレーションは最大{max}機までです。",
+          "noSlots": "空いているアナリストスロットが足りません (空き {free}、必要 {needed})。",
+          "failed": "コンステレーションを生成できませんでした。"
+        }
       }
     }
   }

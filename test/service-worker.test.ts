@@ -46,7 +46,7 @@ const loadWorker = (opts: { putRejects?: boolean; networkFails?: boolean; cached
   const handle = (url: string, mode = 'cors', method = 'GET'): Promise<Response> | undefined => {
     let responded: Promise<Response> | undefined;
 
-    listeners.fetch({ request: { method, url, mode }, respondWith: (p) => (responded = p) });
+    listeners.fetch({ request: { method, url, mode }, respondWith: (p) => (responded = p), waitUntil: () => undefined });
 
     return responded;
   };

@@ -407,6 +407,11 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
         rocketURL: text(rocket?.wiki_url),
       };
     });
+
+    // Rows that render as TBD (stale or unparseable window) go after the dated ones. Array.sort is stable, so the feed order is kept within each group.
+    const isTbd = (launch: LaunchInfoObject): boolean => TheSpaceDevLaunchCalendarPlugin.formatWindow(launch.windowStart) === l('msgs.tbd');
+
+    this.launchList.sort((a, b) => Number(isTbd(a)) - Number(isTbd(b)));
   }
 
   static makeTableHeaders(tbl: HTMLTableElement): void {
@@ -449,7 +454,14 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
     }
 
     try {
-      return `${dateFormat(windowStart as Date, 'isoDateTime', true)} UTC`;
+      const formatted = dateFormat(windowStart as Date, 'isoDateTime', true);
+
+      // LL2 2.0.0 has no net_precision, so a date-only launch arrives as 00:00:00 UTC. Show the date and say the time is unknown.
+      if (formatted.endsWith(' 00:00:00')) {
+        return `${formatted.slice(0, -' 00:00:00'.length)} (${l('msgs.timeTbd')})`;
+      }
+
+      return `${formatted} UTC`;
     } catch {
       return l('msgs.tbd');
     }
@@ -503,12 +515,21 @@ export class TheSpaceDevLaunchCalendarPlugin extends KeepTrackPlugin {
       // Mission name, line break, rocket name
       const tdN = tr.insertCell();
 
-      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdN, truncateString(launchEvent.missionName || l('msgs.unknown'), 15), launchEvent.missionURL);
+      const missionName = launchEvent.missionName || l('msgs.unknown');
+
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdN, truncateString(missionName, 15), launchEvent.missionURL);
       tdN.appendChild(document.createElement('br'));
       TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdN, launchEvent.rocket ?? '', launchEvent.rocketURL);
+      // Truncated cells keep the full text in a tooltip.
+      tdN.title = launchEvent.rocket ? `${missionName} / ${launchEvent.rocket}` : missionName;
 
-      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tr.insertCell(), truncateString(launchEvent.location ?? '', 25), launchEvent.locationURL);
-      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tr.insertCell(), truncateString(launchEvent.agency ?? '', 30), launchEvent.agencyURL);
+      const tdL = tr.insertCell();
+      const tdA = tr.insertCell();
+
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdL, truncateString(launchEvent.location ?? '', 25), launchEvent.locationURL);
+      TheSpaceDevLaunchCalendarPlugin.appendFeedText(tdA, truncateString(launchEvent.agency ?? '', 30), launchEvent.agencyURL);
+      tdL.title = launchEvent.location ?? '';
+      tdA.title = launchEvent.agency ?? '';
 
       // Country Cell (wraps long comma-separated country lists, e.g. ESA members).
       // Render a space after each comma so the cell wraps at code boundaries

@@ -36,10 +36,10 @@
 /* ===== Dense-form fixes (recurring v13 miss) ===== */
 
 /* Stacked select/number fields: keep the floating "active" label from striking
-   through the row above. The first field after the section label only needs the
-   smaller gap. */
+   through the row above, and the first field after the section label needs room
+   too, or its label overlaps the section label (#201). */
 #settings-menu .kt-section .input-field.col.s12 { margin-top: 18px; }
-#settings-menu .kt-section-label + .input-field.col.s12 { margin-top: 6px; }
+#settings-menu .kt-section-label + .input-field.col.s12 { margin-top: 20px; }
 
 /* Toggle rows: tighten the Materialize .row default and give the switches a
    little consistent vertical rhythm inside the card. */
@@ -79,4 +79,80 @@
   text-overflow: clip;
   line-height: 1.25;
   overflow-wrap: anywhere;
+}
+
+/* Reset to Defaults wipes every display option, so mark it destructive. */
+#settings-menu .kt-action--destructive {
+  border-color: rgba(229, 83, 83, 0.55);
+}
+
+#settings-menu .kt-action--destructive .kt-action-label,
+#settings-menu .kt-action--destructive::after {
+  color: #ff7a7a;
+}
+
+#settings-menu .kt-action--destructive:hover {
+  background: rgba(229, 83, 83, 0.14);
+}
+
+/* Sub-groups inside a section (General Settings is split into labelled runs). */
+#settings-menu .kt-subgroup + .kt-subgroup {
+  margin-top: 14px;
+}
+
+#settings-menu .kt-subgroup-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-dark-text-muted);
+  margin: 4px 0 2px;
+  padding-top: 2px;
+}
+
+/* ===== Phone (390 px) fit, Z21 ===== */
+@media (max-width: 639px) {
+  #settings-menu {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* 16px stops iOS zooming on focus; 44px is the touch target minimum. */
+  #settings-filter {
+    height: 44px;
+    font-size: 16px;
+  }
+
+  #settings-menu .kt-action {
+    min-height: 44px;
+  }
+
+  /* Keep the last rows clear of the floating bottom-centre menu button (#217). */
+  #settings-content {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  #settings-content::after {
+    content: '';
+    display: block;
+    flex-shrink: 0;
+    min-height: 24px;
+  }
+
+  #settings-menu .kt-section .input-field,
+  #settings-menu .kt-section .input-field input,
+  #settings-menu .kt-section .select-wrapper {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  #settings-menu .kt-section .switch.row {
+    margin-top: 16px;
+  }
+
+  #settings-menu .kt-section .switch label {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }

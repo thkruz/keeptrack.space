@@ -122,10 +122,9 @@
   display: none;
 }
 
-.most-tracked-note {
-  display: block;
+/* A <p> with kt-note, not <sub>: normalize.css gives sub line-height 0, so wrapped lines drew on top of each other. */
+.kt-ui-v13 .most-tracked-note {
   margin: 8px 6px 0;
-  color: var(--kt-text-tertiary);
 }
 
 #most-tracked-refresh-btn {

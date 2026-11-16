@@ -220,7 +220,7 @@ export class MostTracked extends KeepTrackPlugin {
             </button>
           </section>
           ${tabsHtml}
-          <sub class="most-tracked-note">${tr('privacyNote')}</sub>
+          <p class="kt-note most-tracked-note">${tr('privacyNote')}</p>
         </div>
       </div>
     `;

@@ -864,6 +864,17 @@ body.drawer-mode {
     height: 20px;
     filter: var(--filter-icon-blue);
     opacity: 0.7;
+    /* Also replaces the generic 0.2s filter transition these images would otherwise pick up. */
+    transition: none;
+  }
+
+  /*
+   * Fade the icons only while the pill is open. Collapsed, the sections are clipped to zero width at opacity 0,
+   * and a selection flips selected/disabled on a dozen of these icons at once: with the transition always on,
+   * each flip ran an opacity animation nobody could see ("Compositing failed: animation has no visible change").
+   */
+  .drawer-utility-footer:hover .drawer-utility-icon img,
+  .drawer-utility-footer.expanded .drawer-utility-icon img {
     transition: opacity var(--kt-duration-fast, 100ms) var(--kt-easing-default, cubic-bezier(0.4, 0, 0.2, 1));
   }
 

@@ -62,4 +62,42 @@ describe('EarthCenteredView methods', () => {
     EventBus.getInstance().emit(EventBusEvent.updateLoop);
     expect(unselect).toHaveBeenCalled();
   });
+
+  it('changes the icon once per camera transition and is a no-op on every other frame', () => {
+    const select = vi.spyOn(plugin, 'setBottomIconToSelected');
+    const unselect = vi.spyOn(plugin, 'setBottomIconToUnselected');
+    const classWrites = [vi.spyOn(DOMTokenList.prototype, 'toggle'), vi.spyOn(DOMTokenList.prototype, 'add'), vi.spyOn(DOMTokenList.prototype, 'remove')];
+    const countClassWrites = () => classWrites.reduce((sum, spy) => sum + spy.mock.calls.length, 0);
+    const runFrames = (count: number) => {
+      for (let i = 0; i < count; i++) {
+        EventBus.getInstance().emit(EventBusEvent.updateLoop);
+      }
+    };
+    const camera = ServiceLocator.getMainCamera();
+
+    camera.cameraType = CameraType.FIXED_TO_EARTH;
+    plugin.isMenuButtonActive = false;
+    runFrames(1);
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(plugin.isMenuButtonActive).toBe(true);
+
+    let writes = countClassWrites();
+
+    runFrames(50);
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(unselect).not.toHaveBeenCalled();
+    expect(countClassWrites()).toBe(writes);
+
+    // Selecting a satellite moves the camera off Earth view: one unselect, then nothing.
+    camera.cameraType = CameraType.FIXED_TO_SAT_ECI;
+    runFrames(1);
+    expect(unselect).toHaveBeenCalledTimes(1);
+    expect(plugin.isMenuButtonActive).toBe(false);
+
+    writes = countClassWrites();
+    runFrames(50);
+    expect(select).toHaveBeenCalledTimes(1);
+    expect(unselect).toHaveBeenCalledTimes(1);
+    expect(countClassWrites()).toBe(writes);
+  });
 });

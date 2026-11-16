@@ -433,7 +433,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
         }
       }
 
-      document.documentElement.style.setProperty('--search-box-bottom', '0px');
+      SatInfoBox.setSearchBoxBottom('0px');
       PluginRegistry.getPlugin(SatInfoBox)?.hide();
     }
 

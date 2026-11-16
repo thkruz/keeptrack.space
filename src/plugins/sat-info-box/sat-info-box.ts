@@ -190,7 +190,7 @@ export class SatInfoBox extends KeepTrackPlugin {
     const searchBoxHeight = satInfoboxDom?.getBoundingClientRect().height ?? 0;
     const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
 
-    document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTop}px`);
+    SatInfoBox.setSearchBoxBottom(`${searchBoxHeight + bottomMenuTop}px`);
   }
 
   addListenerToCollapseElement(section: HTMLElement | null, isCollapsedRef?: { value: boolean }): void {
@@ -333,7 +333,7 @@ export class SatInfoBox extends KeepTrackPlugin {
         if (satInfoBoxElement.style.maxHeight !== '80%') {
           satInfoBoxElement.style.maxHeight = '80%';
         }
-        document.documentElement.style.setProperty('--search-box-bottom', '0px');
+        SatInfoBox.setSearchBoxBottom('0px');
         satInfoBoxElement.classList.remove('satinfo-fixed');
 
         const searchResults = getEl('search-results')!;
@@ -789,11 +789,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     // Get the height of the DOM
     const searchBoxHeight = (ServiceLocator.getUiManager().searchManager.isResultsOpen ? satInfoBoxDom?.getBoundingClientRect().height : 0) ?? 0;
     const bottomMenuTop = parseFloat(document.documentElement.style.getPropertyValue('--bottom-menu-top')) || 0;
-    const curVal = document.documentElement.style.getPropertyValue('--search-box-bottom');
 
-    if (curVal !== `${searchBoxHeight + bottomMenuTop}px`) {
-      document.documentElement.style.setProperty('--search-box-bottom', `${searchBoxHeight + bottomMenuTop}px`);
-    }
+    SatInfoBox.setSearchBoxBottom(`${searchBoxHeight + bottomMenuTop}px`);
 
     if (obj.isSatellite()) {
       this.setSatInfoBoxSatellite_();
@@ -845,6 +842,20 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (satIdentifierData) {
       showEl(satIdentifierData);
+    }
+  }
+
+  /**
+   * Set `--search-box-bottom`, which only `#search-results` reads (its max-height). The variable is written on that
+   * element, not on the root: a custom property changed on the root restyles every element that inherits it
+   * (measured at 686 elements for one write), while here it restyles the results list alone. The stylesheet's
+   * `:root` default of 0px still applies until the first write.
+   */
+  static setSearchBoxBottom(value: string): void {
+    const searchResults = getEl('search-results', true);
+
+    if (searchResults && searchResults.style.getPropertyValue('--search-box-bottom') !== value) {
+      searchResults.style.setProperty('--search-box-bottom', value);
     }
   }
 

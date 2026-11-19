@@ -184,11 +184,13 @@ const server = http.createServer((req, res) => {
     }
   } catch (err) {
     res.writeHead(500, { 'Content-Type': 'text/plain' });
-    res.end(String(err));
+    // eslint-disable-next-line no-console
+    console.error(err);
+    res.end('Internal server error');
   }
 });
 
-server.listen(port, () => {
+server.listen(port, '127.0.0.1', () => {
   const address = `http://localhost:${port}`;
 
   // eslint-disable-next-line no-console

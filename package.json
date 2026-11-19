@@ -141,7 +141,6 @@
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.5",
     "dotenv-webpack": "^9.0.0",
-    "happy-dom": "^20.5.0",
     "husky": "^8.0.1",
     "imports-loader": "^5.0.0",
     "jsdom": "^30.1.3",

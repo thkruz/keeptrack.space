@@ -20,7 +20,7 @@ export const FIXED_ISS_TLE = [
 /** Element epoch of {@link FIXED_ISS_TLE} in ms (2008 day 264.51782528). */
 export const FIXED_ISS_EPOCH_MS = Date.UTC(2008, 0, 1) + (264.51782528 - 1) * 86400e3;
 
-const FIXED_TLE_URL = 'http://localhost:5544/e2e-fixed/iss.txt';
+const FIXED_TLE_URL = `http://localhost:${process.env.KEEPTRACK_DEV_PORT ?? 5544}/e2e-fixed/iss.txt`;
 
 export interface FixedSceneOptions extends AppReadyOptions {
   /** Sim time to boot at. */

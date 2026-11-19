@@ -1,0 +1,5 @@
+[
+  { "plugin": "RicPlot", "reason": "Side menu not visible 5 s after bottomMenuClicked with the ISS and a sensor selected (2026-11-18 run). Suspected: needs a second (secondary) satellite to plot relative motion; not observed." },
+  { "plugin": "StereoMap", "reason": "Side menu not visible 5 s after bottomMenuClicked with the ISS selected (2026-11-18 run). Cause not observed; suspected: an earlier menu in the loop clears the selection or the map menu opens through a different path." },
+  { "plugin": "TransponderChannelData", "reason": "Side menu not visible 5 s after bottomMenuClicked (2026-11-18 run). Suspected: needs a satellite with transponder data; the fixed scene has only the ISS. Not observed." }
+]

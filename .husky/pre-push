@@ -1,6 +1,8 @@
 #!/bin/sh
 command -v git-lfs >/dev/null 2>&1 || { printf >&2 "\n%s\n\n" "This repository is configured for Git LFS but 'git-lfs' was not found on your path. If you no longer wish to use Git LFS, remove this hook by deleting the 'pre-push' file in the hooks directory (set by 'core.hookspath'; usually '.git/hooks')."; exit 2; }
-git lfs pre-push "$@"
+# git passes the pushed refs on stdin and git lfs reads them too, so keep a copy.
+refs=$(cat)
+printf '%s\n' "$refs" | git lfs pre-push "$@"
 
 # Full local gate before anything reaches GitHub: lint + typecheck are seconds,
 # the unit-test suite is the expensive part but far cheaper than a CI round-trip
@@ -13,13 +15,36 @@ onError() {
   exit 1
 }
 
+# True when every commit this push adds is a clean merge: two parents, and a tree
+# identical to git's own merge of those parents (no conflict resolution, no extra
+# edits). Everything below the merges is already on a remote branch, so it was
+# tested when it was pushed; CI still runs the full suite on the result.
+only_clean_merges() {
+  [ -n "$refs" ] || return 1
+  printf '%s\n' "$refs" | while read -r _lref lsha _rref _rsha; do
+    [ -n "$lsha" ] || continue
+    case "$lsha" in *[!0]*) ;; *) continue ;; esac # deleting a ref: nothing to test
+    for c in $(git rev-list "$lsha" --not --remotes); do
+      # shellcheck disable=SC2046
+      set -- $(git rev-list --parents -n 1 "$c")
+      [ $# -eq 3 ] || exit 1
+      out=$(git merge-tree --write-tree --no-messages "$2" "$3") || exit 1
+      [ "$(printf '%s\n' "$out" | head -n 1)" = "$(git rev-parse "$c^{tree}")" ] || exit 1
+    done
+  done
+}
+
 echo "pre-push: running lint..." >&2
 pnpm run lint || onError "linting failed."
 
 echo "pre-push: running typecheck..." >&2
 pnpm run typecheck || onError "type checking failed."
 
-echo "pre-push: running unit tests (this takes a few minutes)..." >&2
-pnpm run test || onError "unit tests failed."
+if only_clean_merges; then
+  echo "pre-push: every new commit is a clean merge of already-pushed commits; skipping unit tests (CI runs them)." >&2
+else
+  echo "pre-push: running unit tests (this takes a few minutes)..." >&2
+  pnpm run test || onError "unit tests failed."
+fi
 
 exit 0

@@ -1,0 +1,202 @@
+{
+  "chromium": {
+    "shots": [
+      "chrome-drawer",
+      "chrome-infobox",
+      "chrome-settings-open",
+      "chrome-topbar",
+      "menu-BestPassPlugin",
+      "menu-Breakup",
+      "menu-BreakupAnalysis",
+      "menu-Calculator",
+      "menu-CatalogBrowserPlugin",
+      "menu-CatalogManagementPlugin",
+      "menu-CloseObjectsPlugin",
+      "menu-Collisions",
+      "menu-ColorMenu",
+      "menu-CountriesMenu",
+      "menu-CreateSat",
+      "menu-CustomSensorPlugin",
+      "menu-DebrisScreening",
+      "menu-DopsPlugin",
+      "menu-DrawLinesPlugin",
+      "menu-EcfPlot",
+      "menu-EciPlot",
+      "menu-EditSat",
+      "menu-FilterMenuPlugin",
+      "menu-FindSatPlugin",
+      "menu-GraphicsMenuPlugin",
+      "menu-Inc2AltPlots",
+      "menu-Inc2LonPlots",
+      "menu-KtocNoticesPlugin",
+      "menu-Lat2LonPlots",
+      "menu-LookAnglesPlugin",
+      "menu-MissileSimulatorPlugin",
+      "menu-MostTracked",
+      "menu-MultiSensorLookAnglesPlugin",
+      "menu-NaturalEventsPlugin",
+      "menu-NewLaunch",
+      "menu-OnboardingPlugin",
+      "menu-PlanetsMenuPlugin",
+      "menu-PolarPlotPlugin",
+      "menu-ProximityOps",
+      "menu-Reentries",
+      "menu-ReportsPlugin",
+      "menu-SatConstellations",
+      "menu-SatelliteFov",
+      "menu-SatellitePhotos",
+      "menu-ScenarioManagementMenu",
+      "menu-SearchSettingsPlugin",
+      "menu-SensorInfoPlugin",
+      "menu-SensorListPlugin",
+      "menu-SettingsMenuPlugin",
+      "menu-ShareMenuPlugin",
+      "menu-ShortTermFences",
+      "menu-TheSpaceDevLaunchCalendarPlugin",
+      "menu-Time2LonPlots",
+      "menu-VideoDirectorPlugin",
+      "menu-WatchlistPlugin"
+    ],
+    "flaky": [
+      {
+        "name": "menu-DebugMenuPlugin",
+        "reason": "live camera X/Y text changes every frame (observed in the second run: 327 to 358 px)"
+      },
+      {
+        "name": "menu-MissileSimulatorPlugin",
+        "reason": "launch and target location selects start on random cities (observed: 892 px on laptop)"
+      },
+      {
+        "name": "menu-MostTracked",
+        "reason": "live data: 'updated N minutes ago' and view counts change between runs (observed: 408 px on laptop)"
+      },
+      {
+        "name": "menu-TheSpaceDevLaunchCalendarPlugin",
+        "reason": "live launch list from a network feed differs between runs (observed in the third run, chromium and laptop)"
+      }
+    ]
+  },
+  "laptop": {
+    "shots": [
+      "chrome-drawer",
+      "chrome-infobox",
+      "chrome-settings-open",
+      "chrome-topbar",
+      "menu-BestPassPlugin",
+      "menu-Breakup",
+      "menu-BreakupAnalysis",
+      "menu-Calculator",
+      "menu-CatalogBrowserPlugin",
+      "menu-CatalogManagementPlugin",
+      "menu-CloseObjectsPlugin",
+      "menu-Collisions",
+      "menu-ColorMenu",
+      "menu-CountriesMenu",
+      "menu-CreateSat",
+      "menu-CustomSensorPlugin",
+      "menu-DebrisScreening",
+      "menu-DopsPlugin",
+      "menu-DrawLinesPlugin",
+      "menu-EcfPlot",
+      "menu-EciPlot",
+      "menu-EditSat",
+      "menu-FilterMenuPlugin",
+      "menu-FindSatPlugin",
+      "menu-GraphicsMenuPlugin",
+      "menu-Inc2AltPlots",
+      "menu-Inc2LonPlots",
+      "menu-KtocNoticesPlugin",
+      "menu-Lat2LonPlots",
+      "menu-LookAnglesPlugin",
+      "menu-MissileSimulatorPlugin",
+      "menu-MostTracked",
+      "menu-MultiSensorLookAnglesPlugin",
+      "menu-NaturalEventsPlugin",
+      "menu-NewLaunch",
+      "menu-OnboardingPlugin",
+      "menu-PlanetsMenuPlugin",
+      "menu-PolarPlotPlugin",
+      "menu-ProximityOps",
+      "menu-Reentries",
+      "menu-ReportsPlugin",
+      "menu-SatConstellations",
+      "menu-SatelliteFov",
+      "menu-SatellitePhotos",
+      "menu-ScenarioManagementMenu",
+      "menu-SearchSettingsPlugin",
+      "menu-SensorInfoPlugin",
+      "menu-SensorListPlugin",
+      "menu-SettingsMenuPlugin",
+      "menu-ShareMenuPlugin",
+      "menu-ShortTermFences",
+      "menu-TheSpaceDevLaunchCalendarPlugin",
+      "menu-Time2LonPlots",
+      "menu-VideoDirectorPlugin",
+      "menu-WatchlistPlugin"
+    ],
+    "flaky": [
+      {
+        "name": "menu-DebugMenuPlugin",
+        "reason": "live camera X/Y text changes every frame (observed in the second run: 327 to 358 px)"
+      },
+      {
+        "name": "menu-MissileSimulatorPlugin",
+        "reason": "launch and target location selects start on random cities (observed: 892 px on laptop)"
+      },
+      {
+        "name": "menu-MostTracked",
+        "reason": "live data: 'updated N minutes ago' and view counts change between runs (observed: 408 px on laptop)"
+      },
+      {
+        "name": "menu-TheSpaceDevLaunchCalendarPlugin",
+        "reason": "live launch list from a network feed differs between runs (observed in the third run, chromium and laptop)"
+      }
+    ]
+  },
+  "phone": {
+    "shots": [
+      "chrome-drawer",
+      "chrome-infobox",
+      "chrome-settings-open",
+      "chrome-topbar",
+      "menu-BestPassPlugin",
+      "menu-ColorMenu",
+      "menu-CountriesMenu",
+      "menu-CustomSensorPlugin",
+      "menu-FilterMenuPlugin",
+      "menu-FindSatPlugin",
+      "menu-KtocNoticesPlugin",
+      "menu-LookAnglesPlugin",
+      "menu-MostTracked",
+      "menu-NaturalEventsPlugin",
+      "menu-OnboardingPlugin",
+      "menu-Reentries",
+      "menu-SatConstellations",
+      "menu-SatellitePhotos",
+      "menu-SensorInfoPlugin",
+      "menu-SensorListPlugin",
+      "menu-SettingsMenuPlugin",
+      "menu-ShareMenuPlugin",
+      "menu-TheSpaceDevLaunchCalendarPlugin",
+      "menu-WatchlistPlugin"
+    ],
+    "flaky": [
+      {
+        "name": "menu-DebugMenuPlugin",
+        "reason": "live camera X/Y text changes every frame (observed in the second run: 327 to 358 px)"
+      },
+      {
+        "name": "menu-MissileSimulatorPlugin",
+        "reason": "launch and target location selects start on random cities (observed: 892 px on laptop)"
+      },
+      {
+        "name": "menu-MostTracked",
+        "reason": "live data: 'updated N minutes ago' and view counts change between runs (observed: 408 px on laptop)"
+      },
+      {
+        "name": "menu-TheSpaceDevLaunchCalendarPlugin",
+        "reason": "live launch list from a network feed differs between runs (observed in the third run, chromium and laptop)"
+      }
+    ]
+  }
+}

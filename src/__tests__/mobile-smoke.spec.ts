@@ -18,6 +18,24 @@ const transitionsSettled = async (page: import('@playwright/test').Page) => {
   await page.waitForFunction(() => document.getAnimations().every((a) => !(a instanceof CSSTransition) || a.playState !== 'running'), undefined, { timeout: 5_000 });
 };
 
+/**
+ * Taps a drawer item the way a phone user does. Drawer groups start collapsed on phones, so the
+ * group holding the item is expanded through its header first.
+ */
+const tapDrawerItem = async (page: import('@playwright/test').Page, pluginId: string) => {
+  const item = page.locator(`.drawer-item[data-plugin-id="${pluginId}"]`).first();
+  const group = page.locator('.drawer-group', { has: item }).first();
+
+  // Items outside a group (pinned rows) have nothing to expand.
+  if ((await group.count()) > 0 && (await group.evaluate((el) => el.classList.contains('collapsed')))) {
+    await group.locator('.drawer-group-header').tap({ timeout: 10_000 });
+    await expect(group).not.toHaveClass(/collapsed/u);
+    await transitionsSettled(page);
+  }
+  await item.scrollIntoViewIfNeeded({ timeout: 10_000 });
+  await item.tap({ timeout: 10_000 });
+};
+
 const zoomTarget = (page: import('@playwright/test').Page) =>
   page.evaluate(() => (window as unknown as { keepTrack: { api: { getMainCamera: () => { state: { zoomTarget: number } } } } }).keepTrack.api.getMainCamera().state.zoomTarget);
 
@@ -68,7 +86,7 @@ test.describe('Mobile smoke (Pixel 7 emulation)', () => {
 
     // Drawer -> a phone-enabled menu.
     await page.locator('#drawer-hamburger').tap();
-    await page.locator('.drawer-item[data-plugin-id="share-menu-bottom-icon"]').tap();
+    await tapDrawerItem(page, 'share-menu-bottom-icon');
     await expect(page.locator('#share-menu')).toBeVisible({ timeout: 5_000 });
   });
 
@@ -93,10 +111,12 @@ test.describe('Mobile smoke (Pixel 7 emulation)', () => {
       if (!(await page.locator('#plugin-drawer.open').count())) {
         await page.locator('#drawer-hamburger').tap();
       }
-      const item = page.locator(`.drawer-item[data-plugin-id="${id}"]`);
-
-      await item.scrollIntoViewIfNeeded();
-      await item.tap();
+      // Items that need a selection first (for example Sensor Info without a sensor) are disabled
+      // in the drawer; a user cannot open them, so there is no menu to measure.
+      if ((await page.locator(`.drawer-item[data-plugin-id="${id}"]`).first().getAttribute('aria-disabled')) === 'true') {
+        continue;
+      }
+      await tapDrawerItem(page, id);
       await transitionsSettled(page);
       const offenders = await page.evaluate(() => {
         const vw = window.innerWidth;

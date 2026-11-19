@@ -1,0 +1,278 @@
+{
+  "chromium": {
+    "CustomSensorPlugin": [
+      {
+        "rule": "overlap",
+        "selector": "#cs-mask | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "chromium@de": {
+    "CustomSensorPlugin": [
+      {
+        "rule": "clipped-text",
+        "selector": "#custom-sensor-menu-content > div.side-menu-title-bar > h5.side-menu-title-text"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-mask | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "chromium@ja": {
+    "CustomSensorPlugin": [
+      {
+        "rule": "clipped-text",
+        "selector": "#custom-sensor-menu-content > div.side-menu-title-bar > h5.side-menu-title-text"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "chromium@longest": {
+    "BreakupAnalysis": [
+      {
+        "rule": "clipped-text",
+        "selector": "#breakup-analysis-live-selected-btn > span.kt-action-label"
+      }
+    ],
+    "CustomSensorPlugin": [
+      {
+        "rule": "clipped-text",
+        "selector": "#custom-sensor-menu-content > div.side-menu-title-bar > h5.side-menu-title-text"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-mask | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "laptop": {
+    "CustomSensorPlugin": [
+      {
+        "rule": "overlap",
+        "selector": "#cs-maxaz | #cs-submit"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-minaz | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "laptop@de": {
+    "CustomSensorPlugin": [
+      {
+        "rule": "clipped-text",
+        "selector": "#custom-sensor-menu-content > div.side-menu-title-bar > h5.side-menu-title-text"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-maxaz | #cs-submit"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-minaz | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "laptop@ja": {
+    "CustomSensorPlugin": [
+      {
+        "rule": "clipped-text",
+        "selector": "#custom-sensor-menu-content > div.side-menu-title-bar > h5.side-menu-title-text"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-maxaz | #cs-submit"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-minaz | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "laptop@longest": {
+    "BreakupAnalysis": [
+      {
+        "rule": "clipped-text",
+        "selector": "#breakup-analysis-live-selected-btn > span.kt-action-label"
+      }
+    ],
+    "CustomSensorPlugin": [
+      {
+        "rule": "clipped-text",
+        "selector": "#custom-sensor-menu-content > div.side-menu-title-bar > h5.side-menu-title-text"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-maxaz | #cs-submit"
+      },
+      {
+        "rule": "overlap",
+        "selector": "#cs-minaz | #cs-submit"
+      }
+    ],
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "phone": {
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "phone-narrow": {
+    "(chrome)": [
+      {
+        "rule": "chrome-topbar-overlap",
+        "selector": "[search results] #datetime-status | #search"
+      },
+      {
+        "rule": "overlap",
+        "selector": "[top bar and info box] #sat-watchlist-toggle | #sat-manage-lists"
+      }
+    ]
+  },
+  "phone@de": {
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "phone@ja": {
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  },
+  "phone@longest": {
+    "KtocNoticesPlugin": [
+      {
+        "rule": "bare-select",
+        "selector": "#ktoc-notices-type-filter"
+      }
+    ],
+    "SensorInfoPlugin": [
+      {
+        "rule": "raw-key",
+        "selector": "#sensor-source > a"
+      }
+    ]
+  }
+}

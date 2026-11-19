@@ -1,0 +1,30 @@
+{
+  "chromium": {
+    "shots": [
+      "scene-camera-astronomy",
+      "scene-camera-fps",
+      "scene-camera-planetarium",
+      "scene-camera-sat-eci",
+      "scene-camera-sat-first-person",
+      "scene-camera-sat-lvlh",
+      "scene-closest-zoom-on-satellite",
+      "scene-earth-clouds-off",
+      "scene-earth-clouds-on",
+      "scene-earth-day",
+      "scene-earth-default-iss",
+      "scene-earth-night",
+      "scene-earth-zoom-far",
+      "scene-earth-zoom-near",
+      "scene-graphics-ambient-lighting-off",
+      "scene-graphics-black-earth",
+      "scene-graphics-dim-orbit-in-eclipse-off",
+      "scene-graphics-graticule",
+      "scene-graphics-grayscale-earth",
+      "scene-graphics-night-as-day",
+      "scene-graphics-political-map-off",
+      "scene-sensor-high-lat-3d",
+      "scene-sensor-mid-lat-3d"
+    ],
+    "flaky": []
+  }
+}

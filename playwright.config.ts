@@ -1,9 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
+import { viewportUse } from './test/e2e/viewports';
 
 // Use SwiftShader software GL in CI (no GPU available); real GPU locally for headed mode
 const chromiumArgs = process.env.CI
   ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-webgl']
   : ['--enable-webgl'];
+
+// Port of the server under test. A runner that builds its own dist/ sets KEEPTRACK_DEV_PORT so it never
+// touches the shared dev server on 5544 (build/dev-server.ts reads the same variable).
+const PORT = Number(process.env.KEEPTRACK_DEV_PORT ?? 5544);
 
 export default defineConfig({
   testDir: './src',
@@ -24,7 +29,7 @@ export default defineConfig({
     timeout: 10_000,
   },
   use: {
-    baseURL: 'http://localhost:5544',
+    baseURL: `http://localhost:${PORT}`,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',
@@ -39,10 +44,40 @@ export default defineConfig({
         },
       },
     },
+    // Viewport projects (#614) run only specs tagged @viewports, so functional specs do not triple.
+    // Sizes come from test/e2e/viewports.json; the phone user agent switches the app into mobile mode.
+    {
+      name: 'laptop',
+      grep: /@viewports/u,
+      use: {
+        ...devices['Desktop Chrome'],
+        ...viewportUse('laptop'),
+        launchOptions: { args: chromiumArgs },
+      },
+    },
+    {
+      name: 'phone',
+      grep: /@viewports/u,
+      use: {
+        ...devices['Desktop Chrome'],
+        ...viewportUse('phone'),
+        launchOptions: { args: chromiumArgs },
+      },
+    },
+    // 360 px phone (#614): only specs tagged @narrow, the core chrome checks.
+    {
+      name: 'phone-narrow',
+      grep: /@narrow/u,
+      use: {
+        ...devices['Desktop Chrome'],
+        ...viewportUse('phone-narrow'),
+        launchOptions: { args: chromiumArgs },
+      },
+    },
   ],
   webServer: {
     command: 'npm run start:ci',
-    url: 'http://localhost:5544',
+    url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
   },

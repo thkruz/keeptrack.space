@@ -1,0 +1,59 @@
+---
+name: E2E Request
+
+# Asks the private Pro repo to run the full Playwright suite on the local GPU runner ("Venus") for this
+# PR's head commit. This workflow only sends a commit SHA and a PR number. It never checks out or runs
+# PR code, so a fork PR cannot reach the self-hosted runner. The result comes back as the commit status
+# `e2e/local` (posted by the Pro repo's e2e-local workflow). Setup: src/plugins-pro/scripts/e2e-runner/README.md
+
+"on":
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Commit SHA to test (default is the SHA this run was started on)
+        required: false
+        type: string
+      pr:
+        description: PR number, for the superseded check (optional)
+        required: false
+        type: string
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+
+permissions: {}
+
+jobs:
+  request:
+    name: Queue local e2e run
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # Same-repo, non-draft PRs only (or a manual run by someone with write access).
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.draft == false)
+    steps:
+      - name: Start the e2e-local workflow in the Pro repo
+        env:
+          GH_TOKEN: ${{ secrets.KT_E2E_DISPATCH_TOKEN }}
+          REQ_SHA: ${{ github.event.pull_request.head.sha || inputs.sha || github.sha }}
+          REQ_PR: ${{ github.event.pull_request.number || inputs.pr }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "::error::Secret KT_E2E_DISPATCH_TOKEN is empty. Create it as described in src/plugins-pro/scripts/e2e-runner/README.md."
+            exit 1
+          fi
+          if ! printf '%s' "$REQ_SHA" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::Not a full commit SHA: $REQ_SHA"
+            exit 1
+          fi
+          # workflow_dispatch needs only Actions write on the Pro repo; repository_dispatch would
+          # need Contents write, which is more than this token should hold.
+          gh api --method POST repos/thkruz/keeptrack-space-pro/actions/workflows/e2e-local.yml/dispatches \
+            -f ref=main \
+            -f "inputs[sha]=$REQ_SHA" \
+            -f "inputs[pr]=$REQ_PR" \
+            -f "inputs[suite]=full"
+          echo "Queued e2e-local for $REQ_SHA (PR ${REQ_PR:-none})"

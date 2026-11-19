@@ -121,7 +121,7 @@
     "@semantic-release/github": "^12.0.10",
     "@semantic-release/npm": "^13.2.0",
     "@semantic-release/release-notes-generator": "^14.1.1",
-    "@testing-library/dom": "^9.3.3",
+    "@testing-library/dom": "^10.4.2",
     "@testing-library/user-event": "^14.6.9",
     "@types/agent-base": "^4.2.2",
     "@types/dotenv-webpack": "^7.0.8",

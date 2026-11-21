@@ -15,6 +15,7 @@ import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-man
 import { KM_PER_AU, LandObject, Satellite, SpaceObjectType, Star, spaceObjType2Str } from '@ootk/src/main';
 import i18next from 'i18next';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
+import { escapeHtml } from '../../engine/utils/escape-html';
 import { getEl } from '../../engine/utils/get-el';
 import { LaunchSite } from '../data/catalog-manager/LaunchFacility';
 import { MissileObject } from '../data/catalog-manager/MissileObject';
@@ -275,7 +276,7 @@ export class HoverManager {
   }
 
   private missile_(missile: MissileObject) {
-    this.satHoverBoxNode1.innerHTML = `<span>${missile.name}</span><span>${missile.desc}</span>`;
+    this.satHoverBoxNode1.innerHTML = `<span>${escapeHtml(missile.name)}</span><span>${escapeHtml(missile.desc)}</span>`;
     this.satHoverBoxNode2.textContent = '';
     this.satHoverBoxNode2.style.display = 'none';
     this.satHoverBoxNode3.textContent = '';
@@ -316,7 +317,7 @@ export class HoverManager {
 
       this.satHoverBoxNode1.innerHTML = html`
         <span id="hoverbox-fi"></span>
-        <span>${sat.name}</span>
+        <span>${escapeHtml(sat.name)}</span>
         <span style='color:${color};'>${confidenceScoreString}</span>
       `;
 
@@ -353,7 +354,7 @@ export class HoverManager {
 
     this.satHoverBoxNode3.innerHTML = html`
         <span id="hoverbox-fi"></span>
-        <span>${country}</span>
+        <span>${escapeHtml(country)}</span>
       `;
 
     getEl('hoverbox-fi')!.classList.value = `fi ${country2flagIcon(sat.country)}`;

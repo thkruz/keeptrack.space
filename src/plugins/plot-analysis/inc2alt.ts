@@ -12,6 +12,7 @@ import * as echarts from 'echarts';
 import 'echarts-gl';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './inc2alt.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 // Constellation detection patterns
 const CONSTELLATION_PATTERNS: { name: string; regex: RegExp }[] = [
@@ -371,10 +372,10 @@ export class Inc2AltPlots extends KeepTrackPlugin {
             <div style="text-align: left;">
               <div style="display: flex; align-items: center; margin-bottom: 5px;">
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
-                <span style="font-weight: bold;">${d.name}</span>
+                <span style="font-weight: bold;">${escapeHtml(d.name)}</span>
               </div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.constellation')}:</b> ${d.constellation === 'Other' ? t7e('plugins.Inc2AltPlots.chart.other') : d.constellation}</div>
-              <div><b>${t7e('plugins.Inc2AltPlots.chart.country')}:</b> ${d.country || t7e('plugins.Inc2AltPlots.chart.unknown')}</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.country')}:</b> ${d.country ? escapeHtml(d.country) : t7e('plugins.Inc2AltPlots.chart.unknown')}</div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.altitude')}:</b> ${d.value[0].toFixed(0)} km</div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.inclination')}:</b> ${d.value[1].toFixed(2)}°</div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.period')}:</b> ${d.value[2].toFixed(1)} min</div>

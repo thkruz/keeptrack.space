@@ -17,6 +17,7 @@ import { BaseObject, Satellite, SpaceObjectType, Star, ZoomValue } from '@ootk/s
 import searchPng from '@public/img/icons/search.png';
 import { userActionGate } from '../../engine/core/user-action-gate';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
+import { escapeHtml } from '../../engine/utils/escape-html';
 import { getEl } from '../../engine/utils/get-el';
 import { slideInDown, slideOutUp } from '../../engine/utils/slide';
 import { TopMenu } from '../../plugins/top-menu/top-menu';
@@ -757,7 +758,16 @@ export class SearchManager {
       return '';
     }
 
-    return ` <span class="search-partial-badge search-module-note">${t7e('searchManager.dockedTo').replace('{host}', hostLabel)}</span>`;
+    return ` <span class="search-partial-badge search-module-note">${t7e('searchManager.dockedTo').replace('{host}', escapeHtml(hostLabel))}</span>`;
+  }
+
+  /** Escapes a catalog string and wraps the matched slice in a highlight span. Slices are taken before escaping so entities stay whole. */
+  private static highlightHtml_(text: string, strIndex: number, patlen: number): string {
+    const pre = text.substring(0, strIndex);
+    const match = text.substring(strIndex, strIndex + patlen);
+    const post = text.substring(strIndex + patlen);
+
+    return `${escapeHtml(pre)}<span class="search-hilight">${escapeHtml(match)}</span>${escapeHtml(post)}`;
   }
 
   private static isNameHighlightType_(searchType: SearchResultType): boolean {
@@ -813,45 +823,31 @@ export class SearchManager {
       // A module row carries a note that has to be readable in full, so it wraps instead of truncating.
       html += result.searchType === SearchResultType.MODULE || isDocked(obj.id) ? '<div class="truncate-search search-module-row">' : '<div class="truncate-search">';
 
-      // Left half of search results
+      // Left half of search results. Every catalog string is escaped: names and ids can come from an external catalog (?tle=).
       if (obj.isMissile()) {
-        html += obj.name;
+        html += escapeHtml(obj.name);
       } else if (SearchManager.isNameHighlightType_(result.searchType)) {
         // If the name matched - highlight it
-        html += obj.name.substring(0, result.strIndex);
-        html += '<span class="search-hilight">';
-        html += obj.name.substring(result.strIndex, result.strIndex + result.patlen);
-        html += '</span>';
-        html += obj.name.substring(result.strIndex + result.patlen);
+        html += SearchManager.highlightHtml_(obj.name, result.strIndex, result.patlen);
       } else if (obj.isSatellite() && result.searchType === SearchResultType.ALT_NAME) {
-        const sat = obj as Satellite;
-
         // If the alternate name matched - highlight it
-        html += sat.altName.substring(0, result.strIndex);
-        html += '<span class="search-hilight">';
-        html += sat.altName.substring(result.strIndex, result.strIndex + result.patlen);
-        html += '</span>';
-        html += sat.altName.substring(result.strIndex + result.patlen);
+        html += SearchManager.highlightHtml_((obj as Satellite).altName, result.strIndex, result.patlen);
       } else if (result.searchType === SearchResultType.ALIAS) {
         const alias = getSearchAlias(obj.id) ?? '';
 
         // An alias matched: show the name, then the alias with the match highlighted
-        html += `${obj.name} (${alias.substring(0, result.strIndex)}`;
-        html += '<span class="search-hilight">';
-        html += alias.substring(result.strIndex, result.strIndex + result.patlen);
-        html += '</span>';
-        html += `${alias.substring(result.strIndex + result.patlen)})`;
+        html += `${escapeHtml(obj.name)} (${SearchManager.highlightHtml_(alias, result.strIndex, result.patlen)})`;
       } else if (result.searchType === SearchResultType.MODULE) {
         // A merged station module matched: show the host row with a hint that the module is part of it
         const hostLabel = getHostLabel(String((obj as Satellite).sccNum));
         const hint = t7e('searchManager.moduleOf' as TranslationKey)
-          .replace('{module}', `${result.moduleName ?? ''} ${result.moduleScc ?? ''}`.trim())
-          .replace('{host}', hostLabel);
+          .replace('{module}', escapeHtml(`${result.moduleName ?? ''} ${result.moduleScc ?? ''}`.trim()))
+          .replace('{host}', escapeHtml(hostLabel));
 
-        html += `${obj.name} <span class="search-partial-badge search-module-note">${hint}</span>`;
+        html += `${escapeHtml(obj.name)} <span class="search-partial-badge search-module-note">${hint}</span>`;
       } else {
         // If not, just write the name
-        html += obj.name;
+        html += escapeHtml(obj.name);
       }
       html += SearchManager.dockedNoteHtml_(obj.id, result.searchType);
       html += '</div>';
@@ -867,11 +863,7 @@ export class SearchManager {
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += sat.sccNum.substring(0, result.strIndex);
-            html += '<span class="search-hilight">';
-            html += sat.sccNum.substring(result.strIndex, result.strIndex + result.patlen);
-            html += '</span>';
-            html += sat.sccNum.substring(result.strIndex + result.patlen);
+            html += SearchManager.highlightHtml_(sat.sccNum, result.strIndex, result.patlen);
             if (result.partial) {
               html += `<span class="search-partial-badge">${t7e('searchManager.partialMatch' as TranslationKey)}</span>`;
             }
@@ -886,11 +878,7 @@ export class SearchManager {
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += a5.substring(0, result.strIndex);
-            html += '<span class="search-hilight">';
-            html += a5.substring(result.strIndex, result.strIndex + result.patlen);
-            html += '</span>';
-            html += a5.substring(result.strIndex + result.patlen);
+            html += SearchManager.highlightHtml_(a5, result.strIndex, result.patlen);
             if (result.partial) {
               html += `<span class="search-partial-badge">${t7e('searchManager.partialMatch' as TranslationKey)}</span>`;
             }
@@ -905,11 +893,7 @@ export class SearchManager {
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += intlDes.substring(0, result.strIndex);
-            html += '<span class="search-hilight">';
-            html += intlDes.substring(result.strIndex, result.strIndex + result.patlen);
-            html += '</span>';
-            html += intlDes.substring(result.strIndex + result.patlen);
+            html += SearchManager.highlightHtml_(intlDes, result.strIndex, result.patlen);
           }
           break;
         case SearchResultType.BUS:
@@ -920,11 +904,7 @@ export class SearchManager {
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += sat.bus.substring(0, result.strIndex);
-            html += '<span class="search-hilight">';
-            html += sat.bus.substring(result.strIndex, result.strIndex + result.patlen);
-            html += '</span>';
-            html += sat.bus.substring(result.strIndex + result.patlen);
+            html += SearchManager.highlightHtml_(sat.bus, result.strIndex, result.patlen);
           }
           break;
         case SearchResultType.LAUNCH_VEHICLE:
@@ -934,42 +914,38 @@ export class SearchManager {
             result.strIndex = result.strIndex || 0;
             result.patlen = result.patlen || 5;
 
-            html += sat.launchVehicle.substring(0, result.strIndex);
-            html += '<span class="search-hilight">';
-            html += sat.launchVehicle.substring(result.strIndex, result.strIndex + result.patlen);
-            html += '</span>';
-            html += sat.launchVehicle.substring(result.strIndex + result.patlen);
+            html += SearchManager.highlightHtml_(sat.launchVehicle, result.strIndex, result.patlen);
           }
           break;
         case SearchResultType.MISSILE:
           {
             const misl = obj as MissileObject;
 
-            html += misl.desc;
+            html += escapeHtml(misl.desc);
           }
           break;
         case SearchResultType.STAR:
           html += t7e('searchManager.typeStar' as TranslationKey);
           break;
         case SearchResultType.SENSOR:
-          html += (obj as unknown as DetailedSensor).country ?? t7e('searchManager.typeSensor' as TranslationKey);
+          html += escapeHtml((obj as unknown as DetailedSensor).country ?? t7e('searchManager.typeSensor' as TranslationKey));
           break;
         case SearchResultType.LAUNCH_SITE:
-          html += (obj as unknown as LaunchSite).country ?? t7e('searchManager.typeLaunchSite' as TranslationKey);
+          html += escapeHtml((obj as unknown as LaunchSite).country ?? t7e('searchManager.typeLaunchSite' as TranslationKey));
           break;
         case SearchResultType.PLANET:
           html += t7e('searchManager.typePlanet' as TranslationKey);
           break;
         default:
           if (obj instanceof MissileObject) {
-            html += obj.desc;
+            html += escapeHtml(obj.desc);
           } else if (obj instanceof Star) {
             html += t7e('searchManager.typeStar' as TranslationKey);
           } else if (obj instanceof OemSatellite) {
             // A NORAD id (mission catalog or OEM comment) is shown like any catalog row; otherwise the OEM OBJECT_ID.
-            html += (obj as OemSatellite).sccNum || (obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID;
+            html += escapeHtml((obj as OemSatellite).sccNum || ((obj as OemSatellite).OemDataBlocks[0]?.metadata.OBJECT_ID ?? ''));
           } else {
-            html += (obj as Satellite).sccNum;
+            html += escapeHtml((obj as Satellite).sccNum);
           }
           break;
       }

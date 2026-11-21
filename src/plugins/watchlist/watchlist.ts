@@ -59,6 +59,7 @@ import { EL as SAT_INFO_EL } from '../sat-info-box/sat-info-box-html';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { TopMenu } from '../top-menu/top-menu';
 import './watchlist.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 export interface UpdateWatchlistParams {
   updateWatchlistList?: { id: number; inView: boolean }[];
@@ -719,10 +720,10 @@ export class WatchlistPlugin extends KeepTrackPlugin implements ISettingsContrib
       watchlistListHTML += `
         <div class="row">
           <div class="col s3 m3 l3">
-            <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${sat.sccNum}</span>
+            <span class="sat-sccnum" data-sat-sccnum="${sat.id}" style="cursor: pointer;">${escapeHtml(String(sat.sccNum ?? ''))}</span>
           </div>
           <div class="col s5 m5 l5">
-             <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name || t7e('Common.unknown')}</span>
+             <span class="sat-name" data-sat-name="${sat.id}" style="cursor: pointer;">${sat.name ? escapeHtml(sat.name) : t7e('Common.unknown')}</span>
           </div>
           <div class="col s2 m2 l2">
             <span class="watchlist-age${staleClass}" data-sat-age="${sat.id}"${ageTip}>${ageText}</span>

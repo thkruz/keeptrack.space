@@ -659,7 +659,7 @@ export class SatelliteFov extends KeepTrackPlugin {
     const isSelected = currentSat && mesh.obj.id === currentSat.id;
     const sourceName = mesh.obj.name;
     const targetName = mesh.targetObj?.name ?? t7e('Common.unknown');
-    const label = `${sourceName} → ${targetName}`;
+    const label = `${escapeHtml(sourceName)} → ${escapeHtml(targetName)}`;
     const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${label}</span>` : html`<span>${label}</span>`;
 
     return html`

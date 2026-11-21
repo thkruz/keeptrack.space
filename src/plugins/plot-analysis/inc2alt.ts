@@ -375,7 +375,7 @@ export class Inc2AltPlots extends KeepTrackPlugin {
                 <span style="font-weight: bold;">${escapeHtml(d.name)}</span>
               </div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.constellation')}:</b> ${d.constellation === 'Other' ? t7e('plugins.Inc2AltPlots.chart.other') : d.constellation}</div>
-              <div><b>${t7e('plugins.Inc2AltPlots.chart.country')}:</b> ${d.country || t7e('plugins.Inc2AltPlots.chart.unknown')}</div>
+              <div><b>${t7e('plugins.Inc2AltPlots.chart.country')}:</b> ${d.country ? escapeHtml(d.country) : t7e('plugins.Inc2AltPlots.chart.unknown')}</div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.altitude')}:</b> ${d.value[0].toFixed(0)} km</div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.inclination')}:</b> ${d.value[1].toFixed(2)}°</div>
               <div><b>${t7e('plugins.Inc2AltPlots.chart.period')}:</b> ${d.value[2].toFixed(1)} min</div>

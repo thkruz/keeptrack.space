@@ -482,7 +482,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
       const missile = obj as MissileObject;
 
       missile.launchVehicle = missile.desc.split('(')[1].split(')')[0]; // Remove the () from the booster type
-      satVehicleDom.innerHTML = missile.launchVehicle;
+      satVehicleDom.innerHTML = escapeHtml(missile.launchVehicle);
     } else {
       const sat = obj as Satellite;
 

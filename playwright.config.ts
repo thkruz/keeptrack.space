@@ -30,6 +30,8 @@ export default defineConfig({
   },
   use: {
     baseURL: `http://localhost:${PORT}`,
+    // Keep production API requests visible to the shared fixture's local-only guard.
+    serviceWorkers: 'block',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',

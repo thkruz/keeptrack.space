@@ -882,6 +882,36 @@ describe('SearchManager interactions', () => {
     expect(document.getElementById('search-results')!.querySelector('.search-result-count')!.textContent).toContain('50');
   });
 
+  it('fillResultBox escapes catalog strings instead of rendering them as markup', () => {
+    // Names from an external ?tle= catalog reach the result box verbatim.
+    const payload = '<img src=x onerror="window.__ktXss=1">';
+    const sat = new Satellite({ ...defaultSat, id: 0, name: `EVIL ${payload}`, sccNum: '25544', intlDes: '1998-067A', launchVehicle: `LV ${payload}` });
+
+    Object.assign(sat, { altName: `ALT ${payload}`, bus: `BUS ${payload}` });
+    ServiceLocator.getCatalogManager().objectCache = [sat] as never;
+    ServiceLocator.getDotsManager().positionData = null as never;
+    const results = [
+      { id: 0, searchType: SearchResultType.OBJECT_NAME, strIndex: 0, patlen: 7 },
+      { id: 0, searchType: SearchResultType.ALT_NAME, strIndex: 0, patlen: 6 },
+      { id: 0, searchType: SearchResultType.BUS, strIndex: 0, patlen: 6 },
+      { id: 0, searchType: SearchResultType.LAUNCH_VEHICLE, strIndex: 0, patlen: 6 },
+      { id: 0, searchType: SearchResultType.MODULE, strIndex: 0, patlen: 5, moduleName: payload, moduleScc: '26400' },
+    ];
+
+    mgr.fillResultBox(results, ServiceLocator.getCatalogManager(), results.length);
+    const box = document.getElementById('search-results')!;
+    const rows = box.querySelectorAll('.search-result');
+
+    expect(box.querySelector('img')).toBeNull();
+    // The matched slice is still highlighted, and the full name reads back as plain text.
+    expect(rows[0].querySelector('.search-hilight')!.textContent).toBe('EVIL <i');
+    expect(rows[0].querySelector('.truncate-search')!.textContent).toBe(`EVIL ${payload}`);
+    expect(rows[1].querySelector('.truncate-search')!.textContent).toBe(`ALT ${payload}`);
+    expect(rows[2].querySelector('.search-result-scc')!.textContent).toBe(`BUS ${payload}`);
+    expect(rows[3].querySelector('.search-result-scc')!.textContent).toBe(`LV ${payload}`);
+    expect(rows[4].querySelector('.search-module-note')!.textContent).toContain(payload);
+  });
+
   it('fillResultBox renders a module row whose note wraps instead of truncating (#461)', () => {
     const sat = new Satellite({ ...defaultSat, id: 0, name: 'ISS (ZARYA)', sccNum: '25544' });
 

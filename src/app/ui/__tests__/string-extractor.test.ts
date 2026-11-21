@@ -139,4 +139,8 @@ describe('StringExtractor_more', () => {
   it('extractUserUrl returns the label when no url is known', () => {
     expect(StringExtractor.extractUserUrl('Mystery User', 'Display')).toBe('Display');
   });
+
+  it('extractLiftVehicle escapes an unknown vehicle name instead of returning markup', () => {
+    expect(StringExtractor.extractLiftVehicle('<img src=x onerror="alert(1)">')).toBe('&lt;img src=x onerror=&quot;alert(1)&quot;&gt;');
+  });
 });

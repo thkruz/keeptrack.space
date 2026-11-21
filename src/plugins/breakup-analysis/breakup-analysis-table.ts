@@ -13,6 +13,7 @@
  */
 
 import { html } from '@app/engine/utils/development/formatter';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 import { Satellite } from '@ootk/src/main';
 import { EventSummary, FragmentSortKey, isLikelyDecayed, LIKELY_DECAYED_EPOCH_AGE_DAYS, LIKELY_DECAYED_PERIGEE_KM, SortDir } from './breakup-analysis-core';
 import { BreakupEvent } from './breakup-events';
@@ -284,7 +285,7 @@ export const buildFragmentTable = (sats: Satellite[], opts: FragmentTableOptions
     rows += html`
       <tr class="${rowClass}" data-scc="${sat.sccNum}">
         <td>${sat.sccNum}</td>
-        <td class="ba-cell-left">${sat.name}${tag}</td>
+        <td class="ba-cell-left">${escapeHtml(sat.name)}${tag}</td>
         <td>${sat.getTypeString()}</td>
         <td>${sat.perigee.toFixed(0)}</td>
         <td>${sat.apogee.toFixed(0)}</td>

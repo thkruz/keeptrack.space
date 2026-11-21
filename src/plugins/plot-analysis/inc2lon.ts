@@ -16,6 +16,7 @@ import 'echarts-gl';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { PlotWatermark } from './plot-download';
 import './inc2lon.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 type T7eKey = Parameters<typeof t7e>[0];
 
@@ -278,7 +279,7 @@ export class Inc2LonPlots extends KeepTrackPlugin {
             <div style="text-align: left;">
               <div style="display: flex; align-items: center; margin-bottom: 5px;">
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-right: 5px;"></div>
-                <span style="font-weight: bold;">${d.name}</span>
+                <span style="font-weight: bold;">${escapeHtml(d.name)}</span>
               </div>
               <div><b>${t7e('plugins.Inc2LonPlots.chart.inclination')}:</b> ${d.value[1].toFixed(3)}\u00B0</div>
               <div><b>${t7e('plugins.Inc2LonPlots.chart.longitude')}:</b> ${d.value[0].toFixed(3)}\u00B0</div>

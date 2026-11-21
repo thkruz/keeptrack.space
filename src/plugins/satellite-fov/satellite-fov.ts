@@ -41,6 +41,7 @@ const l = (key: string): string => t7e(`plugins.SatelliteFov.${key}` as Paramete
 
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './satellite-fov.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 const SAT_FOV_TABS_ID = 'sat-fov-tabs';
 
@@ -639,7 +640,7 @@ export class SatelliteFov extends KeepTrackPlugin {
   private static renderEarthCenterConeRow_(mesh: ConeMesh): string {
     const currentSat = PluginRegistry.getPlugin(SelectSatManager)?.getSelectedSat();
     const isSelected = currentSat && mesh.obj.id === currentSat.id;
-    const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${mesh.obj.name}</span>` : html`<span>${mesh.obj.name}</span>`;
+    const nameSpan = isSelected ? html`<span style="color: var(--color-dark-text-accent);">${escapeHtml(mesh.obj.name)}</span>` : html`<span>${escapeHtml(mesh.obj.name)}</span>`;
 
     return html`
     <div class="link" style="display: flex; align-items: center;margin: 0rem 1rem;justify-content: space-around;">

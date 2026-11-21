@@ -25,6 +25,7 @@ import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import { getObjectSummaryKey, getProvidedObjectSummary } from './object-summary';
 import { EL, SECTIONS } from './sat-info-box-object-html';
 import './sat-info-box-object.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 /** Sorts right after the title header (order 0) and before the Actions section and every other section. */
 const SUMMARY_ORDER_ = 0.5;
@@ -485,7 +486,7 @@ export class SatInfoBoxObject extends KeepTrackPlugin implements ISettingsMultiC
     } else {
       const sat = obj as Satellite;
 
-      satVehicleDom.innerHTML = sat.launchVehicle; // Set to JSON record
+      satVehicleDom.innerHTML = escapeHtml(sat.launchVehicle ?? ''); // Set to JSON record
       if (sat.launchVehicle === 'U') {
         satVehicleDom.innerHTML = t7e('SatInfoBoxObject.unknown');
       } // Replace with Unknown if necessary

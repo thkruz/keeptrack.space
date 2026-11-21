@@ -137,7 +137,7 @@
     "@typescript/native-preview": "7.0.0-dev.20260707.2",
     "@vitest/coverage-v8": "^4.0.18",
     "auto-changelog-thkruz": "^1.0.0",
-    "conventional-changelog-conventionalcommits": "^10.4.1",
+    "conventional-changelog-conventionalcommits": "9.3.1",
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.5",
     "dotenv-webpack": "^9.0.0",

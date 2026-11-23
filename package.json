@@ -111,7 +111,7 @@
     "url": "git+https://github.com/thkruz/keeptrack.space.git"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.6",
+    "@biomejs/biome": "2.6.8",
     "@playwright/test": "^1.65.0",
     "@rspack/cli": "2.0.8",
     "@rspack/core": "2.0.8",

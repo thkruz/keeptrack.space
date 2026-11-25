@@ -1,0 +1,283 @@
+{
+  "viewport": {
+    "w": 1366,
+    "h": 768
+  },
+  "clean": {
+    "docOverflowX": 0,
+    "elements": [
+      {
+        "selector": "#menu",
+        "rect": {
+          "x": 100,
+          "y": 50,
+          "w": 300,
+          "h": 400
+        }
+      },
+      {
+        "selector": "#menu > .a",
+        "parent": 0,
+        "rect": {
+          "x": 100,
+          "y": 50,
+          "w": 300,
+          "h": 40
+        },
+        "hasText": true
+      },
+      {
+        "selector": "#menu > .b",
+        "parent": 0,
+        "rect": {
+          "x": 100,
+          "y": 100,
+          "w": 300,
+          "h": 40
+        },
+        "isControl": true,
+        "hit": {
+          "by": null,
+          "relation": "self"
+        },
+        "hasText": true
+      }
+    ]
+  },
+  "offscreen": {
+    "docOverflowX": 120,
+    "elements": [
+      {
+        "selector": "#wide",
+        "rect": {
+          "x": 1300,
+          "y": 10,
+          "w": 200,
+          "h": 30
+        }
+      },
+      {
+        "selector": "#inside-scroller",
+        "inScroller": true,
+        "rect": {
+          "x": 1300,
+          "y": 10,
+          "w": 200,
+          "h": 30
+        }
+      },
+      {
+        "selector": "#past-clip",
+        "clipX": [
+          100,
+          400
+        ],
+        "rect": {
+          "x": 150,
+          "y": 10,
+          "w": 600,
+          "h": 30
+        }
+      },
+      {
+        "selector": "#in-clip",
+        "clipX": [
+          100,
+          400
+        ],
+        "rect": {
+          "x": 150,
+          "y": 50,
+          "w": 200,
+          "h": 30
+        }
+      }
+    ]
+  },
+  "clipped": {
+    "docOverflowX": 0,
+    "elements": [
+      {
+        "selector": "#clip",
+        "hasText": true,
+        "overflowX": "hidden",
+        "scrollW": 220,
+        "clientW": 100,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 100,
+          "h": 20
+        }
+      },
+      {
+        "selector": "#ellipsis",
+        "hasText": true,
+        "overflowX": "hidden",
+        "textOverflow": "ellipsis",
+        "scrollW": 220,
+        "clientW": 100,
+        "rect": {
+          "x": 0,
+          "y": 30,
+          "w": 100,
+          "h": 20
+        }
+      },
+      {
+        "selector": "#select",
+        "hasText": true,
+        "overflowX": "hidden",
+        "selfOverflowExempt": true,
+        "scrollW": 220,
+        "clientW": 100,
+        "rect": {
+          "x": 0,
+          "y": 60,
+          "w": 100,
+          "h": 20
+        }
+      }
+    ]
+  },
+  "overlap": {
+    "docOverflowX": 0,
+    "elements": [
+      {
+        "selector": "#row",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 400,
+          "h": 100
+        }
+      },
+      {
+        "selector": "#row > .l",
+        "parent": 0,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 200,
+          "h": 30
+        }
+      },
+      {
+        "selector": "#row > .r",
+        "parent": 0,
+        "rect": {
+          "x": 150,
+          "y": 0,
+          "w": 200,
+          "h": 30
+        }
+      },
+      {
+        "selector": "#row > .abs",
+        "parent": 0,
+        "position": "absolute",
+        "rect": {
+          "x": 150,
+          "y": 0,
+          "w": 200,
+          "h": 30
+        }
+      },
+      {
+        "selector": "#row > .next",
+        "parent": 0,
+        "rect": {
+          "x": 0,
+          "y": 40,
+          "w": 200,
+          "h": 30
+        }
+      }
+    ]
+  },
+  "occluded": {
+    "docOverflowX": 0,
+    "elements": [
+      {
+        "selector": "#ok",
+        "isControl": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 80,
+          "h": 40
+        },
+        "hit": {
+          "by": null,
+          "relation": "descendant"
+        }
+      },
+      {
+        "selector": "#covered",
+        "isControl": true,
+        "rect": {
+          "x": 0,
+          "y": 50,
+          "w": 80,
+          "h": 40
+        },
+        "hit": {
+          "by": "#overlay",
+          "relation": "other"
+        }
+      }
+    ]
+  },
+  "tap": {
+    "docOverflowX": 0,
+    "elements": [
+      {
+        "selector": "#small",
+        "isControl": true,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "w": 30,
+          "h": 30
+        },
+        "hit": {
+          "by": null,
+          "relation": "self"
+        }
+      },
+      {
+        "selector": "#big",
+        "isControl": true,
+        "rect": {
+          "x": 0,
+          "y": 50,
+          "w": 120,
+          "h": 48
+        },
+        "hit": {
+          "by": null,
+          "relation": "self"
+        }
+      },
+      {
+        "selector": "#zero",
+        "hasText": true,
+        "rect": {
+          "x": 0,
+          "y": 100,
+          "w": 0,
+          "h": 0
+        }
+      },
+      {
+        "selector": "#empty-div",
+        "rect": {
+          "x": 0,
+          "y": 100,
+          "w": 0,
+          "h": 0
+        }
+      }
+    ]
+  }
+}

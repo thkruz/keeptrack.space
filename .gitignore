@@ -302,3 +302,6 @@ src/plugins-pro/data/optical/
 # Codex bridge (local agent config)
 .codex/
 AGENTS.md
+
+# quality gates baseline output (local only)
+.metrics/

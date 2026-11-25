@@ -1,0 +1,32 @@
+{
+  "_note": "Starting rules from quality-gates-plan.md. None is confirmed with Ted yet, so violations report as warn ('unconfirmed rule') and never fail. Set confirmed:true per rule once agreed. Globs: ** any depth, * within one segment, paths repo-relative. 'to' is matched against the resolved import path (alias-expanded) or the raw specifier for packages.",
+  "rules": [
+    {
+      "id": "engine-never-imports-plugins",
+      "description": "The engine (src/engine, excluding ootk) never imports plugins.",
+      "from": ["src/engine/**"],
+      "exceptFrom": ["src/engine/ootk/**"],
+      "to": ["src/plugins/**", "src/plugins-pro/**", "src/plugins-external/**"],
+      "exceptTo": [],
+      "confirmed": false
+    },
+    {
+      "id": "nothing-outside-plugins-pro-imports-plugins-pro",
+      "description": "Nothing outside plugins-pro imports plugins-pro.",
+      "from": ["src/**"],
+      "exceptFrom": ["src/plugins-pro/**", "src/plugins-pro.d.ts"],
+      "to": ["src/plugins-pro/**"],
+      "exceptTo": [],
+      "confirmed": false
+    },
+    {
+      "id": "plugins-use-plugin-api-only",
+      "description": "Plugins (plugins and plugins-pro) reach the app only through the plugin API (src/plugin-api). Imports of src/app and src/engine are violations.",
+      "from": ["src/plugins/**", "src/plugins-pro/**"],
+      "exceptFrom": [],
+      "to": ["src/app/**", "src/engine/**", "src/keepTrackApi.ts", "src/settings/**"],
+      "exceptTo": ["src/engine/ootk/**"],
+      "confirmed": false
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "Visible esta noche",
+      "title": "Visible esta noche",
+      "useMyLocation": "Usar mi ubicación",
+      "location": {
+        "enter": "Introducir una ubicación",
+        "change": "Cambiar",
+        "apply": "Usar esta ubicación",
+        "current": "Ubicación: {{coords}}",
+        "invalid": "Introduce una latitud entre -90 y 90 y una longitud entre -180 y 180."
+      },
+      "status": {
+        "needLocation": "Descubre qué satélites puedes ver desde donde estás, sin necesidad de telescopio.",
+        "locating": "Buscando tu ubicación…",
+        "denied": "El acceso a la ubicación está desactivado. Permítelo en el navegador o introduce una ubicación.",
+        "searching": "Buscando pases brillantes…",
+        "noCatalog": "El catálogo de satélites todavía se está cargando. Vuelve a intentarlo en un momento.",
+        "staleCatalog": "Los datos de satélites cargados ahora son demasiado antiguos para predecir pases con precisión. Vuelve a intentarlo más tarde.",
+        "ready": "Pasos brillantes en las próximas {{nights}} noches",
+        "none": "No hay pases brillantes sobre ti en las próximas {{nights}} noches. Vuelve a mirar en uno o dos días."
+      },
+      "day": {
+        "today": "Hoy",
+        "tonight": "Esta noche",
+        "tomorrow": "Mañana"
+      },
+      "compass": {
+        "N": "N",
+        "NE": "NE",
+        "E": "E",
+        "SE": "SE",
+        "S": "S",
+        "SW": "SO",
+        "W": "O",
+        "NW": "NO"
+      },
+      "height": {
+        "overhead": "muy alto en el cielo",
+        "upTo": "hasta {{deg}}°"
+      },
+      "path": "sale por el {{from}} → {{height}} → se pone por el {{to}}",
+      "brightness": {
+        "veryBright": "Muy brillante",
+        "bright": "Brillante",
+        "visible": "Visible"
+      },
+      "minutes": "{{minutes}} min",
+      "addToCalendar": "Añadir al calendario",
+      "ics": {
+        "summary": "{{name}} pasa sobre ti",
+        "description": "Mira hacia el {{from}} a las {{time}}. Sube {{height}} y se pone por el {{to}}. {{brightness}}, visible durante unos {{minutes}} min. Una luz que se mueve de forma constante, sin parpadear. De KeepTrack Visible esta noche."
+      },
+      "privacyNote": "Tu ubicación se queda en esta pestaña del navegador y no se guarda ni se envía a ningún sitio. El brillo es una estimación.",
+      "help": {
+        "overview": "Visible esta noche muestra los satélites brillantes, como la Estación Espacial Internacional, que puedes ver desde donde estás en las próximas noches, sin telescopio ni ajustes.",
+        "howToUse": "<ol><li>Abre <strong>Visible esta noche</strong> y toca <strong>Usar mi ubicación</strong>.</li><li>Elige un pase: te dice cuándo, por dónde sale y se pone, y lo brillante que es.</li><li>Toca <strong>Añadir al calendario</strong> para recibir un recordatorio.</li><li>Toca el pase para verlo en KeepTrack.</li></ol>",
+        "tip1": "Los satélites se ven mejor poco después de la puesta de sol o antes del amanecer, cuando tu cielo está oscuro pero ellos siguen iluminados por el Sol.",
+        "tip2": "¿Necesitas más control, como otros sensores o todos los pases? Prueba Mejores pases o Ángulos de Visión."
+      }
+    }
+  }
+}

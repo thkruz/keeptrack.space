@@ -115,6 +115,9 @@ const settingsOverride = {
     MostTracked: {
       enabled: false,
     },
+    VisibleTonight: {
+      enabled: false,
+    },
     StereoMap: {
       enabled: false,
     },

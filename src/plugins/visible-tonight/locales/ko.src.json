@@ -1,0 +1,64 @@
+{
+  "plugins": {
+    "VisibleTonight": {
+      "bottomIconLabel": "오늘 밤 보이는 위성",
+      "title": "오늘 밤 보이는 위성",
+      "useMyLocation": "내 위치 사용",
+      "location": {
+        "enter": "위치 직접 입력",
+        "change": "변경",
+        "apply": "이 위치 사용",
+        "current": "위치: {{coords}}",
+        "invalid": "위도는 -90~90, 경도는 -180~180 사이로 입력하세요."
+      },
+      "status": {
+        "needLocation": "망원경 없이 지금 있는 곳에서 볼 수 있는 위성을 확인하세요.",
+        "locating": "위치를 찾는 중…",
+        "denied": "위치 접근이 꺼져 있습니다. 브라우저에서 허용하거나 위치를 직접 입력하세요.",
+        "searching": "밝은 통과를 찾는 중…",
+        "noCatalog": "위성 카탈로그를 아직 불러오는 중입니다. 잠시 후 다시 시도하세요.",
+        "staleCatalog": "지금 불러온 위성 데이터가 너무 오래되어 정확히 예측할 수 없습니다. 나중에 다시 시도하세요.",
+        "ready": "앞으로 {{nights}}일 밤의 밝은 통과",
+        "none": "앞으로 {{nights}}일 밤 동안 머리 위를 지나는 밝은 위성이 없습니다. 하루이틀 뒤에 다시 확인하세요."
+      },
+      "day": {
+        "today": "오늘",
+        "tonight": "오늘 밤",
+        "tomorrow": "내일"
+      },
+      "compass": {
+        "N": "북",
+        "NE": "북동",
+        "E": "동",
+        "SE": "남동",
+        "S": "남",
+        "SW": "남서",
+        "W": "서",
+        "NW": "북서"
+      },
+      "height": {
+        "overhead": "머리 위 높이",
+        "upTo": "최대 {{deg}}°"
+      },
+      "path": "{{from}}쪽에서 떠서 → {{height}} → {{to}}쪽으로 짐",
+      "brightness": {
+        "veryBright": "매우 밝음",
+        "bright": "밝음",
+        "visible": "보임"
+      },
+      "minutes": "{{minutes}}분",
+      "addToCalendar": "캘린더에 추가",
+      "ics": {
+        "summary": "{{name}} 머리 위 통과",
+        "description": "{{time}}에 {{from}}쪽 하늘을 보세요. {{height}}까지 올라갔다가 {{to}}쪽으로 집니다. {{brightness}}, 약 {{minutes}}분 동안 보입니다. 깜빡이지 않고 일정하게 움직이는 빛입니다. KeepTrack '오늘 밤 보이는 위성'에서 제공."
+      },
+      "privacyNote": "위치는 이 브라우저 탭에만 남고 저장되거나 전송되지 않습니다. 밝기는 추정치입니다.",
+      "help": {
+        "overview": "'오늘 밤 보이는 위성'은 국제우주정거장처럼 앞으로 며칠 밤 동안 내 위치에서 볼 수 있는 밝은 위성을 망원경이나 설정 없이 보여 줍니다.",
+        "howToUse": "<ol><li><strong>오늘 밤 보이는 위성</strong>을 열고 <strong>내 위치 사용</strong>을 누르세요.</li><li>통과를 고르면 시간, 뜨고 지는 방향, 밝기를 알려 줍니다.</li><li><strong>캘린더에 추가</strong>를 누르면 알림을 받을 수 있습니다.</li><li>통과 자체를 누르면 KeepTrack에서 볼 수 있습니다.</li></ol>",
+        "tip1": "위성은 해가 진 직후나 해 뜨기 전, 하늘은 어둡지만 위성은 아직 햇빛을 받을 때 가장 잘 보입니다.",
+        "tip2": "다른 센서나 모든 통과처럼 더 자세히 보고 싶다면 '최적 통과'나 '관측각'을 사용해 보세요."
+      }
+    }
+  }
+}

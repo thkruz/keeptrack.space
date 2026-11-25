@@ -37,6 +37,11 @@ describe('lookupKnownVmag', () => {
     expect(lookupKnownVmag(sat)).toBe(7.8);
   });
 
+  it('matches the Tiangong space station (CSS) to its Heavens-Above standard magnitude (#1468)', () => {
+    expect(lookupKnownVmag(makeSat({ name: 'CSS (TIANHE)' }))).toBe(0);
+    expect(estimateStdMagWithSource(makeSat({ name: 'CSS (TIANHE)' }))).toEqual(expect.objectContaining({ vmag: 0, source: 'preset' }));
+  });
+
   it('is case-insensitive on name prefix', () => {
     const sat = makeSat({ name: 'starlink-1234' });
 

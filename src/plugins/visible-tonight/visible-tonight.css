@@ -1,0 +1,186 @@
+/*
+ * Visible Tonight menu styles. The menu uses the shared v13 card system
+ * (.kt-ui-v13 + kt-section/kt-action) and the app's side-menu sizing; only
+ * the pass list lives here. Every tap target is at least 44px tall.
+ */
+
+.visible-tonight-status {
+  margin: 4px 6px 8px;
+  min-height: 1.4em;
+  font-size: 13px;
+  color: var(--kt-text-secondary);
+}
+
+
+#visible-tonight-locate-btn[aria-busy='true'] {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+/* "Location: 40.71° N, 74.01° W  Change": what was detected or typed, and the way to edit it (#1468). */
+.visible-tonight-location {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0 6px 4px;
+  font-size: 13px;
+  color: var(--kt-text-secondary);
+}
+
+.visible-tonight-location[hidden],
+.visible-tonight-location-form[hidden],
+#visible-tonight-locate-btn[hidden] {
+  /* kt-action sets display: flex, which would otherwise override the hidden attribute. */
+  display: none;
+}
+
+/* Text-style secondary actions (Change, Enter a location, Cancel), still 44px tall for touch. */
+.visible-tonight-link {
+  min-height: 44px;
+  margin: 0;
+  padding: 0 4px;
+  border: 0;
+  background: none;
+  color: var(--color-text-light, #f5f5f5);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.visible-tonight-link:hover {
+  color: var(--color-primary-light, #e01a0e);
+}
+
+.visible-tonight-link:focus-visible {
+  outline: 2px solid var(--kt-accent);
+  outline-offset: 2px;
+}
+
+.visible-tonight-link:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.visible-tonight-location-form {
+  margin: 4px 0 0;
+}
+
+.visible-tonight-error {
+  min-height: 0;
+  color: var(--color-primary-light, #e01a0e);
+}
+
+.visible-tonight-error:empty {
+  display: none;
+}
+
+.visible-tonight-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.visible-tonight-list:empty {
+  display: none;
+}
+
+.visible-tonight-item {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--kt-border-subtle, rgb(255 255 255 / 8%));
+}
+
+.visible-tonight-item:last-child {
+  border-bottom: 0;
+}
+
+/* The pass itself: a native button, so keyboard and screen readers work without extra code. */
+.visible-tonight-row {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--kt-radius-sm);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.visible-tonight-row:hover {
+  background: var(--kt-bg-hover);
+}
+
+.visible-tonight-row:focus-visible,
+.visible-tonight-calendar:focus-visible {
+  outline: 2px solid var(--kt-accent);
+  outline-offset: -2px;
+}
+
+.visible-tonight-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--kt-text-primary);
+}
+
+.visible-tonight-when {
+  font-variant-numeric: tabular-nums;
+  color: var(--kt-text-primary);
+}
+
+.visible-tonight-path,
+.visible-tonight-meta {
+  font-size: 12px;
+  color: var(--kt-text-secondary);
+}
+
+/* Emphasis, not the red accent: red reads as a warning, and a very bright pass is good news. */
+.visible-tonight-meta--veryBright {
+  font-weight: 600;
+  color: var(--kt-text-primary);
+}
+
+/* Add to calendar: a compact button beside the row (same look as v13 actions, no chevron), still a 44px target. */
+.visible-tonight-calendar {
+  flex: 0 0 auto;
+  align-self: center;
+  min-height: 44px;
+  max-width: 7.5em;
+  margin: 0;
+  padding: 4px 10px;
+  background: rgb(255 255 255 / 5%);
+  border: 1px solid var(--color-dark-border);
+  border-radius: var(--kt-radius-md, 6px);
+  color: var(--color-text-light, #f5f5f5);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.visible-tonight-calendar:hover {
+  background: rgb(255 255 255 / 9%);
+  border-color: var(--color-primary-light, #e01a0e);
+}
+
+/* kt-note supplies the type and colour; this only spaces it from the cards. */
+.visible-tonight-note {
+  margin: 8px 6px 0;
+}

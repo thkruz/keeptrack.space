@@ -84,9 +84,11 @@ interface Observer {
 }
 
 type VisibleTonightKey = Parameters<typeof t7e>[0];
+/** Translates a key under plugins.VisibleTonight. */
 const tr = (key: string, params?: Record<string, string | number>): string => t7e(`plugins.VisibleTonight.${key}` as VisibleTonightKey, params);
 /** Shared labels reuse other plugins' keys (docs/claude v13 checklist), so the wording matches in every language. */
 const shared = (key: 'labels.dataActions' | 'labels.results' | 'toolbar.refresh'): string => t7e(`plugins.Reentries.${key}` as VisibleTonightKey);
+/** Latitude/Longitude labels, reused from the custom sensor menu so every language matches. */
 const coordLabel = (key: 'latitude' | 'longitude'): string => t7e(`plugins.CustomSensorPlugin.labels.${key}` as VisibleTonightKey);
 
 /** "40.71° N, 74.01° W" with the compass letters translated. */
@@ -110,6 +112,7 @@ const formatClock = (epochMs: number): string => new Intl.DateTimeFormat(i18next
 
 /** "Tonight", "Tomorrow" or "Wednesday", from the viewer's local calendar day. */
 export const dayLabel = (epochMs: number, nowMs: number): string => {
+  /** Local midnight of the day containing `ms`. */
   const startOfDay = (ms: number) => {
     const date = new Date(ms);
 
@@ -129,6 +132,10 @@ export const dayLabel = (epochMs: number, nowMs: number): string => {
   return new Intl.DateTimeFormat(i18next.language, { weekday: 'long' }).format(epochMs);
 };
 
+/**
+ * Visible Tonight (#1468): bright passes over the user's location for the next three nights, in plain
+ * words, with Add to calendar. Built for new users; see the file header for why it has no settings.
+ */
 export class VisibleTonight extends KeepTrackPlugin {
   readonly id = 'VisibleTonight';
   dependencies_ = [];

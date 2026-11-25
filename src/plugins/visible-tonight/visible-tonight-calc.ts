@@ -133,21 +133,25 @@ export const findVisibleWindow = (
   }
   samples.push(setMs);
 
-  let best: { from: number; to: number } | null = null;
-  let runStart: number | null = null;
-
-  for (let i = 0; i <= samples.length; i++) {
-    const visible = i < samples.length && isVisible(samples[i]);
-
-    if (visible && runStart === null) {
-      runStart = i;
-    } else if (!visible && runStart !== null) {
-      if (best === null || i - 1 - runStart > best.to - best.from) {
-        best = { from: runStart, to: i - 1 };
-      }
-      runStart = null;
+  // Longest run of visible samples, as sample indices. A run still open at the last sample is closed after the loop.
+  const runs = { best: null as { from: number; to: number } | null, start: null as number | null };
+  const closeRun = (lastIndex: number): void => {
+    if (runs.start !== null && (runs.best === null || lastIndex - runs.start > runs.best.to - runs.best.from)) {
+      runs.best = { from: runs.start, to: lastIndex };
     }
-  }
+    runs.start = null;
+  };
+
+  samples.forEach((sampleMs, index) => {
+    if (isVisible(sampleMs)) {
+      runs.start ??= index;
+    } else {
+      closeRun(index - 1);
+    }
+  });
+  closeRun(samples.length - 1);
+
+  const { best } = runs;
 
   if (best === null) {
     return null;

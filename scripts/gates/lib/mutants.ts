@@ -45,6 +45,21 @@ export interface JournalEntry {
   bodyHash: string;
   head: string;
   ts: string;
+  /** Optional (runner after 2026-11-25): how tests were chosen, why the import graph was used, list size, run mode. */
+  selector?: 'coverage' | 'import-graph';
+  selectorReason?: string;
+  tests?: number;
+  mode?: string;
+  baselineMs?: number;
+  limitMs?: number;
+  /** Test file that failed (confirmed isolated) for a killed mutant. */
+  killedBy?: string;
+  /** A non-isolated run failed but the isolated rerun of that file passed (state leak). */
+  leak?: boolean;
+  /** Coverage selected more tests than --max-cov-tests; only the likeliest killers ran (a survivor here is weaker evidence). */
+  capped?: boolean;
+  /** Timed out once, rerun alone at low concurrency. */
+  retried?: boolean;
 }
 
 const BINARY_SWAPS: Record<string, string> = {

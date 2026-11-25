@@ -142,7 +142,7 @@ describe('VisibleTonight_flow', () => {
   });
 
   it('searches once the location arrives', () => {
-    const search = vi.spyOn(internals(plugin), 'search_').mockResolvedValue(undefined);
+    const search = vi.spyOn(internals(plugin), 'search_').mockImplementation(() => Promise.resolve());
 
     mockGeolocation((ok) => ok({ coords: { latitude: 51.5, longitude: -0.1, altitude: null } } as GeolocationPosition));
     getEl('visible-tonight-locate-btn')?.click();
@@ -175,7 +175,7 @@ describe('VisibleTonight_flow', () => {
   });
 
   it('Refresh searches again without asking for the location again', () => {
-    const search = vi.spyOn(internals(plugin), 'search_').mockResolvedValue(undefined);
+    const search = vi.spyOn(internals(plugin), 'search_').mockImplementation(() => Promise.resolve());
 
     mockGeolocation(() => undefined);
     showPasses(plugin, [pass()]);
@@ -231,7 +231,7 @@ describe('VisibleTonight_flow', () => {
   });
 
   it('reopening with a known location searches again so "tonight" stays current', () => {
-    const search = vi.spyOn(internals(plugin), 'search_').mockResolvedValue(undefined);
+    const search = vi.spyOn(internals(plugin), 'search_').mockImplementation(() => Promise.resolve());
 
     internals(plugin).observer_ = { lat: 40, lon: -75, altKm: 0 };
     plugin.isMenuButtonActive = true;
@@ -297,7 +297,7 @@ describe('VisibleTonight location editing (#1468)', () => {
   });
 
   it('rejects an out-of-range location and keeps the form open', () => {
-    const search = vi.spyOn(internals(plugin), 'search_').mockResolvedValue(undefined);
+    const search = vi.spyOn(internals(plugin), 'search_').mockImplementation(() => Promise.resolve());
 
     getEl('visible-tonight-edit-btn')?.click();
     input('visible-tonight-lat').value = '91';
@@ -310,7 +310,7 @@ describe('VisibleTonight location editing (#1468)', () => {
   });
 
   it('uses a typed location, so people can plan for somewhere else', () => {
-    const search = vi.spyOn(internals(plugin), 'search_').mockResolvedValue(undefined);
+    const search = vi.spyOn(internals(plugin), 'search_').mockImplementation(() => Promise.resolve());
 
     getEl('visible-tonight-edit-btn')?.click();
     input('visible-tonight-lat').value = '-33.8688';

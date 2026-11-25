@@ -100,6 +100,7 @@ export interface VisiblePass {
   level: BrightnessLevel;
 }
 
+/** Plain-language bucket for an apparent magnitude: very bright (ISS-like), bright, or simply visible. */
 export const brightnessLevel = (mag: number): BrightnessLevel => {
   if (mag <= -1) {
     return 'veryBright';
@@ -127,8 +128,8 @@ export const findVisibleWindow = (
 ): { startMs: number; endMs: number } | null => {
   const samples: number[] = [];
 
-  for (let t = riseMs; t < setMs; t += stepMs) {
-    samples.push(t);
+  for (let sampleMs = riseMs; sampleMs < setMs; sampleMs += stepMs) {
+    samples.push(sampleMs);
   }
   samples.push(setMs);
 
@@ -164,13 +165,13 @@ const brightestMag_ = (target: VisibleTonightTarget, startMs: number, endMs: num
   let best: number | null = null;
   const times = [peakMs];
 
-  for (let t = startMs; t <= endMs; t += stepMs) {
-    times.push(t);
+  for (let sampleMs = startMs; sampleMs <= endMs; sampleMs += stepMs) {
+    times.push(sampleMs);
   }
 
-  for (const t of times) {
-    const look = target.lookAngle(t);
-    const phase = target.phaseAngle(t);
+  for (const sampleMs of times) {
+    const look = target.lookAngle(sampleMs);
+    const phase = target.phaseAngle(sampleMs);
 
     if (look === null || phase === null) {
       continue;
@@ -197,7 +198,7 @@ export const toVisiblePass = (
     return null;
   }
 
-  const peak = findPassPeakMs((t) => target.lookAngle(t)?.el ?? null, window.startMs, window.endMs);
+  const peak = findPassPeakMs((epochMs) => target.lookAngle(epochMs)?.el ?? null, window.startMs, window.endMs);
   const start = target.lookAngle(window.startMs);
   const end = target.lookAngle(window.endMs);
 

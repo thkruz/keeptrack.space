@@ -63,6 +63,7 @@ export const foldIcsLine = (line: string): string => {
   return parts.join('\r\n ');
 };
 
+/** One-event iCalendar file (CRLF lines, folded to 75 octets), with an optional display reminder. */
 export const buildIcs = (event: IcsEvent): string => {
   const lines = [
     'BEGIN:VCALENDAR',

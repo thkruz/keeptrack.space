@@ -111,11 +111,11 @@ const formatClock = (epochMs: number): string => new Intl.DateTimeFormat(i18next
 /** "Tonight", "Tomorrow" or "Wednesday", from the viewer's local calendar day. */
 export const dayLabel = (epochMs: number, nowMs: number): string => {
   const startOfDay = (ms: number) => {
-    const d = new Date(ms);
+    const date = new Date(ms);
 
-    d.setHours(0, 0, 0, 0);
+    date.setHours(0, 0, 0, 0);
 
-    return d.getTime();
+    return date.getTime();
   };
   const days = Math.round((startOfDay(epochMs) - startOfDay(nowMs)) / 86_400_000);
 
@@ -144,6 +144,7 @@ export class VisibleTonight extends KeepTrackPlugin {
   // Composition-based configuration methods
   // =========================================================================
 
+  /** Bottom icon in the Events group: the menu's entry point on desktop and in the phone drawer. */
   getBottomIconConfig(): IBottomIconConfig {
     return {
       elementName: 'visible-tonight-bottom-icon',
@@ -153,6 +154,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     };
   }
 
+  /** Opening the menu searches again when a location is known, so "tonight" is always relative to now. */
   onBottomIconClick(): void {
     if (!this.isMenuButtonActive) {
       return;
@@ -166,19 +168,22 @@ export class VisibleTonight extends KeepTrackPlugin {
     }
   }
 
+  /** Bridges the legacy bottom-icon event to onBottomIconClick (docs/claude architecture). */
   bottomIconCallback = (): void => {
     this.onBottomIconClick();
   };
 
+  /** Side menu: the Data Actions and Results cards, resizable like other v13 menus. */
   getSideMenuConfig(): ISideMenuConfig {
     return {
       elementName: 'visible-tonight-menu',
       title: tr('title'),
-      html: this.buildSideMenuHtml_(),
+      html: VisibleTonight.buildSideMenuHtml_(),
       dragOptions: this.getDragOptions_(),
     };
   }
 
+  /** The v13 standard width range (400 to 550 px), as in Catalog Management. */
   private getDragOptions_(): IDragOptions {
     return {
       isDraggable: true,
@@ -187,6 +192,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     };
   }
 
+  /** Help panel: what the menu does and how to use it, in plain words. */
   getHelpConfig(): IHelpConfig {
     return {
       title: tr('title'),
@@ -202,7 +208,8 @@ export class VisibleTonight extends KeepTrackPlugin {
   // Side menu HTML
   // =========================================================================
 
-  private buildSideMenuHtml_(): string {
+  /** Static menu markup. Rows are added later with DOM APIs (textContent only), never through this template. */
+  private static buildSideMenuHtml_(): string {
     return html`
       <div id="visible-tonight-menu" class="side-menu-parent start-hidden kt-ui-v13">
         <div id="visible-tonight-content" class="side-menu">
@@ -248,12 +255,14 @@ export class VisibleTonight extends KeepTrackPlugin {
   // Lifecycle
   // =========================================================================
 
+  /** Registers for uiManagerFinal, when the menu's DOM exists and its listeners can be attached. */
   addJs(): void {
     super.addJs();
 
     EventBus.getInstance().on(EventBusEvent.uiManagerFinal, this.uiManagerFinal_.bind(this));
   }
 
+  /** Wires the location button, the location form and the pass list (one delegated click listener). */
   private uiManagerFinal_(): void {
     // One button: "Use my location" until a position is known, then "Refresh" (search again, no new prompt).
     getEl('visible-tonight-locate-btn', true)?.addEventListener('click', () => {
@@ -337,7 +346,7 @@ export class VisibleTonight extends KeepTrackPlugin {
       latInput.value = this.observer_ ? this.observer_.lat.toFixed(4) : '';
       lonInput.value = this.observer_ ? this.observer_.lon.toFixed(4) : '';
     }
-    this.setLocationError_('');
+    VisibleTonight.setLocationError_('');
     this.isEditingLocation_ = true;
     this.render_();
     latInput?.focus();
@@ -349,7 +358,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     const lon = parseCoordinate((getEl('visible-tonight-lon', true) as HTMLInputElement | null)?.value ?? '', 180);
 
     if (lat === null || lon === null) {
-      this.setLocationError_(tr('location.invalid'));
+      VisibleTonight.setLocationError_(tr('location.invalid'));
 
       return;
     }
@@ -361,7 +370,8 @@ export class VisibleTonight extends KeepTrackPlugin {
     this.search_();
   }
 
-  private setLocationError_(message: string): void {
+  /** Shows (or clears, with '') the validation message under the location form. */
+  private static setLocationError_(message: string): void {
     const errorEl = getEl('visible-tonight-location-error', true);
 
     if (errorEl) {
@@ -489,7 +499,9 @@ export class VisibleTonight extends KeepTrackPlugin {
   private static target_(sat: Satellite, sensor: DetailedSensor, staleHours: number, onStale: (scope: 'object' | 'pass') => void): VisibleTonightTarget {
     const { satrec } = sat;
     const epochMs = gpEpochMs(sat.epochYear, sat.epochDay);
+    /** True when this element set is older than the stale threshold at `ms` (gp-age). */
     const isStaleAt = (ms: number): boolean => isGpStale(gpAgeHours(epochMs, ms), staleHours);
+    /** ECI position (km) at `ms`, or null when SGP4 cannot propagate (SatMath.getEci returns the origin then). */
     const eciAt = (ms: number): TemeVec3<Kilometers> | null => {
       const position = SatMath.getEci(sat, new Date(ms)).position as TemeVec3<Kilometers>;
 
@@ -580,6 +592,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     EventBus.getInstance().emit(EventBusEvent.pluginActionUsed, this.id, { satId: id });
   }
 
+  /** Saves the pass as a one-event .ics with a reminder; built in the browser, nothing is sent anywhere. */
   protected downloadIcs_(pass: VisiblePass): void {
     const ics = buildIcs({
       uid: `${pass.norad}-${Math.round(pass.startMs / 1000)}@visible-tonight.keeptrack.space`,
@@ -600,14 +613,14 @@ export class VisibleTonight extends KeepTrackPlugin {
       time: formatClock(pass.startMs),
       from: tr(`compass.${compassPoint(pass.startAz)}`),
       to: tr(`compass.${compassPoint(pass.endAz)}`),
-      height: this.heightText_(pass.peakEl),
+      height: VisibleTonight.heightText_(pass.peakEl),
       brightness: tr(`brightness.${pass.level}`),
       minutes: Math.max(1, Math.round((pass.endMs - pass.startMs) / 60_000)),
     });
   }
 
   /** "high overhead" above 60 deg, otherwise "up to 35°". */
-  private heightText_(peakEl: number): string {
+  private static heightText_(peakEl: number): string {
     return peakEl >= 60 ? tr('height.overhead') : tr('height.upTo', { deg: Math.round(peakEl) });
   }
 
@@ -615,6 +628,7 @@ export class VisibleTonight extends KeepTrackPlugin {
   // Rendering
   // =========================================================================
 
+  /** Records the menu state and redraws. */
   protected setStatus_(status: VisibleTonightStatus): void {
     this.status_ = status;
     this.render_();
@@ -625,6 +639,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     return this.observer_ !== null && this.status_ !== 'denied';
   }
 
+  /** Redraws the whole menu from the current state: status, location line or form, main button and rows. */
   protected render_(): void {
     const statusEl = getEl('visible-tonight-status', true);
     const locateBtn = getEl('visible-tonight-locate-btn', true) as HTMLButtonElement | null;
@@ -676,6 +691,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     }
   }
 
+  /** The status line for the current state. */
   private statusText_(): string {
     switch (this.status_) {
       case 'needLocation':
@@ -723,7 +739,7 @@ export class VisibleTonight extends KeepTrackPlugin {
     path.className = 'visible-tonight-path';
     path.textContent = tr('path', {
       from: tr(`compass.${compassPoint(pass.startAz)}`),
-      height: this.heightText_(pass.peakEl),
+      height: VisibleTonight.heightText_(pass.peakEl),
       to: tr(`compass.${compassPoint(pass.endAz)}`),
     });
 

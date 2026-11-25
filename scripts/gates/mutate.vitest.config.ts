@@ -17,6 +17,10 @@ const merged = mergeConfig(base, {
     {
       name: 'mutation-overlay',
       enforce: 'pre',
+      configureVitest(ctx: { experimental_defineCacheKeyGenerator: (cb: (c: { id: string }) => string | false | undefined) => void }) {
+        // Mandatory: without this the fs module cache serves the CLEAN transform for the mutated module.
+        ctx.experimental_defineCacheKeyGenerator(({ id }) => (target && norm(id.split('?')[0]) === target ? false : undefined));
+      },
       load(id: string) {
         if (target && overlay && norm(id.split('?')[0]) === target) {
           return readFileSync(overlay, 'utf-8');
@@ -26,7 +30,11 @@ const merged = mergeConfig(base, {
       },
     },
   ],
-  test: { maxWorkers: Number(process.env.KT_MUTATE_FORKS ?? 2) },
+  test: {
+    maxWorkers: Number(process.env.KT_MUTATE_FORKS ?? 2),
+    // Cross-process transform cache: each spawn otherwise re-transforms hundreds of modules (measured 2.5x faster kills).
+    experimental: { fsModuleCache: true, fsModuleCachePath: process.env.KT_MUTATE_CACHE ?? 'node_modules/.mutate-vitest-cache' },
+  },
 });
 
 if (process.env.KT_MUTATE_TESTS) {

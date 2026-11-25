@@ -24,7 +24,7 @@ import {
 } from './lib/mutants';
 import { buildResult, writeResult, type GateItem } from './lib/report';
 
-const DIR = path.join(REPO_ROOT, '.metrics', 'mutate');
+const DIR = process.env.KT_MUTATE_DIR ?? path.join(REPO_ROOT, '.metrics', 'mutate');
 const JOURNAL = path.join(DIR, 'journal.jsonl');
 const STOP = path.join(DIR, 'STOP');
 const CONFIG = 'scripts/gates/mutate.vitest.config.ts';
@@ -239,6 +239,25 @@ async function runMutants(flags: Flags, head: string, base: string): Promise<voi
 
     return p;
   };
+
+  // Serial warm-up: a cold module cache plus concurrent workers produced baseline errors (suspected concurrent cache writes),
+  // so fill the cache with unmutated runs of the first few distinct files' test lists before the workers start.
+  {
+    const wf = [...new Set(todo.map((m) => m.file))].slice(0, 4);
+    const tw = Date.now();
+    const wdir = path.join(DIR, 'overlay', 'warm');
+
+    mkdirSync(wdir, { recursive: true });
+    for (const f of wf) {
+      const ov = path.join(wdir, 'clean.txt');
+
+      writeFileSync(ov, readFileSync(path.join(REPO_ROOT, f), 'utf-8'));
+      for (const st of stagesFor(f)) {
+        await runVitest(st, path.join(wdir, 'tests.json'), path.join(REPO_ROOT, f), ov, timeoutMs * 2, forks);
+      }
+    }
+    console.log(`cache warm-up: ${wf.length} files serially in ${((Date.now() - tw) / 1000).toFixed(0)}s`);
+  }
 
   const worker = async (w: number) => {
     const dir = path.join(DIR, 'overlay', `w${w}`);

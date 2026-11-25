@@ -83,6 +83,12 @@ export const KNOWN_OBJECT_MAGNITUDES: readonly KnownObjectEntry[] = [
     source: 'Heavens-above published intrinsic magnitude for HST',
   },
   {
+    id: 'css',
+    namePrefix: 'CSS (',
+    vmag: 0.0,
+    source: 'Heavens-above standard magnitude for the Tiangong space station (CSS); max visual -4.2 at perigee, fully lit (#1468)',
+  },
+  {
     id: 'iridium-next',
     namePrefix: 'IRIDIUM ',
     vmag: 6.0,

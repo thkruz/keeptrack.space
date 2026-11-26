@@ -3,13 +3,14 @@ import { sensors } from '@app/app/data/catalogs/sensors';
 import { DetailedSensor } from '@app/app/sensors/DetailedSensor';
 import { SensorMath } from '@app/app/sensors/sensor-math';
 import { SensorManager } from '@app/app/sensors/sensorManager';
-import { calcGmst, Kilometers, lla2eci, Sun, SunStatus, TemeVec3 } from '@ootk/src/main';
+import { calcGmst, Kilometers, llaRad2eci, Sun, SunStatus, TemeVec3 } from '@ootk/src/main';
 import { defaultSat } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 
 /*
- * Ground sites placed by lla2eci sit on a 6371 km sphere, inside the 6378 km equatorial radius the shadow cone uses.
- * Before the fix asin(R / r) was NaN there and every ground site read as SUN, so optical stations were never dark.
+ * Ground sites sit on the WGS84 ellipsoid (llaRad2eci). The shadow cone's asin(R / r) is NaN or meaningless there, so
+ * calculateIsInSun sends anything within 100 km of the ellipsoid down the ground-site path. Before that fix every
+ * ground site read as SUN, so optical stations were never dark.
  */
 
 /** 12:00 UTC: 05:00 MST at Socorro and 02:00 HST at Maui, both before sunrise. */
@@ -21,7 +22,7 @@ const MAUI_NOON = new Date('2026-10-27T22:00:00Z');
 
 const cloneSensor = (sensor: DetailedSensor): DetailedSensor => Object.assign(Object.create(Object.getPrototypeOf(sensor)), sensor) as DetailedSensor;
 
-const sitePosition = (sensor: DetailedSensor, now: Date): TemeVec3 => lla2eci(sensor.llaRad(), calcGmst(now).gmst);
+const sitePosition = (sensor: DetailedSensor, now: Date): TemeVec3 => llaRad2eci(sensor.llaRad(), calcGmst(now).gmst);
 
 /** A satellite 7000 km from Earth's centre, on the sunward side (sign 1) or straight behind Earth (sign -1). */
 const satAlongSunLine = (now: Date, sign: 1 | -1) => {
@@ -40,10 +41,21 @@ const SITES: [string, DetailedSensor, Date][] = [
 ];
 
 describe('optical ground-site night', () => {
-  it.each(SITES)('%s sits inside the equatorial radius (the condition that produced NaN)', (_name, sensor) => {
+  it.each(SITES)('%s is classified as a ground site (the case that produced NaN)', (_name, sensor) => {
     const pos = sitePosition(cloneSensor(sensor), NIGHT);
 
-    expect(Math.hypot(pos.x, pos.y, pos.z)).toBeLessThan(6378.137);
+    expect(SatMath.isGroundSitePosition(pos.x, pos.y, pos.z)).toBe(true);
+  });
+
+  it('SensorMath.checkIfVisibleForOptical stores the WGS84 site position on the sensor (row SM3)', () => {
+    const site = cloneSensor(sensors.GEODDSSOC);
+
+    SensorMath.checkIfVisibleForOptical(satAlongSunLine(NIGHT, 1), site, NIGHT);
+    const expected = sitePosition(site, NIGHT);
+
+    expect(site.position.x).toBeCloseTo(expected.x, 9);
+    expect(site.position.y).toBeCloseTo(expected.y, 9);
+    expect(site.position.z).toBeCloseTo(expected.z, 9);
   });
 
   it.each(SITES)('%s is in night at 2026-10-27T12:00Z and sunlit at local noon', (_name, sensor, noon) => {

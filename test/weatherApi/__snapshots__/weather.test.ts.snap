@@ -1824,9 +1824,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSDGC",
         "operator": "USSF",
         "position": {
-          "x": 4281.79312666609,
-          "y": -4647.717897274467,
-          "z": -809.141411493596,
+          "x": 4286.815749651803,
+          "y": -4653.169756822882,
+          "z": -804.6674954563458,
         },
         "sensorId": 15,
         "sensor_": OpticalSensor {
@@ -1990,9 +1990,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSMAU",
         "operator": "USSF",
         "position": {
-          "x": 622.6372795908738,
-          "y": 5929.599008877658,
-          "z": 2253.9204325836745,
+          "x": 623.5945887326852,
+          "y": 5938.71580853701,
+          "z": 2242.281153855309,
         },
         "sensorId": 16,
         "sensor_": OpticalSensor {
@@ -2165,9 +2165,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSSOC",
         "operator": "USSF",
         "position": {
-          "x": -3651.1831436440775,
-          "y": 3833.683181705651,
-          "z": 3546.446165882101,
+          "x": -3659.0627228665794,
+          "y": 3841.9566123049353,
+          "z": 3530.311839252807,
         },
         "sensorId": 17,
         "sensor_": OpticalSensor {
@@ -2331,9 +2331,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "ZimLAT",
         "operator": "ESA",
         "position": {
-          "x": -1650.527686146805,
-          "y": -4030.1004066670494,
-          "z": 4650.139022163657,
+          "x": -1655.328957988581,
+          "y": -4041.8236923558993,
+          "z": 4632.445605593552,
         },
         "sensorId": 41,
         "sensor_": OpticalSensor {
@@ -2502,9 +2502,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "TRO",
         "operator": "UKSA",
         "position": {
-          "x": 286.817584730809,
-          "y": -5216.502099685054,
-          "z": 3646.311200799352,
+          "x": 287.4538624300576,
+          "y": -5228.074416484371,
+          "z": 3629.936253959266,
         },
         "sensorId": 39,
         "sensor_": OpticalSensor {
@@ -4456,9 +4456,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSDGC",
         "operator": "USSF",
         "position": {
-          "x": 4281.79312666609,
-          "y": -4647.717897274467,
-          "z": -809.141411493596,
+          "x": 4286.815749651803,
+          "y": -4653.169756822882,
+          "z": -804.6674954563458,
         },
         "sensorId": 15,
         "sensor_": OpticalSensor {
@@ -4631,9 +4631,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSMAU",
         "operator": "USSF",
         "position": {
-          "x": 622.6372795908738,
-          "y": 5929.599008877658,
-          "z": 2253.9204325836745,
+          "x": 623.5945887326852,
+          "y": 5938.71580853701,
+          "z": 2242.281153855309,
         },
         "sensorId": 16,
         "sensor_": OpticalSensor {
@@ -4810,9 +4810,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSSOC",
         "operator": "USSF",
         "position": {
-          "x": -3651.1831436440775,
-          "y": 3833.683181705651,
-          "z": 3546.446165882101,
+          "x": -3659.0627228665794,
+          "y": 3841.9566123049353,
+          "z": 3530.311839252807,
         },
         "sensorId": 17,
         "sensor_": OpticalSensor {
@@ -4981,9 +4981,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "ZimLAT",
         "operator": "ESA",
         "position": {
-          "x": -1650.527686146805,
-          "y": -4030.1004066670494,
-          "z": 4650.139022163657,
+          "x": -1655.328957988581,
+          "y": -4041.8236923558993,
+          "z": 4632.445605593552,
         },
         "sensorId": 41,
         "sensor_": OpticalSensor {
@@ -5156,9 +5156,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "TRO",
         "operator": "UKSA",
         "position": {
-          "x": 286.817584730809,
-          "y": -5216.502099685054,
-          "z": 3646.311200799352,
+          "x": 287.4538624300576,
+          "y": -5228.074416484371,
+          "z": 3629.936253959266,
         },
         "sensorId": 39,
         "sensor_": OpticalSensor {
@@ -7140,9 +7140,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSDGC",
         "operator": "USSF",
         "position": {
-          "x": 4281.79312666609,
-          "y": -4647.717897274467,
-          "z": -809.141411493596,
+          "x": 4286.815749651803,
+          "y": -4653.169756822882,
+          "z": -804.6674954563458,
         },
         "sensorId": 15,
         "sensor_": OpticalSensor {
@@ -7311,9 +7311,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSMAU",
         "operator": "USSF",
         "position": {
-          "x": 622.6372795908738,
-          "y": 5929.599008877658,
-          "z": 2253.9204325836745,
+          "x": 623.5945887326852,
+          "y": 5938.71580853701,
+          "z": 2242.281153855309,
         },
         "sensorId": 16,
         "sensor_": OpticalSensor {
@@ -7482,9 +7482,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSSOC",
         "operator": "USSF",
         "position": {
-          "x": -3651.1831436440775,
-          "y": 3833.683181705651,
-          "z": 3546.446165882101,
+          "x": -3659.0627228665794,
+          "y": 3841.9566123049353,
+          "z": 3530.311839252807,
         },
         "sensorId": 17,
         "sensor_": OpticalSensor {
@@ -7653,9 +7653,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "ZimLAT",
         "operator": "ESA",
         "position": {
-          "x": -1650.527686146805,
-          "y": -4030.1004066670494,
-          "z": 4650.139022163657,
+          "x": -1655.328957988581,
+          "y": -4041.8236923558993,
+          "z": 4632.445605593552,
         },
         "sensorId": 41,
         "sensor_": OpticalSensor {
@@ -7824,9 +7824,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "TRO",
         "operator": "UKSA",
         "position": {
-          "x": 286.817584730809,
-          "y": -5216.502099685054,
-          "z": 3646.311200799352,
+          "x": 287.4538624300576,
+          "y": -5228.074416484371,
+          "z": 3629.936253959266,
         },
         "sensorId": 39,
         "sensor_": OpticalSensor {
@@ -9782,9 +9782,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSDGC",
         "operator": "USSF",
         "position": {
-          "x": 4281.79312666609,
-          "y": -4647.717897274467,
-          "z": -809.141411493596,
+          "x": 4286.815749651803,
+          "y": -4653.169756822882,
+          "z": -804.6674954563458,
         },
         "sensorId": 15,
         "sensor_": OpticalSensor {
@@ -9953,9 +9953,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSMAU",
         "operator": "USSF",
         "position": {
-          "x": 622.6372795908738,
-          "y": 5929.599008877658,
-          "z": 2253.9204325836745,
+          "x": 623.5945887326852,
+          "y": 5938.71580853701,
+          "z": 2242.281153855309,
         },
         "sensorId": 16,
         "sensor_": OpticalSensor {
@@ -10128,9 +10128,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSSOC",
         "operator": "USSF",
         "position": {
-          "x": -3651.1831436440775,
-          "y": 3833.683181705651,
-          "z": 3546.446165882101,
+          "x": -3659.0627228665794,
+          "y": 3841.9566123049353,
+          "z": 3530.311839252807,
         },
         "sensorId": 17,
         "sensor_": OpticalSensor {
@@ -10303,9 +10303,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "ZimLAT",
         "operator": "ESA",
         "position": {
-          "x": -1650.527686146805,
-          "y": -4030.1004066670494,
-          "z": 4650.139022163657,
+          "x": -1655.328957988581,
+          "y": -4041.8236923558993,
+          "z": 4632.445605593552,
         },
         "sensorId": 41,
         "sensor_": OpticalSensor {
@@ -10478,9 +10478,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "TRO",
         "operator": "UKSA",
         "position": {
-          "x": 286.817584730809,
-          "y": -5216.502099685054,
-          "z": 3646.311200799352,
+          "x": 287.4538624300576,
+          "y": -5228.074416484371,
+          "z": 3629.936253959266,
         },
         "sensorId": 39,
         "sensor_": OpticalSensor {
@@ -12427,9 +12427,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSDGC",
         "operator": "USSF",
         "position": {
-          "x": 4281.79312666609,
-          "y": -4647.717897274467,
-          "z": -809.141411493596,
+          "x": 4286.815749651803,
+          "y": -4653.169756822882,
+          "z": -804.6674954563458,
         },
         "sensorId": 15,
         "sensor_": OpticalSensor {
@@ -12593,9 +12593,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSMAU",
         "operator": "USSF",
         "position": {
-          "x": 622.6372795908738,
-          "y": 5929.599008877658,
-          "z": 2253.9204325836745,
+          "x": 623.5945887326852,
+          "y": 5938.71580853701,
+          "z": 2242.281153855309,
         },
         "sensorId": 16,
         "sensor_": OpticalSensor {
@@ -12768,9 +12768,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "GEODDSSOC",
         "operator": "USSF",
         "position": {
-          "x": -3651.1831436440775,
-          "y": 3833.683181705651,
-          "z": 3546.446165882101,
+          "x": -3659.0627228665794,
+          "y": 3841.9566123049353,
+          "z": 3530.311839252807,
         },
         "sensorId": 17,
         "sensor_": OpticalSensor {
@@ -12934,9 +12934,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "ZimLAT",
         "operator": "ESA",
         "position": {
-          "x": -1650.527686146805,
-          "y": -4030.1004066670494,
-          "z": 4650.139022163657,
+          "x": -1655.328957988581,
+          "y": -4041.8236923558993,
+          "z": 4632.445605593552,
         },
         "sensorId": 41,
         "sensor_": OpticalSensor {
@@ -13109,9 +13109,9 @@ exports[`SensorTimeline Weather Integration > should correctly calculate passes 
         "objName": "TRO",
         "operator": "UKSA",
         "position": {
-          "x": 286.817584730809,
-          "y": -5216.502099685054,
-          "z": 3646.311200799352,
+          "x": 287.4538624300576,
+          "y": -5228.074416484371,
+          "z": 3629.936253959266,
         },
         "sensorId": 39,
         "sensor_": OpticalSensor {

@@ -2,8 +2,27 @@ import { vec3 } from 'gl-matrix';
 import { BufferAttribute } from './buffer-attribute';
 import { BufferGeometry, GeometryParams } from './buffer-geometry';
 
+/**
+ * Oblate ellipsoid of revolution about the Z axis (the pole axis of {@link SphereGeometry}).
+ * `a` is the equatorial and `b` the polar semi-axis; `height` (default 0) offsets every vertex
+ * along its geodetic normal, so a shell built with the same `a`, `b` sits at a constant
+ * geodetic height above that ellipsoid.
+ */
+export interface SphereEllipsoidRadii {
+  a: number;
+  b: number;
+  height?: number;
+}
+
 interface SphereGeometryParams extends GeometryParams {
+  /** Sphere radius. Ignored when {@link SphereGeometryParams.ellipsoid} is given. */
   radius: number;
+  /**
+   * Build an ellipsoid instead of a sphere. Rows are spaced in GEODETIC latitude,
+   * positions use the prime vertical radius N(lat) (same formula as ootk `llaRad2ecef`),
+   * normals are the geodetic surface normal and `v` stays linear in geodetic latitude.
+   */
+  ellipsoid?: SphereEllipsoidRadii;
   widthSegments: number;
   heightSegments: number;
   isSkipTexture?: boolean;
@@ -46,6 +65,10 @@ export class SphereGeometry extends BufferGeometry {
    * thetaLength Specify vertical sweep angle size. Expects a `Float`. Default `Math.PI`
    */
   thetaLength: number;
+  /**
+   * Ellipsoid semi-axes when built in ellipsoid mode, otherwise null (plain sphere).
+   */
+  ellipsoid: SphereEllipsoidRadii | null;
 
   // Add these properties for sorting
   private vertices_: Float32Array;
@@ -57,7 +80,8 @@ export class SphereGeometry extends BufferGeometry {
    * Create a new instance of {@link SphereGeometry}
    * @remarks
    * The geometry is created by sweeping and calculating vertexes
-   * around the **Y** axis (horizontal sweep) and the **Z** axis (vertical sweep)
+   * around the **Z** axis (horizontal sweep, longitude) and from pole to pole (vertical sweep, latitude);
+   * Z is the pole axis
    * Thus, incomplete spheres (akin to `'sphere slices'`) can be created
    * through the use of different values of {@link phiStart}, {@link phiLength}, {@link thetaStart} and {@link thetaLength},
    * in order to define the points in which we start (or end) calculating those vertices.
@@ -81,6 +105,7 @@ export class SphereGeometry extends BufferGeometry {
       phiLength = Math.PI * 2,
       thetaStart = 0,
       thetaLength = Math.PI,
+      ellipsoid,
     }: SphereGeometryParams
   ) {
     super({
@@ -118,6 +143,7 @@ export class SphereGeometry extends BufferGeometry {
     this.phiLength = phiLength;
     this.thetaStart = thetaStart;
     this.thetaLength = thetaLength;
+    this.ellipsoid = ellipsoid ?? null;
 
     this.calculateCombinedArray(isSkipTexture);
     this.calculateVertIndicies_();
@@ -151,9 +177,7 @@ export class SphereGeometry extends BufferGeometry {
         const v = 1 - heightSegment / this.heightSegments;
         const u = 0.5 + widthSegment / this.widthSegments;
 
-        combinedArray.push(x * this.radius);
-        combinedArray.push(y * this.radius);
-        combinedArray.push(z * this.radius);
+        this.pushPosition_(combinedArray, x, y, z);
         combinedArray.push(x);
         combinedArray.push(y);
         combinedArray.push(z);
@@ -178,6 +202,30 @@ export class SphereGeometry extends BufferGeometry {
     }
 
     this.setCombinedBuffer(this.gl, combinedArray);
+  }
+
+  /**
+   * Push one vertex position. (x, y, z) is the unit direction (cos lat cos lon, cos lat sin lon, sin lat).
+   * Sphere mode scales it by the radius. Ellipsoid mode reads lat as geodetic latitude, so the unit vector
+   * is also the geodetic surface normal, and places the vertex with the prime vertical radius
+   * N = a / sqrt(1 - e2 sin^2 lat): (N + h) cos lat cos lon, (N + h) cos lat sin lon, (N (1 - e2) + h) sin lat.
+   */
+  private pushPosition_(out: number[], x: number, y: number, z: number): void {
+    if (!this.ellipsoid) {
+      out.push(x * this.radius);
+      out.push(y * this.radius);
+      out.push(z * this.radius);
+
+      return;
+    }
+
+    const { a, b, height = 0 } = this.ellipsoid;
+    const e2 = 1 - (b * b) / (a * a);
+    const n = a / Math.sqrt(1 - e2 * z * z);
+
+    out.push((n + height) * x);
+    out.push((n + height) * y);
+    out.push((n * (1 - e2) + height) * z);
   }
 
   /**

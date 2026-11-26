@@ -33,14 +33,14 @@ import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
-import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
+import { SphereEllipsoidRadii, SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { ViewportManager } from '@app/engine/rendering/viewport-manager';
-import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { RADIUS_OF_EARTH, WGS84_A_KM, WGS84_B_KM } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { FrameProfiler, GpuStage } from '@app/engine/utils/frame-profiler';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
+import { EpochUTC, ellipsoidRadiusAlong, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
 import { Body, BackdatePosition as backdatePosition, KM_PER_AU } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { errorManagerInstance } from '../../utils/errorManager';
@@ -66,6 +66,31 @@ import { RELIEF_NORMAL_GLSL } from './relief-shading';
  * whether a satellite is selected or which camera mode is active. Non-Earth center bodies show clouds fully.
  */
 export const getCloudFadeZoom = (isEarthCenterBody: boolean, zoomLevel: number): number => (isEarthCenterBody ? zoomLevel : 1.0);
+
+/**
+ * WGS84 ellipsoid for the Earth surface mesh, or a shell at a constant geodetic height above it.
+ * The surface, the GPU picking pass and the godray occlusion pass all draw the surface mesh, so
+ * they share this geometry; the aurora and atmosphere shells use the same a, b with a height.
+ */
+export const getEarthEllipsoid = (heightKm = 0): SphereEllipsoidRadii => ({ a: WGS84_A_KM, b: WGS84_B_KM, height: heightKm });
+
+/** Geodetic height of the atmosphere shell: the old sphere was 1.025 x the radius, kept as 2.5 % of a. */
+export const EARTH_ATMOSPHERE_HEIGHT_KM = WGS84_A_KM * 0.025;
+
+/**
+ * Camera height above the WGS84 surface directly below it (along the geocentric direction).
+ * Used for the altitude-aware atmosphere; returns the distance itself at the Earth center.
+ */
+export const getCameraAltitudeAboveEllipsoid = (camPos: ArrayLike<number>): number => {
+  const dist = Math.hypot(camPos[0], camPos[1], camPos[2]);
+
+  if (dist === 0) {
+    return 0;
+  }
+  const dir = { x: camPos[0] / dist, y: camPos[1] / dist, z: camPos[2] / dist };
+
+  return dist - ellipsoidRadiusAlong(dir);
+};
 
 /**
  * Texture file base (no quality suffix) of the night map to pair with a day style, or null when
@@ -159,7 +184,7 @@ export class Earth {
   /**
    * Procedural aurora shell. Auroral emission occurs at roughly 100-300 km with
    * the bright green band peaking near 110-120 km, so the aurora is drawn on its
-   * own translucent sphere at that altitude (instead of tinting the surface
+   * own translucent shell at that geodetic height above WGS84 (instead of tinting the surface
    * fragments) to leave a visible gap between the globe and the aurora.
    */
   auroraMesh: Mesh | null = null;
@@ -382,11 +407,7 @@ export class Earth {
 
       // We only need to make the mesh once
       if (!this.surfaceMesh) {
-        const earthSurfaceGeometry = new SphereGeometry(this.gl_, {
-          radius: RADIUS_OF_EARTH,
-          widthSegments: settingsManager.earthNumLatSegs,
-          heightSegments: settingsManager.earthNumLonSegs,
-        });
+        const earthSurfaceGeometry = this.buildEllipsoidGeometry_(0);
         const earthSurfaceMaterial = new ShaderMaterial(this.gl_, {
           uniforms: {
             uIsAmbientLighting: <WebGLUniformLocation>(<unknown>null),
@@ -452,16 +473,25 @@ export class Earth {
    * and only ever builds the mesh once. Unlike the atmosphere, the shaders are
    * local to this file, so it can always build on the first init().
    */
+  /**
+   * WGS84 ellipsoid mesh for the surface (height 0) or a shell at a constant geodetic height.
+   * GPU picking and godray occlusion draw the surface mesh, so they follow the same ellipsoid.
+   */
+  private buildEllipsoidGeometry_(heightKm: number): SphereGeometry {
+    return new SphereGeometry(this.gl_, {
+      radius: WGS84_A_KM + heightKm,
+      ellipsoid: getEarthEllipsoid(heightKm),
+      widthSegments: settingsManager.earthNumLatSegs,
+      heightSegments: settingsManager.earthNumLonSegs,
+    });
+  }
+
   private buildAuroraMesh_(): void {
     if (this.auroraMesh || !this.gl_) {
       return;
     }
 
-    const auroraGeometry = new SphereGeometry(this.gl_, {
-      radius: RADIUS_OF_EARTH + Earth.AURORA_ALTITUDE_KM_,
-      widthSegments: settingsManager.earthNumLatSegs,
-      heightSegments: settingsManager.earthNumLonSegs,
-    });
+    const auroraGeometry = this.buildEllipsoidGeometry_(Earth.AURORA_ALTITUDE_KM_);
     const auroraMaterial = new ShaderMaterial(this.gl_, {
       uniforms: {
         uGlow: <WebGLUniformLocation>(<unknown>null),
@@ -501,11 +531,7 @@ export class Earth {
       return;
     }
 
-    const earthAtmosphereGeometry = new SphereGeometry(this.gl_, {
-      radius: RADIUS_OF_EARTH * 1.025, // Slightly larger than the earth
-      widthSegments: settingsManager.earthNumLatSegs,
-      heightSegments: settingsManager.earthNumLonSegs,
-    });
+    const earthAtmosphereGeometry = this.buildEllipsoidGeometry_(EARTH_ATMOSPHERE_HEIGHT_KM);
     const atmosphereUniforms: Record<string, WebGLUniformLocation> = {
       uLightDirection: <WebGLUniformLocation>(<unknown>null),
       uIntensity: <WebGLUniformLocation>(<unknown>null),
@@ -877,7 +903,7 @@ export class Earth {
     const uCameraAltitude = this.atmosphereMesh.material.uniforms.uCameraAltitude;
 
     if (uCameraAltitude) {
-      const altitudeAboveSurfaceKm = ServiceLocator.getMainCamera().getDistFromEarth() - RADIUS_OF_EARTH;
+      const altitudeAboveSurfaceKm = getCameraAltitudeAboveEllipsoid(ServiceLocator.getMainCamera().getCamPosEarthCentered());
 
       gl.uniform1f(uCameraAltitude, altitudeAboveSurfaceKm);
     }
@@ -1232,7 +1258,7 @@ export class Earth {
 
       //.................................................
       // Relief shading: the sunlit surface uses the terrain normal, while the
-      // terminator, night lights and clouds keep the smooth sphere normal so
+      // terminator, night lights and clouds keep the smooth geodetic normal so
       // city lights and cloud shading do not flicker with the terrain.
       float reliefDiffuse = diffuse;
       vec3 reliefN = normalize(vNormal);
@@ -1326,6 +1352,7 @@ export class Earth {
       // ...............................................
       // Graticule (lat/lon grid lines)
       if (uShowGraticule > 0.5) {
+        // v is linear in geodetic latitude on the WGS84 mesh, so this is geodetic latitude
         float gLatDeg = (0.5 - vUv.y) * 180.0;
         float gLonDeg = (vUv.x - 0.5) * 360.0;
         float wLat = fwidth(vUv.y) * 180.0;

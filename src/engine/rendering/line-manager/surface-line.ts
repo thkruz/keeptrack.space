@@ -1,6 +1,6 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { settingsManager } from '@app/settings/settings';
+import { DEG2RAD, ellipsoidRadiusAlong, Kilometers, liftToEllipsoid, llaRad2ecef, Radians } from '@ootk/src/main';
 import { vec4 } from 'gl-matrix';
 import { GlUtils } from '../gl-utils';
 import { LineManager } from '../line-manager';
@@ -12,7 +12,7 @@ export interface SurfacePoint {
   lon: number;
 }
 
-/** Height above the sphere the Earth mesh is drawn on; keeps the line clear of the surface in the depth buffer. */
+/** Height above the WGS84 ellipsoid the Earth mesh is drawn on; keeps the line clear of the surface in the depth buffer. */
 export const SURFACE_LINE_LIFT_KM = 6;
 /** Dash pattern, in samples: this many segments drawn, this many skipped. */
 const DASH_ON = 2;
@@ -40,8 +40,50 @@ const toUnit = (p: SurfacePoint): [number, number, number] => {
 };
 
 /**
+ * WGS84 point for a geocentric unit direction: the ellipsoid surface point along `u`, raised `liftKm`
+ * along its geodetic normal. For the direction of a toEcef point this returns toEcef(p, liftKm).
+ */
+export const liftedSurfacePoint = (u: [number, number, number], liftKm: number): [number, number, number] => {
+  const r = ellipsoidRadiusAlong({ x: u[0], y: u[1], z: u[2] });
+  const p = liftToEllipsoid({ x: u[0] * r, y: u[1] * r, z: u[2] * r }, liftKm);
+
+  return [p.x, p.y, p.z];
+};
+
+/** Unit vector at fraction `f` of the way from `a` to `b` (linear blend, renormalized). */
+const nlerpUnit_ = (a: [number, number, number], b: [number, number, number], f: number): [number, number, number] => {
+  const x = a[0] + (b[0] - a[0]) * f;
+  const y = a[1] + (b[1] - a[1]) * f;
+  const z = a[2] + (b[2] - a[2]) * f;
+  const n = Math.hypot(x, y, z) || 1;
+
+  return [x / n, y / n, z / n];
+};
+
+/**
+ * Resample a closed rim of unit vectors so neighbouring points are at most FILL_RIM_STEP_DEG apart (a wide wedge
+ * would sag under the Earth mesh).
+ */
+const resampleRim_ = (base: [number, number, number][]): [number, number, number][] => {
+  const units: [number, number, number][] = [];
+
+  for (let i = 0; i < base.length; i++) {
+    const a = base[i];
+    const b = base[(i + 1) % base.length];
+    const ang = Math.acos(Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
+    const parts = Math.max(1, Math.ceil((ang * 180) / Math.PI / FILL_RIM_STEP_DEG));
+
+    for (let j = 0; j < parts; j++) {
+      units.push(nlerpUnit_(a, b, j / parts));
+    }
+  }
+
+  return units;
+};
+
+/**
  * Triangle list (x, y, z, 1 per vertex, ECEF km) covering a star-shaped ring around `center`. Concentric rings
- * between the center and the outline keep each triangle small enough to follow the sphere.
+ * between the center and the outline keep each triangle small enough to follow the WGS84 ellipsoid.
  */
 export function buildFillTriangles(center: SurfacePoint, ring: SurfacePoint[], liftKm = SURFACE_FILL_LIFT_KM): number[] {
   // A closed ring repeats its first point; drop the duplicate so the last wedge is not degenerate.
@@ -52,42 +94,14 @@ export function buildFillTriangles(center: SurfacePoint, ring: SurfacePoint[], l
   }
   const c = toUnit(center);
   const base = pts.map(toUnit);
-  // Resample the rim so neighbouring ring points are at most FILL_RIM_STEP_DEG apart (a wide wedge would sag under the Earth mesh).
-  const units: [number, number, number][] = [];
-
-  for (let i = 0; i < base.length; i++) {
-    const a = base[i];
-    const b = base[(i + 1) % base.length];
-    const ang = Math.acos(Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])));
-    const parts = Math.max(1, Math.ceil((ang * 180) / Math.PI / FILL_RIM_STEP_DEG));
-
-    for (let j = 0; j < parts; j++) {
-      const f = j / parts;
-      const x = a[0] + (b[0] - a[0]) * f;
-      const y = a[1] + (b[1] - a[1]) * f;
-      const z = a[2] + (b[2] - a[2]) * f;
-      const n = Math.hypot(x, y, z) || 1;
-
-      units.push([x / n, y / n, z / n]);
-    }
-  }
+  const units = resampleRim_(base);
   let maxAngle = 0;
 
   for (const u of units) {
     maxAngle = Math.max(maxAngle, Math.acos(Math.min(1, Math.max(-1, c[0] * u[0] + c[1] * u[1] + c[2] * u[2]))));
   }
   const rings = Math.max(1, Math.min(FILL_MAX_RINGS, Math.ceil((maxAngle * 180) / Math.PI / FILL_RING_STEP_DEG)));
-  const r = RADIUS_OF_EARTH + liftKm;
-  const at = (i: number, k: number): [number, number, number] => {
-    const f = k / rings;
-    const u = units[i % units.length];
-    const x = c[0] + (u[0] - c[0]) * f;
-    const y = c[1] + (u[1] - c[1]) * f;
-    const z = c[2] + (u[2] - c[2]) * f;
-    const n = Math.hypot(x, y, z) || 1;
-
-    return [(x / n) * r, (y / n) * r, (z / n) * r];
-  };
+  const at = (i: number, k: number): [number, number, number] => liftedSurfacePoint(nlerpUnit_(c, units[i % units.length], k / rings), liftKm);
   const out: number[] = [];
   const push = (v: [number, number, number]): void => {
     out.push(v[0], v[1], v[2], 1);
@@ -120,7 +134,7 @@ export function buildFillTriangles(center: SurfacePoint, ring: SurfacePoint[], l
  * discard) draws them in the flat map. Each strip is drawn as its own line strip; a dashed line is
  * emitted as short separate segments.
  *
- * An optional translucent fill (SurfaceFill) is drawn under the outline as a triangle fan of sphere-following rings.
+ * An optional translucent fill (SurfaceFill) is drawn under the outline as a triangle fan of ellipsoid-following rings.
  */
 export class SurfaceLine extends Line {
   private drawCalls_: { mode: 'strip' | 'lines'; first: number; count: number }[] = [];
@@ -140,13 +154,11 @@ export class SurfaceLine extends Line {
     return this.fillCount_;
   }
 
-  /** Spherical ECEF vector for a lat/lon in degrees. */
+  /** WGS84 ECEF vector (km) for a geodetic lat/lon in degrees, `liftKm` above the ellipsoid along the geodetic normal. */
   static toEcef(p: SurfacePoint, liftKm = SURFACE_LINE_LIFT_KM): [number, number, number] {
-    const lat = (p.lat * Math.PI) / 180;
-    const lon = (p.lon * Math.PI) / 180;
-    const r = RADIUS_OF_EARTH + liftKm;
+    const v = llaRad2ecef({ lat: (p.lat * DEG2RAD) as Radians, lon: (p.lon * DEG2RAD) as Radians, alt: liftKm as Kilometers });
 
-    return [r * Math.cos(lat) * Math.cos(lon), r * Math.cos(lat) * Math.sin(lon), r * Math.sin(lat)];
+    return [v.x, v.y, v.z];
   }
 
   setColor(color: vec4): void {

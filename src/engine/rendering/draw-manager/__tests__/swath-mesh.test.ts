@@ -1,6 +1,7 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { SwathMesh } from '@app/engine/rendering/draw-manager/swath-mesh';
+import { liftSurfacePoint, SwathMesh } from '@app/engine/rendering/draw-manager/swath-mesh';
 import { SwathMeshFactory, SwathParams } from '@app/engine/rendering/draw-manager/swath-mesh-factory';
+import { eci2lla, TemeVec3 } from '@ootk/src/main';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
 
@@ -92,10 +93,12 @@ describe('SwathMeshFactory ribbon', () => {
 
       /*
        * The plan's bound [b + lift, a + lift + 0.01] km (less 1 m of float32 rounding). Vertices sit
-       * on the drawn 6371 km globe + lift, which lies inside it.
+       * on the WGS84 ellipsoid + lift along the geodetic normal (row SW1), so their geodetic altitude
+       * equals the lift within float32 rounding (about 1 m at 6400 km).
        */
       expect(r).toBeGreaterThanOrEqual(B + lift - 0.001);
       expect(r).toBeLessThanOrEqual(A + lift + 0.01);
+      expect(Math.abs(eci2lla({ x: v[i * 3], y: v[i * 3 + 1], z: v[i * 3 + 2] } as TemeVec3, 0).alt - lift)).toBeLessThan(0.0015);
     }
   });
 
@@ -232,5 +235,38 @@ describe('SwathFanMesh', () => {
     expect(fan.isValid).toBe(true);
     // Apex sits on the satellite (world shift 0 in the test scene).
     expect(first[0]).toBeCloseTo(A + 500, 0);
+  });
+});
+
+describe('liftSurfacePoint (WGS84, row SW1)', () => {
+  it('raises the hand-computed 45 N surface point along the geodetic normal', () => {
+    // Surface point: x = N cos 45 = 4517.5909, z = N (1 - e^2) sin 45 = 4487.3484 (N = 6388.8383).
+    // Geodetic normal at 45 N is (cos 45, 0, sin 45), so a 2 km lift adds 1.41421 km to x and z.
+    const out = new Float64Array(3);
+
+    liftSurfacePoint(4517.5909, 0, 4487.3484, 2, out, 0);
+    expect(out[0]).toBeCloseTo(4519.0051, 3);
+    expect(out[1]).toBeCloseTo(0, 9);
+    expect(out[2]).toBeCloseTo(4488.7626, 3);
+  });
+
+  it('keeps the geodetic latitude instead of the geocentric direction', () => {
+    const out = new Float64Array(6);
+
+    liftSurfacePoint(4517.5909, 0, 4487.3484, 10, out, 3);
+    const lla = eci2lla({ x: out[3], y: out[4], z: out[5] } as TemeVec3, 0);
+
+    expect(lla.lat).toBeCloseTo(45, 5);
+    expect(lla.alt).toBeCloseTo(10, 4);
+    expect([out[0], out[1], out[2]]).toEqual([0, 0, 0]);
+  });
+
+  it('lifts the equator radially from a and the pole from b', () => {
+    const out = new Float64Array(6);
+
+    liftSurfacePoint(A, 0, 0, 3, out, 0);
+    liftSurfacePoint(0, 0, B, 3, out, 3);
+    expect(out[0]).toBeCloseTo(A + 3, 6);
+    expect(out[5]).toBeCloseTo(B + 3, 6);
   });
 });

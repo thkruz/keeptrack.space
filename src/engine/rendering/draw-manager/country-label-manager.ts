@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians } from '@ootk/src/main';
+import { DEG2RAD, EcefVec3, Kilometers, llaRad2ecef, Radians } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import i18next from 'i18next';
 import { glsl } from '../../utils/development/formatter';
@@ -44,6 +44,77 @@ interface AtlasEntry {
   minLabel: number;
   labelRank: number;
 }
+
+interface AtlasPlacement {
+  text: string;
+  x: number;
+  y: number;
+  w: number;
+  country: PoliticalCountry;
+}
+
+/**
+ * Pack the label texts into ATLAS_WIDTH-wide rows (stopping at ATLAS_MAX_HEIGHT) and size the atlas to the next power
+ * of two that holds them.
+ * @param measure Text width in px at the atlas font
+ */
+export const packCountryAtlas = (countries: PoliticalCountry[], locale: string, measure: (text: string) => number): { placements: AtlasPlacement[]; height: number } => {
+  const placements: AtlasPlacement[] = [];
+  let x = 0;
+  let y = 0;
+
+  for (const country of countries) {
+    const text = country.names?.[locale] ?? country.name;
+
+    if (!text) {
+      continue;
+    }
+    const w = Math.min(Math.ceil(measure(text)) + ATLAS_PAD_X * 2, ATLAS_WIDTH);
+
+    if (x + w > ATLAS_WIDTH) {
+      x = 0;
+      y += ATLAS_ROW_HEIGHT;
+    }
+    if (y + ATLAS_ROW_HEIGHT > ATLAS_MAX_HEIGHT) {
+      break;
+    }
+    placements.push({ text, x, y, w, country });
+    x += w;
+  }
+
+  let height = 2;
+
+  while (height < y + ATLAS_ROW_HEIGHT) {
+    height *= 2;
+  }
+
+  return { placements, height };
+};
+
+/** Texture rectangle and WGS84 Earth-fixed anchor of one packed label. */
+export const countryAtlasEntry = ({ x, y, w, country }: AtlasPlacement, height: number): AtlasEntry => {
+  const ecf = countryLabelEcf(country.labelLat, country.labelLon);
+
+  return {
+    u0: x / ATLAS_WIDTH,
+    v0: y / height,
+    u1: (x + w) / ATLAS_WIDTH,
+    v1: (y + ATLAS_ROW_HEIGHT) / height,
+    aspect: w / ATLAS_ROW_HEIGHT,
+    ecf: [ecf.x, ecf.y, ecf.z],
+    minLabel: country.minLabel,
+    labelRank: country.labelRank,
+  };
+};
+
+/**
+ * Earth-fixed anchor of a country label: the WGS84 geodetic point LABEL_ALT_KM above the ellipsoid
+ * (the old `lla2eci(..., gmst 0)` put it on the 6371 km sphere, up to ~22 km off the globe).
+ * @param latDeg - Geodetic latitude in degrees
+ * @param lonDeg - Longitude in degrees
+ */
+export const countryLabelEcf = (latDeg: number, lonDeg: number): EcefVec3<Kilometers> =>
+  llaRad2ecef({ lat: (latDeg * DEG2RAD) as Radians, lon: (lonDeg * DEG2RAD) as Radians, alt: LABEL_ALT_KM });
 
 /**
  * Country name labels for the political map, rendered as GPU billboards.
@@ -213,35 +284,7 @@ export class CountryLabelManager {
     measureCtx.font = font;
 
     // First pass: measure and pack into rows.
-    const placements: { text: string; x: number; y: number; w: number; country: PoliticalCountry }[] = [];
-    let x = 0;
-    let y = 0;
-
-    for (const country of countries) {
-      const text = country.names?.[locale] ?? country.name;
-
-      if (!text) {
-        continue;
-      }
-      const w = Math.min(Math.ceil(measureCtx.measureText(text).width) + ATLAS_PAD_X * 2, ATLAS_WIDTH);
-
-      if (x + w > ATLAS_WIDTH) {
-        x = 0;
-        y += ATLAS_ROW_HEIGHT;
-      }
-      if (y + ATLAS_ROW_HEIGHT > ATLAS_MAX_HEIGHT) {
-        break;
-      }
-      placements.push({ text, x, y, w, country });
-      x += w;
-    }
-
-    let height = 2;
-
-    while (height < y + ATLAS_ROW_HEIGHT) {
-      height *= 2;
-    }
-
+    const { placements, height } = packCountryAtlas(countries, locale, (text) => measureCtx.measureText(text).width);
     const canvas = new OffscreenCanvas(ATLAS_WIDTH, height);
     const ctx = canvas.getContext('2d')!;
 
@@ -252,7 +295,8 @@ export class CountryLabelManager {
     ctx.lineJoin = 'round';
 
     this.atlasEntries_ = [];
-    for (const { text, x: px, y: py, w, country } of placements) {
+    for (const placement of placements) {
+      const { text, x: px, y: py, w } = placement;
       const cy = py + ATLAS_ROW_HEIGHT / 2;
 
       ctx.strokeStyle = 'rgba(0, 0, 0, 0.9)';
@@ -261,18 +305,7 @@ export class CountryLabelManager {
       ctx.fillStyle = '#ffffff';
       ctx.fillText(text, px + ATLAS_PAD_X, cy, w - ATLAS_PAD_X * 2);
 
-      const eci = lla2eci({ lat: (country.labelLat * DEG2RAD) as Radians, lon: (country.labelLon * DEG2RAD) as Radians, alt: LABEL_ALT_KM }, 0 as GreenwichMeanSiderealTime);
-
-      this.atlasEntries_.push({
-        u0: px / ATLAS_WIDTH,
-        v0: py / height,
-        u1: (px + w) / ATLAS_WIDTH,
-        v1: (py + ATLAS_ROW_HEIGHT) / height,
-        aspect: w / ATLAS_ROW_HEIGHT,
-        ecf: [eci.x, eci.y, eci.z],
-        minLabel: country.minLabel,
-        labelRank: country.labelRank,
-      });
+      this.atlasEntries_.push(countryAtlasEntry(placement, height));
     }
 
     // Major countries first so the MAX_LABELS cap trims the least important.

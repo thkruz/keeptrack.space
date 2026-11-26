@@ -640,6 +640,13 @@ export class WebGLRenderer {
     } catch (error) {
       errorManagerInstance.warn(t7e('errorMsgs.Rendering.godraysResizeFailed').replace('{error}', error instanceof Error ? error.message : String(error)));
     }
+
+    // The scenery target's attachments follow the drawing-buffer size too (it also re-checks on every frame it starts).
+    try {
+      scene.sceneryTarget?.resize();
+    } catch {
+      // A failed reallocation leaves the target unallocated; the next frame retries or falls back to the plain path.
+    }
   }
 
   /**

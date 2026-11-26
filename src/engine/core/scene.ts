@@ -46,6 +46,7 @@ import { SkyBoxSphere } from '../rendering/draw-manager/skybox-sphere';
 import { Sun } from '../rendering/draw-manager/sun';
 import { SwathMeshFactory } from '../rendering/draw-manager/swath-mesh-factory';
 import { WorldMarkers } from '../rendering/draw-manager/world-markers';
+import { SceneryTarget, SceneryTargetHook } from '../rendering/scenery-target';
 import { WebGLRenderer } from '../rendering/webgl-renderer';
 import { errorManagerInstance } from '../utils/errorManager';
 import { FrameProfiler, GpuStage } from '../utils/frame-profiler';
@@ -119,6 +120,14 @@ export class Scene {
     gpuPicking: null as unknown as WebGLFramebuffer,
     godrays: null as unknown as WebGLFramebuffer,
   };
+  /**
+   * Optional off-screen scenery target (see scenery-target.ts). While the hook is set and enabled,
+   * the background, atmosphere and aurora render into a floating-point target that is resolved to the
+   * canvas before the dots, labels, orbits and lines. Null (the default) leaves the frame untouched.
+   */
+  sceneryTargetHook: SceneryTargetHook | null = null;
+  sceneryTarget: SceneryTarget | null = null;
+  private isSceneryTargetActive_ = false;
   updateVisualsBasedOnPerformanceTime_ = 0;
   primaryCovBubble: Ellipsoid;
   secondaryCovBubble: Ellipsoid;
@@ -321,6 +330,67 @@ export class Scene {
     }
   }
 
+  /** Install (or clear) the scenery target hook. A new hook gets a fresh attempt at the target. */
+  setSceneryTargetHook(hook: SceneryTargetHook | null): void {
+    this.sceneryTargetHook = hook;
+    this.sceneryTarget?.reset();
+  }
+
+  /** Multiplier the godrays composite applies to the Sun disc this frame (1 when the target is off). */
+  get sunHdrBoost(): number {
+    return this.isSceneryTargetActive_ ? (this.sceneryTargetHook?.getSettings().sunBoost ?? 1) : 1;
+  }
+
+  /** Framebuffer the background and atmosphere draw into: the scenery target while it is active, else the canvas (null). */
+  private sceneryFramebuffer_(): WebGLFramebuffer | null {
+    return this.isSceneryTargetActive_ ? (this.sceneryTarget?.framebuffer ?? null) : null;
+  }
+
+  /**
+   * Start the scenery target for this pass when a hook wants it and the mode supports it. Disabled for
+   * multi-pane layouts (each pane would need its own scissored resolve), for the planetarium and
+   * astronomy cameras (no Earth), and whenever a plugin owns the Earth draw (flat map, polar view).
+   */
+  private beginSceneryTarget_(camera: Camera): boolean {
+    const hook = this.sceneryTargetHook;
+
+    this.earth.isHdrSceneTarget = false;
+    if (!hook || !hook.isEnabled()) {
+      return false;
+    }
+    if (camera.cameraType === CameraType.PLANETARIUM || camera.cameraType === CameraType.ASTRONOMY) {
+      return false;
+    }
+    if (EventBus.getInstance().methods.shouldSkipEarthDraw() || ServiceLocator.getViewportManager()?.isMultiViewActive()) {
+      return false;
+    }
+
+    this.sceneryTarget ??= new SceneryTarget(this.gl_);
+    const clearColor = this.clearColorOverride ?? camera.clearColorOverride ?? [0, 0, 0, 1];
+
+    if (!this.sceneryTarget.begin(hook, clearColor)) {
+      this.gl_.bindFramebuffer(this.gl_.FRAMEBUFFER, null);
+
+      return false;
+    }
+    this.earth.isHdrSceneTarget = true;
+
+    return true;
+  }
+
+  /** Resolve the scenery target (bloom, roll-off, depth copy) to the canvas. No-op when it is not active. */
+  private endSceneryTarget_(renderer: WebGLRenderer): void {
+    if (!this.isSceneryTargetActive_) {
+      return;
+    }
+    this.isSceneryTargetActive_ = false;
+    this.earth.isHdrSceneTarget = false;
+    renderer.postProcessingManager.curBuffer = null;
+    if (this.sceneryTarget && this.sceneryTargetHook) {
+      this.sceneryTarget.resolve(this.sceneryTargetHook);
+    }
+  }
+
   render(renderer: WebGLRenderer, camera: Camera): void {
     this.clear(camera);
 
@@ -328,6 +398,7 @@ export class Scene {
 
     this.renderBackground(renderer, camera);
     this.renderOpaque(renderer, camera);
+    this.endSceneryTarget_(renderer);
 
     EventBus.getInstance().emit(EventBusEvent.drawOverlay);
 
@@ -379,6 +450,12 @@ export class Scene {
     // assumes the full canvas and produces artifacts in small scissored panes
     const isSecondaryPass = ServiceLocator.getViewportManager()?.isSecondaryRenderPass() ?? false;
 
+    this.isSceneryTargetActive_ = false;
+    if (!settingsManager.isDrawLess) {
+      this.isSceneryTargetActive_ = this.beginSceneryTarget_(camera);
+      renderer.postProcessingManager.curBuffer = this.sceneryFramebuffer_();
+    }
+
     if (!settingsManager.isDrawLess) {
       if (settingsManager.isDrawSun && !isSecondaryPass) {
         // A dead/never-initialized godrays must degrade to the plain sun path —
@@ -396,11 +473,11 @@ export class Scene {
         if (skipSunChain) {
           // Match the non-skipped path's post-processing target so the skybox /
           // earth draws below composite to the canvas identically.
-          renderer.postProcessingManager.curBuffer = null;
+          renderer.postProcessingManager.curBuffer = this.sceneryFramebuffer_();
         } else {
-          // Draw the Sun to the Godrays Frame Buffer
+          // Draw the Sun to the Godrays Frame Buffer (or straight to the scenery target / canvas when godrays are off)
           profiler.beginGpu(GpuStage.sun);
-          this.sun.draw(this.earth.lightDirection, fb);
+          this.sun.draw(this.earth.lightDirection, fb ?? this.sceneryFramebuffer_());
           profiler.endGpu(GpuStage.sun);
 
           // Occlusion passes exist ONLY to mask the sun inside the godrays buffer.
@@ -443,7 +520,7 @@ export class Scene {
           // Add the godrays effect to the godrays frame buffer and then apply it to the postprocessing buffer two.
           // Null-safe: a throw here used to abort renderBackground before the earth/
           // atmosphere draws below — one godrays failure blanked the atmosphere.
-          renderer.postProcessingManager.curBuffer = null;
+          renderer.postProcessingManager.curBuffer = this.sceneryFramebuffer_();
           profiler.beginGpu(GpuStage.godrays);
           this.godrays?.draw(camera.projectionMatrix, camera.matrixWorldInverse, renderer.postProcessingManager.curBuffer);
           profiler.endGpu(GpuStage.godrays);
@@ -510,7 +587,8 @@ export class Scene {
       profiler.endGpu(GpuStage.scenery);
     }
 
-    renderer.postProcessingManager.curBuffer = null;
+    // Atmosphere and aurora (renderOpaque) still belong to the scenery target while it is active.
+    renderer.postProcessingManager.curBuffer = this.sceneryFramebuffer_();
   }
 
   /**
@@ -638,6 +716,9 @@ export class Scene {
         this.earth.draw(renderer.postProcessingManager.curBuffer);
       }
     }
+
+    // Everything above is scenery. Resolve it (bloom, roll-off, depth copy) before the dots, orbits and lines draw to the canvas.
+    this.endSceneryTarget_(renderer);
 
     // Draw Dots (dots + GPU picking are timed inside DotsManager.draw)
     dotsManagerInstance.draw(renderer.projectionCameraMatrix, renderer.postProcessingManager.curBuffer);

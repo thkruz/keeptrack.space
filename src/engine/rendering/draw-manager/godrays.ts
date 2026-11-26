@@ -77,6 +77,7 @@ export class Godrays {
     gl.uniform2f(this.mesh.material.uniforms.u_sunPosition, screenPosition[0], screenPosition[1]);
     gl.uniform2f(this.mesh.material.uniforms.u_resolution, gl.canvas.width, gl.canvas.height);
     gl.uniform1f(this.mesh.material.uniforms.u_sunRadius, sunRadius);
+    gl.uniform1f(this.mesh.material.uniforms.u_hdrBoost, ServiceLocator.getScene().sunHdrBoost);
 
     gl.bindVertexArray(this.mesh.geometry.vao);
     gl.drawArrays(gl.TRIANGLES, 0, 6);
@@ -112,6 +113,7 @@ export class Godrays {
         u_sampler: <WebGLUniformLocation>(<unknown>null),
         u_resolution: <WebGLUniformLocation>(<unknown>null),
         u_sunRadius: <WebGLUniformLocation>(<unknown>null),
+        u_hdrBoost: <WebGLUniformLocation>(<unknown>null),
       },
       map: gl.createTexture(),
       textureType: 'flat',
@@ -251,6 +253,7 @@ export class Godrays {
       uniform vec2 u_sunPosition;
       uniform vec2 u_resolution;
       uniform float u_sunRadius;
+      uniform float u_hdrBoost;
 
       in vec2 v_texCoord;
       out vec4 fragColor;
@@ -340,7 +343,11 @@ export class Godrays {
         vec3 rays = 1.0 - exp(-color.rgb * exposure);
 
         float blendFactor = 0.7 + 0.3 * noise;
-        vec3 blended = dist > u_sunRadius ? mix(scene.rgb + rays, rays, blendFactor) : scene.rgb + rays;
+        // u_hdrBoost is 1.0 unless the floating-point scenery target is active; then the bright
+        // disc is lifted above 1.0 so it rolls off and blooms. Rays are sampled before this, unchanged.
+        float discMask = smoothstep(0.55, 0.95, max(scene.r, max(scene.g, scene.b)));
+        vec3 sceneBoosted = scene.rgb * (1.0 + (u_hdrBoost - 1.0) * discMask);
+        vec3 blended = dist > u_sunRadius ? mix(sceneBoosted + rays, rays, blendFactor) : sceneBoosted + rays;
 
         fragColor = vec4(blended, 1.0);
       }

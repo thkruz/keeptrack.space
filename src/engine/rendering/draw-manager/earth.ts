@@ -92,6 +92,12 @@ export interface EarthAtmosphereBindContext {
   /** WGS84 equatorial and polar radii (km). */
   equatorialRadiusKm: number;
   polarRadiusKm: number;
+  /**
+   * True while the target being drawn into is the floating-point scenery target (see
+   * scenery-target.ts): its colour may exceed 1.0, so the shader should write unbounded values and
+   * a scene copy must use a float format.
+   */
+  isHdrTarget: boolean;
 }
 
 /**
@@ -217,6 +223,8 @@ export class Earth {
   private atmosphereIntensity_ = 1.0;
   /** Set by the plugin that supplies the atmosphere shaders; null keeps the plain shell draw path. */
   atmosphereHook: EarthAtmosphereRenderHook | null = null;
+  /** Set by the scene while the Earth draws into the floating-point scenery target; passed to the atmosphere hook. */
+  isHdrSceneTarget = false;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   surfaceMesh: Mesh;
@@ -1003,6 +1011,7 @@ export class Earth {
       cameraAltitudeKm: getCameraAltitudeAboveEllipsoid(camera.getCamPosEarthCentered()),
       equatorialRadiusKm: WGS84_A_KM,
       polarRadiusKm: WGS84_B_KM,
+      isHdrTarget: this.isHdrSceneTarget,
     });
   }
 

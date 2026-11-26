@@ -174,4 +174,30 @@ describe('closeObjectsWorker', () => {
 
     expect(() => dispatch({ typ: 99, runId: 1 })).not.toThrow();
   });
+
+  describe('geodeticAltitudeKm (WGS84, row CW1)', () => {
+    const altOf = async (p: { x: number; y: number; z: number }) => {
+      const { geodeticAltitudeKm } = await import('@app/webworker/closeObjectsWorker');
+
+      return geodeticAltitudeKm(p as never);
+    };
+
+    it('measures from the equatorial semi-axis a = 6378.137 km at the equator', async () => {
+      expect(await altOf({ x: 6378.137 + 500, y: 0, z: 0 })).toBeCloseTo(500, 6);
+    });
+
+    it('measures from the polar semi-axis b = 6356.752 km at the pole', async () => {
+      expect(await altOf({ x: 0, y: 0, z: 6356.7523142 + 500 })).toBeCloseTo(500, 3);
+    });
+
+    it('gives 0 km for the hand-computed WGS84 surface point at 45 N (x 4517.5909, z 4487.3484)', async () => {
+      expect(await altOf({ x: 4517.5909, y: 0, z: 4487.3484 })).toBeCloseTo(0, 3);
+    });
+
+    it('does not depend on the rotation about the polar axis', async () => {
+      const r = 4517.5909 + 400 * Math.SQRT1_2;
+
+      expect(await altOf({ x: r * Math.SQRT1_2, y: r * Math.SQRT1_2, z: 4487.3484 + 400 * Math.SQRT1_2 })).toBeCloseTo(400, 3);
+    });
+  });
 });

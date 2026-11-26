@@ -37,7 +37,7 @@ import {
   Kilometers,
   KilometersPerSecond,
   LandObject,
-  lla2eci,
+  llaRad2eci,
   Milliseconds,
   Minutes,
   Radians,
@@ -768,6 +768,69 @@ export const updateStar = (i: number, _now: Date, _gmst: GreenwichMeanSiderealTi
   satPos[i * 3 + 1] = STAR_DISTANCE * cosDec * Math.sin(ra);
   satPos[i * 3 + 2] = STAR_DISTANCE * Math.sin(dec);
 };
+/**
+ * WGS84 geodetic missile sample (degrees, km above the ellipsoid) to ECI km. Both samples of the
+ * cruncher's missile finite-difference velocity go through this one function.
+ */
+export const missileLlaDegToEci = (latDeg: number, lonDeg: number, altKm: number, gmst: number): TemeVec3<Kilometers> =>
+  llaRad2eci({ lat: (latDeg * DEG2RAD) as Radians, lon: (lonDeg * DEG2RAD) as Radians, alt: altKm as Kilometers }, gmst);
+
+/**
+ * Finite-difference missile velocity: next trajectory point minus the current satPos (km per
+ * step), averaged with the previous estimate once one exists. Reset at the first point.
+ */
+const updateMissileVelocity_ = (i: number, lastTime: number, next: TemeVec3<Kilometers>): void => {
+  const i3 = i * 3;
+
+  if (lastTime === 0) {
+    resetVelocity(satVel, i);
+
+    return;
+  }
+
+  const dx = next.x - satPos[i3];
+  const dy = next.y - satPos[i3 + 1];
+  const dz = next.z - satPos[i3 + 2];
+
+  if (satVel[i3] === 0 && satVel[i3 + 1] === 0 && satVel[i3 + 2] === 0) {
+    satVel[i3] = dx;
+    satVel[i3 + 1] = dy;
+    satVel[i3 + 2] = dz;
+  } else {
+    satVel[i3] = (satVel[i3] + dx) * 0.5;
+    satVel[i3 + 1] = (satVel[i3 + 1] + dy) * 0.5;
+    satVel[i3 + 2] = (satVel[i3 + 2] + dz) * 0.5;
+  }
+};
+
+/** A missing or negative trajectory index starts at 0. */
+const normalizeMissileLastTime_ = (lastTime: number | undefined): number => (lastTime !== undefined && lastTime >= 0 ? lastTime : 0);
+
+/**
+ * New in-view flag for a missile: 0 with no sensors; otherwise a flag already at 1 stays 1, else 1 when any sensor
+ * has the missile in its field of view.
+ * @param current The missile's current satInView flag
+ * @param sensorList Sensors to test, in order
+ * @param positionEcf Missile position in ECEF km
+ */
+export const missileInViewFlag = (current: number, sensorList: Pick<DetailedSensor, 'llaRad' | 'isRaeInFov'>[], positionEcf: EcefVec3<Kilometers>): number => {
+  if (sensorList.length === 0) {
+    return 0;
+  }
+  let flag = current;
+
+  for (const sensor of sensorList) {
+    if (flag === 1) {
+      break;
+    }
+    const rae = ecefRad2rae(sensor.llaRad(), positionEcf);
+
+    flag = sensor.isRaeInFov(rae.az, rae.el, rae.rng) ? 1 : 0;
+  }
+
+  return flag;
+};
+
 export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: GreenwichMeanSiderealTime): boolean => {
   const missile = objCache[i];
 
@@ -792,7 +855,7 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   // ran past the trajectory end, snapping impacted missiles back to their launch site.
   const curMissivarTime = Math.max(0, Math.min(Math.ceil((now.getTime() - missile.startTime) / 1000), tLen - 1));
 
-  missile.lastTime = missile.lastTime !== undefined && missile.lastTime >= 0 ? missile.lastTime : 0;
+  missile.lastTime = normalizeMissileLastTime_(missile.lastTime);
 
   // Look one point ahead for the velocity estimate, but never past the last point (avoids reading
   // undefined lat/lon/alt — which produced NaN velocity — once the missile reaches impact).
@@ -801,33 +864,16 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
   const lon = missile.lonList[timeIndex];
   const alt = missile.altList[timeIndex];
 
-  const cosLat = Math.cos(lat * DEG2RAD);
-  const sinLat = Math.sin(lat * DEG2RAD);
-  const cosLon = Math.cos(lon * DEG2RAD + gmstNext);
-  const sinLon = Math.sin(lon * DEG2RAD + gmstNext);
-
-  if (missile.lastTime === 0) {
-    resetVelocity(satVel, i);
-  } else if (satVel[i * 3] === 0 && satVel[i * 3 + 1] === 0 && satVel[i * 3 + 2] === 0) {
-    satVel[i * 3] = (6371 + alt) * cosLat * cosLon - satPos[i * 3];
-    satVel[i * 3 + 1] = (6371 + alt) * cosLat * sinLon - satPos[i * 3 + 1];
-    satVel[i * 3 + 2] = (6371 + alt) * sinLat - satPos[i * 3 + 2];
-  } else {
-    satVel[i * 3] += (6371 + alt) * cosLat * cosLon - satPos[i * 3];
-    satVel[i * 3 + 1] += (6371 + alt) * cosLat * sinLon - satPos[i * 3 + 1];
-    satVel[i * 3 + 2] += (6371 + alt) * sinLat - satPos[i * 3 + 2];
-    satVel[i * 3] *= 0.5;
-    satVel[i * 3 + 1] *= 0.5;
-    satVel[i * 3 + 2] *= 0.5;
-  }
+  updateMissileVelocity_(i, missile.lastTime, missileLlaDegToEci(lat, lon, alt, gmstNext));
 
   // Interpolate between the two bounding 1-second samples by the fractional elapsed time so the
-  // value glides instead of stair-stepping once per second, and convert with the ellipsoidal
-  // lla2eci (matching the rendered dot, the trajectory line, and MissileObject.eci()) rather than
-  // a spherical approximation. (The rendered dot is recomputed on the main thread every frame; this
-  // worker value feeds the 1 Hz sensor in-view check below.)
+  // value glides instead of stair-stepping once per second, and convert with the WGS84 geodetic
+  // llaRad2eci (matching the rendered dot, the trajectory line, and MissileObject.eci()). The
+  // velocity sample above goes through the same function, so the finite difference never mixes
+  // a spherical and an ellipsoidal point. (The rendered dot is recomputed on the main thread
+  // every frame; this worker value feeds the 1 Hz sensor in-view check below.)
   const sample = interpolateMissileSample(missile.latList, missile.lonList, missile.altList, missile.startTime, now.getTime());
-  const missileEci = lla2eci({ lat: (sample.lat * DEG2RAD) as Radians, lon: (sample.lon * DEG2RAD) as Radians, alt: sample.alt as Kilometers }, gmst);
+  const missileEci = missileLlaDegToEci(sample.lat, sample.lon, sample.alt, gmst);
 
   satPos[i * 3] = missileEci.x;
   satPos[i * 3 + 1] = missileEci.y;
@@ -845,18 +891,7 @@ export const updateMissile = (i: number, now: Date, gmstNext: number, gmst: Gree
     missile.active = false;
   }
 
-  if (sensors.length > 0) {
-    for (const sensor of sensors) {
-      if (satInView[i] === 1) {
-        break;
-      }
-      const rae = ecefRad2rae(sensor.llaRad(), positionEcf);
-
-      satInView[i] = sensor.isRaeInFov(rae.az, rae.el, rae.rng) ? 1 : 0;
-    }
-  } else {
-    satInView[i] = 0;
-  }
+  satInView[i] = missileInViewFlag(satInView[i], sensors, positionEcf);
 
   return true;
 };
@@ -868,7 +903,9 @@ export const updateLandObject = (i: number, gmst: GreenwichMeanSiderealTime): vo
     lon: (landObject.lon * DEG2RAD) as Radians,
     alt: (landObject.alt + GROUND_BUFFER_DISTANCE) as Kilometers,
   };
-  const eci = lla2eci(lla, gmst);
+  // WGS84 geodetic position (llaRad2eci): GROUND_BUFFER_DISTANCE above the ellipsoid along the
+  // geodetic normal, the same point as the site's own eci() plus the buffer.
+  const eci = llaRad2eci(lla, gmst);
 
   satPos[i * 3] = eci.x;
   satPos[i * 3 + 1] = eci.y;

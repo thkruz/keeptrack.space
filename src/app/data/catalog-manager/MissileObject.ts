@@ -16,7 +16,7 @@ import {
   Kilometers,
   KilometersPerSecond,
   LlaVec3,
-  lla2eci,
+  llaRad2eci,
   PosVel,
   Radians,
   SpaceObject,
@@ -186,7 +186,7 @@ export class MissileObject extends SpaceObject {
       alt: sample.alt as Kilometers,
     };
 
-    return lla2eci(lla, gmst);
+    return llaRad2eci(lla, gmst);
   }
 
   /**
@@ -300,7 +300,7 @@ export class MissileObject extends SpaceObject {
 
   /**
    * Unit ECI direction of travel at the current sim time, from the two trajectory
-   * samples bracketing "now" (the same ellipsoidal lla2eci the dot and the orbit
+   * samples bracketing "now" (the same WGS84 llaRad2eci the dot and the orbit
    * line use). The mesh manager points the missile model's nose along this so the
    * mesh tracks the rendered trajectory instead of tumbling. Returns null when the
    * trajectory is too short or the bracketing samples coincide.
@@ -317,7 +317,7 @@ export class MissileObject extends SpaceObject {
     const i0 = Math.min(Math.floor(elapsedSec), lastIdx - 1);
     const i1 = i0 + 1;
 
-    const toEci = (idx: number) => lla2eci({ lat: (this.latList[idx] * DEG2RAD) as Radians, lon: (this.lonList[idx] * DEG2RAD) as Radians, alt: this.altList[idx] }, gmst);
+    const toEci = (idx: number) => llaRad2eci({ lat: (this.latList[idx] * DEG2RAD) as Radians, lon: (this.lonList[idx] * DEG2RAD) as Radians, alt: this.altList[idx] }, gmst);
     const p0 = toEci(i0);
     const p1 = toEci(i1);
     const dir = new Vector3D(p1.x - p0.x, p1.y - p0.y, p1.z - p0.z);
@@ -370,7 +370,7 @@ export class MissileObject extends SpaceObject {
     }
 
     const toEcef = (lat: number, lon: number, alt: number) =>
-      lla2eci({ lat: (lat * DEG2RAD) as Radians, lon: (lon * DEG2RAD) as Radians, alt: alt as Kilometers }, 0 as GreenwichMeanSiderealTime);
+      llaRad2eci({ lat: (lat * DEG2RAD) as Radians, lon: (lon * DEG2RAD) as Radians, alt: alt as Kilometers }, 0 as GreenwichMeanSiderealTime);
 
     const remaining = len - startIdx;
     const out = new Float32Array((remaining + 1) * 4);

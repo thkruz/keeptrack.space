@@ -9,7 +9,7 @@
  */
 
 import { findTca } from '@app/engine/math/tca-search';
-import { RADIUS_OF_EARTH, Satellite, type TemeVec3 } from '@ootk/src/main';
+import { eci2lla, Satellite, type TemeVec3 } from '@ootk/src/main';
 import { type CoMsgStartSearch, type CoResultRow, type CoSatelliteData, type CoWorkerInMsg, CoWorkerMsgType, CoWorkerOutMsgType } from './close-objects-messages';
 import { handleSgp4WasmBackendMsg, isSgp4WasmBackendMsg } from './shared/sgp4-wasm-backend-handler';
 
@@ -66,10 +66,16 @@ function distance_(a: TemeVec3, b: TemeVec3): number {
   return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }
 
-/** Altitude (km) of a TEME position above the spherical Earth. */
-function altitude_(p: TemeVec3): number {
-  return Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z) - RADIUS_OF_EARTH;
+/**
+ * Geodetic altitude (km) of a TEME position above the WGS84 ellipsoid. Geodetic height
+ * depends only on the distance from the polar axis and on z, so any Earth rotation angle
+ * gives the same altitude; gmst 0 is passed for that reason.
+ */
+export function geodeticAltitudeKm(p: TemeVec3): number {
+  return eci2lla(p, 0).alt;
 }
+
+const altitude_ = geodeticAltitudeKm;
 
 interface VerifiedPair {
   row: CoResultRow;

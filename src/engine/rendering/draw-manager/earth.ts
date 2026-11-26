@@ -29,6 +29,7 @@ import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import type { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
@@ -77,6 +78,40 @@ export const getEarthEllipsoid = (heightKm = 0): SphereEllipsoidRadii => ({ a: W
 
 /** Geodetic height of the atmosphere shell: the old sphere was 1.025 x the radius, kept as 2.5 % of a. */
 export const EARTH_ATMOSPHERE_HEIGHT_KM = WGS84_A_KM * 0.025;
+
+/** Per-frame values the engine hands to an {@link EarthAtmosphereRenderHook}. All positions are in the render (inertial, worldShift-translated) frame, in km. */
+export interface EarthAtmosphereBindContext {
+  /** Unit vector toward the Sun, same frame as the shell vertices after modelViewMatrix. */
+  lightDirection: ArrayLike<number>;
+  /** Earth center in the render frame. */
+  earthCenter: [number, number, number];
+  /** Camera position in the render frame. */
+  cameraPosition: ArrayLike<number>;
+  /** Camera height above the WGS84 surface directly below it (km). */
+  cameraAltitudeKm: number;
+  /** WGS84 equatorial and polar radii (km). */
+  equatorialRadiusKm: number;
+  polarRadiusKm: number;
+}
+
+/**
+ * Optional hook by which the plugin that supplies the atmosphere shaders owns how the shell is
+ * drawn. The engine knows nothing about what the shader computes. When a hook is set the engine
+ * does not declare or set `uLightDirection` or `uIntensity` (so the scene's legacy 2x intensity
+ * compensation never reaches the shader); the hook declares and binds everything it uses.
+ */
+export interface EarthAtmosphereRenderHook {
+  /** Geodetic height of the proxy shell above the WGS84 surface (km). */
+  shellHeightKm: number;
+  /** Extra uniform names the shader declares (each must be active in the program). */
+  uniformNames: string[];
+  /** Built-in uniforms to leave undeclared (the shader does not use them). */
+  disabledUniforms?: { normalMatrix?: boolean; cameraPosition?: boolean; worldOffset?: boolean };
+  /** Called after the program is in use and default blending is set; sets blend state and binds uniforms and textures. */
+  bind(gl: WebGL2RenderingContext, uniforms: Record<string, WebGLUniformLocation>, ctx: EarthAtmosphereBindContext): void;
+  /** Called after the draw; unbind textures here. The engine restores the default blend function. */
+  unbind?(gl: WebGL2RenderingContext): void;
+}
 
 /**
  * Camera height above the WGS84 surface directly below it (along the geocentric direction).
@@ -180,6 +215,8 @@ export class Earth {
    * shell pass reproduces the additive brightness of the legacy double-draw.
    */
   private atmosphereIntensity_ = 1.0;
+  /** Set by the plugin that supplies the atmosphere shaders; null keeps the plain shell draw path. */
+  atmosphereHook: EarthAtmosphereRenderHook | null = null;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   surfaceMesh: Mesh;
@@ -534,11 +571,18 @@ export class Earth {
       return;
     }
 
-    const earthAtmosphereGeometry = this.buildEllipsoidGeometry_(EARTH_ATMOSPHERE_HEIGHT_KM);
-    const atmosphereUniforms: Record<string, WebGLUniformLocation> = {
-      uLightDirection: <WebGLUniformLocation>(<unknown>null),
-      uIntensity: <WebGLUniformLocation>(<unknown>null),
-    };
+    const hook = this.atmosphereHook;
+    const earthAtmosphereGeometry = this.buildEllipsoidGeometry_(hook?.shellHeightKm ?? EARTH_ATMOSPHERE_HEIGHT_KM);
+    const atmosphereUniforms: Record<string, WebGLUniformLocation> = hook
+      ? {}
+      : {
+          uLightDirection: <WebGLUniformLocation>(<unknown>null),
+          uIntensity: <WebGLUniformLocation>(<unknown>null),
+        };
+
+    hook?.uniformNames.forEach((name) => {
+      atmosphereUniforms[name] = <WebGLUniformLocation>(<unknown>null);
+    });
 
     /*
      * The EarthAtmosphere (Pro) plugin only emits `uCameraAltitude` when its
@@ -564,10 +608,24 @@ export class Earth {
       disabledUniforms: {
         modelMatrix: true,
         viewMatrix: true,
+        ...hook?.disabledUniforms,
       },
     });
 
     this.initVaoAtmosphere_();
+  }
+
+  /**
+   * Drop the atmosphere shell and build it again from the shaders and hook currently installed.
+   * Used when the plugin switches quality tier at runtime.
+   */
+  rebuildAtmosphereMesh(): void {
+    if (this.atmosphereMesh) {
+      this.gl_?.deleteVertexArray(this.atmosphereMesh.geometry.vao);
+      this.gl_?.deleteProgram(this.atmosphereMesh.program.program);
+      this.atmosphereMesh = null;
+    }
+    this.buildAtmosphereMesh();
   }
 
   typeToString(): string {
@@ -866,6 +924,7 @@ export class Earth {
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    this.bindAtmosphereHook_(gl);
 
     // disable depth test unless zoomed out (avoid atmosphere showing through the moon when zoomed out)
     if (settingsManager.centerBody === SolarBody.Earth && ServiceLocator.getMainCamera().calcDistanceBasedOnZoom() < 2e5) {
@@ -890,6 +949,7 @@ export class Earth {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.atmosphereMesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, this.atmosphereMesh.geometry.indexType, 0);
     gl.bindVertexArray(null);
+    this.atmosphereHook?.unbind?.(gl);
 
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.disable(gl.POLYGON_OFFSET_FILL);
@@ -925,6 +985,27 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageOpacity, this.coverageOverlayOpacity);
   }
 
+  /** Let the atmosphere hook (if any) set blend state and bind its uniforms and textures for this frame. */
+  private bindAtmosphereHook_(gl: WebGL2RenderingContext): void {
+    const hook = this.atmosphereHook;
+
+    if (!hook || !this.atmosphereMesh) {
+      return;
+    }
+
+    const mv = this.modelViewMatrix_;
+    const camera = ServiceLocator.getMainCamera();
+
+    hook.bind(gl, this.atmosphereMesh.material.uniforms, {
+      lightDirection: this.lightDirection,
+      earthCenter: [mv[12], mv[13], mv[14]],
+      cameraPosition: camera.getForwardVector(),
+      cameraAltitudeKm: getCameraAltitudeAboveEllipsoid(camera.getCamPosEarthCentered()),
+      equatorialRadiusKm: WGS84_A_KM,
+      polarRadiusKm: WGS84_B_KM,
+    });
+  }
+
   private setAtmosphereUniforms_(gl: WebGL2RenderingContext) {
     if (!this.atmosphereMesh) {
       return;
@@ -932,12 +1013,19 @@ export class Earth {
 
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.projectionMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
+    if (this.atmosphereMesh.material.uniforms.normalMatrix) {
+      gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    }
+    if (this.atmosphereMesh.material.uniforms.cameraPosition) {
+      gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
+    }
     gl.uniform1f(this.atmosphereMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
-    gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
-    gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
+    // A hook owns its own light and intensity uniforms (see EarthAtmosphereRenderHook).
+    if (!this.atmosphereHook) {
+      gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
+      gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
+    }
 
     /*
      * Altitude-aware scattering (EarthAtmosphere plugin, isAltitudeAware). The uniform
@@ -1101,11 +1189,18 @@ export class Earth {
     gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.position.location);
     this.atmosphereMesh!.geometry.attributes.position.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.normal.location);
-    this.atmosphereMesh!.geometry.attributes.normal.bindToArrayBuffer(gl);
+    // A hook shader may not read normal or uv; the mesh drops attributes the program does not use.
+    const { normal, uv } = this.atmosphereMesh!.geometry.attributes as Partial<Record<'normal' | 'uv', BufferAttribute>>;
 
-    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.uv.location);
-    this.atmosphereMesh!.geometry.attributes.uv.bindToArrayBuffer(gl);
+    if (normal) {
+      gl.enableVertexAttribArray(normal.location);
+      normal.bindToArrayBuffer(gl);
+    }
+
+    if (uv) {
+      gl.enableVertexAttribArray(uv.location);
+      uv.bindToArrayBuffer(gl);
+    }
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.atmosphereMesh!.geometry.getIndex());

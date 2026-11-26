@@ -3,7 +3,7 @@ import { Camera } from '@app/engine/camera/camera';
 import { CameraType } from '@app/engine/camera/camera-type';
 import { PluginRegistry } from '@app/engine/core/plugin-registry';
 import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
-import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, Satellite } from '@ootk/src/main';
+import { DEG2RAD, GreenwichMeanSiderealTime, Kilometers, Milliseconds, Radians, Satellite, WGS84_A } from '@ootk/src/main';
 import { defaultSat, defaultSensor } from '@test/environment/apiMocks';
 import { vi } from 'vitest';
 
@@ -128,7 +128,7 @@ describe('Camera.zoomTouchPinch', () => {
     cameraInstance.state.minDistanceFromTarget = 0.15 as Kilometers;
     settingsManager.touchPinchSensitivity = 0.5;
     settingsManager.nearZoomLevel = 25 as Kilometers;
-    settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
+    settingsManager.minZoomDistance = (WGS84_A + 50) as Kilometers;
     settingsManager.maxZoomDistance = 1.2e6 as Kilometers;
     settingsManager.isZoomStopsSnappedOnSat = false;
     vi.spyOn(PluginRegistry, 'getPlugin').mockReturnValue({
@@ -857,7 +857,7 @@ describe('Camera.zoomWheel scroll-out floor', () => {
 
   it('leaves the Earth view where it was', () => {
     // The floor is derived from the zoom range now; for Earth that derivation IS 0.1.
-    setRange(RADIUS_OF_EARTH + 50, 200000);
+    setRange(WGS84_A + 50, 200000);
 
     // eslint-disable-next-line dot-notation
     expect(Camera['zoomOutSensitivityFloor_']()).toBeCloseTo(0.1, 3);
@@ -865,7 +865,7 @@ describe('Camera.zoomWheel scroll-out floor', () => {
 
   it('keeps stepping out from the very bottom of the range, so no view can trap the camera', () => {
     for (const [min, max] of [
-      [RADIUS_OF_EARTH + 50, 200000],
+      [WGS84_A + 50, 200000],
       [0.05, 1.5e10],
       [2084, 1.2e6],
     ] as const) {

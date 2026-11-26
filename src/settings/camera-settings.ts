@@ -17,8 +17,7 @@
  * /////////////////////////////////////////////////////////////////////////////
  */
 
-import { Kilometers, Radians } from '@app/engine/ootk/src/main';
-import { RADIUS_OF_EARTH } from '../engine/utils/constants';
+import { Kilometers, Radians, WGS84_A } from '@app/engine/ootk/src/main';
 
 /**
  * Camera movement, zoom, and field of view settings
@@ -110,7 +109,7 @@ export class CameraSettings {
    *
    * Used for zooming in and out in default and offset camera modes.
    */
-  minZoomDistance = <Kilometers>(RADIUS_OF_EARTH + 50);
+  minZoomDistance = <Kilometers>(WGS84_A + 50);
   /**
    * Distance from satellite when we switch to close camera mode.
    * This is used to slow down the dolly effect when zooming in on a satellite.

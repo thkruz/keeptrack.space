@@ -21,7 +21,7 @@ import { getEl, hideEl, showEl } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
 import { estimateObjectRadiusKm, initialFramingDistanceKm, targetStandoffDistanceKm } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
-import { createSampleCovarianceFromTle, Kilometers, RADIUS_OF_EARTH, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { createSampleCovarianceFromTle, Kilometers, Satellite, SpaceObjectType, TemeVec3, WGS84_A } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { PlanetsMenuPlugin } from '../planets-menu/planets-menu';
@@ -342,7 +342,7 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     if (id === -1 && this.lastSelectedSat_ !== -1) {
       ServiceLocator.getOrbitManager().clearSelectOrbit();
       // Restore the free-camera zoom floor (a selected missile drops it to the surface).
-      settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
+      settingsManager.minZoomDistance = SelectSatManager.zoomFloorFor_(false);
     } else if (!(obj instanceof OemSatellite)) {
       // Currently Satellites and Missiles assume Earth center
       const wasOffEarth = settingsManager.centerBody !== SolarBody.Earth;
@@ -352,10 +352,10 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
       // so the camera can close in on the mesh at ANY point in the flight, including
       // the low-altitude boost phase. The per-target mesh standoff
       // (minDistanceFromTarget) still keeps the camera off the model, and because the
-      // floor equals the surface the camera never dips below it. Satellites keep the
+      // floor equals the largest ellipsoid radius the camera never dips below the surface. Satellites keep the
       // 50 km floor. Previously both used +50 km, which held the camera above a
       // boosting missile and blocked close inspection of the mesh early in flight.
-      settingsManager.minZoomDistance = (obj?.isMissile() ? RADIUS_OF_EARTH : RADIUS_OF_EARTH + 50) as Kilometers;
+      settingsManager.minZoomDistance = SelectSatManager.zoomFloorFor_(!!obj?.isMissile());
       // Restore the Earth-orbit zoom ceiling ONLY when returning from a planet view
       // (which shrinks/widens it per body). An Earth-centered selection must not
       // stomp a deployment's configured maxZoomDistance (e.g. the companion embed
@@ -620,6 +620,15 @@ export class SelectSatManager extends KeepTrackPlugin implements ISettingsContri
     }
 
     return this.lastSelectedSat_;
+  }
+
+  /**
+   * Camera zoom-in floor measured from Earth centre. A missile may close to the
+   * equatorial radius (the largest ellipsoid radius, so never inside the mesh);
+   * everything else keeps the 50 km standoff above it.
+   */
+  private static zoomFloorFor_(isMissile: boolean): Kilometers {
+    return (isMissile ? WGS84_A : WGS84_A + 50) as Kilometers;
   }
 
   private static updateCruncher_(i: number) {

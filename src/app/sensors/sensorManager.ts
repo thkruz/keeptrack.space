@@ -34,7 +34,7 @@ import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
 import { lineManagerInstance } from '@app/engine/rendering/line-manager';
 import { openColorbox } from '@app/engine/utils/colorbox';
-import { PLANETARIUM_DIST, RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { PLANETARIUM_DIST } from '@app/engine/utils/constants';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
 import { getEl, setInnerHtml } from '@app/engine/utils/get-el';
 import { PersistenceManager, StorageKey } from '@app/engine/utils/persistence-manager';
@@ -42,7 +42,7 @@ import { lat2pitch, lon2yaw } from '@app/engine/utils/transforms';
 import { waitForCruncher } from '@app/engine/utils/waitForCruncher';
 import { t7e } from '@app/locales/keys';
 import { PositionCruncherOutgoingMsg } from '@app/webworker/constants';
-import { calcGmst, DEG2RAD, GreenwichMeanSiderealTime, lla2eci, Radians, SpaceObjectType, Sun, spaceObjType2Str, ZoomValue } from '@ootk/src/main';
+import { calcGmst, DEG2RAD, GreenwichMeanSiderealTime, Kilometers, llaRad2eci, Radians, SpaceObjectType, Sun, spaceObjType2Str, ZoomValue } from '@ootk/src/main';
 import { SelectSatManager } from '../../plugins/select-sat-manager/select-sat-manager';
 import { LookAnglesPlugin } from '../../plugins/sensor/look-angles-plugin';
 import { SensorInfoPlugin } from '../../plugins/sensor/sensor-info-plugin';
@@ -615,7 +615,7 @@ export class SensorManager {
     };
     const { gmst } = calcGmst(now);
     const sunPos = Sun.eci(now);
-    const sensorPos = lla2eci(geodetic, gmst);
+    const sensorPos = llaRad2eci(geodetic, gmst);
 
     sensor.position = sensorPos;
 
@@ -647,19 +647,31 @@ export class SensorManager {
 
     const { gmst } = SatMath.calculateTimeVariables(now);
 
-    const cosLat = Math.cos(sensor.lat * DEG2RAD);
-    const sinLat = Math.sin(sensor.lat * DEG2RAD);
-    const cosLon = Math.cos(sensor.lon * DEG2RAD + gmst);
-    const sinLon = Math.sin(sensor.lon * DEG2RAD + gmst);
+    const { x, y, z } = SensorManager.planetariumCameraEci_(sensor, gmst);
 
     return {
-      x: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * cosLon,
-      y: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * cosLat * sinLon,
-      z: (RADIUS_OF_EARTH + PLANETARIUM_DIST) * sinLat,
+      x,
+      y,
+      z,
       gmst,
       lat: sensor.lat,
       lon: sensor.lon,
     };
+  }
+
+  /**
+   * Planetarium / ground-view camera: the WGS84 site lifted (sensor altitude + PLANETARIUM_DIST)
+   * along the geodetic normal, in ECI. Geodetic altitude is measured along that normal.
+   */
+  private static planetariumCameraEci_(sensor: { lat: number; lon: number; alt: number }, gmst: number) {
+    return llaRad2eci(
+      {
+        lat: (sensor.lat * DEG2RAD) as Radians,
+        lon: (sensor.lon * DEG2RAD) as Radians,
+        alt: (sensor.alt + PLANETARIUM_DIST) as Kilometers,
+      },
+      gmst
+    );
   }
 
   private cameraToCurrentSensor_(sensor?: DetailedSensor) {

@@ -1,5 +1,5 @@
 import { SolarBody } from '@app/engine/core/interfaces';
-import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
+import { Kilometers, RADIUS_OF_EARTH, WGS84_A } from '@ootk/src/main';
 
 /**
  * planets-core.ts holds the DOM-free, GL-free view configuration for centering
@@ -33,7 +33,7 @@ export interface BodyViewConfig {
 /** Zoom limits expressed in plain numbers for readability; cast to Kilometers on return. */
 const SUN_MIN_ZOOM = 62e6; // 62 million km
 const SUN_MAX_ZOOM = 1.5e10; // 15 billion km
-const EARTH_MIN_ZOOM = RADIUS_OF_EARTH + 50;
+const EARTH_MIN_ZOOM = WGS84_A + 50;
 const NEAR_BODY_MAX_ZOOM = 1.2e6; // 1.2 million km (Earth and Moon)
 const PLANET_MAX_ZOOM = 1.3e10; // 13 billion km
 /** Multiplier applied to a body's radius to keep the camera just above its surface. */

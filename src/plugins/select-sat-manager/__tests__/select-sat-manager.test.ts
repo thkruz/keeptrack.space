@@ -9,7 +9,7 @@ import { PlanetsMenuPlugin } from '@app/plugins/planets-menu/planets-menu';
 import { SatInfoBox } from '@app/plugins/sat-info-box/sat-info-box';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
 import { TopMenu } from '@app/plugins/top-menu/top-menu';
-import { Kilometers, Satellite, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { Kilometers, Satellite, SpaceObjectType, TemeVec3, WGS84_A } from '@ootk/src/main';
 import { vi } from 'vitest';
 import { defaultSat, defaultSensor } from '../../../../test/environment/apiMocks';
 import { setupStandardEnvironment } from '../../../../test/environment/standard-env';
@@ -528,5 +528,19 @@ describe('SelectSatManager_planetViewCleanup', () => {
     selectSatManager.selectSat(0);
 
     expect(clearSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('SelectSatManager zoom floor', () => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const floor = (isMissile: boolean) => (SelectSatManager as any).zoomFloorFor_(isMissile) as number;
+
+  it('satellite floor is 50 km above the equatorial radius', () => {
+    expect(floor(false)).toBeCloseTo(6428.137, 3);
+  });
+
+  it('missile floor is the equatorial radius, never inside the ellipsoid', () => {
+    expect(floor(true)).toBe(WGS84_A);
+    expect(floor(true)).toBeGreaterThanOrEqual(WGS84_A);
   });
 });

@@ -203,6 +203,12 @@ export const pluginManifest: PluginDescriptor[] = [
     proClassName: 'EarthAtmosphere',
     defaultConfig: { enabled: true },
   },
+  {
+    configKey: 'TiledEarth',
+    proImport: __IS_PRO__ ? () => import(/* @vite-ignore */ '@plugins-pro/tiled-earth/tiled-earth') : undefined,
+    proClassName: 'TiledEarth',
+    defaultConfig: { enabled: true },
+  },
 
   // ── Bottom Menu Plugins ────────────────────────────────────────────────────
   {

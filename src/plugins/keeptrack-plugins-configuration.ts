@@ -44,6 +44,7 @@ export type KeepTrackPluginsConfiguration = {
   SoundManager?: PluginConfiguration;
   SoundToggle?: PluginConfiguration;
   EarthAtmosphere?: PluginConfiguration;
+  TiledEarth?: PluginConfiguration;
   SensorListPlugin?: PluginConfiguration;
   SensorInfoPlugin?: PluginConfiguration;
   CustomSensorPlugin?: PluginConfiguration;

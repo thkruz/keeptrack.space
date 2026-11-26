@@ -36,6 +36,7 @@ import { SensorToMoonLine } from './line-manager/sensor-to-moon-line';
 import { SensorToRaeLine } from './line-manager/sensor-to-rae-line';
 import { SensorToSatLine } from './line-manager/sensor-to-sat-line';
 import { SensorToSunLine } from './line-manager/sensor-to-sun-line';
+import { WGS84_GLSL } from './shaders/wgs84-glsl';
 
 export class LineManager {
   attribs = {
@@ -805,6 +806,7 @@ export class LineManager {
       `,
     vert: glsl`#version 300 es
       precision highp float;
+    ${WGS84_GLSL}
 
       in vec4 a_position;
 
@@ -910,7 +912,7 @@ export class LineManager {
                   lon = atan(mapPos.y, mapPos.x) - u_gmst;
               }
               lon = mod(lon + PI, 2.0 * PI) - PI;
-              float lat = atan(mapPos.z, length(mapPos.xy));
+              float lat = geodeticLatitude(mapPos);
               float alt = eciDist - u_earthRadius;
               // Use a fixed Z offset to ensure lines always render above the Earth surface
               vec3 flatPos = vec3(lon * u_earthRadius, lat * u_earthRadius, 10.0);

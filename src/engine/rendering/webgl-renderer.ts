@@ -21,6 +21,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
 import { getEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
+import { eciToFlatMapPosition } from '../utils/transforms';
 import { DepthManager } from './depth-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
@@ -501,21 +502,7 @@ export class WebGLRenderer {
 
           return screenPos;
         }
-        const gmst = ServiceLocator.getTimeManager().gmst;
-        let lon = Math.atan2(py, px) - gmst;
-
-        lon = ((((lon + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
-        const lat = Math.atan2(pz, Math.sqrt(px * px + py * py));
-        const alt = eciDist - RADIUS_OF_EARTH;
-
-        px = lon * RADIUS_OF_EARTH;
-        py = lat * RADIUS_OF_EARTH;
-        pz = alt * 0.001;
-
-        // Wrap X to nearest copy of camera center (matches shader logic)
-        const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
-
-        px = mainCamera.flatMapPanX + ((((px - mainCamera.flatMapPanX + mapW * 0.5) % mapW) + mapW) % mapW) - mapW * 0.5;
+        [px, py, pz] = eciToFlatMapPosition(px, py, pz, ServiceLocator.getTimeManager().gmst, RADIUS_OF_EARTH, mainCamera.flatMapPanX);
       }
 
       const posVec4 = <[number, number, number, number]>vec4.fromValues(px, py, pz, 1);

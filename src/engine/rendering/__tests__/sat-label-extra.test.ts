@@ -1,5 +1,7 @@
+import { Kilometers, llaRad2ecef, Radians } from '@ootk/src/main';
 import { describe, expect, it } from 'vitest';
 import { buildObjectLabelSpecs, composeExtraLabels, extraLabelGlyphs, GLYPH_CHARS, glyphIndexOf, groundPointEci, MAX_EXTRA_LABELS } from '../sat-label-manager';
+import { geodeticLatitudeGlslMirror } from '../shaders/wgs84-glsl';
 
 describe('label glyph atlas', () => {
   it('keeps the catalog-number glyph indices (digits 0-9, J=10, S=11, C=12)', () => {
@@ -76,7 +78,7 @@ describe('ground label position math (flat map)', () => {
     let lon = Math.atan2(eci[1], eci[0]) - gmst;
 
     lon = ((((lon + PI) % (2 * PI)) + 2 * PI) % (2 * PI)) - PI;
-    const lat = Math.atan2(eci[2], Math.hypot(eci[0], eci[1]));
+    const lat = geodeticLatitudeGlslMirror(eci[0], eci[1], eci[2]);
     const mapW = 2 * PI * radius;
     let x = lon * radius;
 
@@ -110,7 +112,9 @@ describe('ground label position math (flat map)', () => {
 
   it('keeps the point inside the shader ground-object radius so the globe rotates it to the current gmst', () => {
     expect(Math.hypot(...groundPointEci(10, 20, 0.3, 1))).toBeLessThan(6421);
-    expect(Math.hypot(...groundPointEci(10, 20, 0.3, 1))).toBeCloseTo(6371.3, 3);
+    const ecef = llaRad2ecef({ lat: ((10 * Math.PI) / 180) as Radians, lon: ((20 * Math.PI) / 180) as Radians, alt: 0.3 as Kilometers });
+
+    expect(Math.hypot(...groundPointEci(10, 20, 0.3, 1))).toBeCloseTo(Math.hypot(ecef.x, ecef.y, ecef.z), 6);
   });
 });
 

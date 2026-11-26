@@ -8,8 +8,10 @@ import type { KeepTrackPlugin } from '../plugins/base-plugin';
 import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
 import { CounterStage, FrameProfiler } from '../utils/frame-profiler';
+import { llaDegToEciWgs84 } from '../utils/transforms';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
+import { WGS84_GLSL } from './shaders/wgs84-glsl';
 import { WebGlProgramHelper } from './webgl-program';
 
 /* eslint-disable camelcase */
@@ -105,13 +107,11 @@ export const buildObjectLabelSpecs = (entries: ObjectLabelEntry[]): ExtraLabelSp
  * position buffer was crunched at (the shader subtracts that GMST again, or rotates by the delta on the globe).
  */
 export const groundPointEci = (latDeg: number, lonDeg: number, altKm: number, gmst: number, out: [number, number, number] = [0, 0, 0]): [number, number, number] => {
-  const lat = (latDeg * Math.PI) / 180;
-  const lon = (lonDeg * Math.PI) / 180 + gmst;
-  const r = RADIUS_OF_EARTH + altKm;
+  const eci = llaDegToEciWgs84(latDeg, lonDeg, altKm, gmst);
 
-  out[0] = r * Math.cos(lat) * Math.cos(lon);
-  out[1] = r * Math.cos(lat) * Math.sin(lon);
-  out[2] = r * Math.sin(lat);
+  out[0] = eci.x;
+  out[1] = eci.y;
+  out[2] = eci.z;
 
   return out;
 };
@@ -636,6 +636,7 @@ export class SatLabelManager {
 
     const vertShader = glsl`#version 300 es
       precision highp float;
+    ${WGS84_GLSL}
 
       // Per-vertex (unit quad: 2 triangles)
       in vec2 a_quadVertex;
@@ -676,7 +677,7 @@ export class SatLabelManager {
             }
             float lon = atan(eciPos.y, eciPos.x) - u_gmst;
             lon = mod(lon + PI, 2.0 * PI) - PI;
-            float lat = atan(eciPos.z, length(eciPos.xy));
+            float lat = geodeticLatitude(eciPos);
             float alt = eciDist - u_earthRadius;
             vec3 flatPos = vec3(lon * u_earthRadius, lat * u_earthRadius, alt * 0.001);
 

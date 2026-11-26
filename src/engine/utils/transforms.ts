@@ -1,4 +1,5 @@
-import { DEG2RAD, Degrees, getDayOfYear, Kilometers, Radians, TAU } from '@ootk/src/main';
+import { DEG2RAD, Degrees, getDayOfYear, Kilometers, llaRad2eci, Radians, TAU } from '@ootk/src/main';
+import { geodeticLatitudeGlslMirror } from '../rendering/shaders/wgs84-glsl';
 import { RADIUS_OF_EARTH, ZOOM_EXP } from './constants';
 
 /**
@@ -269,6 +270,50 @@ export const eciToFlatMapX = (eciX: number, eciY: number, gmst: number, earthRad
   const rawX = lon * earthRadius;
 
   return flatMapCenterX + ((((rawX - flatMapCenterX + mapW * 0.5) % mapW) + mapW) % mapW) - mapW * 0.5;
+};
+
+/**
+ * WGS84 ECI position of a point given in degrees and km altitude (missile trail samples).
+ *
+ * @param latDeg - Geodetic latitude (degrees)
+ * @param lonDeg - Longitude (degrees)
+ * @param altKm - Height above the ellipsoid (km)
+ * @param gmst - Greenwich Mean Sidereal Time (radians)
+ * @returns TEME position (km)
+ */
+export const llaDegToEciWgs84 = (latDeg: number, lonDeg: number, altKm: number, gmst: number) =>
+  llaRad2eci({ lat: (latDeg * DEG2RAD) as Radians, lon: (lonDeg * DEG2RAD) as Radians, alt: altKm as Kilometers }, gmst);
+
+/**
+ * Convert an ECI (or ECEF) position to flat-map Y coordinate.
+ * CPU twin of the flat-map branch in the shaders: Y is the geodetic latitude
+ * (WGS84, same Bowring formula as the shared GLSL chunk) times the map radius.
+ *
+ * @param eciX - ECI X component (km)
+ * @param eciY - ECI Y component (km)
+ * @param eciZ - ECI Z component (km, pole axis)
+ * @param earthRadius - Earth radius (km), the plate carree scale
+ * @returns The flat-map Y coordinate (km)
+ */
+export const eciToFlatMapY = (eciX: number, eciY: number, eciZ: number, earthRadius: number): number => geodeticLatitudeGlslMirror(eciX, eciY, eciZ) * earthRadius;
+
+/**
+ * Convert an ECI (or ECEF) position to the flat-map render position. CPU twin of the
+ * dots vertex shader flat-map branch: longitude wrapped to the map copy nearest the
+ * camera pan center, geodetic latitude, and altitude scaled to a small depth.
+ *
+ * @param eciX - ECI X component (km)
+ * @param eciY - ECI Y component (km)
+ * @param eciZ - ECI Z component (km, pole axis)
+ * @param gmst - Greenwich Mean Sidereal Time (radians), 0 for ECEF mode
+ * @param earthRadius - Earth radius (km), the plate carree scale
+ * @param flatMapCenterX - Camera pan center X (km)
+ * @returns [x, y, z] in map units (km)
+ */
+export const eciToFlatMapPosition = (eciX: number, eciY: number, eciZ: number, gmst: number, earthRadius: number, flatMapCenterX: number): [number, number, number] => {
+  const alt = Math.sqrt(eciX * eciX + eciY * eciY + eciZ * eciZ) - earthRadius;
+
+  return [eciToFlatMapX(eciX, eciY, gmst, earthRadius, flatMapCenterX), eciToFlatMapY(eciX, eciY, eciZ, earthRadius), alt * 0.001];
 };
 
 /**

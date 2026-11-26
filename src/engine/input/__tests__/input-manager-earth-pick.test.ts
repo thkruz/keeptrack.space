@@ -74,6 +74,20 @@ describe('InputManager.getEarthScreenPoint on the WGS84 ellipsoid', () => {
     expect(p.every((c) => Number.isNaN(c))).toBe(true);
   });
 
+  it('returns NaN when the Earth is behind the origin (both roots negative)', () => {
+    expect(InputManager.intersectEarthEllipsoid([7000, 0, 0], [8000, 0, 0]).every((c) => Number.isNaN(c))).toBe(true);
+  });
+
+  it('returns NaN when the origin is inside the ellipsoid (near root negative)', () => {
+    expect(InputManager.intersectEarthEllipsoid([1000, 0, 0], [2000, 0, 0]).every((c) => Number.isNaN(c))).toBe(true);
+  });
+
+  it('still returns the near hit for a ray from outside toward the Earth', () => {
+    const p = InputManager.intersectEarthEllipsoid([7000, 0, 0], [6000, 0, 0]);
+
+    expect(Math.abs(p[0] - 6378.137)).toBeLessThan(1e-9);
+  });
+
   it('returns NaN for a zero-length ray', () => {
     expect(InputManager.intersectEarthEllipsoid([7000, 0, 0], [7000, 0, 0]).every((c) => Number.isNaN(c))).toBe(true);
   });

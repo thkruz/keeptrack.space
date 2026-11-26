@@ -269,7 +269,7 @@ export class InputManager {
    * on the GMST rotation about Z, so `eci2lla` of the result is the geodetic lat/lon under the cursor.
    * @param rayOrigin - Camera position, km
    * @param ptThru - Any point on the pick ray past the origin, km
-   * @returns The near intersection, or [NaN, NaN, NaN] when the ray misses the Earth
+   * @returns The near intersection, or [NaN, NaN, NaN] when the ray misses the Earth, the Earth is behind the origin, or the origin is inside it
    */
   static intersectEarthEllipsoid(rayOrigin: ArrayLike<number>, ptThru: ArrayLike<number>): [number, number, number] {
     // Plain doubles, not Float32 vec3: a float32 ulp at 6378 km is about 0.5 m (4e-6 deg)
@@ -280,7 +280,8 @@ export class InputManager {
     const dir = { x: dx / len, y: dy / len, z: dz / len };
     const hit = len > 0 ? rayEllipsoidIntersection({ x: rayOrigin[0], y: rayOrigin[1], z: rayOrigin[2] }, dir) : null;
 
-    if (!hit) {
+    // A negative near root is behind the camera (both roots negative) or the camera is inside the ellipsoid: a miss
+    if (!hit || hit.near < 0) {
       return [Number.NaN, Number.NaN, Number.NaN];
     }
 

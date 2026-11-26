@@ -114,6 +114,7 @@ const PROPERTY_CATEGORY_MAP: Record<string, keyof SettingsManager> = {
   meshListOverride: 'graphics',
   modelsOnSatelliteViewOverride: 'graphics',
   noMeshManager: 'graphics',
+  meshEarthshineStrength: 'graphics',
   isFlagDecalsFeatureEnabled: 'graphics',
   isDrawFlagDecals: 'graphics',
   flagDecalScale: 'graphics',

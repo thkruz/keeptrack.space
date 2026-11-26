@@ -448,6 +448,11 @@ export class GraphicsSettings {
   modelsOnSatelliteViewOverride = false;
   noMeshManager = false;
   /**
+   * Gain on the light reflected from the Earth onto 3D satellite models (earthshine).
+   * 0 turns it off and restores the previous look exactly; 1 is the default.
+   */
+  meshEarthshineStrength = 1;
+  /**
    * Master switch for the flag decal feature. Off until the projection is reworked: the decal is
    * projected along the camera direction, so the flag stays locked to the camera instead of
    * turning with the body. While off the renderer, the Graphics menu card and the info box row

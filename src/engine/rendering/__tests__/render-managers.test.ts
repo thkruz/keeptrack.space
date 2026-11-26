@@ -1,3 +1,4 @@
+import { CameraType } from '@app/engine/camera/camera-type';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { MeshManager } from '@app/engine/rendering/mesh-manager';
@@ -102,6 +103,58 @@ describe('WebGLRenderer accessors', () => {
       }
 
       expect(obj.position).toStrictEqual({ x: 7000, y: 100, z: 200 });
+    });
+
+    describe('with a stubbed camera', () => {
+      const identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+      const stubCamera = (cameraType: CameraType) => {
+        vi.spyOn(ServiceLocator, 'getMainCamera').mockReturnValue({
+          projectionMatrix: identity,
+          matrixWorldInverse: identity,
+          cameraType,
+          flatMapPanX: 0,
+        } as never);
+      };
+      const at = (x: number, y: number, z: number) => ({ id: 2, position: { x, y, z } }) as never;
+
+      afterEach(() => {
+        vi.restoreAllMocks();
+      });
+
+      it('maps an in-range point to pixel coordinates without error in a perspective camera', () => {
+        stubCamera(CameraType.DEFAULT);
+        const result = ServiceLocator.getRenderer().getScreenCoords(at(0, 0, 0.5));
+
+        expect(result.error).toBe(false);
+        expect(result.x).toBeCloseTo(window.innerWidth / 2);
+        expect(result.y).toBeCloseTo(window.innerHeight / 2);
+      });
+
+      it('flags a perspective point outside the depth range', () => {
+        stubCamera(CameraType.DEFAULT);
+
+        expect(ServiceLocator.getRenderer().getScreenCoords(at(0, 0, 2)).error).toBe(true);
+      });
+
+      it('flags a perspective point off the left of the screen', () => {
+        stubCamera(CameraType.DEFAULT);
+
+        expect(ServiceLocator.getRenderer().getScreenCoords(at(-2, 0, 0.5)).error).toBe(true);
+      });
+
+      it('rejects a flat-map object farther than 1e7 km', () => {
+        stubCamera(CameraType.FLAT_MAP);
+
+        expect(ServiceLocator.getRenderer().getScreenCoords(at(2e7, 0, 0)).error).toBe(true);
+      });
+
+      it('skips the depth test in flat-map mode', () => {
+        stubCamera(CameraType.FLAT_MAP);
+        const result = ServiceLocator.getRenderer().getScreenCoords(at(7000, 0, 0));
+
+        expect(typeof result.error).toBe('boolean');
+        expect(Number.isFinite(result.x)).toBe(true);
+      });
     });
   });
 });

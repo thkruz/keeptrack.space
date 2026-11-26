@@ -465,6 +465,12 @@ export class WebGLRenderer {
     this.satLabelModeLastTime_ = timeManagerInstance.realTime;
   }
 
+  private static isOnScreen_(pos: { x: number; y: number; z: number }, isFlatMap: boolean): boolean {
+    const isInsideViewport = pos.x >= 0 && pos.y >= 0;
+
+    return isFlatMap ? isInsideViewport : isInsideViewport && pos.z >= 0 && pos.z <= 1;
+  }
+
   getScreenCoords(obj: BaseObject): {
     x: number;
     y: number;
@@ -520,11 +526,7 @@ export class WebGLRenderer {
       // In flat map (ortho) mode the z check is meaningless: the ortho projection maps
       // the tiny positive z (altitude above the map plane) to a slightly negative NDC z,
       // which would always fail the z >= 0 test meant for perspective projections.
-      if (mainCamera.cameraType === CameraType.FLAT_MAP) {
-        screenPos.error = !(screenPos.x >= 0 && screenPos.y >= 0);
-      } else {
-        screenPos.error = !(screenPos.x >= 0 && screenPos.y >= 0 && screenPos.z >= 0 && screenPos.z <= 1);
-      }
+      screenPos.error = !WebGLRenderer.isOnScreen_(screenPos, mainCamera.cameraType === CameraType.FLAT_MAP);
     } catch {
       screenPos.error = true;
     }

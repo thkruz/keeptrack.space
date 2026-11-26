@@ -77,7 +77,7 @@ export type StringifiedNumber = `${number}.${number}`;
 export { SunStatus } from '@ootk/src/main';
 
 /** Geodetic altitude (km) below which {@link SatMath.calculateIsInSun} treats a position as a ground site (row SM1). */
-export const GROUND_SITE_MAX_ALT_KM = 100;
+export const GROUND_SITE_MAX_ALT_KM = 10;
 
 export abstract class SatMath {
   /**
@@ -200,7 +200,7 @@ export abstract class SatMath {
 
   /**
    * True when an ECI/ECEF point lies inside the ellipsoid with semi-axes (a + h, b + h), h = {@link GROUND_SITE_MAX_ALT_KM}:
-   * geodetic altitude below about 100 km (exact at the equator and the poles, within meters between). Rotation about
+   * geodetic altitude below about 10 km (covers the highest sensor sites, under 6 km; exact at the equator and the poles, within meters between). Rotation about
    * the polar axis does not change the result, so no GMST is needed.
    */
   static isGroundSitePosition(x: number, y: number, z: number): boolean {

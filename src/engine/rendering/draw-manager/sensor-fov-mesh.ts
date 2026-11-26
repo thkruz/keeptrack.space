@@ -500,6 +500,9 @@ export class SensorFovMesh extends CustomMesh {
         return u_azLimits.y >= 360.0 || mod(azDeg - u_azLimits.x, 360.0) <= u_azLimits.y;
       }
 
+      // The flat-map footprint is a stylized spherical (R = u_earthRadius) horizon model on the plate carree
+      // map. It is kept spherical on purpose (audit row C6): the dome outline differs from the WGS84 one by
+      // the 0.19 deg vertical deflection (about 21 km), well inside the map's pixel scale at this zoom.
       // Elevation (deg) seen from the sensor of the point at geocentric radius rho above a ground point theta away
       float elAt(float rho, float theta) {
         return atan(rho * cos(theta) - u_earthRadius, rho * sin(theta)) * RAD2DEG;

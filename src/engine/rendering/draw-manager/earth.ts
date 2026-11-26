@@ -57,6 +57,7 @@ import {
   EarthSpecTextureQuality,
   EarthTextureStyle,
 } from './earth-quality-enums';
+import { buildSurfaceLighting, cameraPositionFromView, type EarthSurfaceOverlay, EarthSurfaceOverlayRegistry } from './earth-surface-layers';
 import { PoliticalMap } from './political-map';
 import { OcclusionProgram } from './post-processing';
 import { RELIEF_NORMAL_GLSL } from './relief-shading';
@@ -109,6 +110,8 @@ export const getEarthNightTextureBase = (style: string): string | null => {
 
 export class Earth {
   private gl_: WebGL2RenderingContext;
+  /** Plugin layers drawn over the surface mesh, before atmosphere and aurora (see earth-surface-layers.ts). */
+  private readonly surfaceOverlays_ = new EarthSurfaceOverlayRegistry();
   private glowDirection_ = 1;
   private glowNumber_ = 0;
   private modelViewMatrix_: mat4;
@@ -784,6 +787,15 @@ export class Earth {
     gl.bindVertexArray(null);
   }
 
+  /** Add (or replace, by id) a layer drawn over the Earth surface each frame. */
+  registerSurfaceOverlay(overlay: EarthSurfaceOverlay): void {
+    this.surfaceOverlays_.register(overlay);
+  }
+
+  unregisterSurfaceOverlay(id: string): boolean {
+    return this.surfaceOverlays_.unregister(id);
+  }
+
   /**
    * This is run once per frame to render the earth.
    */
@@ -805,6 +817,38 @@ export class Earth {
     gl.bindVertexArray(null);
 
     gl.disable(gl.BLEND);
+
+    this.drawSurfaceOverlays_(gl, tgtBuffer);
+  }
+
+  /** Surface overlays see the same matrices and lighting values the surface shader just used. */
+  private drawSurfaceOverlays_(gl: WebGL2RenderingContext, tgtBuffer: WebGLFramebuffer | null): void {
+    if (this.surfaceOverlays_.size === 0) {
+      return;
+    }
+    const camera = ServiceLocator.getMainCamera();
+    const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
+    const zoom = camera.zoomLevel();
+
+    this.surfaceOverlays_.drawAll({
+      gl,
+      targetFramebuffer: tgtBuffer,
+      projectionMatrix: camera.projectionMatrix,
+      viewMatrix: camera.matrixWorldInverse,
+      projectionViewMatrix: ServiceLocator.getRenderer().projectionCameraMatrix,
+      modelMatrix: this.modelViewMatrix_,
+      gmst: ServiceLocator.getTimeManager().gmst,
+      cameraPosition: cameraPositionFromView(camera.matrixWorldInverse),
+      cameraType: camera.cameraType,
+      logDepthBufFC: DepthManager.getConfig().logDepthBufFC,
+      drawingBufferWidth: gl.drawingBufferWidth,
+      drawingBufferHeight: gl.drawingBufferHeight,
+      lighting: buildSurfaceLighting(settingsManager, this.lightDirection, {
+        zoomLevel: isEarthCenterBody ? (zoom / 2) ** (1 / 2) : 1.0,
+        cloudFadeZoom: getCloudFadeZoom(isEarthCenterBody, zoom),
+        isCloudsVisible: settingsManager.isDrawCloudsMap && Boolean(this.textureClouds[settingsManager.earthCloudTextureQuality]),
+      }),
+    });
   }
 
   private drawEarthAtmosphere_(tgtBuffer: WebGLFramebuffer | null) {

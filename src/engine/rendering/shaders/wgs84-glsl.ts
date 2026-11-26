@@ -1,7 +1,8 @@
-import { glsl } from '@app/engine/utils/development/formatter';
-
 /**
  * Shared GLSL for the WGS84 ellipsoid (a = 6378.137 km, f = 1 / 298.257223563).
+ *
+ * Plain template literal on purpose: workers import this module through `transforms.ts`, and the
+ * `glsl` formatter pulls in the error manager, which reads `window` and throws in a worker.
  *
  * - `WGS84_A`, `WGS84_B`: equatorial and polar semi-axes in km.
  * - `WGS84_E2`: first eccentricity squared, 2f - f^2.
@@ -14,7 +15,7 @@ import { glsl } from '@app/engine/utils/development/formatter';
  * Keep {@link geodeticLatitudeGlslMirror} line for line in step with the GLSL; its spec
  * checks the formula against ootk's iterative ECEF-to-geodetic conversion.
  */
-export const WGS84_GLSL = glsl`
+export const WGS84_GLSL = /* glsl */ `
     const float WGS84_A = 6378.137;
     const float WGS84_B = 6356.7523142;
     const float WGS84_E2 = 0.00669437999014;

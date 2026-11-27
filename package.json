@@ -168,7 +168,7 @@
   },
   "dependencies": {
     "@e965/xlsx": "0.20.3",
-    "@materializecss/materialize": "^2.4.0",
+    "@materializecss/materialize": "2.3.3",
     "@supabase/supabase-js": "^2.119.0",
     "astronomy-engine": "^2.1.19",
     "dotenv": "^18.0.10",

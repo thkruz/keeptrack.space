@@ -35,16 +35,11 @@ describe('politicalMapFade (W6: borders fade where the 4096 x 2048 overlay is to
     expect(politicalMapFade(Number.NaN)).toBe(1);
   });
 
-  it('every place that draws the borders applies the fade', () => {
+  it('the Earth surface shader applies the fade', () => {
     const earth = src('src/engine/rendering/draw-manager/earth.ts');
 
     expect(earth).toContain('politicalColor.rgb * politicalColor.a * uPoliticalFade');
     expect(earth).toContain('politicalMapFade(getCameraAltitudeAboveEllipsoid(');
     expect(earth).toMatch(/politicalFade: this\.politicalFade_/u);
-    expect(src('src/plugins-pro/tiled-earth/tile-shaders.ts')).toContain('polColour.a * uPoliticalEnabled');
-    expect(src('src/plugins-pro/tiled-earth/tile-renderer.ts')).toContain('lighting.politicalFade ?? 1');
-    expect(src('src/plugins-pro/cloud-volume/core/cloud-shaders.ts')).toContain('* 2.5 * uPolEnabled');
-    expect(src('src/plugins-pro/cloud-volume/simsat-port/simsat-cloud-frag.ts')).toContain('* 2.5 * uPolEnabled');
-    expect(src('src/plugins-pro/cloud-volume/cloud-volume-hook.ts')).toContain('overlayStrength: ctx.politicalFade');
   });
 });

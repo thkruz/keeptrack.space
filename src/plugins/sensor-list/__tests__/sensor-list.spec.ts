@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SensorListPlugin', () => {
   test('open side menu with sensor list, then close', async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe('SensorListPlugin', () => {
 
     // Open drawer and find item in Sensors group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-1"]');
+    const group = drawerGroupOf(page, 'sensors-bottom-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Calculator', () => {
   test('open side menu, verify form elements, then close', async ({ page }) => {
@@ -13,9 +13,9 @@ test.describe('Calculator', () => {
     await expect(bottomIcon).toBeAttached();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-disabled/u);
 
-    // Open drawer and find item in Analysis group
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-4"]');
+    const group = drawerGroupOf(page, 'menu-calculator');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

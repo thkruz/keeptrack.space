@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SatConstellations Plugin', () => {
   test('open side menu via drawer, verify constellation list and secondary menu, then close', async ({ page }) => {
@@ -18,14 +18,14 @@ test.describe('SatConstellations Plugin', () => {
     await expect(sideMenu).toBeAttached();
     await expect(sideMenu).toBeHidden();
 
-    // Open drawer and find the Constellations item in the CATALOG group
+    // Open drawer and find the Constellations item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const catalogGroup = page.locator('.drawer-group[data-group-key="mode-0"]');
-    const groupItems = catalogGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'menu-constellations');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await catalogGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 

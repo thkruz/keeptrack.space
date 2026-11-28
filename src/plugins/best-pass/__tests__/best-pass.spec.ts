@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { isProBuild, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, isProBuild, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('BestPassPlugin', () => {
   test('icon gated (Pro: login gate, OSS: needs a sensor), drawer item visible, form elements in DOM', async ({ page }) => {
@@ -21,14 +21,14 @@ test.describe('BestPassPlugin', () => {
     await expect(sideMenu).toBeAttached();
     await expect(sideMenu).toBeHidden();
 
-    // Open drawer and find the BestPass item in the EVENTS group (mode-2)
+    // Open drawer and find the BestPass item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const eventsGroup = page.locator('.drawer-group[data-group-key="mode-2"]');
-    const groupItems = eventsGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'best-pass-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await eventsGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
     }
 
     const drawerItem = page.locator('.drawer-item[data-plugin-id="best-pass-icon"]');

@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Collisions Plugin', () => {
   test('open side menu, verify table and toolbar, then close', async ({ page }) => {
@@ -14,15 +14,15 @@ test.describe('Collisions Plugin', () => {
     // Bottom icon should exist in the DOM
     await expect(bottomIcon).toBeAttached();
 
-    // Open drawer and find the Collisions item in EVENTS group
+    // Open drawer and find the Collisions item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    // Expand the EVENTS group if collapsed
-    const eventsGroup = page.locator('.drawer-group[data-group-key="mode-2"]');
-    const groupItems = eventsGroup.locator('.drawer-group-items');
+    // Expand its drawer group if collapsed
+    const group = drawerGroupOf(page, 'conjunction-feed-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await eventsGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
     }
 
     const drawerItem = page.locator('.drawer-item[data-plugin-id="conjunction-feed-icon"]');

@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('ProximityOps', () => {
   test('open side menu, verify form elements and secondary menu, close', async ({ page }) => {
@@ -15,9 +15,9 @@ test.describe('ProximityOps', () => {
 
     await expect(bottomIcon).toBeAttached();
 
-    // Open drawer and find item in Events group
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-2"]');
+    const group = drawerGroupOf(page, 'rendezvous-and proximity operations-bottom-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

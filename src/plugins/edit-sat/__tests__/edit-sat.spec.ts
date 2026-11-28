@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, expectShook, waitForAppReady, watchForShake } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('EditSat', () => {
   test('disabled when no satellite is selected', async ({ page }) => {
@@ -20,10 +20,10 @@ test.describe('EditSat', () => {
     await expect(sideMenu).toBeAttached();
     await expect(sideMenu).toHaveClass(/kt-ui-v13/u);
 
-    // 3. Open drawer and find plugin in CREATE group
+    // 3. Open drawer and find plugin in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const group = page.locator('.drawer-group[data-group-key="mode-3"]');
+    const group = drawerGroupOf(page, 'edit-satellite-bottom-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
@@ -36,7 +36,11 @@ test.describe('EditSat', () => {
     await expect(drawerItem).toBeVisible();
 
     // 4. Clicking disabled drawer item should NOT open the side menu
-    await drawerItem.click();
+    await watchForShake(drawerItem);
+    // The row is aria-disabled, so Playwright would wait for it to be enabled; force skips that wait. The app keeps disabled rows clickable and shakes them
+    await drawerItem.click({ force: true });
+    // The shake proves the click reached the disabled-row handler
+    await expectShook(drawerItem);
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 2_000 });
 
     // 5. Verify form elements exist in DOM even though menu is hidden

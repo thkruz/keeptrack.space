@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SatellitePhotos', () => {
   test('open side menu, verify photo links, then close', async ({ page }) => {
@@ -15,7 +15,7 @@ test.describe('SatellitePhotos', () => {
 
     // Open drawer and find item in Display group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-5"]');
+    const group = drawerGroupOf(page, 'menu-sat-photo');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

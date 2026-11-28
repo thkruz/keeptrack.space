@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, expectShook, waitForAppReady, watchForShake } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Breakup Plugin', () => {
   test('icon is disabled without satellite, drawer item visible in CREATE group', async ({ page }) => {
@@ -19,15 +19,15 @@ test.describe('Breakup Plugin', () => {
     await expect(sideMenu).toBeAttached();
     await expect(sideMenu).toBeHidden();
 
-    // Open drawer and find the Breakup item in the CREATE group
+    // Open drawer and find the Breakup item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    // Expand the CREATE group if collapsed
-    const createGroup = page.locator('.drawer-group[data-group-key="mode-3"]');
-    const groupItems = createGroup.locator('.drawer-group-items');
+    // Expand its drawer group if collapsed
+    const group = drawerGroupOf(page, 'breakup-bottom-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await createGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
     }
 
     const drawerItem = page.locator('.drawer-item[data-plugin-id="breakup-bottom-icon"]');
@@ -35,7 +35,11 @@ test.describe('Breakup Plugin', () => {
     await expect(drawerItem).toBeVisible();
 
     // Clicking a disabled plugin's drawer item should NOT open the side menu
-    await drawerItem.click();
+    await watchForShake(drawerItem);
+    // The row is aria-disabled, so Playwright would wait for it to be enabled; force skips that wait. The app keeps disabled rows clickable and shakes them
+    await drawerItem.click({ force: true });
+    // The shake proves the click reached the disabled-row handler
+    await expectShook(drawerItem);
     await expect(sideMenu).toBeHidden({ timeout: 2_000 });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u);
 

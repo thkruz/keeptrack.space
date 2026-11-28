@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('FilterMenuPlugin', () => {
   test('full user flow: open, verify filters, toggle, reset, close', async ({ page }) => {
@@ -17,7 +17,7 @@ test.describe('FilterMenuPlugin', () => {
     // 2. Open drawer and find plugin in Settings group
     await page.locator('#drawer-hamburger').click();
 
-    const group = page.locator('.drawer-group[data-group-key="mode-7"]');
+    const group = drawerGroupOf(page, 'filter-menu-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 // The endpoint is mocked so the spec never depends on live counts.
 const MOCK_RESPONSE = {
@@ -15,15 +15,15 @@ const MOCK_RESPONSE = {
 const ENDPOINT = '**/v4/stats/most-tracked';
 
 test.describe('MostTracked Plugin', () => {
-  /** Opens the menu from the drawer's CATALOG group (mode-0). */
+  /** Opens the menu from its drawer group. */
   const openMenu = async (page: import('@playwright/test').Page) => {
     await page.locator('#drawer-hamburger').click();
 
-    const catalogGroup = page.locator('.drawer-group[data-group-key="mode-0"]');
-    const groupItems = catalogGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'most-tracked-bottom-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await catalogGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 
@@ -122,8 +122,10 @@ test.describe('MostTracked Plugin', () => {
     ).toBe(toastBefore);
   });
 
-  test('renders the live endpoint @local', async ({ page }) => {
-    // No mock: talks to the real endpoint, so it only runs locally.
+  test('renders the mocked ranking against the loaded catalog @local', async ({ page }) => {
+    // The root suite never reaches the production API (test/e2e/production-api-guard.ts), so the live endpoint is not
+    // covered here; this serves the same fixture as the other tests and checks the real catalog and the rendered rows.
+    await page.route(ENDPOINT, (route) => route.fulfill({ json: MOCK_RESPONSE }));
     await waitForAppReady(page, {
       plugins: { MostTracked: { enabled: true } },
       settings: { noCatalogOnLoad: false, isDisableLoginGate: true, isMobileModeEnabled: true },

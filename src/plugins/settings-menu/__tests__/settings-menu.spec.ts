@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('SettingsMenuPlugin', () => {
   test('open side menu, verify settings form, then close', async ({ page }) => {
@@ -14,7 +14,7 @@ test.describe('SettingsMenuPlugin', () => {
 
     // Open drawer and find item in Settings group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-7"]');
+    const group = drawerGroupOf(page, 'settings-menu-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
@@ -52,6 +52,8 @@ test.describe('SettingsMenuPlugin', () => {
     // The reset row sits at the bottom-center, under the fixed drawer-utility-footer
     // pill, so dispatch the click directly to avoid the overlay intercepting it.
     await page.locator('#settings-reset').dispatchEvent('click');
+    // Reset asks for confirmation first (ModalConfirm); confirm it like a user would.
+    await page.locator('#confirm-action-btn').click();
     await expect
       .poll(() => page.evaluate(() => (window as unknown as { settingsManager?: { isDemoModeOn?: boolean } }).settingsManager?.isDemoModeOn), { timeout: 5_000 })
       .toBe(false);

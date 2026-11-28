@@ -16,6 +16,7 @@ import { Satellite } from '@ootk/src/main';
 import categoryPng from '@public/img/icons/category.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './sat-constellations.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 interface ConstellationStats {
   count: number;
@@ -604,7 +605,7 @@ export class SatConstellations extends KeepTrackPlugin {
     for (const sat of displaySats) {
       tableHtml += `<tr class="sc-table-row link" data-sat-id="${sat.id}">`;
       tableHtml += `<td>${sat.sccNum}</td>`;
-      tableHtml += `<td>${sat.name}</td>`;
+      tableHtml += `<td>${escapeHtml(sat.name)}</td>`;
       tableHtml += `<td>${sat.inclination.toFixed(1)}</td>`;
       tableHtml += `<td>${sat.rightAscension.toFixed(1)}</td>`;
       tableHtml += `<td>${sat.perigee.toFixed(0)}</td>`;

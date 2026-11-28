@@ -82,6 +82,39 @@ describe('ConeMesh', () => {
     });
   });
 
+  describe('WGS84 base placement', () => {
+    const baseCenterNorm = (srcPos: number[]) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ServiceLocator.getDotsManager() as any).positionData.set(srcPos, 0);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (settingsManager as any).coneDistanceFromEarth = 15;
+      const mesh = build();
+
+      mesh.update();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const v = (mesh as any).vertices_ as Float32Array;
+      let cx = 0;
+      let cy = 0;
+      let cz = 0;
+
+      for (let i = 1; i <= 100; i++) {
+        cx += v[i * 3];
+        cy += v[i * 3 + 1];
+        cz += v[i * 3 + 2];
+      }
+
+      return Math.hypot(cx / 100, cy / 100, cz / 100);
+    };
+
+    it('puts the base centre at the equatorial radius plus coneDistanceFromEarth at the equator', () => {
+      expect(baseCenterNorm([42000, 0, 0])).toBeCloseTo(6378.137 + 15, 1);
+    });
+
+    it('puts the base centre at the polar radius plus coneDistanceFromEarth at the pole', () => {
+      expect(baseCenterNorm([0, 0, 42000])).toBeCloseTo(6356.7523 + 15, 1);
+    });
+  });
+
   describe('draw', () => {
     it('draws the cone triangle fan through the GL pipeline', () => {
       const mesh = build();

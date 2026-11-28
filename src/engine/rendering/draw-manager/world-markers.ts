@@ -1,12 +1,21 @@
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { settingsManager } from '@app/settings/settings';
-import { DEG2RAD, Kilometers, lla2eci, Radians } from '@ootk/src/main';
+import { DEG2RAD, Kilometers, llaRad2eci, Radians, TemeVec3 } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { SelectSatManager } from '../../../plugins/select-sat-manager/select-sat-manager';
 import { CameraType } from '../../camera/camera-type';
 import { PluginRegistry } from '../../core/plugin-registry';
 import { glsl } from '../../utils/development/formatter';
 import { DepthManager } from '../depth-manager';
+
+/**
+ * ECI position of the "you are here" pin: the WGS84 geodetic point OBSERVER_ALT_KM above the ellipsoid.
+ * @param latDeg - Geodetic latitude in degrees
+ * @param lonDeg - Longitude in degrees
+ * @param gmst - Greenwich mean sidereal time in radians
+ */
+export const observerMarkerEci = (latDeg: number, lonDeg: number, gmst: number): TemeVec3<Kilometers> =>
+  llaRad2eci({ lat: (latDeg * DEG2RAD) as Radians, lon: (lonDeg * DEG2RAD) as Radians, alt: OBSERVER_ALT_KM }, gmst);
 
 /**
  * WorldMarkers — soft, depth-occluded sprites drawn at ECI positions.
@@ -220,55 +229,62 @@ export class WorldMarkers {
   }
 
   private collectMarkers_(): MarkerSpec[] {
-    const markers: MarkerSpec[] = [];
     // Smooth 0..1 sine pulse (matches the 2D map's smoothed marker pulse).
     const pulse = 0.5 + 0.5 * Math.sin(((performance.now() % PULSE_PERIOD_MS) / PULSE_PERIOD_MS) * Math.PI * 2.0);
 
-    // --- Selected-satellite glow (non-ride-along views only) --------------------
-    if (settingsManager.isDrawSelectionGlow) {
-      const camType = ServiceLocator.getMainCamera()?.cameraType;
-      const isRideAlong = camType === CameraType.FIXED_TO_SAT_LVLH || camType === CameraType.FIXED_TO_SAT_ECI || camType === CameraType.SATELLITE_FIRST_PERSON;
+    return [this.selectionGlowMarker_(pulse), this.observerMarker_()].filter((m): m is MarkerSpec => m !== null);
+  }
 
-      if (!isRideAlong) {
-        const sel = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
+  /** Selected-satellite glow (non-ride-along views only), or null when it should not draw. */
+  private selectionGlowMarker_(pulse: number): MarkerSpec | null {
+    if (!settingsManager.isDrawSelectionGlow) {
+      return null;
+    }
+    const camType = ServiceLocator.getMainCamera()?.cameraType;
+    const isRideAlong = camType === CameraType.FIXED_TO_SAT_LVLH || camType === CameraType.FIXED_TO_SAT_ECI || camType === CameraType.SATELLITE_FIRST_PERSON;
 
-        if (sel && Number(sel.id) > -1 && sel.position) {
-          markers.push({
-            x: sel.position.x,
-            y: sel.position.y,
-            z: sel.position.z,
-            size: 26 + 20 * pulse,
-            r: SELECTION_RGB[0],
-            g: SELECTION_RGB[1],
-            b: SELECTION_RGB[2],
-            a: 0.35 + 0.35 * pulse,
-            shape: SHAPE_GLOW,
-          });
-        }
-      }
+    if (isRideAlong) {
+      return null;
+    }
+    const sel = PluginRegistry.getPlugin(SelectSatManager)?.primarySatObj;
+
+    if (!sel || !(Number(sel.id) > -1) || !sel.position) {
+      return null;
     }
 
-    // --- "You are here" observer pin --------------------------------------------
+    return {
+      x: sel.position.x,
+      y: sel.position.y,
+      z: sel.position.z,
+      size: 26 + 20 * pulse,
+      r: SELECTION_RGB[0],
+      g: SELECTION_RGB[1],
+      b: SELECTION_RGB[2],
+      a: 0.35 + 0.35 * pulse,
+      shape: SHAPE_GLOW,
+    };
+  }
+
+  /** "You are here" observer pin on the WGS84 ellipsoid, or null without a finite observer lat/lon. */
+  private observerMarker_(): MarkerSpec | null {
     const lla = settingsManager.observerMarkerLla;
 
-    if (lla && Number.isFinite(lla.lat) && Number.isFinite(lla.lon)) {
-      const gmst = ServiceLocator.getTimeManager().gmst;
-      const eci = lla2eci({ lat: (lla.lat * DEG2RAD) as Radians, lon: (lla.lon * DEG2RAD) as Radians, alt: OBSERVER_ALT_KM }, gmst);
-
-      markers.push({
-        x: eci.x,
-        y: eci.y,
-        z: eci.z,
-        size: 52, // larger: the pin glyph only uses the sprite's top half (tip at centre)
-        r: OBSERVER_RGB[0],
-        g: OBSERVER_RGB[1],
-        b: OBSERVER_RGB[2],
-        a: 0.95,
-        shape: SHAPE_PIN,
-      });
+    if (!lla || !Number.isFinite(lla.lat) || !Number.isFinite(lla.lon)) {
+      return null;
     }
+    const eci = observerMarkerEci(lla.lat, lla.lon, ServiceLocator.getTimeManager().gmst);
 
-    return markers;
+    return {
+      x: eci.x,
+      y: eci.y,
+      z: eci.z,
+      size: 52, // larger: the pin glyph only uses the sprite's top half (tip at centre)
+      r: OBSERVER_RGB[0],
+      g: OBSERVER_RGB[1],
+      b: OBSERVER_RGB[2],
+      a: 0.95,
+      shape: SHAPE_PIN,
+    };
   }
 
   private compileProgram_(gl: WebGL2RenderingContext, vertSrc: string, fragSrc: string): WebGLProgram | null {

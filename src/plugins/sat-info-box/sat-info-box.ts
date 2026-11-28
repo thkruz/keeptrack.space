@@ -12,6 +12,7 @@ import { IKeyboardShortcut } from '@app/engine/plugins/core/plugin-capabilities'
 import { DraggableBox } from '@app/engine/ui/draggable-box';
 import { html } from '@app/engine/utils/development/formatter';
 import { errorManagerInstance } from '@app/engine/utils/errorManager';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 import { getEl, hideEl, showEl, writeAttrIfChanged, writeHtmlIfChanged } from '@app/engine/utils/get-el';
 import { KeepTrack } from '@app/keeptrack';
 import { t7e } from '@app/locales/keys';
@@ -557,7 +558,7 @@ export class SatInfoBox extends KeepTrackPlugin {
 
     if (isVisible) {
       showEl(el.parentElement, 'flex');
-      writeHtmlIfChanged(el, value);
+      writeHtmlIfChanged(el, escapeHtml(value ?? ''));
     } else {
       hideEl(el.parentElement);
     }
@@ -629,7 +630,8 @@ export class SatInfoBox extends KeepTrackPlugin {
     const isHasAltName: boolean = isShowAltName && !!((obj as Satellite)?.altName && (obj as Satellite).altName !== '');
     const isHasAltId: boolean = !!((obj as Satellite)?.altId && (obj as Satellite).altId !== '');
 
-    setInnerHtml(EL.NAME, obj.name);
+    // Catalog strings can come from an external catalog (?tle=, OEM files): escape before they reach innerHTML.
+    setInnerHtml(EL.NAME, escapeHtml(obj.name ?? ''));
 
     if (obj instanceof Satellite || obj instanceof OemSatellite) {
       /*
@@ -683,13 +685,13 @@ export class SatInfoBox extends KeepTrackPlugin {
     } else if (obj instanceof OemSatellite) {
       const oemSat = obj as OemSatellite;
 
-      setInnerHtml(EL.INTL_DES, oemSat.intlDes || notAvailable);
-      setInnerHtml(EL.OBJNUM, oemSat.sccNum || notAvailable);
-      setInnerHtml(EL.SOURCE, oemSat.source || t7e('satInfoBox.oemFile' as Parameters<typeof t7e>[0]));
+      setInnerHtml(EL.INTL_DES, oemSat.intlDes ? escapeHtml(oemSat.intlDes) : notAvailable);
+      setInnerHtml(EL.OBJNUM, oemSat.sccNum ? escapeHtml(oemSat.sccNum) : notAvailable);
+      setInnerHtml(EL.SOURCE, oemSat.source ? escapeHtml(oemSat.source) : t7e('satInfoBox.oemFile' as Parameters<typeof t7e>[0]));
     } else {
       const sat = obj as Satellite;
 
-      setInnerHtml(EL.INTL_DES, !sat.intlDes || sat.intlDes === 'none' || isPlaceholderIntlDes(sat) ? notAvailable : sat.intlDes);
+      setInnerHtml(EL.INTL_DES, !sat.intlDes || sat.intlDes === 'none' || isPlaceholderIntlDes(sat) ? notAvailable : escapeHtml(sat.intlDes));
       // Synthetic JSC objects have no NORAD number or COSPAR ID; real ones served
       // from a newer Vimpel elset keep theirs.
       if (isSyntheticVimpel(sat)) {
@@ -698,11 +700,11 @@ export class SatInfoBox extends KeepTrackPlugin {
         setInnerHtml(EL.OBJNUM, notAvailableJsc);
         setInnerHtml(EL.INTL_DES, notAvailableJsc);
       } else {
-        setInnerHtml(EL.OBJNUM, sat.sccNum);
+        setInnerHtml(EL.OBJNUM, escapeHtml(sat.sccNum ?? ''));
         // satObjNumDom.setAttribute('data-tooltip', `${FormatTle.convert6DigitToA5(sat.sccNum)}`);
       }
 
-      setInnerHtml(EL.SOURCE, SatInfoBox.formatSourceName(sat.source ?? CatalogSource.CELESTRAK));
+      setInnerHtml(EL.SOURCE, escapeHtml(SatInfoBox.formatSourceName(sat.source ?? CatalogSource.CELESTRAK)));
 
       this.updateConfidenceDom_(sat);
     }

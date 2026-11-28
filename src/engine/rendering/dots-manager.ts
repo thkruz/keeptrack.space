@@ -5,7 +5,7 @@
 import { MissileObject } from '@app/app/data/catalog-manager/MissileObject';
 import { OemSatellite } from '@app/app/objects/oem-satellite';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { BaseObject, DEG2RAD, GreenwichMeanSiderealTime, Kilometers, KilometersPerSecond, lla2eci, Radians, Satellite, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import { BaseObject, GreenwichMeanSiderealTime, Kilometers, KilometersPerSecond, Satellite, Seconds, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { SettingsManager } from '../../settings/settings';
 import { CameraType } from '../camera/camera-type';
@@ -19,12 +19,14 @@ import { RADIUS_OF_EARTH } from '../utils/constants';
 import { glsl } from '../utils/development/formatter';
 import { CounterStage, CpuStage, FrameProfiler, GpuStage } from '../utils/frame-profiler';
 import { ensureVelocityVec3 } from '../utils/space-object-invariants';
+import { llaDegToEciWgs84 } from '../utils/transforms';
 import { BODY_GLYPH_WORDS, BodyGlyph, DOT_HIDE_BODY_RADII, packBodyGlyphs } from './body-glyph';
 import { BufferAttribute } from './buffer-attribute';
 import { DepthManager } from './depth-manager';
 import { IDotsShaderProvider } from './dots-shader-provider';
 import { createBaseFragShader, createBaseVertShader, DotStatus } from './dots-shaders-base';
 import { GlUtils } from './gl-utils';
+import { WGS84_GLSL } from './shaders/wgs84-glsl';
 import { ViewportManager } from './viewport-manager';
 import { WebGlProgramHelper } from './webgl-program';
 import { WebGLRenderer } from './webgl-renderer';
@@ -1483,8 +1485,7 @@ export class DotsManager {
       const i1 = Math.min(i0 + 1, lastIdx);
       const frac = elapsedSec - i0;
 
-      const toEci = (idx: number, g: GreenwichMeanSiderealTime) =>
-        lla2eci({ lat: (obj.latList[idx] * DEG2RAD) as Radians, lon: (obj.lonList[idx] * DEG2RAD) as Radians, alt: obj.altList[idx] }, g);
+      const toEci = (idx: number, g: GreenwichMeanSiderealTime) => llaDegToEciWgs84(obj.latList[idx], obj.lonList[idx], obj.altList[idx], g);
 
       // Current-frame position first; its magnitude (invariant under the Earth-rotation
       // choice) decides whether the shader will apply the ground rotation.
@@ -1686,6 +1687,7 @@ export class DotsManager {
     this.shaders_.picking = {
       vert: glsl`#version 300 es
                 precision highp float;
+    ${WGS84_GLSL}
                 in vec3 a_position;
                 in vec3 a_color;
                 in float a_pickable;
@@ -1763,7 +1765,7 @@ export class DotsManager {
                     }
                     float lon = atan(eciPos.y, eciPos.x) - u_gmst;
                     lon = mod(lon + PI, 2.0 * PI) - PI;
-                    float lat = atan(eciPos.z, length(eciPos.xy));
+                    float lat = geodeticLatitude(eciPos);
                     float alt = eciDist - u_earthRadius;
                     vec3 flatPos = vec3(lon * u_earthRadius, lat * u_earthRadius, alt * 0.001);
 

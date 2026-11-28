@@ -25,6 +25,7 @@ export class MeshRenderer {
   };
 
   private numOfWarnings_: number;
+  private readonly earthshineScratch_ = new Float32Array(3);
 
   private readonly uniforms_ = {
     uPMatrix: <WebGLUniformLocation>(<unknown>null),
@@ -34,6 +35,8 @@ export class MeshRenderer {
     uLightDirection: <WebGLUniformLocation>(<unknown>null),
     uInSun: <WebGLUniformLocation>(<unknown>null),
     logDepthBufFC: <WebGLUniformLocation>(<unknown>null),
+    uEarthshineDir: <WebGLUniformLocation>(<unknown>null),
+    uEarthshine: <WebGLUniformLocation>(<unknown>null),
     uFlagEnabled: <WebGLUniformLocation>(<unknown>null),
     uFlagAtlas: <WebGLUniformLocation>(<unknown>null),
     uFlagCell: <WebGLUniformLocation>(<unknown>null),
@@ -112,6 +115,13 @@ export class MeshRenderer {
     gl.uniformMatrix4fv(this.uniforms_.uCamMatrix, false, camMatrix);
     gl.uniform1f(this.uniforms_.uInSun, this.meshManager_.currentMeshObject.inSun);
     gl.uniform1f(this.uniforms_.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
+    const earthshine = this.meshManager_.earthshine;
+
+    gl.uniform3fv(this.uniforms_.uEarthshineDir, earthshine.direction);
+    this.earthshineScratch_[0] = earthshine.color[0] * earthshine.strength;
+    this.earthshineScratch_[1] = earthshine.color[1] * earthshine.strength;
+    this.earthshineScratch_[2] = earthshine.color[2] * earthshine.strength;
+    gl.uniform3fv(this.uniforms_.uEarthshine, this.earthshineScratch_);
     this.setFlagUniforms_(camMatrix);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.meshManager_.currentMeshObject.model.buffers.vertexBuffer);
@@ -246,6 +256,8 @@ export class MeshRenderer {
     this.uniforms_.uLightDirection = gl.getUniformLocation(this.program_, 'uLightDirection') as WebGLUniformLocation;
     this.uniforms_.uInSun = gl.getUniformLocation(this.program_, 'uInSun') as WebGLUniformLocation;
     this.uniforms_.logDepthBufFC = gl.getUniformLocation(this.program_, 'logDepthBufFC') as WebGLUniformLocation;
+    this.uniforms_.uEarthshineDir = gl.getUniformLocation(this.program_, 'uEarthshineDir') as WebGLUniformLocation;
+    this.uniforms_.uEarthshine = gl.getUniformLocation(this.program_, 'uEarthshine') as WebGLUniformLocation;
     this.uniforms_.uFlagEnabled = gl.getUniformLocation(this.program_, 'uFlagEnabled') as WebGLUniformLocation;
     this.uniforms_.uFlagAtlas = gl.getUniformLocation(this.program_, 'uFlagAtlas') as WebGLUniformLocation;
     this.uniforms_.uFlagCell = gl.getUniformLocation(this.program_, 'uFlagCell') as WebGLUniformLocation;
@@ -337,6 +349,9 @@ export class MeshRenderer {
     uniform float uDecalHalfSize;
     uniform float uFlagAlpha;
 
+    uniform vec3 uEarthshineDir;
+    uniform vec3 uEarthshine;
+
     out vec4 fragColor;
 
     void main(void) {
@@ -369,7 +384,12 @@ export class MeshRenderer {
       vec3 dirColor = baseColor * ambientTint * lightAmt * (min(vInSun,1.0) * 0.65);
       vec3 specColor = vSpecular * lightAmt * (min(vInSun,1.0) * 0.65);
 
-      vec3 color = ambientColor + dirColor + specColor;
+      // Earthshine: light reflected from the Earth, arriving from nadir. Wrapped so faces sideways to the
+      // Earth still get some. uEarthshine is colour times strength and is zero when disabled or off-Earth.
+      float earthWrap = 0.5 + 0.5 * dot(vTransformedNormal, uEarthshineDir);
+      vec3 earthshineColor = baseColor * uEarthshine * (earthWrap * earthWrap);
+
+      vec3 color = ambientColor + dirColor + specColor + earthshineColor;
 
       fragColor = vec4(color, 1.0);
 

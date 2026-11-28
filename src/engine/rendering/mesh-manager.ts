@@ -17,6 +17,7 @@ import { OcclusionProgram } from './draw-manager/post-processing';
 import { GlUtils } from './gl-utils';
 import { Material } from './material';
 import { computeDecalBasis, type DecalBasis } from './mesh/decal-math';
+import { computeEarthshine, type EarthshineResult } from './mesh/earthshine';
 import { OBJLoader } from './mesh/loaders/webgl-obj-loader';
 import type { MeshBounds } from './mesh/mesh-bounds';
 import { MeshRegistry } from './mesh/mesh-registry';
@@ -115,6 +116,8 @@ export class MeshManager {
    * means "use earth.lightDirection" (the satellite path).
    */
   lightDirection: vec3 | null = null;
+  /** Earthshine for the current mesh; strength 0 for anything not orbiting Earth. */
+  earthshine: EarthshineResult = computeEarthshine([0, 0, 0], [0, 0, 0], 0);
   private modelResolver_: ModelResolver;
   private meshRegistry_: MeshRegistry;
   private meshRenderer_: MeshRenderer;
@@ -192,6 +195,7 @@ export class MeshManager {
     this.currentMeshObject.id = 0;
     this.setFlag_(null, -1);
     this.currentMeshObject.inSun = 1;
+    this.earthshine = computeEarthshine([0, 0, 0], [0, 0, 0], 0);
     this.currentMeshObject.isRotationStable = false;
 
     // Light the mesh from the sun as seen from the BODY, not from Earth.
@@ -256,6 +260,7 @@ export class MeshManager {
       y: renderedPos[1],
       z: renderedPos[2],
     };
+    this.earthshine = computeEarthshine(renderedPos, ServiceLocator.getScene().earth.lightDirection, settingsManager.meshEarthshineStrength);
     let drawPosition = [position.x, position.y, position.z] as EciArr3;
 
     // We need to avoid zero values. They break mat4.targetTo

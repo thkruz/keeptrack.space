@@ -74,6 +74,18 @@ export const MOON_SCALAR_DISTANCE = <Kilometers>200000;
 export const RADIUS_OF_EARTH = <Kilometers>6371; // Radius of Earth in kilometers
 
 /**
+ * WGS84 equatorial semi-axis in kilometers. The 3D globe, its shells and Earth picking use
+ * the WGS84 ellipsoid; {@link RADIUS_OF_EARTH} stays the mean radius for the flat and polar
+ * map scales and for code that has not moved to the ellipsoid yet.
+ */
+export const WGS84_A_KM = <Kilometers>6378.137;
+
+/**
+ * WGS84 polar semi-axis in kilometers, a * (1 - f) with f = 1 / 298.257223563 (about 6356.752).
+ */
+export const WGS84_B_KM = <Kilometers>(WGS84_A_KM * (1 - 1 / 298.257223563));
+
+/**
  * Distance objects are placed above earth to avoid z-buffer fighting
  */
 export const GROUND_BUFFER_DISTANCE = <Kilometers>2.5;

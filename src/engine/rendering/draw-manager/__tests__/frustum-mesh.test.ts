@@ -64,6 +64,30 @@ describe('FrustumMesh', () => {
       expect((mesh as any).vertices_.some((v: number) => v !== 0)).toBe(true);
     });
 
+    it.each([
+      ['equator', [6400, 0, 0], 6378.137],
+      ['pole', [0, 0, 6400], 6356.7523],
+    ])('clamps the far plane to the WGS84 surface plus 15 km at the %s', (_name, srcPos, surfaceR) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (ServiceLocator.getDotsManager() as any).positionData.set(srcPos, 0);
+      const mesh = build({ farDistance: 5000 });
+
+      mesh.update();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const v = (mesh as any).vertices_ as Float32Array;
+      let cx = 0;
+      let cy = 0;
+      let cz = 0;
+
+      for (let i = 4; i < 8; i++) {
+        cx += v[i * 3];
+        cy += v[i * 3 + 1];
+        cz += v[i * 3 + 2];
+      }
+      // Mean of the four far corners sits on the nadir axis, at the clamped far distance.
+      expect(Math.hypot(cx / 4, cy / 4, cz / 4)).toBeCloseTo(surfaceR + 15, 1);
+    });
+
     it('sat-to-sat mode points the frustum at the target object', () => {
       const mesh = build({ targetObj: { id: 1 } });
 

@@ -464,3 +464,36 @@ describe('attachSettingControlListeners - button', () => {
     expect(soundStub.play).toHaveBeenCalledWith(SoundNames.BUTTON_CLICK);
   });
 });
+
+describe('renderSettingControl - number slider', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('renders a range input with the value shown beside the label, and sets live while dragging', () => {
+    let value = 0.95;
+    const set = vi.fn((v: number) => {
+      value = v;
+    });
+    const ctrl: ISettingNumberControl = { type: 'number', slider: true, id: 'op', label: 'Max Opacity', min: 0.3, max: 1, step: 0.05, get: () => value, set };
+    const host = mountHtml(renderSettingControl(ctrl, 'sec'));
+    const input = host.querySelector('input') as HTMLInputElement;
+    const readout = host.querySelector(`#${domIdForControl('sec', 'op')}-value`) as HTMLElement;
+
+    expect(input.type).toBe('range');
+    expect(input.getAttribute('min')).toBe('0.3');
+    expect(input.getAttribute('step')).toBe('0.05');
+    expect(readout.textContent).toBe('0.95');
+    attachSettingControlListeners(ctrl, 'sec');
+    input.value = '0.6';
+    input.dispatchEvent(new Event('input'));
+    expect(set).toHaveBeenLastCalledWith(0.6);
+    expect(readout.textContent).toBe('0.60');
+  });
+
+  it('falls back to a number box without min and max', () => {
+    const ctrl: ISettingNumberControl = { type: 'number', slider: true, id: 'n2', label: 'N', get: () => 5, set: vi.fn() };
+
+    expect(renderSettingControl(ctrl, 'sec')).toContain('type="number"');
+  });
+});

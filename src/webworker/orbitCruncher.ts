@@ -1,4 +1,4 @@
-import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, lla2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
+import { DEG2RAD, eci2ecef, GreenwichMeanSiderealTime, Kilometers, llaRad2eci, Radians, Sgp4, TemeVec3 } from '@ootk/src/main';
 import { rebaseToAnchor } from '../engine/math/orbit-anchor-math';
 import { jday } from '../engine/utils/transforms';
 import { toCacheIndex } from './cache-index';
@@ -293,11 +293,11 @@ const drawMissileSegment_ = (missile: OrbitCruncherMissileObject, i: number, poi
   // dots. Without a launch epoch, gmstAnchor is already the current-time GMST.
   const gmst = usePerSampleGmst ? gmstAnchor + EARTH_ROTATION_RAD_PER_SEC * x : gmstAnchor;
 
-  // Use the ellipsoidal (WGS84) lat/lon/alt -> ECI conversion, the same one
-  // MissileObject.eci() and every other object use. A spherical approximation
-  // (geocentric, fixed 6371 km radius) drifts ~15-20 km from the true position at
-  // high latitude, putting the line off the dot/model near a polar apogee.
-  const eci = lla2eci(
+  // Use the WGS84 geodetic lat/lon/alt -> ECI conversion (llaRad2eci), the same one
+  // MissileObject.eci() and the position cruncher use. The deprecated spherical lla2eci
+  // (geodetic latitude on a 6371 km sphere) sits up to ~22 km from the WGS84 point,
+  // which would put the line off the dot/model and off the WGS84 globe.
+  const eci = llaRad2eci(
     { lat: (missile.latList[x] * DEG2RAD) as Radians, lon: (missile.lonList[x] * DEG2RAD) as Radians, alt: missile.altList[x] as Kilometers },
     gmst as GreenwichMeanSiderealTime
   );

@@ -12,7 +12,22 @@ import { jday } from '@app/engine/utils/transforms';
 import { t7e } from '@app/locales/keys';
 import { ScenarioManagementPlugin } from '@app/plugins/scenario-management/scenario-management';
 import { TimeSlider } from '@app/plugins/time-slider/time-slider';
-import { DEG2RAD, Degrees, ecefRad2rae, eci2ecef, eci2lla, Kilometers, KilometersPerSecond, MILLISECONDS_TO_DAYS, RAD2DEG, Sgp4, SpaceObjectType, TemeVec3 } from '@ootk/src/main';
+import {
+  DEG2RAD,
+  Degrees,
+  ecefRad2rae,
+  eci2ecef,
+  eci2lla,
+  Kilometers,
+  KilometersPerSecond,
+  llaRad2eci,
+  MILLISECONDS_TO_DAYS,
+  RAD2DEG,
+  Radians,
+  Sgp4,
+  SpaceObjectType,
+  TemeVec3,
+} from '@ootk/src/main';
 import { SettingsMenuPlugin } from '../settings-menu/settings-menu';
 import { generateBallisticTrajectory } from './ballistic-trajectory';
 import { ChinaICBM, FraSLBM, globalBMTargets, NorthKoreanBM, RussianICBM, USATargets, UsaICBM, ukSLBM } from './missile-data';
@@ -702,9 +717,8 @@ export const MirvAttack = (params: MirvLaunchParams): number => {
  * @returns An object containing the current TEARR data for the missile.
  */
 export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor[]) => {
-  const timeManagerInstance = ServiceLocator.getTimeManager();
-
-  const currentTEARR = {
+  const now = ServiceLocator.getTimeManager().simulationTimeObj;
+  const currentTEARR: MissileTearr = {
     objName: '',
     time: '',
     alt: 0 as Kilometers,
@@ -715,7 +729,6 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
     rng: 0 as Kilometers,
     inView: false,
   }; // Most current TEARR data that is set in satellite object and returned.
-  const now = timeManagerInstance.simulationTimeObj;
   let j = jday(
     now.getUTCFullYear(),
     now.getUTCMonth() + 1, // NOTE:, this function requires months in range 1-12.
@@ -727,128 +740,129 @@ export const getMissileTEARR = (missile: MissileObject, sensors?: DetailedSensor
 
   j += now.getUTCMilliseconds() * MILLISECONDS_TO_DAYS;
   const gmst = Sgp4.gstime(j);
-
-  // If no sensor passed to function then try to use the 'currentSensor'
-  if (sensors === undefined) {
-    const sensorManagerInstance = ServiceLocator.getSensorManager();
-
-    if (sensorManagerInstance.currentSensors === undefined) {
-      throw new TypeError('getTEARR requires a sensor or for a sensor to be currently selected.');
-    } else {
-      sensors = sensorManagerInstance.currentSensors;
-    }
-  }
-
   // TODO: We should return an array
-  const sensor = sensors[0];
-
-  let curMissileTime;
-
-  for (let t = 0; t < missile.altList.length; t++) {
-    if (missile.startTime + t * 1000 > now.getTime()) {
-      curMissileTime = t;
-      break;
-    }
-  }
+  const sensor = resolveTearrSensors_(sensors)[0];
+  const curMissileTime = missileTimeIndex_(missile, now.getTime());
 
   // The missile is not in flight at the current sim time (pre-launch or post-impact):
   // there is no trajectory sample to read, so return the zeroed, not-in-view TEARR
   // rather than indexing the lists with `undefined` and producing NaN angles.
   if (curMissileTime === undefined) {
-    const sensorManagerInstance = ServiceLocator.getSensorManager();
+    return publishTearr_(currentTEARR);
+  }
 
-    if (sensorManagerInstance) {
-      sensorManagerInstance.currentTEARR = currentTEARR;
+  fillMissileLookAngles_(currentTEARR, missile, curMissileTime, gmst, sensor);
+  currentTEARR.inView = isMissileTearrInFov(sensor, currentTEARR);
+
+  return publishTearr_(currentTEARR);
+};
+
+type MissileTearr = {
+  objName: string;
+  time: string;
+  alt: Kilometers;
+  lon: Degrees;
+  lat: Degrees;
+  az: Degrees;
+  el: Degrees;
+  rng: Kilometers;
+  inView: boolean;
+};
+
+type TearrFovSensor = Pick<DetailedSensor, 'minAz' | 'maxAz' | 'minEl' | 'maxEl' | 'minRng' | 'maxRng' | 'minAz2' | 'maxAz2' | 'minEl2' | 'maxEl2' | 'minRng2' | 'maxRng2'>;
+
+/** The sensors passed in, or the currently selected ones. */
+const resolveTearrSensors_ = (sensors?: DetailedSensor[]): DetailedSensor[] => {
+  if (sensors !== undefined) {
+    return sensors;
+  }
+  const current = ServiceLocator.getSensorManager().currentSensors;
+
+  if (current === undefined) {
+    throw new TypeError('getTEARR requires a sensor or for a sensor to be currently selected.');
+  }
+
+  return current;
+};
+
+/** First trajectory index (1 s steps) after `nowMs`, or undefined when the missile is not in flight. */
+const missileTimeIndex_ = (missile: MissileObject, nowMs: number): number | undefined => {
+  for (let t = 0; t < missile.altList.length; t++) {
+    if (missile.startTime + t * 1000 > nowMs) {
+      return t;
     }
-
-    return currentTEARR;
   }
 
-  const cosLat = Math.cos(missile.latList[curMissileTime] * DEG2RAD);
-  const sinLat = Math.sin(missile.latList[curMissileTime] * DEG2RAD);
-  const cosLon = Math.cos(missile.lonList[curMissileTime] * DEG2RAD + gmst);
-  const sinLon = Math.sin(missile.lonList[curMissileTime] * DEG2RAD + gmst);
+  return undefined;
+};
 
-  const x = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * cosLon);
-  const y = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * cosLat * sinLon);
-  const z = <Kilometers>((RADIUS_OF_EARTH + missile.altList[curMissileTime]) * sinLat);
-
-  let lookAngles, positionEcf;
-
-  try {
-    const gpos = eci2lla({ x, y, z }, gmst);
-
-    currentTEARR.alt = gpos.alt;
-    currentTEARR.lon = gpos.lon;
-    currentTEARR.lat = gpos.lat;
-    positionEcf = eci2ecef({ x, y, z }, gmst);
-    lookAngles = ecefRad2rae(sensor.llaRad(), positionEcf);
-    currentTEARR.az = (lookAngles.az * RAD2DEG) as Degrees;
-    currentTEARR.el = (lookAngles.el * RAD2DEG) as Degrees;
-    currentTEARR.rng = lookAngles.rng;
-  } catch {
-    currentTEARR.alt = 0 as Kilometers;
-    currentTEARR.lon = 0 as Degrees;
-    currentTEARR.lat = 0 as Degrees;
-    currentTEARR.az = 0 as Degrees;
-    currentTEARR.el = 0 as Degrees;
-    currentTEARR.rng = 0 as Kilometers;
-  }
-
-  // Check if satellite is in field of view of a sensor.
-  const hasSecondaryFov =
-    sensor.minAz2 !== undefined &&
-    sensor.maxAz2 !== undefined &&
-    sensor.minEl2 !== undefined &&
-    sensor.maxEl2 !== undefined &&
-    sensor.minRng2 !== undefined &&
-    sensor.maxRng2 !== undefined;
-
-  if (sensor.minAz > sensor.maxAz) {
-    const inPrimaryFov =
-      (currentTEARR.az >= sensor.minAz || currentTEARR.az <= sensor.maxAz) &&
-      currentTEARR.el >= sensor.minEl &&
-      currentTEARR.el <= sensor.maxEl &&
-      currentTEARR.rng <= sensor.maxRng &&
-      currentTEARR.rng >= sensor.minRng;
-
-    const inSecondaryFov =
-      hasSecondaryFov &&
-      (currentTEARR.az >= sensor.minAz2! || currentTEARR.az <= sensor.maxAz2!) &&
-      currentTEARR.el >= sensor.minEl2! &&
-      currentTEARR.el <= sensor.maxEl2! &&
-      currentTEARR.rng <= sensor.maxRng2! &&
-      currentTEARR.rng >= sensor.minRng2!;
-
-    currentTEARR.inView = inPrimaryFov || inSecondaryFov;
-  } else {
-    const inPrimaryFov =
-      currentTEARR.az >= sensor.minAz &&
-      currentTEARR.az <= sensor.maxAz &&
-      currentTEARR.el >= sensor.minEl &&
-      currentTEARR.el <= sensor.maxEl &&
-      currentTEARR.rng <= sensor.maxRng &&
-      currentTEARR.rng >= sensor.minRng;
-
-    const inSecondaryFov =
-      hasSecondaryFov &&
-      currentTEARR.az >= sensor.minAz2! &&
-      currentTEARR.az <= sensor.maxAz2! &&
-      currentTEARR.el >= sensor.minEl2! &&
-      currentTEARR.el <= sensor.maxEl2! &&
-      currentTEARR.rng <= sensor.maxRng2! &&
-      currentTEARR.rng >= sensor.minRng2!;
-
-    currentTEARR.inView = inPrimaryFov || inSecondaryFov;
-  }
-
+/** Store the TEARR on the sensor manager when there is one, and return it. */
+const publishTearr_ = (tearr: MissileTearr): MissileTearr => {
   const sensorManagerInstance = ServiceLocator.getSensorManager();
 
   if (sensorManagerInstance) {
-    sensorManagerInstance.currentTEARR = currentTEARR;
+    sensorManagerInstance.currentTEARR = tearr;
   }
 
-  return currentTEARR;
+  return tearr;
+};
+
+/**
+ * Write the geodetic position and look angles of trajectory sample `t` into `tearr` (all zero when the conversion
+ * throws). The sample goes through the WGS84 geodetic llaRad2eci, the same point MissileObject.eci() draws.
+ */
+const fillMissileLookAngles_ = (tearr: MissileTearr, missile: MissileObject, t: number, gmst: number, sensor: DetailedSensor): void => {
+  const eci = llaRad2eci(
+    {
+      lat: (missile.latList[t] * DEG2RAD) as Radians,
+      lon: (missile.lonList[t] * DEG2RAD) as Radians,
+      alt: missile.altList[t] as Kilometers,
+    },
+    gmst
+  );
+
+  try {
+    const gpos = eci2lla(eci, gmst);
+    const lookAngles = ecefRad2rae(sensor.llaRad(), eci2ecef(eci, gmst));
+
+    tearr.alt = gpos.alt;
+    tearr.lon = gpos.lon;
+    tearr.lat = gpos.lat;
+    tearr.az = (lookAngles.az * RAD2DEG) as Degrees;
+    tearr.el = (lookAngles.el * RAD2DEG) as Degrees;
+    tearr.rng = lookAngles.rng;
+  } catch {
+    tearr.alt = 0 as Kilometers;
+    tearr.lon = 0 as Degrees;
+    tearr.lat = 0 as Degrees;
+    tearr.az = 0 as Degrees;
+    tearr.el = 0 as Degrees;
+    tearr.rng = 0 as Kilometers;
+  }
+};
+
+/** Azimuth window test; a wrapping window (min > max) passes north. */
+const inAzWindow_ = (az: number, min: number, max: number, wraps: boolean): boolean => (wraps ? az >= min || az <= max : az >= min && az <= max);
+
+const inElRngWindow_ = (tearr: MissileTearr, minEl: number, maxEl: number, minRng: number, maxRng: number): boolean =>
+  tearr.el >= minEl && tearr.el <= maxEl && tearr.rng <= maxRng && tearr.rng >= minRng;
+
+const hasSecondaryFov_ = (s: TearrFovSensor): boolean => [s.minAz2, s.maxAz2, s.minEl2, s.maxEl2, s.minRng2, s.maxRng2].every((v) => v !== undefined);
+
+/**
+ * True when the TEARR az/el/rng lies in the sensor's primary or secondary field of view. Whether the azimuth windows
+ * wrap through north is decided by the primary window for both, as before.
+ */
+export const isMissileTearrInFov = (sensor: TearrFovSensor, tearr: MissileTearr): boolean => {
+  const wraps = sensor.minAz > sensor.maxAz;
+  const inPrimaryFov = inAzWindow_(tearr.az, sensor.minAz, sensor.maxAz, wraps) && inElRngWindow_(tearr, sensor.minEl, sensor.maxEl, sensor.minRng, sensor.maxRng);
+
+  return (
+    inPrimaryFov ||
+    (hasSecondaryFov_(sensor) &&
+      inAzWindow_(tearr.az, sensor.minAz2!, sensor.maxAz2!, wraps) &&
+      inElRngWindow_(tearr, sensor.minEl2!, sensor.maxEl2!, sensor.minRng2!, sensor.maxRng2!))
+  );
 };
 
 export type MissileManager = typeof missileManager;

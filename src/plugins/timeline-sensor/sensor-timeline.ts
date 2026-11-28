@@ -29,7 +29,7 @@ import {
   earthGravityParam,
   Hours,
   Kilometers,
-  lla2eci,
+  llaRad2eci,
   MILLISECONDS_PER_SECOND,
   Milliseconds,
   Radians,
@@ -754,7 +754,7 @@ export class SensorTimeline extends KeepTrackPlugin {
       alt: sensor.alt,
     };
     const { gmst } = calcGmst(now);
-    const sensorPos = lla2eci(lla, gmst);
+    const sensorPos = llaRad2eci(lla, gmst);
 
     sensor.position = sensorPos;
 

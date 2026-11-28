@@ -1,10 +1,9 @@
 /* eslint-disable max-classes-per-file */
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
-import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { Degrees, Kilometers, Milliseconds } from '@ootk/src/main';
-import { mat4, vec3, vec4 } from 'gl-matrix';
+import { Degrees, Kilometers, Milliseconds, rayEllipsoidIntersection } from '@ootk/src/main';
+import { mat4, vec4 } from 'gl-matrix';
 import { CameraType } from '../camera/camera-type';
 import { PluginRegistry } from '../core/plugin-registry';
 import { ServiceLocator } from '../core/service-locator';
@@ -261,32 +260,32 @@ export class InputManager {
     // What did we click on
     const ptThru = InputManager.unProject(x, y, camera);
 
-    // Clicked on minus starting point is our direction vector
-    const rayDir = vec3.create();
+    return <Kilometers[]>(<unknown>InputManager.intersectEarthEllipsoid(rayOrigin, ptThru));
+  }
 
-    vec3.subtract(rayDir, ptThru, rayOrigin); // rayDir = ptThru - rayOrigin
-    vec3.normalize(rayDir, rayDir);
+  /**
+   * First point where the ray from `rayOrigin` through `ptThru` meets the WGS84 ellipsoid
+   * (the drawn globe), in the same Earth-centred frame as the inputs. Latitude does not depend
+   * on the GMST rotation about Z, so `eci2lla` of the result is the geodetic lat/lon under the cursor.
+   * @param rayOrigin - Camera position, km
+   * @param ptThru - Any point on the pick ray past the origin, km
+   * @returns The near intersection, or [NaN, NaN, NaN] when the ray misses the Earth, the Earth is behind the origin, or the origin is inside it
+   */
+  static intersectEarthEllipsoid(rayOrigin: ArrayLike<number>, ptThru: ArrayLike<number>): [number, number, number] {
+    // Plain doubles, not Float32 vec3: a float32 ulp at 6378 km is about 0.5 m (4e-6 deg)
+    const dx = ptThru[0] - rayOrigin[0];
+    const dy = ptThru[1] - rayOrigin[1];
+    const dz = ptThru[2] - rayOrigin[2];
+    const len = Math.hypot(dx, dy, dz);
+    const dir = { x: dx / len, y: dy / len, z: dz / len };
+    const hit = len > 0 ? rayEllipsoidIntersection({ x: rayOrigin[0], y: rayOrigin[1], z: rayOrigin[2] }, dir) : null;
 
-    const toCenterVec = vec3.create();
+    // A negative near root is behind the camera (both roots negative) or the camera is inside the ellipsoid: a miss
+    if (!hit || hit.near < 0) {
+      return [Number.NaN, Number.NaN, Number.NaN];
+    }
 
-    vec3.scale(toCenterVec, rayOrigin, -1); // toCenter is just -camera pos because center is at [0,0,0]
-    const dParallel = vec3.dot(rayDir, toCenterVec);
-
-    const longDir = vec3.create();
-
-    vec3.scale(longDir, rayDir, dParallel); // longDir = rayDir * distParallel
-    vec3.add(ptThru, rayOrigin, longDir); // ptThru is now on the plane going through the center of sphere
-    const dPerp = vec3.len(ptThru);
-
-    const dSubSurf = Math.sqrt(RADIUS_OF_EARTH * RADIUS_OF_EARTH - dPerp * dPerp);
-    const dSurf = dParallel - dSubSurf;
-
-    const ptSurf = vec3.create();
-
-    vec3.scale(ptSurf, rayDir, dSurf);
-    vec3.add(ptSurf, ptSurf, rayOrigin);
-
-    return <Kilometers[]>(<unknown>ptSurf);
+    return [rayOrigin[0] + dir.x * hit.near, rayOrigin[1] + dir.y * hit.near, rayOrigin[2] + dir.z * hit.near];
   }
 
   public static getSatIdFromCoordAlt(x: number, y: number): number | null {

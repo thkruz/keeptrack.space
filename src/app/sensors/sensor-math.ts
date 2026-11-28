@@ -13,7 +13,7 @@ import {
   Kilometers,
   KilometersPerSecond,
   linearDistance,
-  lla2eci,
+  llaRad2eci,
   MINUTES_PER_DAY,
   relativeVelocity,
   Satellite,
@@ -545,7 +545,7 @@ export class SensorMath {
   static getLightingState(satPos: TemeVec3 | null | undefined, sensor: DetailedSensor, now: Date): { sunlit: boolean | null; siteDark: boolean | null; sunElDeg: number | null } {
     const { gmst } = calcGmst(now);
     const sunPos = Sun.eci(now);
-    const sitePos = lla2eci(sensor.llaRad(), gmst);
+    const sitePos = llaRad2eci(sensor.llaRad(), gmst);
     // Geodetic normal of the site (lat/lon rotated into ECI by GMST), as the Pro planner's site.up
     const lla = sensor.llaRad();
     const up = {
@@ -596,7 +596,7 @@ export class SensorMath {
   static checkIfVisibleForOptical(sat: BaseObject, sensor: DetailedSensor, now: Date): boolean {
     const { gmst } = calcGmst(now);
     const sunPos = Sun.eci(now);
-    const sensorPos = lla2eci(sensor.llaRad(), gmst);
+    const sensorPos = llaRad2eci(sensor.llaRad(), gmst);
 
     sensor.position = sensorPos;
 

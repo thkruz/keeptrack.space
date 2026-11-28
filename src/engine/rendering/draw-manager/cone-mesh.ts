@@ -3,9 +3,10 @@ import { CameraType } from '@app/engine/camera/camera-type';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
+import { BaseObject, Degrees, ellipsoidRadiusAlong, RADIUS_OF_EARTH } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
+import { WGS84_GLSL } from '../shaders/wgs84-glsl';
 import { CustomMesh } from './custom-mesh';
 
 export interface ConeSettings {
@@ -36,7 +37,6 @@ export class ConeMesh extends CustomMesh {
   fieldOfView: number;
   color: [number, number, number, number] = [0.2, 1.0, 1.0, 1.0];
   pos: vec3 = vec3.create();
-  offsetDistance: number = (RADIUS_OF_EARTH + settingsManager.coneDistanceFromEarth) as Kilometers;
   obj: BaseObject;
   targetObj: BaseObject | null = null;
 
@@ -101,6 +101,14 @@ export class ConeMesh extends CustomMesh {
     gl.bufferSubData(gl.ARRAY_BUFFER, 0, this.vertices_);
   }
 
+  /**
+   * Distance from Earth's center to the cone base along a unit direction: the WGS84 surface radius in
+   * that direction plus `coneDistanceFromEarth`.
+   */
+  private static baseDistanceAlong_(dx: number, dy: number, dz: number): number {
+    return ellipsoidRadiusAlong({ x: dx, y: dy, z: dz }) + settingsManager.coneDistanceFromEarth;
+  }
+
   private updateEarthCenter_() {
     const worldShift = Scene.getInstance().worldShift;
     const isFlatMap = ServiceLocator.getMainCamera().cameraType === CameraType.FLAT_MAP;
@@ -140,10 +148,11 @@ export class ConeMesh extends CustomMesh {
 
       this.computeBaseCircle_(dx, dy, dz, baseCX, baseCY, baseCZ, baseRadius);
     } else {
-      const coneHeight = satDistance - this.offsetDistance;
-      const baseCX = dx * this.offsetDistance + worldShift[0];
-      const baseCY = dy * this.offsetDistance + worldShift[1];
-      const baseCZ = dz * this.offsetDistance + worldShift[2];
+      const offsetDistance = ConeMesh.baseDistanceAlong_(dx, dy, dz);
+      const coneHeight = satDistance - offsetDistance;
+      const baseCX = dx * offsetDistance + worldShift[0];
+      const baseCY = dy * offsetDistance + worldShift[1];
+      const baseCZ = dz * offsetDistance + worldShift[2];
       const baseRadius = coneHeight * Math.tan((this.fieldOfView * Math.PI) / 180);
 
       this.computeBaseCircle_(dx, dy, dz, baseCX, baseCY, baseCZ, baseRadius);
@@ -357,6 +366,8 @@ export class ConeMesh extends CustomMesh {
       uniform float u_earthRadius;
       uniform float u_meshRefFlatX;
 
+      ${WGS84_GLSL}
+
       in vec3 a_position;
 
       void main(void) {
@@ -367,7 +378,7 @@ export class ConeMesh extends CustomMesh {
           vec3 eciPos = worldPosition.xyz;
           float eciDist = length(eciPos);
           float lon = atan(eciPos.y, eciPos.x) - u_gmst;
-          float lat = atan(eciPos.z, length(eciPos.xy));
+          float lat = geodeticLatitude(eciPos);
           float alt = eciDist - u_earthRadius;
 
           // Wrap X relative to mesh center to keep all mesh vertices contiguous

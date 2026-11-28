@@ -1,6 +1,7 @@
 import { t7e } from '@app/locales/keys';
 import { BaseObject, SpaceObjectType } from '@ootk/src/main';
 import { errorManagerInstance } from '../../engine/utils/errorManager';
+import { escapeHtml } from '../../engine/utils/escape-html';
 import { countryCodeList, getCountryMapList, launchSiteMap } from '../data/catalogs/countries';
 import { manufacturerCodeMap } from '../data/catalogs/manufacturer-codes';
 import { orgDataService } from '../data/catalogs/org-data-service';
@@ -57,10 +58,10 @@ export abstract class StringExtractor {
     const rocketUrl = rocketUrls.filter((url) => url.rocket === LV);
 
     if (rocketUrl.length > 0) {
-      return `<a class="iframe" href="${rocketUrl[0].url}">${LV}</a>`;
+      return `<a class="iframe" href="${rocketUrl[0].url}">${escapeHtml(LV)}</a>`;
     }
 
-    return `${LV}`;
+    return escapeHtml(LV);
   }
 
   static extractUserUrl(user: string, displayName?: string): string {

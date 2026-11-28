@@ -1,6 +1,7 @@
 import { SensorManager } from '@app/app/sensors/sensorManager';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { settingsManager } from '@app/settings/settings';
+import { geodeticSurfaceNormal, llaRad2eci } from '@ootk/src/main';
 import { defaultSensor } from '@test/environment/apiMocks';
 import { setupStandardEnvironment } from '@test/environment/standard-env';
 import { vi } from 'vitest';
@@ -46,6 +47,40 @@ describe('SensorManager position + observation', () => {
     expect(typeof pos.x).toBe('number');
     expect(typeof pos.gmst).toBe('number');
     expect(pos.lat).toBe(defaultSensor.lat);
+  });
+
+  it('calculateSensorPos puts the planetarium camera on the WGS84 site + (alt + 3 km) along the geodetic normal', () => {
+    const now = new Date('2022-01-01T00:00:00Z');
+    const s = sensor({ lat: 45, lon: 10, alt: 0.4 } as never);
+    const pos = mgr.calculateSensorPos(now, [s]);
+    const site = llaRad2eci({ lat: (45 * Math.PI) / 180, lon: (10 * Math.PI) / 180, alt: 0 } as never, pos.gmst);
+    const n = geodeticSurfaceNormal(site);
+    const lift = 0.4 + 3;
+
+    expect(pos.x).toBeCloseTo(site.x + n.x * lift, 6);
+    expect(pos.y).toBeCloseTo(site.y + n.y * lift, 6);
+    expect(pos.z).toBeCloseTo(site.z + n.z * lift, 6);
+  });
+
+  it('planetarium camera is above the ellipsoid at the equator and pole (never inside the mesh)', () => {
+    const equator = mgr.calculateSensorPos(new Date('2022-01-01T00:00:00Z'), [sensor({ lat: 0, lon: 0, alt: 0 } as never)]);
+    const pole = mgr.calculateSensorPos(new Date('2022-01-01T00:00:00Z'), [sensor({ lat: 90, lon: 0, alt: 0 } as never)]);
+
+    expect(Math.hypot(equator.x, equator.y, equator.z)).toBeCloseTo(6378.137 + 3, 4);
+    expect(Math.hypot(pole.x, pole.y, pole.z)).toBeCloseTo(6356.752314 + 3, 4);
+  });
+
+  it('sensorSunStatus_ stores the WGS84 ECI site position on the sensor', () => {
+    const now = new Date('2022-01-01T00:00:00Z');
+    const s = sensor({ lat: 45, lon: 10, alt: 0.4 } as never);
+
+    p().sensorSunStatus_(now, s);
+
+    const r = Math.hypot(s.position.x, s.position.y, s.position.z);
+
+    // WGS84 geocentric radius at 45 deg is about 6367.49 km (+0.4 km), not the 6371 sphere
+    expect(r).toBeLessThan(6369);
+    expect(r).toBeGreaterThan(6366);
   });
 
   it('canStationsObserve is true for a non-optical sensor', () => {

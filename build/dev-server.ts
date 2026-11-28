@@ -6,6 +6,7 @@ import { dirname, extname, join, normalize, resolve, sep } from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { fileURLToPath } from 'node:url';
 import { ConsoleStyles, logWithStyle } from './lib/build-error';
+import { cloudTilesStartupMessage, handleCloudTiles, isCloudTilesPath, resolveCloudTilesDir } from './cloud-tiles-route';
 import { handlePluginEndpoint } from './plugin-install-endpoint';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -17,6 +18,7 @@ const rootDir = resolve(__dirname, '..');
  */
 const PORT = Number(process.env.KEEPTRACK_DEV_PORT ?? 5544);
 const distDir = resolve(rootDir, 'dist');
+const cloudTilesDir = resolveCloudTilesDir(rootDir);
 
 const RELOAD_SCRIPT = `<script>new EventSource("/__reload").onmessage=()=>location.reload()</script>`;
 
@@ -106,6 +108,13 @@ function startServer() {
     // One-click plugin install (dev-server only; localhost + same-origin guarded).
     if (pathname.startsWith('/__plugin/')) {
       await handlePluginEndpoint(req, res, pathname, rootDir);
+
+      return;
+    }
+
+    // Volumetric-cloud tiles, same-origin, from a folder outside dist/ (never copied by the build).
+    if (isCloudTilesPath(pathname)) {
+      await handleCloudTiles(req, res, pathname, cloudTilesDir);
 
       return;
     }
@@ -237,6 +246,7 @@ function startServer() {
 
   server.listen(PORT, () => {
     logWithStyle(`Serving dist/ at http://localhost:${PORT}`, ConsoleStyles.SUCCESS);
+    logWithStyle(cloudTilesStartupMessage(cloudTilesDir), cloudTilesDir ? ConsoleStyles.INFO : ConsoleStyles.DEBUG);
   });
 }
 

@@ -2,8 +2,8 @@
 import { CameraType } from '@app/engine/camera/camera-type';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
-import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
+import { liftToEllipsoid } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
 import { CustomMesh } from './custom-mesh';
@@ -32,19 +32,25 @@ export interface SwathColors {
 /** Alpha multiplier for strips whose sub-point is in darkness. */
 export const SWATH_UNLIT_ALPHA_SCALE = 0.4;
 
+const liftIn_ = { x: 0, y: 0, z: 0 };
+const liftOut_ = { x: 0, y: 0, z: 0 };
+
 /**
- * Moves a WGS84 surface point onto the rendered globe, `liftKm` above it, writing into `out` at
- * `o`. The geometry is computed on the ellipsoid (true widths), but KeepTrack draws Earth as a
- * sphere of RADIUS_OF_EARTH, which sits up to 14 km above the ellipsoid at high latitude; a point
- * left on the ellipsoid would vanish under the textured globe there. The point keeps its
- * geocentric direction, so its latitude/longitude on the drawn globe are unchanged.
+ * Raises a WGS84 surface point `liftKm` above the ellipsoid along its geodetic normal, writing into
+ * `out` at `o`. The geometry is computed on the ellipsoid (true widths) and the globe is drawn on
+ * the same ellipsoid, so the point keeps its geodetic latitude/longitude and sits on the right
+ * texture pixel. (The old version kept the geocentric direction and rescaled to the 6371 km
+ * sphere, which moved points up to 0.19 deg equatorward against the texture.)
  */
 export const liftSurfacePoint = (x: number, y: number, z: number, liftKm: number, out: Float32Array | Float64Array, o: number): void => {
-  const scale = (RADIUS_OF_EARTH + liftKm) / Math.sqrt(x * x + y * y + z * z);
+  liftIn_.x = x;
+  liftIn_.y = y;
+  liftIn_.z = z;
+  liftToEllipsoid(liftIn_, liftKm, liftOut_);
 
-  out[o] = x * scale;
-  out[o + 1] = y * scale;
-  out[o + 2] = z * scale;
+  out[o] = liftOut_.x;
+  out[o + 1] = liftOut_.y;
+  out[o + 2] = liftOut_.z;
 };
 
 /**

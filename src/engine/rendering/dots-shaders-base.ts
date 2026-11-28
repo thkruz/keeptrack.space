@@ -2,6 +2,7 @@ import { SettingsManager } from '../../settings/settings';
 import { glsl } from '../utils/development/formatter';
 import { BODY_GLYPH_WORDS, BodyGlyph } from './body-glyph';
 import { DepthManager } from './depth-manager';
+import { WGS84_GLSL } from './shaders/wgs84-glsl';
 
 /**
  * Rendering style for the core satellite dot, selected live via the
@@ -324,6 +325,7 @@ export const createBodyGlyphLookupGlsl = (): string => glsl`
 
 export const createBaseVertShader = (settings: SettingsManager): string => glsl`#version 300 es
     precision highp float;
+    ${WGS84_GLSL}
     in vec3 a_position;
     in vec4 a_color;
     in float a_size;
@@ -444,7 +446,7 @@ export const createBaseVertShader = (settings: SettingsManager): string => glsl`
 
             float lon = atan(eciPos.y, eciPos.x) - u_gmst;
             lon = mod(lon + PI, 2.0 * PI) - PI;
-            float lat = atan(eciPos.z, length(eciPos.xy));
+            float lat = geodeticLatitude(eciPos);
             float alt = eciDist - u_earthRadius;
             vec3 flatPos = vec3(lon * u_earthRadius, lat * u_earthRadius, alt * 0.001);
 

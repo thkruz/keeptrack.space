@@ -183,14 +183,42 @@ describe('MissileObject', () => {
     });
   });
 
+  describe('WGS84 placement (row MO1)', () => {
+    // Hand values at geodetic 45 N, alt 0: N = a / sqrt(1 - e^2 / 2) = 6388.8383 km,
+    // distance from the polar axis N cos 45 = 4517.5909 km, z = N (1 - e^2) sin 45 = 4487.3484 km.
+    const at45 = () => makeMissile({ latList: [45, 45] as Degrees[], lonList: [0, 0] as Degrees[], altList: [0, 0] as Kilometers[] });
+
+    it('eci() puts a 45 N ground sample on the ellipsoid, not on the 6371 km sphere', () => {
+      const p = at45().eci()!.position;
+
+      expect(Math.hypot(p.x, p.y)).toBeCloseTo(4517.5909, 3);
+      expect(p.z).toBeCloseTo(4487.3484, 3);
+    });
+
+    it('getOrbitPath anchors at the Earth-fixed WGS84 point (gmst 0)', () => {
+      const m = at45();
+
+      m.getOrbitPath();
+      expect(m.orbitPathAnchor_[0]).toBeCloseTo(4517.5909, 3);
+      expect(m.orbitPathAnchor_[1]).toBeCloseTo(0, 9);
+      expect(m.orbitPathAnchor_[2]).toBeCloseTo(4487.3484, 3);
+    });
+
+    it('getVelocityDirection points north along a meridian climb at the equator', () => {
+      const m = makeMissile({ latList: [0, 0.01] as Degrees[], lonList: [0, 0] as Degrees[], altList: [0, 0] as Kilometers[] });
+      const dir = m.getVelocityDirection()!;
+
+      expect(dir.z).toBeGreaterThan(0.999);
+    });
+  });
+
   describe('getAltitude', () => {
     it('round-trips the sampled altitude through ECI/LLA', () => {
       const m = makeMissile();
 
-      // Recovered altitude tracks the 100 km sample within the ellipsoid-vs-
-      // spherical earth-model slop of the lla2eci/eci2lla round trip.
-      expect(m.getAltitude()).toBeGreaterThan(90);
-      expect(m.getAltitude()).toBeLessThan(110);
+      // eci() and eci2lla are both WGS84 geodetic (row MO1), so the 100 km sample
+      // round-trips exactly instead of within the old spherical slop (90-110 km).
+      expect(m.getAltitude()).toBeCloseTo(100, 6);
     });
 
     it('returns 0 when there is no position', () => {
@@ -206,8 +234,9 @@ describe('MissileObject', () => {
       const result = m.lla();
 
       expect(result).not.toBeNull();
-      expect(Math.abs(result!.lat - 10)).toBeLessThan(0.5);
-      expect(Math.abs(result!.lon - 30)).toBeLessThan(0.5);
+      // WGS84 both ways (row MO1): exact, not the old 0.5 deg spherical slop.
+      expect(result!.lat).toBeCloseTo(10, 6);
+      expect(result!.lon).toBeCloseTo(30, 6);
     });
 
     it('returns null without a position', () => {

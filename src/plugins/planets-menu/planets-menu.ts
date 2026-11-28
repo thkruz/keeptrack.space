@@ -20,7 +20,7 @@ import { html } from '@app/engine/utils/development/formatter';
 import { getEl } from '@app/engine/utils/get-el';
 import { t7e } from '@app/locales/keys';
 import { settingsManager } from '@app/settings/settings';
-import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
+import { Kilometers, WGS84_A } from '@ootk/src/main';
 import planetPng from '@public/img/icons/planet.png';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import {
@@ -189,7 +189,7 @@ export class PlanetsMenuPlugin extends KeepTrackPlugin implements ICommandPalett
             return;
           }
           settingsManager.centerBody = SolarBody.Earth;
-          settingsManager.minZoomDistance = (RADIUS_OF_EARTH + 50) as Kilometers;
+          settingsManager.minZoomDistance = (WGS84_A + 50) as Kilometers;
           settingsManager.maxZoomDistance = 1.2e6 as Kilometers; // 1.2 million km
           // Same reason as in changePlanet: nothing else notices maxZoomDistance moved.
           this.refreshCatalogVisibility_();

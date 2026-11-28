@@ -109,6 +109,7 @@ describe('MeshRenderer', () => {
       },
     },
     prepareFlagDecal: () => null,
+    earthshine: { direction: [0, 0, -1], strength: 0, color: [1, 1, 1] },
     ...over,
   });
 

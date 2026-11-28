@@ -14,6 +14,7 @@ import i18next from 'i18next';
 import { KeepTrackPlugin } from '../../engine/plugins/base-plugin';
 import { SelectSatManager } from '../select-sat-manager/select-sat-manager';
 import './lat2lon.css';
+import { escapeHtml } from '@app/engine/utils/escape-html';
 
 interface SatPoint {
   name: string;
@@ -134,7 +135,7 @@ export class Lat2LonPlots extends KeepTrackPlugin {
             <div style="display: flex; flex-direction: column; align-items: flex-start;">
               <div style="display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; align-items: flex-end;">
                 <div style="width: 10px; height: 10px; background-color: ${color}; border-radius: 50%; margin-bottom: 5px;"></div>
-                <div style="font-weight: bold;"> ${point.name}</div>
+                <div style="font-weight: bold;"> ${escapeHtml(point.name)}</div>
               </div>
               <div><bold>${t7e('plugins.Lat2LonPlots.chart.latitude')}:</bold> ${point.value[1].toFixed(3)}°</div>
               <div><bold>${t7e('plugins.Lat2LonPlots.chart.longitude')}:</bold> ${point.value[0].toFixed(3)}°</div>

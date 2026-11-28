@@ -1,12 +1,13 @@
 import { SolarBody } from '@app/engine/core/interfaces';
 import { getBodyViewConfig } from '@app/plugins/planets-menu/planets-core';
-import { Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
+import { Kilometers, RADIUS_OF_EARTH, WGS84_A } from '@ootk/src/main';
 
 describe('planets-core getBodyViewConfig', () => {
   it('keeps the camera near the surface for Earth and hides the dots', () => {
     const cfg = getBodyViewConfig(SolarBody.Earth);
 
-    expect(cfg.minZoom).toBe(RADIUS_OF_EARTH + 50);
+    expect(cfg.minZoom).toBe(WGS84_A + 50);
+    expect(cfg.minZoom).toBeCloseTo(6428.137, 3);
     expect(cfg.maxZoom).toBe(1.2e6);
     expect(cfg.dotSize).toBe(0);
     expect(cfg.drawOrbits).toBe(false);

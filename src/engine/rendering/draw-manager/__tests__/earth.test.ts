@@ -2,7 +2,7 @@
 
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { Earth, getCloudFadeZoom, getEarthNightTextureBase } from '@app/engine/rendering/draw-manager/earth';
+import { Earth, getEarthNightTextureBase } from '@app/engine/rendering/draw-manager/earth';
 import { EarthNightTextureQuality, EarthTextureStyle } from '@app/engine/rendering/draw-manager/earth-quality-enums';
 import { GreenwichMeanSiderealTime } from '@ootk/src/main';
 import { mat4 } from 'gl-matrix';
@@ -21,17 +21,6 @@ describe('Earth', () => {
     const actual = earth['mvMatrix_'];
 
     expect(actual).toEqual(expected);
-  });
-});
-
-describe('getCloudFadeZoom', () => {
-  it('depends only on zoom for an Earth-centered view', () => {
-    expect(getCloudFadeZoom(true, 0.1)).toBe(0.1);
-    expect(getCloudFadeZoom(true, 0.8)).toBe(0.8);
-  });
-
-  it('keeps clouds fully visible for other center bodies', () => {
-    expect(getCloudFadeZoom(false, 0.1)).toBe(1.0);
   });
 });
 

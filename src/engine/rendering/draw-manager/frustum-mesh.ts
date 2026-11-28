@@ -3,9 +3,10 @@ import { CameraType } from '@app/engine/camera/camera-type';
 import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { glsl } from '@app/engine/utils/development/formatter';
-import { BaseObject, Degrees, Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
+import { BaseObject, Degrees, ellipsoidRadiusAlong, Kilometers, RADIUS_OF_EARTH } from '@ootk/src/main';
 import { mat4, vec3 } from 'gl-matrix';
 import { DepthManager } from '../depth-manager';
+import { WGS84_GLSL } from '../shaders/wgs84-glsl';
 import { CustomMesh } from './custom-mesh';
 
 export interface FrustumSettings {
@@ -143,10 +144,10 @@ export class FrustumMesh extends CustomMesh {
     const oz = pz + worldShift[2];
 
     // Clamp far distance so the far plane stays above the Earth's surface,
-    // matching the cone mesh's base altitude (RADIUS_OF_EARTH + buffer).
+    // matching the cone mesh's base altitude (ellipsoid radius + buffer).
     // Without this, the far plane can extend inside the Earth, and depth
     // testing causes asymmetric occlusion that shifts with camera angle.
-    const maxFarDist = satDistance - RADIUS_OF_EARTH - 15;
+    const maxFarDist = satDistance - ellipsoidRadiusAlong({ x: dx, y: dy, z: dz }) - 15;
     const effectiveNear = Math.min(this.nearDistance, Math.max(maxFarDist, 0));
     const effectiveFar = Math.min(this.farDistance, Math.max(maxFarDist, 0));
 
@@ -492,6 +493,8 @@ export class FrustumMesh extends CustomMesh {
       uniform float u_earthRadius;
       uniform float u_meshRefFlatX;
 
+      ${WGS84_GLSL}
+
       in vec3 a_position;
 
       void main(void) {
@@ -502,7 +505,7 @@ export class FrustumMesh extends CustomMesh {
           vec3 eciPos = worldPosition.xyz;
           float eciDist = length(eciPos);
           float lon = atan(eciPos.y, eciPos.x) - u_gmst;
-          float lat = atan(eciPos.z, length(eciPos.xy));
+          float lat = geodeticLatitude(eciPos);
           float alt = eciDist - u_earthRadius;
 
           // Wrap X relative to mesh center to keep all mesh vertices contiguous

@@ -71,11 +71,28 @@ const renderToggle_ = (c: ISettingToggleControl, domId: string): string => `
           </label>
         </div>`;
 
+/** Slider readout: as many decimals as the step has (0.05 gives 0.95). */
+const formatSliderValue_ = (value: number, step: number | undefined): string => {
+  const decimals = typeof step === 'number' && step > 0 && step < 1 ? Math.min(4, Math.ceil(-Math.log10(step) - 1e-9)) : 0;
+
+  return value.toFixed(decimals);
+};
+
 const renderNumber_ = (c: ISettingNumberControl, domId: string): string => {
   const minAttr = typeof c.min === 'number' ? ` min="${c.min}"` : '';
   const maxAttr = typeof c.max === 'number' ? ` max="${c.max}"` : '';
   const stepAttr = typeof c.step === 'number' ? ` step="${c.step}"` : '';
   const unitSuffix = c.unit ? ` (${escapeText_(c.unit)})` : '';
+
+  if (c.slider && typeof c.min === 'number' && typeof c.max === 'number') {
+    return `
+        <div class="input-field col s12 kt-setting-slider"${tooltipAttrs_(c.helpText)}>
+          <label for="${domId}" class="active">${escapeText_(c.label)}${unitSuffix}: <span id="${domId}-value">${escapeText_(formatSliderValue_(c.get(), c.step))}</span></label>
+          <p class="range-field">
+            <input id="${domId}" type="range" value="${escapeAttr_(String(c.get()))}"${minAttr}${maxAttr}${stepAttr}${disabledAttr_(c)} />
+          </p>
+        </div>`;
+  }
 
   return `
         <div class="input-field col s12"${tooltipAttrs_(c.helpText)}>
@@ -180,6 +197,24 @@ const attachToggleListeners_ = (c: ISettingToggleControl, el: HTMLInputElement):
 };
 
 const attachNumberListeners_ = (c: ISettingNumberControl, el: HTMLInputElement): void => {
+  if (el.type === 'range') {
+    // Live while dragging; the settled value is announced once on 'change'.
+    const readout = document.getElementById(`${el.id}-value`);
+
+    el.addEventListener('input', () => {
+      const parsed = parseFloat(el.value);
+
+      if (!Number.isNaN(parsed)) {
+        c.set(parsed);
+        if (readout) {
+          readout.textContent = formatSliderValue_(c.get(), c.step);
+        }
+      }
+    });
+    el.addEventListener('change', () => emitSettingChanged_(el));
+
+    return;
+  }
   el.addEventListener('change', () => {
     const parsed = parseFloat(el.value);
 

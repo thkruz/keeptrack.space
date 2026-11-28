@@ -21,6 +21,7 @@ import { errorManagerInstance } from '../utils/errorManager';
 import { CpuStage, FrameProfiler } from '../utils/frame-profiler';
 import { getEl } from '../utils/get-el';
 import { isThisNode } from '../utils/isThisNode';
+import { eciToFlatMapPosition } from '../utils/transforms';
 import { DepthManager } from './depth-manager';
 import { PostProcessingManager } from './draw-manager/post-processing';
 import { Sun } from './draw-manager/sun';
@@ -464,6 +465,12 @@ export class WebGLRenderer {
     this.satLabelModeLastTime_ = timeManagerInstance.realTime;
   }
 
+  private static isOnScreen_(pos: { x: number; y: number; z: number }, isFlatMap: boolean): boolean {
+    const isInsideViewport = pos.x >= 0 && pos.y >= 0;
+
+    return isFlatMap ? isInsideViewport : isInsideViewport && pos.z >= 0 && pos.z <= 1;
+  }
+
   getScreenCoords(obj: BaseObject): {
     x: number;
     y: number;
@@ -501,21 +508,7 @@ export class WebGLRenderer {
 
           return screenPos;
         }
-        const gmst = ServiceLocator.getTimeManager().gmst;
-        let lon = Math.atan2(py, px) - gmst;
-
-        lon = ((((lon + Math.PI) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI)) - Math.PI;
-        const lat = Math.atan2(pz, Math.sqrt(px * px + py * py));
-        const alt = eciDist - RADIUS_OF_EARTH;
-
-        px = lon * RADIUS_OF_EARTH;
-        py = lat * RADIUS_OF_EARTH;
-        pz = alt * 0.001;
-
-        // Wrap X to nearest copy of camera center (matches shader logic)
-        const mapW = 2 * Math.PI * RADIUS_OF_EARTH;
-
-        px = mainCamera.flatMapPanX + ((((px - mainCamera.flatMapPanX + mapW * 0.5) % mapW) + mapW) % mapW) - mapW * 0.5;
+        [px, py, pz] = eciToFlatMapPosition(px, py, pz, ServiceLocator.getTimeManager().gmst, RADIUS_OF_EARTH, mainCamera.flatMapPanX);
       }
 
       const posVec4 = <[number, number, number, number]>vec4.fromValues(px, py, pz, 1);
@@ -533,11 +526,7 @@ export class WebGLRenderer {
       // In flat map (ortho) mode the z check is meaningless: the ortho projection maps
       // the tiny positive z (altitude above the map plane) to a slightly negative NDC z,
       // which would always fail the z >= 0 test meant for perspective projections.
-      if (mainCamera.cameraType === CameraType.FLAT_MAP) {
-        screenPos.error = !(screenPos.x >= 0 && screenPos.y >= 0);
-      } else {
-        screenPos.error = !(screenPos.x >= 0 && screenPos.y >= 0 && screenPos.z >= 0 && screenPos.z <= 1);
-      }
+      screenPos.error = !WebGLRenderer.isOnScreen_(screenPos, mainCamera.cameraType === CameraType.FLAT_MAP);
     } catch {
       screenPos.error = true;
     }
@@ -650,6 +639,13 @@ export class WebGLRenderer {
       scene.godrays?.resize();
     } catch (error) {
       errorManagerInstance.warn(t7e('errorMsgs.Rendering.godraysResizeFailed').replace('{error}', error instanceof Error ? error.message : String(error)));
+    }
+
+    // The scenery target's attachments follow the drawing-buffer size too (it also re-checks on every frame it starts).
+    try {
+      scene.sceneryTarget?.resize();
+    } catch {
+      // A failed reallocation leaves the target unallocated; the next frame retries or falls back to the plain path.
     }
   }
 

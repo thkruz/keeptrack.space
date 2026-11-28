@@ -29,18 +29,19 @@ import { Scene } from '@app/engine/core/scene';
 import { ServiceLocator } from '@app/engine/core/service-locator';
 import { EventBus } from '@app/engine/events/event-bus';
 import { EventBusEvent } from '@app/engine/events/event-bus-events';
+import type { BufferAttribute } from '@app/engine/rendering/buffer-attribute';
 import { GlUtils } from '@app/engine/rendering/gl-utils';
 import { GLSL3 } from '@app/engine/rendering/material';
 import { Mesh } from '@app/engine/rendering/mesh';
 import { ShaderMaterial } from '@app/engine/rendering/shader-material';
-import { SphereGeometry } from '@app/engine/rendering/sphere-geometry';
+import { SphereEllipsoidRadii, SphereGeometry } from '@app/engine/rendering/sphere-geometry';
 import { ViewportManager } from '@app/engine/rendering/viewport-manager';
-import { RADIUS_OF_EARTH } from '@app/engine/utils/constants';
+import { RADIUS_OF_EARTH, WGS84_A_KM, WGS84_B_KM } from '@app/engine/utils/constants';
 import { glsl } from '@app/engine/utils/development/formatter';
 import { FrameProfiler, GpuStage } from '@app/engine/utils/frame-profiler';
 import { t7e } from '@app/locales/keys';
 import { SelectSatManager } from '@app/plugins/select-sat-manager/select-sat-manager';
-import { EpochUTC, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
+import { EpochUTC, ellipsoidRadiusAlong, J2000, Kilometers, KilometersPerSecond, Seconds, Sun, TEME, Vector3D } from '@ootk/src/main';
 import { Body, BackdatePosition as backdatePosition, KM_PER_AU } from 'astronomy-engine';
 import { mat3, mat4, vec3 } from 'gl-matrix';
 import { errorManagerInstance } from '../../utils/errorManager';
@@ -48,6 +49,8 @@ import { PersistenceManager, StorageKey } from '../../utils/persistence-manager'
 import { DepthManager } from '../depth-manager';
 import { OrbitPathLine } from '../line-manager/orbit-path';
 import { PlanetColors } from './celestial-bodies/celestial-body';
+import { cloudEvolutionPhase } from './cloud-evolution';
+import { CloudFadeState, isSatelliteLockedCamera, sanitiseCloudMaxOpacity } from './cloud-visibility';
 import {
   AtmosphereSettings,
   EarthBumpTextureQuality,
@@ -57,15 +60,136 @@ import {
   EarthSpecTextureQuality,
   EarthTextureStyle,
 } from './earth-quality-enums';
+import { buildSurfaceLighting, cameraPositionFromView, type EarthSurfaceOverlay, EarthSurfaceOverlayRegistry } from './earth-surface-layers';
+import { NIGHT_AS_DAY_SUN_COSINE } from './night-as-day';
+import { PAINTED_CLOUDS_GLSL } from './painted-clouds-glsl';
 import { PoliticalMap } from './political-map';
+import { politicalMapFade } from './political-map-fade';
 import { OcclusionProgram } from './post-processing';
 import { RELIEF_NORMAL_GLSL } from './relief-shading';
 
 /**
- * The single rule for cloud fade: only the camera zoom (0 = close, 1 = far) matters, never
- * whether a satellite is selected or which camera mode is active. Non-Earth center bodies show clouds fully.
+ * WGS84 ellipsoid for the Earth surface mesh, or a shell at a constant geodetic height above it.
+ * The surface, the GPU picking pass and the godray occlusion pass all draw the surface mesh, so
+ * they share this geometry; the aurora and atmosphere shells use the same a, b with a height.
  */
-export const getCloudFadeZoom = (isEarthCenterBody: boolean, zoomLevel: number): number => (isEarthCenterBody ? zoomLevel : 1.0);
+export const getEarthEllipsoid = (heightKm = 0): SphereEllipsoidRadii => ({ a: WGS84_A_KM, b: WGS84_B_KM, height: heightKm });
+
+/** Geodetic height of the atmosphere shell: the old sphere was 1.025 x the radius, kept as 2.5 % of a. */
+export const EARTH_ATMOSPHERE_HEIGHT_KM = WGS84_A_KM * 0.025;
+
+/** Per-frame values the engine hands to an {@link EarthAtmosphereRenderHook}. All positions are in the render (inertial, worldShift-translated) frame, in km. */
+export interface EarthAtmosphereBindContext {
+  /** Unit vector toward the Sun, same frame as the shell vertices after modelViewMatrix. */
+  lightDirection: ArrayLike<number>;
+  /** Earth center in the render frame. */
+  earthCenter: [number, number, number];
+  /** Camera position in the render frame. */
+  cameraPosition: ArrayLike<number>;
+  /** Camera height above the WGS84 surface directly below it (km). */
+  cameraAltitudeKm: number;
+  /** WGS84 equatorial and polar radii (km). */
+  equatorialRadiusKm: number;
+  polarRadiusKm: number;
+  /**
+   * True while the target being drawn into is the floating-point scenery target (see
+   * scenery-target.ts): its colour may exceed 1.0, so the shader should write unbounded values and
+   * a scene copy must use a float format.
+   */
+  isHdrTarget: boolean;
+  /**
+   * Lowest Sun cosine (cosine of the Sun's angle from the local zenith) the atmosphere should treat as
+   * lit. 0 means real lighting only. Night-as-day sets it to NIGHT_AS_DAY_SUN_COSINE; the shader then
+   * evaluates its per-sample Sun cosine with `nightAsDaySun` (night-as-day.ts), which leaves the lit side as it is.
+   */
+  minSunCosine: number;
+}
+
+/**
+ * Optional hook by which the plugin that supplies the atmosphere shaders owns how the shell is
+ * drawn. The engine knows nothing about what the shader computes. When a hook is set the engine
+ * does not declare or set `uLightDirection` or `uIntensity` (so the scene's legacy 2x intensity
+ * compensation never reaches the shader); the hook declares and binds everything it uses.
+ */
+export interface EarthAtmosphereRenderHook {
+  /** Geodetic height of the proxy shell above the WGS84 surface (km). */
+  shellHeightKm: number;
+  /** Extra uniform names the shader declares (each must be active in the program). */
+  uniformNames: string[];
+  /** Built-in uniforms to leave undeclared (the shader does not use them). */
+  disabledUniforms?: { normalMatrix?: boolean; cameraPosition?: boolean; worldOffset?: boolean };
+  /** Called after the program is in use and default blending is set; sets blend state and binds uniforms and textures. */
+  bind(gl: WebGL2RenderingContext, uniforms: Record<string, WebGLUniformLocation>, ctx: EarthAtmosphereBindContext): void;
+  /** Called after the draw; unbind textures here. The engine restores the default blend function. */
+  unbind?(gl: WebGL2RenderingContext): void;
+}
+
+/** Per-frame values the engine hands to an {@link EarthCloudLayerHook}. Positions are in the render frame, in km. */
+export interface EarthCloudLayerContext {
+  gl: WebGL2RenderingContext;
+  /** Framebuffer the surface was drawn into (null = canvas). Already bound when `draw` runs. */
+  targetFramebuffer: WebGLFramebuffer | null;
+  /** projection x view, the matrix the surface shader receives as `projectionMatrix`. */
+  projectionMatrix: ArrayLike<number>;
+  /** Earth model matrix: Earth-fixed km to the render frame (GMST rotation and any world shift included). */
+  modelMatrix: ArrayLike<number>;
+  /** Unit vector toward the Sun in the render frame. */
+  lightDirection: ArrayLike<number>;
+  /** Camera position in the render frame. */
+  cameraPosition: ArrayLike<number>;
+  /** Camera height above the WGS84 surface directly below it (km). */
+  cameraAltitudeKm: number;
+  /** The coverage texture the painted clouds use (red channel, equirectangular, repeats in u). */
+  cloudTexture: WebGLTexture;
+  /** The painted clouds' drift: subtract from u. Derived from simulation time. */
+  cloudPosition: number;
+  /** Simulation time in days since the Unix epoch (input of the cloud evolution function). */
+  cloudTimeDays: number;
+  /** `settingsManager.cloudEvolutionStrength` (0 = off). */
+  cloudEvolutionStrength: number;
+  /**
+   * Multiply the final cloud opacity (and its ground shadow) by this: the altitude fade while locked on the Earth (none
+   * while locked on a satellite) times `settingsManager.cloudMaxOpacity`. See cloud-visibility.ts. 0 = draw nothing.
+   */
+  cloudOpacity: number;
+  /**
+   * The political map overlay (RGBA, same uv as the surface; rgb times alpha is added to the surface colour),
+   * or null while the political map is off. A cloud layer can use it to keep the borders visible through clouds.
+   */
+  politicalTexture: WebGLTexture | null;
+  /** Strength of the border overlay at this camera altitude (political-map-fade.ts); 0 when the texture is null. */
+  politicalFade: number;
+  logDepthBufFC: number;
+  /** True while drawing into the floating-point scenery target (colour may exceed 1.0). */
+  isHdrTarget: boolean;
+}
+
+/**
+ * Optional hook by which a plugin draws its own cloud layer after the surface and its overlays, and
+ * before the atmosphere. While `isActive()` is true the surface shader skips its painted clouds and
+ * the surface overlays are told no clouds are drawn. The hook owns its GL state and must leave
+ * no VAO bound; the engine restores blending off and depth writes on after `draw`.
+ */
+export interface EarthCloudLayerHook {
+  /** True when the hook draws the clouds this frame (it replaces the painted ones). */
+  isActive(): boolean;
+  draw(ctx: EarthCloudLayerContext): void;
+}
+
+/**
+ * Camera height above the WGS84 surface directly below it (along the geocentric direction).
+ * Used for the altitude-aware atmosphere; returns the distance itself at the Earth center.
+ */
+export const getCameraAltitudeAboveEllipsoid = (camPos: ArrayLike<number>): number => {
+  const dist = Math.hypot(camPos[0], camPos[1], camPos[2]);
+
+  if (dist === 0) {
+    return 0;
+  }
+  const dir = { x: camPos[0] / dist, y: camPos[1] / dist, z: camPos[2] / dist };
+
+  return dist - ellipsoidRadiusAlong(dir);
+};
 
 /**
  * Texture file base (no quality suffix) of the night map to pair with a day style, or null when
@@ -84,6 +208,8 @@ export const getEarthNightTextureBase = (style: string): string | null => {
 
 export class Earth {
   private gl_: WebGL2RenderingContext;
+  /** Plugin layers drawn over the surface mesh, before atmosphere and aurora (see earth-surface-layers.ts). */
+  private readonly surfaceOverlays_ = new EarthSurfaceOverlayRegistry();
   private glowDirection_ = 1;
   private glowNumber_ = 0;
   private modelViewMatrix_: mat4;
@@ -152,6 +278,13 @@ export class Earth {
    * shell pass reproduces the additive brightness of the legacy double-draw.
    */
   private atmosphereIntensity_ = 1.0;
+  /** Set by the plugin that supplies the atmosphere shaders; null keeps the plain shell draw path. */
+  atmosphereHook: EarthAtmosphereRenderHook | null = null;
+  /** Set by a plugin that draws its own cloud layer; null keeps the painted clouds in the surface shader. */
+  cloudLayerHook: EarthCloudLayerHook | null = null;
+  private cloudLayerFailed_ = false;
+  /** Set by the scene while the Earth draws into the floating-point scenery target; passed to the atmosphere hook. */
+  isHdrSceneTarget = false;
   /** Normalized vector pointing to the sun. */
   lightDirection = <vec3>[0, 0, 0];
   surfaceMesh: Mesh;
@@ -159,7 +292,7 @@ export class Earth {
   /**
    * Procedural aurora shell. Auroral emission occurs at roughly 100-300 km with
    * the bright green band peaking near 110-120 km, so the aurora is drawn on its
-   * own translucent sphere at that altitude (instead of tinting the surface
+   * own translucent shell at that geodetic height above WGS84 (instead of tinting the surface
    * fragments) to leave a visible gap between the globe and the aurora.
    */
   auroraMesh: Mesh | null = null;
@@ -175,6 +308,12 @@ export class Earth {
   coverageOverlayOpacity = 0.6;
   imageCache: Record<string, HTMLImageElement> = {};
   cloudPosition_: number = 0;
+  cloudTimeDays_ = 0;
+  /** Cloud opacity multiplier for this frame (cloud-visibility.ts); shared by the painted clouds and a cloud layer hook. */
+  cloudOpacity_ = 1;
+  /** Border overlay strength for this frame (political-map-fade.ts); shared by every place that draws the borders. */
+  politicalFade_ = 1;
+  private readonly cloudFade_ = new CloudFadeState();
   RADIUS: number = RADIUS_OF_EARTH;
   position = <vec3>[0, 0, 0];
   planetObject: Planet | null = null;
@@ -374,7 +513,7 @@ export class Earth {
         settingsManager.earthSpecTextureQuality ??= EarthSpecTextureQuality.OFF;
         settingsManager.earthDayTextureQuality ??= EarthDayTextureQuality.MEDIUM;
         settingsManager.earthNightTextureQuality ??= EarthNightTextureQuality.MEDIUM;
-        settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.OFF;
+        settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.MEDIUM;
       }
 
       this.initPlaceholderTexture_();
@@ -382,17 +521,15 @@ export class Earth {
 
       // We only need to make the mesh once
       if (!this.surfaceMesh) {
-        const earthSurfaceGeometry = new SphereGeometry(this.gl_, {
-          radius: RADIUS_OF_EARTH,
-          widthSegments: settingsManager.earthNumLatSegs,
-          heightSegments: settingsManager.earthNumLonSegs,
-        });
+        const earthSurfaceGeometry = this.buildEllipsoidGeometry_(0);
         const earthSurfaceMaterial = new ShaderMaterial(this.gl_, {
           uniforms: {
             uIsAmbientLighting: <WebGLUniformLocation>(<unknown>null),
             uZoomLevel: <WebGLUniformLocation>(<unknown>null),
             uisGrayScale: <WebGLUniformLocation>(<unknown>null),
             uCloudPosition: <WebGLUniformLocation>(<unknown>null),
+            uCloudPhase: <WebGLUniformLocation>(<unknown>null),
+            uCloudEvolution: <WebGLUniformLocation>(<unknown>null),
             uShowGraticule: <WebGLUniformLocation>(<unknown>null),
             uLightDirection: <WebGLUniformLocation>(<unknown>null),
             uDayMap: <WebGLUniformLocation>(<unknown>null),
@@ -400,11 +537,12 @@ export class Earth {
             uBumpMap: <WebGLUniformLocation>(<unknown>null),
             uSpecMap: <WebGLUniformLocation>(<unknown>null),
             uPoliticalMap: <WebGLUniformLocation>(<unknown>null),
+            uPoliticalFade: <WebGLUniformLocation>(<unknown>null),
             uCloudsMap: <WebGLUniformLocation>(<unknown>null),
             uCoverageMap: <WebGLUniformLocation>(<unknown>null),
             uCoverageEnabled: <WebGLUniformLocation>(<unknown>null),
             uCoverageOpacity: <WebGLUniformLocation>(<unknown>null),
-            uRawZoomLevel: <WebGLUniformLocation>(<unknown>null),
+            uCloudOpacity: <WebGLUniformLocation>(<unknown>null),
             uisDrawNightAsDay: <WebGLUniformLocation>(<unknown>null),
             uNightBrightness: <WebGLUniformLocation>(<unknown>null),
             uReliefExaggeration: <WebGLUniformLocation>(<unknown>null),
@@ -452,16 +590,25 @@ export class Earth {
    * and only ever builds the mesh once. Unlike the atmosphere, the shaders are
    * local to this file, so it can always build on the first init().
    */
+  /**
+   * WGS84 ellipsoid mesh for the surface (height 0) or a shell at a constant geodetic height.
+   * GPU picking and godray occlusion draw the surface mesh, so they follow the same ellipsoid.
+   */
+  private buildEllipsoidGeometry_(heightKm: number): SphereGeometry {
+    return new SphereGeometry(this.gl_, {
+      radius: WGS84_A_KM + heightKm,
+      ellipsoid: getEarthEllipsoid(heightKm),
+      widthSegments: settingsManager.earthNumLatSegs,
+      heightSegments: settingsManager.earthNumLonSegs,
+    });
+  }
+
   private buildAuroraMesh_(): void {
     if (this.auroraMesh || !this.gl_) {
       return;
     }
 
-    const auroraGeometry = new SphereGeometry(this.gl_, {
-      radius: RADIUS_OF_EARTH + Earth.AURORA_ALTITUDE_KM_,
-      widthSegments: settingsManager.earthNumLatSegs,
-      heightSegments: settingsManager.earthNumLonSegs,
-    });
+    const auroraGeometry = this.buildEllipsoidGeometry_(Earth.AURORA_ALTITUDE_KM_);
     const auroraMaterial = new ShaderMaterial(this.gl_, {
       uniforms: {
         uGlow: <WebGLUniformLocation>(<unknown>null),
@@ -501,15 +648,18 @@ export class Earth {
       return;
     }
 
-    const earthAtmosphereGeometry = new SphereGeometry(this.gl_, {
-      radius: RADIUS_OF_EARTH * 1.025, // Slightly larger than the earth
-      widthSegments: settingsManager.earthNumLatSegs,
-      heightSegments: settingsManager.earthNumLonSegs,
+    const hook = this.atmosphereHook;
+    const earthAtmosphereGeometry = this.buildEllipsoidGeometry_(hook?.shellHeightKm ?? EARTH_ATMOSPHERE_HEIGHT_KM);
+    const atmosphereUniforms: Record<string, WebGLUniformLocation> = hook
+      ? {}
+      : {
+          uLightDirection: <WebGLUniformLocation>(<unknown>null),
+          uIntensity: <WebGLUniformLocation>(<unknown>null),
+        };
+
+    hook?.uniformNames.forEach((name) => {
+      atmosphereUniforms[name] = <WebGLUniformLocation>(<unknown>null);
     });
-    const atmosphereUniforms: Record<string, WebGLUniformLocation> = {
-      uLightDirection: <WebGLUniformLocation>(<unknown>null),
-      uIntensity: <WebGLUniformLocation>(<unknown>null),
-    };
 
     /*
      * The EarthAtmosphere (Pro) plugin only emits `uCameraAltitude` when its
@@ -520,6 +670,11 @@ export class Earth {
      */
     if (this.shaders.atmosphereFrag.includes('uCameraAltitude')) {
       atmosphereUniforms.uCameraAltitude = <WebGLUniformLocation>(<unknown>null);
+    }
+
+    // A hook-less shell shader may opt in to the night-as-day rule the same way (the engine sets it per frame).
+    if (!hook && this.shaders.atmosphereFrag.includes('uMinSunCos')) {
+      atmosphereUniforms.uMinSunCos = <WebGLUniformLocation>(<unknown>null);
     }
 
     const earthAtmosphereMaterial = new ShaderMaterial(this.gl_, {
@@ -535,10 +690,24 @@ export class Earth {
       disabledUniforms: {
         modelMatrix: true,
         viewMatrix: true,
+        ...hook?.disabledUniforms,
       },
     });
 
     this.initVaoAtmosphere_();
+  }
+
+  /**
+   * Drop the atmosphere shell and build it again from the shaders and hook currently installed.
+   * Used when the plugin switches quality tier at runtime.
+   */
+  rebuildAtmosphereMesh(): void {
+    if (this.atmosphereMesh) {
+      this.gl_?.deleteVertexArray(this.atmosphereMesh.geometry.vao);
+      this.gl_?.deleteProgram(this.atmosphereMesh.program.program);
+      this.atmosphereMesh = null;
+    }
+    this.buildAtmosphereMesh();
   }
 
   typeToString(): string {
@@ -579,7 +748,21 @@ export class Earth {
     // Derive cloud position from simulation time so clouds move correctly during time changes
     const msPerFullRotation = 5 * 24 * 60 * 60 * 1000; // ~10 days for a full texture cycle
 
-    this.cloudPosition_ = (timeManager.simulationTimeObj.getTime() % msPerFullRotation) / msPerFullRotation;
+    const nowMs = timeManager.simulationTimeObj.getTime();
+
+    this.cloudTimeDays_ = nowMs / 86400000;
+    const camera = ServiceLocator.getMainCamera();
+    const fade = this.cloudFade_.update(
+      performance.now(),
+      getCameraAltitudeAboveEllipsoid(camera.getCamPosEarthCentered()),
+      isSatelliteLockedCamera(camera.cameraType),
+      settingsManager.centerBody === SolarBody.Earth
+    );
+
+    this.cloudOpacity_ = fade * sanitiseCloudMaxOpacity(settingsManager.cloudMaxOpacity);
+    this.politicalFade_ = politicalMapFade(getCameraAltitudeAboveEllipsoid(camera.getCamPosEarthCentered()));
+    // With cloud evolution on, the map stays over the regions it was observed in and the sky changes by hiding cloud instead.
+    this.cloudPosition_ = (settingsManager.cloudEvolutionStrength ?? 0) > 0 ? 0 : (nowMs % msPerFullRotation) / msPerFullRotation;
   }
 
   private getSrc_(base: string, resolution: string | undefined, extension = 'jpg'): string {
@@ -758,6 +941,15 @@ export class Earth {
     gl.bindVertexArray(null);
   }
 
+  /** Add (or replace, by id) a layer drawn over the Earth surface each frame. */
+  registerSurfaceOverlay(overlay: EarthSurfaceOverlay): void {
+    this.surfaceOverlays_.register(overlay);
+  }
+
+  unregisterSurfaceOverlay(id: string): boolean {
+    return this.surfaceOverlays_.unregister(id);
+  }
+
   /**
    * This is run once per frame to render the earth.
    */
@@ -779,6 +971,109 @@ export class Earth {
     gl.bindVertexArray(null);
 
     gl.disable(gl.BLEND);
+
+    this.drawSurfaceOverlays_(gl, tgtBuffer);
+    this.drawCloudLayer_(gl, tgtBuffer);
+  }
+
+  /** The cloud texture the layer hook should use, or null when it does not draw this frame (no hook, clouds off or unloaded, hook idle). */
+  private activeCloudLayerTexture_(): WebGLTexture | null {
+    const hook = this.cloudLayerHook;
+
+    if (!hook || this.cloudLayerFailed_ || !settingsManager.isDrawCloudsMap) {
+      return null;
+    }
+    const texture = this.textureClouds[settingsManager.earthCloudTextureQuality];
+
+    return texture && hook.isActive() ? texture : null;
+  }
+
+  /** True while the cloud layer hook draws the clouds, so the surface shader and overlays skip the painted ones. */
+  isCloudLayerReplacingPaintedClouds(): boolean {
+    return this.activeCloudLayerTexture_() !== null;
+  }
+
+  private drawCloudLayer_(gl: WebGL2RenderingContext, tgtBuffer: WebGLFramebuffer | null): void {
+    const texture = this.activeCloudLayerTexture_();
+
+    if (!texture || !this.cloudLayerHook) {
+      return;
+    }
+    const mv = this.modelViewMatrix_;
+    const camera = ServiceLocator.getMainCamera();
+
+    try {
+      this.cloudLayerHook.draw({
+        gl,
+        targetFramebuffer: tgtBuffer,
+        projectionMatrix: ServiceLocator.getRenderer().projectionCameraMatrix,
+        modelMatrix: mv,
+        lightDirection: this.lightDirection,
+        cameraPosition: cameraPositionFromView(camera.matrixWorldInverse),
+        cameraAltitudeKm: getCameraAltitudeAboveEllipsoid(camera.getCamPosEarthCentered()),
+        cloudTexture: texture,
+        cloudPosition: this.cloudPosition_,
+        cloudTimeDays: this.cloudTimeDays_,
+        cloudEvolutionStrength: settingsManager.cloudEvolutionStrength ?? 0,
+        cloudOpacity: this.cloudOpacity_,
+        politicalTexture: this.activePoliticalTexture_(),
+        politicalFade: this.politicalFade_,
+        logDepthBufFC: DepthManager.getConfig().logDepthBufFC,
+        isHdrTarget: this.isHdrSceneTarget,
+      });
+    } catch (error) {
+      // One failure turns the layer off for good: the painted clouds come back on the next frame.
+      this.cloudLayerFailed_ = true;
+      errorManagerInstance.warn('Earth cloud layer failed to draw; using the painted clouds', error);
+    } finally {
+      gl.bindVertexArray(null);
+      gl.disable(gl.BLEND);
+      gl.depthMask(true);
+      gl.activeTexture(gl.TEXTURE0);
+    }
+  }
+
+  /** The border overlay for plugins, or null while it is off or faded out at this altitude. */
+  private activePoliticalTexture_(): WebGLTexture | null {
+    return settingsManager.isDrawPoliticalMap && this.politicalFade_ > 0 ? this.politicalTexture : null;
+  }
+
+  /** Surface overlays see the same matrices and lighting values the surface shader just used. */
+  private drawSurfaceOverlays_(gl: WebGL2RenderingContext, tgtBuffer: WebGLFramebuffer | null): void {
+    if (this.surfaceOverlays_.size === 0) {
+      return;
+    }
+    const camera = ServiceLocator.getMainCamera();
+    const isEarthCenterBody = settingsManager.centerBody === SolarBody.Earth;
+    const zoom = camera.zoomLevel();
+
+    this.surfaceOverlays_.drawAll({
+      gl,
+      targetFramebuffer: tgtBuffer,
+      projectionMatrix: camera.projectionMatrix,
+      viewMatrix: camera.matrixWorldInverse,
+      projectionViewMatrix: ServiceLocator.getRenderer().projectionCameraMatrix,
+      modelMatrix: this.modelViewMatrix_,
+      gmst: ServiceLocator.getTimeManager().gmst,
+      cameraPosition: cameraPositionFromView(camera.matrixWorldInverse),
+      cameraType: camera.cameraType,
+      logDepthBufFC: DepthManager.getConfig().logDepthBufFC,
+      drawingBufferWidth: gl.drawingBufferWidth,
+      drawingBufferHeight: gl.drawingBufferHeight,
+      lighting: {
+        ...buildSurfaceLighting(settingsManager, this.lightDirection, {
+          zoomLevel: isEarthCenterBody ? (zoom / 2) ** (1 / 2) : 1.0,
+          cloudOpacity: this.cloudOpacity_,
+          isCloudsVisible: settingsManager.isDrawCloudsMap && Boolean(this.textureClouds[settingsManager.earthCloudTextureQuality]) && !this.isCloudLayerReplacingPaintedClouds(),
+        }),
+        cloudTexture: this.textureClouds[settingsManager.earthCloudTextureQuality] ?? null,
+        cloudPosition: this.cloudPosition_,
+        cloudTimeDays: this.cloudTimeDays_,
+        cloudEvolutionStrength: settingsManager.cloudEvolutionStrength ?? 0,
+        politicalTexture: this.activePoliticalTexture_(),
+        politicalFade: this.politicalFade_,
+      },
+    });
   }
 
   private drawEarthAtmosphere_(tgtBuffer: WebGLFramebuffer | null) {
@@ -796,6 +1091,7 @@ export class Earth {
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+    this.bindAtmosphereHook_(gl);
 
     // disable depth test unless zoomed out (avoid atmosphere showing through the moon when zoomed out)
     if (settingsManager.centerBody === SolarBody.Earth && ServiceLocator.getMainCamera().calcDistanceBasedOnZoom() < 2e5) {
@@ -820,6 +1116,7 @@ export class Earth {
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.atmosphereMesh.geometry.getIndex());
     gl.drawElements(gl.TRIANGLES, this.atmosphereMesh.geometry.indexLength, this.atmosphereMesh.geometry.indexType, 0);
     gl.bindVertexArray(null);
+    this.atmosphereHook?.unbind?.(gl);
 
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.disable(gl.POLYGON_OFFSET_FILL);
@@ -843,9 +1140,12 @@ export class Earth {
 
     gl.uniform1f(this.surfaceMesh.material.uniforms.uZoomLevel, isEarthCenterBody ? (ServiceLocator.getMainCamera().zoomLevel() / 2) ** (1 / 2) : 1.0);
 
-    gl.uniform1f(this.surfaceMesh.material.uniforms.uRawZoomLevel, getCloudFadeZoom(isEarthCenterBody, ServiceLocator.getMainCamera().zoomLevel()));
+    // 0 while a plugin cloud layer owns the clouds; otherwise the shared fade times the maximum opacity (cloud-visibility.ts).
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudOpacity, this.isCloudLayerReplacingPaintedClouds() ? 0.0 : this.cloudOpacity_);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisGrayScale, settingsManager.isEarthGrayScale ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudPosition, this.cloudPosition_);
+    gl.uniform4fv(this.surfaceMesh.material.uniforms.uCloudPhase, cloudEvolutionPhase(this.cloudTimeDays_));
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uCloudEvolution, settingsManager.cloudEvolutionStrength ?? 0);
     gl.uniform3fv(this.surfaceMesh.material.uniforms.uLightDirection, this.lightDirection);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uisDrawNightAsDay, settingsManager.isDrawNightAsDay ? 1.0 : 0.0);
     gl.uniform1f(this.surfaceMesh.material.uniforms.uNightBrightness, settingsManager.earthNightBrightness ?? 1.0);
@@ -855,6 +1155,29 @@ export class Earth {
     gl.uniform1f(this.surfaceMesh.material.uniforms.uCoverageOpacity, this.coverageOverlayOpacity);
   }
 
+  /** Let the atmosphere hook (if any) set blend state and bind its uniforms and textures for this frame. */
+  private bindAtmosphereHook_(gl: WebGL2RenderingContext): void {
+    const hook = this.atmosphereHook;
+
+    if (!hook || !this.atmosphereMesh) {
+      return;
+    }
+
+    const mv = this.modelViewMatrix_;
+    const camera = ServiceLocator.getMainCamera();
+
+    hook.bind(gl, this.atmosphereMesh.material.uniforms, {
+      lightDirection: this.lightDirection,
+      earthCenter: [mv[12], mv[13], mv[14]],
+      cameraPosition: camera.getForwardVector(),
+      cameraAltitudeKm: getCameraAltitudeAboveEllipsoid(camera.getCamPosEarthCentered()),
+      equatorialRadiusKm: WGS84_A_KM,
+      polarRadiusKm: WGS84_B_KM,
+      isHdrTarget: this.isHdrSceneTarget,
+      minSunCosine: settingsManager.isDrawNightAsDay ? NIGHT_AS_DAY_SUN_COSINE : 0,
+    });
+  }
+
   private setAtmosphereUniforms_(gl: WebGL2RenderingContext) {
     if (!this.atmosphereMesh) {
       return;
@@ -862,12 +1185,22 @@ export class Earth {
 
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.projectionMatrix, false, ServiceLocator.getRenderer().projectionCameraMatrix);
     gl.uniformMatrix4fv(this.atmosphereMesh.material.uniforms.modelViewMatrix, false, this.modelViewMatrix_);
-    gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
-    gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
+    if (this.atmosphereMesh.material.uniforms.normalMatrix) {
+      gl.uniformMatrix3fv(this.atmosphereMesh.material.uniforms.normalMatrix, false, this.normalMatrix_);
+    }
+    if (this.atmosphereMesh.material.uniforms.cameraPosition) {
+      gl.uniform3fv(this.atmosphereMesh.material.uniforms.cameraPosition, ServiceLocator.getMainCamera().getForwardVector());
+    }
     gl.uniform1f(this.atmosphereMesh.material.uniforms.logDepthBufFC, DepthManager.getConfig().logDepthBufFC);
 
-    gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
-    gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
+    // A hook owns its own light and intensity uniforms (see EarthAtmosphereRenderHook).
+    if (!this.atmosphereHook) {
+      gl.uniform3fv(this.atmosphereMesh.material.uniforms.uLightDirection, this.lightDirection);
+      gl.uniform1f(this.atmosphereMesh.material.uniforms.uIntensity, this.atmosphereIntensity_);
+      if (this.atmosphereMesh.material.uniforms.uMinSunCos) {
+        gl.uniform1f(this.atmosphereMesh.material.uniforms.uMinSunCos, settingsManager.isDrawNightAsDay ? NIGHT_AS_DAY_SUN_COSINE : 0);
+      }
+    }
 
     /*
      * Altitude-aware scattering (EarthAtmosphere plugin, isAltitudeAware). The uniform
@@ -877,7 +1210,7 @@ export class Earth {
     const uCameraAltitude = this.atmosphereMesh.material.uniforms.uCameraAltitude;
 
     if (uCameraAltitude) {
-      const altitudeAboveSurfaceKm = ServiceLocator.getMainCamera().getDistFromEarth() - RADIUS_OF_EARTH;
+      const altitudeAboveSurfaceKm = getCameraAltitudeAboveEllipsoid(ServiceLocator.getMainCamera().getCamPosEarthCentered());
 
       gl.uniform1f(uCameraAltitude, altitudeAboveSurfaceKm);
     }
@@ -1031,11 +1364,18 @@ export class Earth {
     gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.position.location);
     this.atmosphereMesh!.geometry.attributes.position.bindToArrayBuffer(gl);
 
-    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.normal.location);
-    this.atmosphereMesh!.geometry.attributes.normal.bindToArrayBuffer(gl);
+    // A hook shader may not read normal or uv; the mesh drops attributes the program does not use.
+    const { normal, uv } = this.atmosphereMesh!.geometry.attributes as Partial<Record<'normal' | 'uv', BufferAttribute>>;
 
-    gl.enableVertexAttribArray(this.atmosphereMesh!.geometry.attributes.uv.location);
-    this.atmosphereMesh!.geometry.attributes.uv.bindToArrayBuffer(gl);
+    if (normal) {
+      gl.enableVertexAttribArray(normal.location);
+      normal.bindToArrayBuffer(gl);
+    }
+
+    if (uv) {
+      gl.enableVertexAttribArray(uv.location);
+      uv.bindToArrayBuffer(gl);
+    }
 
     // Select the vertex indicies buffer
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.atmosphereMesh!.geometry.getIndex());
@@ -1123,6 +1463,7 @@ export class Earth {
     // Political Map (vector-rasterized from GeoJSON; placeholder until first rasterization)
     gl.uniform1i(this.surfaceMesh.material.uniforms.uPoliticalMap, 4);
     gl.activeTexture(gl.TEXTURE4);
+    gl.uniform1f(this.surfaceMesh.material.uniforms.uPoliticalFade, this.politicalFade_);
     if (sm.isDrawPoliticalMap && this.politicalTexture) {
       gl.bindTexture(gl.TEXTURE_2D, this.politicalTexture);
     } else {
@@ -1158,10 +1499,12 @@ export class Earth {
     surfaceFrag: glsl`
     uniform float uIsAmbientLighting;
     uniform float uCloudPosition;
+    uniform vec4 uCloudPhase;
+    uniform float uCloudEvolution;
     uniform vec3 uLightDirection;
     uniform float uShowGraticule;
     uniform float uZoomLevel;
-    uniform float uRawZoomLevel;
+    uniform float uCloudOpacity;
     uniform float uisGrayScale;
     uniform float uisDrawNightAsDay;
     uniform float uNightBrightness;
@@ -1179,6 +1522,7 @@ export class Earth {
     uniform sampler2D uBumpMap;
     uniform sampler2D uSpecMap;
     uniform sampler2D uPoliticalMap;
+    uniform float uPoliticalFade;
     uniform sampler2D uCloudsMap;
     uniform sampler2D uCoverageMap;
     uniform float uCoverageEnabled;
@@ -1208,6 +1552,8 @@ export class Earth {
 
     ${RELIEF_NORMAL_GLSL}
 
+    ${PAINTED_CLOUDS_GLSL}
+
     void main(void) {
       float fragToLightAngle = dot( vNormal, uLightDirection ) * 0.5 + 0.5; //Remake -1 > 1 to 0 > 1
       vec3 fragToCamera = normalize(vVertToCamera);
@@ -1232,7 +1578,7 @@ export class Earth {
 
       //.................................................
       // Relief shading: the sunlit surface uses the terrain normal, while the
-      // terminator, night lights and clouds keep the smooth sphere normal so
+      // terminator, night lights and clouds keep the smooth geodetic normal so
       // city lights and cloud shading do not flicker with the terrain.
       float reliefDiffuse = diffuse;
       vec3 reliefN = normalize(vNormal);
@@ -1258,9 +1604,10 @@ export class Earth {
         vec3 nightColor = smoothstep(0.0, 2.0, (1.0 - uZoomLevel)) * texture(uNightMap, vUv).rgb * pow(1.0 - diffuse, 2.0) * uNightBrightness;
         surfaceColor = dayTexColor + nightColor + specLightColor;
       } else {
-        // Night-as-day: the whole globe is evenly lit. Relief uses a virtual sun
-        // 45 degrees above every point's horizon, keeping the real sun's azimuth
-        // so the shading direction stays consistent across the terminator.
+        // Night-as-day: the real lighting is kept and a virtual Sun 45 degrees above every point's
+        // horizon lights what is dark (see night-as-day.ts). The ground takes the stronger of the two,
+        // so the lit side is unchanged and the terminator has no seam. Relief uses the virtual sun
+        // with the real sun's azimuth so the shading direction stays consistent across the terminator.
         float reliefShade = 1.0;
         vec3 smoothN = normalize(vNormal);
         vec3 sunTangent = uLightDirection - smoothN * dot(smoothN, uLightDirection);
@@ -1268,7 +1615,9 @@ export class Earth {
           vec3 virtualSun = normalize(smoothN + normalize(sunTangent));
           reliefShade = clamp(dot(reliefN, virtualSun) / dot(smoothN, virtualSun), 0.0, 1.6);
         }
-        surfaceColor = texture(uDayMap, vUv).rgb * reliefShade + specLightColor;
+        float virtualLight = NIGHT_AS_DAY_SUN_COS * reliefShade;
+        vec3 dayColor = (ambientLightColor + directionalLightColor) * max(reliefDiffuse, virtualLight);
+        surfaceColor = texture(uDayMap, vUv).rgb * dayColor + specLightColor;
       }
 
       // ................................................
@@ -1277,13 +1626,13 @@ export class Earth {
       vec2 cloudUv = vUv;
       cloudUv.x -= uCloudPosition;
       float cloudDensity = texture(uCloudsMap, cloudUv).r;
+      cloudDensity = cloudEvolutionCoverage(uCloudsMap, cloudDirFromUv(cloudUv), cloudDensity, uCloudPhase, uCloudEvolution);
 
       // Clouds fade out when camera is near the surface (raw zoom 0 = close, 1 = far)
-      float cloudOpacity = cloudDensity * smoothstep(0.2, 0.35, uRawZoomLevel);
+      float cloudOpacity = paintedCloudOpacity(cloudDensity) * uCloudOpacity;
 
       // Clouds are white when sunlit, dark on the night side
-      float cloudLight = (uisDrawNightAsDay > 0.5) ? 1.0 : max(diffuse, 0.02);
-      vec3 litCloudColor = vec3(cloudLight);
+      vec3 litCloudColor = vec3(paintedCloudLight(diffuse, uisDrawNightAsDay));
 
       // Alpha blend: clouds replace surface proportionally to opacity
       // This naturally masks specular under clouds without double-counting
@@ -1293,7 +1642,8 @@ export class Earth {
       // Don't multiply by diffuse so boundaries remain visible on the night
       // side and when ambient lighting is off.
       vec4 politicalColor = texture(uPoliticalMap, vUv);
-      fragColor.rgb += politicalColor.rgb * politicalColor.a;
+      // Faded out with camera altitude where the texture is too coarse (political-map-fade.ts).
+      fragColor.rgb += politicalColor.rgb * politicalColor.a * uPoliticalFade;
 
       // ...............................................
       // Coverage overlay (generic engine hook fed by a plugin). The red channel
@@ -1326,6 +1676,7 @@ export class Earth {
       // ...............................................
       // Graticule (lat/lon grid lines)
       if (uShowGraticule > 0.5) {
+        // v is linear in geodetic latitude on the WGS84 mesh, so this is geodetic latitude
         float gLatDeg = (0.5 - vUv.y) * 180.0;
         float gLonDeg = (vUv.x - 0.5) * 360.0;
         float wLat = fwidth(vUv.y) * 180.0;

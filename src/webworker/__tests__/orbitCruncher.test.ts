@@ -276,6 +276,45 @@ describe('orbitCruncher worker', () => {
     // Per-sample GMST: 2 hours of Earth rotation spreads the samples by thousands of km.
     expect(spreadOfXCoords(Date.UTC(2022, 0, 1))).toBeGreaterThan(1000);
   });
+
+  it('places missile line vertices on the WGS84 ellipsoid (row PC7)', () => {
+    // Hand values: a sample at the pole, alt 0, sits at z = b = 6356.7523 km; one on the
+    // equator at radius a = 6378.137 km. The old spherical lla2eci gave 6371.0088 for both.
+    const radiiFor = (latDeg: number): { rxy: number; z: number }[] => {
+      const lat = new Array(11).fill(latDeg);
+      const lon = new Array(11).fill(25);
+      const alt = new Array(11).fill(0);
+
+      onMessage({
+        data: { typ: MSG.INIT, numSegs: NUM_SEGS, objData: JSON.stringify([{ missile: true, latList: lat, lonList: lon, altList: alt }]), seqNum: 21 },
+      } as unknown as Parameters<typeof onMessage>[0]);
+      posted = [];
+      onMessage({
+        data: { typ: MSG.MISSILE_UPDATE, id: 0, simulationTime: Date.UTC(2022, 0, 1), seqNum: 21, latList: lat, lonList: lon, altList: alt },
+      } as unknown as Parameters<typeof onMessage>[0]);
+      // Vertices are posted relative to an anchor (float32 precision rebase); add it back.
+      const { pointsOut, anchor } = posted.at(-1)!.payload as { pointsOut: Float32Array; anchor: number[] };
+      const out: { rxy: number; z: number }[] = [];
+
+      for (let p = 0; p < NUM_SEGS + 1; p++) {
+        const x = pointsOut[p * 4] + anchor[0];
+        const y = pointsOut[p * 4 + 1] + anchor[1];
+
+        out.push({ rxy: Math.hypot(x, y), z: pointsOut[p * 4 + 2] + anchor[2] });
+      }
+
+      return out;
+    };
+
+    for (const v of radiiFor(90)) {
+      expect(v.z).toBeCloseTo(6356.7523, 2);
+      expect(v.rxy).toBeCloseTo(0, 2);
+    }
+    for (const v of radiiFor(0)) {
+      expect(v.rxy).toBeCloseTo(6378.137, 2);
+      expect(v.z).toBeCloseTo(0, 2);
+    }
+  });
 });
 
 // Near-equatorial, near-circular GEO element set (same one proximityOpsWorker.test.ts uses),

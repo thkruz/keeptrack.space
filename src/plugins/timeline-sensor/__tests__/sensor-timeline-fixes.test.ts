@@ -59,6 +59,18 @@ describe('SensorTimeline station night (B2)', () => {
     expect(SensorTimeline.checkStationInNight(NIGHT, cloneSensor(sensor))).toBe(true);
   });
 
+  it('positions the site on the WGS84 ellipsoid (row ST1)', () => {
+    // Hand values at geodetic 45 N, alt 0: distance from the polar axis N cos 45 = 4517.5909 km,
+    // z = N (1 - e^2) sin 45 = 4487.3484 km, N = 6388.8383 km. The spherical lla2eci gave 4504.9 / 4504.9.
+    const site = cloneSensor(sensors.GEODDSSOC, { lat: 45 as never, lon: 0 as never, alt: 0 as Kilometers });
+
+    SensorTimeline.checkStationInNight(NIGHT, site);
+    const p = site.position as { x: number; y: number; z: number };
+
+    expect(Math.hypot(p.x, p.y)).toBeCloseTo(4517.5909, 3);
+    expect(p.z).toBeCloseTo(4487.3484, 3);
+  });
+
   it('neither site is in night at its local noon', () => {
     expect(SensorTimeline.checkStationInNight(SOCORRO_NOON, cloneSensor(sensors.GEODDSSOC))).toBe(false);
     expect(SensorTimeline.checkStationInNight(MAUI_NOON, cloneSensor(sensors.GEODDSMAU))).toBe(false);

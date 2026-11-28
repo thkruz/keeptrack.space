@@ -35,12 +35,12 @@ import {
   eci2lla,
   eci2rae,
   GreenwichMeanSiderealTime,
+  geodeticSurfaceNormal,
   Kilometers,
   KilometersPerSecond,
   linearDistance,
   MILLISECONDS_TO_DAYS,
   MINUTES_PER_DAY,
-  Earth as OotkEarth,
   Sun as OotkSun,
   pow2db as ootkPow2db,
   PosVel,
@@ -56,6 +56,8 @@ import {
   SunStatus,
   TemeVec3,
   Vector3D,
+  WGS84_A,
+  WGS84_B,
 } from '@ootk/src/main';
 import { vec3 } from 'gl-matrix';
 import numeric from 'numeric';
@@ -73,6 +75,9 @@ export type StringifiedNumber = `${number}.${number}`;
 
 // Re-export SunStatus from ootk for backward compatibility
 export { SunStatus } from '@ootk/src/main';
+
+/** Geodetic altitude (km) below which {@link SatMath.calculateIsInSun} treats a position as a ground site (row SM1). */
+export const GROUND_SITE_MAX_ALT_KM = 10;
 
 export abstract class SatMath {
   /**
@@ -129,38 +134,13 @@ export abstract class SatMath {
    * @returns A value indicating whether the satellite is in the sun's shadow (umbra), in the penumbra, or in sunlight.
    */
   static calculateIsInSun(obj: BaseObject | StateVectorSgp4, sunECI: TemeVec3): SunStatus {
-    if (!obj) {
+    const pos = SatMath.sunStatusPosition_(obj);
+
+    if (!pos || !sunECI) {
       return SunStatus.UNKNOWN;
     }
 
-    // Extract position from various object types
-    let x: Kilometers;
-    let y: Kilometers;
-    let z: Kilometers;
-
-    // Check for StateVectorSgp4 (has position property directly)
-    if ('position' in obj && typeof obj.position !== 'boolean' && obj.position) {
-      if (!sunECI) {
-        return SunStatus.UNKNOWN;
-      }
-
-      x = obj.position.x;
-      y = obj.position.y;
-      z = obj.position.z;
-    } else if (obj instanceof BaseObject && (obj as unknown as { position?: TemeVec3 }).position) {
-      const pos = (obj as unknown as { position: TemeVec3 }).position;
-
-      if (!sunECI) {
-        return SunStatus.UNKNOWN;
-      }
-
-      x = pos.x;
-      y = pos.y;
-      z = pos.z;
-    } else {
-      return SunStatus.UNKNOWN;
-    }
-
+    const { x, y, z } = pos;
     const r = Math.hypot(x, y, z);
 
     if (!Number.isFinite(r) || r === 0) {
@@ -168,11 +148,12 @@ export abstract class SatMath {
     }
 
     /*
-     * A point at or below the equatorial radius is a ground site (lla2eci places sites on a 6371 km sphere), not a
-     * satellite: the shadow cone's asin(R / r) is NaN there, which used to fall through to SUN. Judge it by the
-     * Sun's elevation above its horizon instead.
+     * A point within GROUND_SITE_MAX_ALT_KM of the WGS84 ellipsoid is a ground site (sensors sit on the ellipsoid via
+     * llaRad2eci), not a satellite: the shadow cone's asin(R / r) is NaN there, which used to fall through to SUN.
+     * Judge it by the Sun's elevation above its horizon instead. A plain radius test fails here: an equatorial site
+     * sits at r = 6378.137 km + alt, above any fixed radius a polar LEO test could use.
      */
-    if (r <= OotkEarth.radiusEquator) {
+    if (SatMath.isGroundSitePosition(x, y, z)) {
       return SatMath.calculateGroundSiteSunStatus({ x, y, z } as TemeVec3, sunECI);
     }
 
@@ -183,31 +164,59 @@ export abstract class SatMath {
     // Use ootk's lighting ratio calculation
     const ratio = OotkSun.lightingRatio(satPos, sunPos);
 
-    if (Number.isNaN(ratio)) {
-      return SunStatus.UNKNOWN;
+    return SatMath.lightingRatioToSunStatus_(ratio);
+  }
+
+  /** Position used by {@link calculateIsInSun}: a state vector's or a catalog object's, or null when it has none. */
+  private static sunStatusPosition_(obj: BaseObject | StateVectorSgp4): TemeVec3 | null {
+    if (!obj) {
+      return null;
+    }
+    // StateVectorSgp4 (has a position property directly)
+    if ('position' in obj && typeof obj.position !== 'boolean' && obj.position) {
+      return obj.position;
+    }
+    if (obj instanceof BaseObject && (obj as unknown as { position?: TemeVec3 }).position) {
+      return (obj as unknown as { position: TemeVec3 }).position;
     }
 
-    // Map ratio to SunStatus:
-    // 0.0 = fully eclipsed (umbra)
-    // 0.0 < ratio < 1.0 = partial illumination (penumbra)
-    // 1.0 = fully illuminated (sun)
-    if (ratio === 0) {
-      return SunStatus.UMBRAL;
-    }
-    if (ratio < 1) {
-      return SunStatus.PENUMBRAL;
-    }
-
-    return SunStatus.SUN;
+    return null;
   }
 
   /**
-   * Sun status at a ground site from the Sun's elevation above the site's (geocentric) horizon: SUN while the whole
+   * Map ootk's lighting ratio to a SunStatus: 0 is fully eclipsed (umbra), between 0 and 1 is partial illumination
+   * (penumbra), 1 is fully lit. NaN is UNKNOWN.
+   */
+  private static lightingRatioToSunStatus_(ratio: number): SunStatus {
+    if (Number.isNaN(ratio)) {
+      return SunStatus.UNKNOWN;
+    }
+    if (ratio === 0) {
+      return SunStatus.UMBRAL;
+    }
+
+    return ratio < 1 ? SunStatus.PENUMBRAL : SunStatus.SUN;
+  }
+
+  /**
+   * True when an ECI/ECEF point lies inside the ellipsoid with semi-axes (a + h, b + h), h = {@link GROUND_SITE_MAX_ALT_KM}:
+   * geodetic altitude below about 10 km (covers the highest sensor sites, under 6 km; exact at the equator and the poles, within meters between). Rotation about
+   * the polar axis does not change the result, so no GMST is needed.
+   */
+  static isGroundSitePosition(x: number, y: number, z: number): boolean {
+    const a = WGS84_A + GROUND_SITE_MAX_ALT_KM;
+    const b = WGS84_B + GROUND_SITE_MAX_ALT_KM;
+
+    return (x * x + y * y) / (a * a) + (z * z) / (b * b) <= 1;
+  }
+
+  /**
+   * Sun status at a ground site from the Sun's elevation above the site's geodetic horizon (WGS84 normal): SUN while the whole
    * solar disk is above it, UMBRAL once the whole disk is below it, PENUMBRAL while the disk straddles it.
    *
    * Use this, not the shadow cone in {@link calculateIsInSun}, for anything on the ground. Both vectors must share a
    * frame (TEME/J2000 differ by ~0.3 deg in 2026, well inside this test's resolution).
-   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sitePos The site's ECI position in km on the WGS84 ellipsoid (e.g. from llaRad2eci).
    * @param sunECI The Sun's ECI position in km.
    * @returns UNKNOWN when either vector is degenerate.
    */
@@ -224,7 +233,9 @@ export abstract class SatMath {
       return SunStatus.UNKNOWN;
     }
 
-    const sinSunEl = (sitePos.x * toSun.x + sitePos.y * toSun.y + sitePos.z * toSun.z) / (r * sunDist);
+    // Geodetic up (unit length): the WGS84 normal, not the geocentric radial, which tilts up to 0.19 deg at 45 deg lat.
+    const up = geodeticSurfaceNormal(sitePos);
+    const sinSunEl = (up.x * toSun.x + up.y * toSun.y + up.z * toSun.z) / sunDist;
     const sunEl = Math.asin(Math.min(1, Math.max(-1, sinSunEl)));
     const sunAngularRadius = Math.asin(Math.min(1, SunBody.RADIUS / sunDist));
 
@@ -240,9 +251,9 @@ export abstract class SatMath {
 
   /**
    * Geometric elevation of the Sun's centre above a ground site's local horizon.
-   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sitePos The site's ECI position in km on the WGS84 ellipsoid (e.g. from llaRad2eci).
    * @param sunECI The Sun's ECI position in km.
-   * @param upECI Unit vector of the site's local vertical in ECI (the geodetic normal). Defaults to the radial direction.
+   * @param upECI Unit vector of the site's local vertical in ECI. Defaults to the WGS84 geodetic normal at `sitePos`.
    * @returns Degrees (negative below the horizon), or null when either vector is degenerate.
    */
   static calculateGroundSiteSunElevation(sitePos: TemeVec3, sunECI: TemeVec3, upECI?: TemeVec3): Degrees | null {
@@ -254,14 +265,14 @@ export abstract class SatMath {
     const toSun = { x: sunECI.x - sitePos.x, y: sunECI.y - sitePos.y, z: sunECI.z - sitePos.z };
     const sunDist = Math.hypot(toSun.x, toSun.y, toSun.z);
 
-    if (!Number.isFinite(r) || !Number.isFinite(sunDist) || r === 0 || sunDist === 0) {
+    if (!SatMath.isUsableLength_(r) || !SatMath.isUsableLength_(sunDist)) {
       return null;
     }
 
-    const up = upECI ?? { x: sitePos.x / r, y: sitePos.y / r, z: sitePos.z / r };
+    const up = upECI ?? geodeticSurfaceNormal(sitePos);
     const upLen = Math.hypot(up.x, up.y, up.z);
 
-    if (!Number.isFinite(upLen) || upLen === 0) {
+    if (!SatMath.isUsableLength_(upLen)) {
       return null;
     }
 
@@ -270,10 +281,15 @@ export abstract class SatMath {
     return (Math.asin(Math.min(1, Math.max(-1, sinSunEl))) * RAD2DEG) as Degrees;
   }
 
+  /** True for a finite, non-zero vector length (Math.hypot never returns a negative). */
+  private static isUsableLength_(len: number): boolean {
+    return Number.isFinite(len) && len > 0;
+  }
+
   /**
    * True when the Sun has fully set at a ground site (its centre more than its own radius, about 0.27 deg, below the
    * horizon). This is the "station is dark" test for optical sensors.
-   * @param sitePos The site's ECI position in km (e.g. from lla2eci).
+   * @param sitePos The site's ECI position in km on the WGS84 ellipsoid (e.g. from llaRad2eci).
    * @param sunECI The Sun's ECI position in km.
    */
   static isGroundSiteInNight(sitePos: TemeVec3, sunECI: TemeVec3): boolean {

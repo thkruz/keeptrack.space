@@ -9,6 +9,7 @@
 import { test as base, expect } from '@playwright/test';
 import { CoverageReport } from 'monocart-coverage-reports';
 import { coverageOptions } from './coverage-options';
+import { installDefaultApiMocks } from './default-api-mocks';
 import { installProductionApiGuard } from './production-api-guard';
 
 const isCoverageEnabled = process.env.E2E_COVERAGE === '1';
@@ -16,6 +17,9 @@ const isCoverageEnabled = process.env.E2E_COVERAGE === '1';
 export const test = base.extend({
   context: async ({ context }, use) => {
     const assertNoLiveApi = await installProductionApiGuard(context);
+
+    // After the guard: later context routes run first, so boot-time endpoints are answered locally.
+    await installDefaultApiMocks(context);
 
     try {
       await use(context);

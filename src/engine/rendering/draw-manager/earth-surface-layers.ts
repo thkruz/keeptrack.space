@@ -30,8 +30,20 @@ export interface EarthSurfaceLighting {
   readonly isGrayScale: boolean;
   /** True when the surface shader draws its cloud layer this frame. */
   readonly isCloudsVisible: boolean;
-  /** The shader's `uRawZoomLevel` (clouds fade in over 0.2..0.35). */
-  readonly cloudFadeZoom: number;
+  /** Painted cloud opacity multiplier: the zoom and satellite-lock fade times the maximum opacity (cloud-visibility.ts). */
+  readonly cloudOpacity: number;
+  /** The painted-cloud coverage texture (red channel), when loaded; overlays that shade by cloud cover sample it. */
+  readonly cloudTexture?: WebGLTexture | null;
+  /** The painted clouds' drift (subtract from u). */
+  readonly cloudPosition?: number;
+  /** Simulation time in days since the Unix epoch; the input of `CLOUD_EVOLUTION_GLSL` (painted-clouds-glsl.ts). */
+  readonly cloudTimeDays?: number;
+  /** `settingsManager.cloudEvolutionStrength` (0 = off). */
+  readonly cloudEvolutionStrength?: number;
+  /** The political map overlay (RGBA, same uv as the surface), or null while it is off; an overlay that covers the surface adds it back. */
+  readonly politicalTexture?: WebGLTexture | null;
+  /** Border overlay strength 0..1 at this camera altitude (political-map-fade.ts); multiply its alpha by it. */
+  readonly politicalFade?: number;
 }
 
 /** Everything an overlay needs to draw on the surface in step with the base mesh. */
@@ -159,8 +171,8 @@ export interface SurfaceLightingSettings {
 export interface SurfaceZoom {
   /** `uZoomLevel`. */
   readonly zoomLevel: number;
-  /** `uRawZoomLevel`. */
-  readonly cloudFadeZoom: number;
+  /** `uCloudOpacity`. */
+  readonly cloudOpacity: number;
   readonly isCloudsVisible: boolean;
 }
 
@@ -174,5 +186,5 @@ export const buildSurfaceLighting = (settings: SurfaceLightingSettings, lightDir
   reliefExaggeration: settings.terrainReliefExaggeration ?? 2.5,
   isGrayScale: settings.isEarthGrayScale === true,
   isCloudsVisible: zoom.isCloudsVisible,
-  cloudFadeZoom: zoom.cloudFadeZoom,
+  cloudOpacity: zoom.cloudOpacity,
 });

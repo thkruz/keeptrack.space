@@ -71,6 +71,22 @@ export class GraphicsSettings {
   hqSoftTerminator = false;
   /** ACES filmic tonemap on the Earth surface. */
   hqFilmicTonemap = false;
+  /** Saved cloud style choice from the Graphics menu ('painted' | 'volumetric'); null until the user picks one. */
+  hqClouds: string | null = null;
+  /** Saved cloud amount from the Graphics menu (0..1, 1 = the data as is); null until the user changes it. */
+  hqCloudAmount: number | null = null;
+  /** How strongly the painted clouds thin out with simulation time (0..1; 0 = off and the map drifts in longitude as before). */
+  cloudEvolutionStrength = 0.5;
+  /** Maximum cloud opacity (0.3..1): multiplies the final opacity and ground shadow of every cloud drawing (painted, lit 2D layer, tiled earth). */
+  cloudMaxOpacity = 0.95;
+  /** Pro: lit 2D cloud layer (sunlight through the atmosphere, relief shading, ground shadows) while volumetric clouds are off. */
+  cloudLayer2d = true;
+  /** Pro 2D cloud layer: how dark a full cloud's ground shadow is (0..1). */
+  cloudLayer2dShadowStrength = 0.5;
+  /** Pro 2D cloud layer: relief shading and self-shadow from the cloud data (0..1; 0 = a flat lit sheet). */
+  cloudLayer2dShadingStrength = 1;
+  /** Saved atmosphere tier choice from the Graphics menu ('shell' | 'scattering'); null until the user picks one. */
+  hqAtmosphere: string | null = null;
 
   // Earth Rendering
   /**

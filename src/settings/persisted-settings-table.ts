@@ -26,6 +26,8 @@ export interface PersistedSettingEntry {
 }
 
 const bool = (raw: string): boolean => raw === 'true';
+/** A saved 0..1 number, or the fallback when missing or corrupt. */
+const unit01 = (v: unknown, fallback: number): number => (typeof v === 'number' && Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : fallback);
 
 const heldValues_ = new Map<StorageKey, string>();
 
@@ -137,7 +139,20 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
   },
   {
     key: StorageKey.SETTINGS_HQ_GRAPHICS,
-    serialize: (sm) => JSON.stringify({ oceanGlint: sm.hqOceanGlint, softTerminator: sm.hqSoftTerminator, filmicTonemap: sm.hqFilmicTonemap }),
+    serialize: (sm) =>
+      JSON.stringify({
+        oceanGlint: sm.hqOceanGlint,
+        softTerminator: sm.hqSoftTerminator,
+        filmicTonemap: sm.hqFilmicTonemap,
+        clouds: sm.hqClouds,
+        cloudAmount: sm.hqCloudAmount,
+        cloudEvolution: sm.cloudEvolutionStrength,
+        cloudMaxOpacity: sm.cloudMaxOpacity,
+        cloudLayer2d: sm.cloudLayer2d,
+        cloudLayer2dShadow: sm.cloudLayer2dShadowStrength,
+        cloudLayer2dShading: sm.cloudLayer2dShadingStrength,
+        atmosphere: sm.hqAtmosphere,
+      }),
     deserialize: (sm, raw) => {
       try {
         const v = JSON.parse(raw) as Record<string, unknown>;
@@ -145,6 +160,15 @@ export const PERSISTED_SETTINGS_TABLE: readonly PersistedSettingEntry[] = [
         sm.hqOceanGlint = v.oceanGlint === true;
         sm.hqSoftTerminator = v.softTerminator === true;
         sm.hqFilmicTonemap = v.filmicTonemap === true;
+        sm.hqClouds = v.clouds === 'painted' || v.clouds === 'volumetric' ? v.clouds : null;
+        sm.hqCloudAmount = typeof v.cloudAmount === 'number' && Number.isFinite(v.cloudAmount) ? Math.min(1, Math.max(0, v.cloudAmount)) : null;
+        sm.cloudEvolutionStrength = typeof v.cloudEvolution === 'number' && Number.isFinite(v.cloudEvolution) ? Math.min(1, Math.max(0, v.cloudEvolution)) : 0.5;
+        // Same range as CLOUD_MAX_OPACITY in cloud-visibility.ts.
+        sm.cloudMaxOpacity = typeof v.cloudMaxOpacity === 'number' && Number.isFinite(v.cloudMaxOpacity) ? Math.min(1, Math.max(0.3, v.cloudMaxOpacity)) : 0.95;
+        sm.cloudLayer2d = v.cloudLayer2d !== false;
+        sm.cloudLayer2dShadowStrength = unit01(v.cloudLayer2dShadow, 0.5);
+        sm.cloudLayer2dShadingStrength = unit01(v.cloudLayer2dShading, 1);
+        sm.hqAtmosphere = v.atmosphere === 'shell' || v.atmosphere === 'scattering' ? v.atmosphere : null;
       } catch {
         // Corrupt value: keep the defaults (all off).
       }

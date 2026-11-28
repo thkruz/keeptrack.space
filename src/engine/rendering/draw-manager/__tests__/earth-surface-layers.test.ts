@@ -126,7 +126,7 @@ describe('cameraPositionFromView', () => {
 
 describe('buildSurfaceLighting', () => {
   it('applies the Earth shader defaults', () => {
-    expect(buildSurfaceLighting({}, [1, 0, 0], { zoomLevel: 0.4, cloudFadeZoom: 0.3, isCloudsVisible: false })).toEqual({
+    expect(buildSurfaceLighting({}, [1, 0, 0], { zoomLevel: 0.4, cloudOpacity: 0.3, isCloudsVisible: false })).toEqual({
       lightDirection: [1, 0, 0],
       isAmbientLighting: false,
       isDrawNightAsDay: false,
@@ -135,7 +135,7 @@ describe('buildSurfaceLighting', () => {
       reliefExaggeration: 2.5,
       isGrayScale: false,
       isCloudsVisible: false,
-      cloudFadeZoom: 0.3,
+      cloudOpacity: 0.3,
     });
   });
 
@@ -143,7 +143,7 @@ describe('buildSurfaceLighting', () => {
     const lighting = buildSurfaceLighting(
       { isEarthAmbientLighting: true, isDrawNightAsDay: true, earthNightBrightness: 2, terrainReliefExaggeration: 0, isEarthGrayScale: true },
       new Float32Array([0, 1, 0]),
-      { zoomLevel: 1, cloudFadeZoom: 0.5, isCloudsVisible: true }
+      { zoomLevel: 1, cloudOpacity: 0.5, isCloudsVisible: true }
     );
 
     expect(lighting).toEqual({
@@ -155,7 +155,7 @@ describe('buildSurfaceLighting', () => {
       reliefExaggeration: 0,
       isGrayScale: true,
       isCloudsVisible: true,
-      cloudFadeZoom: 0.5,
+      cloudOpacity: 0.5,
     });
   });
 });

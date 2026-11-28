@@ -104,6 +104,7 @@ scripts/sgp4-benchmark/*.xtle
 
 # Build Folder
 dist
+.cloud-tiles
 /lib
 
 # nyc Output

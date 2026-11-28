@@ -906,6 +906,11 @@ export interface ISettingNumberControl extends ISettingControlBase {
    * @example 'km', '°', 'ms'
    */
   unit?: string;
+  /**
+   * Render as a range slider (with the value shown beside the label) instead of a number box.
+   * Needs {@link min} and {@link max}; {@link set} runs on every move, so it must be cheap.
+   */
+  slider?: boolean;
 }
 
 /**

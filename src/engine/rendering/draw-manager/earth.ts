@@ -513,7 +513,7 @@ export class Earth {
         settingsManager.earthSpecTextureQuality ??= EarthSpecTextureQuality.OFF;
         settingsManager.earthDayTextureQuality ??= EarthDayTextureQuality.MEDIUM;
         settingsManager.earthNightTextureQuality ??= EarthNightTextureQuality.MEDIUM;
-        settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.OFF;
+        settingsManager.earthCloudTextureQuality ??= EarthCloudTextureQuality.MEDIUM;
       }
 
       this.initPlaceholderTexture_();

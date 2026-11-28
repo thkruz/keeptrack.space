@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, expectShook, waitForAppReady, watchForShake } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('PolarPlotPlugin', () => {
   test('disabled without sensor and satellite, DOM elements exist', async ({ page }) => {
@@ -16,7 +16,7 @@ test.describe('PolarPlotPlugin', () => {
 
     // Open drawer and find item in Sensors group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-1"]');
+    const group = drawerGroupOf(page, 'polar-plot-bottom-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
@@ -29,7 +29,11 @@ test.describe('PolarPlotPlugin', () => {
     await expect(drawerItem).toBeVisible();
 
     // Clicking disabled drawer item should NOT open the side menu
-    await drawerItem.click();
+    await watchForShake(drawerItem);
+    // The row is aria-disabled, so Playwright would wait for it to be enabled; force skips that wait. The app keeps disabled rows clickable and shakes them
+    await drawerItem.click({ force: true });
+    // The shake proves the click reached the disabled-row handler
+    await expectShook(drawerItem);
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u, { timeout: 2_000 });
 
     // Verify side menu elements exist in DOM (hidden)

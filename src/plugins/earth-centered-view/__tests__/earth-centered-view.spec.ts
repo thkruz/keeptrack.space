@@ -19,6 +19,9 @@ test.describe('EarthCenteredView Plugin', () => {
 
     await expect(utilityIcon).toBeVisible();
 
+    // The utility footer is a collapsed pill until hovered (its sections are clipped to zero width), so hover it like a user does
+    await page.locator('#drawer-utility-footer').hover();
+
     // Click the icon - should remain in earth-centered mode (re-activates)
     await utilityIcon.click();
 

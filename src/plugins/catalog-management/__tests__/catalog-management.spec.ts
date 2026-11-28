@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CatalogManagement Plugin', () => {
   test('open side menu, verify tabs and form fields, then close', async ({ page }) => {
@@ -15,14 +15,14 @@ test.describe('CatalogManagement Plugin', () => {
     await expect(bottomIcon).toBeAttached();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-disabled/u);
 
-    // Open drawer and find item in the TOOLS group (mode-6)
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const toolsGroup = page.locator('.drawer-group[data-group-key="mode-6"]');
-    const groupItems = toolsGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'catalog-management-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await toolsGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 

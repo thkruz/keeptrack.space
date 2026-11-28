@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('NewLaunch', () => {
   test('open pro side menu, verify form elements, and close', async ({ page }) => {
@@ -13,10 +13,10 @@ test.describe('NewLaunch', () => {
 
     await expect(bottomIcon).toBeAttached();
 
-    // 2. Open drawer and find plugin item in Create group
+    // 2. Open drawer and find plugin item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const group = page.locator('.drawer-group[data-group-key="mode-3"]');
+    const group = drawerGroupOf(page, 'new-launch-bottom-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

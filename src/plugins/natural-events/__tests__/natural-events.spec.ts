@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('NaturalEventsPlugin', () => {
   test('open side menu via drawer, verify toolbar and table, then close', async ({ page }) => {
@@ -13,14 +13,14 @@ test.describe('NaturalEventsPlugin', () => {
 
     await expect(bottomIcon).toBeAttached();
 
-    // Open drawer and find item in Events group (mode-2)
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const eventsGroup = page.locator('.drawer-group[data-group-key="mode-2"]');
-    const groupItems = eventsGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'menu-natural-events');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await eventsGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CustomSensorPlugin', () => {
   test('open side menu, verify form elements, then close', async ({ page }) => {
@@ -13,9 +13,9 @@ test.describe('CustomSensorPlugin', () => {
     await expect(bottomIcon).toBeAttached();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-disabled/u);
 
-    // Open drawer and find item in Create group
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-3"]');
+    const group = drawerGroupOf(page, 'custom-sensor-bottom-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {

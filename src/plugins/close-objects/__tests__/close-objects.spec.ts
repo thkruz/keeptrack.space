@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('CloseObjects Plugin', () => {
   test('open side menu, verify find button and pro results elements, then close', async ({ page }) => {
@@ -15,14 +15,14 @@ test.describe('CloseObjects Plugin', () => {
     await expect(bottomIcon).toBeAttached();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-disabled/u);
 
-    // Open drawer and find item in the EVENTS group (mode-2)
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const eventsGroup = page.locator('.drawer-group[data-group-key="mode-2"]');
-    const groupItems = eventsGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'conjunction-nearby-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await eventsGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 

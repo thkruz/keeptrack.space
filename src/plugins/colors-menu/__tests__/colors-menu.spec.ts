@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('ColorMenu Plugin', () => {
   test('open side menu, verify color scheme list, then close', async ({ page }) => {
@@ -15,14 +15,14 @@ test.describe('ColorMenu Plugin', () => {
     await expect(bottomIcon).toBeAttached();
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-disabled/u);
 
-    // Open drawer and find item in the CATALOG group (mode-0)
+    // Open drawer and find item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const catalogGroup = page.locator('.drawer-group[data-group-key="mode-0"]');
-    const groupItems = catalogGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'menu-color-scheme');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await catalogGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
       await expect(groupItems).toBeVisible({ timeout: 2_000 });
     }
 

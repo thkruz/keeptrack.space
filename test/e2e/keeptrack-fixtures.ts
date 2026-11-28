@@ -1,4 +1,4 @@
-import { type Page } from '@playwright/test';
+import { type Locator, type Page, expect } from '@playwright/test';
 import {
   type AllowlistEntry,
   type ListenerHandle,
@@ -94,6 +94,52 @@ export const OSS_BASELINE_SKIP = 'baseline captured on the OSS build (TimeSlider
  */
 export async function isProBuild(page: Page): Promise<boolean> {
   return (await page.locator('#time-slider-container').count()) === 0;
+}
+
+/**
+ * The drawer group that holds a plugin's row. Drawer groups are collapsed by default and their
+ * `mode-N` keys follow the menu mode order, which has changed, so a spec must not hard-code the
+ * key of the group to expand. Use the result like the old `.drawer-group[data-group-key=...]`
+ * locator (`.drawer-group-header`, `.drawer-group-items`).
+ */
+export function drawerGroupOf(page: Page, pluginId: string): Locator {
+  // The "recent" group repeats rows opened earlier in the page, so it is not the plugin's own group.
+  return page.locator('.drawer-group:not([data-group-key="recent"])').filter({ has: page.locator(`.drawer-item[data-plugin-id="${pluginId}"]`) });
+}
+
+/** Opens the drawer group that holds the plugin's row when it is collapsed, so the row is visible and clickable. */
+export async function expandDrawerGroupOf(page: Page, pluginId: string): Promise<void> {
+  const group = drawerGroupOf(page, pluginId);
+  const items = group.locator('.drawer-group-items');
+
+  if (await items.isHidden()) {
+    await group.locator('.drawer-group-header').click();
+    await expect(items).toBeVisible({ timeout: 2_000 });
+  }
+}
+
+/**
+ * Starts recording whether the element gets the app's `shake` class. The class lasts only 500 ms, which
+ * a slow click on a busy page can outlast, so a plain `toHaveClass(/shake/u)` after the click can miss it.
+ * Call before the click, then `expectShook` after it.
+ */
+export async function watchForShake(target: Locator): Promise<void> {
+  await target.evaluate((el) => {
+    delete el.dataset.testShook;
+    const mark = () => {
+      if (el.classList.contains('shake')) {
+        el.dataset.testShook = 'true';
+      }
+    };
+
+    new MutationObserver(mark).observe(el, { attributes: true, attributeFilter: ['class'] });
+    mark();
+  });
+}
+
+/** Asserts the element shook since `watchForShake`, which is how the app answers a click on a disabled control. */
+export async function expectShook(target: Locator): Promise<void> {
+  await expect(target).toHaveAttribute('data-test-shook', 'true', { timeout: 5_000 });
 }
 
 export function expectCleanBoot(page: Page): void {

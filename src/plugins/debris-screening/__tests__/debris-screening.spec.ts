@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, expectShook, waitForAppReady, watchForShake } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('DebrisScreening Plugin', () => {
   test('icon is disabled without satellite, drawer item visible in EVENTS group', async ({ page }) => {
@@ -19,14 +19,14 @@ test.describe('DebrisScreening Plugin', () => {
     await expect(sideMenu).toBeAttached();
     await expect(sideMenu).toBeHidden();
 
-    // Open drawer and find the item in the EVENTS group
+    // Open drawer and find the item in its drawer group
     await page.locator('#drawer-hamburger').click();
 
-    const eventsGroup = page.locator('.drawer-group[data-group-key="mode-2"]');
-    const groupItems = eventsGroup.locator('.drawer-group-items');
+    const group = drawerGroupOf(page, 'conjunction-screen-icon');
+    const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
-      await eventsGroup.locator('.drawer-group-header').click();
+      await group.locator('.drawer-group-header').click();
     }
 
     const drawerItem = page.locator('.drawer-item[data-plugin-id="conjunction-screen-icon"]');
@@ -35,7 +35,11 @@ test.describe('DebrisScreening Plugin', () => {
 
     // Clicking a disabled plugin's drawer item should NOT open the side menu
     await drawerItem.scrollIntoViewIfNeeded();
-    await drawerItem.click();
+    await watchForShake(drawerItem);
+    // The row is aria-disabled, so Playwright would wait for it to be enabled; force skips that wait. The app keeps disabled rows clickable and shakes them
+    await drawerItem.click({ force: true });
+    // The shake proves the click reached the disabled-row handler
+    await expectShook(drawerItem);
     await expect(sideMenu).toBeHidden({ timeout: 2_000 });
     await expect(bottomIcon).not.toHaveClass(/bmenu-item-selected/u);
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@test/e2e/coverage';
-import { waitForAppReady } from '@test/e2e/keeptrack-fixtures';
+import { drawerGroupOf, waitForAppReady } from '@test/e2e/keeptrack-fixtures';
 
 test.describe('Plot Analysis Plugins', () => {
   test('satellite-dependent plots are disabled, standalone plots have DOM elements', async ({ page }) => {
@@ -52,9 +52,9 @@ test.describe('Plot Analysis Plugins', () => {
     await expect(page.locator('#plot-analysis-chart-inc2alt')).toBeAttached();
     await expect(page.locator('#plot-analysis-chart-inc2lon')).toBeAttached();
 
-    // ── Open drawer and verify Analysis group has plot items ──
+    // ── Open drawer and verify its drawer group has plot items ──
     await page.locator('#drawer-hamburger').click();
-    const group = page.locator('.drawer-group[data-group-key="mode-4"]');
+    const group = drawerGroupOf(page, 'time2lon-plots-icon');
     const groupItems = group.locator('.drawer-group-items');
 
     if (await groupItems.isHidden()) {
